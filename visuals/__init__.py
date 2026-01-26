@@ -69,6 +69,13 @@ from .waterlilies import WaterLilies
 from .starrynight import StarryNight
 from .mobius import Mobius
 from .lake import Lake
+from .quarks import Quarks
+from .hodge import Hodge
+from .faders import Faders
+from .ripples import Ripples
+from .aurora import Aurora
+from .gyre import Gyre
+from .rug import Rug
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -90,6 +97,13 @@ ALL_VISUALS = [
     StarryNight,
     Mobius,
     Lake,
+    Quarks,
+    Hodge,
+    Faders,
+    Ripples,
+    Aurora,
+    Gyre,
+    Rug,
 ]
 
 __all__ = [
@@ -116,4 +130,11 @@ __all__ = [
     'StarryNight',
     'Mobius',
     'Lake',
+    'Quarks',
+    'Hodge',
+    'Faders',
+    'Ripples',
+    'Aurora',
+    'Gyre',
+    'Rug',
 ]

@@ -18,6 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class WaterLilies(Visual):
     name = "WATERLILIES"
     description = "Monet's pond"
+    category = "art"
 
     def __init__(self, display: Display):
         super().__init__(display)

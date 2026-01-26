@@ -26,6 +26,7 @@ class Particle:
 class Weather(Visual):
     name = "WEATHER"
     description = "Weather effects"
+    category = "nature"
 
     def __init__(self, display: Display):
         super().__init__(display)

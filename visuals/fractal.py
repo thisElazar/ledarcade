@@ -27,6 +27,7 @@ RAINBOW = [
 class Fractal(Visual):
     name = "FRACTAL"
     description = "Infinite zoom"
+    category = "digital"
 
     def __init__(self, display: Display):
         super().__init__(display)

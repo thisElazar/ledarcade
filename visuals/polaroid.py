@@ -17,6 +17,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Polaroid(Visual):
     name = "POLAROID"
     description = "Say cheese!"
+    category = "household"
 
     def __init__(self, display: Display):
         super().__init__(display)

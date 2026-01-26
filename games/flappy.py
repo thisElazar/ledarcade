@@ -15,6 +15,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class Flappy(Game):
     name = "FLAPPY"
     description = "Tap to flap through pipes!"
+    category = "modern"
 
     def __init__(self, display: Display):
         super().__init__(display)

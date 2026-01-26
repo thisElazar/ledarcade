@@ -88,6 +88,7 @@ class Piece:
 class Chess(Game):
     name = "CHESS"
     description = "2P Strategy"
+    category = "2_player"
 
     # Board layout
     BOARD_SIZE = 8

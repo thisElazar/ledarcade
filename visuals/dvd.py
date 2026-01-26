@@ -30,6 +30,7 @@ COLORS = [
 class DVD(Visual):
     name = "DVD"
     description = "Bouncing logo"
+    category = "household"
 
     LOGO_W = 12
     LOGO_H = 8

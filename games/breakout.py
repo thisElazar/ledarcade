@@ -16,6 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class Breakout(Game):
     name = "BREAKOUT"
     description = "Break all the bricks!"
+    category = "arcade"
     
     def __init__(self, display: Display):
         super().__init__(display)

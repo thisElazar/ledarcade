@@ -19,6 +19,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Lake(Visual):
     name = "LAKE"
     description = "Flow field lake"
+    category = "nature"
 
     def __init__(self, display: Display):
         super().__init__(display)

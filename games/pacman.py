@@ -16,6 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class PacMan(Game):
     name = "PAC-MAN"
     description = "Eat dots, avoid ghosts!"
+    category = "arcade"
 
     # Simplified maze for 64x64 display (21x19 tiles at 3px each = 63x57)
     # 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house door

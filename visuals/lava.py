@@ -36,8 +36,9 @@ class Blob:
 
 
 class Lava(Visual):
-    name = "LAVA"
+    name = "LAVALAMP"
     description = "Lava lamp blobs"
+    category = "household"
 
     def __init__(self, display: Display):
         super().__init__(display)

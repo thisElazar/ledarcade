@@ -19,6 +19,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class JezzBall(Game):
     name = "JEZZBALL"
     description = "Trap the bouncing atoms!"
+    category = "retro"
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -18,6 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class StarryNight(Visual):
     name = "STARRYNIGHT"
     description = "Van Gogh's sky"
+    category = "art"
 
     def __init__(self, display: Display):
         super().__init__(display)

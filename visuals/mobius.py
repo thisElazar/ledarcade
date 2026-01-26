@@ -17,6 +17,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Mobius(Visual):
     name = "MOBIUS"
     description = "Rotating Mobius strip"
+    category = "digital"
 
     def __init__(self, display: Display):
         super().__init__(display)

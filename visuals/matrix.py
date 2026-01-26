@@ -30,6 +30,7 @@ class Drop:
 class Matrix(Visual):
     name = "MATRIX"
     description = "Digital rain"
+    category = "digital"
 
     def __init__(self, display: Display):
         super().__init__(display)

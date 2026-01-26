@@ -43,6 +43,7 @@ class Card:
 class Solitaire(Visual):
     name = "SOLITAIRE"
     description = "Card cascade"
+    category = "household"
 
     CARD_W = 6
     CARD_H = 8

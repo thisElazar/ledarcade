@@ -19,6 +19,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Life(Visual):
     name = "LIFE"
     description = "Conway's Game of Life"
+    category = "automata"
 
     MAX_HISTORY = 100  # How many states to remember for rewinding
 

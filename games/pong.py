@@ -16,6 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class Pong(Game):
     name = "PONG"
     description = "Beat the AI!"
+    category = "arcade"
     
     def __init__(self, display: Display):
         super().__init__(display)

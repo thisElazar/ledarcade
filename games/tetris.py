@@ -74,7 +74,8 @@ TETROMINO_COLORS = {
 class Tetris(Game):
     name = "TETRIS"
     description = "Clear lines!"
-    
+    category = "retro"
+
     # Playfield dimensions (standard Tetris is 10 wide, 20 tall)
     BOARD_WIDTH = 10
     BOARD_HEIGHT = 20

@@ -29,6 +29,7 @@ COLONY_COLORS = [
 class Slime(Visual):
     name = "SLIME"
     description = "Competing colonies"
+    category = "automata"
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -16,6 +16,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Fire(Visual):
     name = "FIRE"
     description = "Classic fire effect"
+    category = "nature"
 
     def __init__(self, display: Display):
         super().__init__(display)

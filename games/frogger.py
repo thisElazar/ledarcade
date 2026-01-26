@@ -16,6 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class Frogger(Game):
     name = "FROGGER"
     description = "Cross the road and river!"
+    category = "arcade"
 
     def __init__(self, display: Display):
         super().__init__(display)
