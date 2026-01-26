@@ -137,10 +137,12 @@ class JezzBall(Game):
         # Start building wall on action
         if input_state.action and not self.building_walls:
             # Determine direction based on held arrow key
+            # Up/Down arrow = build vertical wall (goes up and down)
+            # Left/Right arrow = build horizontal wall (goes left and right)
             if input_state.up or input_state.down:
-                self.horizontal = True  # Build horizontal wall
-            elif input_state.left or input_state.right:
                 self.horizontal = False  # Build vertical wall
+            elif input_state.left or input_state.right:
+                self.horizontal = True  # Build horizontal wall
 
             # Can only start wall from empty space
             if not self.grid[self.cursor_y][self.cursor_x]:

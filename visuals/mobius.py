@@ -5,9 +5,9 @@ A Möbius strip that rotates 360 degrees around the Y axis,
 allowing you to view it from all angles.
 
 Controls:
-  Up/Down    - Adjust rotation speed/direction
-  Left/Right - Tilt view angle
-  Space      - Change color scheme
+  Up/Down    - Tilt view angle
+  Left/Right - Adjust rotation speed/direction
+  Space      - Cycle color scheme
 """
 
 import math
@@ -92,20 +92,23 @@ class Mobius(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
+        # Up/Down adjusts tilt (visual angle)
         if input_state.up:
-            self.rotation_speed = min(2.0, self.rotation_speed + 0.1)
-            consumed = True
-        if input_state.down:
-            self.rotation_speed = max(-2.0, self.rotation_speed - 0.1)
-            consumed = True
-
-        if input_state.left:
             self.tilt = min(1.0, self.tilt + 0.05)
             consumed = True
-        if input_state.right:
+        if input_state.down:
             self.tilt = max(-1.0, self.tilt - 0.05)
             consumed = True
 
+        # Left/Right adjusts rotation speed (time-based)
+        if input_state.left:
+            self.rotation_speed = max(-2.0, self.rotation_speed - 0.1)
+            consumed = True
+        if input_state.right:
+            self.rotation_speed = min(2.0, self.rotation_speed + 0.1)
+            consumed = True
+
+        # Space cycles color scheme
         if input_state.action:
             self.current_scheme = (self.current_scheme + 1) % len(self.color_schemes)
             self.update_colors()

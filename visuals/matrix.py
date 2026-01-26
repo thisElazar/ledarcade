@@ -4,9 +4,9 @@ Matrix - Digital rain effect
 Falling green characters like The Matrix.
 
 Controls:
-  Up/Down - Adjust speed
-  Space   - Toggle rainbow mode
-  Escape  - Exit
+  Left/Right - Adjust speed
+  Space      - Toggle rainbow mode
+  Escape     - Exit
 """
 
 import random
@@ -51,10 +51,10 @@ class Matrix(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.up:
+        if input_state.right:
             self.speed_mult = min(3.0, self.speed_mult + 0.1)
             consumed = True
-        if input_state.down:
+        if input_state.left:
             self.speed_mult = max(0.3, self.speed_mult - 0.1)
             consumed = True
         if input_state.action:

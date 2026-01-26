@@ -4,9 +4,9 @@ Starfield - Classic 3D starfield effect
 Stars fly toward the viewer from the center of the screen.
 
 Controls:
-  Up/Down - Adjust speed
-  Space   - Toggle warp mode
-  Escape  - Exit
+  Left/Right - Adjust speed
+  Space      - Toggle warp mode
+  Escape     - Exit
 """
 
 import random
@@ -43,10 +43,10 @@ class Starfield(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.up:
+        if input_state.right:
             self.speed = min(2.0, self.speed + 0.05)
             consumed = True
-        if input_state.down:
+        if input_state.left:
             self.speed = max(0.1, self.speed - 0.05)
             consumed = True
         if input_state.action:

@@ -4,9 +4,9 @@ Fire - Classic demoscene fire effect
 Heat rises from the bottom, creating a realistic fire simulation.
 
 Controls:
-  Up/Down - Adjust intensity
-  Space   - Cycle palette (fire/ice/poison)
-  Escape  - Exit
+  Left/Right - Fire speed
+  Up/Down    - Flame height
+  Space      - Toggle color palette
 """
 
 import random
@@ -23,7 +23,15 @@ class Fire(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.intensity = 0.7
+        self.update_timer = 0.0
+
+        # Fire parameters
+        self.intensity = 0.75        # Heat source intensity
+        self.speed = 1.0             # Simulation speed multiplier
+        self.flame_height = 0.5      # 0=short, 1=tall (affects cooling)
+        self.base_cooling = 4        # Base cooling per step
+
+        # Color palettes
         self.palette_index = 0
         self.palettes = ["fire", "ice", "poison"]
 
@@ -76,12 +84,21 @@ class Fire(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        # Left/Right - fire speed
+        if input_state.right:
+            self.speed = min(3.0, self.speed + 0.2)
+            consumed = True
+        if input_state.left:
+            self.speed = max(0.2, self.speed - 0.2)
+            consumed = True
+        # Up/Down - flame height
         if input_state.up:
-            self.intensity = min(1.0, self.intensity + 0.05)
+            self.flame_height = min(1.0, self.flame_height + 0.1)
             consumed = True
         if input_state.down:
-            self.intensity = max(0.2, self.intensity - 0.05)
+            self.flame_height = max(0.0, self.flame_height - 0.1)
             consumed = True
+        # Space - toggle color palette
         if input_state.action:
             self.palette_index = (self.palette_index + 1) % len(self.palettes)
             consumed = True
@@ -89,14 +106,29 @@ class Fire(Visual):
 
     def update(self, dt: float):
         self.time += dt
+        self.update_timer += dt * self.speed
 
+        # Cap to prevent death spiral
+        step_interval = 0.02
+        if self.update_timer > step_interval * 3:
+            self.update_timer = step_interval
+
+        # Run simulation steps based on speed
+        while self.update_timer >= step_interval:
+            self.update_timer -= step_interval
+            self._step_fire()
+
+    def _step_fire(self):
+        """Single step of fire simulation."""
         # Generate heat at the bottom row
         for x in range(GRID_SIZE):
-            # Random heat sources at bottom
             if random.random() < self.intensity:
                 self.heat[GRID_SIZE - 1][x] = random.randint(160, 255)
             else:
                 self.heat[GRID_SIZE - 1][x] = random.randint(0, 100)
+
+        # Cooling based on flame_height (0=max cooling/short, 1=min cooling/tall)
+        max_cooling = int(self.base_cooling * (1.5 - self.flame_height))
 
         # Propagate heat upward with cooling
         for y in range(GRID_SIZE - 2, -1, -1):
@@ -110,7 +142,7 @@ class Fire(Visual):
                 avg = (below * 3 + left + right) // 5
 
                 # Cooling as heat rises
-                cooling = random.randint(0, 3)
+                cooling = random.randint(0, max(1, max_cooling))
                 self.heat[y][x] = max(0, avg - cooling)
 
     def draw(self):

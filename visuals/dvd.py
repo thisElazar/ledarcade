@@ -5,9 +5,10 @@ The iconic bouncing rectangle that changes color on edge hits.
 Extra celebration when it hits a corner!
 
 Controls:
-  Space   - Randomize position/direction
-  Up/Down - Adjust speed
-  Escape  - Exit
+  Left/Right - Adjust speed
+  Up/Down    - Cycle color palette
+  Space      - Randomize position/direction
+  Escape     - Exit
 """
 
 import random
@@ -67,12 +68,20 @@ class DVD(Visual):
             self.reset()
             consumed = True
 
-        if input_state.up:
+        if input_state.right:
             self.speed = min(60.0, self.speed + 2.0)
             consumed = True
 
-        if input_state.down:
+        if input_state.left:
             self.speed = max(10.0, self.speed - 2.0)
+            consumed = True
+
+        if input_state.up:
+            self.color_idx = (self.color_idx + 1) % len(COLORS)
+            consumed = True
+
+        if input_state.down:
+            self.color_idx = (self.color_idx - 1) % len(COLORS)
             consumed = True
 
         return consumed

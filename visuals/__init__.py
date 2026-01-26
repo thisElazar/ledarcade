@@ -58,7 +58,6 @@ from .matrix import Matrix
 from .life import Life
 from .clock import Clock
 from .weather import Weather
-from .fractal import Fractal
 from .dvd import DVD
 from .lava import Lava
 from .slime import Slime
@@ -76,6 +75,12 @@ from .ripples import Ripples
 from .aurora import Aurora
 from .gyre import Gyre
 from .rug import Rug
+from .trance import Trance
+from .wolfram import Wolfram
+from .mitosis import Mitosis
+from .boids import Boids
+from .attractors import Attractors
+from .flux import Flux
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -86,7 +91,6 @@ ALL_VISUALS = [
     Life,
     Clock,
     Weather,
-    Fractal,
     DVD,
     Lava,
     Slime,
@@ -104,6 +108,12 @@ ALL_VISUALS = [
     Aurora,
     Gyre,
     Rug,
+    Trance,
+    Wolfram,
+    Mitosis,
+    Boids,
+    Attractors,
+    Flux,
 ]
 
 __all__ = [
@@ -119,7 +129,6 @@ __all__ = [
     'Life',
     'Clock',
     'Weather',
-    'Fractal',
     'DVD',
     'Lava',
     'Slime',
@@ -137,4 +146,10 @@ __all__ = [
     'Aurora',
     'Gyre',
     'Rug',
+    'Trance',
+    'Wolfram',
+    'Mitosis',
+    'Boids',
+    'Attractors',
+    'Flux',
 ]

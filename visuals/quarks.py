@@ -10,8 +10,8 @@ Based on the "Rug" rule from CelLab by Rudy Rucker and John Walker.
 Source: https://fourmilab.ch/cellab/
 
 Controls:
-  Up/Down    - Adjust speed
-  Left/Right - Change color palette
+  Left/Right - Adjust speed
+  Up/Down    - Change color palette
   Space      - Reset with new pattern
 """
 
@@ -178,19 +178,19 @@ class Quarks(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.up:
+        if input_state.right:
             self.speed = min(5.0, self.speed + 0.2)
             consumed = True
-        if input_state.down:
+        if input_state.left:
             self.speed = max(0.1, self.speed - 0.2)
             consumed = True
 
-        if input_state.left:
-            self.current_palette = (self.current_palette - 1) % len(self.palettes)
+        if input_state.up:
+            self.current_palette = (self.current_palette + 1) % len(self.palettes)
             self.colors = self.palettes[self.current_palette]
             consumed = True
-        if input_state.right:
-            self.current_palette = (self.current_palette + 1) % len(self.palettes)
+        if input_state.down:
+            self.current_palette = (self.current_palette - 1) % len(self.palettes)
             self.colors = self.palettes[self.current_palette]
             consumed = True
 

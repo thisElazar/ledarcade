@@ -4,9 +4,9 @@ Solitaire Win - Cascading cards
 The classic Windows Solitaire victory animation with bouncing cards.
 
 Controls:
-  Space   - Reset cascade
-  Up/Down - Adjust spawn rate
-  Escape  - Exit
+  Left/Right - Adjust spawn rate
+  Space      - Reset cascade
+  Escape     - Exit
 """
 
 import random
@@ -81,11 +81,11 @@ class Solitaire(Visual):
                 self._spawn_card()
             consumed = True
 
-        if input_state.up:
+        if input_state.right:
             self.spawn_rate = max(0.1, self.spawn_rate - 0.05)
             consumed = True
 
-        if input_state.down:
+        if input_state.left:
             self.spawn_rate = min(1.0, self.spawn_rate + 0.05)
             consumed = True
 

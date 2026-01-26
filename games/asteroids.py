@@ -90,21 +90,38 @@ class Asteroids(Game):
         if input_state.right:
             self.ship_angle += rotation_speed * dt
         
-        # Ship thrust
+        # Ship thrust (forward)
         if input_state.up:
             thrust = 50.0
             self.ship_dx += math.cos(self.ship_angle) * thrust * dt
             self.ship_dy += math.sin(self.ship_angle) * thrust * dt
-            
+
             # Thrust particles
             if random.random() < 0.5:
                 self.particles.append({
-                    'x': self.ship_x - math.cos(self.ship_angle) * 3,
-                    'y': self.ship_y - math.sin(self.ship_angle) * 3,
+                    'x': self.ship_x - math.cos(self.ship_angle) * 2,
+                    'y': self.ship_y - math.sin(self.ship_angle) * 2,
                     'dx': -math.cos(self.ship_angle) * 30 + random.uniform(-10, 10),
                     'dy': -math.sin(self.ship_angle) * 30 + random.uniform(-10, 10),
                     'life': 0.3,
                     'color': Colors.ORANGE,
+                })
+
+        # Ship thrust (backward/reverse)
+        if input_state.down:
+            thrust = 35.0  # Slightly weaker reverse thrust
+            self.ship_dx -= math.cos(self.ship_angle) * thrust * dt
+            self.ship_dy -= math.sin(self.ship_angle) * thrust * dt
+
+            # Reverse thrust particles (from front)
+            if random.random() < 0.5:
+                self.particles.append({
+                    'x': self.ship_x + math.cos(self.ship_angle) * 2,
+                    'y': self.ship_y + math.sin(self.ship_angle) * 2,
+                    'dx': math.cos(self.ship_angle) * 25 + random.uniform(-8, 8),
+                    'dy': math.sin(self.ship_angle) * 25 + random.uniform(-8, 8),
+                    'life': 0.25,
+                    'color': Colors.CYAN,
                 })
         
         # Limit speed
@@ -134,8 +151,8 @@ class Asteroids(Game):
             
             bullet_speed = 80.0
             self.bullets.append({
-                'x': self.ship_x + math.cos(self.ship_angle) * 4,
-                'y': self.ship_y + math.sin(self.ship_angle) * 4,
+                'x': self.ship_x + math.cos(self.ship_angle) * 3,
+                'y': self.ship_y + math.sin(self.ship_angle) * 3,
                 'dx': math.cos(self.ship_angle) * bullet_speed + self.ship_dx * 0.5,
                 'dy': math.sin(self.ship_angle) * bullet_speed + self.ship_dy * 0.5,
                 'life': 1.0,
@@ -320,17 +337,17 @@ class Asteroids(Game):
         # Draw ship (blink if invulnerable)
         if self.invulnerable_timer <= 0 or int(self.invulnerable_timer * 10) % 2 == 0:
             sx, sy = int(self.ship_x), int(self.ship_y)
-            
-            # Ship as triangle
-            nose_x = sx + int(math.cos(self.ship_angle) * 4)
-            nose_y = sy + int(math.sin(self.ship_angle) * 4)
-            
-            left_x = sx + int(math.cos(self.ship_angle + 2.5) * 3)
-            left_y = sy + int(math.sin(self.ship_angle + 2.5) * 3)
-            
-            right_x = sx + int(math.cos(self.ship_angle - 2.5) * 3)
-            right_y = sy + int(math.sin(self.ship_angle - 2.5) * 3)
-            
+
+            # Ship as smaller triangle
+            nose_x = sx + int(math.cos(self.ship_angle) * 3)
+            nose_y = sy + int(math.sin(self.ship_angle) * 3)
+
+            left_x = sx + int(math.cos(self.ship_angle + 2.5) * 2)
+            left_y = sy + int(math.sin(self.ship_angle + 2.5) * 2)
+
+            right_x = sx + int(math.cos(self.ship_angle - 2.5) * 2)
+            right_y = sy + int(math.sin(self.ship_angle - 2.5) * 2)
+
             self.display.draw_line(nose_x, nose_y, left_x, left_y, Colors.CYAN)
             self.display.draw_line(nose_x, nose_y, right_x, right_y, Colors.CYAN)
             self.display.draw_line(left_x, left_y, right_x, right_y, Colors.CYAN)

@@ -5,9 +5,9 @@ Multiple slime mold colonies grow and aggressively compete for territory.
 One colony may eventually dominate!
 
 Controls:
-  Space   - Reset with new random colonies
-  Up/Down - Adjust growth speed
-  Escape  - Exit
+  Left/Right - Adjust growth speed
+  Space      - Reset with new random colonies
+  Escape     - Exit
 """
 
 import random
@@ -103,11 +103,11 @@ class Slime(Visual):
             self.reset()
             consumed = True
 
-        if input_state.up:
+        if input_state.right:
             self.growth_speed = min(3.0, self.growth_speed + 0.2)
             consumed = True
 
-        if input_state.down:
+        if input_state.left:
             self.growth_speed = max(0.2, self.growth_speed - 0.2)
             consumed = True
 

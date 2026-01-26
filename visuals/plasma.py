@@ -4,8 +4,9 @@ Plasma - Classic demoscene effect
 Colorful, smoothly animated plasma waves using sine functions.
 
 Controls:
-  Space  - Cycle color palette
-  Escape - Exit
+  Left/Right - Adjust speed
+  Up/Down    - Cycle color palette
+  Escape     - Exit
 """
 
 import math
@@ -23,6 +24,7 @@ class Plasma(Visual):
 
     def reset(self):
         self.time = 0.0
+        self.speed = 1.0
         self.palette_index = 0
         self.palettes = [
             self._make_palette_fire,
@@ -75,13 +77,23 @@ class Plasma(Visual):
         return (0, int(255 * v * v), int(100 * v))
 
     def handle_input(self, input_state) -> bool:
-        if input_state.action:
+        consumed = False
+        if input_state.right:
+            self.speed = min(3.0, self.speed + 0.1)
+            consumed = True
+        if input_state.left:
+            self.speed = max(0.2, self.speed - 0.1)
+            consumed = True
+        if input_state.up:
             self.palette_index = (self.palette_index + 1) % len(self.palettes)
-            return True
-        return False
+            consumed = True
+        if input_state.down:
+            self.palette_index = (self.palette_index - 1) % len(self.palettes)
+            consumed = True
+        return consumed
 
     def update(self, dt: float):
-        self.time += dt
+        self.time += dt * self.speed
 
     def draw(self):
         self.display.clear(Colors.BLACK)

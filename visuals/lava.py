@@ -4,8 +4,9 @@ Lava Lamp - Classic blob simulation
 Blobs naturally rise and fall with convection currents.
 
 Controls:
-  Space   - Cycle color scheme
-  Escape  - Exit
+  Left/Right - Adjust speed
+  Up/Down    - Cycle color scheme
+  Escape     - Exit
 """
 
 import random
@@ -45,6 +46,7 @@ class Lava(Visual):
 
     def reset(self):
         self.time = 0.0
+        self.speed = 1.0
         self.scheme_idx = 0
 
         # Create blobs - bigger and more
@@ -59,13 +61,23 @@ class Lava(Visual):
             self.blobs.append(blob)
 
     def handle_input(self, input_state) -> bool:
-        if input_state.action:
+        consumed = False
+        if input_state.right:
+            self.speed = min(3.0, self.speed + 0.1)
+            consumed = True
+        if input_state.left:
+            self.speed = max(0.2, self.speed - 0.1)
+            consumed = True
+        if input_state.up:
             self.scheme_idx = (self.scheme_idx + 1) % len(COLOR_SCHEMES)
-            return True
-        return False
+            consumed = True
+        if input_state.down:
+            self.scheme_idx = (self.scheme_idx - 1) % len(COLOR_SCHEMES)
+            consumed = True
+        return consumed
 
     def update(self, dt: float):
-        self.time += dt
+        self.time += dt * self.speed
 
         center_x = GRID_SIZE / 2
         center_y = GRID_SIZE / 2
