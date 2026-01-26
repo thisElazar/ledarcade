@@ -11,7 +11,7 @@ Source: https://fourmilab.ch/cellab/
 
 Controls:
   Up/Down    - Change color palette
-  Left/Right - Adjust speed
+  Left/Right - Adjust decay length (trail duration)
   Space      - Reset with random pattern
 """
 
@@ -29,12 +29,13 @@ class Faders(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.speed = 1.0
         self.update_timer = 0.0
-        self.update_interval = 0.06
+        self.update_interval = 0.05  # Fixed update rate
 
         # States: 0 = dead, 1 = firing, 2 to max_state = refractory (fading)
-        self.max_state = 64  # Number of refractory states
+        self.max_state = 64  # Number of refractory states (adjustable)
+        self.min_decay = 16
+        self.max_decay = 128
         self.refractory_states = self.max_state - 1
 
         # Color palettes - original gradient first, then banded options
@@ -188,10 +189,16 @@ class Faders(Visual):
             consumed = True
 
         if input_state.left:
-            self.speed = max(0.1, self.speed - 0.2)
+            # Shorter decay = faster pulses
+            self.max_state = max(self.min_decay, self.max_state - 8)
+            self.refractory_states = self.max_state - 1
+            self.colors = self.palette_generators[self.current_palette]()
             consumed = True
         if input_state.right:
-            self.speed = min(5.0, self.speed + 0.2)
+            # Longer decay = slower change
+            self.max_state = min(self.max_decay, self.max_state + 8)
+            self.refractory_states = self.max_state - 1
+            self.colors = self.palette_generators[self.current_palette]()
             consumed = True
 
         if input_state.action:
@@ -202,9 +209,9 @@ class Faders(Visual):
 
     def update(self, dt: float):
         self.time += dt
-        self.update_timer += dt * self.speed
+        self.update_timer += dt
 
-        while self.update_timer >= self.update_interval:
+        if self.update_timer >= self.update_interval:
             self.update_timer -= self.update_interval
             self.step_ca()
 
