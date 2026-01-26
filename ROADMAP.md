@@ -131,21 +131,19 @@ The Pac-Man implementation required significant iteration to feel right on a 64x
 
 ## Future Game Ideas
 
-### High Priority (Good fit for 64x64)
-1. **Space Invaders variant** - Already exists, could enhance
-2. **Galaga** - Formation-based shooter
-3. **Centipede** - Segmented enemy movement
-4. **Dig Dug** - Tunnel digging mechanics
-5. **Q*bert** - Isometric cube hopping
+### Implemented ✅
+1. **Space Invaders** - Already exists
+2. **Galaga** - Formation-based shooter ✅
+3. **Centipede** - Segmented enemy movement ✅
+4. **Dig Dug** - Tunnel digging mechanics ✅
+5. **Q*bert** - Isometric cube hopping ✅
+6. **Bomberman** - Grid-based bomb placement ✅
+7. **Lode Runner** - Platform digging ✅
+8. **Donkey Kong** - Multi-screen platformer ✅
 
-### Medium Priority
-6. **Bomberman** - Grid-based bomb placement
-7. **Boulder Dash** - Falling rocks puzzle
-8. **Sokoban** - Push-box puzzles
-9. **Lode Runner** - Platform digging
-
-### Lower Priority (Complex for small display)
-10. **Donkey Kong** - Multi-screen platformer
+### Remaining Ideas
+9. **Boulder Dash** - Falling rocks puzzle
+10. **Sokoban** - Push-box puzzles
 11. **Joust** - Flying combat
 12. **Defender** - Scrolling shooter
 
@@ -211,6 +209,19 @@ When moving from PyGame (desktop) to actual LED matrix:
 - Improved collision systems
 - Turn assist for Pac-Man
 - Custom maze design for small display
+
+### v1.2 (January 2025)
+- Added Sprint 1-8 games from GAME_ROADMAP:
+  - Board games: Connect 4, Checkers, Othello
+  - Puzzles: 2048, Lights Out, Pipe Dream
+  - Driving: Night Driver, Lunar Lander, Indy 500
+  - Endless: Stick Runner, Stack, Geometry Dash
+  - Shooters: Galaga, Centipede
+  - Strategy: Mancala, Go (9x9)
+  - Digging: Dig Dug, Lode Runner
+  - Platforming: Donkey Kong
+- Added bonus games: Q*bert, Bomberman
+- Total: 34 games
 
 ---
 
