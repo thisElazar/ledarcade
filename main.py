@@ -1,32 +1,25 @@
 #!/usr/bin/env python3
 """
-LED Arcade - Main Entry Point
-=============================
+LED Arcade - Games Launcher
+===========================
 
-A collection of classic arcade games designed for a 64x64 LED matrix display.
-Currently runs on desktop via PyGame for prototyping.
+34 classic arcade games for a 64x64 LED matrix display.
+Desktop emulator via PyGame for prototyping.
 
 Controls:
-  Arrow Keys  - Joystick (4-way/8-way depending on game)
-  Space       - Primary action button (fire/select/hard drop)
-  Z           - Secondary button (rarely used)
+  Arrow Keys  - Move / Navigate
+  Space       - Action (fire, jump, select)
+  Z           - Secondary action
   Escape      - Return to menu
 
-Games Included:
-  - Snake     : Classic snake game
-  - Pong      : 1v1 versus AI
-  - Breakout  : Brick breaker
-  - Invaders  : Space Invaders clone
-  - Tetris    : Falling block puzzle
-  - Asteroids : Vector space shooter
+For the full experience with games + visuals, run:
+  python run_arcade.py
 
-To run:
-  python main.py
+See README.md for complete game list and documentation.
 
 Requirements:
   pip install pygame
 
-Author: LED Arcade Project
 License: MIT
 """
 
