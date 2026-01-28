@@ -82,6 +82,12 @@ from .boids import Boids
 from .attractors import Attractors
 from .flux import Flux
 from .cat import Cat
+from .xorpattern import XORPattern
+from .twister import Twister
+from .rotozoom import Rotozoom
+from .rainbow import Rainbow
+from .moire import Moire
+from .cylon import Cylon
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -116,6 +122,12 @@ ALL_VISUALS = [
     Attractors,
     Flux,
     Cat,
+    XORPattern,
+    Twister,
+    Rotozoom,
+    Rainbow,
+    Moire,
+    Cylon,
 ]
 
 __all__ = [
@@ -155,4 +167,10 @@ __all__ = [
     'Attractors',
     'Flux',
     'Cat',
+    'XORPattern',
+    'Twister',
+    'Rotozoom',
+    'Rainbow',
+    'Moire',
+    'Cylon',
 ]
