@@ -84,7 +84,7 @@ class HardwareDisplay:
     Drop-in replacement for arcade.py Display class.
     """
 
-    def __init__(self, brightness: int = 80, gpio_slowdown: int = 4):
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 5):
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
@@ -221,6 +221,7 @@ class HardwareDisplay:
 
     def render(self):
         """Render the buffer to the LED matrix."""
+        self.canvas.Clear()
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 r, g, b = self.buffer[y][x]
