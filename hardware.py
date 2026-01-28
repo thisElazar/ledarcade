@@ -272,26 +272,40 @@ class KeyboardInput:
         self.state = InputState()
         self._prev_keys = set()
         self._current_keys = set()
+        self._available = False
+        self._old_settings = None
 
-        # Save terminal settings
-        self._old_settings = termios.tcgetattr(sys.stdin)
-        # Set terminal to raw mode (no echo, immediate input)
-        tty.setcbreak(sys.stdin.fileno())
+        # Try to set up terminal - may fail if no TTY
+        try:
+            if sys.stdin.isatty():
+                self._old_settings = termios.tcgetattr(sys.stdin)
+                tty.setcbreak(sys.stdin.fileno())
+                self._available = True
+        except Exception:
+            pass  # No terminal available
 
     def __del__(self):
         # Restore terminal settings
-        try:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
-        except:
-            pass
+        if self._old_settings:
+            try:
+                termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
+            except:
+                pass
 
     def cleanup(self):
         """Restore terminal settings."""
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
+        if self._old_settings:
+            try:
+                termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
+            except:
+                pass
 
     def _read_keys(self) -> set:
         """Read currently pressed keys without blocking."""
         keys = set()
+
+        if not self._available:
+            return keys
 
         while select.select([sys.stdin], [], [], 0)[0]:
             ch = sys.stdin.read(1)
