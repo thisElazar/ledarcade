@@ -32,7 +32,8 @@ class Quarks(Visual):
         self.time = 0.0
         self.speed = 1.0
         self.update_timer = 0.0
-        self.update_interval = 0.1  # Slower CA = smoother on Pi
+        self.base_interval = 0.1   # Base CA rate, tuned for Pi
+        self.min_interval = 0.05   # Fastest allowed (prevents lag)
 
         # Color palettes (normal and inverted versions)
         self.palettes = [
@@ -202,11 +203,14 @@ class Quarks(Visual):
 
     def update(self, dt: float):
         self.time += dt
-        self.update_timer += dt * self.speed
+        self.update_timer += dt
 
-        # Run CA updates
-        while self.update_timer >= self.update_interval:
-            self.update_timer -= self.update_interval
+        # Speed adjusts interval: faster = shorter interval
+        effective_interval = max(self.base_interval / self.speed, self.min_interval)
+
+        # Only run 1 CA step per frame max (prevents lag)
+        if self.update_timer >= effective_interval:
+            self.update_timer = 0
             self.step_ca()
 
     def step_ca(self):

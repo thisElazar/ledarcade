@@ -30,7 +30,9 @@ class Hodge(Visual):
     def reset(self):
         self.time = 0.0
         self.update_timer = 0.0
-        self.update_interval = 0.1  # Slower CA = smoother on Pi
+        self.speed = 1.0
+        self.base_interval = 0.1   # Base CA rate, tuned for Pi
+        self.min_interval = 0.05   # Fastest allowed (prevents lag)
 
         # Hodgepodge parameters
         self.n = 63  # Max state (ill state)
@@ -166,8 +168,12 @@ class Hodge(Visual):
         self.time += dt
         self.update_timer += dt
 
-        while self.update_timer >= self.update_interval:
-            self.update_timer -= self.update_interval
+        # Speed adjusts interval: faster = shorter interval
+        effective_interval = max(self.base_interval / self.speed, self.min_interval)
+
+        # Only run 1 CA step per frame max (prevents lag)
+        if self.update_timer >= effective_interval:
+            self.update_timer = 0
             self.step_ca()
 
     def step_ca(self):

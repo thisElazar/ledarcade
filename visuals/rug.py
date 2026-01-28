@@ -34,7 +34,8 @@ class Rug(Visual):
         self.time = 0.0
         self.speed = 1.0
         self.update_timer = 0.0
-        self.update_interval = 0.08  # Slower CA = smoother on Pi
+        self.base_interval = 0.08  # Base CA rate, tuned for Pi
+        self.min_interval = 0.05   # Fastest allowed (prevents lag)
 
         # Color palettes
         self.palettes = [
@@ -165,10 +166,14 @@ class Rug(Visual):
 
     def update(self, dt: float):
         self.time += dt
-        self.update_timer += dt * self.speed
+        self.update_timer += dt
 
-        while self.update_timer >= self.update_interval:
-            self.update_timer -= self.update_interval
+        # Speed adjusts interval: faster = shorter interval
+        effective_interval = max(self.base_interval / self.speed, self.min_interval)
+
+        # Only run 1 CA step per frame max (prevents lag)
+        if self.update_timer >= effective_interval:
+            self.update_timer = 0
             self.step_ca()
 
     def get_cell(self, x, y):
