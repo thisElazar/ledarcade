@@ -256,6 +256,7 @@ def main():
     player_made_leaderboard = False
     player_rank = -1
     final_score = 0  # Store score when game ends
+    game_over_initialized = False  # Track if game over has been processed
     game_over_lockout = 0.0  # Input lockout when entering game over
 
     # High score manager
@@ -324,12 +325,14 @@ def main():
             if input_state.back:
                 in_menu = True
                 current_item = None
+                game_over_initialized = False
             elif current_item:
                 if is_game:
                     # Game logic
                     if current_item.state == GameState.GAME_OVER:
                         # First time entering game over - check for high score
-                        if final_score == 0 or final_score != current_item.score:
+                        if not game_over_initialized:
+                            game_over_initialized = True
                             final_score = current_item.score
                             player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
                             game_over_lockout = 1.5  # Ignore inputs for 1.5 seconds
@@ -409,6 +412,7 @@ def main():
                                     # Play again
                                     current_item.reset()
                                     final_score = 0
+                                    game_over_initialized = False
                                     player_made_leaderboard = False
                                     player_rank = -1
                                 else:
@@ -416,6 +420,7 @@ def main():
                                     in_menu = True
                                     current_item = None
                                     final_score = 0
+                                    game_over_initialized = False
                                     player_made_leaderboard = False
                                     player_rank = -1
                                 game_over_selection = 0
