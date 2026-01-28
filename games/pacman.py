@@ -94,11 +94,20 @@ class PacMan(Game):
             {'name': 'clyde', 'x': 11.0, 'y': 8.0, 'dir': (0, -1), 'color': Colors.ORANGE,
              'scatter_target': (0, 18), 'in_house': True, 'frightened': False, 'eaten': False},
         ]
-        self.ghost_speed = 4.5
-        self.frightened_speed = 3.0
+        # Base speeds (will be modified by level)
+        self.base_ghost_speed = 4.5
+        self.base_frightened_speed = 3.0
+        self.ghost_speed = self.base_ghost_speed
+        self.frightened_speed = self.base_frightened_speed
         self.frightened_timer = 0
         self.ghost_release_timer = 0
         self.ghosts_released = 1  # Blinky starts outside
+
+        # Level-based difficulty settings (based on original 1980 Pac-Man)
+        # Frightened duration decreases each level: 6s at level 1, down to 0s at level 19+
+        # Ghost speed increases each level
+        # Ghost release from pen gets faster each level
+        self._apply_level_difficulty()
 
         # Mode switching (scatter/chase)
         self.chase_mode = True
@@ -180,9 +189,10 @@ class PacMan(Game):
                     ghost['frightened'] = False
                 self.ghost_points = 200
 
-        # Release ghosts from house
+        # Release ghosts from house (faster at higher levels)
         self.ghost_release_timer += dt
-        if self.ghost_release_timer >= 4.0 and self.ghosts_released < 4:
+        ghost_release_interval = self._get_ghost_release_interval()
+        if self.ghost_release_timer >= ghost_release_interval and self.ghosts_released < 4:
             for ghost in self.ghosts:
                 if ghost['in_house']:
                     ghost['in_house'] = False
@@ -487,14 +497,92 @@ class PacMan(Game):
 
         return (self.pac_x, self.pac_y)
 
+    def _get_frightened_duration(self):
+        """Get frightened (blue ghost) duration based on level.
+
+        Based on original 1980 Pac-Man:
+        - Level 1: 6 seconds
+        - Level 2: 5 seconds
+        - Level 3: 4 seconds
+        - Level 4: 3 seconds
+        - Level 5: 2 seconds
+        - Level 6-8: 5 seconds
+        - Level 9: 1 second
+        - Level 10: 5 seconds
+        - Level 11: 2 seconds
+        - Level 12-13: 1 second
+        - Level 14: 3 seconds
+        - Level 15-16: 1 second
+        - Level 17: 0 seconds (no blue time!)
+        - Level 18: 1 second
+        - Level 19+: 0 seconds (no blue time!)
+
+        Simplified approximation that captures the key progression:
+        """
+        # Simplified table inspired by original (duration in seconds)
+        frightened_table = {
+            1: 6.0,
+            2: 5.0,
+            3: 4.0,
+            4: 3.0,
+            5: 2.0,
+            6: 5.0,
+            7: 4.0,
+            8: 3.0,
+            9: 1.0,
+            10: 5.0,
+            11: 2.0,
+            12: 1.0,
+            13: 1.0,
+            14: 3.0,
+            15: 1.0,
+            16: 1.0,
+            17: 0.0,
+            18: 1.0,
+        }
+        # Level 19+ has 0 seconds frightened time
+        if self.level >= 19:
+            return 0.0
+        return frightened_table.get(self.level, 6.0)
+
+    def _get_ghost_speed_multiplier(self):
+        """Get ghost speed multiplier based on level.
+
+        Original Pac-Man had ghosts speed up each level.
+        Returns a multiplier to apply to base ghost speed.
+        """
+        # Speed increases roughly 5% per level, capping around 40% faster
+        multiplier = 1.0 + (self.level - 1) * 0.05
+        return min(multiplier, 1.4)  # Cap at 40% speed increase
+
+    def _get_ghost_release_interval(self):
+        """Get interval between ghost releases from the pen.
+
+        Original Pac-Man released ghosts faster at higher levels.
+        Returns time in seconds between ghost releases.
+        """
+        # Start at 4 seconds, decrease by 0.3 per level, minimum 1 second
+        interval = 4.0 - (self.level - 1) * 0.3
+        return max(interval, 1.0)
+
+    def _apply_level_difficulty(self):
+        """Apply difficulty settings based on current level."""
+        speed_mult = self._get_ghost_speed_multiplier()
+        self.ghost_speed = self.base_ghost_speed * speed_mult
+        self.frightened_speed = self.base_frightened_speed * speed_mult
+
     def activate_power(self):
         """Activate power pellet effect."""
-        self.frightened_timer = 6.0
+        frightened_duration = self._get_frightened_duration()
+        self.frightened_timer = frightened_duration
         self.ghost_points = 200
-        for ghost in self.ghosts:
-            if not ghost['eaten'] and not ghost['in_house']:
-                ghost['frightened'] = True
-                ghost['dir'] = (-ghost['dir'][0], -ghost['dir'][1])
+
+        # Only frighten ghosts if there's actual frightened time
+        if frightened_duration > 0:
+            for ghost in self.ghosts:
+                if not ghost['eaten'] and not ghost['in_house']:
+                    ghost['frightened'] = True
+                    ghost['dir'] = (-ghost['dir'][0], -ghost['dir'][1])
 
     def respawn(self):
         """Respawn Pac-Man after death."""
@@ -536,7 +624,8 @@ class PacMan(Game):
             self.maze.append(maze_row)
 
         self.respawn()
-        self.ghost_speed = min(6.0, self.ghost_speed + 0.3)
+        # Apply level-based difficulty scaling
+        self._apply_level_difficulty()
 
     def draw(self):
         self.display.clear(Colors.BLACK)

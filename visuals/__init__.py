@@ -81,6 +81,7 @@ from .mitosis import Mitosis
 from .boids import Boids
 from .attractors import Attractors
 from .flux import Flux
+from .cat import Cat
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -114,6 +115,7 @@ ALL_VISUALS = [
     Boids,
     Attractors,
     Flux,
+    Cat,
 ]
 
 __all__ = [
@@ -152,4 +154,5 @@ __all__ = [
     'Boids',
     'Attractors',
     'Flux',
+    'Cat',
 ]

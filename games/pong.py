@@ -27,48 +27,89 @@ class Pong(Game):
         self.score = 0
         self.ai_score = 0
         self.win_score = 7
-        
+
         # Paddles
         self.paddle_height = 8
         self.paddle_width = 2
-        
+
         # Player paddle (left side)
         self.player_y = GRID_SIZE // 2 - self.paddle_height // 2
-        
+
         # AI paddle (right side)
         self.ai_y = GRID_SIZE // 2 - self.paddle_height // 2
-        self.ai_speed = 25.0  # AI movement speed (slower = easier)
-        
+
+        # AI difficulty scaling parameters (based on player score)
+        self.ai_base_speed = 20.0  # Starting AI speed (slow = easy)
+        self.ai_max_speed = 55.0   # Maximum AI speed at high player scores
+        self.ai_base_reaction_delay = 0.15  # Starting reaction delay in seconds
+        self.ai_min_reaction_delay = 0.02   # Minimum delay at high player scores
+        self.ai_base_error = 6.0   # Starting tracking error (randomness)
+        self.ai_min_error = 1.0    # Minimum error at high player scores
+        self.ai_reaction_timer = 0.0  # Timer for reaction delay
+        self.ai_target_y = GRID_SIZE // 2  # Delayed target position
+
         # Ball
         self.ball_x = float(GRID_SIZE // 2)
         self.ball_y = float(GRID_SIZE // 2)
         self.ball_dx = 0.0
         self.ball_dy = 0.0
-        self.ball_speed = 50.0
+        self.ball_base_speed = 45.0  # Starting ball speed
+        self.ball_speed = self.ball_base_speed
+        self.ball_speed_increment = 2.0  # Speed increase per volley
+        self.ball_max_speed = 90.0  # Maximum ball speed
         self.ball_active = False
-        
+        self.volley_count = 0  # Track volleys for speed scaling
+
         # Game state
         self.serve_timer = 0
         self.serving = True
         self.last_scorer = 'player'  # Who serves next
-        
+
         # Effects
         self.flash_timer = 0
         self.flash_side = None
+
+    def get_ai_difficulty(self):
+        """Calculate AI difficulty parameters based on player score."""
+        # Difficulty scales from 0.0 (easiest) to 1.0 (hardest)
+        # Based on player score: 0 points = easiest, 6+ points = hardest
+        difficulty = min(1.0, self.score / 6.0)
+
+        # AI speed increases with player score
+        ai_speed = self.ai_base_speed + (self.ai_max_speed - self.ai_base_speed) * difficulty
+
+        # Reaction delay decreases with player score
+        reaction_delay = self.ai_base_reaction_delay - (self.ai_base_reaction_delay - self.ai_min_reaction_delay) * difficulty
+
+        # Tracking error decreases with player score
+        tracking_error = self.ai_base_error - (self.ai_base_error - self.ai_min_error) * difficulty
+
+        return ai_speed, reaction_delay, tracking_error
     
     def serve_ball(self):
         """Serve the ball."""
         self.ball_x = GRID_SIZE // 2
         self.ball_y = GRID_SIZE // 2
-        
+
+        # Reset volley count and ball speed for new point
+        self.volley_count = 0
+        # Ball base speed increases slightly with total points scored
+        total_points = self.score + self.ai_score
+        self.ball_speed = self.ball_base_speed + (total_points * 1.5)
+        self.ball_speed = min(self.ball_speed, self.ball_max_speed * 0.7)  # Cap serve speed
+
         # Serve toward the last scorer's opponent
         direction = 1 if self.last_scorer == 'player' else -1
         angle = random.uniform(-0.5, 0.5)
-        
+
         self.ball_dx = direction * self.ball_speed * math.cos(angle)
         self.ball_dy = self.ball_speed * math.sin(angle)
         self.ball_active = True
         self.serving = False
+
+        # Reset AI reaction timer on serve
+        self.ai_reaction_timer = 0.0
+        self.ai_target_y = self.ball_y
     
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -93,17 +134,24 @@ class Pong(Game):
         if input_state.down:
             self.player_y = min(GRID_SIZE - self.paddle_height, self.player_y + paddle_speed * dt)
         
-        # AI paddle movement (tracks ball with some delay/imperfection)
-        ai_target = self.ball_y - self.paddle_height / 2
-        
-        # Add some randomness to AI (more randomness = easier)
-        ai_target += random.uniform(-4, 4)
-        
-        # AI moves toward target
-        if self.ai_y < ai_target - 1:
-            self.ai_y = min(GRID_SIZE - self.paddle_height, self.ai_y + self.ai_speed * dt)
-        elif self.ai_y > ai_target + 1:
-            self.ai_y = max(8, self.ai_y - self.ai_speed * dt)
+        # Get AI difficulty parameters based on player score
+        ai_speed, reaction_delay, tracking_error = self.get_ai_difficulty()
+
+        # AI paddle movement with reaction delay (simulates human-like response)
+        self.ai_reaction_timer += dt
+
+        # Only update AI target after reaction delay has passed
+        if self.ai_reaction_timer >= reaction_delay:
+            self.ai_reaction_timer = 0.0
+            # AI tracks ball with some randomness (less at higher difficulty)
+            self.ai_target_y = self.ball_y - self.paddle_height / 2
+            self.ai_target_y += random.uniform(-tracking_error, tracking_error)
+
+        # AI moves toward its delayed target position
+        if self.ai_y < self.ai_target_y - 1:
+            self.ai_y = min(GRID_SIZE - self.paddle_height, self.ai_y + ai_speed * dt)
+        elif self.ai_y > self.ai_target_y + 1:
+            self.ai_y = max(8, self.ai_y - ai_speed * dt)
         
         if not self.ball_active:
             return
@@ -122,35 +170,38 @@ class Pong(Game):
         
         # Player paddle collision (left side)
         player_paddle_x = 3
-        if (self.ball_dx < 0 and 
+        if (self.ball_dx < 0 and
             player_paddle_x <= self.ball_x <= player_paddle_x + self.paddle_width + 1 and
             self.player_y <= self.ball_y <= self.player_y + self.paddle_height):
-            
+
             # Bounce with angle based on hit position
             hit_pos = (self.ball_y - self.player_y) / self.paddle_height
             angle = (hit_pos - 0.5) * 1.2
-            
+
+            # Increase volley count and ball speed
+            self.volley_count += 1
+            self.ball_speed = min(self.ball_max_speed, self.ball_speed + self.ball_speed_increment)
+
             self.ball_dx = abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)
             self.ball_x = player_paddle_x + self.paddle_width + 1
-            
-            # Speed up slightly
-            self.ball_speed = min(80, self.ball_speed + 1)
-        
+
         # AI paddle collision (right side)
         ai_paddle_x = GRID_SIZE - 5
         if (self.ball_dx > 0 and
             ai_paddle_x - 1 <= self.ball_x <= ai_paddle_x + self.paddle_width and
             self.ai_y <= self.ball_y <= self.ai_y + self.paddle_height):
-            
+
             hit_pos = (self.ball_y - self.ai_y) / self.paddle_height
             angle = (hit_pos - 0.5) * 1.2
-            
+
+            # Increase volley count and ball speed
+            self.volley_count += 1
+            self.ball_speed = min(self.ball_max_speed, self.ball_speed + self.ball_speed_increment)
+
             self.ball_dx = -abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)
             self.ball_x = ai_paddle_x - 1
-            
-            self.ball_speed = min(80, self.ball_speed + 1)
         
         # Scoring
         if self.ball_x <= 0:
@@ -161,11 +212,11 @@ class Pong(Game):
             self.serving = True
             self.flash_timer = 0.3
             self.flash_side = 'left'
-            self.ball_speed = 50.0
-            
+            # Ball speed will be reset in serve_ball() based on total points
+
             if self.ai_score >= self.win_score:
                 self.state = GameState.GAME_OVER
-        
+
         elif self.ball_x >= GRID_SIZE - 1:
             # Player scores
             self.score += 1
@@ -174,8 +225,8 @@ class Pong(Game):
             self.serving = True
             self.flash_timer = 0.3
             self.flash_side = 'right'
-            self.ball_speed = 50.0
-            
+            # Ball speed will be reset in serve_ball() based on total points
+
             if self.score >= self.win_score:
                 self.state = GameState.WIN
     

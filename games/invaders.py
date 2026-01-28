@@ -53,6 +53,10 @@ class Invaders(Game):
         # Effects
         self.explosion_particles = []
         self.player_hit_timer = 0
+
+        # UFO/Mystery ship
+        self.ufo = None  # {'x': float, 'dir': 1 or -1}
+        self.ufo_timer = random.uniform(20, 30)  # Time until next UFO appears
     
     def setup_enemies(self):
         """Create the enemy grid."""
@@ -102,7 +106,25 @@ class Invaders(Game):
         if self.player_hit_timer > 0:
             self.player_hit_timer -= dt
             return
-        
+
+        # UFO/Mystery ship logic
+        self.ufo_timer -= dt
+        if self.ufo_timer <= 0 and self.ufo is None:
+            # Spawn UFO from random side
+            direction = random.choice([-1, 1])
+            start_x = -5 if direction == 1 else GRID_SIZE + 5
+            self.ufo = {'x': float(start_x), 'dir': direction}
+            self.ufo_timer = random.uniform(20, 30)  # Reset timer for next UFO
+
+        # Update UFO position
+        if self.ufo is not None:
+            self.ufo['x'] += self.ufo['dir'] * 25 * dt  # UFO speed
+            # Check if UFO went off screen
+            if self.ufo['dir'] == 1 and self.ufo['x'] > GRID_SIZE + 5:
+                self.ufo = None
+            elif self.ufo['dir'] == -1 and self.ufo['x'] < -5:
+                self.ufo = None
+
         # Player movement (adjusted for smaller ship)
         player_speed = 50
         if input_state.left:
@@ -202,6 +224,32 @@ class Invaders(Game):
                     # Speed up remaining enemies
                     self.enemy_move_delay = max(0.08, self.enemy_move_delay - 0.01)
                     break
+
+            # Check bullet-UFO collision (if bullet not already removed)
+            if not bullet_removed and bullet in self.bullets and self.ufo is not None:
+                ufo_x = int(self.ufo['x'])
+                ufo_y = 9  # UFO flies at y=9 (just below the separator line)
+                # UFO is 5 pixels wide
+                if (abs(bullet_ix - ufo_x - 2) < 3 and abs(bullet_iy - ufo_y) < 2):
+                    # Hit UFO!
+                    if bullet in self.bullets:
+                        self.bullets.remove(bullet)
+                    bullet_removed = True
+                    # Award random bonus points (50-300 in increments of 50)
+                    bonus = random.choice([50, 100, 150, 200, 250, 300])
+                    self.score += bonus
+
+                    # Create explosion at UFO position
+                    for _ in range(8):
+                        self.explosion_particles.append({
+                            'x': ufo_x + 2,
+                            'y': ufo_y,
+                            'dx': random.uniform(-40, 40),
+                            'dy': random.uniform(-40, 40),
+                            'life': 0.4,
+                        })
+
+                    self.ufo = None
 
             # Check bullet-shield collision (if bullet not already removed)
             if not bullet_removed and bullet in self.bullets:
@@ -323,7 +371,26 @@ class Invaders(Game):
         
         # Draw separator
         self.display.draw_line(0, 7, 63, 7, Colors.DARK_GRAY)
-        
+
+        # Draw UFO/Mystery ship
+        if self.ufo is not None:
+            ux = int(self.ufo['x'])
+            uy = 9  # Just below the separator
+            # Draw UFO shape (5 wide, 2 tall) - classic saucer shape
+            # Only draw pixels that are on screen
+            if 0 <= ux + 2 < GRID_SIZE:
+                self.display.set_pixel(ux + 2, uy, Colors.RED)      # Top center
+            if 0 <= ux + 1 < GRID_SIZE:
+                self.display.set_pixel(ux + 1, uy + 1, Colors.MAGENTA)  # Bottom row
+            if 0 <= ux + 2 < GRID_SIZE:
+                self.display.set_pixel(ux + 2, uy + 1, Colors.RED)
+            if 0 <= ux + 3 < GRID_SIZE:
+                self.display.set_pixel(ux + 3, uy + 1, Colors.MAGENTA)
+            if 0 <= ux < GRID_SIZE:
+                self.display.set_pixel(ux, uy + 1, Colors.MAGENTA)
+            if 0 <= ux + 4 < GRID_SIZE:
+                self.display.set_pixel(ux + 4, uy + 1, Colors.MAGENTA)
+
         # Draw shields
         for shield in self.shields:
             shade = 64 + shield['health'] * 60

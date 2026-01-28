@@ -42,6 +42,38 @@ class NightDriver(Game):
     CAR_COLOR = (200, 50, 50)
     CAR_WINDOW = (100, 150, 200)
 
+    # Oncoming traffic colors
+    ONCOMING_CAR_COLOR = (255, 200, 50)  # Yellow/orange headlights
+    ONCOMING_BODY_COLOR = (80, 80, 100)  # Dark body
+
+    # Vehicle types with different sizes (width_mult, height_mult, headlight_sep_mult, name)
+    # Multipliers are relative to base sedan size
+    VEHICLE_TYPES = [
+        {'name': 'sedan', 'width': 1.0, 'height': 1.0, 'hl_sep': 1.0, 'weight': 40},
+        {'name': 'compact', 'width': 0.8, 'height': 0.8, 'hl_sep': 0.8, 'weight': 20},
+        {'name': 'suv', 'width': 1.2, 'height': 1.3, 'hl_sep': 1.2, 'weight': 20},
+        {'name': 'pickup', 'width': 1.1, 'height': 1.4, 'hl_sep': 1.0, 'weight': 15},
+        {'name': 'semi', 'width': 1.4, 'height': 2.5, 'hl_sep': 1.3, 'weight': 5},  # 18-wheeler
+    ]
+
+    # Turn types with increasing difficulty
+    TURN_NORMAL = 0
+    TURN_HAIRPIN = 1      # Sharp 180-degree turn
+    TURN_CHICANE = 2      # Quick left-right or right-left
+
+    # Road sign types for visual interest
+    SIGN_TYPES = [
+        {'name': 'speed_limit', 'color': (255, 255, 255), 'bg': (40, 40, 40)},
+        {'name': 'curve_left', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
+        {'name': 'curve_right', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
+        {'name': 'hairpin_left', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
+        {'name': 'hairpin_right', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
+        {'name': 'chicane', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
+        {'name': 'mile_marker', 'color': (100, 255, 100), 'bg': (0, 80, 0)},
+        {'name': 'deer_xing', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
+        {'name': 'no_passing', 'color': (255, 255, 255), 'bg': (255, 50, 50)},
+    ]
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
@@ -55,7 +87,7 @@ class NightDriver(Game):
 
         # Speed and distance
         self.speed = 30.0       # Units per second
-        self.max_speed = 80.0
+        self.max_speed = 120.0  # Higher top speed for more intensity
         self.distance = 0.0     # Total distance traveled
 
         # Post positions (0.0 to POST_SPACING, cycles)
@@ -67,6 +99,9 @@ class NightDriver(Game):
         self.turn_duration = 0.0   # How long current turn lasts
         self.turn_timer = 0.0      # Time in current turn
         self.straight_timer = 0.0  # Time until next turn
+        self.curve_intensity = 1.0 # Multiplier for curve tightness (increases with speed)
+        self.current_turn_type = self.TURN_NORMAL
+        self.chicane_phase = 0     # For chicane turns: 0=first curve, 1=second curve
 
         # Start with a short straight
         self.straight_timer = 2.0
@@ -74,6 +109,19 @@ class NightDriver(Game):
         # Crash state
         self.crashed = False
         self.crash_timer = 0.0
+
+        # Oncoming traffic
+        # Each car: {'z': distance (1.0=horizon, 0.0=at player), 'lane': -0.5 or 0.5}
+        self.oncoming_cars = []
+        self.next_car_timer = 3.0  # Time until next car spawns
+        self.min_car_interval = 1.5  # Minimum time between cars
+        self.max_car_interval = 4.0  # Maximum time between cars
+
+        # Road signs for visual interest and warnings
+        # Each sign: {'z': distance, 'type': sign_type_name, 'side': -1 or 1}
+        self.road_signs = []
+        self.next_sign_timer = 2.0
+        self.warning_sign_active = False  # True when approaching special turn
 
     def update(self, input_state: InputState, dt: float):
         if self.state == GameState.GAME_OVER:
@@ -87,8 +135,10 @@ class NightDriver(Game):
                 self.state = GameState.GAME_OVER
             return
 
-        # Steering
-        steer_speed = 2.0
+        # Steering - scales slightly with speed so player can handle faster curves
+        # Base steer of 2.0, up to 3.5 at max speed
+        speed_factor = self.speed / self.max_speed
+        steer_speed = 2.0 + speed_factor * 1.5
         if input_state.left:
             self.player_x -= steer_speed * dt
         if input_state.right:
@@ -98,7 +148,16 @@ class NightDriver(Game):
         self.player_x = max(-1.0, min(1.0, self.player_x))
 
         # Apply curve effect (pushes player toward outside of curve)
-        self.player_x -= self.curve * dt * 0.6
+        # Physics balance:
+        #   - curve_push = curve_value * 0.5 (raw push rate)
+        #   - max_push capped at 75% of steer_speed (always survivable with good reflexes)
+        #   - At max speed: steer=3.5, max_push=2.625/sec
+        #   - Road width is 1.7 (-0.85 to 0.85), so worst case you have ~0.65 sec to react
+        # This means hairpins are HARD but not impossible - requires anticipation
+        curve_push = self.curve * 0.5
+        max_push = steer_speed * 0.75  # Always beatable with good steering
+        curve_push = max(-max_push, min(max_push, curve_push))
+        self.player_x -= curve_push * dt
 
         # Update turn/straight timing
         if self.straight_timer > 0:
@@ -108,24 +167,42 @@ class NightDriver(Game):
             self.curve *= 0.95
 
             if self.straight_timer <= 0:
-                # Start a new turn
-                self.target_curve = random.choice([-1.5, -1.0, 1.0, 1.5])
-                self.turn_duration = random.uniform(2.0, 4.0)
-                self.turn_timer = 0.0
+                # Start a new turn - choose turn type based on speed/distance
+                self.start_new_turn()
         else:
             # In a turn
             self.turn_timer += dt
 
-            # Smoothly approach target curve
+            # Smoothly approach target curve (faster for hairpins)
+            approach_rate = 2.0
+            if self.current_turn_type == self.TURN_HAIRPIN:
+                approach_rate = 3.0
+            elif self.current_turn_type == self.TURN_CHICANE:
+                approach_rate = 4.0
+
             diff = self.target_curve - self.curve
-            self.curve += diff * dt * 2.0
+            self.curve += diff * dt * approach_rate
 
             if self.turn_timer >= self.turn_duration:
-                # End turn, start straight section
-                self.straight_timer = random.uniform(1.0, 3.0)
+                # Check if chicane needs second phase
+                if self.current_turn_type == self.TURN_CHICANE and self.chicane_phase == 0:
+                    # Start second phase - opposite direction
+                    self.chicane_phase = 1
+                    self.target_curve = -self.target_curve
+                    self.turn_duration = random.uniform(0.8, 1.2)
+                    self.turn_timer = 0.0
+                else:
+                    # End turn, start straight section
+                    self.straight_timer = random.uniform(1.0, 3.0)
+                    self.warning_sign_active = False
 
         # Update speed (gradually increases)
-        self.speed = min(self.speed + 2.0 * dt, self.max_speed)
+        self.speed = min(self.speed + 2.5 * dt, self.max_speed)
+
+        # Difficulty scaling: tighter curves at higher speeds
+        # But since push is capped, intensity mainly affects visual bend appearance
+        # Range: 1.0 to 2.0 multiplier
+        self.curve_intensity = 1.0 + speed_factor * 1.0
 
         # Update distance and post offset
         self.distance += self.speed * dt
@@ -136,14 +213,178 @@ class NightDriver(Game):
         # Score based on distance
         self.score = int(self.distance)
 
+        # Update oncoming traffic
+        self.update_oncoming_traffic(dt)
+
+        # Update road signs
+        self.update_road_signs(dt)
+
         # Check collision with posts
         if self.check_collision():
             self.crashed = True
             self.crash_timer = 1.5
 
+        # Check collision with oncoming cars
+        if self.check_car_collision():
+            self.crashed = True
+            self.crash_timer = 1.5
+
+    def start_new_turn(self):
+        """Start a new turn, choosing type based on current speed/distance."""
+        speed_factor = self.speed / self.max_speed
+
+        # Higher chance of special turns at higher speeds
+        turn_roll = random.random()
+
+        # Hairpins start appearing at 40% speed, chicanes at 50%
+        if speed_factor > 0.5 and turn_roll < 0.15:
+            # Chicane (quick S-curve)
+            self.current_turn_type = self.TURN_CHICANE
+            self.chicane_phase = 0
+            direction = random.choice([-1, 1])
+            # Chicanes are sharp but shorter
+            base_curve = direction * random.uniform(2.0, 2.5)
+            self.target_curve = base_curve * self.curve_intensity
+            self.turn_duration = random.uniform(0.8, 1.2)
+            self.spawn_warning_sign('chicane', direction)
+
+        elif speed_factor > 0.4 and turn_roll < 0.25:
+            # Hairpin turn (very sharp, long)
+            self.current_turn_type = self.TURN_HAIRPIN
+            direction = random.choice([-1, 1])
+            # Hairpins are extremely sharp
+            base_curve = direction * random.uniform(2.5, 3.5)
+            self.target_curve = base_curve * self.curve_intensity
+            self.turn_duration = random.uniform(2.0, 3.5)
+            sign_type = 'hairpin_left' if direction < 0 else 'hairpin_right'
+            self.spawn_warning_sign(sign_type, direction)
+
+        else:
+            # Normal turn
+            self.current_turn_type = self.TURN_NORMAL
+            # Base curves get wider at higher speeds
+            base_options = [-1.5, -1.0, 1.0, 1.5]
+            if speed_factor > 0.3:
+                base_options.extend([-2.0, 2.0])
+            if speed_factor > 0.6:
+                base_options.extend([-2.5, 2.5])
+
+            base_curve = random.choice(base_options)
+            self.target_curve = base_curve * self.curve_intensity
+            self.turn_duration = random.uniform(1.5, 3.5)
+
+            # Spawn curve warning for sharper normal turns
+            if abs(base_curve) >= 1.5:
+                sign_type = 'curve_left' if base_curve < 0 else 'curve_right'
+                self.spawn_warning_sign(sign_type, 1 if base_curve < 0 else -1)
+
+        self.turn_timer = 0.0
+        self.warning_sign_active = True
+
+    def spawn_warning_sign(self, sign_type, side):
+        """Spawn a warning sign for upcoming turn."""
+        self.road_signs.append({
+            'z': 1.0,
+            'type': sign_type,
+            'side': side,  # -1 = left side, 1 = right side
+        })
+
     def check_collision(self) -> bool:
         """Check if player car hits a road post."""
         return abs(self.player_x) > 0.85
+
+    def update_road_signs(self, dt: float):
+        """Update road sign positions and spawn decorative signs."""
+        # Move existing signs toward player
+        approach_speed = self.speed * 0.04 * dt
+
+        signs_to_remove = []
+        for sign in self.road_signs:
+            sign['z'] -= approach_speed
+            if sign['z'] < -0.1:
+                signs_to_remove.append(sign)
+
+        for sign in signs_to_remove:
+            self.road_signs.remove(sign)
+
+        # Spawn decorative signs periodically
+        self.next_sign_timer -= dt
+        if self.next_sign_timer <= 0 and not self.warning_sign_active:
+            # Random decorative sign
+            decorative_signs = ['speed_limit', 'mile_marker', 'deer_xing', 'no_passing']
+            sign_type = random.choice(decorative_signs)
+            side = random.choice([-1, 1])
+            self.road_signs.append({
+                'z': 1.0,
+                'type': sign_type,
+                'side': side,
+            })
+            self.next_sign_timer = random.uniform(3.0, 6.0)
+
+    def update_oncoming_traffic(self, dt: float):
+        """Update oncoming car positions and spawn new cars."""
+        # Spawn new cars
+        self.next_car_timer -= dt
+        if self.next_car_timer <= 0:
+            # Spawn a new car at the horizon
+            # In USA, we drive on the right, so oncoming traffic is in the LEFT lane (negative X)
+            # from our perspective. They're in THEIR right lane, we're in OUR right lane.
+            # Left lane spans roughly -0.7 to -0.2, we spawn in the safe middle portion
+            lane = random.uniform(-0.55, -0.35)
+
+            # Choose vehicle type based on weights
+            total_weight = sum(v['weight'] for v in self.VEHICLE_TYPES)
+            roll = random.uniform(0, total_weight)
+            cumulative = 0
+            vehicle_type = self.VEHICLE_TYPES[0]  # Default to sedan
+            for vtype in self.VEHICLE_TYPES:
+                cumulative += vtype['weight']
+                if roll <= cumulative:
+                    vehicle_type = vtype
+                    break
+
+            self.oncoming_cars.append({
+                'z': 1.0,
+                'lane': lane,
+                'type': vehicle_type
+            })
+
+            # Next car interval decreases with speed (more traffic at higher speeds)
+            speed_factor = self.speed / self.max_speed
+            interval_range = self.max_car_interval - self.min_car_interval
+            # Higher speed = shorter intervals
+            base_interval = self.max_car_interval - (speed_factor * interval_range * 0.7)
+            self.next_car_timer = random.uniform(base_interval * 0.7, base_interval * 1.3)
+
+        # Move cars toward player (they approach as we drive toward them)
+        # Combined approach speed: our speed + their speed
+        approach_speed = self.speed * 0.04 * dt  # How fast z decreases
+
+        cars_to_remove = []
+        for car in self.oncoming_cars:
+            car['z'] -= approach_speed
+            # Remove cars that have passed the player
+            if car['z'] < -0.1:
+                cars_to_remove.append(car)
+
+        for car in cars_to_remove:
+            self.oncoming_cars.remove(car)
+
+    def check_car_collision(self) -> bool:
+        """Check if player collides with an oncoming car."""
+        for car in self.oncoming_cars:
+            # Collision zone: car is close (z < 0.15) and in same lateral position
+            if car['z'] < 0.15 and car['z'] > -0.05:
+                # Check lateral collision
+                # Player position is -1 to 1, car lane is around -0.4 or 0.4
+                car_lane = car['lane']
+                # Collision width based on vehicle type
+                vehicle_type = car.get('type', self.VEHICLE_TYPES[0])
+                base_collision_width = 0.35
+                collision_width = base_collision_width * vehicle_type['width']
+                if abs(self.player_x - car_lane) < collision_width:
+                    return True
+        return False
 
     def world_to_screen(self, world_z: float, world_x: float) -> tuple:
         """Convert world coordinates to screen coordinates with perspective."""
@@ -178,18 +419,32 @@ class NightDriver(Game):
         speed_pct = int((self.speed / self.max_speed) * 99)
         self.display.draw_text_small(45, 1, f"{speed_pct}", Colors.YELLOW)
 
-        # Draw turn indicator
+        # Draw turn indicator (flashing orange for hairpin/chicane)
         if abs(self.curve) > 0.3:
-            if self.curve > 0:
-                self.display.draw_text_small(30, 1, ">", Colors.CYAN)
+            # Color based on turn type intensity
+            if self.current_turn_type == self.TURN_HAIRPIN:
+                indicator_color = Colors.ORANGE if int(self.distance * 5) % 2 == 0 else Colors.RED
+            elif self.current_turn_type == self.TURN_CHICANE:
+                indicator_color = Colors.YELLOW if int(self.distance * 5) % 2 == 0 else Colors.ORANGE
             else:
-                self.display.draw_text_small(26, 1, "<", Colors.CYAN)
+                indicator_color = Colors.CYAN
+
+            if self.curve > 0:
+                self.display.draw_text_small(30, 1, ">", indicator_color)
+            else:
+                self.display.draw_text_small(26, 1, "<", indicator_color)
 
         # Draw road edges (perspective lines)
         self.draw_road_edges()
 
         # Draw posts
         self.draw_posts()
+
+        # Draw road signs
+        self.draw_road_signs()
+
+        # Draw oncoming traffic
+        self.draw_oncoming_cars()
 
         # Draw car
         if not self.crashed:
@@ -248,6 +503,116 @@ class NightDriver(Game):
                 self.display.draw_rect(rx - post_width // 2, ry - post_height,
                                        post_width, post_height, self.POST_COLOR)
 
+    def draw_road_signs(self):
+        """Draw road signs with perspective."""
+        # Sort by z so farther signs are drawn first
+        sorted_signs = sorted(self.road_signs, key=lambda s: s['z'], reverse=True)
+
+        for sign in sorted_signs:
+            z = sign['z']
+            sign_type = sign['type']
+            side = sign['side']
+
+            # Don't draw signs too far or too close
+            if z > 0.9 or z < 0.1:
+                continue
+
+            # Position sign outside the road edge
+            x_pos = side * 1.15  # Just outside road edge
+            screen_x, screen_y = self.world_to_screen(z, x_pos)
+
+            # Size based on distance
+            closeness = 1.0 - z
+            sign_width = max(2, int(closeness * 8))
+            sign_height = max(2, int(closeness * 8))
+
+            # Find sign colors
+            sign_info = None
+            for st in self.SIGN_TYPES:
+                if st['name'] == sign_type:
+                    sign_info = st
+                    break
+            if not sign_info:
+                continue
+
+            fg_color = sign_info['color']
+            bg_color = sign_info['bg']
+
+            # Draw sign background (post + sign)
+            post_x = screen_x
+            post_y = screen_y
+            sign_x = screen_x - sign_width // 2
+            sign_y = screen_y - sign_height - max(1, int(closeness * 3))
+
+            # Sign post
+            if 0 <= post_x < GRID_SIZE and 0 <= post_y < GRID_SIZE:
+                post_h = max(1, int(closeness * 4))
+                for py in range(post_h):
+                    if 0 <= sign_y + sign_height + py < GRID_SIZE:
+                        self.display.set_pixel(post_x, sign_y + sign_height + py, (80, 80, 80))
+
+            # Sign face
+            if sign_width >= 2 and sign_height >= 2:
+                if 0 <= sign_x < GRID_SIZE - sign_width and 0 <= sign_y < GRID_SIZE - sign_height:
+                    # Background
+                    self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, bg_color)
+
+                    # Draw symbol based on type
+                    cx = sign_x + sign_width // 2
+                    cy = sign_y + sign_height // 2
+
+                    if 'curve_left' in sign_type or 'hairpin_left' in sign_type:
+                        # Left arrow
+                        if sign_width >= 3:
+                            self.display.set_pixel(cx - 1, cy, fg_color)
+                            self.display.set_pixel(cx, cy, fg_color)
+                            if sign_height >= 3:
+                                self.display.set_pixel(cx, cy - 1, fg_color)
+                                self.display.set_pixel(cx, cy + 1, fg_color)
+
+                    elif 'curve_right' in sign_type or 'hairpin_right' in sign_type:
+                        # Right arrow
+                        if sign_width >= 3:
+                            self.display.set_pixel(cx + 1, cy, fg_color)
+                            self.display.set_pixel(cx, cy, fg_color)
+                            if sign_height >= 3:
+                                self.display.set_pixel(cx, cy - 1, fg_color)
+                                self.display.set_pixel(cx, cy + 1, fg_color)
+
+                    elif sign_type == 'chicane':
+                        # S-curve symbol
+                        if sign_width >= 3 and sign_height >= 3:
+                            self.display.set_pixel(cx - 1, cy - 1, fg_color)
+                            self.display.set_pixel(cx, cy, fg_color)
+                            self.display.set_pixel(cx + 1, cy + 1, fg_color)
+
+                    elif sign_type == 'speed_limit':
+                        # Just show border
+                        self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, fg_color)
+                        if sign_width > 2 and sign_height > 2:
+                            self.display.draw_rect(sign_x + 1, sign_y + 1,
+                                                  sign_width - 2, sign_height - 2, bg_color)
+
+                    elif sign_type == 'mile_marker':
+                        # Green with white center
+                        if sign_width >= 3 and sign_height >= 3:
+                            self.display.set_pixel(cx, cy, fg_color)
+
+                    elif sign_type == 'deer_xing':
+                        # Diamond shape hint
+                        self.display.set_pixel(cx, cy - 1, fg_color)
+                        self.display.set_pixel(cx, cy + 1, fg_color)
+                        self.display.set_pixel(cx - 1, cy, fg_color)
+                        self.display.set_pixel(cx + 1, cy, fg_color)
+
+                    elif sign_type == 'no_passing':
+                        # Red with diagonal
+                        if sign_width >= 3:
+                            self.display.set_pixel(sign_x + 1, sign_y + 1, (255, 255, 255))
+                            if sign_height >= 3:
+                                self.display.set_pixel(sign_x + sign_width - 2,
+                                                      sign_y + sign_height - 2, (255, 255, 255))
+
     def draw_car(self):
         """Draw the player's car at bottom of screen."""
         car_center_x = self.VANISHING_X + int(self.player_x * 20)
@@ -276,3 +641,83 @@ class NightDriver(Game):
             py = self.CAR_Y + (hash(i * 3 + int(self.crash_timer * 15)) % 8) - 4
             if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                 self.display.set_pixel(px, py, color)
+
+    def draw_oncoming_cars(self):
+        """Draw oncoming traffic with perspective (headlights approaching)."""
+        # Sort by z so farther cars are drawn first (painter's algorithm)
+        sorted_cars = sorted(self.oncoming_cars, key=lambda c: c['z'], reverse=True)
+
+        for car in sorted_cars:
+            z = car['z']
+            lane = car['lane']
+            vehicle_type = car.get('type', self.VEHICLE_TYPES[0])
+
+            # Don't draw cars too far away or past player
+            if z > 0.95 or z < 0.0:
+                continue
+
+            # Get screen position
+            screen_x, screen_y = self.world_to_screen(z, lane)
+
+            # Size increases as car gets closer (perspective)
+            # At z=1.0 (far), size is tiny; at z=0 (close), size is large
+            closeness = 1.0 - z  # 0.0 = far, 1.0 = close
+
+            # Apply vehicle type multipliers
+            width_mult = vehicle_type['width']
+            height_mult = vehicle_type['height']
+            hl_sep_mult = vehicle_type['hl_sep']
+
+            # Headlight size (the main visible element at night)
+            headlight_size = max(1, int(closeness * 4))
+            # Car body dimensions scaled by vehicle type
+            body_width = max(2, int(closeness * 10 * width_mult))
+            body_height = max(1, int(closeness * 6 * height_mult))
+
+            # Headlight separation increases as car gets closer
+            headlight_sep = max(1, int(closeness * 6 * hl_sep_mult))
+
+            # Draw car body (dark, barely visible at night)
+            if closeness > 0.3:  # Only visible when close enough
+                body_x = screen_x - body_width // 2
+                # For tall vehicles (semis), body extends upward more
+                body_y = screen_y - int(body_height * 0.7)
+                if 0 <= body_x < GRID_SIZE and 0 <= body_y < GRID_SIZE:
+                    # Semis get a slightly different color (darker trailer)
+                    body_color = (60, 60, 80) if vehicle_type['name'] == 'semi' else self.ONCOMING_BODY_COLOR
+                    self.display.draw_rect(body_x, body_y, body_width, body_height, body_color)
+
+                    # Draw cab for semi trucks (lighter section at bottom)
+                    if vehicle_type['name'] == 'semi' and closeness > 0.5:
+                        cab_height = max(2, body_height // 3)
+                        cab_y = body_y + body_height - cab_height
+                        self.display.draw_rect(body_x, cab_y, body_width, cab_height, self.ONCOMING_BODY_COLOR)
+
+            # Draw headlights (bright, always visible)
+            # Left headlight
+            hl_left_x = screen_x - headlight_sep // 2
+            # Right headlight
+            hl_right_x = screen_x + headlight_sep // 2
+
+            # Headlight brightness increases as car gets closer
+            brightness = int(155 + closeness * 100)
+            headlight_color = (brightness, brightness, min(255, int(brightness * 0.8)))
+
+            # Draw headlights
+            if 0 <= hl_left_x < GRID_SIZE and 0 <= screen_y < GRID_SIZE:
+                if headlight_size == 1:
+                    self.display.set_pixel(hl_left_x, screen_y, headlight_color)
+                else:
+                    self.display.draw_rect(hl_left_x - headlight_size // 2,
+                                          screen_y - headlight_size // 2,
+                                          headlight_size, headlight_size,
+                                          headlight_color)
+
+            if 0 <= hl_right_x < GRID_SIZE and 0 <= screen_y < GRID_SIZE:
+                if headlight_size == 1:
+                    self.display.set_pixel(hl_right_x, screen_y, headlight_color)
+                else:
+                    self.display.draw_rect(hl_right_x - headlight_size // 2,
+                                          screen_y - headlight_size // 2,
+                                          headlight_size, headlight_size,
+                                          headlight_color)

@@ -146,14 +146,17 @@ class Galaga(Game):
             bullet['y'] -= 120 * dt
         self.bullets = [b for b in self.bullets if b['y'] > 0]
 
-        # Update enemy bullets
+        # Update enemy bullets (speed scales with level)
+        enemy_bullet_speed = 60 + self.level * 8  # Faster bullets at higher levels
         for bullet in self.enemy_bullets:
-            bullet['y'] += 60 * dt
+            bullet['y'] += enemy_bullet_speed * dt
         self.enemy_bullets = [b for b in self.enemy_bullets if b['y'] < GRID_SIZE]
 
-        # Formation movement (gentle sway)
+        # Formation movement (gentle sway that speeds up with level)
         self.formation_time += dt
-        self.formation_offset_x = math.sin(self.formation_time * 1.5) * 6
+        oscillation_speed = 1.5 + self.level * 0.15  # Faster oscillation at higher levels
+        oscillation_amplitude = 6 + min(self.level, 5)  # Wider sway at higher levels (max +5)
+        self.formation_offset_x = math.sin(self.formation_time * oscillation_speed) * oscillation_amplitude
 
         # Dive attack timing
         self.dive_timer += dt
@@ -210,13 +213,15 @@ class Galaga(Game):
             self.next_level()
 
     def start_dive_attack(self):
-        """Start a dive attack with 1-2 enemies."""
+        """Start a dive attack with enemies scaling by level."""
         alive_enemies = [(col, row, e) for (col, row), e in self.formation.items() if e['alive']]
         if not alive_enemies:
             return
 
-        # Pick 1-2 enemies to dive
-        num_divers = min(len(alive_enemies), random.randint(1, 2))
+        # More simultaneous divers at higher levels (1-2 at level 1, up to 2-5 at higher levels)
+        min_divers = 1 + min(self.level // 3, 2)  # 1 -> 2 -> 3 as levels increase
+        max_divers = 2 + min(self.level // 2, 3)  # 2 -> 3 -> 4 -> 5 as levels increase
+        num_divers = min(len(alive_enemies), random.randint(min_divers, max_divers))
         chosen = random.sample(alive_enemies, num_divers)
 
         for col, row, enemy in chosen:
@@ -224,14 +229,16 @@ class Galaga(Game):
             enemy['alive'] = False  # Remove from formation
 
             # Create dive path toward player then loop back
+            # Diver speed scales more aggressively with level
+            diver_speed = 45 + self.level * 8  # Faster dive speed scaling
             self.divers.append({
                 'x': ex,
                 'y': ey,
                 'type': enemy['type'],
                 'phase': 'dive',  # dive, attack, return
-                'speed': 45 + self.level * 5,
+                'speed': diver_speed,
                 'target_x': self.player_x,
-                'shoot_timer': random.uniform(0.5, 1.5),
+                'shoot_timer': random.uniform(0.3, 1.2 - min(self.level * 0.05, 0.5)),  # Shoot more often at higher levels
             })
 
     def update_divers(self, dt: float):
@@ -246,11 +253,14 @@ class Galaga(Game):
                     diver['x'] += math.copysign(speed * 0.7 * dt, dx)
                 diver['y'] += speed * dt
 
-                # Shoot occasionally
+                # Shoot occasionally (more frequently at higher levels)
                 diver['shoot_timer'] -= dt
                 if diver['shoot_timer'] <= 0:
                     self.enemy_bullets.append({'x': diver['x'], 'y': diver['y'] + 3})
-                    diver['shoot_timer'] = random.uniform(0.8, 1.5)
+                    # Shorter intervals between shots at higher levels
+                    min_interval = max(0.4, 0.8 - self.level * 0.04)
+                    max_interval = max(0.8, 1.5 - self.level * 0.06)
+                    diver['shoot_timer'] = random.uniform(min_interval, max_interval)
 
                 # Switch to attack phase near player level
                 if diver['y'] >= self.PLAYER_Y - 10:

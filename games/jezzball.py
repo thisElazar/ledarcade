@@ -2,18 +2,66 @@
 JezzBall - Trap the bouncing atoms
 ==================================
 Build walls to divide the play area. Trap atoms in smaller areas.
-Complete the level when 75%+ of the area is filled with walls.
+Complete the level when 75%+ of the area is filled.
+
+Based on the original Microsoft Entertainment Pack game by Dima Pavlovsky (1992).
+
+Mechanics:
+  - Press Space to shoot two wall rays in opposite directions
+  - Rays extend until they hit an existing wall
+  - If an atom hits a ray, that ray is destroyed and you lose 1 life
+  - If an atom hits the source point (center), BOTH rays die and you lose 2 lives
+  - Rays are independent: one can complete while the other is destroyed
+  - Areas without atoms are automatically filled when walls complete
+  - You start each level with lives equal to the number of atoms
+
+Difficulty:
+  - You have a 5-second SHIELD at the start of each level (cyan forcefield)
+  - After the shield expires, atoms hitting your cursor cost 1 life!
+  - Taking damage gives you 1 second of invincibility to escape
+  - Lives persist between levels - be careful!
+  - Bonus life at level 3, then every 2 levels (3, 5, 7, 9...) max 10
 
 Controls:
-  Arrow Keys - Move cursor
-  Space + Up/Down - Build horizontal wall
-  Space + Left/Right - Build vertical wall
-  Space alone - Build in last direction used (default: horizontal)
-  Escape - Return to menu
+  Arrow Keys - Move cursor and set wall direction
+  Space      - Build wall in current direction
+  Escape     - Return to menu
 """
 
 import random
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
+
+
+class Wall:
+    """A single wall ray that extends in one direction."""
+
+    def __init__(self, start_x: int, start_y: int, dx: int, dy: int):
+        self.start_x = start_x
+        self.start_y = start_y
+        self.dx = dx  # Direction: -1, 0, or 1
+        self.dy = dy
+        self.length = 0  # Current length (not counting start)
+        self.finished = False
+        self.dead = False
+        self.speed = 80  # Pixels per second
+        self.progress = 0.0  # Sub-pixel progress
+
+    def get_tip_position(self) -> tuple:
+        """Get the current tip position of the wall."""
+        return (
+            self.start_x + self.dx * self.length,
+            self.start_y + self.dy * self.length
+        )
+
+    def get_all_positions(self) -> list:
+        """Get all positions this wall occupies (excluding start if length > 0)."""
+        positions = []
+        for i in range(1, self.length + 1):
+            positions.append((
+                self.start_x + self.dx * i,
+                self.start_y + self.dy * i
+            ))
+        return positions
 
 
 class JezzBall(Game):
@@ -29,7 +77,7 @@ class JezzBall(Game):
         self.state = GameState.PLAYING
         self.score = 0
         self.level = 1
-        self.lives = 3
+        self.lives = 2  # Start with lives = atoms (level 1 has 2 atoms)
 
         # Play area (leaving room for HUD at top)
         self.play_top = 10
@@ -54,20 +102,27 @@ class JezzBall(Game):
         self.atoms = []
         self.spawn_atoms(self.level + 1)
 
-        # Cursor
+        # Cursor position (in grid coordinates)
         self.cursor_x = self.width // 2
         self.cursor_y = self.height // 2
-        self.cursor_blink = 0
+        self.cursor_blink = 0.0
 
         # Wall building direction (True = horizontal, False = vertical)
         self.horizontal = True
 
-        # Active walls being built (list of wall segments)
-        self.building_walls = []  # {'x': int, 'y': int, 'dx': int, 'dy': int, 'pixels': list}
+        # Active walls being built (two rays extending in opposite directions)
+        self.walls = []  # List of Wall objects
 
         # Movement timing
-        self.cursor_delay = 0.08
+        self.cursor_delay = 0.06
         self.cursor_timer = 0
+        self.move_held_time = 0.0
+
+        # Shield timer - invincible for first 5 seconds of each level
+        self.level_time = 0.0
+        self.shield_duration = 5.0
+        self.shield_hit_flash = 0.0  # Flash when hit while shielded
+        self.bonus_life_flash = 0.0  # Flash when gaining a bonus life
 
         # Fill percentage
         self.fill_percent = 0
@@ -79,18 +134,24 @@ class JezzBall(Game):
         colors = [Colors.RED, Colors.CYAN, Colors.YELLOW, Colors.MAGENTA, Colors.ORANGE]
 
         for i in range(count):
-            # Find a valid spawn position
+            # Find a valid spawn position (away from edges)
             attempts = 0
             while attempts < 100:
-                x = random.randint(5, self.width - 6)
-                y = random.randint(5, self.height - 6)
+                x = random.randint(8, self.width - 10)
+                y = random.randint(8, self.height - 10)
                 if not self.grid[y][x]:
                     break
                 attempts += 1
 
-            # Random direction
-            dx = random.choice([-1, 1]) * random.uniform(25, 40)
-            dy = random.choice([-1, 1]) * random.uniform(25, 40)
+            # Random direction with consistent speed
+            speed = random.uniform(28, 38)
+            angle = random.uniform(0.3, 1.2)  # Avoid pure horizontal/vertical
+            if random.random() < 0.5:
+                angle = -angle
+
+            import math
+            dx = speed * math.cos(angle) * random.choice([-1, 1])
+            dy = speed * math.sin(angle) * random.choice([-1, 1])
 
             self.atoms.append({
                 'x': float(x),
@@ -115,129 +176,221 @@ class JezzBall(Game):
         if self.state != GameState.PLAYING:
             return
 
-        # Cursor movement with repeat
-        self.cursor_timer += dt
-        if self.cursor_timer >= self.cursor_delay:
-            if input_state.up:
-                self.cursor_y = max(1, self.cursor_y - 1)
-                self.cursor_timer = 0
-            elif input_state.down:
-                self.cursor_y = min(self.height - 2, self.cursor_y + 1)
-                self.cursor_timer = 0
-            elif input_state.left:
-                self.cursor_x = max(1, self.cursor_x - 1)
-                self.cursor_timer = 0
-            elif input_state.right:
-                self.cursor_x = min(self.width - 2, self.cursor_x + 1)
-                self.cursor_timer = 0
-
-        # Cursor blink
+        # Update timers
         self.cursor_blink += dt
+        self.level_time += dt
 
-        # Start building wall on action
-        if input_state.action and not self.building_walls:
-            # Determine direction based on held arrow key
-            # Up/Down arrow = build vertical wall (goes up and down)
-            # Left/Right arrow = build horizontal wall (goes left and right)
-            if input_state.up or input_state.down:
-                self.horizontal = False  # Build vertical wall
-            elif input_state.left or input_state.right:
-                self.horizontal = True  # Build horizontal wall
+        # Decay flash effects
+        if self.shield_hit_flash > 0:
+            self.shield_hit_flash -= dt * 4
+        if self.bonus_life_flash > 0:
+            self.bonus_life_flash -= dt * 2
 
+        # Direction switching (even while walls are building)
+        if input_state.up or input_state.down:
+            self.horizontal = False
+        elif input_state.left or input_state.right:
+            self.horizontal = True
+
+        # Cursor movement with acceleration
+        if input_state.any_direction:
+            self.move_held_time += dt
+        else:
+            self.move_held_time = 0
+
+        # Faster movement after holding
+        current_delay = self.cursor_delay if self.move_held_time < 0.3 else 0.03
+
+        self.cursor_timer += dt
+        if self.cursor_timer >= current_delay:
+            moved = False
+            if input_state.up and self.cursor_y > 1:
+                self.cursor_y -= 1
+                moved = True
+            elif input_state.down and self.cursor_y < self.height - 2:
+                self.cursor_y += 1
+                moved = True
+            elif input_state.left and self.cursor_x > 1:
+                self.cursor_x -= 1
+                moved = True
+            elif input_state.right and self.cursor_x < self.width - 2:
+                self.cursor_x += 1
+                moved = True
+
+            if moved:
+                self.cursor_timer = 0
+
+        # Start building wall on action press (only if no walls active)
+        if input_state.action and not self.walls:
             # Can only start wall from empty space
             if not self.grid[self.cursor_y][self.cursor_x]:
                 if self.horizontal:
-                    # Build wall going left and right
-                    self.building_walls = [
-                        {'x': self.cursor_x, 'y': self.cursor_y, 'dx': -1, 'dy': 0, 'pixels': []},
-                        {'x': self.cursor_x, 'y': self.cursor_y, 'dx': 1, 'dy': 0, 'pixels': []},
+                    # Two walls: one going left, one going right
+                    self.walls = [
+                        Wall(self.cursor_x, self.cursor_y, -1, 0),
+                        Wall(self.cursor_x, self.cursor_y, 1, 0),
                     ]
                 else:
-                    # Build wall going up and down
-                    self.building_walls = [
-                        {'x': self.cursor_x, 'y': self.cursor_y, 'dx': 0, 'dy': -1, 'pixels': []},
-                        {'x': self.cursor_x, 'y': self.cursor_y, 'dx': 0, 'dy': 1, 'pixels': []},
+                    # Two walls: one going up, one going down
+                    self.walls = [
+                        Wall(self.cursor_x, self.cursor_y, 0, -1),
+                        Wall(self.cursor_x, self.cursor_y, 0, 1),
                     ]
 
-        # Grow building walls
-        walls_to_remove = []
-        for wall in self.building_walls:
-            # Extend wall
-            wall['x'] += wall['dx']
-            wall['y'] += wall['dy']
+        # Update active walls
+        if self.walls:
+            self._update_walls(dt)
 
-            x, y = wall['x'], wall['y']
+        # Move atoms
+        self._update_atoms(dt)
 
-            # Check if hit existing wall
-            if 0 <= x < self.width and 0 <= y < self.height:
-                if self.grid[y][x]:
-                    # Wall reached existing wall - complete this segment
-                    walls_to_remove.append(wall)
-                else:
-                    # Check atom collision with building wall
-                    hit_atom = False
-                    for atom in self.atoms:
-                        ax, ay = int(atom['x']), int(atom['y'])
-                        # Check 2x2 area for atom
-                        for adx in range(2):
-                            for ady in range(2):
-                                if x == ax + adx and y == ay + ady:
-                                    hit_atom = True
-                                    break
+    def _update_walls(self, dt: float):
+        """Update all active wall rays."""
+        for wall in self.walls:
+            if wall.finished or wall.dead:
+                continue
 
-                    if hit_atom:
-                        # Wall hit by atom - destroy wall and lose life
-                        self.lose_life()
-                        return
-                    else:
-                        # Add pixel to wall
-                        wall['pixels'].append((x, y))
-            else:
-                walls_to_remove.append(wall)
+            # Advance wall
+            wall.progress += wall.speed * dt
 
-        # Remove completed wall segments
-        for wall in walls_to_remove:
-            if wall in self.building_walls:
-                self.building_walls.remove(wall)
+            while wall.progress >= 1.0 and not wall.finished and not wall.dead:
+                wall.progress -= 1.0
+                wall.length += 1
 
-        # If all walls complete, commit them to grid
-        if not self.building_walls and walls_to_remove:
-            for wall in walls_to_remove:
-                for px, py in wall['pixels']:
-                    if 0 <= px < self.width and 0 <= py < self.height:
-                        self.grid[py][px] = True
+                tip_x, tip_y = wall.get_tip_position()
 
-            # Fill areas without atoms
-            self.fill_empty_regions()
-            self.update_fill_percent()
-            self.score += 10
+                # Check bounds
+                if tip_x < 0 or tip_x >= self.width or tip_y < 0 or tip_y >= self.height:
+                    wall.finished = True
+                    break
+
+                # Check if hit existing wall
+                if self.grid[tip_y][tip_x]:
+                    wall.finished = True
+                    break
+
+        # Check if both walls are done (finished or dead)
+        all_done = all(w.finished or w.dead for w in self.walls)
+
+        if all_done and self.walls:
+            # Commit completed walls to grid
+            for wall in self.walls:
+                if wall.finished and not wall.dead:
+                    for x, y in wall.get_all_positions():
+                        if 0 <= x < self.width and 0 <= y < self.height:
+                            self.grid[y][x] = True
+
+            # Also mark the starting position if at least one wall finished
+            any_finished = any(w.finished and not w.dead for w in self.walls)
+            if any_finished:
+                start_x = self.walls[0].start_x
+                start_y = self.walls[0].start_y
+                self.grid[start_y][start_x] = True
+
+                # Fill regions without atoms
+                self.fill_empty_regions()
+                self.update_fill_percent()
+                self.score += 10
+
+            # Clear walls
+            self.walls = []
 
             # Check win condition
             if self.fill_percent >= 75:
+                self.score += (self.fill_percent - 75) * 5  # Bonus for extra fill
                 self.level += 1
                 self.start_next_level()
 
-        # Move atoms
+    def _check_atom_at_position(self, px: int, py: int) -> bool:
+        """Check if any atom occupies the given position."""
         for atom in self.atoms:
+            ax, ay = int(atom['x']), int(atom['y'])
+            # Atoms are 2x2
+            for adx in range(2):
+                for ady in range(2):
+                    if px == ax + adx and py == ay + ady:
+                        return True
+        return False
+
+    def _check_wall_collisions(self):
+        """
+        Check for atom collisions with building walls.
+        Handles the special case where hitting the source point costs 2 lives.
+        """
+        if not self.walls:
+            return
+
+        # Get source point (shared by both walls)
+        source_x = self.walls[0].start_x
+        source_y = self.walls[0].start_y
+
+        # Check if atom hit the source point (where both rays originate)
+        # This costs 2 lives and kills both walls
+        source_hit = self._check_atom_at_position(source_x, source_y)
+
+        if source_hit:
+            # Kill both walls and lose 2 lives
+            for wall in self.walls:
+                wall.dead = True
+            self.lives -= 2
+            if self.lives <= 0:
+                self.lives = 0
+                self.state = GameState.GAME_OVER
+            return
+
+        # Check each wall independently for hits along their length
+        for wall in self.walls:
+            if wall.dead or wall.finished:
+                continue
+
+            wall_hit = False
+
+            # Check all positions along the wall (excluding source, handled above)
+            for wx, wy in wall.get_all_positions():
+                if self._check_atom_at_position(wx, wy):
+                    wall_hit = True
+                    break
+
+            if wall_hit:
+                wall.dead = True
+                self.lives -= 1
+                if self.lives <= 0:
+                    self.lives = 0
+                    self.state = GameState.GAME_OVER
+
+    def _update_atoms(self, dt: float):
+        """Update atom positions and handle bouncing."""
+        # Get all wall positions for bounce collision (not destruction)
+        wall_positions = set()
+        for wall in self.walls:
+            if not wall.dead:
+                wall_positions.add((wall.start_x, wall.start_y))
+                for pos in wall.get_all_positions():
+                    wall_positions.add(pos)
+
+        for atom in self.atoms:
+            # Calculate new position
             new_x = atom['x'] + atom['dx'] * dt
             new_y = atom['y'] + atom['dy'] * dt
 
-            # Bounce off walls
-            ix, iy = int(new_x), int(new_y)
-
-            # Check all 4 corners of 2x2 atom
+            # Check collision with grid walls and active building walls
             bounce_x = False
             bounce_y = False
 
+            # Check all 4 corners of 2x2 atom
             for dx in range(2):
                 for dy in range(2):
                     check_x = int(new_x) + dx
                     check_y = int(new_y) + dy
+
                     if 0 <= check_x < self.width and 0 <= check_y < self.height:
-                        if self.grid[check_y][check_x]:
-                            # Determine if horizontal or vertical bounce
+                        hit_wall = self.grid[check_y][check_x] or (check_x, check_y) in wall_positions
+
+                        if hit_wall:
                             old_check_x = int(atom['x']) + dx
                             old_check_y = int(atom['y']) + dy
+
+                            # Determine bounce direction
                             if old_check_x != check_x:
                                 bounce_x = True
                             if old_check_y != check_y:
@@ -253,21 +406,43 @@ class JezzBall(Game):
             atom['x'] = new_x
             atom['y'] = new_y
 
-            # Check collision with building walls
-            for wall in self.building_walls:
-                for px, py in wall['pixels']:
-                    for adx in range(2):
-                        for ady in range(2):
-                            if px == int(atom['x']) + adx and py == int(atom['y']) + ady:
-                                self.lose_life()
-                                return
+        # Now check for wall destruction (separate from bouncing)
+        self._check_wall_collisions()
 
-    def lose_life(self):
-        """Handle losing a life."""
-        self.lives -= 1
-        self.building_walls = []
-        if self.lives <= 0:
-            self.state = GameState.GAME_OVER
+        # Check cursor collision (only after shield expires)
+        self._check_cursor_collision()
+
+    def _check_cursor_collision(self):
+        """Check if an atom hits the cursor. Damages player after shield expires."""
+        # Shield active - no damage but show feedback
+        shielded = self.level_time < self.shield_duration
+
+        for atom in self.atoms:
+            ax, ay = int(atom['x']), int(atom['y'])
+
+            # Check if atom (2x2) overlaps cursor position
+            cursor_hit = False
+            for adx in range(2):
+                for ady in range(2):
+                    if ax + adx == self.cursor_x and ay + ady == self.cursor_y:
+                        cursor_hit = True
+                        break
+                if cursor_hit:
+                    break
+
+            if cursor_hit:
+                if shielded:
+                    # Shield absorbs hit - just flash
+                    self.shield_hit_flash = 1.0
+                else:
+                    # Take damage!
+                    self.lives -= 1
+                    # Brief invincibility after hit (reset shield for 1 second)
+                    self.level_time = self.shield_duration - 1.0
+                    if self.lives <= 0:
+                        self.lives = 0
+                        self.state = GameState.GAME_OVER
+                    return  # Only take one hit per frame
 
     def start_next_level(self):
         """Start the next level."""
@@ -282,17 +457,26 @@ class JezzBall(Game):
             self.grid[y][0] = True
             self.grid[y][self.width - 1] = True
 
-        # Spawn more atoms
-        self.spawn_atoms(self.level + 1)
+        # Bonus life at level 3, then every 2 levels (3, 5, 7, 9...) - max 10 lives
+        if self.level >= 3 and self.level % 2 == 1:
+            self.lives = min(10, self.lives + 1)
+            self.bonus_life_flash = 1.0  # Visual feedback
+
+        # Spawn more atoms (lives persist - no reset!)
+        atom_count = self.level + 1
+        self.spawn_atoms(atom_count)
         self.update_fill_percent()
-        self.lives = min(self.lives + 1, 5)  # Gain a life, max 5
+        self.walls = []
+
+        # Reset shield timer for new level
+        self.level_time = 0.0
+        self.shield_hit_flash = 0.0
 
     def fill_empty_regions(self):
         """Fill regions that don't contain atoms using flood fill."""
-        # Find all empty regions
         visited = [[False for _ in range(self.width)] for _ in range(self.height)]
 
-        # Get atom positions
+        # Get atom positions (2x2 for each)
         atom_positions = set()
         for atom in self.atoms:
             for dx in range(2):
@@ -340,36 +524,64 @@ class JezzBall(Game):
         self.display.draw_text_small(1, 1, f"L{self.level}", Colors.CYAN)
         self.display.draw_text_small(18, 1, f"{self.fill_percent}%", Colors.GREEN)
 
-        # Draw lives
+        # Draw lives as small dots (flash green when bonus life gained)
         for i in range(self.lives):
-            self.display.set_pixel(50 + i * 3, 2, Colors.RED)
-            self.display.set_pixel(51 + i * 3, 2, Colors.RED)
+            x = 50 + (i % 5) * 3
+            y = 2 if i < 5 else 5
+
+            # Flash all lives green/white when bonus gained
+            if self.bonus_life_flash > 0:
+                flash = int(self.bonus_life_flash * 4) % 2 == 0
+                life_color = Colors.WHITE if flash else Colors.GREEN
+            else:
+                life_color = Colors.RED
+
+            self.display.set_pixel(x, y, life_color)
+            self.display.set_pixel(x + 1, y, life_color)
+
+        # Show "+1" indicator when bonus life gained
+        if self.bonus_life_flash > 0.3:
+            self.display.draw_text_small(44, 1, "+1", Colors.GREEN)
 
         # Draw direction indicator
-        dir_text = "H" if self.horizontal else "V"
-        self.display.draw_text_small(42, 1, dir_text, Colors.YELLOW)
+        dir_char = "H" if self.horizontal else "V"
+        self.display.draw_text_small(42, 1, dir_char, Colors.YELLOW)
 
         # Draw separator
         self.display.draw_line(0, 8, 63, 8, Colors.DARK_GRAY)
 
-        # Draw grid
+        # Draw grid (walls and filled areas)
         for y in range(self.height):
             for x in range(self.width):
                 screen_x = self.play_left + x
                 screen_y = self.play_top + y
                 if self.grid[y][x]:
-                    # Border vs filled
+                    # Border vs filled interior
                     if y == 0 or y == self.height - 1 or x == 0 or x == self.width - 1:
                         self.display.set_pixel(screen_x, screen_y, Colors.BLUE)
                     else:
-                        self.display.set_pixel(screen_x, screen_y, Colors.WHITE)
+                        self.display.set_pixel(screen_x, screen_y, (100, 100, 140))
 
         # Draw building walls
-        for wall in self.building_walls:
-            for px, py in wall['pixels']:
-                screen_x = self.play_left + px
-                screen_y = self.play_top + py
-                self.display.set_pixel(screen_x, screen_y, Colors.YELLOW)
+        for wall in self.walls:
+            if wall.dead:
+                continue
+
+            # Draw start position
+            sx = self.play_left + wall.start_x
+            sy = self.play_top + wall.start_y
+            self.display.set_pixel(sx, sy, Colors.YELLOW)
+
+            # Draw wall body
+            for wx, wy in wall.get_all_positions():
+                screen_x = self.play_left + wx
+                screen_y = self.play_top + wy
+                if 0 <= screen_x < GRID_SIZE and 0 <= screen_y < GRID_SIZE:
+                    # Brighter at tip
+                    if (wx, wy) == wall.get_tip_position():
+                        self.display.set_pixel(screen_x, screen_y, Colors.WHITE)
+                    else:
+                        self.display.set_pixel(screen_x, screen_y, Colors.YELLOW)
 
         # Draw atoms (2x2)
         for atom in self.atoms:
@@ -381,18 +593,80 @@ class JezzBall(Game):
                     if 0 <= screen_x < GRID_SIZE and 0 <= screen_y < GRID_SIZE:
                         self.display.set_pixel(screen_x, screen_y, atom['color'])
 
-        # Draw cursor (blinking crosshair)
-        if int(self.cursor_blink * 4) % 2 == 0:
-            cx = self.play_left + self.cursor_x
-            cy = self.play_top + self.cursor_y
-            cursor_color = Colors.GREEN if not self.grid[self.cursor_y][self.cursor_x] else Colors.RED
+        # Draw shield effect when active
+        cx = self.play_left + self.cursor_x
+        cy = self.play_top + self.cursor_y
+        shielded = self.level_time < self.shield_duration
 
-            # Crosshair
-            self.display.set_pixel(cx, cy, cursor_color)
-            self.display.set_pixel(cx - 1, cy, cursor_color)
-            self.display.set_pixel(cx + 1, cy, cursor_color)
-            self.display.set_pixel(cx, cy - 1, cursor_color)
-            self.display.set_pixel(cx, cy + 1, cursor_color)
+        if shielded:
+            # Pulsing shield circle
+            import math
+            pulse = 0.5 + 0.5 * math.sin(self.level_time * 6)
+            shield_time_left = self.shield_duration - self.level_time
+
+            # Shield gets dimmer as it runs out
+            intensity = min(1.0, shield_time_left / 2.0)
+
+            # Flash brighter when hit
+            if self.shield_hit_flash > 0:
+                intensity = 1.0
+                pulse = 1.0
+
+            # Shield color (cyan with pulse)
+            shield_brightness = int(80 + 120 * pulse * intensity)
+            shield_color = (0, shield_brightness, shield_brightness)
+
+            # Draw shield ring (radius 4)
+            shield_points = [
+                (0, -4), (0, 4), (-4, 0), (4, 0),  # Cardinals
+                (-3, -3), (3, -3), (-3, 3), (3, 3),  # Diagonals
+                (-2, -3), (2, -3), (-2, 3), (2, 3),  # Near diagonals
+                (-3, -2), (3, -2), (-3, 2), (3, 2),
+            ]
+            for dx, dy in shield_points:
+                px, py = cx + dx, cy + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    self.display.set_pixel(px, py, shield_color)
+
+            # Show countdown in HUD area
+            secs_left = int(shield_time_left) + 1
+            self.display.draw_text_small(56, 1, str(secs_left), Colors.CYAN)
+
+        # Draw cursor as directional arrows
+        if int(self.cursor_blink * 4) % 2 == 0 or self.walls:
+            # Color based on whether we can build here
+            can_build = not self.grid[self.cursor_y][self.cursor_x] and not self.walls
+            cursor_color = Colors.GREEN if can_build else Colors.RED
+
+            # Flash white briefly after taking damage
+            if not shielded and self.level_time < self.shield_duration + 1.0:
+                if int(self.level_time * 8) % 2 == 0:
+                    cursor_color = Colors.WHITE
+
+            if self.horizontal:
+                # Horizontal arrows pointing left and right (< >)
+                # Left arrow
+                self.display.set_pixel(cx - 2, cy, cursor_color)
+                self.display.set_pixel(cx - 1, cy - 1, cursor_color)
+                self.display.set_pixel(cx - 1, cy + 1, cursor_color)
+                # Right arrow
+                self.display.set_pixel(cx + 2, cy, cursor_color)
+                self.display.set_pixel(cx + 1, cy - 1, cursor_color)
+                self.display.set_pixel(cx + 1, cy + 1, cursor_color)
+                # Center dot
+                self.display.set_pixel(cx, cy, cursor_color)
+            else:
+                # Vertical arrows pointing up and down (^ v)
+                # Up arrow
+                self.display.set_pixel(cx, cy - 2, cursor_color)
+                self.display.set_pixel(cx - 1, cy - 1, cursor_color)
+                self.display.set_pixel(cx + 1, cy - 1, cursor_color)
+                # Down arrow
+                self.display.set_pixel(cx, cy + 2, cursor_color)
+                self.display.set_pixel(cx - 1, cy + 1, cursor_color)
+                self.display.set_pixel(cx + 1, cy + 1, cursor_color)
+                # Center dot
+                self.display.set_pixel(cx, cy, cursor_color)
 
     def draw_game_over(self):
         """Custom game over screen."""

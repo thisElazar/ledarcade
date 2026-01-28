@@ -96,6 +96,9 @@ class DigDug(Game):
                 'move_timer': 0,
                 'ghost_mode': False,
                 'ghost_timer': 0,
+                'fire_timer': 0,  # Fygar fire breath cooldown
+                'fire_active': False,  # Is fire currently being breathed
+                'fire_duration': 0,  # How long fire has been active
             })
 
             # Create small chamber around enemy
@@ -205,6 +208,19 @@ class DigDug(Game):
         if len(self.enemies) == 0:
             self.next_level()
 
+    def get_enemy_speed(self, ghost_mode: bool) -> float:
+        """Calculate enemy speed based on level. Lower value = faster movement."""
+        # Base speeds - enemies get faster each level
+        # Level 1: 0.15 normal, 0.20 ghost
+        # Each level reduces delay by ~8%, making enemies faster
+        speed_multiplier = max(0.4, 1.0 - (self.level - 1) * 0.08)
+
+        if ghost_mode:
+            # Ghosts are faster, and scale with level too
+            return 0.20 * speed_multiplier
+        else:
+            return 0.15 * speed_multiplier
+
     def update_enemies(self, dt: float):
         """Update enemy movement and behavior."""
         for enemy in self.enemies:
@@ -215,8 +231,12 @@ class DigDug(Game):
 
             # Ghost mode - move through dirt toward player
             enemy['ghost_timer'] += dt
-            if enemy['ghost_timer'] > 5.0 and not enemy['ghost_mode']:
-                if random.random() < 0.3:
+            # Higher levels trigger ghost mode sooner
+            ghost_trigger_time = max(2.0, 5.0 - self.level * 0.3)
+            if enemy['ghost_timer'] > ghost_trigger_time and not enemy['ghost_mode']:
+                # Higher levels have higher chance of going ghost
+                ghost_chance = min(0.6, 0.3 + self.level * 0.03)
+                if random.random() < ghost_chance:
                     enemy['ghost_mode'] = True
                     enemy['ghost_timer'] = 0
 
@@ -225,7 +245,11 @@ class DigDug(Game):
                     enemy['ghost_mode'] = False
                     enemy['ghost_timer'] = 0
 
-            move_speed = 0.15 if not enemy['ghost_mode'] else 0.2
+            # Fygar fire breath logic
+            if enemy['type'] == 'fygar':
+                self.update_fygar_fire(enemy, dt)
+
+            move_speed = self.get_enemy_speed(enemy['ghost_mode'])
 
             if enemy['move_timer'] >= move_speed:
                 enemy['move_timer'] = 0
@@ -276,6 +300,60 @@ class DigDug(Game):
                 if 0 <= new_x < GRID_SIZE and 8 <= new_y < GRID_SIZE:
                     enemy['x'] = new_x
                     enemy['y'] = new_y
+
+    def update_fygar_fire(self, enemy: dict, dt: float):
+        """Update Fygar's horizontal fire breath attack."""
+        if enemy['fire_active']:
+            # Fire is currently being breathed
+            enemy['fire_duration'] += dt
+            if enemy['fire_duration'] >= 0.5:  # Fire lasts 0.5 seconds
+                enemy['fire_active'] = False
+                enemy['fire_duration'] = 0
+                enemy['fire_timer'] = 0
+            else:
+                # Check if fire hits player (horizontal fire breath)
+                fire_dir = enemy['dir'][0]  # Only horizontal component
+                if fire_dir == 0:
+                    # If moving vertically, fire in a random horizontal direction
+                    fire_dir = random.choice([-1, 1])
+
+                # Fire extends up to 8 pixels horizontally
+                fire_length = 8 + self.level  # Fire gets longer at higher levels
+                for i in range(1, fire_length + 1):
+                    fire_x = enemy['x'] + fire_dir * i
+                    fire_y = enemy['y']
+
+                    if not (0 <= fire_x < GRID_SIZE):
+                        break
+
+                    # Fire only travels through tunnels
+                    if not self.tunnels[fire_y][fire_x]:
+                        break
+
+                    # Check if fire hits player
+                    if self.invincible <= 0:
+                        if abs(fire_x - self.player_x) <= 1 and abs(fire_y - self.player_y) <= 1:
+                            self.player_hit()
+                            break
+        else:
+            # Fire cooldown
+            enemy['fire_timer'] += dt
+            # Fire more frequently at higher levels
+            fire_cooldown = max(1.5, 3.0 - self.level * 0.15)
+            if enemy['fire_timer'] >= fire_cooldown:
+                # Check if player is in horizontal line of sight
+                if abs(enemy['y'] - self.player_y) <= 2:
+                    # Player is roughly at same height
+                    dist_to_player = abs(enemy['x'] - self.player_x)
+                    if dist_to_player <= 15 and dist_to_player > 2:
+                        # Close enough to fire, but not too close
+                        enemy['fire_active'] = True
+                        enemy['fire_duration'] = 0
+                        # Face toward player for fire
+                        if self.player_x > enemy['x']:
+                            enemy['dir'] = (1, 0)
+                        else:
+                            enemy['dir'] = (-1, 0)
 
     def update_rocks(self, dt: float):
         """Update falling rocks."""
@@ -373,6 +451,11 @@ class DigDug(Game):
         for enemy in self.enemies:
             self.draw_enemy(enemy)
 
+        # Draw Fygar fire breath
+        for enemy in self.enemies:
+            if enemy['type'] == 'fygar' and enemy.get('fire_active', False):
+                self.draw_fygar_fire(enemy)
+
         # Draw pump
         if self.pump_active and self.pump_length > 0:
             self.draw_pump()
@@ -444,6 +527,41 @@ class DigDug(Game):
             py = y + dy * i
             if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                 self.display.set_pixel(px, py, Colors.YELLOW)
+
+    def draw_fygar_fire(self, enemy: dict):
+        """Draw Fygar's horizontal fire breath."""
+        x, y = enemy['x'], enemy['y']
+        fire_dir = enemy['dir'][0]  # Horizontal direction
+
+        if fire_dir == 0:
+            return  # No horizontal direction, no fire to draw
+
+        fire_length = 8 + self.level
+        for i in range(1, fire_length + 1):
+            fire_x = x + fire_dir * i
+            fire_y = y
+
+            if not (0 <= fire_x < GRID_SIZE):
+                break
+
+            # Fire only travels through tunnels
+            if not self.tunnels[fire_y][fire_x]:
+                break
+
+            # Draw fire with orange/red gradient
+            if i <= 3:
+                color = Colors.RED
+            elif i <= 6:
+                color = Colors.ORANGE
+            else:
+                color = Colors.YELLOW
+
+            self.display.set_pixel(fire_x, fire_y, color)
+            # Make fire thicker (add pixels above and below)
+            if fire_y - 1 >= 0:
+                self.display.set_pixel(fire_x, fire_y - 1, color)
+            if fire_y + 1 < GRID_SIZE:
+                self.display.set_pixel(fire_x, fire_y + 1, color)
 
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)

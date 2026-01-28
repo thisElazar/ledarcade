@@ -1,11 +1,18 @@
 """
 Lunar Lander - Arcade Classic
 ==============================
-Land safely on the moon!
+Land safely on the moon! Survive as many landings as possible.
 
 Controls:
   Left/Right - Rotate lander
   Space      - Main thrust (direction lander is pointing)
+
+Progression:
+  - Each successful landing advances to next level
+  - Higher levels have: more gravity, less fuel, rougher terrain, smaller pads
+  - Score accumulates across landings
+  - Bonus fuel awarded on successful landing
+  - Game ends on crash
 """
 
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
@@ -18,17 +25,17 @@ class LunarLander(Game):
     description = "Moon Landing"
     category = "arcade"
 
-    # Physics
-    GRAVITY = 10.0           # Pixels per second squared (floatier)
-    THRUST = 28.0            # Main engine thrust
-    ROTATION_SPEED = 3.0     # Radians per second
-    MAX_LANDING_SPEED = 20.0   # Max vertical speed for safe landing
-    MAX_LATERAL_SPEED = 15.0   # Max horizontal speed for safe landing
-    MAX_LANDING_ANGLE = 0.21   # Max angle from vertical for safe landing (~12 degrees)
+    # Base physics (modified by level)
+    BASE_GRAVITY = 8.0           # Pixels per second squared
+    BASE_THRUST = 28.0           # Main engine thrust
+    ROTATION_SPEED = 3.0         # Radians per second
+    MAX_LANDING_SPEED = 18.0     # Max vertical speed for safe landing
+    MAX_LATERAL_SPEED = 12.0     # Max horizontal speed for safe landing
+    MAX_LANDING_ANGLE = 0.21     # Max angle from vertical for safe landing (~12 degrees)
 
-    # Fuel
-    STARTING_FUEL = 200.0
-    THRUST_FUEL_RATE = 25.0    # Fuel per second of thrust
+    # Fuel (modified by level)
+    BASE_FUEL = 250.0
+    THRUST_FUEL_RATE = 25.0      # Fuel per second of thrust
 
     # Lander
     LANDER_WIDTH = 6
@@ -51,14 +58,30 @@ class LunarLander(Game):
     def reset(self):
         self.state = GameState.PLAYING
         self.score = 0
+        self.level = 1
+        self.landings = 0
+        self.start_new_descent()
+
+    def start_new_descent(self):
+        """Start a new descent attempt (called at game start and after successful landing)."""
+        # Calculate level-based difficulty
+        level_factor = min(self.level, 10)  # Cap at level 10 difficulty
+
+        # Physics get harder: more gravity
+        self.gravity = self.BASE_GRAVITY + (level_factor - 1) * 1.5
+
+        # Less starting fuel at higher levels
+        fuel_penalty = (level_factor - 1) * 15
+        base_fuel = max(self.BASE_FUEL - fuel_penalty, 120)
 
         # Lander state
         self.x = 32.0
         self.y = 8.0
-        self.vx = random.uniform(-3, 3)  # Initial horizontal velocity
+        # Higher levels start with more lateral velocity
+        self.vx = random.uniform(-3 - level_factor * 0.5, 3 + level_factor * 0.5)
         self.vy = 0.0
-        self.angle = random.uniform(-0.3, 0.3)  # Initial angle (radians, 0 = pointing up)
-        self.fuel = self.STARTING_FUEL
+        self.angle = random.uniform(-0.3, 0.3)
+        self.fuel = base_fuel
 
         # Thrust state (for visuals)
         self.thrusting = False
@@ -71,25 +94,48 @@ class LunarLander(Game):
         self.crashed = False
         self.landing_pad = None
         self.landing_multiplier = 1
+        self.landing_bonus = 0
 
     def generate_terrain(self):
-        """Generate random terrain with landing pads."""
+        """Generate random terrain with landing pads. Difficulty scales with level."""
         self.terrain = []
         self.pads = []  # List of (x_start, x_end, multiplier)
+
+        level_factor = min(self.level, 10)
 
         # Generate terrain heights
         y = 55  # Start near bottom
         x = 0
 
-        # Decide pad positions (2-3 pads)
-        num_pads = random.randint(2, 3)
-        pad_positions = sorted(random.sample(range(1, 6), num_pads))
-        pad_widths = [random.randint(8, 12) for _ in pad_positions]
-        pad_multipliers = [1, 2, 5][:num_pads]
-        random.shuffle(pad_multipliers)
+        # Decide pad positions (fewer pads at higher levels)
+        if self.level <= 3:
+            num_pads = 3
+        elif self.level <= 6:
+            num_pads = 2
+        else:
+            num_pads = random.choice([1, 2])
+
+        pad_positions = sorted(random.sample(range(1, 6), min(num_pads, 5)))
+
+        # Pad widths shrink at higher levels
+        base_width = max(12 - level_factor, 6)
+        pad_widths = [random.randint(base_width, base_width + 4) for _ in pad_positions]
+
+        # Point multipliers (smaller pads = more points)
+        pad_multipliers = []
+        for w in pad_widths:
+            if w <= 7:
+                pad_multipliers.append(5)
+            elif w <= 9:
+                pad_multipliers.append(2)
+            else:
+                pad_multipliers.append(1)
 
         segment_width = GRID_SIZE // 6
         current_pad_idx = 0
+
+        # Terrain roughness increases with level
+        max_height_change = min(2 + level_factor // 3, 5)
 
         while x < GRID_SIZE:
             segment = x // segment_width
@@ -108,15 +154,15 @@ class LunarLander(Game):
                 self.pads.append((pad_x_start, x - 1, pad_y, pad_multipliers[current_pad_idx]))
                 current_pad_idx += 1
             else:
-                # Random terrain
-                steps = random.randint(3, 8)
+                # Random terrain (rougher at higher levels)
+                steps = random.randint(2, 6)
                 for _ in range(steps):
                     if x < GRID_SIZE:
                         self.terrain.append(y)
                         x += 1
-                        # Vary height
-                        y += random.randint(-2, 2)
-                        y = max(45, min(60, y))
+                        # Vary height (more at higher levels)
+                        y += random.randint(-max_height_change, max_height_change)
+                        y = max(42, min(60, y))
 
         # Ensure terrain covers full width
         while len(self.terrain) < GRID_SIZE:
@@ -170,10 +216,11 @@ class LunarLander(Game):
                 self.reset()
             return
 
-        # Landed - show success screen, wait for click to play again
+        # Landed - show success screen, wait for click to advance to next level
         if self.landed:
             if input_state.action:
-                self.reset()
+                self.level += 1
+                self.start_new_descent()
             return
 
         if self.crashed:
@@ -192,16 +239,16 @@ class LunarLander(Game):
         if input_state.action_held and self.fuel > 0:
             # Thrust direction: angle=0 means pointing up, so thrust is up
             # angle>0 means tilted right, thrust pushes up-right
-            self.vx += math.sin(self.angle) * self.THRUST * dt
-            self.vy -= math.cos(self.angle) * self.THRUST * dt
+            self.vx += math.sin(self.angle) * self.BASE_THRUST * dt
+            self.vy -= math.cos(self.angle) * self.BASE_THRUST * dt
             self.fuel -= self.THRUST_FUEL_RATE * dt
             self.thrusting = True
 
         # Clamp fuel
         self.fuel = max(0, self.fuel)
 
-        # Apply gravity
-        self.vy += self.GRAVITY * dt
+        # Apply gravity (scales with level)
+        self.vy += self.gravity * dt
 
         # Update position
         self.x += self.vx * dt
@@ -220,8 +267,14 @@ class LunarLander(Game):
             self.landed = True
             self.landing_pad = pad
             self.landing_multiplier = pad[3]
-            self.score = int(100 * self.landing_multiplier + self.fuel)
-            # Don't set GAME_OVER yet - show landed screen first
+            # Scoring: base points * multiplier + fuel bonus + level bonus
+            base_points = 50
+            fuel_bonus = int(self.fuel * 0.5)
+            level_bonus = self.level * 25
+            self.landing_bonus = int(base_points * self.landing_multiplier + fuel_bonus + level_bonus)
+            self.score += self.landing_bonus
+            self.landings += 1
+            # Don't set GAME_OVER yet - show landed screen, then advance level
         elif crashed:
             self.crashed = True
             self.state = GameState.GAME_OVER
@@ -243,15 +296,19 @@ class LunarLander(Game):
 
         # Draw landed success screen
         if self.landed:
-            self.display.draw_text_small(16, 16, "LANDED!", Colors.GREEN)
-            mult_text = f"{self.landing_multiplier}X BONUS"
-            self.display.draw_text_small(8, 26, mult_text, Colors.YELLOW)
-            self.display.draw_text_small(8, 36, f"SCORE: {self.score}", Colors.WHITE)
-            self.display.draw_text_small(4, 50, "PRESS SPACE", Colors.GRAY)
+            self.display.draw_text_small(14, 14, "LANDED!", Colors.GREEN)
+            self.display.draw_text_small(10, 24, f"+{self.landing_bonus}", Colors.YELLOW)
+            if self.landing_multiplier > 1:
+                self.display.draw_text_small(35, 24, f"{self.landing_multiplier}X", Colors.CYAN)
+            self.display.draw_text_small(4, 34, f"SCORE:{self.score}", Colors.WHITE)
+            self.display.draw_text_small(4, 44, f"NEXT:LV{self.level + 1}", Colors.GRAY)
+            self.display.draw_text_small(8, 54, "PRESS BTN", Colors.GRAY)
 
         # Draw crash message
         elif self.state == GameState.GAME_OVER:
-            self.display.draw_text_small(16, 20, "CRASHED!", Colors.RED)
+            self.display.draw_text_small(14, 16, "CRASHED!", Colors.RED)
+            self.display.draw_text_small(4, 28, f"LEVEL:{self.level}", Colors.GRAY)
+            self.display.draw_text_small(4, 38, f"LANDS:{self.landings}", Colors.GRAY)
 
     def draw_terrain(self):
         """Draw the terrain and landing pads."""
@@ -346,29 +403,34 @@ class LunarLander(Game):
                 self.display.set_pixel(px, py, color)
 
     def draw_hud(self):
-        """Draw fuel gauge and velocity indicators."""
-        # Fuel bar
-        fuel_pct = self.fuel / self.STARTING_FUEL
-        fuel_width = int(20 * fuel_pct)
-        fuel_color = self.FUEL_COLOR if fuel_pct > 0.25 else self.DANGER_COLOR
+        """Draw fuel gauge, level, score, and velocity indicators."""
+        # Level indicator
+        self.display.draw_text_small(1, 1, f"L{self.level}", Colors.WHITE)
 
-        self.display.draw_text_small(1, 1, "F", fuel_color)
-        self.display.draw_rect(6, 1, fuel_width, 4, fuel_color)
+        # Fuel bar
+        fuel_pct = self.fuel / self.BASE_FUEL
+        fuel_width = int(16 * fuel_pct)
+        fuel_color = self.FUEL_COLOR if fuel_pct > 0.25 else self.DANGER_COLOR
+        self.display.draw_rect(14, 1, fuel_width, 4, fuel_color)
+
+        # Score (top right)
+        score_str = str(self.score)
+        self.display.draw_text_small(64 - len(score_str) * 4, 1, score_str, Colors.YELLOW)
 
         # Velocity indicator
         speed = math.sqrt(self.vx * self.vx + self.vy * self.vy)
         speed_color = Colors.GREEN if speed < self.MAX_LANDING_SPEED else self.DANGER_COLOR
 
-        # Vertical speed indicator (arrow)
+        # Vertical speed indicator (arrow) - bottom left
         if self.vy > 2:
-            self.display.draw_text_small(56, 1, "v", speed_color)
+            self.display.draw_text_small(1, 58, "v", speed_color)
         elif self.vy < -2:
-            self.display.draw_text_small(56, 1, "^", speed_color)
+            self.display.draw_text_small(1, 58, "^", speed_color)
 
         # Angle indicator (shows if tilted too much)
         angle_ok = abs(self.angle) <= self.MAX_LANDING_ANGLE
         angle_color = Colors.GREEN if angle_ok else self.DANGER_COLOR
         if self.angle > 0.1:
-            self.display.draw_text_small(30, 1, ">", angle_color)
+            self.display.draw_text_small(8, 58, ">", angle_color)
         elif self.angle < -0.1:
-            self.display.draw_text_small(30, 1, "<", angle_color)
+            self.display.draw_text_small(8, 58, "<", angle_color)

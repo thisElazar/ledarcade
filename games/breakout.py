@@ -1,11 +1,19 @@
 """
-Breakout - Classic brick breaker
-================================
-Bounce the ball to break all the bricks!
+Breakout - Classic 1976 Atari arcade game
+=========================================
+Authentic recreation of the original Breakout mechanics.
+
+Original rules:
+- 8 rows of bricks (2 rows each: red, orange, green, yellow)
+- Points: Red=7, Orange=5, Green=3, Yellow=1
+- Paddle shrinks to half after ball hits top wall
+- Ball speeds up after 4 hits, again after 12 hits
+- Ball is fastest when in orange/red rows
+- 3 lives to clear 2 screens (max score 864)
 
 Controls:
   Left/Right - Move paddle
-  Space      - Launch ball / Restart
+  Space      - Launch ball
 """
 
 import random
@@ -15,211 +23,266 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 class Breakout(Game):
     name = "BREAKOUT"
-    description = "Break all the bricks!"
+    description = "Classic 1976 Atari"
     category = "arcade"
-    
+
+    # Authentic color scheme (bottom to top): Yellow, Green, Orange, Red
+    BRICK_ROWS = [
+        {'color': Colors.YELLOW, 'points': 1},
+        {'color': Colors.YELLOW, 'points': 1},
+        {'color': Colors.GREEN, 'points': 3},
+        {'color': Colors.GREEN, 'points': 3},
+        {'color': Colors.ORANGE, 'points': 5},
+        {'color': Colors.ORANGE, 'points': 5},
+        {'color': Colors.RED, 'points': 7},
+        {'color': Colors.RED, 'points': 7},
+    ]
+
+    # Speed tiers (pixels per second)
+    SPEED_INITIAL = 40.0
+    SPEED_AFTER_4 = 50.0
+    SPEED_AFTER_12 = 60.0
+    SPEED_TOP_ROWS = 70.0  # When ball is in orange/red zone
+
+    # Paddle sizes
+    PADDLE_FULL = 12
+    PADDLE_HALF = 6
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
-    
+
     def reset(self):
         self.state = GameState.PLAYING
         self.score = 0
         self.lives = 3
-        
+        self.screen = 1  # Current screen (1 or 2)
+        self.hit_count = 0  # Total brick hits this ball
+        self.hit_ceiling = False  # Has ball hit top wall this screen?
+
         # Paddle
-        self.paddle_width = 10
+        self.paddle_width = self.PADDLE_FULL
         self.paddle_x = GRID_SIZE // 2 - self.paddle_width // 2
         self.paddle_y = GRID_SIZE - 4
-        
+
         # Ball
         self.ball_x = float(GRID_SIZE // 2)
         self.ball_y = float(self.paddle_y - 2)
         self.ball_dx = 0.0
         self.ball_dy = 0.0
-        self.ball_speed = 45.0  # Pixels per second
+        self.ball_speed = self.SPEED_INITIAL
         self.ball_launched = False
-        
+
         # Bricks
         self.bricks = []
         self.setup_bricks()
-        
-        # Effects
-        self.shake_timer = 0
-    
+
     def setup_bricks(self):
-        """Create the brick layout."""
+        """Create the authentic 8-row brick layout."""
         self.bricks = []
-        brick_colors = [
-            Colors.RED,
-            Colors.ORANGE,
-            Colors.YELLOW,
-            Colors.GREEN,
-            Colors.CYAN,
-        ]
-        
-        # 5 rows of bricks, starting at row 10
+
         brick_width = 4
         brick_height = 2
         bricks_per_row = GRID_SIZE // brick_width
-        
-        for row in range(5):
+        start_y = 8  # Start below score area
+
+        # 8 rows, bottom to top (index 0 = bottom yellow, index 7 = top red)
+        for row in range(8):
+            row_def = self.BRICK_ROWS[row]
             for col in range(bricks_per_row):
                 brick = {
                     'x': col * brick_width,
-                    'y': 10 + row * (brick_height + 1),
+                    'y': start_y + (7 - row) * (brick_height + 1),  # Top rows at top
                     'w': brick_width - 1,
                     'h': brick_height,
-                    'color': brick_colors[row],
-                    'points': (5 - row) * 10,  # Top rows worth more
+                    'color': row_def['color'],
+                    'points': row_def['points'],
+                    'row': row,  # Track which row for speed changes
                 }
                 self.bricks.append(brick)
-    
+
     def launch_ball(self):
         """Launch the ball from the paddle."""
         if not self.ball_launched:
-            angle = random.uniform(-0.4, 0.4)  # Random angle
+            angle = random.uniform(-0.4, 0.4)
             self.ball_dx = math.sin(angle) * self.ball_speed
-            self.ball_dy = -self.ball_speed  # Always go up
+            self.ball_dy = -self.ball_speed
             self.ball_launched = True
-    
+            self.hit_count = 0
+
+    def get_current_speed(self):
+        """Calculate ball speed based on authentic rules."""
+        # Base speed from hit count
+        if self.hit_count >= 12:
+            speed = self.SPEED_AFTER_12
+        elif self.hit_count >= 4:
+            speed = self.SPEED_AFTER_4
+        else:
+            speed = self.SPEED_INITIAL
+
+        # Faster in top rows (orange/red zone)
+        ball_y = int(self.ball_y)
+        top_zone_y = 8 + 4 * 3  # Top 4 rows
+        if ball_y < top_zone_y:
+            speed = max(speed, self.SPEED_TOP_ROWS)
+
+        return speed
+
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
             return
-        
+
         # Move paddle
-        paddle_speed = 60  # Pixels per second
+        paddle_speed = 60
         if input_state.left:
             self.paddle_x = max(0, self.paddle_x - paddle_speed * dt)
         if input_state.right:
             self.paddle_x = min(GRID_SIZE - self.paddle_width, self.paddle_x + paddle_speed * dt)
-        
+
         # Launch ball
         if input_state.action and not self.ball_launched:
             self.launch_ball()
-        
+
         # Ball follows paddle if not launched
         if not self.ball_launched:
             self.ball_x = self.paddle_x + self.paddle_width / 2
             self.ball_y = self.paddle_y - 2
             return
-        
-        # Update shake
-        if self.shake_timer > 0:
-            self.shake_timer -= dt
-        
+
+        # Update ball speed based on game state
+        self.ball_speed = self.get_current_speed()
+
+        # Normalize and apply speed
+        current_speed = math.sqrt(self.ball_dx**2 + self.ball_dy**2)
+        if current_speed > 0:
+            scale = self.ball_speed / current_speed
+            self.ball_dx *= scale
+            self.ball_dy *= scale
+
         # Move ball
         self.ball_x += self.ball_dx * dt
         self.ball_y += self.ball_dy * dt
-        
-        # Wall collisions
+
+        # Wall collisions (2x2 ball)
         if self.ball_x <= 0:
             self.ball_x = 0
             self.ball_dx = abs(self.ball_dx)
-        if self.ball_x >= GRID_SIZE - 1:
-            self.ball_x = GRID_SIZE - 1
+        if self.ball_x >= GRID_SIZE - 2:
+            self.ball_x = GRID_SIZE - 2
             self.ball_dx = -abs(self.ball_dx)
-        if self.ball_y <= 7:  # Top wall (below score)
+
+        # Top wall - shrink paddle (authentic mechanic)
+        if self.ball_y <= 7:
             self.ball_y = 7
             self.ball_dy = abs(self.ball_dy)
-        
+            if not self.hit_ceiling:
+                self.hit_ceiling = True
+                self.paddle_width = self.PADDLE_HALF
+                # Re-center paddle at new width
+                self.paddle_x = min(self.paddle_x, GRID_SIZE - self.paddle_width)
+
         # Bottom - lose life
-        if self.ball_y >= GRID_SIZE:
+        if self.ball_y >= GRID_SIZE - 1:
             self.lives -= 1
             self.ball_launched = False
             if self.lives <= 0:
                 self.state = GameState.GAME_OVER
-        
+            else:
+                # Reset for next ball but keep paddle size
+                self.hit_count = 0
+
         # Paddle collision
         ball_ix, ball_iy = int(self.ball_x), int(self.ball_y)
-        if (self.ball_dy > 0 and 
-            self.paddle_y <= ball_iy <= self.paddle_y + 1 and
-            self.paddle_x <= ball_ix <= self.paddle_x + self.paddle_width):
-            
-            # Bounce angle depends on where ball hit paddle
+        ball_bottom = ball_iy + 1
+        if (self.ball_dy > 0 and
+            self.paddle_y <= ball_bottom <= self.paddle_y + 1 and
+            self.paddle_x - 1 <= ball_ix <= self.paddle_x + self.paddle_width):
+
             hit_pos = (self.ball_x - self.paddle_x) / self.paddle_width
-            angle = (hit_pos - 0.5) * 1.2  # -0.6 to 0.6 radians
-            
-            speed = math.sqrt(self.ball_dx**2 + self.ball_dy**2)
-            self.ball_dx = math.sin(angle) * speed
-            self.ball_dy = -abs(math.cos(angle) * speed)
-            self.ball_y = self.paddle_y - 1
-        
+            angle = (hit_pos - 0.5) * 1.2
+
+            self.ball_dx = math.sin(angle) * self.ball_speed
+            self.ball_dy = -abs(math.cos(angle) * self.ball_speed)
+            self.ball_y = self.paddle_y - 2
+
         # Brick collisions
         for brick in self.bricks[:]:
             if self.ball_brick_collision(brick):
                 self.bricks.remove(brick)
                 self.score += brick['points']
-                # No screen shake
-                
-                # Speed up slightly
-                self.ball_speed = min(80, self.ball_speed + 0.5)
+                self.hit_count += 1
                 break
-        
-        # Win condition
+
+        # Screen cleared - advance or win
         if not self.bricks:
-            self.state = GameState.WIN
-    
+            if self.screen < 2:
+                # Advance to screen 2
+                self.screen = 2
+                self.setup_bricks()
+                self.ball_launched = False
+                self.hit_ceiling = False
+                self.paddle_width = self.PADDLE_FULL
+                self.paddle_x = GRID_SIZE // 2 - self.paddle_width // 2
+            else:
+                # Both screens cleared - game complete!
+                self.state = GameState.WIN
+
     def ball_brick_collision(self, brick) -> bool:
-        """Check and handle ball-brick collision."""
+        """Check and handle ball-brick collision (2x2 ball)."""
         bx, by = int(self.ball_x), int(self.ball_y)
-        
-        if (brick['x'] <= bx <= brick['x'] + brick['w'] and
-            brick['y'] <= by <= brick['y'] + brick['h']):
-            
-            # Determine bounce direction
-            # Simple: reverse y direction
-            self.ball_dy = -self.ball_dy
-            return True
-        
+
+        for dx in range(2):
+            for dy in range(2):
+                px, py = bx + dx, by + dy
+                if (brick['x'] <= px <= brick['x'] + brick['w'] and
+                    brick['y'] <= py <= brick['y'] + brick['h']):
+                    self.ball_dy = -self.ball_dy
+                    return True
         return False
-    
+
     def draw(self):
         self.display.clear(Colors.BLACK)
-        
-        # Screen shake offset
-        shake_x = random.randint(-1, 1) if self.shake_timer > 0 else 0
-        shake_y = random.randint(-1, 1) if self.shake_timer > 0 else 0
-        
+
         # Draw score and lives
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-        
-        # Draw lives as hearts/dots
+
+        # Draw lives as dots
         for i in range(self.lives):
-            self.display.set_pixel(55 + i * 3, 2, Colors.RED)
-            self.display.set_pixel(56 + i * 3, 2, Colors.RED)
-            self.display.set_pixel(55 + i * 3, 3, Colors.RED)
-        
+            self.display.set_pixel(50 + i * 4, 2, Colors.WHITE)
+            self.display.set_pixel(51 + i * 4, 2, Colors.WHITE)
+            self.display.set_pixel(50 + i * 4, 3, Colors.WHITE)
+            self.display.set_pixel(51 + i * 4, 3, Colors.WHITE)
+
         # Draw separator
         self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
-        
+
         # Draw bricks
         for brick in self.bricks:
             self.display.draw_rect(
-                brick['x'] + shake_x, 
-                brick['y'] + shake_y,
-                brick['w'], 
-                brick['h'], 
+                brick['x'],
+                brick['y'],
+                brick['w'],
+                brick['h'],
                 brick['color']
             )
-        
+
         # Draw paddle
         paddle_ix = int(self.paddle_x)
         for i in range(self.paddle_width):
-            self.display.set_pixel(paddle_ix + i + shake_x, self.paddle_y + shake_y, Colors.WHITE)
-            self.display.set_pixel(paddle_ix + i + shake_x, self.paddle_y + 1 + shake_y, Colors.GRAY)
-        
-        # Draw ball
+            self.display.set_pixel(paddle_ix + i, self.paddle_y, Colors.WHITE)
+            self.display.set_pixel(paddle_ix + i, self.paddle_y + 1, Colors.GRAY)
+
+        # Draw ball (2x2 pixels)
         ball_ix, ball_iy = int(self.ball_x), int(self.ball_y)
-        self.display.set_pixel(ball_ix + shake_x, ball_iy + shake_y, Colors.WHITE)
-        
+        self.display.set_pixel(ball_ix, ball_iy, Colors.WHITE)
+        self.display.set_pixel(ball_ix + 1, ball_iy, Colors.WHITE)
+        self.display.set_pixel(ball_ix, ball_iy + 1, Colors.WHITE)
+        self.display.set_pixel(ball_ix + 1, ball_iy + 1, Colors.WHITE)
+
         # Draw launch prompt
         if not self.ball_launched:
-            self.display.draw_text_small(8, 40, "SPACE:LAUNCH", Colors.GRAY)
-    
-    def draw_game_over(self):
-        """Custom game over for Breakout."""
-        self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
-        self.display.draw_text_small(12, 32, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+            if self.screen == 1:
+                self.display.draw_text_small(4, 45, "SPACE:LAUNCH", Colors.GRAY)
+            else:
+                self.display.draw_text_small(8, 40, "SCREEN 2", Colors.CYAN)
+                self.display.draw_text_small(4, 50, "SPACE:LAUNCH", Colors.GRAY)

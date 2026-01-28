@@ -49,7 +49,17 @@ class Bomberman(Game):
     EXIT_COLOR = (100, 200, 100)
     PLAYER_COLOR = Colors.WHITE
     PLAYER_FACE = (255, 200, 150)
-    ENEMY_COLOR = (200, 50, 200)  # Purple balloon enemy
+    ENEMY_COLOR = (200, 50, 200)  # Purple balloon enemy (random movement)
+    ENEMY_CHASER_COLOR = (255, 80, 80)  # Red enemy (chases player)
+    ENEMY_FAST_COLOR = (255, 165, 0)  # Orange enemy (fast but random)
+
+    # Enemy types
+    ENEMY_TYPE_RANDOM = 0   # Moves randomly
+    ENEMY_TYPE_CHASER = 1   # Chases the player
+    ENEMY_TYPE_FAST = 2     # Fast but random movement
+
+    # Base enemy move delay (seconds) - decreases with level
+    BASE_ENEMY_DELAY = 0.5
 
     POWERUP_BOMB_COLOR = Colors.BLUE
     POWERUP_FIRE_COLOR = Colors.RED
@@ -155,9 +165,14 @@ class Bomberman(Game):
             pos = brick_positions[i]
             self.hidden_powerups[pos] = random.choice(powerup_types)
 
-        # Place enemies
+        # Place enemies with scaling difficulty
         self.enemies = []
-        num_enemies = 3 + self.level
+        # More enemies at higher levels: starts at 3, increases faster
+        num_enemies = 3 + self.level + (self.level // 3)
+
+        # Calculate enemy speed scaling - enemies get faster each level
+        # Level 1: 0.5s delay, Level 5: 0.35s delay, Level 10: 0.25s delay
+        self.enemy_base_delay = max(0.2, self.BASE_ENEMY_DELAY - (self.level - 1) * 0.03)
 
         enemy_positions = []
         for y in range(3, self.GRID_HEIGHT - 1):
@@ -168,11 +183,35 @@ class Bomberman(Game):
         random.shuffle(enemy_positions)
         for i in range(min(num_enemies, len(enemy_positions))):
             ex, ey = enemy_positions[i]
+
+            # Determine enemy type based on level and randomness
+            # Higher levels have more chasers and fast enemies
+            enemy_type = self.ENEMY_TYPE_RANDOM
+            if self.level >= 2:
+                roll = random.random()
+                # Probability of chaser increases with level (10% at level 2, up to 40%)
+                chaser_chance = min(0.4, 0.1 + (self.level - 2) * 0.05)
+                # Probability of fast enemy (starts at level 3)
+                fast_chance = min(0.3, 0.0 if self.level < 3 else 0.1 + (self.level - 3) * 0.04)
+
+                if roll < chaser_chance:
+                    enemy_type = self.ENEMY_TYPE_CHASER
+                elif roll < chaser_chance + fast_chance:
+                    enemy_type = self.ENEMY_TYPE_FAST
+
+            # Calculate individual enemy delay
+            if enemy_type == self.ENEMY_TYPE_FAST:
+                move_delay = self.enemy_base_delay * 0.6  # 40% faster
+            else:
+                move_delay = self.enemy_base_delay
+
             self.enemies.append({
                 'x': ex,
                 'y': ey,
-                'move_timer': random.random(),
+                'move_timer': random.random() * move_delay,
+                'move_delay': move_delay,
                 'direction': random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)]),
+                'type': enemy_type,
             })
 
         # Reset player
@@ -387,37 +426,104 @@ class Bomberman(Game):
             self.score += 50
 
     def update_enemies(self, dt: float):
-        """Update enemy movement."""
+        """Update enemy movement with different behaviors based on type."""
         for enemy in self.enemies:
             enemy['move_timer'] += dt
 
-            if enemy['move_timer'] >= 0.4:
+            move_delay = enemy.get('move_delay', 0.4)
+            if enemy['move_timer'] >= move_delay:
                 enemy['move_timer'] = 0
 
-                dx, dy = enemy['direction']
+                enemy_type = enemy.get('type', self.ENEMY_TYPE_RANDOM)
+
+                # Determine movement direction based on enemy type
+                if enemy_type == self.ENEMY_TYPE_CHASER:
+                    # Chaser: try to move toward player
+                    dx, dy = self.get_chase_direction(enemy)
+                else:
+                    # Random movement (includes FAST type)
+                    dx, dy = enemy['direction']
+
                 new_x = enemy['x'] + dx
                 new_y = enemy['y'] + dy
 
                 # Check if can move
-                can_move = True
-                if new_x < 1 or new_x >= self.GRID_WIDTH - 1:
-                    can_move = False
-                elif new_y < 1 or new_y >= self.GRID_HEIGHT - 1:
-                    can_move = False
-                elif self.grid[new_y][new_x] not in [self.EMPTY, self.EXIT]:
-                    can_move = False
-
-                # Also avoid bombs
-                for bomb in self.active_bombs:
-                    if bomb['x'] == new_x and bomb['y'] == new_y:
-                        can_move = False
+                can_move = self.can_enemy_move_to(new_x, new_y)
 
                 if can_move:
                     enemy['x'] = new_x
                     enemy['y'] = new_y
+                    # Update direction for random enemies
+                    if enemy_type != self.ENEMY_TYPE_CHASER:
+                        enemy['direction'] = (dx, dy)
                 else:
                     # Change direction
-                    enemy['direction'] = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
+                    if enemy_type == self.ENEMY_TYPE_CHASER:
+                        # Chaser tries random direction when blocked
+                        valid_dirs = self.get_valid_enemy_directions(enemy['x'], enemy['y'])
+                        if valid_dirs:
+                            enemy['direction'] = random.choice(valid_dirs)
+                    else:
+                        # Random enemies pick new random direction
+                        enemy['direction'] = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
+
+    def can_enemy_move_to(self, x, y):
+        """Check if an enemy can move to position."""
+        if x < 1 or x >= self.GRID_WIDTH - 1:
+            return False
+        if y < 1 or y >= self.GRID_HEIGHT - 1:
+            return False
+        if self.grid[y][x] not in [self.EMPTY, self.EXIT]:
+            return False
+        # Avoid bombs
+        for bomb in self.active_bombs:
+            if bomb['x'] == x and bomb['y'] == y:
+                return False
+        return True
+
+    def get_valid_enemy_directions(self, x, y):
+        """Get list of valid movement directions from position."""
+        valid = []
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            if self.can_enemy_move_to(x + dx, y + dy):
+                valid.append((dx, dy))
+        return valid
+
+    def get_chase_direction(self, enemy):
+        """Get direction to chase the player (simple pathfinding)."""
+        ex, ey = enemy['x'], enemy['y']
+        px, py = self.player_x, self.player_y
+
+        # Calculate distances
+        dx_to_player = px - ex
+        dy_to_player = py - ey
+
+        # Possible moves sorted by preference (toward player)
+        possible_moves = []
+
+        if dx_to_player > 0:
+            possible_moves.append((1, 0))
+        elif dx_to_player < 0:
+            possible_moves.append((-1, 0))
+
+        if dy_to_player > 0:
+            possible_moves.append((0, 1))
+        elif dy_to_player < 0:
+            possible_moves.append((0, -1))
+
+        # Add remaining directions as fallback
+        all_dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        for d in all_dirs:
+            if d not in possible_moves:
+                possible_moves.append(d)
+
+        # Try each direction in order of preference
+        for dx, dy in possible_moves:
+            if self.can_enemy_move_to(ex + dx, ey + dy):
+                return (dx, dy)
+
+        # If no valid move, keep current direction
+        return enemy.get('direction', (1, 0))
 
     def check_enemy_collision(self):
         """Check if player collides with enemy."""
@@ -545,19 +651,28 @@ class Bomberman(Game):
             self.display.set_pixel(px + 2, py, self.BOMB_FUSE)
 
     def draw_enemy(self, enemy):
-        """Draw an enemy."""
+        """Draw an enemy with color based on type."""
         px = self.OFFSET_X + enemy['x'] * self.TILE_SIZE
         py = self.OFFSET_Y + enemy['y'] * self.TILE_SIZE
 
+        # Get enemy color based on type
+        enemy_type = enemy.get('type', self.ENEMY_TYPE_RANDOM)
+        if enemy_type == self.ENEMY_TYPE_CHASER:
+            color = self.ENEMY_CHASER_COLOR
+        elif enemy_type == self.ENEMY_TYPE_FAST:
+            color = self.ENEMY_FAST_COLOR
+        else:
+            color = self.ENEMY_COLOR
+
         # Balloon-like enemy
-        self.display.set_pixel(px + 1, py, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 2, py, self.ENEMY_COLOR)
-        self.display.set_pixel(px, py + 1, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 1, py + 1, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 2, py + 1, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 3, py + 1, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 1, py + 2, self.ENEMY_COLOR)
-        self.display.set_pixel(px + 2, py + 2, self.ENEMY_COLOR)
+        self.display.set_pixel(px + 1, py, color)
+        self.display.set_pixel(px + 2, py, color)
+        self.display.set_pixel(px, py + 1, color)
+        self.display.set_pixel(px + 1, py + 1, color)
+        self.display.set_pixel(px + 2, py + 1, color)
+        self.display.set_pixel(px + 3, py + 1, color)
+        self.display.set_pixel(px + 1, py + 2, color)
+        self.display.set_pixel(px + 2, py + 2, color)
 
         # Eyes
         self.display.set_pixel(px + 1, py + 1, Colors.WHITE)

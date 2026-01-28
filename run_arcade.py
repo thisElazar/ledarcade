@@ -13,15 +13,130 @@ Controls:
 
 import pygame
 import sys
+from enum import Enum, auto
 from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState
 from catalog import (
     register_games, register_visuals, get_all_categories,
     GAME_CATEGORIES, VISUAL_CATEGORIES
 )
+from highscores import get_high_score_manager
 
 # Import all games and visuals
 from games import ALL_GAMES
 from visuals import ALL_VISUALS
+
+
+# Game over sub-states
+class GameOverState(Enum):
+    FLASHING = auto()      # Alternating between score and leaderboard
+    ENTER_INITIALS = auto() # Player entering their initials
+    CHOOSE_ACTION = auto()  # PLAY AGAIN / MENU selection
+
+
+def draw_game_over_score(display, score):
+    """Draw the GAME OVER screen with player's score."""
+    display.clear(Colors.BLACK)
+    display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
+    display.draw_text_small(12, 32, f"SCORE:{score}", Colors.WHITE)
+
+
+def draw_leaderboard(display, game_name, highlight_rank=-1):
+    """Draw the high scores leaderboard.
+
+    Args:
+        display: The display to draw on
+        game_name: Name of the game to show scores for
+        highlight_rank: 1-3 to highlight that rank, -1 for no highlight
+    """
+    display.clear(Colors.BLACK)
+    display.draw_text_small(4, 2, "HIGH SCORES", Colors.YELLOW)
+    display.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
+
+    hsm = get_high_score_manager()
+    scores = hsm.get_top_scores(game_name)
+
+    if not scores:
+        display.draw_text_small(12, 28, "NO SCORES", Colors.GRAY)
+        display.draw_text_small(16, 38, "YET!", Colors.GRAY)
+        return
+
+    y = 14
+    for i, (initials, score) in enumerate(scores):
+        rank = i + 1
+        # Highlight the player's new score
+        if rank == highlight_rank:
+            color = Colors.CYAN
+        else:
+            color = Colors.WHITE
+
+        # Format: "1 AAA 12345" - rank, initials, score
+        display.draw_text_small(2, y, f"{rank}", color)
+        display.draw_text_small(10, y, initials, color)
+        # Right-align score
+        score_str = str(score)
+        score_x = 62 - len(score_str) * 4
+        display.draw_text_small(score_x, y, score_str, color)
+        y += 8
+
+
+def draw_initials_entry(display, initials, cursor_pos, score):
+    """Draw the initials entry screen.
+
+    Args:
+        display: The display to draw on
+        initials: List of 3 characters
+        cursor_pos: 0-2 indicating which letter is being edited
+        score: The player's score to display
+    """
+    display.clear(Colors.BLACK)
+    display.draw_text_small(4, 2, "NEW RECORD!", Colors.YELLOW)
+    display.draw_text_small(12, 12, f"SCORE:{score}", Colors.WHITE)
+
+    display.draw_line(0, 22, 63, 22, Colors.DARK_GRAY)
+    display.draw_text_small(2, 26, "ENTER NAME:", Colors.GRAY)
+
+    # Draw the three letter slots
+    slot_x = 20
+    for i, letter in enumerate(initials):
+        x = slot_x + i * 10
+        if i == cursor_pos:
+            # Draw cursor indicators (up/down arrows)
+            display.draw_text_small(x + 1, 34, "^", Colors.YELLOW)
+            display.draw_text_small(x, 42, letter, Colors.CYAN)
+            display.draw_text_small(x + 1, 50, "v", Colors.YELLOW)
+        else:
+            display.draw_text_small(x, 42, letter, Colors.WHITE)
+
+    display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
+    display.draw_text_small(4, 58, "BTN:CONFIRM", Colors.GRAY)
+
+
+def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1):
+    """Draw the PLAY AGAIN / MENU selection.
+
+    Args:
+        display: The display to draw on
+        selection: 0 = PLAY AGAIN, 1 = MENU
+        score: The player's score
+        made_leaderboard: Whether player made the leaderboard
+        rank: Player's rank if they made leaderboard
+    """
+    display.clear(Colors.BLACK)
+
+    if made_leaderboard:
+        display.draw_text_small(8, 8, f"RANK #{rank}!", Colors.CYAN)
+        display.draw_text_small(12, 18, f"SCORE:{score}", Colors.WHITE)
+    else:
+        display.draw_text_small(8, 12, "GAME OVER", Colors.RED)
+        display.draw_text_small(12, 22, f"SCORE:{score}", Colors.WHITE)
+
+    # Draw selection options
+    if selection == 0:
+        display.draw_text_small(4, 40, ">PLAY AGAIN", Colors.YELLOW)
+        display.draw_text_small(4, 50, " MENU", Colors.GRAY)
+    else:
+        display.draw_text_small(4, 40, " PLAY AGAIN", Colors.GRAY)
+        display.draw_text_small(4, 50, ">MENU", Colors.YELLOW)
 
 
 def draw_menu(display, categories, cat_index, item_index):
@@ -129,14 +244,32 @@ def main():
     item_index = 0
     current_item = None
     is_game = False
+    visual_exit_hold = 0.0  # Timer for hold-to-exit visuals
+
+    # Game over state
+    game_over_state = GameOverState.FLASHING
+    game_over_selection = 0  # 0 = PLAY AGAIN, 1 = MENU
+    flash_timer = 0.0  # Timer for alternating screens
+    flash_show_leaderboard = False  # Which screen to show
+    player_initials = ['A', 'A', 'A']  # Current initials being entered
+    initials_cursor = 0  # Which letter is being edited (0-2)
+    player_made_leaderboard = False
+    player_rank = -1
+    final_score = 0  # Store score when game ends
+    game_over_lockout = 0.0  # Input lockout when entering game over
+
+    # High score manager
+    hsm = get_high_score_manager()
 
     # Debounce for left/right navigation
     nav_cooldown = 0
+    input_cooldown = 0  # Cooldown for initials entry
 
     running = True
     while running:
         dt = clock.tick(30) / 1000.0
         nav_cooldown = max(0, nav_cooldown - dt)
+        input_cooldown = max(0, input_cooldown - dt)
 
         # Handle events
         for event in pygame.event.get():
@@ -195,17 +328,120 @@ def main():
                 if is_game:
                     # Game logic
                     if current_item.state == GameState.GAME_OVER:
-                        current_item.draw_game_over()
-                        if input_state.action:
-                            current_item.reset()
+                        # First time entering game over - check for high score
+                        if final_score == 0 or final_score != current_item.score:
+                            final_score = current_item.score
+                            player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
+                            game_over_lockout = 1.5  # Ignore inputs for 1.5 seconds
+                            if player_made_leaderboard:
+                                # Go straight to initials entry
+                                game_over_state = GameOverState.ENTER_INITIALS
+                                player_initials = ['A', 'A', 'A']
+                                initials_cursor = 0
+                            else:
+                                # Start flashing between score and leaderboard
+                                game_over_state = GameOverState.FLASHING
+                                flash_timer = 0.0
+                                flash_show_leaderboard = False
+
+                        # Tick down the lockout timer
+                        if game_over_lockout > 0:
+                            game_over_lockout -= dt
+
+                        # Handle based on current game over sub-state (only if lockout expired)
+                        if game_over_state == GameOverState.FLASHING:
+                            flash_timer += dt
+                            if flash_timer >= 2.0:
+                                flash_timer = 0.0
+                                flash_show_leaderboard = not flash_show_leaderboard
+
+                            # Any input skips to action selection (if lockout expired)
+                            if game_over_lockout <= 0:
+                                if input_state.action or input_state.up or input_state.down:
+                                    game_over_state = GameOverState.CHOOSE_ACTION
+                                    game_over_selection = 0
+
+                            # Draw appropriate screen
+                            if flash_show_leaderboard:
+                                draw_leaderboard(display, current_item.name)
+                            else:
+                                draw_game_over_score(display, final_score)
+
+                        elif game_over_state == GameOverState.ENTER_INITIALS:
+                            if input_cooldown <= 0 and game_over_lockout <= 0:
+                                # Up/Down cycles letter
+                                if input_state.up:
+                                    letter = player_initials[initials_cursor]
+                                    if letter == 'A':
+                                        player_initials[initials_cursor] = 'Z'
+                                    else:
+                                        player_initials[initials_cursor] = chr(ord(letter) - 1)
+                                    input_cooldown = 0.15
+                                elif input_state.down:
+                                    letter = player_initials[initials_cursor]
+                                    if letter == 'Z':
+                                        player_initials[initials_cursor] = 'A'
+                                    else:
+                                        player_initials[initials_cursor] = chr(ord(letter) + 1)
+                                    input_cooldown = 0.15
+                                # Left/Right moves cursor
+                                elif input_state.left and initials_cursor > 0:
+                                    initials_cursor -= 1
+                                    input_cooldown = 0.2
+                                elif input_state.right and initials_cursor < 2:
+                                    initials_cursor += 1
+                                    input_cooldown = 0.2
+                                # Action confirms initials
+                                elif input_state.action:
+                                    initials_str = ''.join(player_initials)
+                                    player_rank = hsm.add_score(current_item.name, initials_str, final_score)
+                                    game_over_state = GameOverState.CHOOSE_ACTION
+                                    game_over_selection = 0
+                                    input_cooldown = 0.2
+
+                            draw_initials_entry(display, player_initials, initials_cursor, final_score)
+
+                        elif game_over_state == GameOverState.CHOOSE_ACTION:
+                            if input_state.up or input_state.down:
+                                game_over_selection = 1 - game_over_selection
+                            elif input_state.action:
+                                if game_over_selection == 0:
+                                    # Play again
+                                    current_item.reset()
+                                    final_score = 0
+                                    player_made_leaderboard = False
+                                    player_rank = -1
+                                else:
+                                    # Return to menu
+                                    in_menu = True
+                                    current_item = None
+                                    final_score = 0
+                                    player_made_leaderboard = False
+                                    player_rank = -1
+                                game_over_selection = 0
+
+                            if current_item:
+                                draw_action_selection(display, game_over_selection, final_score,
+                                                      player_made_leaderboard, player_rank)
                     else:
                         current_item.update(input_state, dt)
                         current_item.draw()
                 else:
                     # Visual logic
-                    current_item.handle_input(input_state)
-                    current_item.update(dt)
-                    current_item.draw()
+                    # Hold action button for 2 seconds to return to menu
+                    if input_state.action_held:
+                        visual_exit_hold += dt
+                        if visual_exit_hold >= 2.0:
+                            in_menu = True
+                            current_item = None
+                            visual_exit_hold = 0.0
+                    else:
+                        visual_exit_hold = 0.0
+
+                    if current_item:
+                        current_item.handle_input(input_state)
+                        current_item.update(dt)
+                        current_item.draw()
 
         display.render()
 

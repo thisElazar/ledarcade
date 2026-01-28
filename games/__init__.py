@@ -38,6 +38,7 @@ from .loderunner import LodeRunner
 from .donkeykong import DonkeyKong
 from .qbert import QBert
 from .bomberman import Bomberman
+from .arkanoid import Arkanoid
 
 # List of all available games
 ALL_GAMES = [
@@ -75,6 +76,7 @@ ALL_GAMES = [
     DonkeyKong,
     QBert,
     Bomberman,
+    Arkanoid,
 ]
 
 __all__ = [
@@ -112,5 +114,6 @@ __all__ = [
     'DonkeyKong',
     'QBert',
     'Bomberman',
+    'Arkanoid',
     'ALL_GAMES',
 ]

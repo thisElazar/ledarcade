@@ -333,12 +333,23 @@ class Game(ABC):
         """Draw score at top of screen."""
         self.display.draw_text_small(1, y, f"{self.score}", Colors.WHITE)
     
-    def draw_game_over(self):
-        """Draw game over screen."""
+    def draw_game_over(self, selection: int = 0):
+        """Draw game over screen with menu options.
+
+        Args:
+            selection: 0 = PLAY AGAIN, 1 = MENU
+        """
         self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 25, "GAME OVER", Colors.RED)
-        self.display.draw_text_small(12, 35, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
+        self.display.draw_text_small(12, 30, f"SCORE:{self.score}", Colors.WHITE)
+
+        # Draw selection options
+        if selection == 0:
+            self.display.draw_text_small(4, 44, ">PLAY AGAIN", Colors.YELLOW)
+            self.display.draw_text_small(4, 54, " MENU", Colors.GRAY)
+        else:
+            self.display.draw_text_small(4, 44, " PLAY AGAIN", Colors.GRAY)
+            self.display.draw_text_small(4, 54, ">MENU", Colors.YELLOW)
 
 
 # =============================================================================
@@ -356,6 +367,7 @@ class Arcade:
         self.games: List[type] = []  # Game classes
         self.current_game: Optional[Game] = None
         self.menu_selection = 0
+        self.game_over_selection = 0  # 0 = PLAY AGAIN, 1 = MENU
         self.in_menu = True
     
     def register_game(self, game_class: type):
@@ -426,9 +438,19 @@ class Arcade:
                     self.current_game = None
                 elif self.current_game:
                     if self.current_game.state == GameState.GAME_OVER:
-                        self.current_game.draw_game_over()
-                        if input_state.action:
-                            self.current_game.reset()
+                        # Handle game over menu selection
+                        if input_state.up or input_state.down:
+                            self.game_over_selection = 1 - self.game_over_selection
+                        elif input_state.action:
+                            if self.game_over_selection == 0:
+                                # Play again
+                                self.current_game.reset()
+                            else:
+                                # Return to menu
+                                self.in_menu = True
+                                self.current_game = None
+                            self.game_over_selection = 0
+                        self.current_game.draw_game_over(self.game_over_selection)
                     else:
                         self.current_game.update(input_state, dt)
                         self.current_game.draw()
