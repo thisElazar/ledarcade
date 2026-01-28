@@ -29,9 +29,45 @@ The Pi 3 serves as the prototyping platform. Once everything works, we validate 
 
 ## GPIO Pin Mapping
 
-### HUB75 Panel Connection (Direct Wiring)
+### HUB75 Panel Connection
 
 No HAT is used. Female-to-female Dupont jumpers connect the panel's HUB75 input header directly to the Pi's GPIO.
+
+**Two options:**
+1. **Standard wiring** (recommended for new builds) - matches library's "regular" mapping, no patches needed
+2. **Custom wiring** (current prototype) - requires custom library mapping
+
+---
+
+### Option 1: Standard Wiring (Recommended)
+
+Use the `rpi-rgb-led-matrix` library's built-in "regular" hardware mapping. No library modifications needed.
+
+| HUB75 Pin | Function | Pi GPIO | Physical Pin |
+|-----------|----------|---------|--------------|
+| R1 | Red (upper half) | GPIO 11 | Pin 23 |
+| G1 | Green (upper half) | GPIO 27 | Pin 13 |
+| B1 | Blue (upper half) | GPIO 7 | Pin 26 |
+| R2 | Red (lower half) | GPIO 8 | Pin 24 |
+| G2 | Green (lower half) | GPIO 9 | Pin 21 |
+| B2 | Blue (lower half) | GPIO 10 | Pin 19 |
+| A | Row select bit 0 | GPIO 22 | Pin 15 |
+| B | Row select bit 1 | GPIO 23 | Pin 16 |
+| C | Row select bit 2 | GPIO 24 | Pin 18 |
+| D | Row select bit 3 | GPIO 25 | Pin 22 |
+| E | Row select bit 4 (64x64) | GPIO 15 | Pin 10 |
+| CLK | Clock | GPIO 17 | Pin 11 |
+| LAT | Latch | GPIO 4 | Pin 7 |
+| OE | Output enable | GPIO 18 | Pin 12 |
+| GND | Ground | GND | Pin 6, 9, 14, 20, 25, 30, 34, 39 |
+
+In `hardware.py`, use: `options.hardware_mapping = 'regular'`
+
+---
+
+### Option 2: Custom Wiring (Current Prototype)
+
+The prototype uses a custom "led-arcade" mapping. Requires patching the library (see below).
 
 | HUB75 Pin | Function | Pi GPIO | Physical Pin |
 |-----------|----------|---------|--------------|
@@ -50,6 +86,38 @@ No HAT is used. Female-to-female Dupont jumpers connect the panel's HUB75 input 
 | LAT | Latch | GPIO 4 | Pin 7 |
 | OE | Output enable | GPIO 18 | Pin 12 |
 | GND | Ground | GND | Pin 6, 9, 14, 20, 25, 30, 34, 39 |
+
+In `hardware.py`, use: `options.hardware_mapping = 'led-arcade'`
+
+**To add the custom mapping to the library:**
+
+1. Edit `~/rpi-rgb-led-matrix/lib/hardware-mapping.c`
+2. Add after the "regular" mapping block:
+
+```c
+  {
+    .name          = "led-arcade",
+    .output_enable = GPIO_BIT(18),
+    .clock         = GPIO_BIT(17),
+    .strobe        = GPIO_BIT(4),
+    .a             = GPIO_BIT(22),
+    .b             = GPIO_BIT(26),
+    .c             = GPIO_BIT(27),
+    .d             = GPIO_BIT(20),
+    .e             = GPIO_BIT(21),
+    .p0_r1         = GPIO_BIT(5),
+    .p0_g1         = GPIO_BIT(13),
+    .p0_b1         = GPIO_BIT(6),
+    .p0_r2         = GPIO_BIT(12),
+    .p0_g2         = GPIO_BIT(16),
+    .p0_b2         = GPIO_BIT(23),
+  },
+```
+
+3. Rebuild: `cd ~/rpi-rgb-led-matrix && make clean && make`
+4. Rebuild Python bindings: `cd bindings/python && make build-python && sudo make install-python`
+
+---
 
 **Note:** The E pin is required for 64x64 panels (32-row addressing needs 5 address bits).
 
@@ -112,12 +180,14 @@ ping ledarcade.local
 sudo apt update && sudo apt upgrade -y
 
 # Install required packages
-sudo apt install -y git python3-pip python3-dev
+sudo apt install -y git python3-pip python3-dev cython3
 
 # Disable onboard audio (conflicts with LED matrix timing)
-sudo nano /boot/config.txt
-# Comment out: dtparam=audio=on
-# Add: dtparam=audio=off
+# Method 1: Edit config
+sudo sed -i 's/^dtparam=audio=on/dtparam=audio=off/' /boot/firmware/config.txt
+
+# Method 2: Blacklist the module (belt and suspenders)
+echo 'blacklist snd_bcm2835' | sudo tee /etc/modprobe.d/blacklist-sound.conf
 
 # Reboot to apply
 sudo reboot
@@ -132,13 +202,29 @@ git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
 
 # Build the library
 cd rpi-rgb-led-matrix
-make
+make -j4
 
 # Build Python bindings
 cd bindings/python
 make build-python PYTHON=$(which python3)
 sudo make install-python PYTHON=$(which python3)
 ```
+
+### Clone and Run LED Arcade
+
+```bash
+# Clone the project
+git clone https://github.com/thisElazar/ledarcade.git ~/led-arcade
+
+# Run on hardware
+cd ~/led-arcade
+sudo python3 run_hardware.py
+```
+
+**Controls (keyboard):**
+- Arrow keys / WASD - Navigate
+- Space - Select / Action
+- Q - Back / Exit
 
 ### Transfer Project Files
 
