@@ -72,7 +72,9 @@ class Quarks(Visual):
 
         # Initialize grid with 256 states
         self.grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+        self.prev_grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
         self.next_grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+        self.blend = 0.0  # Interpolation factor between prev and current
 
         # Initialize with boundary values and some seeds
         self.init_pattern()
@@ -213,8 +215,16 @@ class Quarks(Visual):
             self.update_timer = 0
             self.step_ca()
 
+        # Blend factor for smooth interpolation between CA states
+        self.blend = min(1.0, self.update_timer / effective_interval)
+
     def step_ca(self):
         """Perform one step of the Rug cellular automaton."""
+        # Save current state for interpolation
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                self.prev_grid[y][x] = self.grid[y][x]
+
         # Update all cells with toroidal wrapping
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
@@ -277,6 +287,17 @@ class Quarks(Visual):
     def draw(self):
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
-                state = self.grid[y][x]
-                color = self.colors[state]
+                prev_state = self.prev_grid[y][x]
+                curr_state = self.grid[y][x]
+
+                # Interpolate between previous and current color
+                prev_color = self.colors[prev_state]
+                curr_color = self.colors[curr_state]
+                t = self.blend
+
+                color = (
+                    int(prev_color[0] + (curr_color[0] - prev_color[0]) * t),
+                    int(prev_color[1] + (curr_color[1] - prev_color[1]) * t),
+                    int(prev_color[2] + (curr_color[2] - prev_color[2]) * t),
+                )
                 self.display.set_pixel(x, y, color)
