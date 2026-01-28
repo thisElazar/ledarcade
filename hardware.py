@@ -97,7 +97,6 @@ class HardwareDisplay:
         options.drop_privileges = False
 
         self.matrix = RGBMatrix(options=options)
-        self.canvas = self.matrix.CreateFrameCanvas()
 
         # Virtual framebuffer (matches arcade.py interface)
         self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
@@ -221,12 +220,10 @@ class HardwareDisplay:
 
     def render(self):
         """Render the buffer to the LED matrix."""
-        self.canvas.Clear()
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 r, g, b = self.buffer[y][x]
-                self.canvas.SetPixel(x, y, r, g, b)
-        self.canvas = self.matrix.SwapOnVSync(self.canvas)
+                self.matrix.SetPixel(x, y, r, g, b)
 
 
 # =============================================================================
