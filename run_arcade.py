@@ -124,7 +124,7 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
     display.clear(Colors.BLACK)
 
     if made_leaderboard:
-        display.draw_text_small(2, 8, f"RANK #{rank}!", Colors.CYAN)
+        display.draw_text_small(2, 8, f"RANK {rank}!", Colors.CYAN)
         display.draw_text_small(2, 18, f"SCORE:{score}", Colors.WHITE)
     else:
         display.draw_text_small(2, 12, "GAME OVER", Colors.RED)

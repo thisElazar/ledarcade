@@ -40,10 +40,11 @@ class Flappy(Game):
 
         # Pipes
         self.pipes = []  # List of {'x': float, 'gap_y': int, 'scored': bool}
-        self.pipe_speed = 40.0  # Pixels per second
+        self.pipe_speed = 35.0  # Pixels per second (slower start)
         self.pipe_width = 6
-        self.gap_height = 16  # Height of the passable gap
-        self.pipe_spacing = 30  # Horizontal distance between pipes
+        self.gap_height = 18  # Height of the passable gap (more forgiving)
+        self.pipe_spacing = 35  # Horizontal distance between pipes (more time to react)
+        self.last_gap_y = 28  # Track last gap for rhythmic placement
 
         # Spawn first pipe
         self.spawn_pipe(GRID_SIZE + 10)
@@ -56,11 +57,19 @@ class Flappy(Game):
         self.started = False
 
     def spawn_pipe(self, x: float):
-        """Spawn a new pipe at the given x position."""
-        # Random gap position, leaving room at top and bottom
-        min_gap_y = 12  # Below HUD
-        max_gap_y = self.ground_y - self.gap_height - 4
-        gap_y = random.randint(min_gap_y, max_gap_y)
+        """Spawn a new pipe at the given x position with rhythmic gap placement."""
+        # Gap position constrained for smooth, playable transitions
+        min_gap_y = 14  # Below HUD with margin
+        max_gap_y = self.ground_y - self.gap_height - 6
+
+        # Limit vertical change from last gap for rhythmic flow
+        # Max 10 pixel change between consecutive pipes
+        max_change = 10
+        target_min = max(min_gap_y, self.last_gap_y - max_change)
+        target_max = min(max_gap_y, self.last_gap_y + max_change)
+
+        gap_y = random.randint(target_min, target_max)
+        self.last_gap_y = gap_y
 
         self.pipes.append({
             'x': x,
@@ -114,8 +123,8 @@ class Flappy(Game):
             if not pipe['scored'] and pipe['x'] + self.pipe_width < self.bird_x:
                 pipe['scored'] = True
                 self.score += 1
-                # Speed up slightly
-                self.pipe_speed = min(70, self.pipe_speed + 1)
+                # Speed up gradually (capped at reasonable max)
+                self.pipe_speed = min(55, self.pipe_speed + 0.5)
 
         # Remove off-screen pipes
         self.pipes = [p for p in self.pipes if p['x'] > -self.pipe_width]
@@ -234,6 +243,6 @@ class Flappy(Game):
     def draw_game_over(self):
         """Custom game over screen."""
         self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
-        self.display.draw_text_small(16, 32, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(2, 20, "GAME OVER", Colors.RED)
+        self.display.draw_text_small(2, 32, f"SCORE:{self.score}", Colors.WHITE)
+        self.display.draw_text_small(2, 50, "SPACE:RETRY", Colors.GRAY)

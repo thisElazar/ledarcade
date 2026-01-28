@@ -78,14 +78,16 @@ class Tetris(Game):
     # Playfield dimensions (standard Tetris is 10 wide, 20 tall)
     BOARD_WIDTH = 10
     BOARD_HEIGHT = 20
-    
+
     def __init__(self, display: Display):
         super().__init__(display)
 
-        # Calculate board position (left side, more vertical space)
-        self.board_x = 4
-        self.board_y = 10
-        self.cell_size = 2  # Each cell is 2x2 pixels
+        # Board uses 3x3 cells for max visibility (30x60 pixels)
+        self.cell_size = 3
+        # Center the board horizontally: (64 - 30) / 2 = 17
+        self.board_x = 17
+        # Start at y=2 for 60px tall board (rows 2-61)
+        self.board_y = 2
 
         self.reset()
     
@@ -300,19 +302,13 @@ class Tetris(Game):
     def draw(self):
         self.display.clear(Colors.BLACK)
 
-        # Draw score at top
-        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-
-        # Draw level
-        self.display.draw_text_small(50, 1, f"L{self.level}", Colors.CYAN)
-        
         # Draw board border
         bx, by = self.board_x, self.board_y
         bw = self.BOARD_WIDTH * self.cell_size
         bh = self.BOARD_HEIGHT * self.cell_size
-        
+
         self.display.draw_rect(bx - 1, by - 1, bw + 2, bh + 2, Colors.DARK_GRAY, filled=False)
-        
+
         # Draw board contents
         for y in range(self.BOARD_HEIGHT):
             for x in range(self.BOARD_WIDTH):
@@ -321,7 +317,7 @@ class Tetris(Game):
                     px = bx + x * self.cell_size
                     py = by + y * self.cell_size
                     self.display.draw_rect(px, py, self.cell_size, self.cell_size, color)
-        
+
         # Draw line clear effect
         if self.line_clear_rows:
             flash = int(self.line_clear_timer * 10) % 2 == 0
@@ -329,16 +325,16 @@ class Tetris(Game):
                 py = by + y * self.cell_size
                 color = Colors.WHITE if flash else Colors.BLACK
                 self.display.draw_rect(bx, py, bw, self.cell_size, color)
-        
+
         # Draw current piece
         if self.current_piece and not self.line_clear_rows:
             color = TETROMINO_COLORS[self.current_piece]
-            
+
             # Draw ghost piece (where it will land)
             ghost_y = self.piece_y
             while not self.check_collision(dy=ghost_y - self.piece_y + 1):
                 ghost_y += 1
-            
+
             ghost_color = (color[0] // 4, color[1] // 4, color[2] // 4)
             shape = TETROMINOS[self.current_piece][self.current_rotation]
             for block_dx, block_dy in shape:
@@ -348,31 +344,45 @@ class Tetris(Game):
                     px = bx + x * self.cell_size
                     py = by + y * self.cell_size
                     self.display.draw_rect(px, py, self.cell_size, self.cell_size, ghost_color)
-            
+
             # Draw actual piece
             for x, y in self.get_piece_blocks():
                 if y >= 0:
                     px = bx + x * self.cell_size
                     py = by + y * self.cell_size
                     self.display.draw_rect(px, py, self.cell_size, self.cell_size, color)
-        
-        # Draw next piece preview (right side)
-        next_x = bx + bw + 6
-        next_y = by + 8
 
-        self.display.draw_text_small(next_x, by, "NEXT", Colors.GRAY)
+        # LEFT SIDE INFO (x 0-15)
+        # Score
+        self.display.draw_text_small(1, 2, "SC", Colors.GRAY)
+        score_str = str(self.score)
+        # Stack score digits vertically if needed
+        if self.score < 1000:
+            self.display.draw_text_small(1, 10, score_str, Colors.WHITE)
+        else:
+            # Show abbreviated score
+            self.display.draw_text_small(1, 10, f"{self.score // 1000}K", Colors.WHITE)
+
+        # Level
+        self.display.draw_text_small(1, 26, "LV", Colors.GRAY)
+        self.display.draw_text_small(1, 34, f"{self.level}", Colors.CYAN)
+
+        # Lines
+        self.display.draw_text_small(1, 50, "LN", Colors.GRAY)
+        self.display.draw_text_small(1, 58, f"{self.lines}", Colors.WHITE)
+
+        # RIGHT SIDE INFO (x 48-63)
+        # Next piece preview
+        self.display.draw_text_small(49, 2, "NX", Colors.GRAY)
 
         if self.next_piece:
             color = TETROMINO_COLORS[self.next_piece]
             shape = TETROMINOS[self.next_piece][0]
+            # Draw next piece with 2px cells to fit in side panel
             for block_dx, block_dy in shape:
-                px = next_x + block_dx * self.cell_size
-                py = next_y + block_dy * self.cell_size
-                self.display.draw_rect(px, py, self.cell_size, self.cell_size, color)
-
-        # Draw lines count
-        self.display.draw_text_small(next_x, by + 24, f"LN", Colors.GRAY)
-        self.display.draw_text_small(next_x, by + 32, f"{self.lines}", Colors.WHITE)
+                px = 49 + block_dx * 2
+                py = 12 + block_dy * 2
+                self.display.draw_rect(px, py, 2, 2, color)
     
     def draw_game_over(self):
         """Custom game over for Tetris."""

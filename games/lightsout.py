@@ -29,7 +29,7 @@ class LightsOut(Game):
     # Colors
     LIGHT_ON = (255, 255, 100)   # Bright yellow
     LIGHT_OFF = (40, 40, 50)     # Dark gray
-    BOARD_BG = (30, 30, 40)
+    BOARD_BG = (0, 0, 0)         # True black
     CURSOR_COLOR = Colors.CYAN
 
     def __init__(self, display: Display):

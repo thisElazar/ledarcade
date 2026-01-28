@@ -255,8 +255,8 @@ class Mancala(Game):
                 is_selected = True
             self.draw_pit(x, y, self.pits[i], is_selected)
 
-        # Draw HUD
-        p1_color = Colors.RED
+        # Draw HUD - both players use white for clarity
+        p1_color = Colors.WHITE
         p2_color = Colors.WHITE
 
         if self.current_player == PLAYER_1:
@@ -316,8 +316,8 @@ class Mancala(Game):
         # Draw seeds as dots
         self.draw_seeds(x + 1, y + 2, seeds, self.STORE_WIDTH - 2, self.PIT_HEIGHT * 2)
 
-        # Player indicator on store
-        player_color = Colors.RED if player == PLAYER_1 else Colors.WHITE
+        # Player indicator on store - both use white
+        player_color = Colors.WHITE
         # Highlight border if it's this player's turn
         if player == self.current_player:
             # Draw glowing border
@@ -344,33 +344,45 @@ class Mancala(Game):
             self.display.set_pixel(x + self.PIT_WIDTH - 2, y + self.PIT_HEIGHT - 1, Colors.YELLOW)
 
     def draw_seeds(self, x: int, y: int, count: int, width: int, height: int):
-        """Draw seeds as 2x2 colored jewels."""
+        """Draw seeds as 2x2 colored jewels, spread out for visibility."""
         if count == 0:
             return
 
-        # Arrange seeds in a pattern (spaced for 2x2 jewels)
+        # Create a 2x3 grid of jewel positions (6 jewels visible, counter at 8+)
+        # More spread out for better visibility
         positions = []
-        for row in range(height // 4):
-            for col in range(width // 3):
-                positions.append((x + col * 3, y + row * 4))
+        # 2 columns, 3 rows with generous spacing
+        col_spacing = max(3, width // 2)
+        row_spacing = max(3, height // 3)
+        for row in range(3):
+            for col in range(2):
+                px = x + col * col_spacing
+                py = y + row * row_spacing
+                positions.append((px, py))
 
-        for i in range(min(count, len(positions))):
-            px, py = positions[i]
-            # Use colorful seeds - draw as 2x2 block
-            seed_color = self.SEED_COLORS[i % len(self.SEED_COLORS)]
-            self.display.set_pixel(px, py, seed_color)
-            self.display.set_pixel(px + 1, py, seed_color)
-            self.display.set_pixel(px, py + 1, seed_color)
-            self.display.set_pixel(px + 1, py + 1, seed_color)
+        # Also add a 7th position in the middle if space allows
+        if width >= 4 and height >= 8:
+            positions.append((x + width // 2 - 1, y + height // 2 - 1))
 
-        # If more seeds than positions, show count
-        if count > len(positions):
+        # Draw jewels for counts up to 7
+        max_jewels = min(count, 7)
+        for i in range(max_jewels):
+            if i < len(positions):
+                px, py = positions[i]
+                seed_color = self.SEED_COLORS[i % len(self.SEED_COLORS)]
+                self.display.set_pixel(px, py, seed_color)
+                self.display.set_pixel(px + 1, py, seed_color)
+                self.display.set_pixel(px, py + 1, seed_color)
+                self.display.set_pixel(px + 1, py + 1, seed_color)
+
+        # Show count only when 8 or more seeds
+        if count >= 8:
             self.display.draw_text_small(x, y, str(count), Colors.WHITE)
 
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)
         if self.winner == PLAYER_1:
-            self.display.draw_text_small(2, 20, "P1 WINS!", Colors.RED)
+            self.display.draw_text_small(2, 20, "P1 WINS!", Colors.WHITE)
         elif self.winner == PLAYER_2:
             self.display.draw_text_small(2, 20, "P2 WINS!", Colors.WHITE)
         else:
