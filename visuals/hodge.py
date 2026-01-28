@@ -30,7 +30,7 @@ class Hodge(Visual):
     def reset(self):
         self.time = 0.0
         self.update_timer = 0.0
-        self.update_interval = 0.05
+        self.update_interval = 0.1  # Slower CA = smoother on Pi
 
         # Hodgepodge parameters
         self.n = 63  # Max state (ill state)
