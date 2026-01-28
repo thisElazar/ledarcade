@@ -91,6 +91,7 @@ from .cylon import Cylon
 from .sinescroller import SineScroller
 from .mondrian import Mondrian
 from .copperbars import CopperBars
+from .greatwave import GreatWave
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -138,6 +139,7 @@ ALL_VISUALS = [
     SineScroller,
     Mondrian,
     CopperBars,
+    GreatWave,
     Settings,
     TestPattern,
     About,
@@ -190,6 +192,7 @@ __all__ = [
     'SineScroller',
     'Mondrian',
     'CopperBars',
+    'GreatWave',
     'Settings',
     'TestPattern',
     'About',
