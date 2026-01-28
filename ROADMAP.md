@@ -220,8 +220,8 @@ When moving from PyGame (desktop) to actual LED matrix:
   - Strategy: Mancala, Go (9x9)
   - Digging: Dig Dug, Lode Runner
   - Platforming: Donkey Kong
-- Added bonus games: Q*bert, Bomberman
-- Total: 34 games
+- Added bonus games: Q*bert, Bomberman, Arkanoid
+- Total: 35 games
 
 ---
 

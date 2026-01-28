@@ -45,6 +45,7 @@ VISUAL_CATEGORIES = [
     Category("NATURE", Colors.GREEN),       # Natural phenomena
     Category("DIGITAL", Colors.CYAN),       # Computer/math visualizations
     Category("ART", Colors.YELLOW),         # Famous paintings
+    Category("SPRITES", Colors.LIME),       # Video game sprite animations
     Category("HOUSEHOLD", Colors.ORANGE),   # Domestic nostalgia
     Category("UTILITY", Colors.WHITE),      # Functional displays
 ]

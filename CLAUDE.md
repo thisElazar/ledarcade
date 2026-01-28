@@ -43,17 +43,19 @@ python3 run_arcade.py
 - `run_hardware.py` - Hardware launcher for Pi
 - `catalog.py` - Category system for menu organization
 
-## Game Categories
-- `arcade` - Classic arcade games (Pac-Man, Galaga, Tetris, Snake, etc.)
-- `retro` - Other retro formats (Game & Watch style, handheld)
-- `modern` - Modern indie/puzzle games
-- `strategy` - Board games and strategy
-- `2_player` - Two-player games (skip high scores, show winner)
+## Game Categories (35 games)
+- `arcade` - Classic arcade machines (17): Pac-Man, Galaga, Invaders, Tetris, etc.
+- `retro` - Computer/console classics (6): Arkanoid, JezzBall, Pipe Dream, etc.
+- `modern` - Mobile-era games (6): Flappy, 2048, Geometry Dash, etc.
+- `2_player` - Turn-based multiplayer (6): Chess, Go, Checkers, etc.
 
-## Visual Categories
-- `organic` - Nature-inspired (Boids, Slime, etc.)
-- `digital` - Digital/geometric (Matrix, Mobius, etc.)
-- `cellular` - Cellular automata (Life, Hodge, etc.)
+## Visual Categories (44 visuals)
+- `automata` - Cellular automata & agents (11): Life, Boids, Slime, Hodge, etc.
+- `nature` - Natural phenomena (7): Fire, Plasma, Starfield, Weather, etc.
+- `digital` - Math/computer viz (13): Matrix, Rotozoom, Copper Bars, etc.
+- `art` - Famous paintings (3): Starry Night, Water Lilies, Mondrian
+- `household` - Domestic nostalgia (5): DVD, Lava Lamp, Solitaire, Cat, etc.
+- `utility` - Functional displays (5): Clock, Sysinfo, Settings, etc.
 
 ## Design Guidelines
 - 64x64 pixel canvas - keep visuals simple and bold

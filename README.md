@@ -1,6 +1,6 @@
 # LED Arcade
 
-A collection of **34 classic arcade games** and **30 visual effects** designed for a **64x64 RGB LED matrix**, with a desktop emulator for prototyping.
+A collection of **35 classic arcade games** and **44 visual effects** designed for a **64x64 RGB LED matrix**, with a desktop emulator for prototyping.
 
 ![64x64 resolution](https://img.shields.io/badge/resolution-64x64-blue)
 ![Python 3.7+](https://img.shields.io/badge/python-3.7+-green)
@@ -47,11 +47,11 @@ A 640x640 window opens (10x scale of the 64x64 display).
 
 ---
 
-## Games (34 Total)
+## Games (35 Total)
 
 Games are organized into categories in the menu:
 
-### Arcade (15 games)
+### Arcade (17 games)
 Classic coin-op arcade machines.
 
 | Game | Description | Controls |
@@ -71,18 +71,19 @@ Classic coin-op arcade machines.
 | **Pac-Man** | Eat dots, avoid ghosts | Arrows set direction |
 | **Pong** | Classic paddle game vs AI | Up/Down moves paddle |
 | **Q*bert** | Hop on cubes to change color | Arrows hop diagonally |
+| **Snake** | Eat food, grow longer | Arrows change direction |
+| **Tetris** | Stack blocks, clear lines | Arrows move, Up rotates, Space drops |
 
-### Retro (7 games)
+### Retro (6 games)
 Classic computer and console games.
 
 | Game | Description | Controls |
 |------|-------------|----------|
+| **Arkanoid** | 1986 Taito classic | Left/Right moves paddle |
 | **Indy 500** | Top-down racing | Arrows steer, Space gas |
 | **JezzBall** | Trap bouncing atoms | Arrows + Space builds walls |
 | **Pipe Dream** | Connect pipes before flood | Arrows move, Space places |
-| **Snake** | Eat food, grow longer | Arrows change direction |
 | **Space Cruise** | Space exploration | Arrows move |
-| **Tetris** | Stack blocks, clear lines | Arrows move, Up rotates, Space drops |
 | **Trash Blaster** | Shoot trash | Arrows aim, Space fires |
 
 ### Modern (6 games)
@@ -111,7 +112,7 @@ Turn-based multiplayer with shared controller.
 
 ---
 
-## Visuals (30 Total)
+## Visuals (44 Total)
 
 Ambient visual effects organized by category:
 
@@ -145,41 +146,55 @@ Natural phenomena.
 | **Starfield** | 3D starfield flythrough |
 | **Weather** | Rain, snow, storms |
 
-### Digital (5)
+### Digital (13)
 Mathematical and computer visualizations.
 
 | Visual | Description |
 |--------|-------------|
 | **Attractors** | Strange attractor trajectories |
+| **Copper Bars** | Amiga raster bars |
+| **Cylon** | Larson scanner |
 | **Flux** | Flowing energy patterns |
 | **Matrix** | Falling green code |
 | **Mobius** | Twisting surface |
+| **Moire** | Interference patterns |
+| **Rainbow** | Color wheel cycle |
+| **Rotozoom** | Rotating zoom |
+| **Sine Scroller** | Wavy scroller |
 | **Trance** | Hypnotic patterns |
+| **Twister** | Rotating bars |
+| **XOR Pattern** | Fractal patterns |
 
-### Art (2)
+### Art (3)
 Famous painting interpretations.
 
 | Visual | Description |
 |--------|-------------|
+| **Mondrian** | Geometric composition |
 | **Starry Night** | Van Gogh's masterpiece |
 | **Water Lilies** | Monet's garden |
 
-### Household (4)
+### Household (5)
 Domestic nostalgia.
 
 | Visual | Description |
 |--------|-------------|
+| **Cat** | Stretching on pillow |
 | **DVD** | Bouncing DVD logo |
 | **Lava Lamp** | Flowing lava lamp |
 | **Polaroid** | Photo slideshow |
 | **Solitaire** | Win card cascade |
 
-### Utility (1)
+### Utility (5)
 Functional displays.
 
 | Visual | Description |
 |--------|-------------|
+| **About** | Credits |
 | **Clock** | Time display |
+| **Settings** | Display settings |
+| **Sysinfo** | System info |
+| **Test Pattern** | Test all pixels |
 
 ---
 
@@ -189,12 +204,16 @@ Functional displays.
 led-arcade/
 ├── run_arcade.py        # Unified launcher (games + visuals)
 ├── run_visuals.py       # Visual-only launcher
+├── run_hardware.py      # Hardware launcher for Raspberry Pi
 ├── main.py              # Games-only launcher
 ├── arcade.py            # Core framework
+├── hardware.py          # LED matrix driver
 ├── catalog.py           # Category system
+├── highscores.py        # High score persistence
 ├── requirements.txt     # Dependencies
 ├── README.md            # This file
 ├── ROADMAP.md           # Development roadmap
+├── HARDWARE.md          # Hardware build guide
 ├── GAME_ROADMAP.md      # Game implementation tracker
 ├── VISUAL_RESOURCES.md  # Visual effect references
 ├── games/               # All game implementations
@@ -202,12 +221,12 @@ led-arcade/
 │   ├── snake.py
 │   ├── pacman.py
 │   ├── donkeykong.py
-│   └── ... (34 games)
+│   └── ... (35 games)
 └── visuals/             # All visual effects
     ├── __init__.py
     ├── plasma.py
     ├── fire.py
-    └── ... (30 visuals)
+    └── ... (44 visuals)
 ```
 
 ---
@@ -290,14 +309,12 @@ The framework abstracts display and input for easy hardware migration:
 
 ### Components Needed
 - **64x64 RGB LED Matrix** (HUB75) - ~$40
-- **Controller**: Pimoroni Interstate 75 (RP2040) or Raspberry Pi + RGB Bonnet
+- **Controller**: Raspberry Pi 3 (development) or Pi Zero 2 W (deployment)
 - **5V 4A+ Power Supply**
-- **Arcade controls** (joystick + button)
+- **Arcade controls** (joystick + 3 buttons)
 
 ### Porting Steps
-1. Replace `Display` class with LED matrix library calls
-2. Replace `InputHandler` with GPIO button reads
-3. Adjust timing for hardware refresh rate
+See [HARDWARE.md](HARDWARE.md) for complete wiring guide and Pi setup instructions.
 
 ---
 
@@ -325,7 +342,7 @@ MIT License - do whatever you want with it!
 
 ## Stats
 
-- **34 Games** across 4 categories
-- **30 Visuals** across 6 categories
-- **~15,000 lines** of Python
-- **64 total items** to explore!
+- **35 Games** across 4 categories
+- **44 Visuals** across 6 categories
+- **~18,000 lines** of Python
+- **79 total items** to explore!

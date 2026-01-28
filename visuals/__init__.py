@@ -92,6 +92,15 @@ from .sinescroller import SineScroller
 from .mondrian import Mondrian
 from .copperbars import CopperBars
 from .greatwave import GreatWave
+from .demonspirals import DemonSpirals
+from .particlelife import ParticleLife
+from .fireflies import Fireflies
+from .starwarsca import StarWarsCA
+from .truchet import Truchet
+from .sandpile import Sandpile
+from .scream import Scream
+from .mario import Mario
+from .sonic import Sonic
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -140,6 +149,15 @@ ALL_VISUALS = [
     Mondrian,
     CopperBars,
     GreatWave,
+    DemonSpirals,
+    ParticleLife,
+    Fireflies,
+    StarWarsCA,
+    Truchet,
+    Sandpile,
+    Scream,
+    Mario,
+    Sonic,
     Settings,
     TestPattern,
     About,
@@ -193,6 +211,15 @@ __all__ = [
     'Mondrian',
     'CopperBars',
     'GreatWave',
+    'DemonSpirals',
+    'ParticleLife',
+    'Fireflies',
+    'StarWarsCA',
+    'Truchet',
+    'Sandpile',
+    'Scream',
+    'Mario',
+    'Sonic',
     'Settings',
     'TestPattern',
     'About',

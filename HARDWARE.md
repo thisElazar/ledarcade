@@ -366,8 +366,8 @@ The Zero 2 W uses the same 40-pin GPIO header as the Pi 3, so all wiring transfe
 
 ## Future Enhancements
 
-- [ ] Hardware driver layer (`display_hardware.py`)
-- [ ] GPIO input handler (`input_hardware.py`)
+- [x] Hardware driver layer (`hardware.py`)
+- [x] GPIO input handler (integrated in `hardware.py`)
+- [x] Enclosure design (`miniArcade.3dm` in project root)
 - [ ] Auto-start on boot (systemd service)
 - [ ] Gamma correction LUT for LED color accuracy
-- [ ] Enclosure design and mounting
