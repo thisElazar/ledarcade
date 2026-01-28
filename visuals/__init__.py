@@ -88,6 +88,13 @@ from .rotozoom import Rotozoom
 from .rainbow import Rainbow
 from .moire import Moire
 from .cylon import Cylon
+from .sinescroller import SineScroller
+from .mondrian import Mondrian
+from .copperbars import CopperBars
+from .settings import Settings
+from .testpattern import TestPattern
+from .about import About
+from .sysinfo import SysInfo
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -128,6 +135,13 @@ ALL_VISUALS = [
     Rainbow,
     Moire,
     Cylon,
+    SineScroller,
+    Mondrian,
+    CopperBars,
+    Settings,
+    TestPattern,
+    About,
+    SysInfo,
 ]
 
 __all__ = [
@@ -173,4 +187,11 @@ __all__ = [
     'Rainbow',
     'Moire',
     'Cylon',
+    'SineScroller',
+    'Mondrian',
+    'CopperBars',
+    'Settings',
+    'TestPattern',
+    'About',
+    'SysInfo',
 ]
