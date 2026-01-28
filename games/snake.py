@@ -15,7 +15,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 class Snake(Game):
     name = "SNAKE"
     description = "Eat food, grow longer!"
-    category = "retro"
+    category = "arcade"
 
     # Scale factor - each game unit is 2x2 pixels
     SCALE = 2
