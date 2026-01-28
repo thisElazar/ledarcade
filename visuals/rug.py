@@ -34,7 +34,7 @@ class Rug(Visual):
         self.time = 0.0
         self.speed = 1.0
         self.update_timer = 0.0
-        self.update_interval = 0.03
+        self.update_interval = 0.08  # Slower CA = smoother on Pi
 
         # Color palettes
         self.palettes = [

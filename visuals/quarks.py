@@ -32,7 +32,7 @@ class Quarks(Visual):
         self.time = 0.0
         self.speed = 1.0
         self.update_timer = 0.0
-        self.update_interval = 0.05  # Time between CA updates
+        self.update_interval = 0.1  # Slower CA = smoother on Pi
 
         # Color palettes (normal and inverted versions)
         self.palettes = [
