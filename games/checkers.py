@@ -475,7 +475,7 @@ class Checkers(Game):
     def draw_game_over(self):
         """Draw game over message."""
         color = self.PLAYER_1_COLOR if self.winner == PLAYER_1 else self.PLAYER_2_COLOR
-        self.display.draw_text_small(8, 0, self.game_over_reason, color)
+        self.display.draw_text_small(2, 0, self.game_over_reason, color)
 
     def blend_colors(self, c1: tuple, c2: tuple, factor: float) -> tuple:
         """Blend two colors."""

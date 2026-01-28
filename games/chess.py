@@ -686,10 +686,10 @@ class Chess(Game):
         self.display.clear(Colors.BLACK)
 
         if self.is_checkmate:
-            self.display.draw_text_small(4, 20, "CHECKMATE!", Colors.YELLOW)
-            self.display.draw_text_small(4, 32, self.game_over_reason, Colors.WHITE)
+            self.display.draw_text_small(2, 20, "CHECKMATE!", Colors.YELLOW)
+            self.display.draw_text_small(2, 32, self.game_over_reason, Colors.WHITE)
         else:
-            self.display.draw_text_small(4, 20, "DRAW", Colors.GRAY)
-            self.display.draw_text_small(4, 32, self.game_over_reason, Colors.WHITE)
+            self.display.draw_text_small(2, 20, "DRAW", Colors.GRAY)
+            self.display.draw_text_small(2, 32, self.game_over_reason, Colors.WHITE)
 
-        self.display.draw_text_small(4, 50, "SPACE:AGAIN", Colors.GRAY)
+        self.display.draw_text_small(2, 50, "SPACE:AGAIN", Colors.GRAY)

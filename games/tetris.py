@@ -5,9 +5,8 @@ Stack the falling blocks and clear lines!
 
 Controls:
   Left/Right - Move piece
-  Up         - Rotate piece
-  Down       - Soft drop (faster fall)
-  Space      - Hard drop (instant drop)
+  Up/Space   - Rotate piece
+  Down       - Hard drop (instant drop)
 """
 
 import random
@@ -82,12 +81,12 @@ class Tetris(Game):
     
     def __init__(self, display: Display):
         super().__init__(display)
-        
-        # Calculate board position (centered)
-        self.board_x = (GRID_SIZE - self.BOARD_WIDTH * 2) // 2 - 8
-        self.board_y = 8
+
+        # Calculate board position (left side, more vertical space)
+        self.board_x = 4
+        self.board_y = 10
         self.cell_size = 2  # Each cell is 2x2 pixels
-        
+
         self.reset()
     
     def reset(self):
@@ -257,8 +256,8 @@ class Tetris(Game):
             self.piece_x += move_dx
             self.lock_timer = 0  # Reset lock delay on movement
         
-        # Rotation
-        if input_state.up:
+        # Rotation (Up or Action button)
+        if input_state.up or input_state.action:
             new_rotation = (self.current_rotation + 1) % 4
             if not self.check_collision(rotation=new_rotation):
                 self.current_rotation = new_rotation
@@ -272,27 +271,25 @@ class Tetris(Game):
                 self.piece_x += 1
                 self.current_rotation = new_rotation
                 self.lock_timer = 0
-        
-        # Soft drop
-        drop_delay = self.fall_delay / 10 if input_state.down else self.fall_delay
-        
-        # Hard drop
-        if input_state.action:
+
+        # Hard drop (Down)
+        if input_state.down:
             while not self.check_collision(dy=1):
                 self.piece_y += 1
                 self.score += 2
             self.lock_piece()
             return
+
+        # Normal drop delay (no soft drop)
+        drop_delay = self.fall_delay
         
         # Gravity
         self.fall_timer += dt
         if self.fall_timer >= drop_delay:
             self.fall_timer = 0
-            
+
             if not self.check_collision(dy=1):
                 self.piece_y += 1
-                if input_state.down:
-                    self.score += 1
                 self.lock_timer = 0
             else:
                 # Piece is resting - start lock timer
@@ -302,15 +299,12 @@ class Tetris(Game):
     
     def draw(self):
         self.display.clear(Colors.BLACK)
-        
-        # Draw score
+
+        # Draw score at top
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-        
+
         # Draw level
-        self.display.draw_text_small(40, 1, f"L{self.level}", Colors.CYAN)
-        
-        # Draw separator
-        self.display.draw_line(0, 7, 63, 7, Colors.DARK_GRAY)
+        self.display.draw_text_small(50, 1, f"L{self.level}", Colors.CYAN)
         
         # Draw board border
         bx, by = self.board_x, self.board_y
@@ -362,12 +356,12 @@ class Tetris(Game):
                     py = by + y * self.cell_size
                     self.display.draw_rect(px, py, self.cell_size, self.cell_size, color)
         
-        # Draw next piece preview
-        next_x = bx + bw + 4
-        next_y = by + 4
-        
+        # Draw next piece preview (right side)
+        next_x = bx + bw + 6
+        next_y = by + 8
+
         self.display.draw_text_small(next_x, by, "NEXT", Colors.GRAY)
-        
+
         if self.next_piece:
             color = TETROMINO_COLORS[self.next_piece]
             shape = TETROMINOS[self.next_piece][0]
@@ -375,14 +369,15 @@ class Tetris(Game):
                 px = next_x + block_dx * self.cell_size
                 py = next_y + block_dy * self.cell_size
                 self.display.draw_rect(px, py, self.cell_size, self.cell_size, color)
-        
+
         # Draw lines count
-        self.display.draw_text_small(next_x, by + 18, f"L:{self.lines}", Colors.GRAY)
+        self.display.draw_text_small(next_x, by + 24, f"LN", Colors.GRAY)
+        self.display.draw_text_small(next_x, by + 32, f"{self.lines}", Colors.WHITE)
     
     def draw_game_over(self):
         """Custom game over for Tetris."""
         self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 15, "GAME OVER", Colors.RED)
-        self.display.draw_text_small(8, 28, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(8, 38, f"LINES:{self.lines}", Colors.CYAN)
-        self.display.draw_text_small(4, 52, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(2, 15, "GAME OVER", Colors.RED)
+        self.display.draw_text_small(2, 28, f"SCORE:{self.score}", Colors.WHITE)
+        self.display.draw_text_small(2, 38, f"LINES:{self.lines}", Colors.CYAN)
+        self.display.draw_text_small(2, 52, "SPACE:RETRY", Colors.GRAY)

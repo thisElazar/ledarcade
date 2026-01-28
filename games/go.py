@@ -368,11 +368,11 @@ class Go(Game):
         self.display.clear(Colors.BLACK)
 
         if self.winner == BLACK:
-            self.display.draw_text_small(8, 18, "BLACK WINS", Colors.WHITE)
+            self.display.draw_text_small(2, 18, "BLACK WINS", Colors.WHITE)
         else:
-            self.display.draw_text_small(8, 18, "WHITE WINS", Colors.WHITE)
+            self.display.draw_text_small(2, 18, "WHITE WINS", Colors.WHITE)
 
-        self.display.draw_text_small(4, 32, f"B:{self.black_score:.1f}", Colors.WHITE)
+        self.display.draw_text_small(2, 32, f"B:{self.black_score:.1f}", Colors.WHITE)
         self.display.draw_text_small(32, 32, f"W:{self.white_score:.1f}", Colors.GRAY)
 
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.DARK_GRAY)
+        self.display.draw_text_small(2, 50, "SPACE:RETRY", Colors.DARK_GRAY)

@@ -47,21 +47,21 @@ class GameOverState(Enum):
 
 def draw_game_over_score(display, score):
     display.clear(Colors.BLACK)
-    display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
-    display.draw_text_small(12, 32, f"SCORE:{score}", Colors.WHITE)
+    display.draw_text_small(2, 20, "GAME OVER", Colors.RED)
+    display.draw_text_small(2, 32, f"SCORE:{score}", Colors.WHITE)
 
 
 def draw_leaderboard(display, game_name, highlight_rank=-1):
     display.clear(Colors.BLACK)
-    display.draw_text_small(4, 2, "HIGH SCORES", Colors.YELLOW)
+    display.draw_text_small(2, 2, "HIGH SCORES", Colors.YELLOW)
     display.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
 
     hsm = get_high_score_manager()
     scores = hsm.get_top_scores(game_name)
 
     if not scores:
-        display.draw_text_small(12, 28, "NO SCORES", Colors.GRAY)
-        display.draw_text_small(16, 38, "YET!", Colors.GRAY)
+        display.draw_text_small(2, 28, "NO SCORES", Colors.GRAY)
+        display.draw_text_small(2, 38, "YET!", Colors.GRAY)
         return
 
     y = 14
@@ -78,8 +78,8 @@ def draw_leaderboard(display, game_name, highlight_rank=-1):
 
 def draw_initials_entry(display, initials, cursor_pos, score):
     display.clear(Colors.BLACK)
-    display.draw_text_small(4, 2, "NEW RECORD!", Colors.YELLOW)
-    display.draw_text_small(12, 12, f"SCORE:{score}", Colors.WHITE)
+    display.draw_text_small(2, 2, "NEW RECORD!", Colors.YELLOW)
+    display.draw_text_small(2, 12, f"SCORE:{score}", Colors.WHITE)
     display.draw_line(0, 22, 63, 22, Colors.DARK_GRAY)
     display.draw_text_small(2, 26, "ENTER NAME:", Colors.GRAY)
 
@@ -101,18 +101,18 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
     display.clear(Colors.BLACK)
 
     if made_leaderboard:
-        display.draw_text_small(8, 8, f"RANK #{rank}!", Colors.CYAN)
-        display.draw_text_small(12, 18, f"SCORE:{score}", Colors.WHITE)
+        display.draw_text_small(2, 8, f"RANK #{rank}!", Colors.CYAN)
+        display.draw_text_small(2, 18, f"SCORE:{score}", Colors.WHITE)
     else:
-        display.draw_text_small(8, 12, "GAME OVER", Colors.RED)
-        display.draw_text_small(12, 22, f"SCORE:{score}", Colors.WHITE)
+        display.draw_text_small(2, 12, "GAME OVER", Colors.RED)
+        display.draw_text_small(2, 22, f"SCORE:{score}", Colors.WHITE)
 
     if selection == 0:
-        display.draw_text_small(4, 40, ">PLAY AGAIN", Colors.YELLOW)
-        display.draw_text_small(4, 50, " MENU", Colors.GRAY)
+        display.draw_text_small(2, 40, ">PLAY AGAIN", Colors.YELLOW)
+        display.draw_text_small(2, 50, " MENU", Colors.GRAY)
     else:
-        display.draw_text_small(4, 40, " PLAY AGAIN", Colors.GRAY)
-        display.draw_text_small(4, 50, ">MENU", Colors.YELLOW)
+        display.draw_text_small(2, 40, " PLAY AGAIN", Colors.GRAY)
+        display.draw_text_small(2, 50, ">MENU", Colors.YELLOW)
 
 
 def draw_menu(display, categories, cat_index, item_index):
@@ -212,6 +212,7 @@ def main():
     in_menu = True
     cat_index = 0
     item_index = 0
+    is_two_player = False  # 2-player games skip high scores
     current_item = None
     is_game = False
     visual_exit_hold = 0.0
@@ -279,6 +280,7 @@ def main():
                             current_item = item_class(display)
                             current_item.reset()
                             is_game = hasattr(current_item, 'state') and isinstance(current_item.state, GameState)
+                            is_two_player = getattr(current_item, 'category', '') == '2_player'
                             in_menu = False
 
                     if input_state.back:
@@ -298,16 +300,24 @@ def main():
                             if not game_over_initialized:
                                 game_over_initialized = True
                                 final_score = current_item.score
-                                player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
                                 game_over_lockout = 1.5
-                                if player_made_leaderboard:
-                                    game_over_state = GameOverState.ENTER_INITIALS
-                                    player_initials = ['A', 'A', 'A']
-                                    initials_cursor = 0
+
+                                if is_two_player:
+                                    # 2-player games: skip high scores
+                                    game_over_state = GameOverState.CHOOSE_ACTION
+                                    game_over_selection = 0
+                                    player_made_leaderboard = False
                                 else:
-                                    game_over_state = GameOverState.FLASHING
-                                    flash_timer = 0.0
-                                    flash_show_leaderboard = False
+                                    # Single player: check for high score
+                                    player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
+                                    if player_made_leaderboard:
+                                        game_over_state = GameOverState.ENTER_INITIALS
+                                        player_initials = ['A', 'A', 'A']
+                                        initials_cursor = 0
+                                    else:
+                                        game_over_state = GameOverState.FLASHING
+                                        flash_timer = 0.0
+                                        flash_show_leaderboard = False
 
                             if game_over_lockout > 0:
                                 game_over_lockout -= dt
@@ -354,27 +364,39 @@ def main():
                                 draw_initials_entry(display, player_initials, initials_cursor, final_score)
 
                             elif game_over_state == GameOverState.CHOOSE_ACTION:
-                                if input_state.up or input_state.down:
-                                    game_over_selection = 1 - game_over_selection
-                                elif input_state.action:
-                                    if game_over_selection == 0:
-                                        current_item.reset()
-                                        final_score = 0
-                                        game_over_initialized = False
-                                        player_made_leaderboard = False
-                                        player_rank = -1
-                                    else:
-                                        in_menu = True
-                                        current_item = None
-                                        final_score = 0
-                                        game_over_initialized = False
-                                        player_made_leaderboard = False
-                                        player_rank = -1
-                                    game_over_selection = 0
+                                if game_over_lockout <= 0:
+                                    if input_state.up or input_state.down:
+                                        game_over_selection = 1 - game_over_selection
+                                    elif input_state.action:
+                                        if game_over_selection == 0:
+                                            current_item.reset()
+                                            final_score = 0
+                                            game_over_initialized = False
+                                            player_made_leaderboard = False
+                                            player_rank = -1
+                                        else:
+                                            in_menu = True
+                                            current_item = None
+                                            final_score = 0
+                                            game_over_initialized = False
+                                            player_made_leaderboard = False
+                                            player_rank = -1
+                                        game_over_selection = 0
 
                                 if current_item:
-                                    draw_action_selection(display, game_over_selection, final_score,
-                                                          player_made_leaderboard, player_rank)
+                                    if is_two_player:
+                                        # Use game's own draw_game_over (shows winner)
+                                        current_item.draw_game_over()
+                                        # Add play again / menu options at bottom
+                                        if game_over_selection == 0:
+                                            display.draw_text_small(4, 50, ">AGAIN", Colors.YELLOW)
+                                            display.draw_text_small(32, 50, " MENU", Colors.GRAY)
+                                        else:
+                                            display.draw_text_small(4, 50, " AGAIN", Colors.GRAY)
+                                            display.draw_text_small(32, 50, ">MENU", Colors.YELLOW)
+                                    else:
+                                        draw_action_selection(display, game_over_selection, final_score,
+                                                              player_made_leaderboard, player_rank)
                         else:
                             current_item.update(input_state, dt)
                             current_item.draw()

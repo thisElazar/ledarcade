@@ -374,4 +374,4 @@ class Othello(Game):
             color = Colors.GRAY
 
         # Draw result
-        self.display.draw_text_small(4, 1, self.game_over_reason, color)
+        self.display.draw_text_small(2, 1, self.game_over_reason, color)

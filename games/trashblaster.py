@@ -40,22 +40,29 @@ class Trash:
         """Return list of (dx, dy, color) offsets for this trash shape."""
         pixels = []
         c = self.color
+        bright = (min(255, c[0] + 50), min(255, c[1] + 50), min(255, c[2] + 50))
         darker = (c[0] * 2 // 3, c[1] * 2 // 3, c[2] * 2 // 3)
 
-        if self.size == 1:  # Small - 2x2
-            pixels = [(0, 0, c), (1, 0, darker), (0, 1, darker), (1, 1, c)]
-        elif self.size == 2:  # Medium - 3x3
+        if self.size == 1:  # Small - bottle cap / wrapper scrap
             pixels = [
-                (0, 0, darker), (1, 0, c), (2, 0, darker),
-                (0, 1, c), (1, 1, c), (2, 1, c),
-                (0, 2, darker), (1, 2, darker), (2, 2, darker),
+                (0, 0, bright), (1, 0, c),
+                (0, 1, c), (1, 1, bright),
             ]
-        else:  # Large - 4x4
+        elif self.size == 2:  # Medium - crushed can / bottle
+            # Can shape with highlight
             pixels = [
-                (0, 0, darker), (1, 0, c), (2, 0, c), (3, 0, darker),
-                (0, 1, c), (1, 1, c), (2, 1, c), (3, 1, c),
-                (0, 2, c), (1, 2, c), (2, 2, c), (3, 2, c),
-                (0, 3, darker), (1, 3, darker), (2, 3, darker), (3, 3, darker),
+                        (1, 0, bright),
+                (0, 1, c), (1, 1, bright), (2, 1, c),
+                (0, 2, c), (1, 2, c), (2, 2, darker),
+                        (1, 3, darker),
+            ]
+        else:  # Large - box / crumpled junk
+            # Irregular box shape
+            pixels = [
+                (0, 0, darker), (1, 0, c), (2, 0, bright), (3, 0, c),
+                (0, 1, c), (1, 1, bright), (2, 1, c), (3, 1, darker),
+                (0, 2, bright), (1, 2, c), (2, 2, c),
+                (0, 3, c), (1, 3, darker), (2, 3, darker), (3, 3, darker),
             ]
 
         # Center the shape
@@ -161,11 +168,12 @@ class TrashBlaster(Game):
     category = "retro"
 
     TRASH_COLORS = [
-        (120, 120, 120),  # Gray
-        (100, 80, 60),    # Brown
-        (80, 100, 80),    # Dull green
-        (100, 90, 110),   # Dusty purple
-        (110, 100, 80),   # Tan
+        (180, 180, 180),  # Bright gray (tin can)
+        (200, 140, 80),   # Orange-brown (cardboard)
+        (120, 200, 120),  # Bright green (bottle)
+        (180, 100, 180),  # Purple (plastic)
+        (200, 200, 100),  # Yellow (wrapper)
+        (100, 180, 220),  # Cyan (container)
     ]
 
     def __init__(self, display: Display):

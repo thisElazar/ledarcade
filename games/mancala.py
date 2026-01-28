@@ -344,21 +344,24 @@ class Mancala(Game):
             self.display.set_pixel(x + self.PIT_WIDTH - 2, y + self.PIT_HEIGHT - 1, Colors.YELLOW)
 
     def draw_seeds(self, x: int, y: int, count: int, width: int, height: int):
-        """Draw seeds as colored dots."""
+        """Draw seeds as 2x2 colored jewels."""
         if count == 0:
             return
 
-        # Arrange seeds in a pattern
+        # Arrange seeds in a pattern (spaced for 2x2 jewels)
         positions = []
-        for row in range(height // 3):
-            for col in range(width // 2):
-                positions.append((x + col * 2 + (row % 2), y + row * 3))
+        for row in range(height // 4):
+            for col in range(width // 3):
+                positions.append((x + col * 3, y + row * 4))
 
         for i in range(min(count, len(positions))):
             px, py = positions[i]
-            # Use colorful seeds
+            # Use colorful seeds - draw as 2x2 block
             seed_color = self.SEED_COLORS[i % len(self.SEED_COLORS)]
             self.display.set_pixel(px, py, seed_color)
+            self.display.set_pixel(px + 1, py, seed_color)
+            self.display.set_pixel(px, py + 1, seed_color)
+            self.display.set_pixel(px + 1, py + 1, seed_color)
 
         # If more seeds than positions, show count
         if count > len(positions):
@@ -367,10 +370,10 @@ class Mancala(Game):
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)
         if self.winner == PLAYER_1:
-            self.display.draw_text_small(12, 20, "P1 WINS!", Colors.RED)
+            self.display.draw_text_small(2, 20, "P1 WINS!", Colors.RED)
         elif self.winner == PLAYER_2:
-            self.display.draw_text_small(12, 20, "P2 WINS!", Colors.WHITE)
+            self.display.draw_text_small(2, 20, "P2 WINS!", Colors.WHITE)
         else:
-            self.display.draw_text_small(16, 20, "TIE!", Colors.YELLOW)
+            self.display.draw_text_small(2, 20, "TIE!", Colors.YELLOW)
 
-        self.display.draw_text_small(8, 35, f"P1:{self.store1} P2:{self.store2}", Colors.GRAY)
+        self.display.draw_text_small(2, 35, f"P1:{self.store1} P2:{self.store2}", Colors.GRAY)
