@@ -1,0 +1,506 @@
+#!/usr/bin/env python3
+"""
+Hardware Display Driver for LED Arcade
+=======================================
+Provides Display and Input classes that work with the RGB LED matrix
+and GPIO buttons on Raspberry Pi.
+
+Uses the same interface as arcade.py so games work unchanged.
+"""
+
+import sys
+import time
+from typing import Tuple, Optional
+
+# RGB Matrix library (only available on Pi)
+try:
+    from rgbmatrix import RGBMatrix, RGBMatrixOptions
+    HAS_MATRIX = True
+except ImportError:
+    HAS_MATRIX = False
+    print("Warning: rgbmatrix not found - hardware display unavailable")
+
+# GPIO for buttons (only available on Pi)
+try:
+    import RPi.GPIO as GPIO
+    HAS_GPIO = True
+except ImportError:
+    HAS_GPIO = False
+
+# Keyboard input fallback
+import select
+import termios
+import tty
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+
+GRID_SIZE = 64
+
+# Our custom GPIO mapping pins (directly wired, no HAT)
+# These match the "led-arcade" hardware mapping we added to the library
+
+# Button GPIO pins (directly connect button between GPIO and GND)
+BUTTON_PINS = {
+    'up': 19,
+    'down': 25,
+    'left': 24,
+    'right': 8,
+    'action': 7,      # A button (Space)
+    'secondary': 9,   # B button (Z)
+    'back': 11,       # C button (Escape)
+}
+
+
+# =============================================================================
+# COLORS (same as arcade.py)
+# =============================================================================
+
+class Colors:
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    YELLOW = (255, 255, 0)
+    CYAN = (0, 255, 255)
+    MAGENTA = (255, 0, 255)
+    ORANGE = (255, 128, 0)
+    PINK = (255, 128, 128)
+    LIME = (128, 255, 0)
+    PURPLE = (128, 0, 255)
+    GRAY = (128, 128, 128)
+    DARK_GRAY = (64, 64, 64)
+
+
+# =============================================================================
+# HARDWARE DISPLAY
+# =============================================================================
+
+class HardwareDisplay:
+    """
+    64x64 LED Matrix display driver.
+    Drop-in replacement for arcade.py Display class.
+    """
+
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 4):
+        if not HAS_MATRIX:
+            raise RuntimeError("rgbmatrix library not available")
+
+        options = RGBMatrixOptions()
+        options.rows = 64
+        options.cols = 64
+        options.hardware_mapping = 'led-arcade'
+        options.gpio_slowdown = gpio_slowdown
+        options.brightness = brightness
+        options.drop_privileges = False
+
+        self.matrix = RGBMatrix(options=options)
+        self.canvas = self.matrix.CreateFrameCanvas()
+
+        # Virtual framebuffer (matches arcade.py interface)
+        self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+
+    def clear(self, color=Colors.BLACK):
+        """Clear the display to a solid color."""
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                self.buffer[y][x] = color
+
+    def set_pixel(self, x: int, y: int, color: Tuple[int, int, int]):
+        """Set a single pixel. Coordinates are 0-63."""
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            self.buffer[y][x] = color
+
+    def get_pixel(self, x: int, y: int) -> Tuple[int, int, int]:
+        """Get color of a pixel."""
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            return self.buffer[y][x]
+        return Colors.BLACK
+
+    def draw_rect(self, x: int, y: int, w: int, h: int, color: Tuple[int, int, int], filled: bool = True):
+        """Draw a rectangle."""
+        for dy in range(h):
+            for dx in range(w):
+                if filled or dx == 0 or dx == w-1 or dy == 0 or dy == h-1:
+                    self.set_pixel(x + dx, y + dy, color)
+
+    def draw_line(self, x0: int, y0: int, x1: int, y1: int, color: Tuple[int, int, int]):
+        """Draw a line using Bresenham's algorithm."""
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1
+        sy = 1 if y0 < y1 else -1
+        err = dx - dy
+
+        while True:
+            self.set_pixel(x0, y0, color)
+            if x0 == x1 and y0 == y1:
+                break
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x0 += sx
+            if e2 < dx:
+                err += dx
+                y0 += sy
+
+    def draw_circle(self, cx: int, cy: int, r: int, color: Tuple[int, int, int], filled: bool = False):
+        """Draw a circle."""
+        for y in range(-r, r + 1):
+            for x in range(-r, r + 1):
+                dist = x*x + y*y
+                if filled:
+                    if dist <= r*r:
+                        self.set_pixel(cx + x, cy + y, color)
+                else:
+                    if abs(dist - r*r) < r * 2:
+                        self.set_pixel(cx + x, cy + y, color)
+
+    def draw_text_small(self, x: int, y: int, text: str, color: Tuple[int, int, int]):
+        """Draw tiny 3x5 pixel text."""
+        FONT_3X5 = {
+            'A': ['010', '101', '111', '101', '101'],
+            'B': ['110', '101', '110', '101', '110'],
+            'C': ['011', '100', '100', '100', '011'],
+            'D': ['110', '101', '101', '101', '110'],
+            'E': ['111', '100', '110', '100', '111'],
+            'F': ['111', '100', '110', '100', '100'],
+            'G': ['011', '100', '101', '101', '011'],
+            'H': ['101', '101', '111', '101', '101'],
+            'I': ['111', '010', '010', '010', '111'],
+            'J': ['001', '001', '001', '101', '010'],
+            'K': ['101', '110', '100', '110', '101'],
+            'L': ['100', '100', '100', '100', '111'],
+            'M': ['101', '111', '111', '101', '101'],
+            'N': ['101', '111', '111', '111', '101'],
+            'O': ['010', '101', '101', '101', '010'],
+            'P': ['110', '101', '110', '100', '100'],
+            'Q': ['010', '101', '101', '110', '011'],
+            'R': ['110', '101', '110', '101', '101'],
+            'S': ['011', '100', '010', '001', '110'],
+            'T': ['111', '010', '010', '010', '010'],
+            'U': ['101', '101', '101', '101', '011'],
+            'V': ['101', '101', '101', '010', '010'],
+            'W': ['101', '101', '111', '111', '101'],
+            'X': ['101', '101', '010', '101', '101'],
+            'Y': ['101', '101', '010', '010', '010'],
+            'Z': ['111', '001', '010', '100', '111'],
+            '0': ['111', '101', '101', '101', '111'],
+            '1': ['010', '110', '010', '010', '111'],
+            '2': ['110', '001', '010', '100', '111'],
+            '3': ['110', '001', '010', '001', '110'],
+            '4': ['101', '101', '111', '001', '001'],
+            '5': ['111', '100', '110', '001', '110'],
+            '6': ['011', '100', '110', '101', '010'],
+            '7': ['111', '001', '010', '010', '010'],
+            '8': ['010', '101', '010', '101', '010'],
+            '9': ['010', '101', '011', '001', '110'],
+            ' ': ['000', '000', '000', '000', '000'],
+            ':': ['000', '010', '000', '010', '000'],
+            '-': ['000', '000', '111', '000', '000'],
+            '.': ['000', '000', '000', '000', '010'],
+            '!': ['010', '010', '010', '000', '010'],
+            '?': ['110', '001', '010', '000', '010'],
+            '>': ['100', '010', '001', '010', '100'],
+            '#': ['010', '111', '010', '111', '010'],
+            '^': ['010', '101', '000', '000', '000'],
+            'v': ['000', '000', '000', '101', '010'],
+        }
+
+        cursor = x
+        for char in text.upper():
+            if char in FONT_3X5:
+                glyph = FONT_3X5[char]
+                for row_idx, row in enumerate(glyph):
+                    for col_idx, pixel in enumerate(row):
+                        if pixel == '1':
+                            self.set_pixel(cursor + col_idx, y + row_idx, color)
+            cursor += 4
+
+    def render(self):
+        """Render the buffer to the LED matrix."""
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                r, g, b = self.buffer[y][x]
+                self.canvas.SetPixel(x, y, r, g, b)
+        self.canvas = self.matrix.SwapOnVSync(self.canvas)
+
+
+# =============================================================================
+# INPUT HANDLING
+# =============================================================================
+
+class InputState:
+    """Tracks the state of all inputs for the current frame."""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.up = False
+        self.down = False
+        self.left = False
+        self.right = False
+        self.action = False
+        self.secondary = False
+        self.back = False
+        self.action_held = False
+        self.secondary_held = False
+
+    @property
+    def dx(self) -> int:
+        return (1 if self.right else 0) - (1 if self.left else 0)
+
+    @property
+    def dy(self) -> int:
+        return (1 if self.down else 0) - (1 if self.up else 0)
+
+    @property
+    def any_direction(self) -> bool:
+        return self.up or self.down or self.left or self.right
+
+
+class KeyboardInput:
+    """
+    Keyboard input handler for terminal.
+    Works over SSH without pygame.
+    """
+
+    def __init__(self):
+        self.state = InputState()
+        self._prev_keys = set()
+        self._current_keys = set()
+
+        # Save terminal settings
+        self._old_settings = termios.tcgetattr(sys.stdin)
+        # Set terminal to raw mode (no echo, immediate input)
+        tty.setcbreak(sys.stdin.fileno())
+
+    def __del__(self):
+        # Restore terminal settings
+        try:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
+        except:
+            pass
+
+    def cleanup(self):
+        """Restore terminal settings."""
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self._old_settings)
+
+    def _read_keys(self) -> set:
+        """Read currently pressed keys without blocking."""
+        keys = set()
+
+        while select.select([sys.stdin], [], [], 0)[0]:
+            ch = sys.stdin.read(1)
+            if ch == '\x1b':  # Escape sequence
+                # Check for arrow keys
+                if select.select([sys.stdin], [], [], 0.01)[0]:
+                    ch2 = sys.stdin.read(1)
+                    if ch2 == '[':
+                        if select.select([sys.stdin], [], [], 0.01)[0]:
+                            ch3 = sys.stdin.read(1)
+                            if ch3 == 'A': keys.add('up')
+                            elif ch3 == 'B': keys.add('down')
+                            elif ch3 == 'C': keys.add('right')
+                            elif ch3 == 'D': keys.add('left')
+                else:
+                    keys.add('back')  # Plain escape
+            elif ch == ' ':
+                keys.add('action')
+            elif ch == 'z' or ch == 'Z':
+                keys.add('secondary')
+            elif ch == 'q' or ch == 'Q':
+                keys.add('back')
+            elif ch == 'w' or ch == 'W':
+                keys.add('up')
+            elif ch == 's' or ch == 'S':
+                keys.add('down')
+            elif ch == 'a' or ch == 'A':
+                keys.add('left')
+            elif ch == 'd' or ch == 'D':
+                keys.add('right')
+
+        return keys
+
+    def update(self) -> InputState:
+        """Update input state. Call once per frame."""
+        self._prev_keys = self._current_keys
+        self._current_keys = self._read_keys()
+
+        # Directions (currently pressed)
+        self.state.up = 'up' in self._current_keys
+        self.state.down = 'down' in self._current_keys
+        self.state.left = 'left' in self._current_keys
+        self.state.right = 'right' in self._current_keys
+
+        # Buttons (fresh press detection)
+        self.state.action = 'action' in self._current_keys and 'action' not in self._prev_keys
+        self.state.secondary = 'secondary' in self._current_keys and 'secondary' not in self._prev_keys
+        self.state.back = 'back' in self._current_keys and 'back' not in self._prev_keys
+
+        # Held state
+        self.state.action_held = 'action' in self._current_keys
+        self.state.secondary_held = 'secondary' in self._current_keys
+
+        return self.state
+
+
+class GPIOInput:
+    """
+    GPIO button input handler.
+    For physical arcade buttons connected to Pi GPIO.
+    """
+
+    def __init__(self):
+        if not HAS_GPIO:
+            raise RuntimeError("RPi.GPIO not available")
+
+        self.state = InputState()
+        self._prev_buttons = {}
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+
+        # Set up button pins with pull-up resistors
+        for name, pin in BUTTON_PINS.items():
+            GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            self._prev_buttons[name] = False
+
+    def __del__(self):
+        try:
+            GPIO.cleanup()
+        except:
+            pass
+
+    def cleanup(self):
+        GPIO.cleanup()
+
+    def update(self) -> InputState:
+        """Update input state from GPIO buttons."""
+        current = {}
+        for name, pin in BUTTON_PINS.items():
+            # Active low: pressed = GPIO reads LOW
+            current[name] = not GPIO.input(pin)
+
+        # Directions
+        self.state.up = current['up']
+        self.state.down = current['down']
+        self.state.left = current['left']
+        self.state.right = current['right']
+
+        # Fresh press detection
+        self.state.action = current['action'] and not self._prev_buttons['action']
+        self.state.secondary = current['secondary'] and not self._prev_buttons['secondary']
+        self.state.back = current['back'] and not self._prev_buttons['back']
+
+        # Held state
+        self.state.action_held = current['action']
+        self.state.secondary_held = current['secondary']
+
+        self._prev_buttons = current
+        return self.state
+
+
+# =============================================================================
+# COMBINED INPUT (Keyboard + GPIO)
+# =============================================================================
+
+class HardwareInput:
+    """
+    Combined input handler that supports both keyboard and GPIO.
+    Keyboard always works (for debugging), GPIO used when available.
+    """
+
+    def __init__(self, use_gpio: bool = True):
+        self.keyboard = KeyboardInput()
+        self.gpio = None
+
+        if use_gpio and HAS_GPIO:
+            try:
+                self.gpio = GPIOInput()
+                print("GPIO buttons enabled")
+            except Exception as e:
+                print(f"GPIO init failed: {e}, using keyboard only")
+
+        self.state = InputState()
+
+    def cleanup(self):
+        self.keyboard.cleanup()
+        if self.gpio:
+            self.gpio.cleanup()
+
+    def update(self) -> InputState:
+        """Update from both keyboard and GPIO, merge results."""
+        kb = self.keyboard.update()
+
+        if self.gpio:
+            gp = self.gpio.update()
+            # Merge: either source can trigger
+            self.state.up = kb.up or gp.up
+            self.state.down = kb.down or gp.down
+            self.state.left = kb.left or gp.left
+            self.state.right = kb.right or gp.right
+            self.state.action = kb.action or gp.action
+            self.state.secondary = kb.secondary or gp.secondary
+            self.state.back = kb.back or gp.back
+            self.state.action_held = kb.action_held or gp.action_held
+            self.state.secondary_held = kb.secondary_held or gp.secondary_held
+        else:
+            self.state = kb
+
+        return self.state
+
+
+# =============================================================================
+# TEST
+# =============================================================================
+
+if __name__ == "__main__":
+    print("Hardware Display Test")
+    print("=" * 40)
+
+    if not HAS_MATRIX:
+        print("ERROR: rgbmatrix library not found")
+        print("This must run on a Raspberry Pi with the library installed")
+        sys.exit(1)
+
+    display = HardwareDisplay()
+
+    # Draw test pattern
+    print("Drawing test pattern...")
+
+    # Red corner
+    for y in range(32):
+        for x in range(32):
+            display.set_pixel(x, y, (255, 0, 0))
+
+    # Green corner
+    for y in range(32):
+        for x in range(32, 64):
+            display.set_pixel(x, y, (0, 255, 0))
+
+    # Blue corner
+    for y in range(32, 64):
+        for x in range(32):
+            display.set_pixel(x, y, (0, 0, 255))
+
+    # Yellow corner
+    for y in range(32, 64):
+        for x in range(32, 64):
+            display.set_pixel(x, y, (255, 255, 0))
+
+    # Text
+    display.draw_text_small(8, 28, "LED ARCADE", (255, 255, 255))
+
+    display.render()
+
+    print("Test pattern displayed! Press Ctrl+C to exit")
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nDone!")
