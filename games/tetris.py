@@ -5,8 +5,9 @@ Stack the falling blocks and clear lines!
 
 Controls:
   Left/Right - Move piece
-  Up/Space   - Rotate piece
-  Down       - Hard drop (instant drop)
+  Up         - Rotate piece
+  Down       - Soft drop (faster fall)
+  Space      - Hard drop (instant drop)
 """
 
 import random
@@ -258,8 +259,8 @@ class Tetris(Game):
             self.piece_x += move_dx
             self.lock_timer = 0  # Reset lock delay on movement
         
-        # Rotation (Up or Action button)
-        if input_state.up or input_state.action:
+        # Rotation (Up only)
+        if input_state.up:
             new_rotation = (self.current_rotation + 1) % 4
             if not self.check_collision(rotation=new_rotation):
                 self.current_rotation = new_rotation
@@ -274,16 +275,16 @@ class Tetris(Game):
                 self.current_rotation = new_rotation
                 self.lock_timer = 0
 
-        # Hard drop (Down)
-        if input_state.down:
+        # Hard drop (Action button)
+        if input_state.action:
             while not self.check_collision(dy=1):
                 self.piece_y += 1
                 self.score += 2
             self.lock_piece()
             return
 
-        # Normal drop delay (no soft drop)
-        drop_delay = self.fall_delay
+        # Soft drop (Down held = faster fall)
+        drop_delay = self.fall_delay / 10 if input_state.down else self.fall_delay
         
         # Gravity
         self.fall_timer += dt
@@ -292,6 +293,8 @@ class Tetris(Game):
 
             if not self.check_collision(dy=1):
                 self.piece_y += 1
+                if input_state.down:
+                    self.score += 1  # Bonus for soft drop
                 self.lock_timer = 0
             else:
                 # Piece is resting - start lock timer
