@@ -115,10 +115,6 @@ class About(Visual):
             if cursor_on:
                 self.display.draw_rect(cursor_x, 24, 4, 6, TERM_GREEN)
 
-        # Credits fade in after typing finishes
-        if typing_done:
-            self.display.draw_text_small(2, 40, "ELAZAR & CLAUDE", DIM_GREEN)
-
         # Footer
         self.display.draw_line(0, 56, 63, 56, DIM_GREEN)
         self.display.draw_text_small(2, 58, "BTN:EXIT", DIM_GREEN)

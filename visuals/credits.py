@@ -35,13 +35,6 @@ class Credits(Visual):
         self.lines = [
             ("LED ARCADE", C),
             ("", G),
-            # --- Team ---
-            ("DESIGNED BY", G),
-            ("THISELAZAR", Y),
-            ("", G),
-            ("PROGRAMMED BY", G),
-            ("CLAUDE CODE", Y),
-            ("", G),
             ("", G),
             # --- Games ---
             ("- GAMES -", M),
@@ -190,6 +183,14 @@ class Credits(Visual):
             ("PYTHON", C),
             ("RGBMATRIX", C),
             ("RASPBERRY PI", C),
+            ("", G),
+            ("", G),
+            # --- Team ---
+            ("DESIGNED BY", G),
+            ("THISELAZAR", Y),
+            ("", G),
+            ("PROGRAMMED BY", G),
+            ("CLAUDE CODE", Y),
             ("", G),
             ("", G),
             ("", G),
