@@ -39,6 +39,7 @@ from .donkeykong import DonkeyKong
 from .qbert import QBert
 from .bomberman import Bomberman
 from .arkanoid import Arkanoid
+from .skifree import SkiFree
 
 # List of all available games
 ALL_GAMES = [
@@ -77,6 +78,7 @@ ALL_GAMES = [
     QBert,
     Bomberman,
     Arkanoid,
+    SkiFree,
 ]
 
 __all__ = [
@@ -115,5 +117,6 @@ __all__ = [
     'QBert',
     'Bomberman',
     'Arkanoid',
+    'SkiFree',
     'ALL_GAMES',
 ]
