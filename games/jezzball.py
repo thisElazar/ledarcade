@@ -674,4 +674,4 @@ class JezzBall(Game):
         self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(12, 32, f"LEVEL:{self.level}", Colors.CYAN)
         self.display.draw_text_small(12, 40, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

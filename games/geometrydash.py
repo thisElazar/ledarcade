@@ -444,4 +444,4 @@ class GeometryDash(Game):
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(12, 32, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

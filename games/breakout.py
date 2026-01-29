@@ -282,7 +282,7 @@ class Breakout(Game):
         # Draw launch prompt
         if not self.ball_launched:
             if self.screen == 1:
-                self.display.draw_text_small(4, 45, "SPACE:LAUNCH", Colors.GRAY)
+                self.display.draw_text_small(4, 45, "BTN:LAUNCH", Colors.GRAY)
             else:
                 self.display.draw_text_small(8, 40, "SCREEN 2", Colors.CYAN)
-                self.display.draw_text_small(4, 50, "SPACE:LAUNCH", Colors.GRAY)
+                self.display.draw_text_small(4, 50, "BTN:LAUNCH", Colors.GRAY)

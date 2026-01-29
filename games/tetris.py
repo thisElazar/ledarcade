@@ -393,4 +393,4 @@ class Tetris(Game):
         self.display.draw_text_small(2, 15, "GAME OVER", Colors.RED)
         self.display.draw_text_small(2, 28, f"SCORE:{self.score}", Colors.WHITE)
         self.display.draw_text_small(2, 38, f"LINES:{self.lines}", Colors.CYAN)
-        self.display.draw_text_small(2, 52, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(2, 52, "BTN:RETRY", Colors.GRAY)

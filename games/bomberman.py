@@ -724,4 +724,4 @@ class Bomberman(Game):
         self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(8, 32, f"SCORE:{self.score}", Colors.WHITE)
         self.display.draw_text_small(12, 42, f"LEVEL:{self.level}", Colors.YELLOW)
-        self.display.draw_text_small(4, 54, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(4, 54, "BTN:RETRY", Colors.GRAY)

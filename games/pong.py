@@ -286,4 +286,4 @@ class Pong(Game):
             self.display.draw_text_small(12, 20, "YOU LOSE", Colors.RED)
         
         self.display.draw_text_small(8, 35, f"FINAL:{self.score}-{self.ai_score}", Colors.WHITE)
-        self.display.draw_text_small(4, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

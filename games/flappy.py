@@ -238,11 +238,11 @@ class Flappy(Game):
 
         # Start prompt
         if not self.started:
-            self.display.draw_text_small(8, 30, "SPACE:FLAP", Colors.WHITE)
+            self.display.draw_text_small(8, 30, "BTN:FLAP", Colors.WHITE)
 
     def draw_game_over(self):
         """Custom game over screen."""
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(2, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(2, 32, f"SCORE:{self.score}", Colors.WHITE)
-        self.display.draw_text_small(2, 50, "SPACE:RETRY", Colors.GRAY)
+        self.display.draw_text_small(2, 50, "BTN:RETRY", Colors.GRAY)

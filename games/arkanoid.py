@@ -706,4 +706,4 @@ class Arkanoid(Game):
         if self.balls and not self.balls[0]['launched']:
             level_name = self.levels[self.level % len(self.levels)]['name']
             self.display.draw_text_small(12, 38, level_name, Colors.YELLOW)
-            self.display.draw_text_small(8, 50, "SPACE:START", Colors.GRAY)
+            self.display.draw_text_small(8, 50, "BTN:START", Colors.GRAY)
