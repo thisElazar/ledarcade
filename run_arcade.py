@@ -218,6 +218,52 @@ def draw_menu(display, categories, cat_index, item_index):
     display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
 
 
+KONAMI_CODE = ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R', 'A', 'B']
+
+
+def _hue_to_rgb(h):
+    """Convert hue (0.0-1.0) to RGB tuple."""
+    h = h % 1.0
+    r = max(0.0, min(1.0, abs(h * 6.0 - 3.0) - 1.0))
+    g = max(0.0, min(1.0, 2.0 - abs(h * 6.0 - 2.0)))
+    b = max(0.0, min(1.0, 2.0 - abs(h * 6.0 - 4.0)))
+    return (int(r * 255), int(g * 255), int(b * 255))
+
+
+def draw_konami_egg(display, timer):
+    """Draw the 30 LIVES easter egg."""
+    display.clear(Colors.BLACK)
+
+    # Brief white flash at start
+    if timer < 0.15:
+        display.clear(Colors.WHITE)
+        return
+
+    t = timer - 0.15
+    hue = (t * 2.0) % 1.0
+    color = _hue_to_rgb(hue)
+
+    # Random sparkles
+    for _ in range(25):
+        sx = random.randint(0, GRID_SIZE - 1)
+        sy = random.randint(0, GRID_SIZE - 1)
+        display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.5) % 1.0))
+
+    # "30" with glow effect
+    cx = center_x("30")
+    cy = 22
+    for ox in [-1, 0, 1]:
+        for oy in [-1, 0, 1]:
+            if ox == 0 and oy == 0:
+                continue
+            glow = (color[0] // 4, color[1] // 4, color[2] // 4)
+            display.draw_text_small(cx + ox, cy + oy, "30", glow)
+    display.draw_text_small(cx, cy, "30", color)
+
+    # "LIVES" below
+    display.draw_text_small(center_x("LIVES"), 34, "LIVES", color)
+
+
 def has_any_input(input_state):
     """Return True if any button or direction is active."""
     return (input_state.up_pressed or input_state.down_pressed or
@@ -295,6 +341,11 @@ def main():
     in_shuffle_mode = False
     shuffle_playlist = None
 
+    # Konami code state
+    konami_buffer = []
+    konami_active = False
+    konami_timer = 0.0
+
     # Game over state
     game_over_state = GameOverState.FLASHING
     game_over_selection = 0  # 0 = PLAY AGAIN, 1 = MENU
@@ -343,6 +394,13 @@ def main():
                     if idle_visual:
                         idle_visual.update(dt)
                         idle_visual.draw()
+            elif konami_active:
+                konami_timer += dt
+                if konami_timer >= 2.0:
+                    konami_active = False
+                    idle_timer = 0.0
+                else:
+                    draw_konami_egg(display, konami_timer)
             else:
                 # Hold either button 2 sec to quit app
                 if input_state.action_l_held or input_state.action_r_held:
@@ -362,9 +420,29 @@ def main():
                         idle_visual = _pick_idle_visual(display)
                         idle_cycle_timer = 0.0
 
+                # Konami code tracking
+                _ki = None
+                if input_state.up_pressed: _ki = 'U'
+                elif input_state.down_pressed: _ki = 'D'
+                elif input_state.left_pressed: _ki = 'L'
+                elif input_state.right_pressed: _ki = 'R'
+                elif input_state.action_l: _ki = 'A'
+                elif input_state.action_r: _ki = 'B'
+                if _ki:
+                    konami_buffer.append(_ki)
+                    konami_buffer = konami_buffer[-10:]
+                konami_match = konami_buffer == KONAMI_CODE
+                if konami_match:
+                    konami_active = True
+                    konami_timer = 0.0
+                    konami_buffer = []
+                # Intercept button presses mid-sequence (9th input is A)
+                konami_intercept = (len(konami_buffer) >= 9 and
+                                    konami_buffer[-9:] == KONAMI_CODE[:9])
+
                 if not categories:
                     draw_menu(display, categories, 0, 0)
-                else:
+                elif not konami_match:
                     category = categories[cat_index]
 
                     # Category navigation (left/right)
@@ -382,8 +460,8 @@ def main():
                         elif input_state.down_pressed and item_index < len(category.items) - 1:
                             item_index += 1
 
-                        # Launch item
-                        if input_state.action_l or input_state.action_r:
+                        # Launch item (skip if mid-konami intercept)
+                        if not konami_intercept and (input_state.action_l or input_state.action_r):
                             item_class = category.items[item_index]
 
                             # Game playlist (shuffle mode)

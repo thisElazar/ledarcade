@@ -66,8 +66,22 @@ class Slideshow(Visual):
             self._child.draw()
 
     def handle_input(self, input_state):
-        # Don't pass input to child — avoids confusing palette changes during auto-cycle
-        return False
+        # Single button press skips to next visual
+        if input_state.action_l or input_state.action_r:
+            self._advance()
+            return True
+        # Pass only left/right (time controls) to child, block up/down (style)
+        if not self._child:
+            return False
+        if not (input_state.left_pressed or input_state.right_pressed or
+                input_state.left or input_state.right):
+            return False
+        filtered = InputState()
+        filtered.left = input_state.left
+        filtered.right = input_state.right
+        filtered.left_pressed = input_state.left_pressed
+        filtered.right_pressed = input_state.right_pressed
+        return self._child.handle_input(filtered)
 
 
 # ---------------------------------------------------------------------------
