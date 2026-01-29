@@ -61,7 +61,9 @@ class SkiFree(Game):
 
     # Yeti
     YETI_SPAWN_DISTANCE = 750   # Meters
-    YETI_SPEED = 90.0           # Faster than normal max
+    YETI_SPEED_MIN = 30.0       # Slowest (slower than player base)
+    YETI_SPEED_MAX = 65.0       # Fastest burst
+    YETI_SPEED_CHANGE = 1.5     # Seconds between speed shifts
     YETI_CATCH_DIST = 4.0       # Pixels to catch player
 
     # Obstacle generation
@@ -82,8 +84,9 @@ class SkiFree(Game):
     SKIER_HEAD = (255, 200, 150)
     SKIER_SKI = (60, 60, 200)
     CRASH_COLOR = (255, 100, 100)
-    YETI_BODY = (230, 230, 240)
-    YETI_FACE = (60, 60, 80)
+    YETI_BODY = (150, 150, 165)
+    YETI_FACE = (50, 50, 70)
+    YETI_ARMS = (0, 0, 0)
     BOOST_COLOR = (50, 200, 255)
     BOOST_EMPTY = (60, 60, 70)
 
@@ -126,6 +129,8 @@ class SkiFree(Game):
         self.yeti_y = 0.0
         self.yeti_eating = False
         self.yeti_eat_timer = 0.0
+        self.yeti_speed = self.YETI_SPEED_MAX
+        self.yeti_speed_timer = 0.0
 
         # Obstacles: {type, x, y, w, h}
         self.obstacles = []
@@ -362,15 +367,19 @@ class SkiFree(Game):
             self._check_yeti_catch()
 
     def _update_yeti(self, dt: float):
-        """Move Yeti toward player."""
+        """Move Yeti toward player with variable speed."""
+        # Randomly shift speed every YETI_SPEED_CHANGE seconds
+        self.yeti_speed_timer += dt
+        if self.yeti_speed_timer >= self.YETI_SPEED_CHANGE:
+            self.yeti_speed_timer = 0.0
+            self.yeti_speed = random.uniform(self.YETI_SPEED_MIN, self.YETI_SPEED_MAX)
+
         dx = self.player_x - self.yeti_x
         dy = int(self.player_y) - self.yeti_y
         dist = math.sqrt(dx * dx + dy * dy)
 
         if dist > 0:
-            # Yeti moves toward player at fixed speed
-            # But also scrolls with the slope (moves up with obstacles)
-            yeti_move = self.YETI_SPEED * dt
+            yeti_move = self.yeti_speed * dt
             self.yeti_x += (dx / dist) * yeti_move
             self.yeti_y += (dy / dist) * yeti_move
 
@@ -629,7 +638,7 @@ class SkiFree(Game):
             return
 
         # Normal Yeti — chasing
-        # Head
+        # Head (3 wide)
         if 0 <= yy < GRID_SIZE:
             for dx in range(-1, 2):
                 if 0 <= yx + dx < GRID_SIZE:
@@ -641,12 +650,24 @@ class SkiFree(Game):
             self.display.set_pixel(yx, yy + 1, self.YETI_BODY)
             if 0 <= yx + 1 < GRID_SIZE:
                 self.display.set_pixel(yx + 1, yy + 1, self.YETI_FACE)
-        # Body
+        # Body (3 wide) + stick arms
         for dy in range(2, 4):
             if 0 <= yy + dy < GRID_SIZE:
                 for dx in range(-1, 2):
                     if 0 <= yx + dx < GRID_SIZE:
                         self.display.set_pixel(yx + dx, yy + dy, self.YETI_BODY)
+        # Arms (stick out from body row 2)
+        if 0 <= yy + 2 < GRID_SIZE:
+            if 0 <= yx - 2 < GRID_SIZE:
+                self.display.set_pixel(yx - 2, yy + 2, self.YETI_ARMS)
+            if 0 <= yx + 2 < GRID_SIZE:
+                self.display.set_pixel(yx + 2, yy + 2, self.YETI_ARMS)
+            # Hands one pixel down from arms
+            if 0 <= yy + 3 < GRID_SIZE:
+                if 0 <= yx - 3 < GRID_SIZE:
+                    self.display.set_pixel(yx - 3, yy + 3, self.YETI_ARMS)
+                if 0 <= yx + 3 < GRID_SIZE:
+                    self.display.set_pixel(yx + 3, yy + 3, self.YETI_ARMS)
         # Legs
         if 0 <= yy + 4 < GRID_SIZE:
             if 0 <= yx - 1 < GRID_SIZE:
