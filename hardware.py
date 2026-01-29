@@ -90,7 +90,7 @@ class HardwareDisplay:
     Drop-in replacement for arcade.py Display class.
     """
 
-    def __init__(self, brightness: int = 80, gpio_slowdown: int = 5):
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2):
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
