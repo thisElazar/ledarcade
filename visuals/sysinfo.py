@@ -15,7 +15,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class SysInfo(Visual):
-    name = "SYSINFO"
+    name = "INFO"
     description = "System info"
     category = "utility"
 

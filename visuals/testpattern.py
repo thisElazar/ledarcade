@@ -21,7 +21,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class TestPattern(Visual):
-    name = "PIXELTEST"
+    name = "PIXEL TEST"
     description = "Test all pixels"
     category = "utility"
 

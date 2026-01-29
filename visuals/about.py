@@ -61,7 +61,7 @@ class About(Visual):
 
         # More info
         self.display.draw_text_small(2, 32, "HUB75", Colors.GRAY)
-        self.display.draw_text_small(2, 39, "RASPBERRY PI", Colors.WHITE)
+        self.display.draw_text_small(2, 39, "RASPBERRY PI 3", Colors.WHITE)
 
         # Fun stats
         self.display.draw_text_small(2, 50, "4096 PIXELS", Colors.GRAY)
