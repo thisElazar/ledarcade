@@ -94,8 +94,6 @@ class HardwareDisplay:
         options.gpio_slowdown = gpio_slowdown
         options.brightness = brightness
         options.drop_privileges = False
-        options.pwm_lsb_nanoseconds = 300  # Higher = less flicker, slight loss in dark shades
-        options.show_refresh_rate = True    # Temporary: shows refresh Hz on terminal
 
         self.matrix = RGBMatrix(options=options)
 
