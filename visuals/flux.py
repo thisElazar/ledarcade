@@ -182,15 +182,18 @@ class Flux(Visual):
         """
         Potential that rises near edges, creating natural circulation inward.
         Curl of a radial potential creates circular flow.
+        Uses separate x/y edge potentials so corners get extra repulsion.
         """
         center = GRID_SIZE / 2
-        # Distance from center, normalized
+        # Normalized distance from center on each axis
         dx = (x - center) / center
         dy = (y - center) / center
-        r_sq = dx * dx + dy * dy
 
-        # Potential increases toward edges (quartic for soft center, strong edges)
-        return r_sq * r_sq * 2.0
+        # Stronger edge-aware potential: rises steeply near each edge independently
+        # This prevents corners from being dead zones
+        edge_x = dx * dx * dx * dx  # x^4 - steep near left/right edges
+        edge_y = dy * dy * dy * dy  # y^4 - steep near top/bottom edges
+        return (edge_x + edge_y) * 3.0
 
     def get_curl_velocity(self, x, y):
         """
@@ -215,18 +218,19 @@ class Flux(Visual):
         dp_dy = (p_yp - p_ym) / (2 * eps)
 
         # Boundary potential derivatives (analytical)
+        # P = (bx^4 + by^4) * 3.0, where bx = (x-center)/center
         center = GRID_SIZE / 2
         bx = (x - center) / center
         by = (y - center) / center
-        r_sq = bx * bx + by * by
 
-        # d/dx of r^4 = 4*r^2 * 2*bx/center = 8*r^2*bx/center
-        db_dx = 8 * r_sq * bx / center * 2.0
-        db_dy = 8 * r_sq * by / center * 2.0
+        # d/dx of bx^4 * 3 = 4*bx^3 / center * 3 = 12*bx^3 / center
+        db_dx = 12.0 * bx * bx * bx / center
+        # d/dy of by^4 * 3 = 12*by^3 / center
+        db_dy = 12.0 * by * by * by / center
 
-        # Combine potentials
-        total_dp_dx = dp_dx + db_dx * 0.15  # Boundary influence
-        total_dp_dy = dp_dy + db_dy * 0.15
+        # Combine potentials (stronger boundary to prevent edge sticking)
+        total_dp_dx = dp_dx + db_dx * 0.3
+        total_dp_dy = dp_dy + db_dy * 0.3
 
         # Curl: vx = dP/dy, vy = -dP/dx
         vx = total_dp_dy

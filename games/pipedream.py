@@ -65,8 +65,8 @@ class PipeDream(Game):
     START_COLOR = (200, 100, 50)
 
     # Timing
-    START_DELAY = 12.0  # Seconds before flow starts
-    FLOW_SPEED = 1.2    # Seconds per pipe segment
+    START_DELAY = 18.0  # Seconds before flow starts
+    FLOW_SPEED = 2.0    # Seconds per pipe segment
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -157,41 +157,42 @@ class PipeDream(Game):
         self.queue.append(self.random_pipe())
 
     def get_next_direction(self, pipe: PipeType, from_dir: str) -> str:
-        """Get the exit direction when entering a pipe from a direction."""
+        """Get the exit direction when entering a pipe from a direction.
+
+        Flow enters from the opposite side of from_dir and must exit
+        through exactly one other connected side (no filling all directions).
+        """
         connections = PIPE_CONNECTIONS[pipe]
         up, down, left, right = connections
 
-        # from_dir is where we came FROM, so we entered from opposite
-        if from_dir == 'right':  # Entered from left
-            if up:
-                return 'up'
-            if down:
-                return 'down'
-            if right:
-                return 'right'
-        elif from_dir == 'left':  # Entered from right
-            if up:
-                return 'up'
-            if down:
-                return 'down'
-            if left:
-                return 'left'
-        elif from_dir == 'down':  # Entered from top
-            if left:
-                return 'left'
-            if right:
-                return 'right'
-            if down:
-                return 'down'
-        elif from_dir == 'up':  # Entered from bottom
-            if left:
-                return 'left'
-            if right:
-                return 'right'
-            if up:
-                return 'up'
+        # The entry side is the opposite of from_dir
+        # We need to find a connected side that is NOT the entry side
+        entry_side = {
+            'right': 'left',
+            'left': 'right',
+            'up': 'down',
+            'down': 'up',
+        }[from_dir]
 
-        return None  # Dead end
+        # Check each direction except the one we entered from
+        candidates = []
+        if up and entry_side != 'up':
+            candidates.append('up')
+        if down and entry_side != 'down':
+            candidates.append('down')
+        if left and entry_side != 'left':
+            candidates.append('left')
+        if right and entry_side != 'right':
+            candidates.append('right')
+
+        # For a straight pipe or corner, there should be exactly one exit
+        # For a cross pipe, prefer continuing in the same direction
+        if not candidates:
+            return None
+
+        if from_dir in candidates:
+            return from_dir  # Continue straight through (cross pipe)
+        return candidates[0]
 
     def can_flow_into(self, col: int, row: int, from_dir: str) -> bool:
         """Check if flow can enter a cell from the given direction."""

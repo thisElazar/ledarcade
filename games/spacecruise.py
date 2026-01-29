@@ -127,7 +127,7 @@ class LaserShot:
 
 
 class SpaceCruise(Game):
-    name = "SPACECRUISE"
+    name = "SPACE CRUISE"
     description = "Math shooter!"
     category = "retro"
 
@@ -212,23 +212,41 @@ class SpaceCruise(Game):
         shot = LaserShot(rocket_nose_x, rocket_nose_y, self.crosshair_x, self.crosshair_y)
         self.laser_shots.append(shot)
 
-        # Check for hits
+        # Check for hits along the laser line from rocket to crosshair
         hit_target = None
+        best_t = 999.0  # Parametric distance along beam (lower = closer to rocket)
+
         for target in self.targets:
             if not target.alive:
                 continue
 
-            # Simple distance check
-            tx = target.x + 1.5  # Center of target
+            # Target center (with float offset)
+            tx = target.x + 1.5
             ty = target.y + 2.5 + math.sin(self.time * target.float_speed + target.float_offset) * target.float_amplitude
 
-            dx = self.crosshair_x - tx
-            dy = self.crosshair_y - ty
+            # Check distance from target center to the laser line segment
+            # Line from (rocket_nose_x, rocket_nose_y) to (crosshair_x, crosshair_y)
+            lx = self.crosshair_x - rocket_nose_x
+            ly = self.crosshair_y - rocket_nose_y
+            line_len_sq = lx * lx + ly * ly
+            if line_len_sq < 0.01:
+                continue
+
+            # Project target onto line, clamped to segment
+            t = ((tx - rocket_nose_x) * lx + (ty - rocket_nose_y) * ly) / line_len_sq
+            t = max(0.0, min(1.0, t))
+
+            # Closest point on line to target
+            closest_x = rocket_nose_x + t * lx
+            closest_y = rocket_nose_y + t * ly
+
+            dx = tx - closest_x
+            dy = ty - closest_y
             dist = math.sqrt(dx * dx + dy * dy)
 
-            if dist < 5:  # Hit radius
+            if dist < 4 and t < best_t:  # Hit radius along beam
                 hit_target = target
-                break
+                best_t = t
 
         if hit_target:
             self._process_hit(hit_target)
@@ -589,13 +607,14 @@ class SpaceCruise(Game):
         """Draw score and countdown."""
         self._draw_number(2, 2, self.score, (0, 200, 100))
 
-        # Countdown timer in top area
+        # Countdown timer at top center
         secs = max(0, int(self.time_remaining))
         mins = secs // 60
         secs = secs % 60
         timer_color = (255, 50, 50) if self.time_remaining < 10 else (200, 200, 0)
         timer_str = f"{mins}:{secs:02d}"
-        self.display.draw_text_small(42, 2, timer_str, timer_color)
+        # Center the timer (5 chars * 4px = 20px, centered at 32 - 10 = 22)
+        self.display.draw_text_small(22, 2, timer_str, timer_color)
 
     def draw(self):
         self.display.clear(self.SPACE_BLACK)

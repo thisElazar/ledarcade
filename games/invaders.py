@@ -73,8 +73,8 @@ class Invaders(Game):
                 }
                 self.enemies.append(enemy)
         
-        # Speed up based on level
-        self.enemy_move_delay = max(0.15, 0.5 - (self.level - 1) * 0.08)
+        # Speed up based on level (start slower, ramp up)
+        self.enemy_move_delay = max(0.15, 0.8 - (self.level - 1) * 0.1)
     
     def setup_shields(self):
         """Create defensive shields."""

@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class StickRunner(Game):
-    name = "STICKRUN"
+    name = "STICK RUN"
     description = "Jump the rooftops!"
     category = "modern"
 

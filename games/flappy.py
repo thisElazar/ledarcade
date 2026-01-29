@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Flappy(Game):
-    name = "FLAPPY"
+    name = "FLAPPY BIRD"
     description = "Tap to flap through pipes!"
     category = "modern"
 

@@ -18,7 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class DemonSpirals(Visual):
-    name = "DEMONS"
+    name = "CYCLIC"
     description = "Cyclic CA spirals"
     category = "automata"
 

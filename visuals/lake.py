@@ -74,13 +74,31 @@ class Lake(Visual):
         self.ship_timer = 0.0
         self.spawn_ship()
 
-        # Colors - wave layers from trough to crest
-        self.water_color = (15, 30, 60)
-        self.flow_trough = (30, 55, 100)      # Darkest - wave trough
-        self.flow_color = (60, 100, 160)       # Mid - normal
-        self.flow_crest = (110, 160, 210)      # Brightest - wave crest
-        self.flow_highlight = (140, 190, 230)  # Wake disturbance
-        self.ship_color = (180, 140, 100)
+        # Color palettes: (water_bg, trough, mid, crest, highlight, ship)
+        self.palettes = [
+            # Deep blue lake
+            ((15, 30, 60), (30, 55, 100), (60, 100, 160), (110, 160, 210), (140, 190, 230), (180, 140, 100)),
+            # Emerald lake
+            ((10, 35, 30), (20, 60, 50), (40, 100, 80), (80, 160, 120), (120, 200, 150), (200, 160, 100)),
+            # Sunset lake
+            ((40, 20, 30), (70, 40, 50), (120, 70, 80), (180, 110, 100), (220, 150, 120), (220, 180, 100)),
+            # Arctic lake
+            ((20, 30, 40), (40, 55, 70), (70, 100, 130), (120, 160, 190), (160, 200, 220), (160, 140, 120)),
+            # Night lake
+            ((5, 8, 20), (10, 18, 40), (20, 35, 70), (40, 60, 110), (60, 90, 140), (120, 100, 80)),
+        ]
+        self.current_palette = 0
+        self._apply_palette()
+
+    def _apply_palette(self):
+        """Apply current palette colors."""
+        p = self.palettes[self.current_palette]
+        self.water_color = p[0]
+        self.flow_trough = p[1]
+        self.flow_color = p[2]
+        self.flow_crest = p[3]
+        self.flow_highlight = p[4]
+        self.ship_color = p[5]
 
     def generate_eddies(self):
         """Generate vortex centers for wind patterns."""
@@ -133,11 +151,13 @@ class Lake(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.up:
-            self.wind_strength = min(1.5, self.wind_strength + 0.05)
+        if input_state.up_pressed:
+            self.current_palette = (self.current_palette + 1) % len(self.palettes)
+            self._apply_palette()
             consumed = True
-        if input_state.down:
-            self.wind_strength = max(0.0, self.wind_strength - 0.05)
+        if input_state.down_pressed:
+            self.current_palette = (self.current_palette - 1) % len(self.palettes)
+            self._apply_palette()
             consumed = True
 
         if input_state.left:

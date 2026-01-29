@@ -80,7 +80,7 @@ class Firefly:
 # --- Main visual ---
 
 class Fireflies(Visual):
-    name = "FIREFLY"
+    name = "FIREFLIES"
     description = "Synchronized flashing"
     category = "nature"
 

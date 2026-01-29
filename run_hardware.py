@@ -24,7 +24,7 @@ from visuals import ALL_VISUALS
 
 # Game state from arcade module
 sys.path.insert(0, '.')
-from arcade import GameState
+from arcade import GameState, GRID_SIZE
 
 # High scores
 from highscores import get_high_score_manager
@@ -44,23 +44,30 @@ class GameOverState(Enum):
 # DRAWING FUNCTIONS
 # =============================================================================
 
+def center_x(text):
+    """Calculate x position to center text (4px per char + 1px spacing)."""
+    width = len(text) * 5 - 1
+    return max(0, (GRID_SIZE - width) // 2)
+
+
 def draw_game_over_score(display, score):
     display.clear(Colors.BLACK)
-    display.draw_text_small(2, 20, "GAME OVER", Colors.RED)
-    display.draw_text_small(2, 32, f"SCORE:{score}", Colors.WHITE)
+    display.draw_text_small(center_x("GAME OVER"), 20, "GAME OVER", Colors.RED)
+    score_text = f"SCORE:{score}"
+    display.draw_text_small(center_x(score_text), 32, score_text, Colors.WHITE)
 
 
 def draw_leaderboard(display, game_name, highlight_rank=-1):
     display.clear(Colors.BLACK)
-    display.draw_text_small(2, 2, "HIGH SCORES", Colors.YELLOW)
+    display.draw_text_small(center_x("HIGH SCORES"), 2, "HIGH SCORES", Colors.YELLOW)
     display.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
 
     hsm = get_high_score_manager()
     scores = hsm.get_top_scores(game_name)
 
     if not scores:
-        display.draw_text_small(2, 28, "NO SCORES", Colors.GRAY)
-        display.draw_text_small(2, 38, "YET!", Colors.GRAY)
+        display.draw_text_small(center_x("NO SCORES"), 28, "NO SCORES", Colors.GRAY)
+        display.draw_text_small(center_x("YET!"), 38, "YET!", Colors.GRAY)
         return
 
     y = 14
@@ -77,10 +84,11 @@ def draw_leaderboard(display, game_name, highlight_rank=-1):
 
 def draw_initials_entry(display, initials, cursor_pos, score):
     display.clear(Colors.BLACK)
-    display.draw_text_small(2, 2, "NEW RECORD!", Colors.YELLOW)
-    display.draw_text_small(2, 12, f"SCORE:{score}", Colors.WHITE)
+    display.draw_text_small(center_x("NEW RECORD!"), 2, "NEW RECORD!", Colors.YELLOW)
+    score_text = f"SCORE:{score}"
+    display.draw_text_small(center_x(score_text), 12, score_text, Colors.WHITE)
     display.draw_line(0, 22, 63, 22, Colors.DARK_GRAY)
-    display.draw_text_small(2, 26, "ENTER NAME:", Colors.GRAY)
+    display.draw_text_small(center_x("ENTER NAME:"), 26, "ENTER NAME:", Colors.GRAY)
 
     slot_x = 20
     for i, letter in enumerate(initials):
@@ -100,11 +108,14 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
     display.clear(Colors.BLACK)
 
     if made_leaderboard:
-        display.draw_text_small(2, 8, f"RANK {rank}!", Colors.CYAN)
-        display.draw_text_small(2, 18, f"SCORE:{score}", Colors.WHITE)
+        rank_text = f"RANK {rank}!"
+        display.draw_text_small(center_x(rank_text), 8, rank_text, Colors.CYAN)
+        score_text = f"SCORE:{score}"
+        display.draw_text_small(center_x(score_text), 18, score_text, Colors.WHITE)
     else:
-        display.draw_text_small(2, 12, "GAME OVER", Colors.RED)
-        display.draw_text_small(2, 22, f"SCORE:{score}", Colors.WHITE)
+        display.draw_text_small(center_x("GAME OVER"), 12, "GAME OVER", Colors.RED)
+        score_text = f"SCORE:{score}"
+        display.draw_text_small(center_x(score_text), 22, score_text, Colors.WHITE)
 
     if selection == 0:
         display.draw_text_small(2, 40, ">PLAY AGAIN", Colors.YELLOW)

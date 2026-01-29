@@ -98,8 +98,8 @@ class Pong(Game):
         self.ball_speed = self.ball_base_speed + (total_points * 1.5)
         self.ball_speed = min(self.ball_speed, self.ball_max_speed * 0.7)  # Cap serve speed
 
-        # Serve toward the last scorer's opponent
-        direction = 1 if self.last_scorer == 'player' else -1
+        # Always serve toward the player (left side)
+        direction = -1
         angle = random.uniform(-0.5, 0.5)
 
         self.ball_dx = direction * self.ball_speed * math.cos(angle)

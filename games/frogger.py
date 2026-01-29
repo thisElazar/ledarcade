@@ -78,11 +78,11 @@ class Frogger(Game):
         # Each lane has cars moving in one direction at a speed
         lane_configs = [
             # (row, direction, speed, car_length, gap)
-            (1, 1, 15, 2, 8),    # Slow cars right
-            (2, -1, 20, 2, 6),   # Medium cars left
-            (3, 1, 25, 3, 7),    # Trucks right
-            (4, -1, 18, 2, 5),   # Cars left
-            (5, 1, 30, 2, 6),    # Fast cars right
+            (1, 1, 12, 2, 10),   # Slow cars right
+            (2, -1, 16, 2, 9),   # Medium cars left
+            (3, 1, 20, 3, 9),    # Trucks right
+            (4, -1, 14, 2, 8),   # Cars left
+            (5, 1, 24, 2, 8),    # Fast cars right
         ]
 
         for row, direction, speed, length, gap in lane_configs:
@@ -106,11 +106,11 @@ class Frogger(Game):
         # Water lane configs
         water_configs = [
             # (row, type, direction, speed, length, gap)
-            (7, 'turtle', -1, 12, 3, 4),   # Turtles left
-            (8, 'log', 1, 18, 4, 5),       # Short logs right
-            (9, 'log', -1, 15, 5, 4),      # Medium logs left
-            (10, 'turtle', 1, 14, 3, 5),   # Turtles right
-            (11, 'log', -1, 20, 6, 6),     # Long logs left
+            (7, 'turtle', -1, 10, 3, 3),   # Turtles left
+            (8, 'log', 1, 14, 5, 4),       # Short logs right (longer)
+            (9, 'log', -1, 12, 6, 3),      # Medium logs left (longer, tighter)
+            (10, 'turtle', 1, 11, 4, 4),   # Turtles right (longer groups)
+            (11, 'log', -1, 16, 7, 5),     # Long logs left (longer)
         ]
 
         for row, obj_type, direction, speed, length, gap in water_configs:

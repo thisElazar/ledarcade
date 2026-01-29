@@ -17,7 +17,7 @@ PLAYER_2 = 2  # Yellow
 
 
 class Connect4(Game):
-    name = "CONNECT4"
+    name = "CONNECT 4"
     description = "2P Strategy"
     category = "2_player"
 

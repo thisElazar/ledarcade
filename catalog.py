@@ -20,6 +20,7 @@ class Category:
     """A category/page in the menu system."""
     name: str
     color: Tuple[int, int, int]
+    key: str = ""  # Lookup key used by game/visual classes
     items: List[Any] = field(default_factory=list)
 
     def add(self, item_class):
@@ -33,26 +34,26 @@ class Category:
 
 # Game categories
 GAME_CATEGORIES = [
-    Category("ARCADE", Colors.YELLOW),      # True arcade machines
-    Category("RETRO", Colors.GREEN),        # Pre-mobile, non-arcade
-    Category("MODERN", Colors.CYAN),        # Mobile era games
-    Category("2 PLAYER", Colors.MAGENTA),   # Multiplayer games
+    Category("ARCADE GAMES", Colors.YELLOW, "arcade"),
+    Category("RETRO GAMES", Colors.GREEN, "retro"),
+    Category("MODERN GAMES", Colors.CYAN, "modern"),
+    Category("2 PLAYER GAMES", Colors.MAGENTA, "2_player"),
 ]
 
 # Visual categories
 VISUAL_CATEGORIES = [
-    Category("AUTOMATA", Colors.MAGENTA),   # Cellular automata
-    Category("NATURE", Colors.GREEN),       # Natural phenomena
-    Category("DIGITAL", Colors.CYAN),       # Computer/math visualizations
-    Category("ART", Colors.YELLOW),         # Famous paintings
-    Category("SPRITES", Colors.LIME),       # Video game sprite animations
-    Category("HOUSEHOLD", Colors.ORANGE),   # Domestic nostalgia
-    Category("UTILITY", Colors.WHITE),      # Functional displays
+    Category("AUTOMATA", Colors.MAGENTA, "automata"),
+    Category("NATURE", Colors.GREEN, "nature"),
+    Category("DIGITAL", Colors.CYAN, "digital"),
+    Category("ART", Colors.YELLOW, "art"),
+    Category("SPRITES", Colors.LIME, "sprites"),
+    Category("HOUSEHOLD", Colors.ORANGE, "household"),
+    Category("UTILITY", Colors.WHITE, "utility"),
 ]
 
-# Category name to object mapping for easy lookup
-GAME_CATEGORY_MAP: Dict[str, Category] = {cat.name.lower().replace(" ", "_"): cat for cat in GAME_CATEGORIES}
-VISUAL_CATEGORY_MAP: Dict[str, Category] = {cat.name.lower().replace(" ", "_"): cat for cat in VISUAL_CATEGORIES}
+# Category key to object mapping for easy lookup
+GAME_CATEGORY_MAP: Dict[str, Category] = {cat.key: cat for cat in GAME_CATEGORIES}
+VISUAL_CATEGORY_MAP: Dict[str, Category] = {cat.key: cat for cat in VISUAL_CATEGORIES}
 
 
 def register_games(game_classes):
