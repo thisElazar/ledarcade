@@ -97,6 +97,9 @@ class HardwareDisplay:
 
         self.matrix = RGBMatrix(options=options)
 
+        # Double-buffered: draw to offscreen canvas, then swap atomically
+        self.canvas = self.matrix.CreateFrameCanvas()
+
         # Virtual framebuffer (matches arcade.py interface)
         self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
@@ -218,11 +221,13 @@ class HardwareDisplay:
             cursor += 4
 
     def render(self):
-        """Render the buffer to the LED matrix."""
+        """Render the buffer to the LED matrix using double-buffering."""
+        canvas = self.canvas
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 r, g, b = self.buffer[y][x]
-                self.matrix.SetPixel(x, y, r, g, b)
+                canvas.SetPixel(x, y, r, g, b)
+        self.canvas = self.matrix.SwapOnVSync(canvas)
 
 
 # =============================================================================
