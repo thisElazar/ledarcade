@@ -109,14 +109,15 @@ class HardwareDisplay:
 
         # Flat bytearray framebuffer: RGBRGBRGB... row-major, 3 bytes per pixel
         self._fb = bytearray(GRID_SIZE * GRID_SIZE * 3)
+        # Pre-allocated zero buffer for fast black clear
+        self._zeros = bytes(GRID_SIZE * GRID_SIZE * 3)
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
-        r, g, b = color
-        if r == 0 and g == 0 and b == 0:
-            self._fb[:] = b'\x00' * len(self._fb)
+        if color[0] == 0 and color[1] == 0 and color[2] == 0:
+            self._fb[:] = self._zeros
         else:
-            row = bytes([r, g, b]) * GRID_SIZE
+            row = bytes(color) * GRID_SIZE
             self._fb[:] = row * GRID_SIZE
 
     def set_pixel(self, x: int, y: int, color: Tuple[int, int, int]):
@@ -238,8 +239,8 @@ class HardwareDisplay:
         """Render the buffer to the LED matrix using bulk SetImage."""
         canvas = self.canvas
         if HAS_PIL:
-            # Bulk transfer: build PIL Image from flat bytearray, single C call
-            img = Image.frombytes('RGB', (GRID_SIZE, GRID_SIZE), bytes(self._fb))
+            # Bulk transfer: PIL Image from bytearray, single C call to matrix
+            img = Image.frombuffer('RGB', (GRID_SIZE, GRID_SIZE), self._fb, 'raw', 'RGB', 0, 1)
             canvas.SetImage(img)
         else:
             # Fallback: per-pixel from flat bytearray (slower)
