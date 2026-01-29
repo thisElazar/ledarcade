@@ -94,6 +94,24 @@ The Pac-Man implementation required significant iteration to feel right on a 64x
 - Text rendering limited to 3x5 pixel font
 - Complex sprites must be 2-3 pixels max
 
+### LED Color Contrast (Needs Attention)
+Several games use muddy browns, near-black, or washed-out pastels that have poor visibility on the LED matrix. Bold saturated colors with clear value separation work best.
+
+**Fixed:**
+- 2048 — replaced pastel cream/tan mobile palette with distinct saturated colors
+- Chess — black pieces changed to dark red, board squares adjusted
+- Checkers — P2 white pieces changed to blue, board squares adjusted
+- Othello — P1 black pieces changed to dark red for green board contrast
+- Go — brighter grid lines, star points, and black stones
+
+**Remaining (low priority):**
+- Donkey Kong — DK and barrels use muddy browns (139,90,43 / 120,70,35)
+- Dig Dug — dirt colors (139,90,43 / 100,65,30) are muddy browns
+- Lode Runner — rope color (139,90,43) same muddy brown
+- Frogger — logs use muddy brown, rocks are similar dark grays
+- Geometry Dash — multiple near-identical dark grays for ground/platforms
+- Bomberman — bomb color (20,20,20) nearly invisible, wall/floor similar brightness
+
 ---
 
 ## Discussed But Not Implemented

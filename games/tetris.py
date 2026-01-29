@@ -259,8 +259,8 @@ class Tetris(Game):
             self.piece_x += move_dx
             self.lock_timer = 0  # Reset lock delay on movement
         
-        # Rotation (Up only)
-        if input_state.up:
+        # Rotation (Up only, single press)
+        if input_state.up_pressed:
             new_rotation = (self.current_rotation + 1) % 4
             if not self.check_collision(rotation=new_rotation):
                 self.current_rotation = new_rotation

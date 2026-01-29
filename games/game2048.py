@@ -25,25 +25,25 @@ class Game2048(Game):
     BOARD_X = (GRID_SIZE - BOARD_SIZE) // 2  # 7
     BOARD_Y = 8  # Below HUD
 
-    # Colors for each tile value
+    # Colors for each tile value (bold saturated for LED matrix)
     TILE_COLORS = {
-        0: (50, 50, 60),       # Empty
-        2: (238, 228, 218),    # Cream
-        4: (237, 224, 200),    # Light tan
-        8: (242, 177, 121),    # Orange
-        16: (245, 149, 99),    # Dark orange
-        32: (246, 124, 95),    # Red-orange
-        64: (246, 94, 59),     # Red
-        128: (237, 207, 114),  # Yellow
-        256: (237, 204, 97),   # Gold
-        512: (237, 200, 80),   # Bright gold
-        1024: (237, 197, 63),  # Golden
-        2048: (237, 194, 46),  # Bright yellow
+        0: (20, 20, 30),       # Empty (dark)
+        2: (80, 80, 100),      # Cool gray
+        4: (60, 100, 140),     # Steel blue
+        8: (220, 140, 30),     # Orange
+        16: (240, 100, 30),    # Dark orange
+        32: (220, 50, 50),     # Red
+        64: (200, 30, 30),     # Deep red
+        128: (240, 220, 50),   # Bright yellow
+        256: (50, 200, 50),    # Green
+        512: (30, 160, 220),   # Sky blue
+        1024: (180, 50, 220),  # Purple
+        2048: (255, 255, 100), # Gold
     }
 
-    TEXT_DARK = (119, 110, 101)
-    TEXT_LIGHT = (249, 246, 242)
-    BOARD_BG = (187, 173, 160)
+    TEXT_DARK = (255, 255, 255)
+    TEXT_LIGHT = (255, 255, 255)
+    BOARD_BG = (40, 40, 50)
 
     def __init__(self, display: Display):
         super().__init__(display)

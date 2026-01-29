@@ -1,7 +1,7 @@
 """
 Indy 500 - Top-Down Racing
 ===========================
-Race around the track and beat your best time!
+Race as many laps as you can in 2 minutes!
 
 Controls:
   Left/Right - Steer
@@ -14,7 +14,7 @@ import math
 
 class Indy500(Game):
     name = "INDY 500"
-    description = "Top-Down Racing"
+    description = "Laps in 2 min!"
     category = "retro"
 
     # Track parameters (oval)
@@ -41,7 +41,6 @@ class Indy500(Game):
 
     def __init__(self, display: Display):
         super().__init__(display)
-        self.best_time = None
         self.reset()
 
     def reset(self):
@@ -66,9 +65,9 @@ class Indy500(Game):
         self.off_track = False
         self.off_track_timer = 0.0
 
-        # Race state
-        self.race_complete = False
-        self.target_laps = 3
+        # Race timer (2 minutes)
+        self.time_limit = 120.0
+        self.time_remaining = 120.0
 
     def point_on_track(self, x: float, y: float) -> bool:
         """Check if a point is on the track."""
@@ -89,7 +88,12 @@ class Indy500(Game):
                 self.reset()
             return
 
-        if self.race_complete:
+        # Countdown timer
+        self.time_remaining -= dt
+        if self.time_remaining <= 0:
+            self.time_remaining = 0
+            self.score = self.lap
+            self.state = GameState.GAME_OVER
             return
 
         # Update time
@@ -103,7 +107,7 @@ class Indy500(Game):
             self.angle += self.TURN_SPEED * dt
 
         # Acceleration / braking
-        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
+        if input_state.action_l_held or input_state.action_r_held:
             self.speed += self.ACCELERATION * dt
         else:
             # Friction when not accelerating
@@ -146,13 +150,6 @@ class Indy500(Game):
                 self.lap += 1
                 self.last_lap_time = self.lap_time
                 self.lap_time = 0.0
-
-                if self.lap >= self.target_laps:
-                    self.race_complete = True
-                    self.score = int(self.total_time * 10)
-                    if self.best_time is None or self.total_time < self.best_time:
-                        self.best_time = self.total_time
-                    self.state = GameState.GAME_OVER
         else:
             self.crossed_finish = False
 
@@ -170,10 +167,6 @@ class Indy500(Game):
 
         # Draw HUD
         self.draw_hud()
-
-        # Draw race complete message
-        if self.race_complete:
-            self.draw_race_complete()
 
     def draw_track(self):
         """Draw the oval track."""
@@ -257,34 +250,20 @@ class Indy500(Game):
             self.display.set_pixel(sx2, sy2, self.CAR_ACCENT)
 
     def draw_hud(self):
-        """Draw lap counter and time."""
+        """Draw lap counter and countdown timer."""
         # Lap counter
-        lap_text = f"L{self.lap + 1}/{self.target_laps}"
-        self.display.draw_text_small(1, 1, lap_text, Colors.WHITE)
+        self.display.draw_text_small(1, 1, f"LAP:{self.lap}", Colors.WHITE)
 
-        # Current lap time
-        time_sec = int(self.lap_time)
-        time_dec = int((self.lap_time - time_sec) * 10)
-        time_text = f"{time_sec}.{time_dec}"
-        self.display.draw_text_small(40, 1, time_text, Colors.YELLOW)
+        # Countdown timer (M:SS)
+        secs = max(0, int(self.time_remaining))
+        mins = secs // 60
+        secs = secs % 60
+        timer_color = Colors.RED if self.time_remaining < 10 else Colors.YELLOW
+        self.display.draw_text_small(36, 1, f"{mins}:{secs:02d}", timer_color)
 
-        # Speed indicator (small bar)
-        speed_pct = self.speed / self.MAX_SPEED
-        bar_width = int(10 * speed_pct)
-        bar_color = Colors.GREEN if not self.off_track else Colors.RED
-        self.display.draw_rect(54, 2, bar_width, 3, bar_color)
-
-    def draw_race_complete(self):
-        """Draw race complete message."""
-        self.display.draw_text_small(12, 14, "FINISHED!", Colors.GREEN)
-
-        # Total time
-        total_sec = int(self.total_time)
-        total_dec = int((self.total_time - total_sec) * 10)
-        self.display.draw_text_small(8, 24, f"TIME:{total_sec}.{total_dec}s", Colors.WHITE)
-
-        # Best time
-        if self.best_time:
-            best_sec = int(self.best_time)
-            best_dec = int((self.best_time - best_sec) * 10)
-            self.display.draw_text_small(8, 32, f"BEST:{best_sec}.{best_dec}s", Colors.YELLOW)
+    def draw_game_over(self):
+        """Draw game over showing laps completed."""
+        self.display.clear(Colors.BLACK)
+        self.display.draw_text_small(8, 16, "TIME UP!", Colors.RED)
+        self.display.draw_text_small(8, 28, f"LAPS:{self.lap}", Colors.WHITE)
+        self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

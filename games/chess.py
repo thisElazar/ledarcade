@@ -4,9 +4,8 @@ Chess - Two Player Strategy Game
 Classic chess on a 64x64 LED display!
 
 Controls:
-  Arrow Keys - Move cursor
-  Space      - Select piece / Confirm move
-  Z          - Cancel selection
+  Joystick - Move cursor
+  Button   - Select piece / Confirm move (press same piece to deselect)
 """
 
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
@@ -96,11 +95,11 @@ class Chess(Game):
     BOARD_OFFSET_X = 4  # Left margin
     BOARD_OFFSET_Y = 8  # Top margin (leaves room for HUD)
 
-    # Colors
-    LIGHT_SQUARE = (180, 140, 100)
-    DARK_SQUARE = (120, 80, 50)
+    # Colors (tuned for LED matrix contrast)
+    LIGHT_SQUARE = (140, 120, 80)
+    DARK_SQUARE = (50, 70, 50)
     WHITE_PIECE = (255, 255, 255)
-    BLACK_PIECE = (40, 40, 40)
+    BLACK_PIECE = (180, 60, 60)  # Dark red — visible on both square colors
     CURSOR_COLOR = Colors.CYAN
     SELECTED_COLOR = Colors.YELLOW
     VALID_MOVE_COLOR = (100, 200, 100)
@@ -456,7 +455,7 @@ class Chess(Game):
                 self.promotion_choice = (self.promotion_choice - 1) % 4
             elif input_state.right:
                 self.promotion_choice = (self.promotion_choice + 1) % 4
-            elif input_state.action_l:
+            elif (input_state.action_l or input_state.action_r):
                 self.promote_pawn(promotion_pieces[self.promotion_choice])
             return
 
@@ -481,13 +480,8 @@ class Chess(Game):
             self.last_direction = (0, 0)
             self.move_timer = 0
 
-        # Cancel selection
-        if input_state.action_r:
-            self.selected_pos = None
-            self.valid_moves = []
-
         # Select piece or make move
-        if input_state.action_l:
+        if (input_state.action_l or input_state.action_r):
             cursor_pos = (self.cursor_x, self.cursor_y)
 
             if self.selected_pos is None:
@@ -530,9 +524,10 @@ class Chess(Game):
         self.display.clear(Colors.BLACK)
 
         # Draw HUD
-        turn_text = "WHITE" if self.current_turn == WHITE else "BLACK"
-        turn_color = Colors.WHITE if self.current_turn == WHITE else Colors.GRAY
-        self.display.draw_text_small(1, 1, turn_text, turn_color)
+        if self.current_turn == WHITE:
+            self.display.draw_text_small(1, 1, "P1", self.WHITE_PIECE)
+        else:
+            self.display.draw_text_small(1, 1, "P2", self.BLACK_PIECE)
 
         if self.in_check:
             self.display.draw_text_small(32, 1, "CHECK", Colors.RED)

@@ -4,12 +4,11 @@ TrashBlaster - Zap floating trash from your spaceship!
 Inspired by MathBlasters. You're piloting an alien vessel through a debris
 field. Look through your cockpit window and use your targeting crosshair
 to blast floating trash. Move the crosshair with the joystick and fire
-with the action button!
+with the action button! Score as many points as you can in 2 minutes!
 
 Controls:
   Arrow Keys - Move targeting crosshair
   Space/Action - Fire laser at crosshair position
-  Escape - Exit
 """
 
 import random
@@ -183,6 +182,8 @@ class TrashBlaster(Game):
     def reset(self):
         self.state = GameState.PLAYING
         self.time = 0.0
+        self.time_limit = 120.0
+        self.time_remaining = 120.0
         self.score = 0
         self.trash = []
         self.explosions = []
@@ -303,6 +304,12 @@ class TrashBlaster(Game):
             return
 
         self.time += dt
+        self.time_remaining -= dt
+        if self.time_remaining <= 0:
+            self.time_remaining = 0
+            self.state = GameState.GAME_OVER
+            return
+
         self.difficulty_timer += dt
 
         # Increase difficulty over time
@@ -511,9 +518,17 @@ class TrashBlaster(Game):
             self._draw_digit(x + i * 4, y, char, color)
 
     def _draw_score_display(self):
-        """Draw score in the cockpit frame area."""
+        """Draw score and countdown in the cockpit frame area."""
         # Score in top-left of frame
         self._draw_number(2, 2, self.score, (0, 200, 100))
+
+        # Countdown timer in top-right of frame
+        secs = max(0, int(self.time_remaining))
+        mins = secs // 60
+        secs = secs % 60
+        timer_color = (255, 50, 50) if self.time_remaining < 10 else (200, 200, 0)
+        timer_str = f"{mins}:{secs:02d}"
+        self.display.draw_text_small(42, 2, timer_str, timer_color)
 
     def draw(self):
         # Space background (visible through viewport)

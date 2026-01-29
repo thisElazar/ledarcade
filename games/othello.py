@@ -12,7 +12,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 # Players
-PLAYER_1 = 1  # Black (goes first)
+PLAYER_1 = 1  # Red (goes first)
 PLAYER_2 = 2  # White
 
 
@@ -27,13 +27,13 @@ class Othello(Game):
     BOARD_OFFSET_X = 4
     BOARD_OFFSET_Y = 8
 
-    # Colors
-    BOARD_COLOR = (30, 120, 50)  # Green felt
-    GRID_COLOR = (20, 80, 35)
-    PLAYER_1_COLOR = (30, 30, 30)    # Black
+    # Colors (tuned for LED matrix contrast)
+    BOARD_COLOR = (20, 80, 35)   # Darker green felt
+    GRID_COLOR = (15, 55, 25)
+    PLAYER_1_COLOR = (180, 60, 60)   # Dark red (visible on green)
     PLAYER_2_COLOR = (240, 240, 240)  # White
     CURSOR_COLOR = Colors.YELLOW
-    VALID_MOVE_COLOR = (80, 180, 100)
+    VALID_MOVE_COLOR = (100, 200, 120)
 
     # Animation
     FLIP_DURATION = 0.3  # seconds per flip animation
@@ -287,10 +287,10 @@ class Othello(Game):
 
     def draw_hud(self):
         """Draw score and turn indicator."""
-        # Player 1 score (black)
+        # Player 1 score
         self.display.draw_text_small(1, 1, f"P1:{self.p1_score:2d}", self.PLAYER_1_COLOR)
 
-        # Player 2 score (white)
+        # Player 2 score
         self.display.draw_text_small(36, 1, f"P2:{self.p2_score:2d}", self.PLAYER_2_COLOR)
 
         # Turn indicator (highlight current player's score)
@@ -366,12 +366,13 @@ class Othello(Game):
 
     def draw_game_over(self):
         """Draw game over message."""
+        self.display.clear(Colors.BLACK)
         if self.winner == PLAYER_1:
-            color = self.PLAYER_1_COLOR
+            self.display.draw_text_small(2, 20, "P1 WINS!", self.PLAYER_1_COLOR)
         elif self.winner == PLAYER_2:
-            color = self.PLAYER_2_COLOR
+            self.display.draw_text_small(2, 20, "P2 WINS!", self.PLAYER_2_COLOR)
         else:
-            color = Colors.GRAY
+            self.display.draw_text_small(2, 20, "DRAW!", Colors.GRAY)
 
-        # Draw result
-        self.display.draw_text_small(2, 1, self.game_over_reason, color)
+        self.display.draw_text_small(2, 34, self.game_over_reason, Colors.WHITE)
+        self.display.draw_text_small(2, 50, "BTN:AGAIN", Colors.DARK_GRAY)

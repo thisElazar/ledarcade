@@ -4,9 +4,8 @@ Go - Ancient Strategy Board Game
 Surround territory and capture stones!
 
 Controls:
-  Arrow Keys - Move cursor
-  Space      - Place stone
-  Z          - Pass turn
+  Joystick   - Move cursor (up past top = PASS zone)
+  Button     - Place stone / Confirm pass
 """
 
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
@@ -244,24 +243,31 @@ class Go(Game):
                 self.cursor_x = min(self.BOARD_SIZE - 1, self.cursor_x + 1)
                 moved = True
             elif input_state.up:
-                self.cursor_y = max(0, self.cursor_y - 1)
+                if self.cursor_y == 0:
+                    # Move to pass zone (y = -1)
+                    self.cursor_y = -1
+                elif self.cursor_y > 0:
+                    self.cursor_y -= 1
                 moved = True
             elif input_state.down:
-                self.cursor_y = min(self.BOARD_SIZE - 1, self.cursor_y + 1)
+                if self.cursor_y == -1:
+                    self.cursor_y = 0
+                else:
+                    self.cursor_y = min(self.BOARD_SIZE - 1, self.cursor_y + 1)
                 moved = True
 
             if moved:
                 self.input_cooldown = self.move_delay
 
-            # Place stone
-            if input_state.action_l:
-                if self.place_stone(self.cursor_x, self.cursor_y):
-                    self.input_cooldown = 0.2
-
-            # Pass turn
-            if input_state.action_r:
-                self.pass_turn()
-                self.input_cooldown = 0.3
+            # Place stone or pass
+            if (input_state.action_l or input_state.action_r):
+                if self.cursor_y == -1:
+                    # Pass turn from pass zone
+                    self.pass_turn()
+                    self.input_cooldown = 0.3
+                else:
+                    if self.place_stone(self.cursor_x, self.cursor_y):
+                        self.input_cooldown = 0.2
 
     def draw(self):
         self.display.clear(Colors.BLACK)
@@ -273,7 +279,7 @@ class Go(Game):
             self.BOARD_OFFSET_Y - 2,
             board_px,
             board_px,
-            (180, 150, 100)  # Wood color
+            (160, 130, 70)  # Wood color (saturated for LED)
         )
 
         # Draw grid lines
@@ -282,20 +288,20 @@ class Go(Game):
             x1 = self.BOARD_OFFSET_X
             x2 = self.BOARD_OFFSET_X + (self.BOARD_SIZE - 1) * self.CELL_SIZE
             y = self.BOARD_OFFSET_Y + i * self.CELL_SIZE
-            self.display.draw_line(x1, y, x2, y, (80, 60, 40))
+            self.display.draw_line(x1, y, x2, y, (100, 75, 30))
 
             # Vertical
             y1 = self.BOARD_OFFSET_Y
             y2 = self.BOARD_OFFSET_Y + (self.BOARD_SIZE - 1) * self.CELL_SIZE
             x = self.BOARD_OFFSET_X + i * self.CELL_SIZE
-            self.display.draw_line(x, y1, x, y2, (80, 60, 40))
+            self.display.draw_line(x, y1, x, y2, (100, 75, 30))
 
         # Draw star points (hoshi)
         star_points = [(2, 2), (6, 2), (2, 6), (6, 6), (4, 4)]
         for sx, sy in star_points:
             px = self.BOARD_OFFSET_X + sx * self.CELL_SIZE
             py = self.BOARD_OFFSET_Y + sy * self.CELL_SIZE
-            self.display.set_pixel(px, py, (60, 40, 20))
+            self.display.set_pixel(px, py, (80, 55, 20))
 
         # Draw stones
         for y in range(self.BOARD_SIZE):
@@ -314,8 +320,8 @@ class Go(Game):
         px = self.BOARD_OFFSET_X + x * self.CELL_SIZE
         py = self.BOARD_OFFSET_Y + y * self.CELL_SIZE
 
-        stone_color = (20, 20, 20) if color == BLACK else (240, 240, 240)
-        highlight = (60, 60, 60) if color == BLACK else (255, 255, 255)
+        stone_color = (40, 40, 50) if color == BLACK else (240, 240, 240)
+        highlight = (80, 80, 100) if color == BLACK else (255, 255, 255)
 
         # Draw 3x3 stone
         for dy in range(-1, 2):
@@ -327,7 +333,12 @@ class Go(Game):
         self.display.set_pixel(px - 1, py - 1, highlight)
 
     def draw_cursor(self):
-        """Draw the cursor."""
+        """Draw the cursor or pass zone indicator."""
+        if self.cursor_y == -1:
+            # Cursor is in pass zone — highlight PASS text
+            self.display.draw_text_small(20, 1, "PASS", Colors.CYAN)
+            return
+
         px = self.BOARD_OFFSET_X + self.cursor_x * self.CELL_SIZE
         py = self.BOARD_OFFSET_Y + self.cursor_y * self.CELL_SIZE
 
@@ -343,26 +354,33 @@ class Go(Game):
         if self.board[self.cursor_y][self.cursor_x] == 0:
             if self.is_valid_move(self.cursor_x, self.cursor_y):
                 # Ghost stone
-                ghost_color = (40, 40, 40) if self.current_player == BLACK else (200, 200, 200)
+                ghost_color = (60, 60, 60) if self.current_player == BLACK else (200, 200, 200)
                 self.display.set_pixel(px, py, ghost_color)
 
     def draw_hud(self):
         """Draw the heads-up display."""
-        # Current player
+        # Current player indicator
         if self.current_player == BLACK:
             self.display.draw_text_small(1, 1, "B", Colors.WHITE)
-            self.display.set_pixel(10, 2, (20, 20, 20))
+            self.display.set_pixel(10, 3, (60, 60, 60))
+            self.display.set_pixel(11, 3, (60, 60, 60))
         else:
             self.display.draw_text_small(1, 1, "W", Colors.WHITE)
-            self.display.set_pixel(10, 2, (240, 240, 240))
+            self.display.set_pixel(10, 3, (240, 240, 240))
+            self.display.set_pixel(11, 3, (240, 240, 240))
 
         # Captures
         self.display.draw_text_small(45, 1, f"{self.black_captures}", Colors.WHITE)
         self.display.draw_text_small(55, 1, f"{self.white_captures}", Colors.GRAY)
 
-        # Pass indicator
-        if self.consecutive_passes > 0:
+        # Pass zone hint (dimmed when cursor is on board, bright when in pass zone)
+        if self.cursor_y == -1:
+            # Cursor in pass zone — draw_cursor handles the highlight
+            pass
+        elif self.consecutive_passes > 0:
             self.display.draw_text_small(20, 1, "PASS", Colors.YELLOW)
+        else:
+            self.display.draw_text_small(20, 1, "PASS", Colors.DARK_GRAY)
 
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)

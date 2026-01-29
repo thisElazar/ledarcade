@@ -2,7 +2,7 @@
 SpaceCruise - MathBlasters Math Shooting Game
 ==============================================
 Pilot your rocket through space and shoot floating numbers and operators!
-Build math combos to maximize your score.
+Build math combos to maximize your score in 2 minutes!
 
 Combo System:
   - Hit a number: Loads it as your first operand
@@ -15,7 +15,6 @@ Controls:
   Up/Down    - Move rocket vertically
   Left/Right - Move crosshair horizontally
   Space      - Fire at crosshair position
-  Escape     - Exit
 """
 
 import random
@@ -152,6 +151,8 @@ class SpaceCruise(Game):
     def reset(self):
         self.state = GameState.PLAYING
         self.time = 0.0
+        self.time_limit = 120.0
+        self.time_remaining = 120.0
         self.score = 0
 
         # Rocket position
@@ -333,6 +334,12 @@ class SpaceCruise(Game):
             return
 
         self.time += dt
+        self.time_remaining -= dt
+        if self.time_remaining <= 0:
+            self.time_remaining = 0
+            self.state = GameState.GAME_OVER
+            return
+
         self.bob_phase += dt * 2.5
 
         # Handle input
@@ -579,8 +586,16 @@ class SpaceCruise(Game):
                 self._draw_digit(x + 10, y, '?', (255, 255, 0))
 
     def _draw_score(self):
-        """Draw score display."""
+        """Draw score and countdown."""
         self._draw_number(2, 2, self.score, (0, 200, 100))
+
+        # Countdown timer in top area
+        secs = max(0, int(self.time_remaining))
+        mins = secs // 60
+        secs = secs % 60
+        timer_color = (255, 50, 50) if self.time_remaining < 10 else (200, 200, 0)
+        timer_str = f"{mins}:{secs:02d}"
+        self.display.draw_text_small(42, 2, timer_str, timer_color)
 
     def draw(self):
         self.display.clear(self.SPACE_BLACK)

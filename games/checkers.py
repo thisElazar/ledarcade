@@ -35,11 +35,11 @@ class Checkers(Game):
     BOARD_OFFSET_X = 4
     BOARD_OFFSET_Y = 6
 
-    # Colors
-    LIGHT_SQUARE = (180, 160, 130)
-    DARK_SQUARE = (80, 60, 40)
-    PLAYER_1_COLOR = (220, 50, 50)   # Red
-    PLAYER_2_COLOR = (240, 240, 240)  # White
+    # Colors (tuned for LED matrix contrast)
+    LIGHT_SQUARE = (140, 120, 80)
+    DARK_SQUARE = (50, 70, 50)
+    PLAYER_1_COLOR = (255, 60, 60)   # Bright red
+    PLAYER_2_COLOR = (60, 140, 255)  # Blue (visible on both square colors)
     KING_ACCENT = (255, 215, 0)  # Gold crown
     CURSOR_COLOR = Colors.CYAN
     SELECTED_COLOR = Colors.YELLOW
