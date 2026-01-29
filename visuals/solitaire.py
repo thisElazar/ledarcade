@@ -50,13 +50,39 @@ for _i in range(_RAINBOW_SIZE):
         _RAINBOW_LUT.append((255, 0, int(255 * (1 - _f))))
 _RAINBOW_LUT = tuple(_RAINBOW_LUT)
 
-# Pre-compute background row for fast clear
-_BG_COLOR = (0, 50, 20)
-_BG_ROW = [_BG_COLOR] * GRID_SIZE
-
 # Pre-compute card face colors
+_BG_COLOR = (0, 50, 20)
 _BORDER_COLOR = (200, 200, 200)
 _FACE_COLOR = (255, 255, 255)
+
+# Pre-compute card face row bytes for hardware fast path
+# Each suit color gets 16 pre-built byte rows (one per card row)
+_CARD_ROW_BYTES = {}
+for _cc in set(CARD_COLORS):
+    _rows = []
+    _border_b = bytes(_BORDER_COLOR)
+    _suit_b = bytes(_cc)
+    _face_b = bytes(_FACE_COLOR)
+    for _dy in range(CARD_H):
+        _row = bytearray(CARD_W * 3)
+        _is_border_y = (_dy == 0 or _dy == CARD_H - 1)
+        _is_pip_y = (6 <= _dy <= 9)
+        for _dx in range(CARD_W):
+            _off = _dx * 3
+            if _is_border_y or _dx == 0 or _dx == CARD_W - 1:
+                _row[_off:_off+3] = _border_b
+            elif _is_pip_y and 4 <= _dx <= 7:
+                _row[_off:_off+3] = _suit_b
+            else:
+                _row[_off:_off+3] = _face_b
+        _rows.append(bytes(_row))
+    _CARD_ROW_BYTES[_cc] = _rows
+
+# Pre-compute background row for emulator fast clear
+_BG_ROW = [_BG_COLOR] * GRID_SIZE
+
+# Card row width in bytes
+_CARD_BYTE_W = CARD_W * 3
 
 
 class Card:
@@ -180,31 +206,84 @@ class Solitaire(Visual):
             self._spawn_card()
 
     def draw(self):
-        buf = self.display.buffer
+        self.display.clear(_BG_COLOR)
 
-        # Fast clear — slice-assign pre-computed background row
-        for row in buf:
-            row[:] = _BG_ROW
+        # Detect display backend for fast-path drawing
+        fb = getattr(self.display, '_fb', None)
+        if fb is not None:
+            self._draw_cards_fb(fb)
+        else:
+            self._draw_cards_buf(self.display.buffer)
 
-        # Draw all cards with rainbow trails (oldest first so newest on top)
+    def _draw_cards_fb(self, fb):
+        """Draw cards directly to hardware flat bytearray."""
+        gs3 = GRID_SIZE * 3  # row stride in bytes
+
         for card in self.cards:
             trail = card.trail
             trail_len = len(trail)
 
             if trail_len > 0:
-                # Pre-compute per-trail scaling factors
                 hue_base = card.hue_offset
                 hue_scale = 0.5 / max(1, trail_len)
                 alpha_scale = 0.8 / trail_len
 
                 for i, (tx, ty) in enumerate(trail):
-                    # Rainbow color from LUT
+                    hue_idx = int((hue_base + i * hue_scale) * _RAINBOW_SIZE) % _RAINBOW_SIZE
+                    r, g, b = _RAINBOW_LUT[hue_idx]
+                    alpha = (i + 1) * alpha_scale
+                    color_bytes = bytes((int(r * alpha), int(g * alpha), int(b * alpha)))
+
+                    x0 = max(0, tx)
+                    y0 = max(0, ty)
+                    x1 = min(GRID_SIZE, tx + CARD_W)
+                    y1 = min(GRID_SIZE, ty + CARD_H)
+                    if x0 < x1 and y0 < y1:
+                        row_fill = color_bytes * (x1 - x0)
+                        fill_len = len(row_fill)
+                        for sy in range(y0, y1):
+                            offset = sy * gs3 + x0 * 3
+                            fb[offset:offset + fill_len] = row_fill
+
+            # Draw card face from pre-computed row bytes
+            ix, iy = int(card.x), int(card.y)
+            x0 = max(0, ix)
+            y0 = max(0, iy)
+            x1 = min(GRID_SIZE, ix + CARD_W)
+            y1 = min(GRID_SIZE, iy + CARD_H)
+            if x0 < x1 and y0 < y1:
+                card_rows = _CARD_ROW_BYTES[card.color]
+                if x0 == ix and x1 == ix + CARD_W:
+                    # No horizontal clipping — full row slice
+                    for sy in range(y0, y1):
+                        offset = sy * gs3 + ix * 3
+                        fb[offset:offset + _CARD_BYTE_W] = card_rows[sy - iy]
+                else:
+                    # Clipped — sub-slice of pre-computed row
+                    clip_start = (x0 - ix) * 3
+                    clip_end = (x1 - ix) * 3
+                    clip_len = clip_end - clip_start
+                    for sy in range(y0, y1):
+                        offset = sy * gs3 + x0 * 3
+                        fb[offset:offset + clip_len] = card_rows[sy - iy][clip_start:clip_end]
+
+    def _draw_cards_buf(self, buf):
+        """Draw cards directly to emulator 2D list buffer."""
+        for card in self.cards:
+            trail = card.trail
+            trail_len = len(trail)
+
+            if trail_len > 0:
+                hue_base = card.hue_offset
+                hue_scale = 0.5 / max(1, trail_len)
+                alpha_scale = 0.8 / trail_len
+
+                for i, (tx, ty) in enumerate(trail):
                     hue_idx = int((hue_base + i * hue_scale) * _RAINBOW_SIZE) % _RAINBOW_SIZE
                     r, g, b = _RAINBOW_LUT[hue_idx]
                     alpha = (i + 1) * alpha_scale
                     color = (int(r * alpha), int(g * alpha), int(b * alpha))
 
-                    # Fill card-sized rect directly into buffer (clamped bounds)
                     x0 = max(0, tx)
                     y0 = max(0, ty)
                     x1 = min(GRID_SIZE, tx + CARD_W)
