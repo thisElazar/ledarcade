@@ -66,7 +66,7 @@ def draw_leaderboard(display, game_name, highlight_rank=-1):
     y = 14
     for i, (initials, score) in enumerate(scores):
         rank = i + 1
-        color = Colors.CYAN if rank == highlight_rank else Colors.WHITE
+        color = Colors.YELLOW if rank == highlight_rank else Colors.WHITE
         display.draw_text_small(2, y, f"{rank}", color)
         display.draw_text_small(10, y, initials, color)
         score_str = str(score)
@@ -331,7 +331,7 @@ def main():
                                         game_over_selection = 0
 
                                 if flash_show_leaderboard:
-                                    draw_leaderboard(display, current_item.name)
+                                    draw_leaderboard(display, current_item.name, player_rank)
                                 else:
                                     draw_game_over_score(display, final_score)
 
@@ -353,11 +353,13 @@ def main():
                                         if initials_cursor < 2:
                                             initials_cursor += 1
                                         else:
-                                            # Last letter — submit
+                                            # Last letter — submit, then show flashing with highlight
                                             initials_str = ''.join(player_initials)
                                             player_rank = hsm.add_score(current_item.name, initials_str, final_score)
-                                            game_over_state = GameOverState.CHOOSE_ACTION
-                                            game_over_selection = 0
+                                            game_over_state = GameOverState.FLASHING
+                                            flash_timer = 0.0
+                                            flash_show_leaderboard = True
+                                            game_over_lockout = 1.0
                                         input_cooldown = 0.2
 
                                 draw_initials_entry(display, player_initials, initials_cursor, final_score)
