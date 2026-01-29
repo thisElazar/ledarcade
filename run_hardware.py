@@ -4,11 +4,10 @@ LED Arcade - Hardware Launcher
 ==============================
 Runs the arcade on the LED matrix hardware.
 
-Controls (keyboard over SSH):
-  Arrow Keys or WASD - Joystick
-  Space              - Left action button
-  Z                  - Right action button
-  Hold button 2s     - Back/Exit
+Controls:
+  Joystick    - Navigate menus and gameplay
+  Buttons     - Action / Select
+  Hold 2s     - Return to menu from game or visual
 """
 
 import sys
@@ -167,8 +166,7 @@ def draw_menu(display, categories, cat_index, item_index):
         display.draw_text_small(58, 14 + (visible - 1) * 8, "v", Colors.GRAY)
 
     display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-    display.draw_text_small(2, 58, "SPC:GO", Colors.GRAY)
-    display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
+    display.draw_text_small(8, 58, "PRESS TO PLAY", Colors.GRAY)
 
 
 # =============================================================================
@@ -181,10 +179,9 @@ def main():
     print("=" * 50)
     print()
     print("Controls:")
-    print("  Arrow keys / WASD - Navigate")
-    print("  Space             - Left action")
-    print("  Z                 - Right action")
-    print("  Hold button 2s    - Back / Exit")
+    print("  Joystick    - Navigate")
+    print("  Buttons     - Action / Select")
+    print("  Hold 2s     - Return to menu")
     print()
 
     # Register content
@@ -205,7 +202,7 @@ def main():
     input_handler = HardwareInput(use_gpio=True)
 
     print("=" * 50)
-    print("READY! Use keyboard to control.")
+    print("READY!")
     print("=" * 50)
 
     # State
@@ -215,8 +212,7 @@ def main():
     is_two_player = False  # 2-player games skip high scores
     current_item = None
     is_game = False
-    exit_hold = 0.0         # Timer for hold-to-exit (menu and gameplay)
-    visual_exit_hold = 0.0
+    exit_hold = 0.0         # Timer for hold-to-exit (gameplay and visuals)
 
     # Game over state
     game_over_state = GameOverState.FLASHING
@@ -251,14 +247,6 @@ def main():
             input_state = input_handler.update()
 
             if in_menu:
-                # Hold either button 2 sec to quit app
-                if input_state.action_l_held or input_state.action_r_held:
-                    exit_hold += dt
-                    if exit_hold >= 2.0:
-                        running = False
-                else:
-                    exit_hold = 0.0
-
                 if not categories:
                     draw_menu(display, categories, 0, 0)
                 else:
@@ -408,15 +396,15 @@ def main():
                             current_item.update(input_state, dt)
                             current_item.draw()
                     else:
-                        # Visual
+                        # Visual — hold either button 2 sec to return to menu
                         if input_state.action_l_held or input_state.action_r_held:
-                            visual_exit_hold += dt
-                            if visual_exit_hold >= 2.0:
+                            exit_hold += dt
+                            if exit_hold >= 2.0:
                                 in_menu = True
                                 current_item = None
-                                visual_exit_hold = 0.0
+                                exit_hold = 0.0
                         else:
-                            visual_exit_hold = 0.0
+                            exit_hold = 0.0
 
                         if current_item:
                             current_item.handle_input(input_state)
