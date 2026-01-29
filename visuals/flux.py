@@ -1,6 +1,6 @@
 """
-Flux - Flow field visualization
-================================
+Flux - Curl Noise Flow Field
+==============================
 Three species of curves trace through a curl noise field, creating
 elegant, ever-evolving patterns like gases or fluids mixing.
 
@@ -8,7 +8,9 @@ Uses curl noise (divergence-free) so flow lines never converge into
 sinks or diverge from sources - they flow smoothly around each other
 like streamlines in an ideal fluid.
 
-A boundary potential creates natural circulation away from edges.
+Based on Robert Bridson's "Curl-Noise for Procedural Fluid Flow"
+(SIGGRAPH 2007). A boundary potential creates natural circulation
+away from edges.
 
 Controls:
   Up/Down    - Adjust trail length

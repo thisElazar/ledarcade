@@ -15,7 +15,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Cylon(Visual):
-    name = "CYLON"
+    name = "LARSON SCAN"
     description = "Larson scanner"
     category = "digital"
 

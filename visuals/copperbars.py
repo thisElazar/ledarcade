@@ -30,7 +30,7 @@ class Bar:
 
 
 class CopperBars(Visual):
-    name = "COPPERBARS"
+    name = "AMIGA BARS"
     description = "Amiga raster bars"
     category = "digital"
 
