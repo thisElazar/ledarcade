@@ -108,6 +108,8 @@ from .about import About
 from .sysinfo import SysInfo
 from .credits import Credits
 from .controls import Controls
+from .inputtest import InputTest
+from .shutdown import Shutdown
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -167,6 +169,8 @@ ALL_VISUALS = [
     SysInfo,
     Credits,
     Controls,
+    InputTest,
+    Shutdown,
 ]
 
 __all__ = [
@@ -231,4 +235,6 @@ __all__ = [
     'SysInfo',
     'Credits',
     'Controls',
+    'InputTest',
+    'Shutdown',
 ]
