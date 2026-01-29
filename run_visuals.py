@@ -71,6 +71,7 @@ def main():
     menu_selection = 0
     current_visual = None
     exit_hold = 0.0  # Timer for hold-to-exit
+    exit_hold_both = 0.0  # Timer for both-buttons hold-to-exit
 
     running = True
     while running:
@@ -108,15 +109,20 @@ def main():
             draw_menu(display, ALL_VISUALS, menu_selection)
 
         else:
-            # Running visual — hold either button 2 sec to return to menu
+            # Visual — hold both buttons 0.5s or either button 1s to return to menu
+            if input_state.action_l_held and input_state.action_r_held:
+                exit_hold_both += dt
+            else:
+                exit_hold_both = 0.0
             if input_state.action_l_held or input_state.action_r_held:
                 exit_hold += dt
-                if exit_hold >= 2.0:
-                    in_menu = True
-                    current_visual = None
-                    exit_hold = 0.0
             else:
                 exit_hold = 0.0
+            if exit_hold_both >= 0.5 or exit_hold >= 1.0:
+                in_menu = True
+                current_visual = None
+                exit_hold = 0.0
+                exit_hold_both = 0.0
 
             if current_visual:
                 # Let visual handle input
