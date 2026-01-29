@@ -122,9 +122,13 @@ def main():
                 # Let visual handle input
                 current_visual.handle_input(input_state)
 
-                # Update and draw
-                current_visual.update(dt)
-                current_visual.draw()
+                if getattr(current_visual, 'wants_exit', False):
+                    in_menu = True
+                    current_visual = None
+                else:
+                    # Update and draw
+                    current_visual.update(dt)
+                    current_visual.draw()
 
         display.render()
 

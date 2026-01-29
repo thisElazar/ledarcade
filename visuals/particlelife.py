@@ -105,14 +105,14 @@ class ParticleLife(Visual):
             consumed = True
 
         # Up/Down: adjust species count (3-6)
-        if input_state.up:
+        if input_state.up_pressed:
             if self.num_species < 6:
                 self.num_species += 1
                 self._generate_rules()
                 self._spawn_particles()
             consumed = True
 
-        if input_state.down:
+        if input_state.down_pressed:
             if self.num_species > 3:
                 self.num_species -= 1
                 self._generate_rules()

@@ -409,8 +409,12 @@ def main():
 
                         if current_item:
                             current_item.handle_input(input_state)
-                            current_item.update(dt)
-                            current_item.draw()
+                            if getattr(current_item, 'wants_exit', False):
+                                in_menu = True
+                                current_item = None
+                            else:
+                                current_item.update(dt)
+                                current_item.draw()
 
             display.render()
 

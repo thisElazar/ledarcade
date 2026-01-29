@@ -172,10 +172,10 @@ class XORPattern(Visual):
             consumed = True
 
         # Color palette (Up/Down)
-        if input_state.up:
+        if input_state.up_pressed:
             self.palette_index = (self.palette_index + 1) % len(self.palettes)
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.palette_index = (self.palette_index - 1) % len(self.palettes)
             consumed = True
 

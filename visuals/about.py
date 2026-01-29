@@ -41,11 +41,11 @@ class About(Visual):
         consumed = False
 
         # Page navigation
-        if input_state.down and self.page < self.num_pages - 1:
+        if input_state.down_pressed and self.page < self.num_pages - 1:
             self.page += 1
             self.page_transition = 1.0
             consumed = True
-        if input_state.up and self.page > 0:
+        if input_state.up_pressed and self.page > 0:
             self.page -= 1
             self.page_transition = 1.0
             consumed = True

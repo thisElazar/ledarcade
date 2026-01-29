@@ -107,12 +107,12 @@ class Life(Visual):
             self.paused = not self.paused
             consumed = True
 
-        if input_state.up:
+        if input_state.up_pressed:
             # Dense randomize
             self._randomize(0.45)
             consumed = True
 
-        if input_state.down:
+        if input_state.down_pressed:
             # Sparse randomize
             self._randomize(0.15)
             consumed = True

@@ -90,11 +90,11 @@ class Cat(Visual):
             self.cat_color_idx = (self.cat_color_idx - 1) % len(CAT_COLORS)
             consumed = True
 
-        if input_state.up:
+        if input_state.up_pressed:
             self.pillow_color_idx = (self.pillow_color_idx + 1) % len(PILLOW_COLORS)
             consumed = True
 
-        if input_state.down:
+        if input_state.down_pressed:
             self.pillow_color_idx = (self.pillow_color_idx - 1) % len(PILLOW_COLORS)
             consumed = True
 

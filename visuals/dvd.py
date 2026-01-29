@@ -76,11 +76,11 @@ class DVD(Visual):
             self.speed = max(10.0, self.speed - 2.0)
             consumed = True
 
-        if input_state.up:
+        if input_state.up_pressed:
             self.color_idx = (self.color_idx + 1) % len(COLORS)
             consumed = True
 
-        if input_state.down:
+        if input_state.down_pressed:
             self.color_idx = (self.color_idx - 1) % len(COLORS)
             consumed = True
 

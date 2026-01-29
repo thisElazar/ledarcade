@@ -196,11 +196,11 @@ class Mondrian(Visual):
             self.animation_speed = min(3.0, self.animation_speed + 0.1)
             consumed = True
 
-        if input_state.up:
+        if input_state.up_pressed:
             self.palette_index = (self.palette_index - 1) % len(self.PALETTES)
             self.palette = self.PALETTES[self.palette_index]
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.palette_index = (self.palette_index + 1) % len(self.PALETTES)
             self.palette = self.PALETTES[self.palette_index]
             consumed = True

@@ -24,6 +24,7 @@ class Visual(ABC):
     def __init__(self, display: Display):
         self.display = display
         self.time = 0.0  # Total elapsed time
+        self.wants_exit = False  # Set True to return to menu
         self.reset()
 
     @abstractmethod

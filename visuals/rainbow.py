@@ -97,10 +97,10 @@ class Rainbow(Visual):
             consumed = True
 
         # Mode cycling
-        if input_state.up:
+        if input_state.up_pressed:
             self.mode = (self.mode + 1) % self.num_modes
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.mode = (self.mode - 1) % self.num_modes
             consumed = True
 

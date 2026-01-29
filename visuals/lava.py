@@ -68,10 +68,10 @@ class Lava(Visual):
         if input_state.left:
             self.speed = max(0.2, self.speed - 0.1)
             consumed = True
-        if input_state.up:
+        if input_state.up_pressed:
             self.scheme_idx = (self.scheme_idx + 1) % len(COLOR_SCHEMES)
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.scheme_idx = (self.scheme_idx - 1) % len(COLOR_SCHEMES)
             consumed = True
         return consumed

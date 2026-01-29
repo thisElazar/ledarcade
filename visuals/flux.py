@@ -298,10 +298,10 @@ class Flux(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.up:
+        if input_state.up_pressed:
             self.base_trail_length = min(self.max_trail, self.base_trail_length + 6)
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.base_trail_length = max(self.min_trail, self.base_trail_length - 6)
             consumed = True
         if input_state.left:

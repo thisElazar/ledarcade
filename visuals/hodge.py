@@ -142,11 +142,11 @@ class Hodge(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.up:
+        if input_state.up_pressed:
             self.current_palette = (self.current_palette + 1) % len(self.palettes)
             self.colors = self.palettes[self.current_palette]
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.current_palette = (self.current_palette - 1) % len(self.palettes)
             self.colors = self.palettes[self.current_palette]
             consumed = True

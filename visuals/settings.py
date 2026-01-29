@@ -1,19 +1,19 @@
 """
-Settings - Display brightness control
-=====================================
-A utility for adjusting display brightness and other settings.
+Brightness - Display brightness control
+========================================
+Adjust the LED panel brightness.
 
 Controls:
   Up/Down - Adjust brightness
-  Escape - Exit
+  Button  - Accept and return to menu
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Settings(Visual):
-    name = "SETTINGS"
-    description = "Display settings"
+    name = "BRIGHTNESS"
+    description = "Adjust brightness"
     category = "utility"
 
     def __init__(self, display: Display):
@@ -38,12 +38,18 @@ class Settings(Visual):
             self.display.matrix.brightness = value
 
     def handle_input(self, input_state) -> bool:
-        if input_state.up:
+        if input_state.up_pressed:
             self.set_brightness(self.brightness + self.step)
             return True
-        elif input_state.down:
+        elif input_state.down_pressed:
             self.set_brightness(self.brightness - self.step)
             return True
+
+        # Button press accepts and exits
+        if input_state.action_l or input_state.action_r:
+            self.wants_exit = True
+            return True
+
         return False
 
     def update(self, dt: float):
@@ -53,15 +59,12 @@ class Settings(Visual):
         self.display.clear(Colors.BLACK)
 
         # Title
-        self.display.draw_text_small(2, 2, "SETTINGS", Colors.CYAN)
+        self.display.draw_text_small(2, 2, "BRIGHTNESS", Colors.CYAN)
         self.display.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
-
-        # Brightness label
-        self.display.draw_text_small(2, 14, "BRIGHTNESS", Colors.WHITE)
 
         # Draw brightness bar
         bar_x = 2
-        bar_y = 22
+        bar_y = 20
         bar_width = 50
         bar_height = 8
 
@@ -81,8 +84,8 @@ class Settings(Visual):
             self.display.draw_rect(bar_x + 1, bar_y + 1, fill_width, bar_height - 2, bar_color)
 
         # Percentage display
-        self.display.draw_text_small(54, 24, f"{self.brightness}", Colors.WHITE)
+        self.display.draw_text_small(54, 22, f"{self.brightness}", Colors.WHITE)
 
         # Instructions at bottom
         self.display.draw_line(0, 50, 63, 50, Colors.DARK_GRAY)
-        self.display.draw_text_small(2, 54, "UP/DN ADJUST", Colors.GRAY)
+        self.display.draw_text_small(2, 54, "BTN:ACCEPT", Colors.GRAY)

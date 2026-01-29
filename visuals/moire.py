@@ -49,10 +49,10 @@ class Moire(Visual):
             self.speed = max(0.2, self.speed - 0.1)
             consumed = True
         # Up/Down cycle color palette
-        if input_state.up:
+        if input_state.up_pressed:
             self.palette_index = (self.palette_index + 1) % len(self.palettes)
             consumed = True
-        if input_state.down:
+        if input_state.down_pressed:
             self.palette_index = (self.palette_index - 1) % len(self.palettes)
             consumed = True
         # Action cycles pattern type
