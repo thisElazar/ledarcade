@@ -110,6 +110,10 @@ from .credits import Credits
 from .controls import Controls
 from .inputtest import InputTest
 from .shutdown import Shutdown
+from .slideshow import (
+    Slideshow, AllVisuals, Chill, Energy, ArtGallery,
+    SpriteGallery, Demoscene, Complexity,
+)
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -171,6 +175,13 @@ ALL_VISUALS = [
     Controls,
     InputTest,
     Shutdown,
+    AllVisuals,
+    Chill,
+    Energy,
+    ArtGallery,
+    SpriteGallery,
+    Demoscene,
+    Complexity,
 ]
 
 __all__ = [
@@ -237,4 +248,12 @@ __all__ = [
     'Controls',
     'InputTest',
     'Shutdown',
+    'Slideshow',
+    'AllVisuals',
+    'Chill',
+    'Energy',
+    'ArtGallery',
+    'SpriteGallery',
+    'Demoscene',
+    'Complexity',
 ]

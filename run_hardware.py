@@ -12,6 +12,7 @@ Controls:
 
 import sys
 import time
+import random
 from enum import Enum, auto
 
 # Hardware display and input
@@ -104,7 +105,7 @@ def draw_initials_entry(display, initials, cursor_pos, score):
     display.draw_text_small(4, 58, "BTN:NEXT", Colors.GRAY)
 
 
-def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1):
+def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1, first_option="PLAY AGAIN"):
     display.clear(Colors.BLACK)
 
     if made_leaderboard:
@@ -118,10 +119,10 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         display.draw_text_small(center_x(score_text), 22, score_text, Colors.WHITE)
 
     if selection == 0:
-        display.draw_text_small(2, 40, ">PLAY AGAIN", Colors.YELLOW)
+        display.draw_text_small(2, 40, f">{first_option}", Colors.YELLOW)
         display.draw_text_small(2, 50, " MENU", Colors.GRAY)
     else:
-        display.draw_text_small(2, 40, " PLAY AGAIN", Colors.GRAY)
+        display.draw_text_small(2, 40, f" {first_option}", Colors.GRAY)
         display.draw_text_small(2, 50, ">MENU", Colors.YELLOW)
 
 
@@ -181,6 +182,33 @@ def draw_menu(display, categories, cat_index, item_index):
 
 
 # =============================================================================
+# HELPERS
+# =============================================================================
+
+def has_any_input(input_state):
+    """Return True if any button or direction is active."""
+    return (input_state.up_pressed or input_state.down_pressed or
+            input_state.left_pressed or input_state.right_pressed or
+            input_state.action_l or input_state.action_r or
+            input_state.action_l_held or input_state.action_r_held)
+
+
+def _pick_idle_visual(display):
+    """Pick a random non-utility, non-slideshow visual and instantiate it."""
+    from visuals import ALL_VISUALS
+    from visuals.slideshow import Slideshow
+    candidates = [v for v in ALL_VISUALS
+                  if not issubclass(v, Slideshow)
+                  and getattr(v, 'category', '') != 'utility']
+    if not candidates:
+        return None
+    cls = random.choice(candidates)
+    vis = cls(display)
+    vis.reset()
+    return vis
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 
@@ -225,6 +253,16 @@ def main():
     is_game = False
     exit_hold = 0.0         # Timer for hold-to-exit (gameplay and visuals)
 
+    # Idle screen state
+    idle_timer = 0.0
+    in_idle = False
+    idle_visual = None
+    idle_cycle_timer = 0.0
+
+    # Shuffle mode state
+    in_shuffle_mode = False
+    shuffle_playlist = None
+
     # Game over state
     game_over_state = GameOverState.FLASHING
     game_over_selection = 0
@@ -258,34 +296,74 @@ def main():
             input_state = input_handler.update()
 
             if in_menu:
-                if not categories:
-                    draw_menu(display, categories, 0, 0)
+                # Idle screen logic
+                if in_idle:
+                    if has_any_input(input_state):
+                        in_idle = False
+                        idle_visual = None
+                        idle_timer = 0.0
+                    else:
+                        idle_cycle_timer += dt
+                        if idle_cycle_timer >= 30.0:
+                            idle_visual = _pick_idle_visual(display)
+                            idle_cycle_timer = 0.0
+                        if idle_visual:
+                            idle_visual.update(dt)
+                            idle_visual.draw()
                 else:
-                    category = categories[cat_index]
+                    # Track idle time
+                    if has_any_input(input_state):
+                        idle_timer = 0.0
+                    else:
+                        idle_timer += dt
+                        if idle_timer >= 60.0:
+                            in_idle = True
+                            idle_visual = _pick_idle_visual(display)
+                            idle_cycle_timer = 0.0
 
-                    if input_state.left_pressed and len(categories) > 1:
-                        cat_index = (cat_index - 1) % len(categories)
-                        item_index = 0
-                    elif input_state.right_pressed and len(categories) > 1:
-                        cat_index = (cat_index + 1) % len(categories)
-                        item_index = 0
+                    if not categories:
+                        draw_menu(display, categories, 0, 0)
+                    else:
+                        category = categories[cat_index]
 
-                    if category.items:
-                        if input_state.up_pressed and item_index > 0:
-                            item_index -= 1
-                        elif input_state.down_pressed and item_index < len(category.items) - 1:
-                            item_index += 1
+                        if input_state.left_pressed and len(categories) > 1:
+                            cat_index = (cat_index - 1) % len(categories)
+                            item_index = 0
+                        elif input_state.right_pressed and len(categories) > 1:
+                            cat_index = (cat_index + 1) % len(categories)
+                            item_index = 0
 
-                        if input_state.action_l or input_state.action_r:
-                            item_class = category.items[item_index]
-                            current_item = item_class(display)
-                            current_item.reset()
-                            is_game = hasattr(current_item, 'state') and isinstance(current_item.state, GameState)
-                            is_two_player = getattr(current_item, 'category', '') == '2_player'
-                            in_menu = False
-                            exit_hold = 0.0
+                        if category.items:
+                            if input_state.up_pressed and item_index > 0:
+                                item_index -= 1
+                            elif input_state.down_pressed and item_index < len(category.items) - 1:
+                                item_index += 1
 
-                    draw_menu(display, categories, cat_index, item_index)
+                            if input_state.action_l or input_state.action_r:
+                                item_class = category.items[item_index]
+
+                                # Game playlist (shuffle mode)
+                                if hasattr(item_class, 'games'):
+                                    shuffle_playlist = item_class
+                                    game_class = random.choice(item_class.games)
+                                    current_item = game_class(display)
+                                    current_item.reset()
+                                    is_game = True
+                                    is_two_player = False
+                                    in_shuffle_mode = True
+                                    in_menu = False
+                                    exit_hold = 0.0
+                                else:
+                                    current_item = item_class(display)
+                                    current_item.reset()
+                                    is_game = hasattr(current_item, 'state') and isinstance(current_item.state, GameState)
+                                    is_two_player = getattr(current_item, 'category', '') == '2_player'
+                                    in_shuffle_mode = False
+                                    shuffle_playlist = None
+                                    in_menu = False
+                                    exit_hold = 0.0
+
+                        draw_menu(display, categories, cat_index, item_index)
 
             else:
                 # Running game or visual
@@ -298,6 +376,9 @@ def main():
                             in_menu = True
                             current_item = None
                             game_over_initialized = False
+                            in_shuffle_mode = False
+                            shuffle_playlist = None
+                            idle_timer = 0.0
                             exit_hold = 0.0
                     else:
                         exit_hold = 0.0
@@ -381,7 +462,14 @@ def main():
                                         game_over_selection = 1 - game_over_selection
                                     elif input_state.action_l or input_state.action_r:
                                         if game_over_selection == 0:
-                                            current_item.reset()
+                                            if in_shuffle_mode and shuffle_playlist:
+                                                # Next game from playlist
+                                                game_class = random.choice(shuffle_playlist.games)
+                                                current_item = game_class(display)
+                                                current_item.reset()
+                                            else:
+                                                # Play again
+                                                current_item.reset()
                                             final_score = 0
                                             game_over_initialized = False
                                             player_made_leaderboard = False
@@ -393,6 +481,9 @@ def main():
                                             game_over_initialized = False
                                             player_made_leaderboard = False
                                             player_rank = -1
+                                            in_shuffle_mode = False
+                                            shuffle_playlist = None
+                                            idle_timer = 0.0
                                         game_over_selection = 0
 
                                 if current_item:
@@ -407,8 +498,10 @@ def main():
                                             display.draw_text_small(4, 50, " AGAIN", Colors.GRAY)
                                             display.draw_text_small(32, 50, ">MENU", Colors.YELLOW)
                                     else:
+                                        first_opt = "NEXT GAME" if in_shuffle_mode else "PLAY AGAIN"
                                         draw_action_selection(display, game_over_selection, final_score,
-                                                              player_made_leaderboard, player_rank)
+                                                              player_made_leaderboard, player_rank,
+                                                              first_option=first_opt)
                         else:
                             current_item.update(input_state, dt)
                             current_item.draw()
@@ -420,6 +513,7 @@ def main():
                                 in_menu = True
                                 current_item = None
                                 exit_hold = 0.0
+                                idle_timer = 0.0
                         else:
                             exit_hold = 0.0
 
@@ -428,6 +522,7 @@ def main():
                             if getattr(current_item, 'wants_exit', False):
                                 in_menu = True
                                 current_item = None
+                                idle_timer = 0.0
                             else:
                                 current_item.update(dt)
                                 current_item.draw()

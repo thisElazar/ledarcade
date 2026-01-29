@@ -38,10 +38,12 @@ GAME_CATEGORIES = [
     Category("RETRO GAMES", Colors.GREEN, "retro"),
     Category("MODERN GAMES", Colors.CYAN, "modern"),
     Category("2 PLAYER GAMES", Colors.MAGENTA, "2_player"),
+    Category("GAME MIX", Colors.ORANGE, "game_mix"),
 ]
 
 # Visual categories
 VISUAL_CATEGORIES = [
+    Category("VISUAL MIX", Colors.PINK, "visual_mix"),
     Category("ART", Colors.YELLOW, "art"),
     Category("AUTOMATA", Colors.MAGENTA, "automata"),
     Category("DIGITAL", Colors.CYAN, "digital"),

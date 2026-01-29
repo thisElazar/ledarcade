@@ -40,6 +40,9 @@ from .qbert import QBert
 from .bomberman import Bomberman
 from .arkanoid import Arkanoid
 from .skifree import SkiFree
+from .shuffle import (
+    AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
+)
 
 # List of all available games
 ALL_GAMES = [
@@ -79,7 +82,18 @@ ALL_GAMES = [
     Bomberman,
     Arkanoid,
     SkiFree,
+    AllGames,
+    ArcadeMix,
+    QuickPlay,
+    Shooters,
+    Puzzle,
+    Classics,
 ]
+
+# Populate AllGames with all single-player, non-playlist games
+AllGames.games = [g for g in ALL_GAMES
+                  if getattr(g, 'category', '') != '2_player'
+                  and not hasattr(g, 'games')]
 
 __all__ = [
     'Snake',
@@ -119,4 +133,10 @@ __all__ = [
     'Arkanoid',
     'SkiFree',
     'ALL_GAMES',
+    'AllGames',
+    'ArcadeMix',
+    'QuickPlay',
+    'Shooters',
+    'Puzzle',
+    'Classics',
 ]
