@@ -16,6 +16,15 @@ class HighScoreManager:
 
     MAX_SCORES_PER_GAME = 5  # Top 5 leaderboard
 
+    # Games renamed in commit 7f69468 — map old keys to new keys
+    _RENAME_MAP = {
+        "STICKRUN": "STICK RUN",
+        "FLAPPY": "FLAPPY BIRD",
+        "SPACECRUISE": "SPACE CRUISE",
+        "CONNECT4": "CONNECT 4",
+        "DONKEY K": "DONKEY KONG",
+    }
+
     def __init__(self, filepath: Optional[str] = None):
         """Initialize the high score manager.
 
@@ -32,6 +41,7 @@ class HighScoreManager:
 
         self.scores = {}  # {game_name: [(initials, score), ...]}
         self.load_scores()
+        self._migrate_renamed_games()
 
     def load_scores(self):
         """Load scores from JSON file."""
@@ -58,6 +68,24 @@ class HighScoreManager:
         except IOError:
             # Can't save, fail silently (scores still work in memory)
             pass
+
+    def _migrate_renamed_games(self):
+        """Migrate scores from old game names to new names (one-time on init)."""
+        changed = False
+        for old_key, new_key in self._RENAME_MAP.items():
+            if old_key not in self.scores:
+                continue
+            if new_key not in self.scores:
+                # Simple rename
+                self.scores[new_key] = self.scores.pop(old_key)
+            else:
+                # Merge old into new, keep top 5
+                merged = self.scores[new_key] + self.scores.pop(old_key)
+                merged.sort(key=lambda x: x[1], reverse=True)
+                self.scores[new_key] = merged[:self.MAX_SCORES_PER_GAME]
+            changed = True
+        if changed:
+            self.save_scores()
 
     def get_top_scores(self, game_name: str) -> List[Tuple[str, int]]:
         """Get the top scores for a game.

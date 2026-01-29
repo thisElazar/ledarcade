@@ -4,8 +4,9 @@ Brightness - Display brightness control
 Adjust the LED panel brightness.
 
 Controls:
-  Up/Down - Adjust brightness
-  Button  - Accept and return to menu
+  Up/Right - Increase brightness
+  Down/Left - Decrease brightness
+  Button    - Accept and return to menu
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -38,10 +39,10 @@ class Settings(Visual):
             self.display.matrix.brightness = value
 
     def handle_input(self, input_state) -> bool:
-        if input_state.up_pressed:
+        if input_state.up_pressed or input_state.right_pressed:
             self.set_brightness(self.brightness + self.step)
             return True
-        elif input_state.down_pressed:
+        elif input_state.down_pressed or input_state.left_pressed:
             self.set_brightness(self.brightness - self.step)
             return True
 

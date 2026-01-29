@@ -13,6 +13,8 @@ Controls:
 
 import pygame
 import sys
+import time
+import math
 import random
 from enum import Enum, auto
 from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState
@@ -30,6 +32,7 @@ from visuals import ALL_VISUALS
 # Game over sub-states
 class GameOverState(Enum):
     FLASHING = auto()      # Alternating between score and leaderboard
+    MILESTONE = auto()     # New #1 champion celebration
     ENTER_INITIALS = auto() # Player entering their initials
     CHOOSE_ACTION = auto()  # PLAY AGAIN / MENU selection
 
@@ -264,6 +267,87 @@ def draw_konami_egg(display, timer):
     display.draw_text_small(center_x("LIVES"), 34, "LIVES", color)
 
 
+def draw_milestone_celebration(display, timer):
+    """Draw the NEW CHAMPION milestone celebration (1.5s)."""
+    t = timer
+    hue = (t * 1.5) % 1.0
+
+    display.clear(Colors.BLACK)
+
+    # Pulsing gold border
+    pulse = 0.6 + 0.4 * math.sin(t * 10)
+    gold = (int(255 * pulse), int(200 * pulse), 0)
+    for i in range(GRID_SIZE):
+        display.set_pixel(i, 0, gold)
+        display.set_pixel(i, GRID_SIZE - 1, gold)
+        display.set_pixel(0, i, gold)
+        display.set_pixel(GRID_SIZE - 1, i, gold)
+
+    # Sparkles
+    for _ in range(15):
+        sx = random.randint(1, GRID_SIZE - 2)
+        sy = random.randint(1, GRID_SIZE - 2)
+        display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.3) % 1.0))
+
+    # "NEW" text with glow
+    new_color = (255, 255, int(100 + 155 * pulse))
+    cx = center_x("NEW")
+    for ox in [-1, 0, 1]:
+        for oy in [-1, 0, 1]:
+            if ox == 0 and oy == 0:
+                continue
+            glow = (new_color[0] // 4, new_color[1] // 4, new_color[2] // 4)
+            display.draw_text_small(cx + ox, 20 + oy, "NEW", glow)
+    display.draw_text_small(cx, 20, "NEW", new_color)
+
+    # "CHAMPION!" text
+    champ_color = _hue_to_rgb(hue)
+    cx2 = center_x("CHAMPION!")
+    display.draw_text_small(cx2, 34, "CHAMPION!", champ_color)
+
+
+def draw_spin_egg(display, timer):
+    """Draw the TURBO! spin easter egg animation (2s)."""
+    display.clear(Colors.BLACK)
+
+    # Brief white flash at start
+    if timer < 0.15:
+        display.clear(Colors.WHITE)
+        return
+
+    t = timer - 0.15
+    hue = (t * 3.0) % 1.0
+
+    # Spinning ring of rainbow border pixels
+    ring_count = 16
+    cx, cy = GRID_SIZE // 2, GRID_SIZE // 2
+    radius = 24
+    for i in range(ring_count):
+        angle = (i / ring_count) * 2 * math.pi + t * 8
+        px = int(cx + radius * math.cos(angle))
+        py = int(cy + radius * math.sin(angle))
+        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+            display.set_pixel(px, py, _hue_to_rgb((hue + i / ring_count) % 1.0))
+
+    # Random sparkles
+    for _ in range(20):
+        sx = random.randint(0, GRID_SIZE - 1)
+        sy = random.randint(0, GRID_SIZE - 1)
+        display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.5) % 1.0))
+
+    # "TURBO!" with glow effect
+    color = _hue_to_rgb(hue)
+    tx = center_x("TURBO!")
+    ty = 28
+    for ox in [-1, 0, 1]:
+        for oy in [-1, 0, 1]:
+            if ox == 0 and oy == 0:
+                continue
+            glow = (color[0] // 4, color[1] // 4, color[2] // 4)
+            display.draw_text_small(tx + ox, ty + oy, "TURBO!", glow)
+    display.draw_text_small(tx, ty, "TURBO!", color)
+
+
 def has_any_input(input_state):
     """Return True if any button or direction is active."""
     return (input_state.up_pressed or input_state.down_pressed or
@@ -346,6 +430,12 @@ def main():
     konami_active = False
     konami_timer = 0.0
 
+    # Spin easter egg state
+    spin_buffer = []         # Last 4 directional inputs (L/D/R/U only)
+    spin_circle_times = []   # Timestamps of completed circles
+    spin_active = False
+    spin_timer = 0.0
+
     # Game over state
     game_over_state = GameOverState.FLASHING
     game_over_selection = 0  # 0 = PLAY AGAIN, 1 = MENU
@@ -358,6 +448,7 @@ def main():
     final_score = 0  # Store score when game ends
     game_over_initialized = False  # Track if game over has been processed
     game_over_lockout = 0.0  # Input lockout when entering game over
+    milestone_timer = 0.0  # Timer for milestone celebration
 
     # High score manager
     hsm = get_high_score_manager()
@@ -401,6 +492,13 @@ def main():
                     idle_timer = 0.0
                 else:
                     draw_konami_egg(display, konami_timer)
+            elif spin_active:
+                spin_timer += dt
+                if spin_timer >= 2.0:
+                    spin_active = False
+                    idle_timer = 0.0
+                else:
+                    draw_spin_egg(display, spin_timer)
             else:
                 # Hold either button 2 sec to quit app
                 if input_state.action_l_held or input_state.action_r_held:
@@ -439,6 +537,27 @@ def main():
                 # Intercept button presses mid-sequence (9th input is A)
                 konami_intercept = (len(konami_buffer) >= 9 and
                                     konami_buffer[-9:] == KONAMI_CODE[:9])
+
+                # Spin easter egg tracking (directional only, independent of konami)
+                _si = None
+                if input_state.left_pressed: _si = 'L'
+                elif input_state.down_pressed: _si = 'D'
+                elif input_state.right_pressed: _si = 'R'
+                elif input_state.up_pressed: _si = 'U'
+                if _si:
+                    spin_buffer.append(_si)
+                    spin_buffer = spin_buffer[-4:]
+                    if spin_buffer == ['L', 'D', 'R', 'U'] or spin_buffer == ['R', 'D', 'L', 'U']:
+                        spin_circle_times.append(time.time())
+                        spin_buffer = []
+                        # Keep only recent circles
+                        now_t = time.time()
+                        spin_circle_times = [t for t in spin_circle_times if now_t - t <= 2.5]
+                        if len(spin_circle_times) >= 3:
+                            spin_active = True
+                            spin_timer = 0.0
+                            spin_circle_times = []
+                            spin_buffer = []
 
                 if not categories:
                     draw_menu(display, categories, 0, 0)
@@ -522,7 +641,13 @@ def main():
                                 # Single player: check for high score
                                 player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
                                 if player_made_leaderboard:
-                                    game_over_state = GameOverState.ENTER_INITIALS
+                                    # Check if this beats the current #1 (milestone)
+                                    existing = hsm.get_top_scores(current_item.name)
+                                    if existing and final_score > existing[0][1]:
+                                        game_over_state = GameOverState.MILESTONE
+                                        milestone_timer = 0.0
+                                    else:
+                                        game_over_state = GameOverState.ENTER_INITIALS
                                     player_initials = ['A', 'A', 'A']
                                     initials_cursor = 0
                                 else:
@@ -535,7 +660,13 @@ def main():
                             game_over_lockout -= dt
 
                         # Handle based on current game over sub-state (only if lockout expired)
-                        if game_over_state == GameOverState.FLASHING:
+                        if game_over_state == GameOverState.MILESTONE:
+                            milestone_timer += dt
+                            draw_milestone_celebration(display, milestone_timer)
+                            if milestone_timer >= 1.5:
+                                game_over_state = GameOverState.ENTER_INITIALS
+
+                        elif game_over_state == GameOverState.FLASHING:
                             flash_timer += dt
                             if flash_timer >= 2.0:
                                 flash_timer = 0.0
