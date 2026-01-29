@@ -21,11 +21,13 @@ class SkiFree(Game):
     category = "retro"
 
     # Player constants
-    PLAYER_SCREEN_Y = 48       # Fixed vertical position on screen
+    PLAYER_Y_MIN = 20          # Highest screen position (skiing fast)
+    PLAYER_Y_MAX = 50          # Lowest screen position (skiing slow)
+    PLAYER_Y_DEFAULT = 35      # Default screen position
     BASE_SPEED = 45.0          # Pixels/sec straight downhill
     MAX_SPEED = 80.0           # Speed cap before boost
     BOOST_SPEED = 110.0        # Speed while boosting
-    BRAKE_SPEED = 8.0          # Speed while braking
+    PLAYER_Y_SPEED = 40.0      # How fast player moves up/down on screen
     LATERAL_SPEED = 50.0       # Horizontal movement speed
 
     # Speed multipliers by direction
@@ -94,6 +96,7 @@ class SkiFree(Game):
 
         # Player state
         self.player_x = 32.0
+        self.player_y = float(self.PLAYER_Y_DEFAULT)
         self.direction = 0
         self.braking = False
         self.speed = self.BASE_SPEED
@@ -124,22 +127,29 @@ class SkiFree(Game):
 
         # Obstacles: {type, x, y, w, h}
         self.obstacles = []
-        self.next_obstacle_y = GRID_SIZE + 10  # Start generating below screen
+        # World-space frontier: how far ahead (in world distance) we've generated
+        self.gen_world_distance = 0.0
 
-        # Pre-generate initial obstacles
-        self._generate_obstacles_until(GRID_SIZE + 80)
+        # Pre-generate initial obstacles covering the screen + buffer
+        self._generate_ahead()
 
     def _get_obstacle_interval(self):
         """Get spacing between obstacle rows based on distance."""
-        # Gradually decrease interval (more dense) as distance increases
         progress = min(1.0, self.distance_meters / 3000.0)
         return self.OBSTACLE_INTERVAL_START - progress * (self.OBSTACLE_INTERVAL_START - self.OBSTACLE_INTERVAL_MIN)
 
-    def _generate_obstacles_until(self, target_y: float):
-        """Generate obstacles from current frontier down to target_y."""
-        while self.next_obstacle_y < target_y:
-            self._generate_obstacle_row(self.next_obstacle_y)
-            self.next_obstacle_y += self._get_obstacle_interval()
+    def _generate_ahead(self):
+        """Generate obstacles ahead of the player in world-space."""
+        # We need obstacles covering from current scroll position to well below the screen.
+        # "screen_bottom" in world distance = self.distance + GRID_SIZE + buffer
+        needed_distance = self.distance + GRID_SIZE + 60
+
+        while self.gen_world_distance < needed_distance:
+            # Convert world distance to screen y: objects at gen_world_distance
+            # appear at screen_y = (gen_world_distance - self.distance)
+            screen_y = self.gen_world_distance - self.distance
+            self._generate_obstacle_row(screen_y)
+            self.gen_world_distance += self._get_obstacle_interval()
 
     def _generate_obstacle_row(self, y: float):
         """Generate a row of obstacles at the given y position."""
@@ -222,22 +232,27 @@ class SkiFree(Game):
             return
 
         # --- Input ---
+        # Up/Down move player on screen (up = speed up, down = slow down)
         if input_state.up:
-            self.braking = True
+            self.player_y -= 40.0 * dt
+        elif input_state.down:
+            self.player_y += 40.0 * dt
+        self.player_y = max(self.PLAYER_Y_MIN, min(self.PLAYER_Y_MAX, self.player_y))
+
+        # Left/Right steer
+        if input_state.left and input_state.right:
             self.direction = 0
+        elif input_state.left:
+            self.direction = -1
+        elif input_state.right:
+            self.direction = 1
         else:
-            self.braking = False
-            if input_state.left and input_state.right:
-                self.direction = 0
-            elif input_state.left:
-                self.direction = -1
-            elif input_state.right:
-                self.direction = 1
-            else:
-                self.direction = 0
+            self.direction = 0
+
+        self.braking = False
 
         # Boost
-        if (input_state.action_l_held or input_state.action_r_held) and self.boost_fuel > 0 and not self.braking:
+        if (input_state.action_l_held or input_state.action_r_held) and self.boost_fuel > 0:
             self.boosting = True
             self.boost_fuel -= dt
             if self.boost_fuel < 0:
@@ -249,9 +264,7 @@ class SkiFree(Game):
             self.boost_fuel = min(self.BOOST_FUEL_MAX, self.boost_fuel + self.BOOST_RECHARGE * dt)
 
         # --- Speed calculation ---
-        if self.braking:
-            target_speed = self.BRAKE_SPEED
-        elif self.boosting:
+        if self.boosting:
             target_speed = self.BOOST_SPEED
         else:
             # Base speed increases with distance
@@ -287,7 +300,7 @@ class SkiFree(Game):
         # --- Collision detection ---
         if not self.airborne:
             px = int(self.player_x)
-            py = self.PLAYER_SCREEN_Y
+            py = int(self.player_y)
             player_box = (px - 1, py - 1, 3, 4)
 
             for obs in self.obstacles:
@@ -315,7 +328,7 @@ class SkiFree(Game):
                         self.speed *= 1.2  # Speed boost from ramp
 
         # --- Generate new obstacles ---
-        self._generate_obstacles_until(GRID_SIZE + 40)
+        self._generate_ahead()
 
         # --- Cull off-screen obstacles ---
         self.obstacles = [o for o in self.obstacles if o['y'] > -10]
@@ -333,7 +346,7 @@ class SkiFree(Game):
     def _update_yeti(self, dt: float):
         """Move Yeti toward player."""
         dx = self.player_x - self.yeti_x
-        dy = self.PLAYER_SCREEN_Y - self.yeti_y
+        dy = int(self.player_y) - self.yeti_y
         dist = math.sqrt(dx * dx + dy * dy)
 
         if dist > 0:
@@ -349,14 +362,14 @@ class SkiFree(Game):
     def _check_yeti_catch(self) -> bool:
         """Check if Yeti caught the player."""
         dx = self.player_x - self.yeti_x
-        dy = self.PLAYER_SCREEN_Y - self.yeti_y
+        dy = int(self.player_y) - self.yeti_y
         dist = math.sqrt(dx * dx + dy * dy)
 
         if dist < self.YETI_CATCH_DIST:
             self.yeti_eating = True
             self.yeti_eat_timer = 0.0
             self.yeti_x = self.player_x
-            self.yeti_y = self.PLAYER_SCREEN_Y
+            self.yeti_y = int(self.player_y)
             return True
         return False
 
@@ -478,7 +491,7 @@ class SkiFree(Game):
 
     def _draw_player(self):
         px = int(self.player_x)
-        py = self.PLAYER_SCREEN_Y
+        py = int(self.player_y)
 
         if self.crashed:
             # Tumble sprite — sprawled out
@@ -573,7 +586,7 @@ class SkiFree(Game):
         if self.yeti_eating:
             # Eating animation — big yeti over player
             px = int(self.player_x)
-            py = self.PLAYER_SCREEN_Y
+            py = int(self.player_y)
 
             # Yeti body (larger during eat)
             for dy in range(-2, 4):
