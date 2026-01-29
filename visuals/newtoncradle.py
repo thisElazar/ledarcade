@@ -6,6 +6,7 @@ Classic desk toy with swinging steel balls transferring momentum.
 Controls:
   Left/Right - Add/remove balls
   Up/Down    - Adjust swing amplitude
+  Button     - Cycle number of balls in swing
 """
 
 import math
@@ -73,6 +74,12 @@ class NewtonCradle(Visual):
         elif input_state.down_pressed:
             for i in range(self.num_balls):
                 self.angles[i] *= 0.7
+            consumed = True
+        # Button: cycle number of balls in swing
+        if input_state.action_l or input_state.action_r:
+            max_pull = self.num_balls - 1
+            self.pull_count = self.pull_count % max_pull + 1
+            self._start_swing()
             consumed = True
         # Left/Right: add/remove balls
         if input_state.right_pressed:
