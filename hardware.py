@@ -43,10 +43,10 @@ GRID_SIZE = 64
 
 # Button GPIO pins (directly connect button between GPIO and GND)
 BUTTON_PINS = {
-    'up': 19,
-    'down': 25,
-    'left': 24,
-    'right': 8,
+    'up': 25,         # Joystick installed upside-down: physical down = up
+    'down': 19,       # physical up = down
+    'left': 8,        # physical right = left
+    'right': 24,      # physical left = right
     'action_l': 7,    # Left button (Space)
     'action_r': 9,    # Right button (Z)
 }
@@ -236,10 +236,17 @@ class InputState:
         self.reset()
 
     def reset(self):
+        # Directions (held — True while joystick is held)
         self.up = False
         self.down = False
         self.left = False
         self.right = False
+        # Directions (pressed — True only on first frame)
+        self.up_pressed = False
+        self.down_pressed = False
+        self.left_pressed = False
+        self.right_pressed = False
+        # Buttons
         self.action_l = False
         self.action_r = False
         self.action_l_held = False
@@ -338,11 +345,17 @@ class KeyboardInput:
         self._prev_keys = self._current_keys
         self._current_keys = self._read_keys()
 
-        # Directions (currently pressed)
+        # Directions (held)
         self.state.up = 'up' in self._current_keys
         self.state.down = 'down' in self._current_keys
         self.state.left = 'left' in self._current_keys
         self.state.right = 'right' in self._current_keys
+
+        # Directions (fresh press)
+        self.state.up_pressed = 'up' in self._current_keys and 'up' not in self._prev_keys
+        self.state.down_pressed = 'down' in self._current_keys and 'down' not in self._prev_keys
+        self.state.left_pressed = 'left' in self._current_keys and 'left' not in self._prev_keys
+        self.state.right_pressed = 'right' in self._current_keys and 'right' not in self._prev_keys
 
         # Buttons (fresh press detection)
         self.state.action_l = 'action_l' in self._current_keys and 'action_l' not in self._prev_keys
@@ -392,11 +405,17 @@ class GPIOInput:
             # Active low: pressed = GPIO reads LOW
             current[name] = not GPIO.input(pin)
 
-        # Directions
+        # Directions (held)
         self.state.up = current['up']
         self.state.down = current['down']
         self.state.left = current['left']
         self.state.right = current['right']
+
+        # Directions (fresh press)
+        self.state.up_pressed = current['up'] and not self._prev_buttons['up']
+        self.state.down_pressed = current['down'] and not self._prev_buttons['down']
+        self.state.left_pressed = current['left'] and not self._prev_buttons['left']
+        self.state.right_pressed = current['right'] and not self._prev_buttons['right']
 
         # Fresh press detection
         self.state.action_l = current['action_l'] and not self._prev_buttons['action_l']
@@ -449,6 +468,10 @@ class HardwareInput:
             self.state.down = kb.down or gp.down
             self.state.left = kb.left or gp.left
             self.state.right = kb.right or gp.right
+            self.state.up_pressed = kb.up_pressed or gp.up_pressed
+            self.state.down_pressed = kb.down_pressed or gp.down_pressed
+            self.state.left_pressed = kb.left_pressed or gp.left_pressed
+            self.state.right_pressed = kb.right_pressed or gp.right_pressed
             self.state.action_l = kb.action_l or gp.action_l
             self.state.action_r = kb.action_r or gp.action_r
             self.state.action_l_held = kb.action_l_held or gp.action_l_held

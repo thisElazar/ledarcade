@@ -94,9 +94,9 @@ def main():
                 exit_hold = 0.0
 
             # Menu navigation
-            if input_state.up and menu_selection > 0:
+            if input_state.up_pressed and menu_selection > 0:
                 menu_selection -= 1
-            elif input_state.down and menu_selection < len(ALL_VISUALS) - 1:
+            elif input_state.down_pressed and menu_selection < len(ALL_VISUALS) - 1:
                 menu_selection += 1
             elif (input_state.action_l or input_state.action_r) and ALL_VISUALS:
                 # Start selected visual

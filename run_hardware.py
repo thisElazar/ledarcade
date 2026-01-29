@@ -232,7 +232,6 @@ def main():
     game_over_lockout = 0.0
 
     hsm = get_high_score_manager()
-    nav_cooldown = 0
     input_cooldown = 0
 
     FPS = 30
@@ -246,7 +245,6 @@ def main():
             dt = now - last_time
             last_time = now
 
-            nav_cooldown = max(0, nav_cooldown - dt)
             input_cooldown = max(0, input_cooldown - dt)
 
             # Update input
@@ -266,20 +264,17 @@ def main():
                 else:
                     category = categories[cat_index]
 
-                    if nav_cooldown <= 0:
-                        if input_state.left and len(categories) > 1:
-                            cat_index = (cat_index - 1) % len(categories)
-                            item_index = 0
-                            nav_cooldown = 0.2
-                        elif input_state.right and len(categories) > 1:
-                            cat_index = (cat_index + 1) % len(categories)
-                            item_index = 0
-                            nav_cooldown = 0.2
+                    if input_state.left_pressed and len(categories) > 1:
+                        cat_index = (cat_index - 1) % len(categories)
+                        item_index = 0
+                    elif input_state.right_pressed and len(categories) > 1:
+                        cat_index = (cat_index + 1) % len(categories)
+                        item_index = 0
 
                     if category.items:
-                        if input_state.up and item_index > 0:
+                        if input_state.up_pressed and item_index > 0:
                             item_index -= 1
-                        elif input_state.down and item_index < len(category.items) - 1:
+                        elif input_state.down_pressed and item_index < len(category.items) - 1:
                             item_index += 1
 
                         if input_state.action_l or input_state.action_r:
@@ -341,7 +336,7 @@ def main():
                                     flash_show_leaderboard = not flash_show_leaderboard
 
                                 if game_over_lockout <= 0:
-                                    if input_state.action_l or input_state.action_r or input_state.up or input_state.down:
+                                    if input_state.action_l or input_state.action_r or input_state.up_pressed or input_state.down_pressed:
                                         game_over_state = GameOverState.CHOOSE_ACTION
                                         game_over_selection = 0
 
@@ -352,18 +347,18 @@ def main():
 
                             elif game_over_state == GameOverState.ENTER_INITIALS:
                                 if input_cooldown <= 0 and game_over_lockout <= 0:
-                                    if input_state.up:
+                                    if input_state.up_pressed:
                                         letter = player_initials[initials_cursor]
                                         player_initials[initials_cursor] = 'Z' if letter == 'A' else chr(ord(letter) - 1)
                                         input_cooldown = 0.15
-                                    elif input_state.down:
+                                    elif input_state.down_pressed:
                                         letter = player_initials[initials_cursor]
                                         player_initials[initials_cursor] = 'A' if letter == 'Z' else chr(ord(letter) + 1)
                                         input_cooldown = 0.15
-                                    elif input_state.left and initials_cursor > 0:
+                                    elif input_state.left_pressed and initials_cursor > 0:
                                         initials_cursor -= 1
                                         input_cooldown = 0.2
-                                    elif input_state.right and initials_cursor < 2:
+                                    elif input_state.right_pressed and initials_cursor < 2:
                                         initials_cursor += 1
                                         input_cooldown = 0.2
                                     elif input_state.action_l or input_state.action_r:
@@ -377,7 +372,7 @@ def main():
 
                             elif game_over_state == GameOverState.CHOOSE_ACTION:
                                 if game_over_lockout <= 0:
-                                    if input_state.up or input_state.down:
+                                    if input_state.up_pressed or input_state.down_pressed:
                                         game_over_selection = 1 - game_over_selection
                                     elif input_state.action_l or input_state.action_r:
                                         if game_over_selection == 0:

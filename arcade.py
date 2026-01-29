@@ -70,11 +70,16 @@ class InputState:
         self.reset()
     
     def reset(self):
-        # Direction (can be held)
+        # Directions (held — True while key is held)
         self.up = False
         self.down = False
         self.left = False
         self.right = False
+        # Directions (pressed — True only on first frame)
+        self.up_pressed = False
+        self.down_pressed = False
+        self.left_pressed = False
+        self.right_pressed = False
 
         # Buttons (pressed this frame)
         self.action_l = False    # Space - left action
@@ -109,22 +114,30 @@ class InputHandler:
     def update(self) -> InputState:
         """Update input state. Call once per frame."""
         keys = pygame.key.get_pressed()
-        
+
         # Directions (held state)
         self.state.up = keys[pygame.K_UP]
         self.state.down = keys[pygame.K_DOWN]
         self.state.left = keys[pygame.K_LEFT]
         self.state.right = keys[pygame.K_RIGHT]
-        
+
         # Buttons (held state)
         self.state.action_l_held = keys[pygame.K_SPACE]
         self.state.action_r_held = keys[pygame.K_z]
 
         # Detect fresh presses (not held from last frame)
         current_keys = set()
+        if keys[pygame.K_UP]: current_keys.add(pygame.K_UP)
+        if keys[pygame.K_DOWN]: current_keys.add(pygame.K_DOWN)
+        if keys[pygame.K_LEFT]: current_keys.add(pygame.K_LEFT)
+        if keys[pygame.K_RIGHT]: current_keys.add(pygame.K_RIGHT)
         if keys[pygame.K_SPACE]: current_keys.add(pygame.K_SPACE)
         if keys[pygame.K_z]: current_keys.add(pygame.K_z)
 
+        self.state.up_pressed = pygame.K_UP in current_keys and pygame.K_UP not in self._prev_keys
+        self.state.down_pressed = pygame.K_DOWN in current_keys and pygame.K_DOWN not in self._prev_keys
+        self.state.left_pressed = pygame.K_LEFT in current_keys and pygame.K_LEFT not in self._prev_keys
+        self.state.right_pressed = pygame.K_RIGHT in current_keys and pygame.K_RIGHT not in self._prev_keys
         self.state.action_l = pygame.K_SPACE in current_keys and pygame.K_SPACE not in self._prev_keys
         self.state.action_r = pygame.K_z in current_keys and pygame.K_z not in self._prev_keys
 
@@ -424,9 +437,9 @@ class Arcade:
                     exit_hold = 0.0
 
                 # Menu navigation
-                if input_state.up and self.menu_selection > 0:
+                if input_state.up_pressed and self.menu_selection > 0:
                     self.menu_selection -= 1
-                elif input_state.down and self.menu_selection < len(self.games) - 1:
+                elif input_state.down_pressed and self.menu_selection < len(self.games) - 1:
                     self.menu_selection += 1
                 elif (input_state.action_l or input_state.action_r) and self.games:
                     # Start selected game
@@ -451,7 +464,7 @@ class Arcade:
                 if self.current_game:
                     if self.current_game.state == GameState.GAME_OVER:
                         # Handle game over menu selection
-                        if input_state.up or input_state.down:
+                        if input_state.up_pressed or input_state.down_pressed:
                             self.game_over_selection = 1 - self.game_over_selection
                         elif input_state.action_l or input_state.action_r:
                             if self.game_over_selection == 0:
