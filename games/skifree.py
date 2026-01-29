@@ -115,19 +115,19 @@ class SkiFree(Game):
         self.distance = 0.0         # Total pixels scrolled
         self.distance_meters = 0.0  # Displayed distance
 
-        # Obstacles: {type, x, y, w, h}
-        self.obstacles = []
-        self.next_obstacle_y = GRID_SIZE + 10  # Start generating below screen
-
-        # Pre-generate initial obstacles
-        self._generate_obstacles_until(GRID_SIZE + 80)
-
         # Yeti
         self.yeti_active = False
         self.yeti_x = 0.0
         self.yeti_y = 0.0
         self.yeti_eating = False
         self.yeti_eat_timer = 0.0
+
+        # Obstacles: {type, x, y, w, h}
+        self.obstacles = []
+        self.next_obstacle_y = GRID_SIZE + 10  # Start generating below screen
+
+        # Pre-generate initial obstacles
+        self._generate_obstacles_until(GRID_SIZE + 80)
 
     def _get_obstacle_interval(self):
         """Get spacing between obstacle rows based on distance."""
