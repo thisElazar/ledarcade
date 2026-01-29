@@ -12,6 +12,13 @@ import sys
 import time
 from typing import Tuple, Optional
 
+# PIL for bulk pixel transfer to LED matrix
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
 # RGB Matrix library (only available on Pi)
 try:
     from rgbmatrix import RGBMatrix, RGBMatrixOptions
@@ -100,24 +107,31 @@ class HardwareDisplay:
         # Double-buffered: draw to offscreen canvas, then swap atomically
         self.canvas = self.matrix.CreateFrameCanvas()
 
-        # Virtual framebuffer (matches arcade.py interface)
-        self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+        # Flat bytearray framebuffer: RGBRGBRGB... row-major, 3 bytes per pixel
+        self._fb = bytearray(GRID_SIZE * GRID_SIZE * 3)
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                self.buffer[y][x] = color
+        r, g, b = color
+        if r == 0 and g == 0 and b == 0:
+            self._fb[:] = b'\x00' * len(self._fb)
+        else:
+            row = bytes([r, g, b]) * GRID_SIZE
+            self._fb[:] = row * GRID_SIZE
 
     def set_pixel(self, x: int, y: int, color: Tuple[int, int, int]):
         """Set a single pixel. Coordinates are 0-63."""
         if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
-            self.buffer[y][x] = color
+            offset = (y * GRID_SIZE + x) * 3
+            self._fb[offset] = color[0]
+            self._fb[offset + 1] = color[1]
+            self._fb[offset + 2] = color[2]
 
     def get_pixel(self, x: int, y: int) -> Tuple[int, int, int]:
         """Get color of a pixel."""
         if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
-            return self.buffer[y][x]
+            offset = (y * GRID_SIZE + x) * 3
+            return (self._fb[offset], self._fb[offset + 1], self._fb[offset + 2])
         return Colors.BLACK
 
     def draw_rect(self, x: int, y: int, w: int, h: int, color: Tuple[int, int, int], filled: bool = True):
@@ -221,12 +235,20 @@ class HardwareDisplay:
             cursor += 4
 
     def render(self):
-        """Render the buffer to the LED matrix using double-buffering."""
+        """Render the buffer to the LED matrix using bulk SetImage."""
         canvas = self.canvas
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                r, g, b = self.buffer[y][x]
-                canvas.SetPixel(x, y, r, g, b)
+        if HAS_PIL:
+            # Bulk transfer: build PIL Image from flat bytearray, single C call
+            img = Image.frombytes('RGB', (GRID_SIZE, GRID_SIZE), bytes(self._fb))
+            canvas.SetImage(img)
+        else:
+            # Fallback: per-pixel from flat bytearray (slower)
+            fb = self._fb
+            for y in range(GRID_SIZE):
+                row_offset = y * GRID_SIZE * 3
+                for x in range(GRID_SIZE):
+                    offset = row_offset + x * 3
+                    canvas.SetPixel(x, y, fb[offset], fb[offset+1], fb[offset+2])
         self.canvas = self.matrix.SwapOnVSync(canvas)
 
 
