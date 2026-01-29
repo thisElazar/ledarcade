@@ -42,13 +42,13 @@ GAME_CATEGORIES = [
 
 # Visual categories
 VISUAL_CATEGORIES = [
-    Category("AUTOMATA", Colors.MAGENTA, "automata"),
-    Category("NATURE", Colors.GREEN, "nature"),
-    Category("DIGITAL", Colors.CYAN, "digital"),
     Category("ART", Colors.YELLOW, "art"),
-    Category("SPRITES", Colors.LIME, "sprites"),
+    Category("AUTOMATA", Colors.MAGENTA, "automata"),
+    Category("DIGITAL", Colors.CYAN, "digital"),
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
-    Category("UTILITY", Colors.WHITE, "utility"),
+    Category("NATURE", Colors.GREEN, "nature"),
+    Category("SPRITES", Colors.LIME, "sprites"),
+    Category("UTILITY", Colors.WHITE, "utility"),      # Always last
 ]
 
 # Category key to object mapping for easy lookup
