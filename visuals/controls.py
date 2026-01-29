@@ -35,34 +35,34 @@ class Controls(Visual):
     def _draw_joystick(self, cx, cy):
         """Draw a small joystick icon with directional arrows."""
         # Center knob
-        self.display.set_pixel(cx, cy, Colors.WHITE)
-        self.display.set_pixel(cx + 1, cy, Colors.WHITE)
-        self.display.set_pixel(cx, cy + 1, Colors.WHITE)
-        self.display.set_pixel(cx + 1, cy + 1, Colors.WHITE)
+        self.display.set_pixel(cx, cy, Colors.RED)
+        self.display.set_pixel(cx + 1, cy, Colors.RED)
+        self.display.set_pixel(cx, cy + 1, Colors.RED)
+        self.display.set_pixel(cx + 1, cy + 1, Colors.RED)
 
         # Up arrow
-        self.display.set_pixel(cx, cy - 2, Colors.CYAN)
-        self.display.set_pixel(cx + 1, cy - 2, Colors.CYAN)
-        self.display.set_pixel(cx, cy - 1, Colors.CYAN)
-        self.display.set_pixel(cx + 1, cy - 1, Colors.CYAN)
+        self.display.set_pixel(cx, cy - 2, (180, 40, 40))
+        self.display.set_pixel(cx + 1, cy - 2, (180, 40, 40))
+        self.display.set_pixel(cx, cy - 1, (180, 40, 40))
+        self.display.set_pixel(cx + 1, cy - 1, (180, 40, 40))
 
         # Down arrow
-        self.display.set_pixel(cx, cy + 3, Colors.CYAN)
-        self.display.set_pixel(cx + 1, cy + 3, Colors.CYAN)
-        self.display.set_pixel(cx, cy + 2, Colors.CYAN)
-        self.display.set_pixel(cx + 1, cy + 2, Colors.CYAN)
+        self.display.set_pixel(cx, cy + 3, (180, 40, 40))
+        self.display.set_pixel(cx + 1, cy + 3, (180, 40, 40))
+        self.display.set_pixel(cx, cy + 2, (180, 40, 40))
+        self.display.set_pixel(cx + 1, cy + 2, (180, 40, 40))
 
         # Left arrow
-        self.display.set_pixel(cx - 2, cy, Colors.CYAN)
-        self.display.set_pixel(cx - 2, cy + 1, Colors.CYAN)
-        self.display.set_pixel(cx - 1, cy, Colors.CYAN)
-        self.display.set_pixel(cx - 1, cy + 1, Colors.CYAN)
+        self.display.set_pixel(cx - 2, cy, (180, 40, 40))
+        self.display.set_pixel(cx - 2, cy + 1, (180, 40, 40))
+        self.display.set_pixel(cx - 1, cy, (180, 40, 40))
+        self.display.set_pixel(cx - 1, cy + 1, (180, 40, 40))
 
         # Right arrow
-        self.display.set_pixel(cx + 3, cy, Colors.CYAN)
-        self.display.set_pixel(cx + 3, cy + 1, Colors.CYAN)
-        self.display.set_pixel(cx + 2, cy, Colors.CYAN)
-        self.display.set_pixel(cx + 2, cy + 1, Colors.CYAN)
+        self.display.set_pixel(cx + 3, cy, (180, 40, 40))
+        self.display.set_pixel(cx + 3, cy + 1, (180, 40, 40))
+        self.display.set_pixel(cx + 2, cy, (180, 40, 40))
+        self.display.set_pixel(cx + 2, cy + 1, (180, 40, 40))
 
     def _draw_button(self, cx, cy, color):
         """Draw a small circular button."""
@@ -87,8 +87,8 @@ class Controls(Visual):
         self.display.draw_text_small(17, 21, "NAVIGATE", Colors.GRAY)
 
         # Buttons section
-        self._draw_button(6, 33, Colors.RED)
-        self._draw_button(11, 33, Colors.BLUE)
+        self._draw_button(6, 33, Colors.WHITE)
+        self._draw_button(11, 33, Colors.WHITE)
         self.display.draw_text_small(17, 32, "ACTION", Colors.WHITE)
         self.display.draw_text_small(17, 39, "SELECT", Colors.GRAY)
 
