@@ -7,6 +7,17 @@ Hold 2 seconds to exit back to menu (handled by main loop).
 
 import random
 from visuals import Visual
+from arcade import InputState
+
+
+def _randomize_style(visual):
+    """Simulate random up-presses to randomize a visual's palette/style."""
+    fake = InputState()
+    presses = random.randint(0, 10)
+    for _ in range(presses):
+        fake.reset()
+        fake.up_pressed = True
+        visual.handle_input(fake)
 
 
 class Slideshow(Visual):
@@ -39,6 +50,7 @@ class Slideshow(Visual):
             cls = self._queue.pop()
             self._child = cls(self.display)
             self._child.reset()
+            _randomize_style(self._child)
             self._cycle_timer = 0.0
 
     def update(self, dt):

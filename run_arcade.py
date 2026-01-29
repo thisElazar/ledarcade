@@ -229,7 +229,7 @@ def has_any_input(input_state):
 def _pick_idle_visual(display):
     """Pick a random non-utility, non-slideshow visual and instantiate it."""
     from visuals import ALL_VISUALS
-    from visuals.slideshow import Slideshow
+    from visuals.slideshow import Slideshow, _randomize_style
     candidates = [v for v in ALL_VISUALS
                   if not issubclass(v, Slideshow)
                   and getattr(v, 'category', '') != 'utility']
@@ -238,6 +238,7 @@ def _pick_idle_visual(display):
     cls = random.choice(candidates)
     vis = cls(display)
     vis.reset()
+    _randomize_style(vis)
     return vis
 
 
