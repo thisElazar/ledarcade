@@ -5,7 +5,8 @@ Shows hardware details for the LED arcade system.
 Second page shows a retro terminal "HELLO WORLD" easter egg.
 
 Controls:
-  Any button/direction - Next page / Exit
+  Button   - Exit to menu
+  Joystick - Hidden second page
 """
 
 import math
@@ -25,12 +26,16 @@ class About(Visual):
         self.page = 0  # 0 = system info, 1 = hello world
 
     def handle_input(self, input_state) -> bool:
-        if (input_state.action_l or input_state.action_r or
-                input_state.up_pressed or input_state.down_pressed or
+        # Buttons always exit
+        if input_state.action_l or input_state.action_r:
+            self.wants_exit = True
+            return True
+        # Joystick is the secret — advances to hello world page, then exits
+        if (input_state.up_pressed or input_state.down_pressed or
                 input_state.left_pressed or input_state.right_pressed):
             if self.page == 0:
                 self.page = 1
-                self.time = 0.0  # Reset time for typewriter effect
+                self.time = 0.0
             else:
                 self.wants_exit = True
             return True
@@ -70,9 +75,9 @@ class About(Visual):
         # Fun stats
         self.display.draw_text_small(2, 50, "4096 PIXELS", Colors.GRAY)
 
-        # Footer hint
+        # Footer
         self.display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-        self.display.draw_text_small(2, 58, "BTN:MORE", Colors.GRAY)
+        self.display.draw_text_small(2, 58, "BTN:EXIT", Colors.GRAY)
 
     def _draw_hello_world(self):
         """Draw page 1: retro green terminal with typewriter effect."""
