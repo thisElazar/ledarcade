@@ -2,7 +2,7 @@
 SkiFree - Endless Downhill Skiing
 =================================
 Ski down the mountain, dodge trees and rocks!
-The Yeti appears at 2000m — use boost to outrun him!
+The Yeti appears at 750m — use boost to outrun him!
 
 Controls:
   Left/Right - Steer (diagonal skiing)
@@ -52,14 +52,15 @@ class SkiFree(Game):
     BOOST_RECHARGE = 0.3       # Fuel per second recharge
 
     # Crash
-    CRASH_DURATION = 0.8       # Seconds frozen after crash
+    CRASH_DURATION = 0.8       # Seconds tumbling after crash
+    INVULN_DURATION = 0.5      # Brief invulnerability after crash recovery
 
     # Jump
     JUMP_DURATION = 0.5        # Airborne time from ramp
     MOGUL_JUMP_DURATION = 0.2  # Small hop from mogul
 
     # Yeti
-    YETI_SPAWN_DISTANCE = 2000  # Meters
+    YETI_SPAWN_DISTANCE = 750   # Meters
     YETI_SPEED = 90.0           # Faster than normal max
     YETI_CATCH_DIST = 4.0       # Pixels to catch player
 
@@ -104,6 +105,7 @@ class SkiFree(Game):
         # Crash state
         self.crashed = False
         self.crash_timer = 0.0
+        self.invuln_timer = 0.0
 
         # Jump state
         self.airborne = False
@@ -219,17 +221,33 @@ class SkiFree(Game):
                 self.state = GameState.GAME_OVER
             return
 
-        # Crash recovery
+        # Crash recovery — slope keeps scrolling, player tumbles past the obstacle
         if self.crashed:
             self.crash_timer -= dt
             if self.crash_timer <= 0:
                 self.crashed = False
+                self.invuln_timer = self.INVULN_DURATION
+
+            # Keep scrolling obstacles during crash (at reduced speed)
+            scroll_amount = self.speed * dt
+            for obs in self.obstacles:
+                obs['y'] -= scroll_amount
+            self.distance += scroll_amount
+            self.distance_meters = self.distance / 3.0
+            self.score = int(self.distance_meters)
+            self._generate_ahead()
+            self.obstacles = [o for o in self.obstacles if o['y'] > -10]
+
             # Yeti still moves during crash
             if self.yeti_active:
                 self._update_yeti(dt)
                 if self._check_yeti_catch():
                     return
             return
+
+        # Tick down invulnerability
+        if self.invuln_timer > 0:
+            self.invuln_timer -= dt
 
         # --- Input ---
         # Up/Down move player on screen (up = speed up, down = slow down)
@@ -298,7 +316,7 @@ class SkiFree(Game):
                 self.airborne = False
 
         # --- Collision detection ---
-        if not self.airborne:
+        if not self.airborne and self.invuln_timer <= 0:
             px = int(self.player_x)
             py = int(self.player_y)
             player_box = (px - 1, py - 1, 3, 4)
@@ -504,6 +522,10 @@ class SkiFree(Game):
             if 0 <= py + 2 < GRID_SIZE:
                 self.display.set_pixel(px, py + 2, self.SKIER_SKI)
             return
+
+        # Flicker during invulnerability
+        if self.invuln_timer > 0 and int(self.invuln_timer * 10) % 2 == 0:
+            return  # Skip drawing every other frame for flicker effect
 
         if self.airborne:
             # Airborne — spread eagle with shadow
