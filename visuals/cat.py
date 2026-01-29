@@ -82,11 +82,11 @@ class Cat(Visual):
             self.purr_intensity = 1.0
             consumed = True
 
-        if input_state.right:
+        if input_state.right_pressed:
             self.cat_color_idx = (self.cat_color_idx + 1) % len(CAT_COLORS)
             consumed = True
 
-        if input_state.left:
+        if input_state.left_pressed:
             self.cat_color_idx = (self.cat_color_idx - 1) % len(CAT_COLORS)
             consumed = True
 
