@@ -117,8 +117,10 @@ class SysInfo(Visual):
         self.last_refresh = self.time
 
     def handle_input(self, input_state) -> bool:
-        if (input_state.action_l or input_state.action_r):
-            self._refresh_stats()
+        if (input_state.action_l or input_state.action_r or
+                input_state.up_pressed or input_state.down_pressed or
+                input_state.left_pressed or input_state.right_pressed):
+            self.wants_exit = True
             return True
         return False
 

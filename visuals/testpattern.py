@@ -64,22 +64,13 @@ class TestPattern(Visual):
         return (x, y)
 
     def handle_input(self, input_state) -> bool:
-        consumed = False
-
-        # Left/Right - adjust speed
-        if input_state.right:
-            self.speed = min(self.max_speed, self.speed + 20.0)
-            consumed = True
-        if input_state.left:
-            self.speed = max(self.min_speed, self.speed - 20.0)
-            consumed = True
-
-        # Toggle between pixel march and quadrant mode
-        if (input_state.action_l or input_state.action_r):
-            self.mode = 1 - self.mode  # Toggle between 0 and 1
-            consumed = True
-
-        return consumed
+        # Any button press exits
+        if (input_state.action_l or input_state.action_r or
+                input_state.up_pressed or input_state.down_pressed or
+                input_state.left_pressed or input_state.right_pressed):
+            self.wants_exit = True
+            return True
+        return False
 
     def update(self, dt: float):
         self.time += dt

@@ -220,12 +220,16 @@ class Mancala(Game):
         self.input_cooldown -= dt
 
         if self.input_cooldown <= 0:
-            # Select pit
+            # Select pit (invert for P2 since their pits are visually mirrored)
+            move = 0
             if input_state.left:
-                self.selected_pit = (self.selected_pit - 1) % 6
-                self.input_cooldown = 0.15
+                move = -1
             elif input_state.right:
-                self.selected_pit = (self.selected_pit + 1) % 6
+                move = 1
+            if move != 0:
+                if self.current_player == PLAYER_2:
+                    move = -move
+                self.selected_pit = (self.selected_pit + move) % 6
                 self.input_cooldown = 0.15
 
             # Sow seeds

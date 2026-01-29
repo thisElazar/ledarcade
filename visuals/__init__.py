@@ -106,6 +106,8 @@ from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
 from .sysinfo import SysInfo
+from .credits import Credits
+from .controls import Controls
 
 # List of all available visuals
 ALL_VISUALS = [
@@ -163,6 +165,8 @@ ALL_VISUALS = [
     TestPattern,
     About,
     SysInfo,
+    Credits,
+    Controls,
 ]
 
 __all__ = [
@@ -225,4 +229,6 @@ __all__ = [
     'TestPattern',
     'About',
     'SysInfo',
+    'Credits',
+    'Controls',
 ]

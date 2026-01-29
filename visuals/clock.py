@@ -30,6 +30,10 @@ class Clock(Visual):
         if (input_state.action_l or input_state.action_r):
             self.analog_mode = not self.analog_mode
             return True
+        if (input_state.up_pressed or input_state.down_pressed or
+                input_state.left_pressed or input_state.right_pressed):
+            self.wants_exit = True
+            return True
         return False
 
     def update(self, dt: float):
