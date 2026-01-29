@@ -403,10 +403,14 @@ def main():
                                     else:
                                         player_initials[initials_cursor] = chr(ord(letter) + 1)
                                     input_cooldown = 0.15
-                                # Action confirms current letter
-                                elif input_state.action_l or input_state.action_r:
+                                # Left goes back a letter
+                                elif input_state.left_pressed:
+                                    if initials_cursor > 0:
+                                        initials_cursor -= 1
+                                    input_cooldown = 0.2
+                                # Right or action confirms current letter
+                                elif input_state.right_pressed or input_state.action_l or input_state.action_r:
                                     if initials_cursor < 2:
-                                        # Confirm letter, advance to next
                                         initials_cursor += 1
                                     else:
                                         # Last letter — submit
