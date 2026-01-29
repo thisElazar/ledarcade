@@ -93,7 +93,7 @@ def draw_initials_entry(display, initials, cursor_pos, score):
             display.draw_text_small(x, 42, letter, Colors.WHITE)
 
     display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-    display.draw_text_small(4, 58, "BTN:CONFIRM", Colors.GRAY)
+    display.draw_text_small(4, 58, "BTN:NEXT", Colors.GRAY)
 
 
 def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1):
@@ -343,17 +343,16 @@ def main():
                                         letter = player_initials[initials_cursor]
                                         player_initials[initials_cursor] = 'A' if letter == 'Z' else chr(ord(letter) + 1)
                                         input_cooldown = 0.15
-                                    elif input_state.left_pressed and initials_cursor > 0:
-                                        initials_cursor -= 1
-                                        input_cooldown = 0.2
-                                    elif input_state.right_pressed and initials_cursor < 2:
-                                        initials_cursor += 1
-                                        input_cooldown = 0.2
                                     elif input_state.action_l or input_state.action_r:
-                                        initials_str = ''.join(player_initials)
-                                        player_rank = hsm.add_score(current_item.name, initials_str, final_score)
-                                        game_over_state = GameOverState.CHOOSE_ACTION
-                                        game_over_selection = 0
+                                        if initials_cursor < 2:
+                                            # Confirm letter, advance to next
+                                            initials_cursor += 1
+                                        else:
+                                            # Last letter — submit
+                                            initials_str = ''.join(player_initials)
+                                            player_rank = hsm.add_score(current_item.name, initials_str, final_score)
+                                            game_over_state = GameOverState.CHOOSE_ACTION
+                                            game_over_selection = 0
                                         input_cooldown = 0.2
 
                                 draw_initials_entry(display, player_initials, initials_cursor, final_score)
