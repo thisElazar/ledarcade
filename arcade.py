@@ -7,9 +7,9 @@ Runs on desktop with PyGame, designed to port easily to hardware.
 
 Controls:
   Arrow Keys  - Joystick (4-way or 8-way depending on game)
-  Space       - Primary action button (A)
-  Z           - Secondary button (B) 
-  Escape      - Back to menu
+  Space       - Left action button
+  Z           - Right action button
+  Hold button - Back to menu
   
 Author: LED Arcade Project
 """
@@ -75,15 +75,14 @@ class InputState:
         self.down = False
         self.left = False
         self.right = False
-        
+
         # Buttons (pressed this frame)
-        self.action = False      # Space - primary
-        self.secondary = False   # Z - secondary
-        self.back = False        # Escape
-        
+        self.action_l = False    # Space - left action
+        self.action_r = False    # Z - right action
+
         # Buttons (held)
-        self.action_held = False
-        self.secondary_held = False
+        self.action_l_held = False
+        self.action_r_held = False
     
     @property
     def dx(self) -> int:
@@ -118,19 +117,17 @@ class InputHandler:
         self.state.right = keys[pygame.K_RIGHT]
         
         # Buttons (held state)
-        self.state.action_held = keys[pygame.K_SPACE]
-        self.state.secondary_held = keys[pygame.K_z]
-        
+        self.state.action_l_held = keys[pygame.K_SPACE]
+        self.state.action_r_held = keys[pygame.K_z]
+
         # Detect fresh presses (not held from last frame)
         current_keys = set()
         if keys[pygame.K_SPACE]: current_keys.add(pygame.K_SPACE)
         if keys[pygame.K_z]: current_keys.add(pygame.K_z)
-        if keys[pygame.K_ESCAPE]: current_keys.add(pygame.K_ESCAPE)
-        
-        self.state.action = pygame.K_SPACE in current_keys and pygame.K_SPACE not in self._prev_keys
-        self.state.secondary = pygame.K_z in current_keys and pygame.K_z not in self._prev_keys
-        self.state.back = pygame.K_ESCAPE in current_keys and pygame.K_ESCAPE not in self._prev_keys
-        
+
+        self.state.action_l = pygame.K_SPACE in current_keys and pygame.K_SPACE not in self._prev_keys
+        self.state.action_r = pygame.K_z in current_keys and pygame.K_z not in self._prev_keys
+
         self._prev_keys = current_keys
         return self.state
 
@@ -404,44 +401,59 @@ class Arcade:
     def run(self):
         """Main game loop."""
         running = True
-        
+        exit_hold = 0.0  # Hold-to-exit timer
+
         while running:
             dt = self.clock.tick(FPS) / 1000.0  # Delta time in seconds
-            
+
             # Handle events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            
+
             # Update input
             input_state = self.input.update()
-            
+
             if self.in_menu:
+                # Hold either button 2 sec to quit
+                if input_state.action_l_held or input_state.action_r_held:
+                    exit_hold += dt
+                    if exit_hold >= 2.0:
+                        running = False
+                else:
+                    exit_hold = 0.0
+
                 # Menu navigation
                 if input_state.up and self.menu_selection > 0:
                     self.menu_selection -= 1
                 elif input_state.down and self.menu_selection < len(self.games) - 1:
                     self.menu_selection += 1
-                elif input_state.action and self.games:
+                elif (input_state.action_l or input_state.action_r) and self.games:
                     # Start selected game
                     self.current_game = self.games[self.menu_selection](self.display)
                     self.current_game.reset()
                     self.in_menu = False
-                
+                    exit_hold = 0.0
+
                 self.draw_menu()
-            
+
             else:
-                # In game
-                if input_state.back:
-                    # Return to menu
-                    self.in_menu = True
-                    self.current_game = None
-                elif self.current_game:
+                # In game — hold either button 2 sec to return to menu
+                if input_state.action_l_held or input_state.action_r_held:
+                    exit_hold += dt
+                    if exit_hold >= 2.0:
+                        self.in_menu = True
+                        self.current_game = None
+                        exit_hold = 0.0
+                else:
+                    exit_hold = 0.0
+
+                if self.current_game:
                     if self.current_game.state == GameState.GAME_OVER:
                         # Handle game over menu selection
                         if input_state.up or input_state.down:
                             self.game_over_selection = 1 - self.game_over_selection
-                        elif input_state.action:
+                        elif input_state.action_l or input_state.action_r:
                             if self.game_over_selection == 0:
                                 # Play again
                                 self.current_game.reset()
@@ -454,9 +466,9 @@ class Arcade:
                     else:
                         self.current_game.update(input_state, dt)
                         self.current_game.draw()
-            
+
             self.display.render()
-        
+
         pygame.quit()
 
 

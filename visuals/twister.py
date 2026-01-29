@@ -150,7 +150,7 @@ class Twister(Visual):
             consumed = True
 
         # Twist mode toggle
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.twist_mode = (self.twist_mode + 1) % 3
             consumed = True
 

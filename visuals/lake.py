@@ -147,7 +147,7 @@ class Lake(Visual):
             self.time_scale = min(3.0, self.time_scale + 0.1)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.spawn_ship()
             consumed = True
 

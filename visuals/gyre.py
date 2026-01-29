@@ -238,7 +238,7 @@ class Gyre(Visual):
             self.speed = min(5.0, self.speed + 0.2)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.init_pattern()
             consumed = True
 

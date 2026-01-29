@@ -135,7 +135,7 @@ class Galaga(Game):
 
         # Firing
         self.fire_cooldown -= dt
-        if input_state.action_held and self.fire_cooldown <= 0 and len(self.bullets) < self.MAX_BULLETS:
+        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held and self.fire_cooldown <= 0 and len(self.bullets) < self.MAX_BULLETS:
             self.bullets.append({'x': self.player_x, 'y': self.PLAYER_Y - 2})
             if self.has_dual_ship:
                 self.bullets.append({'x': self.player_x + 6, 'y': self.PLAYER_Y - 2})

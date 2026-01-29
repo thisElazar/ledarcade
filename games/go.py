@@ -254,12 +254,12 @@ class Go(Game):
                 self.input_cooldown = self.move_delay
 
             # Place stone
-            if input_state.action:
+            if input_state.action_l:
                 if self.place_stone(self.cursor_x, self.cursor_y):
                     self.input_cooldown = 0.2
 
             # Pass turn
-            if input_state.secondary:
+            if input_state.action_r:
                 self.pass_turn()
                 self.input_cooldown = 0.3
 

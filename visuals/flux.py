@@ -310,7 +310,7 @@ class Flux(Visual):
         if input_state.right:
             self.time_scale = min(2.5, self.time_scale + 0.15)
             consumed = True
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.current_palette = (self.current_palette + 1) % len(self.palettes)
             consumed = True
         return consumed

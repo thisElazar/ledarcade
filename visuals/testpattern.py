@@ -75,7 +75,7 @@ class TestPattern(Visual):
             consumed = True
 
         # Toggle between pixel march and quadrant mode
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.mode = 1 - self.mode  # Toggle between 0 and 1
             consumed = True
 

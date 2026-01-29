@@ -222,7 +222,7 @@ class CopperBars(Visual):
             consumed = True
 
         # Change wave pattern
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.wave_pattern = (self.wave_pattern + 1) % len(self.wave_patterns)
             consumed = True
 

@@ -122,7 +122,7 @@ class Cylon(Visual):
             consumed = True
 
         # Space - toggle mode
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.mode = (self.mode + 1) % 2
             # Clear trails when switching modes
             self.trail = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]

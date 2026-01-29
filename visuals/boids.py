@@ -113,7 +113,7 @@ class Boids(Visual):
         consumed = False
 
         # Space spawns new boids
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self._spawn_several()
             consumed = True
 

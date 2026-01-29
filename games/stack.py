@@ -118,7 +118,7 @@ class Stack(Game):
             self._update_swing_position()
 
             # Drop on action
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.dropping = True
                 self.drop_y = self._get_swing_y()
 

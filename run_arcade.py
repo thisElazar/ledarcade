@@ -8,7 +8,7 @@ Controls:
   Left/Right - Switch category (page)
   Up/Down    - Select item within category
   Space      - Launch selected item
-  Escape     - Back to menu / Exit
+  Hold button - Back to menu / Exit
 """
 
 import pygame
@@ -202,7 +202,7 @@ def draw_menu(display, categories, cat_index, item_index):
     # Instructions
     display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
     display.draw_text_small(2, 58, "SPACE:GO", Colors.GRAY)
-    display.draw_text_small(36, 58, "ESC:EXIT", Colors.GRAY)
+    display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
 
 
 def main():
@@ -229,7 +229,7 @@ def main():
     print("  Left/Right - Switch category")
     print("  Up/Down    - Select item")
     print("  Space      - Launch")
-    print("  Escape     - Back/Exit")
+    print("  Hold btn   - Back/Exit")
     print()
     print("=" * 50)
 
@@ -245,6 +245,7 @@ def main():
     current_item = None
     is_game = False
     is_two_player = False  # 2-player games skip high scores
+    exit_hold = 0.0         # Timer for hold-to-exit (menu and gameplay)
     visual_exit_hold = 0.0  # Timer for hold-to-exit visuals
 
     # Game over state
@@ -282,9 +283,15 @@ def main():
         input_state = input_handler.update()
 
         if in_menu:
-            if not categories:
-                if input_state.back:
+            # Hold either button 2 sec to quit app
+            if input_state.action_l_held or input_state.action_r_held:
+                exit_hold += dt
+                if exit_hold >= 2.0:
                     running = False
+            else:
+                exit_hold = 0.0
+
+            if not categories:
                 draw_menu(display, categories, 0, 0)
             else:
                 category = categories[cat_index]
@@ -308,7 +315,7 @@ def main():
                         item_index += 1
 
                     # Launch item
-                    if input_state.action:
+                    if input_state.action_l or input_state.action_r:
                         item_class = category.items[item_index]
                         current_item = item_class(display)
                         current_item.reset()
@@ -317,19 +324,24 @@ def main():
                         # Check if it's a 2-player game (no high scores)
                         is_two_player = getattr(current_item, 'category', '') == '2_player'
                         in_menu = False
-
-                if input_state.back:
-                    running = False
+                        exit_hold = 0.0
 
                 draw_menu(display, categories, cat_index, item_index)
 
         else:
             # Running item (game or visual)
-            if input_state.back:
-                in_menu = True
-                current_item = None
-                game_over_initialized = False
-            elif current_item:
+            # Hold either button 2 sec to return to menu
+            if input_state.action_l_held or input_state.action_r_held:
+                exit_hold += dt
+                if exit_hold >= 2.0:
+                    in_menu = True
+                    current_item = None
+                    game_over_initialized = False
+                    exit_hold = 0.0
+            else:
+                exit_hold = 0.0
+
+            if current_item:
                 if is_game:
                     # Game logic
                     if current_item.state == GameState.GAME_OVER:
@@ -369,7 +381,7 @@ def main():
 
                             # Any input skips to action selection (if lockout expired)
                             if game_over_lockout <= 0:
-                                if input_state.action or input_state.up or input_state.down:
+                                if input_state.action_l or input_state.action_r or input_state.up or input_state.down:
                                     game_over_state = GameOverState.CHOOSE_ACTION
                                     game_over_selection = 0
 
@@ -404,7 +416,7 @@ def main():
                                     initials_cursor += 1
                                     input_cooldown = 0.2
                                 # Action confirms initials
-                                elif input_state.action:
+                                elif input_state.action_l or input_state.action_r:
                                     initials_str = ''.join(player_initials)
                                     player_rank = hsm.add_score(current_item.name, initials_str, final_score)
                                     game_over_state = GameOverState.CHOOSE_ACTION
@@ -417,7 +429,7 @@ def main():
                             if game_over_lockout <= 0:
                                 if input_state.up or input_state.down:
                                     game_over_selection = 1 - game_over_selection
-                                elif input_state.action:
+                                elif input_state.action_l or input_state.action_r:
                                     if game_over_selection == 0:
                                         # Play again
                                         current_item.reset()
@@ -454,8 +466,8 @@ def main():
                         current_item.draw()
                 else:
                     # Visual logic
-                    # Hold action button for 2 seconds to return to menu
-                    if input_state.action_held:
+                    # Hold either button for 2 seconds to return to menu
+                    if input_state.action_l_held or input_state.action_r_held:
                         visual_exit_hold += dt
                         if visual_exit_hold >= 2.0:
                             in_menu = True

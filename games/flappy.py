@@ -82,7 +82,7 @@ class Flappy(Game):
             return
 
         # Flap on action
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.bird_vy = self.flap_strength
             self.started = True
             self.wing_up = True

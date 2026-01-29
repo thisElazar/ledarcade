@@ -6,7 +6,7 @@ A retro arcade system running on a Raspberry Pi 3 with a 64x64 RGB LED matrix (H
 ## Hardware Setup
 - **Display**: 64x64 RGB LED matrix panel (HUB75 interface)
 - **Controller**: Raspberry Pi 3 at `thiselazar@arcade.local`
-- **Input**: Keyboard over SSH (arrows/WASD, Space, Z, Q/Escape)
+- **Input**: Keyboard over SSH (arrows/WASD, Space, Z; hold button 2s to exit)
 - **GPIO**: Custom "led-arcade" hardware mapping (see HARDWARE.md)
 
 ## Development Workflow

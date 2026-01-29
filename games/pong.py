@@ -118,7 +118,7 @@ class Pong(Game):
         # Serve on space
         if self.serving:
             self.serve_timer += dt
-            if input_state.action or self.serve_timer > 1.5:
+            if (input_state.action_l or input_state.action_r) or self.serve_timer > 1.5:
                 self.serve_ball()
                 self.serve_timer = 0
             return

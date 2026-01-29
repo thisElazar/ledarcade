@@ -473,7 +473,7 @@ class Arkanoid(Game):
             self.paddle_x = min(GRID_SIZE - self.paddle_width, self.paddle_x + paddle_speed * dt)
 
         # Launch ball or fire laser
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             for ball in self.balls:
                 if not ball['launched']:
                     self.launch_ball(ball)

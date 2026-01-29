@@ -7,7 +7,7 @@ Standalone runner for visual effects on the 64x64 LED matrix.
 Controls:
   Left/Right - Previous/Next visual
   Space      - Visual-specific action
-  Escape     - Return to menu / Exit
+  Hold button - Return to menu / Exit
 
 Run with: python run_visuals.py
 """
@@ -70,6 +70,7 @@ def main():
     in_menu = True
     menu_selection = 0
     current_visual = None
+    exit_hold = 0.0  # Timer for hold-to-exit
 
     running = True
     while running:
@@ -84,28 +85,40 @@ def main():
         input_state = input_handler.update()
 
         if in_menu:
+            # Hold either button 2 sec to quit
+            if input_state.action_l_held or input_state.action_r_held:
+                exit_hold += dt
+                if exit_hold >= 2.0:
+                    running = False
+            else:
+                exit_hold = 0.0
+
             # Menu navigation
             if input_state.up and menu_selection > 0:
                 menu_selection -= 1
             elif input_state.down and menu_selection < len(ALL_VISUALS) - 1:
                 menu_selection += 1
-            elif input_state.action and ALL_VISUALS:
+            elif (input_state.action_l or input_state.action_r) and ALL_VISUALS:
                 # Start selected visual
                 current_visual = ALL_VISUALS[menu_selection](display)
                 current_visual.reset()
                 in_menu = False
-            elif input_state.back:
-                running = False
+                exit_hold = 0.0
 
             draw_menu(display, ALL_VISUALS, menu_selection)
 
         else:
-            # Running visual
-            if input_state.back:
-                # Return to menu
-                in_menu = True
-                current_visual = None
-            elif current_visual:
+            # Running visual — hold either button 2 sec to return to menu
+            if input_state.action_l_held or input_state.action_r_held:
+                exit_hold += dt
+                if exit_hold >= 2.0:
+                    in_menu = True
+                    current_visual = None
+                    exit_hold = 0.0
+            else:
+                exit_hold = 0.0
+
+            if current_visual:
                 # Let visual handle input
                 current_visual.handle_input(input_state)
 

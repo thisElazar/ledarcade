@@ -158,7 +158,7 @@ class Hodge(Visual):
             self.g = min(15, self.g + 0.25)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.init_random()
             consumed = True
 

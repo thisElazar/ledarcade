@@ -102,7 +102,7 @@ class Life(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Space toggles pause/resume
             self.paused = not self.paused
             consumed = True

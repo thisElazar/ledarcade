@@ -348,7 +348,7 @@ class TrashBlaster(Game):
         self.crosshair_y = max(margin, min(GRID_SIZE - margin, self.crosshair_y))
 
         # Fire on action button
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self._fire_at_crosshair()
 
         # Update fire cooldown

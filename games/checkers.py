@@ -300,7 +300,7 @@ class Checkers(Game):
             self.move_timer = 0
 
         # Select / Move
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             cursor_pos = (self.cursor_x, self.cursor_y)
 
             if self.multi_jump_pos:

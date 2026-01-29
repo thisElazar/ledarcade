@@ -266,7 +266,7 @@ class Bomberman(Game):
                         return
 
         # Place bomb
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.place_bomb()
 
         # Update bombs

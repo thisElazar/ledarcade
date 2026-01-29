@@ -78,7 +78,7 @@ class Weather(Visual):
                 self.particles.append(p)
 
     def handle_input(self, input_state) -> bool:
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.weather_index = (self.weather_index + 1) % len(self.weathers)
             self._init_weather()
             return True

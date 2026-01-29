@@ -191,7 +191,7 @@ class Rotozoom(Visual):
             consumed = True
 
         # Space cycles texture pattern
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.texture_index = (self.texture_index + 1) % len(self.textures)
             consumed = True
 

@@ -47,9 +47,8 @@ BUTTON_PINS = {
     'down': 25,
     'left': 24,
     'right': 8,
-    'action': 7,      # A button (Space)
-    'secondary': 9,   # B button (Z)
-    'back': 11,       # C button (Escape)
+    'action_l': 7,    # Left button (Space)
+    'action_r': 9,    # Right button (Z)
 }
 
 
@@ -241,11 +240,10 @@ class InputState:
         self.down = False
         self.left = False
         self.right = False
-        self.action = False
-        self.secondary = False
-        self.back = False
-        self.action_held = False
-        self.secondary_held = False
+        self.action_l = False
+        self.action_r = False
+        self.action_l_held = False
+        self.action_r_held = False
 
     @property
     def dx(self) -> int:
@@ -319,13 +317,11 @@ class KeyboardInput:
                             elif ch3 == 'C': keys.add('right')
                             elif ch3 == 'D': keys.add('left')
                 else:
-                    keys.add('back')  # Plain escape
+                    pass  # Plain escape (no longer mapped)
             elif ch == ' ':
-                keys.add('action')
+                keys.add('action_l')
             elif ch == 'z' or ch == 'Z':
-                keys.add('secondary')
-            elif ch == 'q' or ch == 'Q':
-                keys.add('back')
+                keys.add('action_r')
             elif ch == 'w' or ch == 'W':
                 keys.add('up')
             elif ch == 's' or ch == 'S':
@@ -349,13 +345,12 @@ class KeyboardInput:
         self.state.right = 'right' in self._current_keys
 
         # Buttons (fresh press detection)
-        self.state.action = 'action' in self._current_keys and 'action' not in self._prev_keys
-        self.state.secondary = 'secondary' in self._current_keys and 'secondary' not in self._prev_keys
-        self.state.back = 'back' in self._current_keys and 'back' not in self._prev_keys
+        self.state.action_l = 'action_l' in self._current_keys and 'action_l' not in self._prev_keys
+        self.state.action_r = 'action_r' in self._current_keys and 'action_r' not in self._prev_keys
 
         # Held state
-        self.state.action_held = 'action' in self._current_keys
-        self.state.secondary_held = 'secondary' in self._current_keys
+        self.state.action_l_held = 'action_l' in self._current_keys
+        self.state.action_r_held = 'action_r' in self._current_keys
 
         return self.state
 
@@ -404,13 +399,12 @@ class GPIOInput:
         self.state.right = current['right']
 
         # Fresh press detection
-        self.state.action = current['action'] and not self._prev_buttons['action']
-        self.state.secondary = current['secondary'] and not self._prev_buttons['secondary']
-        self.state.back = current['back'] and not self._prev_buttons['back']
+        self.state.action_l = current['action_l'] and not self._prev_buttons['action_l']
+        self.state.action_r = current['action_r'] and not self._prev_buttons['action_r']
 
         # Held state
-        self.state.action_held = current['action']
-        self.state.secondary_held = current['secondary']
+        self.state.action_l_held = current['action_l']
+        self.state.action_r_held = current['action_r']
 
         self._prev_buttons = current
         return self.state
@@ -455,11 +449,10 @@ class HardwareInput:
             self.state.down = kb.down or gp.down
             self.state.left = kb.left or gp.left
             self.state.right = kb.right or gp.right
-            self.state.action = kb.action or gp.action
-            self.state.secondary = kb.secondary or gp.secondary
-            self.state.back = kb.back or gp.back
-            self.state.action_held = kb.action_held or gp.action_held
-            self.state.secondary_held = kb.secondary_held or gp.secondary_held
+            self.state.action_l = kb.action_l or gp.action_l
+            self.state.action_r = kb.action_r or gp.action_r
+            self.state.action_l_held = kb.action_l_held or gp.action_l_held
+            self.state.action_r_held = kb.action_r_held or gp.action_r_held
         else:
             self.state = kb
 

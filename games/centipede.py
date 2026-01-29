@@ -122,7 +122,7 @@ class Centipede(Game):
 
         # Firing
         self.fire_cooldown -= dt
-        if input_state.action_held and self.fire_cooldown <= 0 and self.bullet is None:
+        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held and self.fire_cooldown <= 0 and self.bullet is None:
             self.bullet = {'x': self.player_x, 'y': self.player_y - 2}
             self.fire_cooldown = self.FIRE_COOLDOWN
 

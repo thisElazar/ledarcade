@@ -154,7 +154,7 @@ class Sonic(Visual):
             self.speed = min(6.0, self.speed + 0.2)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.speed = 1.5
             self.frame_index = 0
             self.frame_timer = 0.0

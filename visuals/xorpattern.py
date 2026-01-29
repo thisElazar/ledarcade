@@ -180,7 +180,7 @@ class XORPattern(Visual):
             consumed = True
 
         # Pattern variation (Space/Action)
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.pattern_index = (self.pattern_index + 1) % len(self.patterns)
             consumed = True
 

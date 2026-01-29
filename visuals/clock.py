@@ -27,7 +27,7 @@ class Clock(Visual):
         self.color_cycle = 0.0
 
     def handle_input(self, input_state) -> bool:
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.analog_mode = not self.analog_mode
             return True
         return False

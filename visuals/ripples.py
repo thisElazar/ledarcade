@@ -184,7 +184,7 @@ class Ripples(Visual):
             self.damping = min(0.999, self.damping + 0.01)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.drop_ripple()
             consumed = True
 

@@ -114,7 +114,7 @@ class Polaroid(Visual):
             consumed = True
 
         # Take picture
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.take_picture()
             consumed = True
 

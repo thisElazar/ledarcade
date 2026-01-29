@@ -264,7 +264,7 @@ class Attractors(Visual):
             consumed = True
 
         # Space changes attractor type (auto-resets particles)
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.current_attractor = (self.current_attractor + 1) % len(self.attractors)
             self.init_particles()
             consumed = True

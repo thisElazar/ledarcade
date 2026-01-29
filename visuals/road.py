@@ -158,7 +158,7 @@ class Road(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.view_mode = 1 - self.view_mode
             if self.view_mode == 1:
                 self.generate_cacti()

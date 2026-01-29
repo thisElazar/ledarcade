@@ -84,7 +84,7 @@ class Sandpile(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Toggle between center and random drop mode
             self.center_mode = not self.center_mode
             # Reset grid when switching modes so the new pattern is clean

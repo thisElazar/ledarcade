@@ -271,7 +271,7 @@ class LodeRunner(Game):
         if self.dig_cooldown > 0:
             self.dig_cooldown -= dt
 
-        if input_state.action and self.dig_cooldown <= 0:
+        if (input_state.action_l or input_state.action_r) and self.dig_cooldown <= 0:
             # Dig in the direction player is facing
             dig_x = self.player_x + self.player_facing
             if self.dig_hole(dig_x, self.player_y + 1):

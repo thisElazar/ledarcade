@@ -117,7 +117,7 @@ class SysInfo(Visual):
         self.last_refresh = self.time
 
     def handle_input(self, input_state) -> bool:
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self._refresh_stats()
             return True
         return False

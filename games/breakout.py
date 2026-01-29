@@ -140,7 +140,7 @@ class Breakout(Game):
             self.paddle_x = min(GRID_SIZE - self.paddle_width, self.paddle_x + paddle_speed * dt)
 
         # Launch ball
-        if input_state.action and not self.ball_launched:
+        if (input_state.action_l or input_state.action_r) and not self.ball_launched:
             self.launch_ball()
 
         # Ball follows paddle if not launched

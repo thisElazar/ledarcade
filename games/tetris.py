@@ -276,7 +276,7 @@ class Tetris(Game):
                 self.lock_timer = 0
 
         # Hard drop (Action button)
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             while not self.check_collision(dy=1):
                 self.piece_y += 1
                 self.score += 2

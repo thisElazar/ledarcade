@@ -99,7 +99,7 @@ class Fire(Visual):
             self.flame_height = max(0.0, self.flame_height - 0.1)
             consumed = True
         # Space - toggle color palette
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.palette_index = (self.palette_index + 1) % len(self.palettes)
             consumed = True
         return consumed

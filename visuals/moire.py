@@ -56,7 +56,7 @@ class Moire(Visual):
             self.palette_index = (self.palette_index - 1) % len(self.palettes)
             consumed = True
         # Action cycles pattern type
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.pattern_index = (self.pattern_index + 1) % len(self.patterns)
             consumed = True
         return consumed

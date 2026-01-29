@@ -10,7 +10,7 @@ This document covers the physical hardware build for the LED Arcade system, incl
 - **Display:** 64x64 RGB LED Matrix (HUB75 interface)
 - **Power:** 5V 4A power supply (dedicated to panel)
 - **Controller:** Raspberry Pi (Pi 3 for prototyping, Pi Zero 2 W for deployment)
-- **Input:** 1 joystick (4 directions) + 3 buttons
+- **Input:** 1 joystick (4 directions) + 2 buttons
 - **Audio:** USB audio adapter (optional, for 8-bit sound effects)
 
 ### Why Two Pi Models?
@@ -131,9 +131,8 @@ Active-low configuration: buttons connect GPIO to GND when pressed. Internal pul
 | DOWN | Joystick down | GPIO 25 | Pin 22 |
 | LEFT | Joystick left | GPIO 24 | Pin 18 |
 | RIGHT | Joystick right | GPIO 8 | Pin 24 |
-| BTN_A | Action (Space) | GPIO 7 | Pin 26 |
-| BTN_B | Secondary (Z) | GPIO 9 | Pin 21 |
-| BTN_C | Back (Escape) | GPIO 11 | Pin 23 |
+| BTN_L | Left action (Space) | GPIO 7 | Pin 26 |
+| BTN_R | Right action (Z) | GPIO 9 | Pin 21 |
 | GND | Common ground | GND | Any GND pin |
 
 ### Power Connections
@@ -223,8 +222,9 @@ sudo python3 run_hardware.py
 
 **Controls (keyboard):**
 - Arrow keys / WASD - Navigate
-- Space - Select / Action
-- Q - Back / Exit
+- Space - Left action / Select
+- Z - Right action
+- Hold button 2s - Back / Exit
 
 ### Transfer Project Files
 
@@ -320,7 +320,7 @@ Before first power-on:
 - [ ] Panel GND connected to Pi GND
 - [ ] All 14 HUB75 signal wires connected (R1, G1, B1, R2, G2, B2, A, B, C, D, E, CLK, LAT, OE)
 - [ ] Joystick 4 directions wired to GPIO 19, 25, 24, 8
-- [ ] 3 buttons wired to GPIO 7, 9, 11
+- [ ] 2 buttons wired to GPIO 7, 9
 - [ ] All button/joystick commons connected to GND
 - [ ] Double-check no shorts between adjacent pins
 

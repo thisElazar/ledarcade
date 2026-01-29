@@ -125,7 +125,7 @@ class Wolfram(Visual):
             self.speed = min(4.0, self.speed + 0.3)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Next preset rule - new pattern rolls in from bottom
             self.rule_index = (self.rule_index + 1) % len(self.PRESET_RULES)
             self.rule = self.PRESET_RULES[self.rule_index]

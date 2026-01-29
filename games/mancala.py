@@ -229,7 +229,7 @@ class Mancala(Game):
                 self.input_cooldown = 0.15
 
             # Sow seeds
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 pit_index = self.selected_pit if self.current_player == PLAYER_1 else self.selected_pit + 6
                 if self.pits[pit_index] > 0:
                     self.sow_seeds(pit_index)

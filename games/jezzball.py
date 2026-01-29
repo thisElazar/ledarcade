@@ -221,7 +221,7 @@ class JezzBall(Game):
                 self.cursor_timer = 0
 
         # Start building wall on action press (only if no walls active)
-        if input_state.action and not self.walls:
+        if (input_state.action_l or input_state.action_r) and not self.walls:
             # Can only start wall from empty space
             if not self.grid[self.cursor_y][self.cursor_x]:
                 if self.horizontal:

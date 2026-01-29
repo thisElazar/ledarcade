@@ -159,7 +159,7 @@ class Connect4(Game):
             self.move_timer = self.move_delay  # Allow immediate move on new press
 
         # Drop piece
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             drop_row = self.get_drop_row(self.cursor_col)
             if drop_row >= 0:
                 self.dropping = True

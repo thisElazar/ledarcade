@@ -267,7 +267,7 @@ class PipeDream(Game):
 
     def update(self, input_state: InputState, dt: float):
         if self.state == GameState.GAME_OVER:
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.reset()
             return
 
@@ -303,7 +303,7 @@ class PipeDream(Game):
             self.move_timer = 0
 
         # Place pipe
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.place_pipe()
 
     def draw(self):

@@ -125,7 +125,7 @@ class LightsOut(Game):
 
         if self.state == GameState.GAME_OVER:
             # Won - press space for next level
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.next_level()
                 self.state = GameState.PLAYING
             return
@@ -150,7 +150,7 @@ class LightsOut(Game):
             self.move_timer = 0
 
         # Toggle light
-        if input_state.action and self.toggle_flash <= 0:
+        if (input_state.action_l or input_state.action_r) and self.toggle_flash <= 0:
             self.toggle(self.cursor_x, self.cursor_y)
             self.moves += 1
 

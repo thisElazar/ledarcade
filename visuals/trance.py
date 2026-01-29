@@ -213,7 +213,7 @@ class Trance(Visual):
         consumed = False
 
         # Space cycles texture pattern
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.texture_index = (self.texture_index + 1) % len(self.textures)
             # Also cycle palette with texture for variety
             self.palette_index = (self.palette_index + 1) % len(self.palettes)

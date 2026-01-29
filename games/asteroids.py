@@ -159,7 +159,7 @@ class Asteroids(Game):
         
         # Fire bullets
         self.fire_cooldown = max(0, self.fire_cooldown - dt)
-        if input_state.action and self.fire_cooldown <= 0:
+        if (input_state.action_l or input_state.action_r) and self.fire_cooldown <= 0:
             self.fire_cooldown = 0.2
             
             bullet_speed = 80.0

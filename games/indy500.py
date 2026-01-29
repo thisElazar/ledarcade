@@ -85,7 +85,7 @@ class Indy500(Game):
 
     def update(self, input_state: InputState, dt: float):
         if self.state == GameState.GAME_OVER:
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.reset()
             return
 
@@ -103,7 +103,7 @@ class Indy500(Game):
             self.angle += self.TURN_SPEED * dt
 
         # Acceleration / braking
-        if input_state.action_held:
+        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
             self.speed += self.ACCELERATION * dt
         else:
             # Friction when not accelerating

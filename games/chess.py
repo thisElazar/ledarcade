@@ -456,7 +456,7 @@ class Chess(Game):
                 self.promotion_choice = (self.promotion_choice - 1) % 4
             elif input_state.right:
                 self.promotion_choice = (self.promotion_choice + 1) % 4
-            elif input_state.action:
+            elif input_state.action_l:
                 self.promote_pawn(promotion_pieces[self.promotion_choice])
             return
 
@@ -482,12 +482,12 @@ class Chess(Game):
             self.move_timer = 0
 
         # Cancel selection
-        if input_state.secondary:
+        if input_state.action_r:
             self.selected_pos = None
             self.valid_moves = []
 
         # Select piece or make move
-        if input_state.action:
+        if input_state.action_l:
             cursor_pos = (self.cursor_x, self.cursor_y)
 
             if self.selected_pos is None:

@@ -201,7 +201,7 @@ class Faders(Visual):
             self.colors = self.palette_generators[self.current_palette]()
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.init_random()
             consumed = True
 

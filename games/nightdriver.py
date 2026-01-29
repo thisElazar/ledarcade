@@ -125,7 +125,7 @@ class NightDriver(Game):
 
     def update(self, input_state: InputState, dt: float):
         if self.state == GameState.GAME_OVER:
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.reset()
             return
 

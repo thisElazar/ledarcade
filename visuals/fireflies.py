@@ -194,7 +194,7 @@ class Fireflies(Visual):
         consumed = False
 
         # Space: randomize all phases (restart synchronization from chaos)
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             for f in self.fireflies:
                 f.phase = random.uniform(0.0, self.TWO_PI)
                 f.flash_age = 1.0

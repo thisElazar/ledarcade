@@ -160,7 +160,7 @@ class DigDug(Game):
                 self.player_y = new_y
 
         # Pump action
-        if input_state.action_held:
+        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
             if not self.pump_active:
                 self.pump_active = True
                 self.pump_length = 0

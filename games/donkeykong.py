@@ -274,7 +274,7 @@ class DonkeyKong(Game):
                 self.walk_frame = (self.walk_frame + 1) % 2
 
             # Jumping
-            if input_state.action and self.on_ground:
+            if (input_state.action_l or input_state.action_r) and self.on_ground:
                 self.velocity_y = self.JUMP_VELOCITY
                 self.on_ground = False
 

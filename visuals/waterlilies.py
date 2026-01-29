@@ -139,7 +139,7 @@ class WaterLilies(Visual):
             self.update_palette()
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Add a ripple at center
             self.ripples.append({
                 'x': GRID_SIZE // 2,

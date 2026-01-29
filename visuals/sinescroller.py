@@ -119,7 +119,7 @@ class SineScroller(Visual):
             consumed = True
 
         # Pattern cycling (on action button press)
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.pattern_index = (self.pattern_index + 1) % self.PATTERN_COUNT
             consumed = True
 

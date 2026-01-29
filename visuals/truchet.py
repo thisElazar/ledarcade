@@ -242,7 +242,7 @@ class Truchet(Visual):
             consumed = True
 
         # Space: regenerate pattern and cycle tile size
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.tile_size_index = (self.tile_size_index + 1) % len(self.TILE_SIZES)
             self.tile_size = self.TILE_SIZES[self.tile_size_index]
             self._generate_grid()

@@ -126,7 +126,7 @@ class Mitosis(Visual):
             self.base_growth_rate = min(4.0, self.base_growth_rate + 0.2)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Add new colonies at random positions
             for _ in range(3):
                 x = random.uniform(8, GRID_SIZE - 8)

@@ -347,7 +347,7 @@ class SpaceCruise(Game):
         if input_state.right:
             self.crosshair_x = min(GRID_SIZE - 4, self.crosshair_x + 1.5)
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self._fire()
 
         # Update fire cooldown

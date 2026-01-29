@@ -158,7 +158,7 @@ class StarryNight(Visual):
             self.twinkle_rate = max(0.3, self.twinkle_rate - 0.1)
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Add a shooting star
             self.shooting_stars.append({
                 'x': random.uniform(0, GRID_SIZE // 2),

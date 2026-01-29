@@ -205,7 +205,7 @@ class Mondrian(Visual):
             self.palette = self.PALETTES[self.palette_index]
             consumed = True
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.generate_composition()
             consumed = True
 

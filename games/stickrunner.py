@@ -207,12 +207,12 @@ class StickRunner(Game):
 
         # Jump if on ground OR near a surface (allows slope jumping)
         can_jump_now = self.on_ground or self._near_ground()
-        if input_state.action and can_jump_now and self.can_jump:
+        if (input_state.action_l or input_state.action_r) and can_jump_now and self.can_jump:
             self.velocity_y = self.JUMP_VELOCITY
             self.on_ground = False
             self.can_jump = False
 
-        if not input_state.action_held:
+        if not (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
             self.can_jump = True
 
         self.velocity_y += self.GRAVITY * dt

@@ -137,7 +137,7 @@ class Invaders(Game):
             self.fire_cooldown -= dt
 
         # Fire bullet (multiple bullets allowed with cooldown)
-        if input_state.action and self.fire_cooldown <= 0:
+        if (input_state.action_l or input_state.action_r) and self.fire_cooldown <= 0:
             self.bullets.append({
                 'x': int(self.player_x) + 1,  # Center of smaller ship
                 'y': self.player_y - 1,

@@ -49,7 +49,7 @@ class Starfield(Visual):
         if input_state.left:
             self.speed = max(0.1, self.speed - 0.05)
             consumed = True
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.warp = not self.warp
             consumed = True
         return consumed

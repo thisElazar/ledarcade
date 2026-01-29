@@ -77,7 +77,7 @@ class Cat(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             # Pet the cat!
             self.purr_intensity = 1.0
             consumed = True

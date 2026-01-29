@@ -109,7 +109,7 @@ class Mobius(Visual):
             consumed = True
 
         # Space cycles color scheme
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.current_scheme = (self.current_scheme + 1) % len(self.color_schemes)
             self.update_colors()
             consumed = True

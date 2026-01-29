@@ -99,7 +99,7 @@ class ParticleLife(Visual):
         consumed = False
 
         # Space: regenerate rules and respawn
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self._generate_rules()
             self._spawn_particles()
             consumed = True

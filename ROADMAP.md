@@ -171,9 +171,11 @@ class Game(ABC):
 ### Input System
 ```python
 input_state.up/down/left/right  # Direction (held)
-input_state.action              # Space (pressed this frame)
-input_state.action_held         # Space (held)
-input_state.back                # Escape (pressed)
+input_state.action_l            # Space (pressed this frame)
+input_state.action_l_held       # Space (held)
+input_state.action_r            # Z (pressed this frame)
+input_state.action_r_held       # Z (held)
+# Hold either button 2 sec to exit/return to menu
 ```
 
 ### Display System

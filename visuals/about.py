@@ -51,7 +51,7 @@ class About(Visual):
             consumed = True
 
         # Theme cycling
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.theme_index = (self.theme_index + 1) % len(self.THEMES)
             consumed = True
 

@@ -105,7 +105,7 @@ class Rainbow(Visual):
             consumed = True
 
         # Direction reversal
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.direction *= -1
             consumed = True
 

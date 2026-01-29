@@ -212,13 +212,13 @@ class LunarLander(Game):
 
     def update(self, input_state: InputState, dt: float):
         if self.state == GameState.GAME_OVER:
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.reset()
             return
 
         # Landed - show success screen, wait for click to advance to next level
         if self.landed:
-            if input_state.action:
+            if (input_state.action_l or input_state.action_r):
                 self.level += 1
                 self.start_new_descent()
             return
@@ -236,7 +236,7 @@ class LunarLander(Game):
             self.angle += self.ROTATION_SPEED * dt
 
         # Main thrust (pushes in direction lander is pointing)
-        if input_state.action_held and self.fuel > 0:
+        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held and self.fuel > 0:
             # Thrust direction: angle=0 means pointing up, so thrust is up
             # angle>0 means tilted right, thrust pushes up-right
             self.vx += math.sin(self.angle) * self.BASE_THRUST * dt

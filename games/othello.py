@@ -237,7 +237,7 @@ class Othello(Game):
             self.move_timer = 0
 
         # Place piece
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             if (self.cursor_x, self.cursor_y) in self.valid_moves:
                 self.make_move(self.cursor_x, self.cursor_y)
 

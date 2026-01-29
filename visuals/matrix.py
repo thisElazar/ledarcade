@@ -57,7 +57,7 @@ class Matrix(Visual):
         if input_state.left:
             self.speed_mult = max(0.3, self.speed_mult - 0.1)
             consumed = True
-        if input_state.action:
+        if (input_state.action_l or input_state.action_r):
             self.rainbow = not self.rainbow
             consumed = True
         return consumed

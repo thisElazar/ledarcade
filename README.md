@@ -249,7 +249,7 @@ class MyGame(Game):
         self.score = 0
 
     def update(self, input_state, dt):
-        if input_state.action:
+        if input_state.action_l:
             # Handle space bar
             pass
 
