@@ -9,7 +9,7 @@ Controls:
   Arrow Keys  - Joystick (4-way or 8-way depending on game)
   Space       - Left action button
   Z           - Right action button
-  Hold button - Back to menu
+  Hold both   - Back to menu (games need both buttons held)
   
 Author: LED Arcade Project
 """
@@ -451,8 +451,8 @@ class Arcade:
                 self.draw_menu()
 
             else:
-                # In game — hold either button 2 sec to return to menu
-                if input_state.action_l_held or input_state.action_r_held:
+                # In game — hold BOTH buttons 2 sec to return to menu
+                if input_state.action_l_held and input_state.action_r_held:
                     exit_hold += dt
                     if exit_hold >= 2.0:
                         self.in_menu = True

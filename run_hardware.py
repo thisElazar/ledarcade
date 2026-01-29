@@ -7,7 +7,7 @@ Runs the arcade on the LED matrix hardware.
 Controls:
   Joystick    - Navigate menus and gameplay
   Buttons     - Action / Select
-  Hold 2s     - Return to menu from game or visual
+  Hold both 2s - Return to menu (games need both buttons)
 """
 
 import sys
@@ -181,7 +181,7 @@ def main():
     print("Controls:")
     print("  Joystick    - Navigate")
     print("  Buttons     - Action / Select")
-    print("  Hold 2s     - Return to menu")
+    print("  Hold both 2s - Return to menu")
     print()
 
     # Register content
@@ -278,16 +278,18 @@ def main():
 
             else:
                 # Running game or visual
-                # Hold either button 2 sec to return to menu
-                if input_state.action_l_held or input_state.action_r_held:
-                    exit_hold += dt
-                    if exit_hold >= 2.0:
-                        in_menu = True
-                        current_item = None
-                        game_over_initialized = False
+                # Games: hold BOTH buttons 2 sec to return to menu
+                # Visuals: handled by their own exit check below (either button)
+                if is_game:
+                    if input_state.action_l_held and input_state.action_r_held:
+                        exit_hold += dt
+                        if exit_hold >= 2.0:
+                            in_menu = True
+                            current_item = None
+                            game_over_initialized = False
+                            exit_hold = 0.0
+                    else:
                         exit_hold = 0.0
-                else:
-                    exit_hold = 0.0
 
                 if current_item:
                     if is_game:

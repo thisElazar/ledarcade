@@ -8,7 +8,7 @@ Controls:
   Left/Right - Switch category (page)
   Up/Down    - Select item within category
   Space      - Launch selected item
-  Hold button - Back to menu / Exit
+  Hold both   - Back to menu (games) / Exit
 """
 
 import pygame
@@ -229,7 +229,7 @@ def main():
     print("  Left/Right - Switch category")
     print("  Up/Down    - Select item")
     print("  Space      - Launch")
-    print("  Hold btn   - Back/Exit")
+    print("  Hold both  - Back/Exit (games)")
     print()
     print("=" * 50)
 
@@ -325,8 +325,8 @@ def main():
 
         else:
             # Running item (game or visual)
-            # Hold either button 2 sec to return to menu
-            if input_state.action_l_held or input_state.action_r_held:
+            # Hold BOTH buttons 2 sec to return to menu (games need both to avoid conflicts)
+            if input_state.action_l_held and input_state.action_r_held:
                 exit_hold += dt
                 if exit_hold >= 2.0:
                     in_menu = True
