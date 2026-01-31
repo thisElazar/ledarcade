@@ -255,16 +255,16 @@ def draw_milestone_celebration(display, timer):
         sy = random.randint(1, GRID_SIZE - 2)
         display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.3) % 1.0))
 
-    # "NEW" text with glow
+    # "TOP SCORE" text with glow
     new_color = (255, 255, int(100 + 155 * pulse))
-    cx = center_x("NEW")
+    cx = center_x("TOP SCORE")
     for ox in [-1, 0, 1]:
         for oy in [-1, 0, 1]:
             if ox == 0 and oy == 0:
                 continue
             glow = (new_color[0] // 4, new_color[1] // 4, new_color[2] // 4)
-            display.draw_text_small(cx + ox, 20 + oy, "NEW", glow)
-    display.draw_text_small(cx, 20, "NEW", new_color)
+            display.draw_text_small(cx + ox, 20 + oy, "TOP SCORE", glow)
+    display.draw_text_small(cx, 20, "TOP SCORE", new_color)
 
     # "CHAMPION!" text
     champ_color = _hue_to_rgb(hue)
