@@ -87,7 +87,7 @@ def draw_leaderboard(display, game_name, highlight_rank=-1):
 
 def draw_initials_entry(display, initials, cursor_pos, score):
     display.clear(Colors.BLACK)
-    display.draw_text_small(center_x("NEW RECORD!"), 2, "NEW RECORD!", Colors.YELLOW)
+    display.draw_text_small(center_x("HIGH SCORE!"), 2, "HIGH SCORE!", Colors.YELLOW)
     score_text = f"SCORE:{score}"
     display.draw_text_small(center_x(score_text), 12, score_text, Colors.WHITE)
     display.draw_line(0, 22, 63, 22, Colors.DARK_GRAY)
