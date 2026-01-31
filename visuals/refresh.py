@@ -1,8 +1,9 @@
 """
-Refresh - Pull latest code and restart the arcade
-===================================================
-Runs git pull to fetch new code, then restarts the
-arcade process so changes take effect immediately.
+Refresh - Restart the arcade with latest code
+===============================================
+Attempts a git pull, then restarts the arcade process
+regardless of pull outcome. The restart is the point —
+new code may already be on disk from a prior deploy.
 
 Controls:
   Up/Down    - Select YES/NO
@@ -17,7 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 class Refresh(Visual):
     name = "REFRESH"
-    description = "Update code"
+    description = "Restart arcade"
     category = "utility"
 
     def __init__(self, display: Display):
@@ -29,9 +30,7 @@ class Refresh(Visual):
         self.confirmed = False
         self.pull_started = False
         self.pull_done = False
-        self.pull_ok = False
         self.pull_msg = ""
-        self.pull_timer = 0.0
         self.restart_timer = 0.0
 
     def handle_input(self, input_state) -> bool:
@@ -61,7 +60,7 @@ class Refresh(Visual):
         if not self.confirmed:
             return
 
-        # Run git pull once
+        # Attempt git pull once (best-effort)
         if not self.pull_started:
             self.pull_started = True
             repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -78,47 +77,34 @@ class Refresh(Visual):
                     if "Already up to date" in output:
                         self.pull_msg = "UP TO DATE"
                     else:
-                        self.pull_msg = "UPDATED"
-                    self.pull_ok = True
+                        self.pull_msg = "PULLED"
                 else:
                     self.pull_msg = "PULL FAILED"
-                    self.pull_ok = False
-            except subprocess.TimeoutExpired:
-                self.pull_msg = "TIMED OUT"
-                self.pull_ok = False
             except Exception:
-                self.pull_msg = "GIT ERROR"
-                self.pull_ok = False
+                self.pull_msg = "PULL SKIPPED"
             self.pull_done = True
-            self.pull_timer = 0.0
+            self.restart_timer = 0.0
 
-        # After pull completes, show result then restart
+        # Always restart after showing status briefly
         if self.pull_done:
-            self.pull_timer += dt
-            if self.pull_ok and self.pull_timer >= 1.5:
-                # Re-exec the current process to restart with new code
+            self.restart_timer += dt
+            if self.restart_timer >= 1.5:
                 os.execv(sys.executable, [sys.executable] + sys.argv)
-            elif not self.pull_ok and self.pull_timer >= 3.0:
-                # Pull failed — go back to menu
-                self.wants_exit = True
 
     def draw(self):
         self.display.clear(Colors.BLACK)
 
         if self.confirmed:
             if not self.pull_done:
-                self.display.draw_text_small(2, 20, "PULLING...", Colors.CYAN)
+                self.display.draw_text_small(2, 24, "PULLING...", Colors.CYAN)
                 dots = int(self.time * 3) % 4
-                self.display.draw_text_small(2, 34, "." * dots, Colors.GRAY)
-            elif self.pull_ok:
-                self.display.draw_text_small(2, 14, self.pull_msg, Colors.GREEN)
-                self.display.draw_text_small(2, 28, "RESTARTING", Colors.CYAN)
-                dots = int(self.pull_timer * 3) % 4
-                self.display.draw_text_small(2, 42, "." * dots, Colors.GRAY)
+                self.display.draw_text_small(2, 38, "." * dots, Colors.GRAY)
             else:
-                self.display.draw_text_small(2, 14, self.pull_msg, Colors.RED)
-                self.display.draw_text_small(2, 28, "NO CHANGES", Colors.GRAY)
-                self.display.draw_text_small(2, 42, "MADE", Colors.GRAY)
+                msg_color = Colors.GREEN if self.pull_msg == "PULLED" else Colors.YELLOW
+                self.display.draw_text_small(2, 14, self.pull_msg, msg_color)
+                self.display.draw_text_small(2, 28, "RESTARTING", Colors.CYAN)
+                dots = int(self.restart_timer * 3) % 4
+                self.display.draw_text_small(2, 42, "." * dots, Colors.GRAY)
             return
 
         # Title
@@ -128,7 +114,7 @@ class Refresh(Visual):
         self.display.draw_line(2, 9, 61, 9, Colors.GRAY)
 
         # Description
-        self.display.draw_text_small(2, 14, "PULL CODE +", Colors.WHITE)
+        self.display.draw_text_small(2, 14, "PULL + ", Colors.WHITE)
         self.display.draw_text_small(2, 22, "RESTART?", Colors.WHITE)
 
         # YES / NO options
