@@ -15,7 +15,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class DnD(Game):
-    name = "D&D"
+    name = "DND"
     description = "Dungeon Crawler!"
     category = "retro"
 
