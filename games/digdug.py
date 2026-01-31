@@ -54,9 +54,12 @@ class DigDug(Game):
             for y in range(8):
                 self.tunnels[y][x] = True
 
-        # Create initial player tunnel
+        # Create initial player tunnel (3px wide to match player)
         for y in range(8, 16):
-            self.tunnels[y][self.player_x] = True
+            for tx in range(-1, 2):
+                px = self.player_x + tx
+                if 0 <= px < GRID_SIZE:
+                    self.tunnels[y][px] = True
 
         # Enemies
         self.enemies = []
@@ -160,8 +163,11 @@ class DigDug(Game):
             new_y = self.player_y + dy
 
             if 0 <= new_x < GRID_SIZE and 8 <= new_y < GRID_SIZE:
-                # Dig tunnel
-                self.tunnels[new_y][new_x] = True
+                # Dig tunnel matching player size (3x3 cross)
+                for tx, ty in [(0,0),(-1,0),(1,0),(0,-1),(0,1)]:
+                    px, py = new_x + tx, new_y + ty
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.tunnels[py][px] = True
                 self.player_x = new_x
                 self.player_y = new_y
 
@@ -267,8 +273,12 @@ class DigDug(Game):
                     enemy['ghost_timer'] = 0
             else:
                 if enemy['ghost_timer'] > 3.0:
-                    enemy['ghost_mode'] = False
-                    enemy['ghost_timer'] = 0
+                    # Only exit ghost mode if currently in a tunnel,
+                    # otherwise stay ghost until we reach one
+                    ex, ey = enemy['x'], enemy['y']
+                    if 0 <= ex < GRID_SIZE and 0 <= ey < GRID_SIZE and self.tunnels[ey][ex]:
+                        enemy['ghost_mode'] = False
+                        enemy['ghost_timer'] = 0
 
             # Fygar fire breath logic
             if enemy['type'] == 'fygar':
@@ -451,7 +461,10 @@ class DigDug(Game):
             for y in range(8):
                 self.tunnels[y][x] = True
         for y in range(8, 16):
-            self.tunnels[y][self.player_x] = True
+            for tx in range(-1, 2):
+                px = self.player_x + tx
+                if 0 <= px < GRID_SIZE:
+                    self.tunnels[y][px] = True
 
         self.spawn_enemies()
         self.spawn_rocks()

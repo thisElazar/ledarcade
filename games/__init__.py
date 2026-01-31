@@ -14,6 +14,7 @@ from .flappy import Flappy
 from .jezzball import JezzBall
 from .frogger import Frogger
 from .pacman import PacMan
+from .mspacman import MsPacMan
 from .chess import Chess
 from .trashblaster import TrashBlaster
 from .spacecruise import SpaceCruise
@@ -40,6 +41,10 @@ from .qbert import QBert
 from .bomberman import Bomberman
 from .arkanoid import Arkanoid
 from .skifree import SkiFree
+from .pool import Pool
+from .burgertime import BurgerTime
+from .dnd import DnD
+from .darts import Darts
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -56,6 +61,7 @@ ALL_GAMES = [
     JezzBall,
     Frogger,
     PacMan,
+    MsPacMan,
     Chess,
     TrashBlaster,
     SpaceCruise,
@@ -82,6 +88,10 @@ ALL_GAMES = [
     Bomberman,
     Arkanoid,
     SkiFree,
+    Pool,
+    BurgerTime,
+    DnD,
+    Darts,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -106,6 +116,7 @@ __all__ = [
     'JezzBall',
     'Frogger',
     'PacMan',
+    'MsPacMan',
     'Chess',
     'TrashBlaster',
     'SpaceCruise',
@@ -132,6 +143,10 @@ __all__ = [
     'Bomberman',
     'Arkanoid',
     'SkiFree',
+    'Pool',
+    'BurgerTime',
+    'DnD',
+    'Darts',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',

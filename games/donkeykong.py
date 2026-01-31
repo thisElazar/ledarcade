@@ -32,12 +32,15 @@ class DonkeyKong(Game):
     OIL_COLOR = (50, 50, 200)          # Blue flame
 
     # Physics constants
-    GRAVITY = 200.0
-    JUMP_VELOCITY = -58.0
+    GRAVITY = 150.0
     MAX_FALL_SPEED = 120.0
     MOVE_SPEED = 35.0
     CLIMB_SPEED = 25.0
     BARREL_SPEED = 30.0
+
+    # Explicit jump arc (parabolic, not physics-based)
+    JUMP_DURATION = 0.5   # Total airtime in seconds
+    JUMP_PEAK = 5         # Max height in pixels at apex
 
     # Player size
     PLAYER_WIDTH = 3
@@ -62,6 +65,9 @@ class DonkeyKong(Game):
         self.velocity_y = 0.0
         self.on_ground = True
         self.on_ladder = False
+        self.jumping = False
+        self.jump_timer = 0.0
+        self.jump_start_y = 0.0
         self.facing = 1  # 1=right, -1=left
         self.has_hammer = False
         self.hammer_timer = 0.0
@@ -118,51 +124,56 @@ class DonkeyKong(Game):
         # Bottom platform (flat, where Mario starts)
         self.girders.append({'x1': 0, 'x2': 64, 'y1': 60, 'y2': 60})
 
-        # Row 1 - slopes down-right
-        self.girders.append({'x1': 8, 'x2': 60, 'y1': 51, 'y2': 54})
+        # Girder design: high side extends to wall, low side ends short.
+        # Barrels roll downhill off the short end and land on the next
+        # platform whose high side reaches the wall on that same side.
 
-        # Row 2 - slopes down-left
-        self.girders.append({'x1': 4, 'x2': 56, 'y1': 44, 'y2': 41})
+        # Row 1 - slopes down-right (high=left to wall, low=right short)
+        self.girders.append({'x1': 0, 'x2': 52, 'y1': 51, 'y2': 54})
 
-        # Row 3 - slopes down-right
-        self.girders.append({'x1': 8, 'x2': 60, 'y1': 33, 'y2': 36})
+        # Row 2 - slopes down-left (high=right to wall, low=left short)
+        self.girders.append({'x1': 12, 'x2': 64, 'y1': 44, 'y2': 41})
 
-        # Row 4 - slopes down-left
-        self.girders.append({'x1': 4, 'x2': 56, 'y1': 26, 'y2': 23})
+        # Row 3 - slopes down-right (high=left to wall, low=right short)
+        self.girders.append({'x1': 0, 'x2': 52, 'y1': 33, 'y2': 36})
 
-        # Row 5 - slopes down-right (shorter, near DK)
-        self.girders.append({'x1': 8, 'x2': 52, 'y1': 15, 'y2': 18})
+        # Row 4 - slopes down-left (high=right to wall, low=left short)
+        self.girders.append({'x1': 12, 'x2': 64, 'y1': 26, 'y2': 23})
+
+        # Row 5 - slopes down-right (high=left to wall, low=right short)
+        self.girders.append({'x1': 0, 'x2': 52, 'y1': 15, 'y2': 18})
 
         # Top platform (DK and Pauline)
         self.girders.append({'x1': 12, 'x2': 40, 'y1': 8, 'y2': 8})
 
-        # Ladders connecting platforms
+        # Ladders - main ladders near the low (drop-off) end of each
+        # platform, broken ladders mid-platform for alternate routes
         # Bottom to Row 1
-        self.ladders.append({'x': 55, 'y1': 51, 'y2': 60, 'broken': False})
-        self.ladders.append({'x': 18, 'y1': 54, 'y2': 60, 'broken': True})
+        self.ladders.append({'x': 50, 'y1': 54, 'y2': 60, 'broken': False})
+        self.ladders.append({'x': 20, 'y1': 52, 'y2': 60, 'broken': True})
 
         # Row 1 to Row 2
-        self.ladders.append({'x': 12, 'y1': 41, 'y2': 52, 'broken': False})
-        self.ladders.append({'x': 45, 'y1': 43, 'y2': 53, 'broken': True})
+        self.ladders.append({'x': 14, 'y1': 44, 'y2': 51, 'broken': False})
+        self.ladders.append({'x': 38, 'y1': 43, 'y2': 53, 'broken': True})
 
         # Row 2 to Row 3
-        self.ladders.append({'x': 50, 'y1': 33, 'y2': 42, 'broken': False})
-        self.ladders.append({'x': 25, 'y1': 35, 'y2': 42, 'broken': True})
+        self.ladders.append({'x': 50, 'y1': 36, 'y2': 42, 'broken': False})
+        self.ladders.append({'x': 28, 'y1': 35, 'y2': 43, 'broken': True})
 
         # Row 3 to Row 4
-        self.ladders.append({'x': 10, 'y1': 23, 'y2': 34, 'broken': False})
-        self.ladders.append({'x': 40, 'y1': 25, 'y2': 35, 'broken': True})
+        self.ladders.append({'x': 14, 'y1': 26, 'y2': 34, 'broken': False})
+        self.ladders.append({'x': 38, 'y1': 25, 'y2': 35, 'broken': True})
 
         # Row 4 to Row 5
-        self.ladders.append({'x': 48, 'y1': 15, 'y2': 24, 'broken': False})
-        self.ladders.append({'x': 20, 'y1': 17, 'y2': 24, 'broken': True})
+        self.ladders.append({'x': 50, 'y1': 18, 'y2': 24, 'broken': False})
+        self.ladders.append({'x': 28, 'y1': 16, 'y2': 25, 'broken': True})
 
         # Row 5 to Top
         self.ladders.append({'x': 16, 'y1': 8, 'y2': 16, 'broken': False})
 
         # Hammer powerups
-        self.hammers.append({'x': 8, 'y': 47, 'active': True})
-        self.hammers.append({'x': 52, 'y': 29, 'active': True})
+        self.hammers.append({'x': 6, 'y': 48, 'active': True})
+        self.hammers.append({'x': 46, 'y': 30, 'active': True})
 
     def get_girder_y_at_x(self, girder, x):
         """Get the Y position of a girder at a given X coordinate."""
@@ -224,8 +235,8 @@ class DonkeyKong(Game):
         girder, surface_y = self.get_platform_at(self.player_x, self.player_y + self.PLAYER_HEIGHT)
         ladder = self.get_ladder_at(self.player_x, self.player_y + self.PLAYER_HEIGHT // 2)
 
-        # Determine if on ground (only when not actively climbing)
-        if not self.on_ladder:
+        # Determine if on ground (skip during explicit jump arc)
+        if not self.on_ladder and not self.jumping:
             if girder and abs(self.player_y + self.PLAYER_HEIGHT - surface_y) < 3:
                 self.on_ground = True
                 self.velocity_y = 0
@@ -255,7 +266,7 @@ class DonkeyKong(Game):
 
         else:
             # Not on ladder - normal movement
-            # Horizontal movement
+            # Horizontal movement (allowed during jump too)
             if input_state.left:
                 self.player_x -= self.MOVE_SPEED * dt
                 self.facing = -1
@@ -273,13 +284,15 @@ class DonkeyKong(Game):
                 self.walk_timer = 0
                 self.walk_frame = (self.walk_frame + 1) % 2
 
-            # Jumping
-            if (input_state.action_l or input_state.action_r) and self.on_ground:
-                self.velocity_y = self.JUMP_VELOCITY
+            # Jumping — explicit arc, not physics-based
+            if (input_state.action_l or input_state.action_r) and self.on_ground and not self.jumping:
+                self.jumping = True
+                self.jump_timer = 0.0
+                self.jump_start_y = self.player_y
                 self.on_ground = False
 
-            # Grab ladder
-            if (input_state.up or input_state.down) and ladder:
+            # Grab ladder (not while jumping)
+            if not self.jumping and (input_state.up or input_state.down) and ladder:
                 if input_state.up and self.can_climb_ladder(ladder, going_up=True):
                     self.on_ladder = True
                     self.player_x = ladder['x']  # Snap to ladder
@@ -287,8 +300,27 @@ class DonkeyKong(Game):
                     self.on_ladder = True
                     self.player_x = ladder['x']
 
-            # Apply gravity when not on ground and not on ladder
-            if not self.on_ground:
+            # Jump arc or gravity
+            if self.jumping:
+                self.jump_timer += dt
+                if self.jump_timer >= self.JUMP_DURATION:
+                    # Jump finished — land on nearest platform
+                    self.jumping = False
+                    self.player_y = self.jump_start_y
+                    g, sy = self.get_platform_at(self.player_x, self.player_y + self.PLAYER_HEIGHT)
+                    if g and abs(self.player_y + self.PLAYER_HEIGHT - sy) < 5:
+                        self.on_ground = True
+                        self.player_y = sy - self.PLAYER_HEIGHT
+                    else:
+                        self.on_ground = False
+                        self.velocity_y = 0
+                else:
+                    # Parabolic arc: 0 at start, JUMP_PEAK at midpoint, 0 at end
+                    p = self.jump_timer / self.JUMP_DURATION
+                    offset = self.JUMP_PEAK * 4 * p * (1 - p)
+                    self.player_y = self.jump_start_y - offset
+            elif not self.on_ground:
+                # Gravity only for falling off edges (not jumping)
                 self.velocity_y += self.GRAVITY * dt
                 self.velocity_y = min(self.velocity_y, self.MAX_FALL_SPEED)
                 self.player_y += self.velocity_y * dt
@@ -364,17 +396,19 @@ class DonkeyKong(Game):
             if barrel.get('falling', False):
                 # Barrel is falling between girders
                 barrel['y'] += self.BARREL_SPEED * dt * 3
-                # Check if landed on a girder
-                girder = self.find_girder_at(barrel['x'], barrel['y'] + self.BARREL_SIZE)
-                if girder:
-                    surface_y = self.get_girder_y_at_x(girder, barrel['x'])
-                    barrel['y'] = surface_y - self.BARREL_SIZE
-                    barrel['falling'] = False
-                    # Set direction based on girder slope
-                    if girder['y2'] > girder['y1']:
-                        barrel['velocity_x'] = 1  # Roll right (downhill)
-                    else:
-                        barrel['velocity_x'] = -1  # Roll left (downhill)
+                # Only land on girders BELOW where we started falling
+                fall_origin = barrel.get('fall_origin_y', 0)
+                target = self.find_girder_below(barrel['x'], fall_origin + self.BARREL_SIZE)
+                if target:
+                    surface_y = self.get_girder_y_at_x(target, barrel['x'])
+                    if barrel['y'] + self.BARREL_SIZE >= surface_y - 2:
+                        barrel['y'] = surface_y - self.BARREL_SIZE
+                        barrel['falling'] = False
+                        # Set direction based on girder slope
+                        if target['y2'] > target['y1']:
+                            barrel['velocity_x'] = 1  # Roll right (downhill)
+                        else:
+                            barrel['velocity_x'] = -1  # Roll left (downhill)
 
             elif barrel['on_ladder']:
                 # Barrel is rolling down a ladder
@@ -383,13 +417,15 @@ class DonkeyKong(Game):
                 ladder = self.get_ladder_at(barrel['x'], barrel['y'])
                 if ladder is None or barrel['y'] >= ladder['y2'] - 2:
                     barrel['on_ladder'] = False
-                    # Find next girder
-                    girder = self.find_girder_at(barrel['x'], barrel['y'] + 4)
-                    if girder:
-                        surface_y = self.get_girder_y_at_x(girder, barrel['x'])
+                    # Find next girder below ladder bottom
+                    target = self.find_girder_below(barrel['x'], barrel['y'])
+                    if target is None:
+                        target = self.find_girder_at(barrel['x'], barrel['y'] + 4)
+                    if target:
+                        surface_y = self.get_girder_y_at_x(target, barrel['x'])
                         barrel['y'] = surface_y - self.BARREL_SIZE
                         # Set direction based on girder slope
-                        if girder['y2'] > girder['y1']:
+                        if target['y2'] > target['y1']:
                             barrel['velocity_x'] = 1
                         else:
                             barrel['velocity_x'] = -1
@@ -416,8 +452,10 @@ class DonkeyKong(Game):
                             barrel['on_ladder'] = True
                             barrel['x'] = ladder['x']
                         else:
-                            # Drop to next girder
+                            # Drop to next girder — save origin so we
+                            # don't re-land on the same platform
                             barrel['falling'] = True
+                            barrel['fall_origin_y'] = barrel['y']
 
                     # Random chance to take a ladder mid-girder
                     if not barrel.get('falling', False):
@@ -428,6 +466,7 @@ class DonkeyKong(Game):
                 else:
                     # No girder found, start falling
                     barrel['falling'] = True
+                    barrel['fall_origin_y'] = barrel['y']
 
             # Remove barrels that fall off screen
             if barrel['y'] > 62:
@@ -510,6 +549,7 @@ class DonkeyKong(Game):
             self.velocity_y = 0.0
             self.on_ground = True
             self.on_ladder = False
+            self.jumping = False
             self.has_hammer = False
             self.barrels.clear()
             self.barrel_spawn_timer = 0.0
@@ -526,6 +566,7 @@ class DonkeyKong(Game):
         self.velocity_y = 0.0
         self.on_ground = True
         self.on_ladder = False
+        self.jumping = False
         self.has_hammer = False
         self.barrels.clear()
         self.barrel_spawn_timer = 0.0

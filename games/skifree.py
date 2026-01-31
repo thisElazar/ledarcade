@@ -71,6 +71,9 @@ class SkiFree(Game):
     OBSTACLE_INTERVAL_MIN = 12.0    # Minimum spacing (dense)
     MIN_GAP = 10                    # Minimum clear gap in pixels
 
+    # Chunk-based generation
+    CHUNK_SIZE = 64
+
     # Colors
     SNOW_COLOR = (240, 240, 255)
     TREE_GREEN = (30, 160, 40)
@@ -98,9 +101,9 @@ class SkiFree(Game):
         self.state = GameState.PLAYING
         self.score = 0
 
-        # Player state
-        self.player_x = 32.0
-        self.player_y = float(self.PLAYER_Y_DEFAULT)
+        # Player state — world-space X, screen-space Y
+        self.player_x = 32.0        # World X (unbounded)
+        self.player_y = float(self.PLAYER_Y_DEFAULT)  # Screen Y
         self.direction = 0
         self.braking = False
         self.speed = self.BASE_SPEED
@@ -120,100 +123,133 @@ class SkiFree(Game):
 
         # Scrolling / distance
         self.scroll_speed = self.BASE_SPEED
-        self.distance = 0.0         # Total pixels scrolled
+        self.distance = 0.0         # Total vertical world distance
         self.distance_meters = 0.0  # Displayed distance
 
-        # Yeti
+        # Yeti — world-space coordinates
         self.yeti_active = False
-        self.yeti_x = 0.0
-        self.yeti_y = 0.0
+        self.yeti_x = 0.0          # World X
+        self.yeti_y = 0.0          # World Y
         self.yeti_eating = False
         self.yeti_eat_timer = 0.0
         self.yeti_speed = self.YETI_SPEED_MAX
         self.yeti_speed_timer = 0.0
 
-        # Obstacles: {type, x, y, w, h}
+        # Obstacles: {type, x, y, w, h} — world-space coords (fixed after creation)
         self.obstacles = []
-        # World-space frontier: how far ahead (in world distance) we've generated
-        self.gen_world_distance = 0.0
+        # Chunk-based generation
+        self.generated_chunks = set()
 
-        # Pre-generate initial obstacles covering the screen + buffer
-        self._generate_ahead()
+        # Generate initial chunks
+        self._generate_chunks()
 
-    def _get_obstacle_interval(self):
+    def _get_obstacle_interval(self, distance_meters):
         """Get spacing between obstacle rows based on distance."""
-        progress = min(1.0, self.distance_meters / 3000.0)
+        progress = min(1.0, distance_meters / 3000.0)
         return self.OBSTACLE_INTERVAL_START - progress * (self.OBSTACLE_INTERVAL_START - self.OBSTACLE_INTERVAL_MIN)
 
-    def _generate_ahead(self):
-        """Generate obstacles ahead of the player in world-space."""
-        # We need obstacles covering from current scroll position to well below the screen.
-        # "screen_bottom" in world distance = self.distance + GRID_SIZE + buffer
-        needed_distance = self.distance + GRID_SIZE + 60
+    def _generate_chunks(self):
+        """Generate chunks visible to camera plus a buffer."""
+        cam_x = self.player_x - 32
+        cam_y = self.distance
 
-        while self.gen_world_distance < needed_distance:
-            # Convert world distance to screen y: objects at gen_world_distance
-            # appear at screen_y = (gen_world_distance - self.distance)
-            screen_y = self.gen_world_distance - self.distance
-            self._generate_obstacle_row(screen_y)
-            self.gen_world_distance += self._get_obstacle_interval()
+        # Visible chunk range with 1-chunk buffer on each side
+        cx_min = int(math.floor(cam_x / self.CHUNK_SIZE)) - 1
+        cx_max = int(math.floor((cam_x + GRID_SIZE) / self.CHUNK_SIZE)) + 1
+        cy_min = int(math.floor(cam_y / self.CHUNK_SIZE)) - 1
+        cy_max = int(math.floor((cam_y + GRID_SIZE) / self.CHUNK_SIZE)) + 1
 
-    def _generate_obstacle_row(self, y: float):
-        """Generate a row of obstacles at the given y position."""
-        # Decide how many obstacles in this row (1-3)
-        density = min(0.8, 0.3 + self.distance_meters / 4000.0)
+        for cx in range(cx_min, cx_max + 1):
+            for cy in range(cy_min, cy_max + 1):
+                if (cx, cy) not in self.generated_chunks:
+                    self._generate_chunk(cx, cy)
+                    self.generated_chunks.add((cx, cy))
+
+    def _generate_chunk(self, cx, cy):
+        """Generate obstacles for a single chunk using deterministic seeding."""
+        # Skip chunks above world start
+        if cy < 0:
+            return
+
+        # Deterministic RNG per chunk
+        seed = (cx * 73856093) ^ (cy * 19349663)
+        rng = random.Random(seed)
+
+        x_min = cx * self.CHUNK_SIZE
+        y_min = cy * self.CHUNK_SIZE
+
+        # Distance (meters) at chunk center for difficulty scaling
+        chunk_center_y = y_min + self.CHUNK_SIZE / 2
+        distance_meters = chunk_center_y / 3.0
+
+        interval = self._get_obstacle_interval(distance_meters)
+
+        # Generate obstacle rows within chunk
+        y = y_min + rng.uniform(0, interval)
+        while y < y_min + self.CHUNK_SIZE:
+            self._generate_obstacle_row(rng, x_min, y, distance_meters)
+            y += interval
+
+    def _generate_obstacle_row(self, rng, x_min, y, distance_meters):
+        """Generate a row of obstacles at the given world y position."""
+        density = min(0.8, 0.3 + distance_meters / 4000.0)
         num_obstacles = 1
-        if random.random() < density:
+        if rng.random() < density:
             num_obstacles = 2
-        if random.random() < density * 0.4:
+        if rng.random() < density * 0.4:
             num_obstacles = 3
 
-        # Place obstacles with guaranteed gap
         placed = []
-        attempts = 0
-
         for _ in range(num_obstacles):
-            for _ in range(10):  # Max attempts per obstacle
-                attempts += 1
-                obs = self._random_obstacle(y)
-
-                # Check gap with existing obstacles in this row
+            for _ in range(10):
+                obs = self._random_obstacle(rng, x_min, y, distance_meters)
                 overlaps = False
                 for p in placed:
                     if abs(obs['x'] - p['x']) < self.MIN_GAP:
                         overlaps = True
                         break
-
                 if not overlaps:
                     placed.append(obs)
                     self.obstacles.append(obs)
                     break
 
-    def _random_obstacle(self, y: float) -> dict:
-        """Create a random obstacle at given y."""
-        x = random.randint(2, GRID_SIZE - 6)
-        roll = random.random()
+    def _random_obstacle(self, rng, x_min, y, distance_meters):
+        """Create a random obstacle at given world y within the chunk's x range."""
+        x = x_min + rng.randint(2, self.CHUNK_SIZE - 6)
+        roll = rng.random()
 
-        # After Yeti spawns, more ramps to help escape
+        # More ramps after yeti distance for escape opportunities (deterministic)
         ramp_chance = 0.08
-        if self.yeti_active:
+        if distance_meters >= self.YETI_SPAWN_DISTANCE:
             ramp_chance = 0.15
 
         if roll < 0.45:
-            # Small tree
             return {'type': 'small_tree', 'x': x, 'y': y, 'w': 3, 'h': 4}
         elif roll < 0.75:
-            # Large tree
             return {'type': 'large_tree', 'x': x, 'y': y, 'w': 5, 'h': 6}
         elif roll < 0.88:
-            # Rock
             return {'type': 'rock', 'x': x, 'y': y, 'w': 3, 'h': 2}
         elif roll < 1.0 - ramp_chance:
-            # Mogul
             return {'type': 'mogul', 'x': x, 'y': y, 'w': 3, 'h': 2}
         else:
-            # Jump ramp
             return {'type': 'ramp', 'x': x, 'y': y, 'w': 4, 'h': 2}
+
+    def _cull_far(self):
+        """Remove obstacles far from the camera."""
+        cam_x = self.player_x - 32
+        cam_y = self.distance
+        cull_dist = self.CHUNK_SIZE * 2.5
+
+        self.obstacles = [o for o in self.obstacles
+                          if abs(o['y'] - cam_y) < cull_dist
+                          and abs(o['x'] - cam_x) < cull_dist]
+
+        # Prune old vertical chunk records (but keep horizontal for determinism)
+        current_cy = int(math.floor(cam_y / self.CHUNK_SIZE))
+        self.generated_chunks = {
+            (cx, cy) for (cx, cy) in self.generated_chunks
+            if cy >= current_cy - 2
+        }
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -226,22 +262,19 @@ class SkiFree(Game):
                 self.state = GameState.GAME_OVER
             return
 
-        # Crash recovery — slope keeps scrolling, player tumbles past the obstacle
+        # Crash recovery — slope keeps scrolling
         if self.crashed:
             self.crash_timer -= dt
             if self.crash_timer <= 0:
                 self.crashed = False
                 self.invuln_timer = self.INVULN_DURATION
 
-            # Keep scrolling obstacles during crash (at reduced speed)
             scroll_amount = self.speed * dt
-            for obs in self.obstacles:
-                obs['y'] -= scroll_amount
             self.distance += scroll_amount
             self.distance_meters = self.distance / 3.0
             self.score = int(self.distance_meters)
-            self._generate_ahead()
-            self.obstacles = [o for o in self.obstacles if o['y'] > -10]
+            self._generate_chunks()
+            self._cull_far()
 
             # Yeti still moves during crash
             if self.yeti_active:
@@ -255,7 +288,6 @@ class SkiFree(Game):
             self.invuln_timer -= dt
 
         # --- Input ---
-        # Up/Down move player on screen (up = speed up, down = slow down)
         if input_state.up:
             self.player_y -= 40.0 * dt
         elif input_state.down:
@@ -283,35 +315,27 @@ class SkiFree(Game):
                 self.boosting = False
         else:
             self.boosting = False
-            # Recharge boost fuel when not using it
             self.boost_fuel = min(self.BOOST_FUEL_MAX, self.boost_fuel + self.BOOST_RECHARGE * dt)
 
         # --- Speed calculation ---
         if self.boosting:
             target_speed = self.BOOST_SPEED
         else:
-            # Base speed increases with distance
             progress_speed = min(self.MAX_SPEED, self.BASE_SPEED + self.distance_meters * 0.008)
             target_speed = progress_speed * self.DIRECTION_SPEED[self.direction]
 
-        # Smooth speed transitions
         self.speed += (target_speed - self.speed) * min(1.0, dt * 5.0)
 
-        # --- Horizontal movement ---
+        # --- Horizontal movement (world-space, unbounded) ---
         lateral = self.DIRECTION_LATERAL[self.direction] * self.LATERAL_SPEED * dt
         if self.boosting:
-            lateral *= 1.3  # Slightly faster lateral during boost
+            lateral *= 1.3
         self.player_x += lateral
-        self.player_x = max(2, min(GRID_SIZE - 3, self.player_x))
 
-        # --- Scroll obstacles ---
+        # --- Vertical scrolling (distance) ---
         scroll_amount = self.speed * dt
-        for obs in self.obstacles:
-            obs['y'] -= scroll_amount
-
-        # --- Distance tracking ---
         self.distance += scroll_amount
-        self.distance_meters = self.distance / 3.0  # Scale factor
+        self.distance_meters = self.distance / 3.0
         self.score = int(self.distance_meters)
 
         # --- Jump timer ---
@@ -322,17 +346,21 @@ class SkiFree(Game):
 
         # --- Collision detection ---
         if not self.airborne and self.invuln_timer <= 0:
-            px = int(self.player_x)
-            py = int(self.player_y)
-            player_box = (px - 1, py - 1, 3, 4)
+            cam_x = self.player_x - 32
+            # Player hitbox at screen center
+            player_box = (31, int(self.player_y) - 1, 3, 4)
 
             for obs in self.obstacles:
-                ox = int(obs['x'])
-                oy = int(obs['y'])
+                ox = int(obs['x'] - cam_x)
+                oy = int(obs['y'] - self.distance)
+
+                # Quick screen reject
+                if ox < -8 or ox > 72 or oy < -8 or oy > 72:
+                    continue
+
                 ow = obs['w']
                 oh = obs['h']
 
-                # Simple AABB overlap
                 if (player_box[0] < ox + ow and player_box[0] + player_box[2] > ox and
                     player_box[1] < oy + oh and player_box[1] + player_box[3] > oy):
 
@@ -348,19 +376,17 @@ class SkiFree(Game):
                     elif obs['type'] == 'ramp':
                         self.airborne = True
                         self.air_timer = self.JUMP_DURATION
-                        self.speed *= 1.2  # Speed boost from ramp
+                        self.speed *= 1.2
 
-        # --- Generate new obstacles ---
-        self._generate_ahead()
-
-        # --- Cull off-screen obstacles ---
-        self.obstacles = [o for o in self.obstacles if o['y'] > -10]
+        # --- Generate new chunks & cull ---
+        self._generate_chunks()
+        self._cull_far()
 
         # --- Yeti ---
         if not self.yeti_active and self.distance_meters >= self.YETI_SPAWN_DISTANCE:
             self.yeti_active = True
             self.yeti_x = self.player_x
-            self.yeti_y = -10  # Spawn above screen
+            self.yeti_y = self.distance - 10  # Above screen in world Y
 
         if self.yeti_active:
             self._update_yeti(dt)
@@ -368,14 +394,16 @@ class SkiFree(Game):
 
     def _update_yeti(self, dt: float):
         """Move Yeti toward player with variable speed."""
-        # Randomly shift speed every YETI_SPEED_CHANGE seconds
         self.yeti_speed_timer += dt
         if self.yeti_speed_timer >= self.YETI_SPEED_CHANGE:
             self.yeti_speed_timer = 0.0
             self.yeti_speed = random.uniform(self.YETI_SPEED_MIN, self.YETI_SPEED_MAX)
 
+        # Player world position
+        player_world_y = self.distance + self.player_y
+
         dx = self.player_x - self.yeti_x
-        dy = int(self.player_y) - self.yeti_y
+        dy = player_world_y - self.yeti_y
         dist = math.sqrt(dx * dx + dy * dy)
 
         if dist > 0:
@@ -383,29 +411,34 @@ class SkiFree(Game):
             self.yeti_x += (dx / dist) * yeti_move
             self.yeti_y += (dy / dist) * yeti_move
 
-        # Yeti also gets pushed up by scrolling (same as obstacles)
-        self.yeti_y -= self.speed * dt * 0.3  # Partial scroll — Yeti resists being scrolled away
+        # Downhill drift (replaces old scroll resistance)
+        self.yeti_y += self.speed * dt * 0.7
 
     def _check_yeti_catch(self) -> bool:
-        """Check if Yeti caught the player."""
+        """Check if Yeti caught the player (world-space)."""
+        player_world_y = self.distance + self.player_y
+
         dx = self.player_x - self.yeti_x
-        dy = int(self.player_y) - self.yeti_y
+        dy = player_world_y - self.yeti_y
         dist = math.sqrt(dx * dx + dy * dy)
 
         if dist < self.YETI_CATCH_DIST:
             self.yeti_eating = True
             self.yeti_eat_timer = 0.0
             self.yeti_x = self.player_x
-            self.yeti_y = int(self.player_y)
+            self.yeti_y = player_world_y
             return True
         return False
 
     def draw(self):
+        cam_x = self.player_x - 32
+        cam_y = self.distance
+
         # Snow background
         self.display.clear(self.SNOW_COLOR)
 
-        # Draw some snow texture (subtle dots)
-        random.seed(int(self.distance / 20) * 7)
+        # Draw some snow texture (subtle dots) — seeded from camera position
+        random.seed(int(cam_x / 20) * 7 + int(cam_y / 20) * 13)
         for _ in range(20):
             sx = random.randint(0, 63)
             sy = random.randint(0, 63)
@@ -415,7 +448,7 @@ class SkiFree(Game):
         # Draw obstacles (sorted by y so closer ones draw on top)
         sorted_obs = sorted(self.obstacles, key=lambda o: o['y'])
         for obs in sorted_obs:
-            self._draw_obstacle(obs)
+            self._draw_obstacle(obs, cam_x, cam_y)
 
         # Draw player
         if not self.yeti_eating:
@@ -423,25 +456,20 @@ class SkiFree(Game):
 
         # Draw Yeti
         if self.yeti_active:
-            self._draw_yeti()
+            self._draw_yeti(cam_x, cam_y)
 
         # Draw HUD
         self._draw_hud()
 
-    def _draw_obstacle(self, obs: dict):
-        x = int(obs['x'])
-        y = int(obs['y'])
+    def _draw_obstacle(self, obs: dict, cam_x: float, cam_y: float):
+        x = int(obs['x'] - cam_x)
+        y = int(obs['y'] - cam_y)
 
         # Skip if off screen
-        if y < -8 or y > GRID_SIZE + 4:
+        if x < -8 or x > GRID_SIZE + 4 or y < -8 or y > GRID_SIZE + 4:
             return
 
         if obs['type'] == 'small_tree':
-            # Triangle tree: 3 wide, 3 tall canopy + 1 trunk
-            #   X
-            #  XXX
-            #   X
-            #   |
             if 0 <= y < GRID_SIZE:
                 self.display.set_pixel(x + 1, y, self.TREE_GREEN)
             if 0 <= y + 1 < GRID_SIZE:
@@ -454,19 +482,12 @@ class SkiFree(Game):
                 self.display.set_pixel(x + 1, y + 3, self.TREE_TRUNK)
 
         elif obs['type'] == 'large_tree':
-            # Larger tree: 5 wide
-            #    X
-            #   XXX
-            #  XXXXX
-            #   XXX
-            #    X
-            #    |
             rows = [
-                (2, 1),       # 1 pixel wide at top
-                (1, 3),       # 3 wide
-                (0, 5),       # 5 wide
-                (1, 3),       # 3 wide
-                (2, 1),       # 1 wide
+                (2, 1),
+                (1, 3),
+                (0, 5),
+                (1, 3),
+                (2, 1),
             ]
             for i, (offset, width) in enumerate(rows):
                 ry = y + i
@@ -476,12 +497,10 @@ class SkiFree(Game):
                         px = x + offset + dx
                         if 0 <= px < GRID_SIZE:
                             self.display.set_pixel(px, ry, color)
-            # Trunk
             if 0 <= y + 5 < GRID_SIZE and 0 <= x + 2 < GRID_SIZE:
                 self.display.set_pixel(x + 2, y + 5, self.TREE_TRUNK)
 
         elif obs['type'] == 'rock':
-            # Gray blob 3x2
             if 0 <= y < GRID_SIZE:
                 for dx in range(3):
                     if 0 <= x + dx < GRID_SIZE:
@@ -495,7 +514,6 @@ class SkiFree(Game):
                     self.display.set_pixel(x + 2, y + 1, self.ROCK_DARK)
 
         elif obs['type'] == 'mogul':
-            # Small white-gray bump
             if 0 <= y < GRID_SIZE:
                 for dx in range(3):
                     if 0 <= x + dx < GRID_SIZE:
@@ -505,7 +523,6 @@ class SkiFree(Game):
                     self.display.set_pixel(x + 1, y + 1, (200, 200, 215))
 
         elif obs['type'] == 'ramp':
-            # Rainbow stripe ramp
             if 0 <= y < GRID_SIZE:
                 for dx in range(4):
                     if 0 <= x + dx < GRID_SIZE:
@@ -517,11 +534,10 @@ class SkiFree(Game):
                         self.display.set_pixel(x + dx, y + 1, c)
 
     def _draw_player(self):
-        px = int(self.player_x)
+        px = 32  # Always screen center
         py = int(self.player_y)
 
         if self.crashed:
-            # Tumble sprite — sprawled out
             if 0 <= py < GRID_SIZE:
                 self.display.set_pixel(px, py, self.CRASH_COLOR)
             if 0 <= py + 1 < GRID_SIZE:
@@ -534,24 +550,16 @@ class SkiFree(Game):
 
         # Flicker during invulnerability
         if self.invuln_timer > 0 and int(self.invuln_timer * 10) % 2 == 0:
-            return  # Skip drawing every other frame for flicker effect
+            return
 
         if self.airborne:
-            # Airborne — spread eagle with shadow
-            # Shadow on ground
             if 0 <= py + 3 < GRID_SIZE:
                 self.display.set_pixel(px, py + 3, (180, 180, 195))
-            # Skier raised up
             jump_py = py - 3
         else:
             jump_py = py
 
         if self.direction == 0:
-            # Straight down
-            #  O
-            # /|\
-            #  |
-            # / \
             if 0 <= jump_py < GRID_SIZE:
                 self.display.set_pixel(px, jump_py, self.SKIER_HEAD)
             if 0 <= jump_py + 1 < GRID_SIZE:
@@ -567,11 +575,6 @@ class SkiFree(Game):
                         self.display.set_pixel(px + dx, jump_py + 3, self.SKIER_SKI)
 
         elif self.direction in (-1, -2):
-            # Leaning left
-            #  O
-            # /|
-            # /
-            # |
             if 0 <= jump_py < GRID_SIZE:
                 self.display.set_pixel(px, jump_py, self.SKIER_HEAD)
             if 0 <= jump_py + 1 < GRID_SIZE:
@@ -585,11 +588,6 @@ class SkiFree(Game):
                 self.display.set_pixel(px, jump_py + 3, self.SKIER_SKI)
 
         elif self.direction in (1, 2):
-            # Leaning right
-            # O
-            # |\
-            #   \
-            #   |
             if 0 <= jump_py < GRID_SIZE:
                 self.display.set_pixel(px, jump_py, self.SKIER_HEAD)
             if 0 <= jump_py + 1 < GRID_SIZE:
@@ -610,34 +608,35 @@ class SkiFree(Game):
                 if 0 <= ty < GRID_SIZE:
                     self.display.set_pixel(px, ty, trail_color)
 
-    def _draw_yeti(self):
-        yx = int(self.yeti_x)
-        yy = int(self.yeti_y)
-
+    def _draw_yeti(self, cam_x: float, cam_y: float):
         if self.yeti_eating:
-            # Eating animation — big yeti over player
-            px = int(self.player_x)
+            # Eating animation — big yeti over player (screen center)
+            px = 32
             py = int(self.player_y)
 
-            # Yeti body (larger during eat)
             for dy in range(-2, 4):
                 for dx in range(-2, 3):
                     ppx = px + dx
                     ppy = py + dy
                     if 0 <= ppx < GRID_SIZE and 0 <= ppy < GRID_SIZE:
                         self.display.set_pixel(ppx, ppy, self.YETI_BODY)
-            # Face
             if 0 <= py - 1 < GRID_SIZE:
                 if 0 <= px - 1 < GRID_SIZE:
                     self.display.set_pixel(px - 1, py - 1, self.YETI_FACE)
                 if 0 <= px + 1 < GRID_SIZE:
                     self.display.set_pixel(px + 1, py - 1, self.YETI_FACE)
-            # Mouth
             if 0 <= py < GRID_SIZE:
                 self.display.set_pixel(px, py, (200, 50, 50))
             return
 
-        # Normal Yeti — chasing
+        # Normal Yeti — chasing (world to screen transform)
+        yx = int(self.yeti_x - cam_x)
+        yy = int(self.yeti_y - cam_y)
+
+        # Skip if off screen
+        if yx < -8 or yx > GRID_SIZE + 8 or yy < -8 or yy > GRID_SIZE + 8:
+            return
+
         # Head (3 wide)
         if 0 <= yy < GRID_SIZE:
             for dx in range(-1, 2):
@@ -656,13 +655,12 @@ class SkiFree(Game):
                 for dx in range(-1, 2):
                     if 0 <= yx + dx < GRID_SIZE:
                         self.display.set_pixel(yx + dx, yy + dy, self.YETI_BODY)
-        # Arms (stick out from body row 2)
+        # Arms
         if 0 <= yy + 2 < GRID_SIZE:
             if 0 <= yx - 2 < GRID_SIZE:
                 self.display.set_pixel(yx - 2, yy + 2, self.YETI_ARMS)
             if 0 <= yx + 2 < GRID_SIZE:
                 self.display.set_pixel(yx + 2, yy + 2, self.YETI_ARMS)
-            # Hands one pixel down from arms
             if 0 <= yy + 3 < GRID_SIZE:
                 if 0 <= yx - 3 < GRID_SIZE:
                     self.display.set_pixel(yx - 3, yy + 3, self.YETI_ARMS)
@@ -677,27 +675,21 @@ class SkiFree(Game):
 
     def _draw_hud(self):
         """Draw distance and boost meter."""
-        # Dark bar at top for readability
         self.display.draw_rect(0, 0, GRID_SIZE, 7, (0, 0, 0))
 
-        # Distance
         dist_str = f"{int(self.distance_meters)}M"
         self.display.draw_text_small(1, 1, dist_str, Colors.WHITE)
 
-        # Yeti warning
         if self.yeti_active:
             self.display.draw_text_small(28, 1, "YETI", Colors.RED)
 
-        # Boost meter (right side, 10px wide bar)
         bar_x = 53
         bar_w = 10
         bar_h = 3
         bar_y = 2
 
-        # Background
         self.display.draw_rect(bar_x, bar_y, bar_w, bar_h, self.BOOST_EMPTY)
 
-        # Fuel level
         fuel_pct = self.boost_fuel / self.BOOST_FUEL_MAX
         fuel_w = int(bar_w * fuel_pct)
         if fuel_w > 0:

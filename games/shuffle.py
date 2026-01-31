@@ -29,12 +29,12 @@ class ArcadeMix(GamePlaylist):
     @classmethod
     def _init_games(cls):
         from games import (Snake, Breakout, Invaders, Tetris, Asteroids,
-                           Frogger, PacMan, NightDriver, Pong, Galaga,
-                           Centipede, DigDug, LodeRunner, DonkeyKong,
-                           QBert, Bomberman, LunarLander)
+                           Frogger, PacMan, MsPacMan, NightDriver, Pong,
+                           Galaga, Centipede, DigDug, LodeRunner,
+                           DonkeyKong, QBert, Bomberman, LunarLander)
         cls.games = [Snake, Breakout, Invaders, Tetris, Asteroids,
-                     Frogger, PacMan, NightDriver, Pong, Galaga,
-                     Centipede, DigDug, LodeRunner, DonkeyKong,
+                     Frogger, PacMan, MsPacMan, NightDriver, Pong,
+                     Galaga, Centipede, DigDug, LodeRunner, DonkeyKong,
                      QBert, Bomberman, LunarLander]
 
 
@@ -74,8 +74,8 @@ class Classics(GamePlaylist):
 
     @classmethod
     def _init_games(cls):
-        from games import PacMan, Snake, Breakout, Frogger, Pong
-        cls.games = [PacMan, Snake, Breakout, Frogger, Pong]
+        from games import PacMan, MsPacMan, Snake, Breakout, Frogger, Pong
+        cls.games = [PacMan, MsPacMan, Snake, Breakout, Frogger, Pong]
 
 
 # Initialize games lists for playlists with static lists

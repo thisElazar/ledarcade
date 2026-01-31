@@ -1,7 +1,8 @@
 """
-Pac-Man - Classic maze chase
-============================
-Navigate the maze, eat all dots. Avoid ghosts unless you eat a power pellet!
+Ms. Pac-Man - Maze chase with cycling mazes
+=============================================
+Navigate 4 distinct mazes, eat all dots. Ghosts are less predictable!
+Bouncing fruit enters from the tunnels for bonus points.
 
 Controls:
   Arrow Keys - Set direction (queued for next intersection)
@@ -13,34 +14,132 @@ import math
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
-class PacMan(Game):
-    name = "PAC-MAN"
+class MsPacMan(Game):
+    name = "MS. PAC-MAN"
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
 
-    # Simplified maze for 64x64 display (21x19 tiles at 3px each = 63x57)
+    # 4 cycling maze layouts (21x19 tiles at 3px each = 63x57)
     # 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house door
-    # Fully connected - every dot reachable
-    MAZE_TEMPLATE = [
-        "111111111111111111111",  # R0:  Top border
-        "122222222222222222221",  # R1:  Open corridor
-        "121112111212111211121",  # R2:  Upper blocks
-        "131112111212111211131",  # R3:  Power pellets at (1,3) & (19,3)
-        "122222222222222222221",  # R4:  Open corridor
-        "121121211111112121121",  # R5:  7-wide center block
-        "121121211111112121121",  # R6:  7-wide center block (2-tall)
-        "122222222222222222221",  # R7:  Open corridor (Blinky start)
-        "122212221141122212221",  # R8:  Ghost house top + door at (10,8)
-        "022212221000122212220",  # R9:  Tunnel + ghost interior
-        "122212221000122212221",  # R10: Ghost interior
-        "122212221111122212221",  # R11: Ghost house bottom wall
-        "122222222222222222221",  # R12: Open corridor
-        "121112111212111211121",  # R13: Lower blocks
-        "122222222222222222221",  # R14: Open corridor (Pac-Man spawn)
-        "131211212111212112131",  # R15: Power pellets at (1,15) & (19,15)
-        "121211212111212112121",  # R16: Bottom blocks (2-tall)
-        "122222222222222222221",  # R17: Open corridor
-        "111111111111111111111",  # R18: Bottom border
+    # Rows 7-12 are identical across all mazes (ghost house region)
+    # All corridors are paths (no open areas). Two tunnels per maze.
+    # Every row is a palindrome. No dead ends.
+    MAZES = [
+        {
+            # Maze 1 (Hot Pink): Tunnels at R3, R9
+            'template': [
+                "111111111111111111111",  # R0
+                "122212221222122212221",  # R1
+                "122212121212121212221",  # R2
+                "032212221222122212230",  # R3  tunnel + pellets
+                "121222122212221222121",  # R4
+                "122212221222122212221",  # R5
+                "121222122212221222121",  # R6
+                "122212221222122212221",  # R7
+                "122212221141122212221",  # R8
+                "022212221000122212220",  # R9  tunnel + ghost interior
+                "122212221000122212221",  # R10
+                "122212221111122212221",  # R11
+                "122212221222122212221",  # R12
+                "121222122212221222121",  # R13
+                "122212221222122212221",  # R14
+                "131222122212221222131",  # R15  pellets
+                "122212121212121212221",  # R16
+                "122212221222122212221",  # R17
+                "111111111111111111111",  # R18
+            ],
+            'wall_color': (255, 105, 180),  # Hot pink
+            'tunnel_rows': [3, 9],
+        },
+        {
+            # Maze 2 (Cyan): Tunnels at R9, R15
+            'template': [
+                "111111111111111111111",  # R0
+                "132112221222122211231",  # R1  pellets (F-type)
+                "122212221222122212221",  # R2
+                "121222122212221222121",  # R3
+                "122212221222122212221",  # R4
+                "122212121212121212221",  # R5
+                "122212221222122212221",  # R6
+                "122212221222122212221",  # R7
+                "122212221141122212221",  # R8
+                "022212221000122212220",  # R9  tunnel + ghost interior
+                "122212221000122212221",  # R10
+                "122212221111122212221",  # R11
+                "122212221222122212221",  # R12
+                "121222122212221222121",  # R13
+                "122212221222122212221",  # R14
+                "031222122212221222130",  # R15  tunnel + pellets
+                "122212221222122212221",  # R16
+                "122112221222122211221",  # R17  (F-type)
+                "111111111111111111111",  # R18
+            ],
+            'wall_color': (0, 255, 255),  # Cyan
+            'tunnel_rows': [9, 15],
+        },
+        {
+            # Maze 3 (Brown/Orange): Tunnels at R3, R9
+            'template': [
+                "111111111111111111111",  # R0
+                "132212221222122212231",  # R1  pellets
+                "121222122212221222121",  # R2
+                "022212221222122212220",  # R3  tunnel
+                "121222122212221222121",  # R4
+                "122212221222122212221",  # R5
+                "122212121212121212221",  # R6
+                "122212221222122212221",  # R7
+                "122212221141122212221",  # R8
+                "022212221000122212220",  # R9  tunnel + ghost interior
+                "122212221000122212221",  # R10
+                "122212221111122212221",  # R11
+                "122212221222122212221",  # R12
+                "122212121212121212221",  # R13
+                "122212221222122212221",  # R14
+                "131222122212221222131",  # R15  pellets
+                "122212221222122212221",  # R16
+                "122212221222122212221",  # R17
+                "111111111111111111111",  # R18
+            ],
+            'wall_color': (180, 100, 50),  # Brown/orange
+            'tunnel_rows': [3, 9],
+        },
+        {
+            # Maze 4 (Blue): Tunnels at R9, R15
+            'template': [
+                "111111111111111111111",  # R0
+                "122212221222122212221",  # R1
+                "122212121212121212221",  # R2
+                "132212221222122212231",  # R3  pellets
+                "121222122212221222121",  # R4
+                "122212221222122212221",  # R5
+                "122212121212121212221",  # R6
+                "122212221222122212221",  # R7
+                "122212221141122212221",  # R8
+                "022212221000122212220",  # R9  tunnel + ghost interior
+                "122212221000122212221",  # R10
+                "122212221111122212221",  # R11
+                "122212221222122212221",  # R12
+                "121222122212221222121",  # R13
+                "122212221222122212221",  # R14
+                "031222122212221222130",  # R15  tunnel + pellets
+                "122212221222122212221",  # R16
+                "122112221222122211221",  # R17  (F-type)
+                "111111111111111111111",  # R18
+            ],
+            'wall_color': (80, 80, 255),  # Blue
+            'tunnel_rows': [9, 15],
+        },
+    ]
+
+    # Fruit types: (name, color, points)
+    FRUIT_TYPES = [
+        ('cherry',     (255, 0, 0),     100),
+        ('strawberry', (255, 50, 50),   200),
+        ('orange',     (255, 165, 0),   500),
+        ('pretzel',    (180, 120, 60),  700),
+        ('apple',      (0, 200, 0),     1000),
+        ('pear',       (180, 255, 0),   2000),
+        ('banana',     (255, 255, 0),   5000),
     ]
 
     def __init__(self, display: Display):
@@ -62,17 +161,8 @@ class PacMan(Game):
         self.offset_x = 0
         self.offset_y = 7  # Leave room for HUD at top
 
-        # Initialize maze from template
-        self.maze = []
-        self.dots_remaining = 0
-        for row in self.MAZE_TEMPLATE:
-            maze_row = []
-            for char in row:
-                cell = int(char)
-                maze_row.append(cell)
-                if cell == 2 or cell == 3:
-                    self.dots_remaining += 1
-            self.maze.append(maze_row)
+        # Load initial maze
+        self._load_maze(self._get_maze_index())
 
         # Pac-Man position (tile coordinates, float for smooth movement)
         self.pac_x = 10.0
@@ -103,10 +193,7 @@ class PacMan(Game):
         self.ghost_release_timer = 0
         self.ghosts_released = 1  # Blinky starts outside
 
-        # Level-based difficulty settings (based on original 1980 Pac-Man)
-        # Frightened duration decreases each level: 6s at level 1, down to 0s at level 19+
-        # Ghost speed increases each level
-        # Ghost release from pen gets faster each level
+        # Level-based difficulty settings
         self._apply_level_difficulty()
 
         # Mode switching (scatter/chase)
@@ -119,6 +206,45 @@ class PacMan(Game):
 
         # Eaten ghost points
         self.ghost_points = 200
+
+        # Fruit state
+        self.fruit = {'active': False, 'x': 0.0, 'y': 0.0,
+                      'dir': (1, 0), 'type': 0, 'timer': 0.0}
+        self.fruit_score_display = 0
+        self.fruit_score_timer = 0.0
+
+    def _get_maze_index(self):
+        """Get maze index based on current level."""
+        level = self.level
+        if level <= 2:
+            return 0
+        elif level <= 5:
+            return 1
+        elif level <= 9:
+            return 2
+        elif level <= 14:
+            return 3
+        else:
+            return 2 + ((level - 15) % 2)  # Alternate mazes 3 & 4
+
+    def _load_maze(self, maze_index):
+        """Load a maze layout by index."""
+        maze_data = self.MAZES[maze_index]
+        self.wall_color = maze_data['wall_color']
+        self.tunnel_rows = maze_data['tunnel_rows']
+        self.maze = []
+        self.dots_remaining = 0
+        for row in maze_data['template']:
+            maze_row = [int(ch) for ch in row]
+            for cell in maze_row:
+                if cell in (2, 3):
+                    self.dots_remaining += 1
+            self.maze.append(maze_row)
+        self.dots_total = self.dots_remaining
+        self.dots_eaten = 0
+        self.fruit_spawned_count = 0
+        self.fruit = {'active': False, 'x': 0.0, 'y': 0.0,
+                      'dir': (1, 0), 'type': 0, 'timer': 0.0}
 
     def get_tile(self, x, y):
         """Get tile at position, handling wrapping."""
@@ -154,12 +280,25 @@ class PacMan(Game):
 
     def can_move(self, x, y, dx, dy, is_ghost=False):
         """Check if entity can move in direction from position (x,y)."""
-        # Round position to tile and check adjacent tile
         tile_x = int(round(x))
         tile_y = int(round(y))
         next_tile_x = tile_x + dx
         next_tile_y = tile_y + dy
         return self.tile_passable(next_tile_x, next_tile_y, is_ghost)
+
+    def tile_passable(self, tx, ty, is_ghost=False):
+        """Check if a specific tile is passable."""
+        if tx < 0 or tx >= self.maze_width or ty < 0 or ty >= self.maze_height:
+            # Allow tunnel wrap on tunnel rows
+            if ty in self.tunnel_rows and (tx < 0 or tx >= self.maze_width):
+                return True
+            return False
+        tile = self.maze[ty][tx]
+        if tile == 1:
+            return False
+        if tile == 4 and not is_ghost:
+            return False
+        return True
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -189,14 +328,14 @@ class PacMan(Game):
                     ghost['frightened'] = False
                 self.ghost_points = 200
 
-        # Release ghosts from house (faster at higher levels)
+        # Release ghosts from house
         self.ghost_release_timer += dt
         ghost_release_interval = self._get_ghost_release_interval()
         if self.ghost_release_timer >= ghost_release_interval and self.ghosts_released < 4:
             for ghost in self.ghosts:
                 if ghost['in_house']:
                     ghost['in_house'] = False
-                    ghost['x'] = 10.0  # Exit through door
+                    ghost['x'] = 10.0
                     ghost['y'] = 7.0
                     ghost['dir'] = (-1, 0)
                     self.ghosts_released += 1
@@ -220,11 +359,15 @@ class PacMan(Game):
                 self.maze[ty][tx] = 0
                 self.score += 10
                 self.dots_remaining -= 1
+                self.dots_eaten += 1
+                self._check_fruit_spawn()
             elif tile == 3:  # Power pellet
                 self.maze[ty][tx] = 0
                 self.score += 50
                 self.dots_remaining -= 1
+                self.dots_eaten += 1
                 self.activate_power()
+                self._check_fruit_spawn()
 
         # Check win condition
         if self.dots_remaining <= 0:
@@ -253,12 +396,126 @@ class PacMan(Game):
                         self.respawn()
                     return
 
+        # Update fruit
+        self._move_fruit(dt)
+        self._check_fruit_collection()
+
+        # Update fruit score display timer
+        if self.fruit_score_timer > 0:
+            self.fruit_score_timer -= dt
+
         # Pellet flash animation
         self.pellet_flash += dt
 
+    def _check_fruit_spawn(self):
+        """Spawn fruit at ~35% and ~85% dots eaten."""
+        if self.fruit_spawned_count >= 2 or self.fruit['active']:
+            return
+        ratio = self.dots_eaten / max(self.dots_total, 1)
+        if self.fruit_spawned_count == 0 and ratio >= 0.35:
+            self._spawn_fruit()
+        elif self.fruit_spawned_count == 1 and ratio >= 0.85:
+            self._spawn_fruit()
+
+    def _spawn_fruit(self):
+        """Spawn fruit from a random tunnel opening."""
+        self.fruit_spawned_count += 1
+        # Pick a random tunnel row
+        row = random.choice(self.tunnel_rows)
+        # Enter from left or right
+        if random.random() < 0.5:
+            x = 0.0
+            d = (1, 0)
+        else:
+            x = float(self.maze_width - 1)
+            d = (-1, 0)
+        # Fruit type based on level
+        fruit_idx = min(self.level - 1, len(self.FRUIT_TYPES) - 1)
+        self.fruit = {
+            'active': True,
+            'x': x,
+            'y': float(row),
+            'dir': d,
+            'type': fruit_idx,
+            'timer': 10.0,  # 10 second lifetime
+        }
+
+    def _move_fruit(self, dt):
+        """Move the bouncing fruit through the maze."""
+        if not self.fruit['active']:
+            return
+
+        self.fruit['timer'] -= dt
+        if self.fruit['timer'] <= 0:
+            self.fruit['active'] = False
+            return
+
+        # Move at 75% of Pac-Man speed
+        speed = self.pac_speed * 0.75
+        fx, fy = self.fruit['x'], self.fruit['y']
+        tile_x, tile_y = int(round(fx)), int(round(fy))
+
+        # At tile center, pick a new direction
+        at_center = abs(fx - tile_x) < 0.1 and abs(fy - tile_y) < 0.1
+        if at_center:
+            self.fruit['x'] = float(tile_x)
+            self.fruit['y'] = float(tile_y)
+            fx, fy = self.fruit['x'], self.fruit['y']
+
+            # Find valid directions (no reverse unless stuck)
+            possible = []
+            reverse = (-self.fruit['dir'][0], -self.fruit['dir'][1])
+            for d in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+                nx = tile_x + d[0]
+                ny = tile_y + d[1]
+                if self.tile_passable(nx, ny, is_ghost=False):
+                    if d != reverse:
+                        possible.append(d)
+            if not possible:
+                # Allow reverse
+                for d in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+                    nx = tile_x + d[0]
+                    ny = tile_y + d[1]
+                    if self.tile_passable(nx, ny, is_ghost=False):
+                        possible.append(d)
+            if possible:
+                self.fruit['dir'] = random.choice(possible)
+
+        # Move
+        dx, dy = self.fruit['dir']
+        new_x = fx + dx * speed * dt
+        new_y = fy + dy * speed * dt
+
+        check_x = int(round(new_x + dx * 0.4))
+        check_y = int(round(new_y + dy * 0.4))
+        if self.tile_passable(check_x, check_y, is_ghost=False):
+            self.fruit['x'] = new_x
+            self.fruit['y'] = new_y
+        else:
+            self.fruit['x'] = round(self.fruit['x'])
+            self.fruit['y'] = round(self.fruit['y'])
+
+        # Tunnel wrap
+        if self.fruit['x'] < 0:
+            self.fruit['x'] = self.maze_width - 1.0
+        elif self.fruit['x'] >= self.maze_width:
+            self.fruit['x'] = 0.0
+
+    def _check_fruit_collection(self):
+        """Check if Pac-Man collected the fruit."""
+        if not self.fruit['active']:
+            return
+        dist = math.sqrt((self.pac_x - self.fruit['x'])**2 +
+                         (self.pac_y - self.fruit['y'])**2)
+        if dist < 0.8:
+            _, _, points = self.FRUIT_TYPES[self.fruit['type']]
+            self.score += points
+            self.fruit_score_display = points
+            self.fruit_score_timer = 1.5
+            self.fruit['active'] = False
+
     def move_pacman(self, dt: float):
         """Move Pac-Man with queued direction handling and turn assist."""
-        # Get current tile
         cur_tile_x = int(round(self.pac_x))
         cur_tile_y = int(round(self.pac_y))
 
@@ -266,10 +523,6 @@ class PacMan(Game):
         if self.pac_next_dir != (0, 0) and self.pac_next_dir != self.pac_dir:
             ndx, ndy = self.pac_next_dir
 
-            # Check multiple nearby tiles for valid turn points
-            turn_made = False
-
-            # Tiles to check: current tile and one tile back in current direction
             tiles_to_check = [(cur_tile_x, cur_tile_y)]
             if self.pac_dir != (0, 0):
                 back_x = cur_tile_x - self.pac_dir[0]
@@ -277,34 +530,27 @@ class PacMan(Game):
                 tiles_to_check.append((back_x, back_y))
 
             for check_tx, check_ty in tiles_to_check:
-                # Can we turn at this tile?
                 next_x = check_tx + ndx
                 next_y = check_ty + ndy
 
                 if self.tile_passable(next_x, next_y, is_ghost=False):
-                    # Check if we're close enough to this turn point
                     dist_x = abs(self.pac_x - check_tx)
                     dist_y = abs(self.pac_y - check_ty)
 
-                    # Generous turn window
                     if self.pac_dir == (0, 0):
                         can_turn = dist_x < 0.5 and dist_y < 0.5
-                    elif self.pac_dir[0] != 0:  # Moving horizontally
+                    elif self.pac_dir[0] != 0:
                         can_turn = dist_y < 0.3 and dist_x < 0.6
-                    else:  # Moving vertically
+                    else:
                         can_turn = dist_x < 0.3 and dist_y < 0.6
 
                     if can_turn:
                         self.pac_dir = self.pac_next_dir
-                        # Snap to the turn point's lane
-                        if ndx != 0:  # Turning to horizontal
+                        if ndx != 0:
                             self.pac_y = float(check_ty)
-                        if ndy != 0:  # Turning to vertical
+                        if ndy != 0:
                             self.pac_x = float(check_tx)
-                        turn_made = True
                         break
-
-            # If we couldn't turn, keep the queued direction for later
 
         # Move in current direction
         if self.pac_dir != (0, 0):
@@ -312,21 +558,16 @@ class PacMan(Game):
             new_x = self.pac_x + dx * self.pac_speed * dt
             new_y = self.pac_y + dy * self.pac_speed * dt
 
-            # Get the tile Pac-Man would be in after moving
             new_tile_x = int(round(new_x))
             new_tile_y = int(round(new_y))
 
-            # Also check the tile ahead for early wall detection
             ahead_tile_x = int(new_x + dx * 0.5)
             ahead_tile_y = int(new_y + dy * 0.5)
 
-            # Current tile must always be passable
             if not self.tile_passable(new_tile_x, new_tile_y, is_ghost=False):
-                # Would enter a wall - stop at tile center
                 self.pac_x = float(cur_tile_x)
                 self.pac_y = float(cur_tile_y)
             elif not self.tile_passable(ahead_tile_x, ahead_tile_y, is_ghost=False):
-                # Approaching a wall - stop at the edge of current tile
                 if dx > 0:
                     max_x = float(new_tile_x) + 0.4
                     self.pac_x = min(new_x, max_x)
@@ -340,7 +581,6 @@ class PacMan(Game):
                     min_y = float(new_tile_y) - 0.4
                     self.pac_y = max(new_y, min_y)
             else:
-                # Safe to move
                 self.pac_x = new_x
                 self.pac_y = new_y
 
@@ -350,24 +590,9 @@ class PacMan(Game):
         elif self.pac_x >= self.maze_width:
             self.pac_x = 0.0
 
-    def tile_passable(self, tx, ty, is_ghost=False):
-        """Check if a specific tile is passable."""
-        if tx < 0 or tx >= self.maze_width or ty < 0 or ty >= self.maze_height:
-            # Allow tunnel wrap on row 9
-            if ty == 9 and (tx < 0 or tx >= self.maze_width):
-                return True
-            return False
-        tile = self.maze[ty][tx]
-        if tile == 1:
-            return False
-        if tile == 4 and not is_ghost:
-            return False
-        return True
-
     def move_ghost(self, ghost, dt: float):
-        """Move ghost with AI."""
+        """Move ghost with AI - semi-random at intersections."""
         if ghost['in_house']:
-            # Float up and down in house
             ghost['y'] += ghost['dir'][1] * 1.5 * dt
             if ghost['y'] < 9.0:
                 ghost['dir'] = (0, 1)
@@ -390,20 +615,17 @@ class PacMan(Game):
         else:
             speed = self.ghost_speed
 
-        # Get current tile position
         gx, gy = ghost['x'], ghost['y']
         tile_x, tile_y = int(round(gx)), int(round(gy))
 
-        # Check if at tile center (for direction decisions)
         at_center = abs(gx - tile_x) < 0.1 and abs(gy - tile_y) < 0.1
 
         if at_center:
-            # Snap to center
             ghost['x'] = float(tile_x)
             ghost['y'] = float(tile_y)
             gx, gy = ghost['x'], ghost['y']
 
-            # Check for eaten ghost reaching home (at tile center)
+            # Check for eaten ghost reaching home
             if ghost['eaten']:
                 if tile_x == 10 and tile_y == 8:
                     self._return_ghost_home(ghost)
@@ -416,13 +638,10 @@ class PacMan(Game):
             for d in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
                 next_x = tile_x + d[0]
                 next_y = tile_y + d[1]
-
                 if self.tile_passable(next_x, next_y, is_ghost=True):
-                    # Don't reverse unless necessary
                     if d != reverse or ghost['frightened'] or ghost['eaten']:
                         possible.append(d)
 
-            # If no non-reverse options, allow reverse
             if not possible:
                 for d in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
                     next_x = tile_x + d[0]
@@ -430,15 +649,17 @@ class PacMan(Game):
                     if self.tile_passable(next_x, next_y, is_ghost=True):
                         possible.append(d)
 
-            # Choose direction
+            # Choose direction - semi-random AI
             if possible:
                 if ghost['frightened'] and not ghost['eaten']:
+                    ghost['dir'] = random.choice(possible)
+                elif not ghost['eaten'] and len(possible) >= 3 and random.random() < 0.25:
+                    # Ms. Pac-Man: 25% chance of random turn at intersections
                     ghost['dir'] = random.choice(possible)
                 else:
                     target = self.get_ghost_target(ghost)
                     best_dir = possible[0]
                     best_dist = float('inf')
-
                     for d in possible:
                         nx = tile_x + d[0]
                         ny = tile_y + d[1]
@@ -446,7 +667,6 @@ class PacMan(Game):
                         if dist < best_dist:
                             best_dist = dist
                             best_dir = d
-
                     ghost['dir'] = best_dir
 
         # Move in current direction
@@ -455,7 +675,6 @@ class PacMan(Game):
             new_x = gx + dx * speed * dt
             new_y = gy + dy * speed * dt
 
-            # Check if we're about to enter a wall
             check_x = int(round(new_x + dx * 0.4))
             check_y = int(round(new_y + dy * 0.4))
 
@@ -463,7 +682,6 @@ class PacMan(Game):
                 ghost['x'] = new_x
                 ghost['y'] = new_y
             else:
-                # Stop at tile center
                 ghost['x'] = round(ghost['x'])
                 ghost['y'] = round(ghost['y'])
 
@@ -473,7 +691,7 @@ class PacMan(Game):
         elif ghost['x'] >= self.maze_width:
             ghost['x'] = 0.0
 
-        # Eaten ghost: proximity catch for door (handles overshoot at high speed)
+        # Eaten ghost: proximity catch for door
         if ghost['eaten']:
             if abs(ghost['x'] - 10.0) < 0.5 and abs(ghost['y'] - 8.0) < 0.5:
                 self._return_ghost_home(ghost)
@@ -492,7 +710,7 @@ class PacMan(Game):
     def get_ghost_target(self, ghost):
         """Get target tile for ghost AI."""
         if ghost['eaten']:
-            return (10.0, 8.0)  # Ghost house door
+            return (10.0, 8.0)
 
         if not self.chase_mode:
             return ghost['scatter_target']
@@ -517,70 +735,24 @@ class PacMan(Game):
         return (self.pac_x, self.pac_y)
 
     def _get_frightened_duration(self):
-        """Get frightened (blue ghost) duration based on level.
-
-        Based on original 1980 Pac-Man:
-        - Level 1: 6 seconds
-        - Level 2: 5 seconds
-        - Level 3: 4 seconds
-        - Level 4: 3 seconds
-        - Level 5: 2 seconds
-        - Level 6-8: 5 seconds
-        - Level 9: 1 second
-        - Level 10: 5 seconds
-        - Level 11: 2 seconds
-        - Level 12-13: 1 second
-        - Level 14: 3 seconds
-        - Level 15-16: 1 second
-        - Level 17: 0 seconds (no blue time!)
-        - Level 18: 1 second
-        - Level 19+: 0 seconds (no blue time!)
-
-        Simplified approximation that captures the key progression:
-        """
-        # Simplified table inspired by original (duration in seconds)
+        """Get frightened duration based on level."""
         frightened_table = {
-            1: 6.0,
-            2: 5.0,
-            3: 4.0,
-            4: 3.0,
-            5: 2.0,
-            6: 5.0,
-            7: 4.0,
-            8: 3.0,
-            9: 1.0,
-            10: 5.0,
-            11: 2.0,
-            12: 1.0,
-            13: 1.0,
-            14: 3.0,
-            15: 1.0,
-            16: 1.0,
-            17: 0.0,
-            18: 1.0,
+            1: 6.0, 2: 5.0, 3: 4.0, 4: 3.0, 5: 2.0,
+            6: 5.0, 7: 4.0, 8: 3.0, 9: 1.0, 10: 5.0,
+            11: 2.0, 12: 1.0, 13: 1.0, 14: 3.0, 15: 1.0,
+            16: 1.0, 17: 0.0, 18: 1.0,
         }
-        # Level 19+ has 0 seconds frightened time
         if self.level >= 19:
             return 0.0
         return frightened_table.get(self.level, 6.0)
 
     def _get_ghost_speed_multiplier(self):
-        """Get ghost speed multiplier based on level.
-
-        Original Pac-Man had ghosts speed up each level.
-        Returns a multiplier to apply to base ghost speed.
-        """
-        # Speed increases roughly 5% per level, capping around 40% faster
+        """Get ghost speed multiplier based on level."""
         multiplier = 1.0 + (self.level - 1) * 0.05
-        return min(multiplier, 1.4)  # Cap at 40% speed increase
+        return min(multiplier, 1.4)
 
     def _get_ghost_release_interval(self):
-        """Get interval between ghost releases from the pen.
-
-        Original Pac-Man released ghosts faster at higher levels.
-        Returns time in seconds between ghost releases.
-        """
-        # Start at 4 seconds, decrease by 0.3 per level, minimum 1 second
+        """Get interval between ghost releases from the pen."""
         interval = 4.0 - (self.level - 1) * 0.3
         return max(interval, 1.0)
 
@@ -596,7 +768,6 @@ class PacMan(Game):
         self.frightened_timer = frightened_duration
         self.ghost_points = 200
 
-        # Only frighten ghosts if there's actual frightened time
         if frightened_duration > 0:
             for ghost in self.ghosts:
                 if not ghost['eaten'] and not ghost['in_house']:
@@ -629,21 +800,13 @@ class PacMan(Game):
         self.ghost_release_timer = 0
         self.frightened_timer = 0
 
-    def next_level(self):
-        """Start next level."""
-        self.maze = []
-        self.dots_remaining = 0
-        for row in self.MAZE_TEMPLATE:
-            maze_row = []
-            for char in row:
-                cell = int(char)
-                maze_row.append(cell)
-                if cell == 2 or cell == 3:
-                    self.dots_remaining += 1
-            self.maze.append(maze_row)
+        # Deactivate fruit on death
+        self.fruit['active'] = False
 
+    def next_level(self):
+        """Start next level with new maze."""
+        self._load_maze(self._get_maze_index())
         self.respawn()
-        # Apply level-based difficulty scaling
         self._apply_level_difficulty()
 
     def draw(self):
@@ -652,13 +815,16 @@ class PacMan(Game):
         # Draw HUD
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
 
-        # Draw lives
+        # Draw lives (with bow on each life icon)
         for i in range(self.lives - 1):
             lx = 50 + i * 5
+            # Yellow body
             self.display.set_pixel(lx, 2, Colors.YELLOW)
             self.display.set_pixel(lx + 1, 2, Colors.YELLOW)
             self.display.set_pixel(lx, 3, Colors.YELLOW)
             self.display.set_pixel(lx + 1, 3, Colors.YELLOW)
+            # Pink bow on top
+            self.display.set_pixel(lx, 1, (255, 50, 100))
 
         # Draw maze
         for ty in range(self.maze_height):
@@ -667,10 +833,10 @@ class PacMan(Game):
                 py = self.offset_y + ty * self.tile_size
                 tile = self.maze[ty][tx]
 
-                if tile == 1:  # Wall
+                if tile == 1:  # Wall - use per-maze color
                     for dx in range(self.tile_size):
                         for dy in range(self.tile_size):
-                            self.display.set_pixel(px + dx, py + dy, Colors.BLUE)
+                            self.display.set_pixel(px + dx, py + dy, self.wall_color)
                 elif tile == 4:  # Ghost house door
                     self.display.set_pixel(px + 1, py + 1, Colors.PINK)
                 elif tile == 2:  # Dot
@@ -681,13 +847,26 @@ class PacMan(Game):
                             for dy in range(2):
                                 self.display.set_pixel(px + dx, py + dy, (255, 255, 200))
 
+        # Draw fruit
+        if self.fruit['active']:
+            _, color, _ = self.FRUIT_TYPES[self.fruit['type']]
+            fx = self.offset_x + int(self.fruit['x'] * self.tile_size) + 1
+            fy = self.offset_y + int(self.fruit['y'] * self.tile_size) + 1
+            self.display.set_pixel(fx, fy, color)
+            self.display.set_pixel(fx + 1, fy, color)
+            self.display.set_pixel(fx, fy + 1, color)
+            self.display.set_pixel(fx + 1, fy + 1, color)
+
+        # Draw fruit score popup
+        if self.fruit_score_timer > 0:
+            self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
+
         # Draw ghosts (2x2)
         for ghost in self.ghosts:
             gx = self.offset_x + int(ghost['x'] * self.tile_size) + 1
             gy = self.offset_y + int(ghost['y'] * self.tile_size) + 1
 
             if ghost['eaten']:
-                # Just eyes
                 self.display.set_pixel(gx, gy, Colors.WHITE)
                 self.display.set_pixel(gx + 1, gy, Colors.WHITE)
             elif ghost['frightened']:
@@ -709,7 +888,7 @@ class PacMan(Game):
                 self.display.set_pixel(gx, gy, Colors.WHITE)
                 self.display.set_pixel(gx + 1, gy, Colors.WHITE)
 
-        # Draw Pac-Man (2x2 yellow)
+        # Draw Ms. Pac-Man (2x2 yellow with bow)
         px = self.offset_x + int(self.pac_x * self.tile_size) + 1
         py = self.offset_y + int(self.pac_y * self.tile_size) + 1
 
@@ -717,6 +896,19 @@ class PacMan(Game):
         self.display.set_pixel(px + 1, py, Colors.YELLOW)
         self.display.set_pixel(px, py + 1, Colors.YELLOW)
         self.display.set_pixel(px + 1, py + 1, Colors.YELLOW)
+
+        # Bow - pink pixel positioned based on facing direction
+        bow_color = (255, 50, 100)
+        if self.pac_dir == (1, 0):  # Facing right - bow on top-left
+            self.display.set_pixel(px, py - 1, bow_color)
+        elif self.pac_dir == (-1, 0):  # Facing left - bow on top-right
+            self.display.set_pixel(px + 1, py - 1, bow_color)
+        elif self.pac_dir == (0, -1):  # Facing up - bow on right
+            self.display.set_pixel(px + 2, py, bow_color)
+        elif self.pac_dir == (0, 1):  # Facing down - bow on right
+            self.display.set_pixel(px + 2, py, bow_color)
+        else:  # Stationary - bow on top
+            self.display.set_pixel(px, py - 1, bow_color)
 
         # Mouth animation (cut out one pixel)
         if self.mouth_open:

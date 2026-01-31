@@ -36,7 +36,7 @@ class Particle:
 
 
 class ParticleLife(Visual):
-    name = "P LIFE"
+    name = "JELLYFISH"
     description = "Emergent particles"
     category = "automata"
 

@@ -64,11 +64,6 @@ class NightDriver(Game):
     # Road sign types for visual interest
     SIGN_TYPES = [
         {'name': 'speed_limit', 'color': (255, 255, 255), 'bg': (40, 40, 40)},
-        {'name': 'curve_left', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
-        {'name': 'curve_right', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
-        {'name': 'hairpin_left', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
-        {'name': 'hairpin_right', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
-        {'name': 'chicane', 'color': (255, 100, 0), 'bg': (0, 0, 0)},
         {'name': 'mile_marker', 'color': (100, 255, 100), 'bg': (0, 80, 0)},
         {'name': 'deer_xing', 'color': (255, 220, 0), 'bg': (0, 0, 0)},
         {'name': 'no_passing', 'color': (255, 255, 255), 'bg': (255, 50, 50)},
@@ -103,8 +98,10 @@ class NightDriver(Game):
         self.current_turn_type = self.TURN_NORMAL
         self.chicane_phase = 0     # For chicane turns: 0=first curve, 1=second curve
 
-        # Start with a short straight
+        # Start with a short straight — pre-plan the first turn
         self.straight_timer = 2.0
+        self.next_turn = self.plan_next_turn()
+        self.warning_spawned = False
 
         # Crash state
         self.crashed = False
@@ -166,9 +163,15 @@ class NightDriver(Game):
             # Ease curve back to zero
             self.curve *= 0.95
 
+            # Spawn warning sign 1 second before turn starts
+            if self.straight_timer <= 1.0 and not self.warning_spawned and self.next_turn:
+                if self.next_turn['sign_type']:
+                    self.spawn_warning_sign(self.next_turn)
+                self.warning_spawned = True
+
             if self.straight_timer <= 0:
-                # Start a new turn - choose turn type based on speed/distance
-                self.start_new_turn()
+                # Apply the pre-planned turn
+                self.apply_next_turn()
         else:
             # In a turn
             self.turn_timer += dt
@@ -192,9 +195,11 @@ class NightDriver(Game):
                     self.turn_duration = random.uniform(0.8, 1.2)
                     self.turn_timer = 0.0
                 else:
-                    # End turn, start straight section
+                    # End turn, start straight section and plan next turn
                     self.straight_timer = random.uniform(1.0, 3.0)
                     self.warning_sign_active = False
+                    self.next_turn = self.plan_next_turn()
+                    self.warning_spawned = False
 
         # Update speed (gradually increases)
         self.speed = min(self.speed + 2.5 * dt, self.max_speed)
@@ -229,65 +234,95 @@ class NightDriver(Game):
             self.crashed = True
             self.crash_timer = 1.5
 
-    def start_new_turn(self):
-        """Start a new turn, choosing type based on current speed/distance."""
+    def plan_next_turn(self):
+        """Pre-compute the next turn so we can warn the player early."""
         speed_factor = self.speed / self.max_speed
-
-        # Higher chance of special turns at higher speeds
         turn_roll = random.random()
 
-        # Hairpins start appearing at 40% speed, chicanes at 50%
         if speed_factor > 0.5 and turn_roll < 0.15:
-            # Chicane (quick S-curve)
-            self.current_turn_type = self.TURN_CHICANE
-            self.chicane_phase = 0
             direction = random.choice([-1, 1])
-            # Chicanes are sharp but shorter
             base_curve = direction * random.uniform(2.0, 2.5)
-            self.target_curve = base_curve * self.curve_intensity
-            self.turn_duration = random.uniform(0.8, 1.2)
-            self.spawn_warning_sign('chicane', direction)
+            target_curve = base_curve * self.curve_intensity
+            return {
+                'turn_type': self.TURN_CHICANE,
+                'target_curve': target_curve,
+                'turn_duration': random.uniform(0.8, 1.2),
+                'sign_type': 'turn_warning',
+                'sign_side': 1,
+                'sign_direction': direction,
+            }
 
         elif speed_factor > 0.4 and turn_roll < 0.25:
-            # Hairpin turn (very sharp, long)
-            self.current_turn_type = self.TURN_HAIRPIN
             direction = random.choice([-1, 1])
-            # Hairpins are extremely sharp
             base_curve = direction * random.uniform(2.5, 3.5)
-            self.target_curve = base_curve * self.curve_intensity
-            self.turn_duration = random.uniform(2.0, 3.5)
-            sign_type = 'hairpin_left' if direction < 0 else 'hairpin_right'
-            self.spawn_warning_sign(sign_type, direction)
+            target_curve = base_curve * self.curve_intensity
+            return {
+                'turn_type': self.TURN_HAIRPIN,
+                'target_curve': target_curve,
+                'turn_duration': random.uniform(2.0, 3.5),
+                'sign_type': 'turn_warning',
+                'sign_side': 1,
+                'sign_direction': direction,
+            }
 
         else:
-            # Normal turn
-            self.current_turn_type = self.TURN_NORMAL
-            # Base curves get wider at higher speeds
             base_options = [-1.5, -1.0, 1.0, 1.5]
             if speed_factor > 0.3:
                 base_options.extend([-2.0, 2.0])
             if speed_factor > 0.6:
                 base_options.extend([-2.5, 2.5])
-
             base_curve = random.choice(base_options)
-            self.target_curve = base_curve * self.curve_intensity
-            self.turn_duration = random.uniform(1.5, 3.5)
-
-            # Spawn curve warning for sharper normal turns
+            target_curve = base_curve * self.curve_intensity
             if abs(base_curve) >= 1.5:
-                sign_type = 'curve_left' if base_curve < 0 else 'curve_right'
-                self.spawn_warning_sign(sign_type, 1 if base_curve < 0 else -1)
+                sign_type = 'turn_warning'
+                sign_direction = 1 if base_curve > 0 else -1
+            else:
+                sign_type = None
+                sign_direction = 0
+            return {
+                'turn_type': self.TURN_NORMAL,
+                'target_curve': target_curve,
+                'turn_duration': random.uniform(1.5, 3.5),
+                'sign_type': sign_type,
+                'sign_side': 1,
+                'sign_direction': sign_direction,
+            }
 
+    def apply_next_turn(self):
+        """Activate the pre-planned turn."""
+        turn = self.next_turn
+        if not turn:
+            return
+        self.current_turn_type = turn['turn_type']
+        self.target_curve = turn['target_curve']
+        self.turn_duration = turn['turn_duration']
         self.turn_timer = 0.0
         self.warning_sign_active = True
+        if turn['turn_type'] == self.TURN_CHICANE:
+            self.chicane_phase = 0
+        self.next_turn = None
 
-    def spawn_warning_sign(self, sign_type, side):
-        """Spawn a warning sign for upcoming turn."""
+    def spawn_warning_sign(self, turn_info):
+        """Spawn a warning sign for upcoming turn — always on right side."""
         self.road_signs.append({
             'z': 1.0,
-            'type': sign_type,
-            'side': side,  # -1 = left side, 1 = right side
+            'type': 'turn_warning',
+            'side': 1,  # Always right side of road
+            'direction': turn_info['sign_direction'],
+            'severity_color': self.get_turn_severity_color(turn_info['target_curve']),
         })
+
+    def get_turn_severity_color(self, target_curve):
+        """Get warning sign color based on turn severity."""
+        severity = abs(target_curve)
+        if severity < 2.5:
+            return (0, 200, 0)      # Green - small turn
+        elif severity < 4.0:
+            return (255, 220, 0)    # Yellow - medium turn
+        elif severity < 5.5:
+            return (255, 140, 0)    # Orange - sharp turn
+        else:
+            return (255, 40, 40)    # Red - hairpin
 
     def check_collision(self) -> bool:
         """Check if player car hits a road post."""
@@ -526,92 +561,81 @@ class NightDriver(Game):
             sign_width = max(2, int(closeness * 8))
             sign_height = max(2, int(closeness * 8))
 
-            # Find sign colors
-            sign_info = None
-            for st in self.SIGN_TYPES:
-                if st['name'] == sign_type:
-                    sign_info = st
-                    break
-            if not sign_info:
-                continue
-
-            fg_color = sign_info['color']
-            bg_color = sign_info['bg']
-
-            # Draw sign background (post + sign)
+            # Compute sign position
             post_x = screen_x
-            post_y = screen_y
             sign_x = screen_x - sign_width // 2
             sign_y = screen_y - sign_height - max(1, int(closeness * 3))
 
-            # Sign post
-            if 0 <= post_x < GRID_SIZE and 0 <= post_y < GRID_SIZE:
+            # Sign post (all sign types)
+            if 0 <= post_x < GRID_SIZE and 0 <= screen_y < GRID_SIZE:
                 post_h = max(1, int(closeness * 4))
                 for py in range(post_h):
                     if 0 <= sign_y + sign_height + py < GRID_SIZE:
                         self.display.set_pixel(post_x, sign_y + sign_height + py, (80, 80, 80))
 
-            # Sign face
-            if sign_width >= 2 and sign_height >= 2:
-                if 0 <= sign_x < GRID_SIZE - sign_width and 0 <= sign_y < GRID_SIZE - sign_height:
-                    # Background
-                    self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, bg_color)
+            if sign_width < 2 or sign_height < 2:
+                continue
+            if not (0 <= sign_x < GRID_SIZE - sign_width and 0 <= sign_y < GRID_SIZE - sign_height):
+                continue
 
-                    # Draw symbol based on type
-                    cx = sign_x + sign_width // 2
-                    cy = sign_y + sign_height // 2
+            if sign_type == 'turn_warning':
+                # Turn warning: colored triangle pointing in turn direction
+                direction = sign.get('direction', 1)
+                severity_color = sign.get('severity_color', (255, 220, 0))
 
-                    if 'curve_left' in sign_type or 'hairpin_left' in sign_type:
-                        # Left arrow
-                        if sign_width >= 3:
-                            self.display.set_pixel(cx - 1, cy, fg_color)
-                            self.display.set_pixel(cx, cy, fg_color)
-                            if sign_height >= 3:
-                                self.display.set_pixel(cx, cy - 1, fg_color)
-                                self.display.set_pixel(cx, cy + 1, fg_color)
+                # Black background
+                self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, (0, 0, 0))
 
-                    elif 'curve_right' in sign_type or 'hairpin_right' in sign_type:
-                        # Right arrow
-                        if sign_width >= 3:
-                            self.display.set_pixel(cx + 1, cy, fg_color)
-                            self.display.set_pixel(cx, cy, fg_color)
-                            if sign_height >= 3:
-                                self.display.set_pixel(cx, cy - 1, fg_color)
-                                self.display.set_pixel(cx, cy + 1, fg_color)
+                # Draw triangle pointing in turn direction
+                center_row = (sign_height - 1) / 2.0
+                for row in range(sign_height):
+                    dist = abs(row - center_row)
+                    max_dist = sign_height / 2.0
+                    fill = max(1, int(sign_width * (1.0 - dist / max_dist))) if max_dist > 0 else sign_width
+                    for col in range(fill):
+                        if direction > 0:  # Right turn - triangle points right
+                            px = sign_x + col
+                        else:  # Left turn - triangle points left
+                            px = sign_x + sign_width - 1 - col
+                        py = sign_y + row
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            self.display.set_pixel(px, py, severity_color)
+            else:
+                # Decorative signs - look up colors from SIGN_TYPES
+                sign_info = None
+                for st in self.SIGN_TYPES:
+                    if st['name'] == sign_type:
+                        sign_info = st
+                        break
+                if not sign_info:
+                    continue
 
-                    elif sign_type == 'chicane':
-                        # S-curve symbol
-                        if sign_width >= 3 and sign_height >= 3:
-                            self.display.set_pixel(cx - 1, cy - 1, fg_color)
-                            self.display.set_pixel(cx, cy, fg_color)
-                            self.display.set_pixel(cx + 1, cy + 1, fg_color)
+                fg_color = sign_info['color']
+                bg_color = sign_info['bg']
+                self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, bg_color)
 
-                    elif sign_type == 'speed_limit':
-                        # Just show border
-                        self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, fg_color)
-                        if sign_width > 2 and sign_height > 2:
-                            self.display.draw_rect(sign_x + 1, sign_y + 1,
-                                                  sign_width - 2, sign_height - 2, bg_color)
+                cx = sign_x + sign_width // 2
+                cy = sign_y + sign_height // 2
 
-                    elif sign_type == 'mile_marker':
-                        # Green with white center
-                        if sign_width >= 3 and sign_height >= 3:
-                            self.display.set_pixel(cx, cy, fg_color)
-
-                    elif sign_type == 'deer_xing':
-                        # Diamond shape hint
-                        self.display.set_pixel(cx, cy - 1, fg_color)
-                        self.display.set_pixel(cx, cy + 1, fg_color)
-                        self.display.set_pixel(cx - 1, cy, fg_color)
-                        self.display.set_pixel(cx + 1, cy, fg_color)
-
-                    elif sign_type == 'no_passing':
-                        # Red with diagonal
-                        if sign_width >= 3:
-                            self.display.set_pixel(sign_x + 1, sign_y + 1, (255, 255, 255))
-                            if sign_height >= 3:
-                                self.display.set_pixel(sign_x + sign_width - 2,
-                                                      sign_y + sign_height - 2, (255, 255, 255))
+                if sign_type == 'speed_limit':
+                    self.display.draw_rect(sign_x, sign_y, sign_width, sign_height, fg_color)
+                    if sign_width > 2 and sign_height > 2:
+                        self.display.draw_rect(sign_x + 1, sign_y + 1,
+                                              sign_width - 2, sign_height - 2, bg_color)
+                elif sign_type == 'mile_marker':
+                    if sign_width >= 3 and sign_height >= 3:
+                        self.display.set_pixel(cx, cy, fg_color)
+                elif sign_type == 'deer_xing':
+                    self.display.set_pixel(cx, cy - 1, fg_color)
+                    self.display.set_pixel(cx, cy + 1, fg_color)
+                    self.display.set_pixel(cx - 1, cy, fg_color)
+                    self.display.set_pixel(cx + 1, cy, fg_color)
+                elif sign_type == 'no_passing':
+                    if sign_width >= 3:
+                        self.display.set_pixel(sign_x + 1, sign_y + 1, (255, 255, 255))
+                        if sign_height >= 3:
+                            self.display.set_pixel(sign_x + sign_width - 2,
+                                                  sign_y + sign_height - 2, (255, 255, 255))
 
     def draw_car(self):
         """Draw the player's car at bottom of screen."""
