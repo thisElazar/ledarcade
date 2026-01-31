@@ -17,7 +17,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Refresh(Visual):
-    name = "REFRESH"
+    name = "UPDATE"
     description = "Restart arcade"
     category = "utility"
 
