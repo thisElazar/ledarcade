@@ -664,7 +664,7 @@ def main():
                         if game_over_state == GameOverState.MILESTONE:
                             milestone_timer += dt
                             draw_milestone_celebration(display, milestone_timer)
-                            if milestone_timer >= 1.5:
+                            if milestone_timer >= 3.0:
                                 game_over_state = GameOverState.ENTER_INITIALS
 
                         elif game_over_state == GameOverState.FLASHING:
