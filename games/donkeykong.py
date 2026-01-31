@@ -33,7 +33,7 @@ class DonkeyKong(Game):
 
     # Physics constants
     GRAVITY = 200.0
-    JUMP_VELOCITY = -85.0
+    JUMP_VELOCITY = -58.0
     MAX_FALL_SPEED = 120.0
     MOVE_SPEED = 35.0
     CLIMB_SPEED = 25.0
@@ -410,9 +410,9 @@ class DonkeyKong(Game):
                     at_right_edge = barrel['x'] >= girder['x2'] - 2
 
                     if at_left_edge or at_right_edge:
-                        # Check if there's a ladder to take
+                        # Check if there's a ladder to take (strongly prefer ladders)
                         ladder = self.get_ladder_at(barrel['x'], barrel['y'] + self.BARREL_SIZE + 2)
-                        if ladder and random.random() < 0.5:
+                        if ladder and random.random() < 0.8:
                             barrel['on_ladder'] = True
                             barrel['x'] = ladder['x']
                         else:

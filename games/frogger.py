@@ -63,6 +63,9 @@ class Frogger(Game):
         self.turtles = []
         self.setup_water()
 
+        # Halfway bonus tracking (once per life)
+        self.reached_halfway = False
+
         # Timer
         self.time_left = 30.0
         self.timer_warning = False
@@ -78,11 +81,11 @@ class Frogger(Game):
         # Each lane has cars moving in one direction at a speed
         lane_configs = [
             # (row, direction, speed, car_length, gap)
-            (1, 1, 12, 2, 10),   # Slow cars right
-            (2, -1, 16, 2, 9),   # Medium cars left
-            (3, 1, 20, 3, 9),    # Trucks right
-            (4, -1, 14, 2, 8),   # Cars left
-            (5, 1, 24, 2, 8),    # Fast cars right
+            (1, 1, 12, 2, 11),   # Slow cars right
+            (2, -1, 16, 2, 10),  # Medium cars left
+            (3, 1, 20, 3, 10),   # Trucks right
+            (4, -1, 14, 2, 9),   # Cars left
+            (5, 1, 24, 2, 9),    # Fast cars right
         ]
 
         for row, direction, speed, length, gap in lane_configs:
@@ -167,14 +170,20 @@ class Frogger(Game):
                 moved = True
 
             if moved:
+                old_row = self.frog_row
                 self.frog_col = new_col
                 self.frog_row = new_row
                 self.move_cooldown = self.move_delay
                 self.frog_riding = None
 
                 # Score for moving forward
-                if new_row > self.frog_row:
+                if new_row > old_row:
                     self.score += 10
+
+                # Halfway bonus (row 6 safe zone, once per life)
+                if self.frog_row >= 6 and not self.reached_halfway:
+                    self.reached_halfway = True
+                    self.score += 50
 
         # Update timer
         self.time_left -= dt
@@ -306,6 +315,7 @@ class Frogger(Game):
         self.frog_col = 7
         self.frog_row = 0
         self.frog_riding = None
+        self.reached_halfway = False
         self.time_left = 30.0
 
     def next_level(self):
@@ -384,10 +394,10 @@ class Frogger(Game):
             ly = row_to_y(log['row'])
             for i in range(log['length'] * self.cell_size):
                 if 0 <= lx + i < GRID_SIZE:
-                    self.display.set_pixel(lx + i, ly, (139, 90, 43))
-                    self.display.set_pixel(lx + i, ly + 1, (160, 100, 50))
-                    self.display.set_pixel(lx + i, ly + 2, (160, 100, 50))
-                    self.display.set_pixel(lx + i, ly + 3, (139, 90, 43))
+                    self.display.set_pixel(lx + i, ly, (210, 150, 70))
+                    self.display.set_pixel(lx + i, ly + 1, (180, 120, 50))
+                    self.display.set_pixel(lx + i, ly + 2, (180, 120, 50))
+                    self.display.set_pixel(lx + i, ly + 3, (210, 150, 70))
 
         # Draw turtles
         for turtle in self.turtles:
@@ -397,11 +407,12 @@ class Frogger(Game):
                 color = Colors.GREEN if not turtle['diving'] else (0, 100, 0)
 
                 # Draw each turtle in the group
+                highlight = (100, 255, 100)
                 for t in range(turtle['length']):
                     tsx = tx + t * self.cell_size
                     if 0 <= tsx < GRID_SIZE and tsx + 3 < GRID_SIZE:
-                        # Turtle shell
-                        self.display.set_pixel(tsx + 1, ty, color)
+                        # Turtle shell with highlight
+                        self.display.set_pixel(tsx + 1, ty, highlight)
                         self.display.set_pixel(tsx, ty + 1, color)
                         self.display.set_pixel(tsx + 1, ty + 1, color)
                         self.display.set_pixel(tsx + 2, ty + 1, color)

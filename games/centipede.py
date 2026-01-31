@@ -86,13 +86,17 @@ class Centipede(Game):
         length = 8 + self.level * 2
         length = min(length, 16)
 
-        # Start from top
-        start_x = random.randint(10, 54)
+        # Start from top — ensure start_x is high enough for all segments
+        min_start_x = length * 3 + 2
+        start_x = max(min_start_x, random.randint(10, 54))
         start_y = 6
 
         for i in range(length):
+            seg_x = float(start_x - i * 3)
+            # Clamp any segment that would be off-screen
+            seg_x = max(2.0, seg_x)
             self.segments.append({
-                'x': float(start_x - i * 3),
+                'x': seg_x,
                 'y': float(start_y),
                 'dir_x': 1,  # Moving right
                 'is_head': i == 0
@@ -272,23 +276,48 @@ class Centipede(Game):
                     'x': 0 if random.random() < 0.5 else 63,
                     'y': random.randint(self.PLAYER_AREA_TOP, 58),
                     'vx': random.choice([-30, 30]),
-                    'vy': random.choice([-20, 20])
+                    'vy': random.choice([-20, 20]),
+                    'lifetime': 0.0,
+                    'exiting': False,
                 }
         else:
-            # Move erratically
-            self.spider['x'] += self.spider['vx'] * dt
-            self.spider['y'] += self.spider['vy'] * dt
+            # Track lifetime
+            self.spider['lifetime'] += dt
 
-            # Bounce off walls
-            if self.spider['x'] < 2 or self.spider['x'] > 61:
-                self.spider['vx'] *= -1
-            if self.spider['y'] < self.PLAYER_AREA_TOP or self.spider['y'] > 60:
-                self.spider['vy'] *= -1
+            if self.spider.get('exiting', False):
+                # Move toward nearest edge to exit
+                if self.spider['x'] < 32:
+                    self.spider['vx'] = -40
+                else:
+                    self.spider['vx'] = 40
+                self.spider['vy'] = 0
 
-            # Random direction changes
-            if random.random() < 0.02:
-                self.spider['vx'] = random.choice([-30, 30])
-                self.spider['vy'] = random.choice([-20, 20])
+                self.spider['x'] += self.spider['vx'] * dt
+                self.spider['y'] += self.spider['vy'] * dt
+            else:
+                # Check lifetime — start exiting after ~8s
+                if self.spider['lifetime'] >= 8.0:
+                    self.spider['exiting'] = True
+
+                # Move erratically
+                self.spider['x'] += self.spider['vx'] * dt
+                self.spider['y'] += self.spider['vy'] * dt
+
+                # Bounce off walls
+                if self.spider['x'] < 2 or self.spider['x'] > 61:
+                    self.spider['vx'] *= -1
+                if self.spider['y'] < self.PLAYER_AREA_TOP or self.spider['y'] > 60:
+                    self.spider['vy'] *= -1
+
+                # Random direction changes — biased toward player
+                if random.random() < 0.02:
+                    if random.random() < 0.6:
+                        # Bias toward player
+                        self.spider['vx'] = 30 if self.player_x > self.spider['x'] else -30
+                        self.spider['vy'] = 20 if self.player_y > self.spider['y'] else -20
+                    else:
+                        self.spider['vx'] = random.choice([-30, 30])
+                        self.spider['vy'] = random.choice([-20, 20])
 
             # Spider eats mushrooms
             for (mx, my) in list(self.mushrooms.keys()):

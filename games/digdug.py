@@ -43,6 +43,8 @@ class DigDug(Game):
         self.pump_active = False
         self.pump_length = 0
         self.pump_timer = 0
+        self.pump_phase = 'extend'  # 'extend' or 'retract'
+        self.pump_extend_timer = 0  # Time spent in extend phase
 
         # Tunnel map (True = dug out)
         self.tunnels = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
@@ -87,6 +89,9 @@ class DigDug(Game):
                         break
 
             enemy_type = 'pooka' if random.random() < 0.7 else 'fygar'
+            # Stagger ghost mode trigger per enemy using spawn index
+            ghost_interval = max(3.0, 6.0 - self.level * 0.3)
+            ghost_offset = i * (ghost_interval / max(1, num_enemies))
             self.enemies.append({
                 'x': ex,
                 'y': ey,
@@ -95,7 +100,8 @@ class DigDug(Game):
                 'inflate': 0,  # 0-4, pops at 4
                 'move_timer': 0,
                 'ghost_mode': False,
-                'ghost_timer': 0,
+                'ghost_timer': ghost_offset,  # Stagger by spawn index
+                'ghost_interval': ghost_interval,  # Fixed interval for this enemy
                 'fire_timer': 0,  # Fygar fire breath cooldown
                 'fire_active': False,  # Is fire currently being breathed
                 'fire_duration': 0,  # How long fire has been active
@@ -159,19 +165,40 @@ class DigDug(Game):
                 self.player_x = new_x
                 self.player_y = new_y
 
-        # Pump action
-        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
+        # Pump action with extend/retract cycle
+        if (input_state.action_l_held or input_state.action_r_held):
             if not self.pump_active:
                 self.pump_active = True
                 self.pump_length = 0
                 self.pump_timer = 0
+                self.pump_phase = 'extend'
+                self.pump_extend_timer = 0
 
             self.pump_timer += dt
-            if self.pump_timer >= 0.1:
-                self.pump_timer = 0
-                self.pump_length = min(self.pump_length + 1, 8)
+            self.pump_extend_timer += dt
 
-                # Check if pump hits enemy
+            if self.pump_phase == 'extend':
+                if self.pump_timer >= 0.1:
+                    self.pump_timer = 0
+                    self.pump_length = min(self.pump_length + 1, 8)
+
+                # Auto-retract after max length or 0.8s
+                if self.pump_length >= 8 or self.pump_extend_timer >= 0.8:
+                    self.pump_phase = 'retract'
+                    self.pump_timer = 0
+
+            elif self.pump_phase == 'retract':
+                if self.pump_timer >= 0.08:
+                    self.pump_timer = 0
+                    self.pump_length -= 1
+                    if self.pump_length <= 0:
+                        self.pump_length = 0
+                        # Reset for next pump cycle
+                        self.pump_phase = 'extend'
+                        self.pump_extend_timer = 0
+
+            # Check if pump hits enemy (during both extend and retract)
+            if self.pump_length > 0:
                 pump_x = self.player_x + self.player_dir[0] * self.pump_length
                 pump_y = self.player_y + self.player_dir[1] * self.pump_length
 
@@ -185,6 +212,8 @@ class DigDug(Game):
         else:
             self.pump_active = False
             self.pump_length = 0
+            self.pump_phase = 'extend'
+            self.pump_extend_timer = 0
             # Enemies deflate when not being pumped
             for enemy in self.enemies:
                 if enemy['inflate'] > 0:
@@ -229,18 +258,14 @@ class DigDug(Game):
 
             enemy['move_timer'] += dt
 
-            # Ghost mode - move through dirt toward player
+            # Ghost mode - fixed timer per enemy (staggered by spawn index)
             enemy['ghost_timer'] += dt
-            # Higher levels trigger ghost mode sooner
-            ghost_trigger_time = max(2.0, 5.0 - self.level * 0.3)
-            if enemy['ghost_timer'] > ghost_trigger_time and not enemy['ghost_mode']:
-                # Higher levels have higher chance of going ghost
-                ghost_chance = min(0.6, 0.3 + self.level * 0.03)
-                if random.random() < ghost_chance:
+            ghost_interval = enemy.get('ghost_interval', 5.0)
+            if not enemy['ghost_mode']:
+                if enemy['ghost_timer'] >= ghost_interval:
                     enemy['ghost_mode'] = True
                     enemy['ghost_timer'] = 0
-
-            if enemy['ghost_mode']:
+            else:
                 if enemy['ghost_timer'] > 3.0:
                     enemy['ghost_mode'] = False
                     enemy['ghost_timer'] = 0
@@ -279,9 +304,16 @@ class DigDug(Game):
                             can_move = True
 
                     if not can_move:
-                        # Try to turn
+                        # Try to turn - prefer directions toward player (75%)
                         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-                        random.shuffle(directions)
+                        if random.random() < 0.75:
+                            # Sort by distance to player (closest first)
+                            directions.sort(key=lambda d: (
+                                abs((enemy['x'] + d[0]) - self.player_x) +
+                                abs((enemy['y'] + d[1]) - self.player_y)
+                            ))
+                        else:
+                            random.shuffle(directions)
                         for d in directions:
                             tx = enemy['x'] + d[0]
                             ty = enemy['y'] + d[1]

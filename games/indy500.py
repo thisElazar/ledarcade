@@ -1,7 +1,7 @@
 """
 Indy 500 - Top-Down Racing
 ===========================
-Race as many laps as you can in 2 minutes!
+Race as many laps as you can in 1 minute!
 
 Controls:
   Left/Right - Steer
@@ -14,7 +14,7 @@ import math
 
 class Indy500(Game):
     name = "INDY 500"
-    description = "Laps in 2 min!"
+    description = "Laps in 1 min!"
     category = "retro"
 
     # Track parameters (oval)
@@ -47,10 +47,10 @@ class Indy500(Game):
         self.state = GameState.PLAYING
         self.score = 0
 
-        # Car state - start at bottom of track
-        self.x = self.TRACK_CENTER_X
-        self.y = self.TRACK_CENTER_Y + self.TRACK_RADIUS_Y - self.TRACK_WIDTH // 2
-        self.angle = -math.pi / 2  # Facing left (will go counter-clockwise)
+        # Car state - start mid-track just right of finish line, facing left
+        self.x = self.TRACK_CENTER_X + 6
+        self.y = self.TRACK_CENTER_Y + self.TRACK_RADIUS_Y  # Track midline at bottom
+        self.angle = math.pi  # Facing left toward finish line
         self.speed = 0.0
 
         # Lap tracking
@@ -63,11 +63,15 @@ class Indy500(Game):
 
         # Track state
         self.off_track = False
-        self.off_track_timer = 0.0
 
-        # Race timer (2 minutes)
-        self.time_limit = 120.0
-        self.time_remaining = 120.0
+        # Race timer (1 minute)
+        self.time_limit = 60.0
+        self.time_remaining = 60.0
+
+    @property
+    def finish_line_y(self) -> float:
+        """Y coordinate of the finish line (track midline at bottom of oval)."""
+        return self.TRACK_CENTER_Y + self.TRACK_RADIUS_Y
 
     def point_on_track(self, x: float, y: float) -> bool:
         """Check if a point is on the track."""
@@ -116,19 +120,31 @@ class Indy500(Game):
         # Speed limits
         self.speed = max(0, min(self.MAX_SPEED, self.speed))
 
-        # Off-track penalty
-        if self.off_track:
-            self.speed = min(self.speed, self.MAX_SPEED * 0.4)
-            self.off_track_timer += dt
+        # Save position before moving
+        prev_x = self.x
+        prev_y = self.y
 
         # Update position
-        self.x += math.cos(self.angle) * self.speed * dt
-        self.y += math.sin(self.angle) * self.speed * dt
+        new_x = self.x + math.cos(self.angle) * self.speed * dt
+        new_y = self.y + math.sin(self.angle) * self.speed * dt
 
-        # Check if on track
-        self.off_track = not self.point_on_track(self.x, self.y)
+        # Hard barrier collision — stop if new position is off track
+        if self.point_on_track(new_x, new_y):
+            self.x = new_x
+            self.y = new_y
+            self.off_track = False
+        else:
+            # Push back to last valid position with a small bounce
+            self.speed = 0
+            self.x = prev_x - math.cos(self.angle) * 0.5
+            self.y = prev_y - math.sin(self.angle) * 0.5
+            self.off_track = True
+            # If bounce-back is also off track, stay at prev position
+            if not self.point_on_track(self.x, self.y):
+                self.x = prev_x
+                self.y = prev_y
 
-        # Keep on screen (wrap or clamp)
+        # Keep on screen
         self.x = max(2, min(GRID_SIZE - 3, self.x))
         self.y = max(10, min(GRID_SIZE - 3, self.y))
 
@@ -137,9 +153,7 @@ class Indy500(Game):
             self.checkpoint_passed = True
 
         # Check finish line crossing (outer half of track at bottom, going left)
-        # Match the shifted finish line position
-        track_midline_y = self.TRACK_CENTER_Y + self.TRACK_RADIUS_Y - self.TRACK_WIDTH // 2
-        finish_y = track_midline_y + self.TRACK_WIDTH // 4  # Shifted toward outside
+        finish_y = self.finish_line_y
         if (abs(self.y - finish_y) < 4 and
             abs(self.x - self.TRACK_CENTER_X) < 4 and
             math.cos(self.angle) < 0):  # Moving left
@@ -194,26 +208,20 @@ class Indy500(Game):
                 self.display.set_pixel(int(ix), int(iy), color)
 
     def draw_finish_line(self):
-        """Draw the start/finish line across the track width."""
+        """Draw the start/finish line spanning the full track width."""
         finish_x = self.TRACK_CENTER_X
 
-        # Track midline at bottom of oval
-        track_midline_y = int(self.TRACK_CENTER_Y + self.TRACK_RADIUS_Y - self.TRACK_WIDTH // 2)
-        track_inner_y = track_midline_y - self.TRACK_WIDTH // 2 + 2
-        track_outer_y = track_midline_y + self.TRACK_WIDTH // 2 - 2
-
-        # Shift down toward outside by half the line height
-        line_height = track_outer_y - track_inner_y
-        shift = line_height // 2
-        track_inner_y += shift
-        track_outer_y += shift
-
-        for dy in range(track_inner_y, track_outer_y + 1):
-            for dx in range(-1, 2):
-                if (dx + dy) % 2 == 0:
+        # Scan vertically at finish_x to find all on-track pixels
+        for y in range(GRID_SIZE):
+            if self.point_on_track(finish_x, y) and y > self.TRACK_CENTER_Y:
+                # Checkerboard pattern (2 pixels wide)
+                for dx in range(-1, 2):
                     px = finish_x + dx
-                    if 0 <= px < GRID_SIZE and 0 <= dy < GRID_SIZE:
-                        self.display.set_pixel(px, dy, self.FINISH_COLOR)
+                    if 0 <= px < GRID_SIZE:
+                        if (dx + y) % 2 == 0:
+                            self.display.set_pixel(px, y, self.FINISH_COLOR)
+                        else:
+                            self.display.set_pixel(px, y, Colors.BLACK)
 
     def draw_car(self):
         """Draw the player's car."""
