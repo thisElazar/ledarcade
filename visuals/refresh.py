@@ -65,8 +65,9 @@ class Refresh(Visual):
             self.pull_started = True
             repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             try:
+                # safe.directory=* avoids "dubious ownership" when running as root
                 result = subprocess.run(
-                    ["git", "pull"],
+                    ["git", "-c", "safe.directory=*", "pull"],
                     cwd=repo_dir,
                     capture_output=True,
                     text=True,
