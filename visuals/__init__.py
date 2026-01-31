@@ -110,6 +110,7 @@ from .credits import Credits
 from .controls import Controls
 from .inputtest import InputTest
 from .shutdown import Shutdown
+from .refresh import Refresh
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .slideshow import (
@@ -177,6 +178,7 @@ ALL_VISUALS = [
     Controls,
     InputTest,
     Shutdown,
+    Refresh,
     NewtonCradle,
     DblPendulum,
     AllVisuals,
@@ -252,6 +254,7 @@ __all__ = [
     'Controls',
     'InputTest',
     'Shutdown',
+    'Refresh',
     'NewtonCradle',
     'DblPendulum',
     'Slideshow',
