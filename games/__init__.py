@@ -44,7 +44,9 @@ from .skifree import SkiFree
 from .pool import Pool
 from .burgertime import BurgerTime
 from .dnd import DnD
+from .bowling import Bowling
 from .darts import Darts
+from .shuffleboard import Shuffleboard
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -90,8 +92,10 @@ ALL_GAMES = [
     SkiFree,
     Pool,
     BurgerTime,
+    Bowling,
     DnD,
     Darts,
+    Shuffleboard,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -145,8 +149,10 @@ __all__ = [
     'SkiFree',
     'Pool',
     'BurgerTime',
+    'Bowling',
     'DnD',
     'Darts',
+    'Shuffleboard',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
