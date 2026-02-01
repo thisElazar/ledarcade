@@ -18,6 +18,28 @@ Controls:
 import random
 import math
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
+from games.arkanoid_levels import LEVEL_DATA
+
+
+# Playfield layout (64px total)
+# [4px wall][5px x 11 columns = 55px bricks][5px wall]
+PLAY_LEFT = 4       # first pixel of playfield
+PLAY_RIGHT = 59     # first pixel of right wall
+BRICK_WIDTH = 5     # stride per column
+BRICK_DRAW_W = 4    # drawn width (stride - 1 gap)
+BRICK_HEIGHT = 2    # drawn height
+BRICK_STRIDE_Y = 3  # vertical stride (height + 1 gap)
+BRICK_START_Y = 8   # first brick row y position
+NUM_COLS = 11
+
+# Character-to-color mapping for level data
+BRICK_CHAR_MAP = {
+    '0': None,
+    '1': 'white',   '2': 'orange',  '3': 'cyan',
+    '4': 'green',   '5': 'red',     '6': 'blue',
+    '7': 'pink',    '8': 'yellow',  '9': 'silver',
+    'A': 'gold',
+}
 
 
 class Arkanoid(Game):
@@ -72,9 +94,9 @@ class Arkanoid(Game):
         self.lives = 3
         self.level = 0
 
-        # Paddle (Vaus)
+        # Paddle (Vaus) - centered within walled playfield
         self.paddle_width = self.PADDLE_NORMAL
-        self.paddle_x = GRID_SIZE // 2 - self.paddle_width // 2
+        self.paddle_x = PLAY_LEFT + (PLAY_RIGHT - PLAY_LEFT - self.paddle_width) // 2
         self.paddle_y = GRID_SIZE - 4
 
         # Balls (support multi-ball)
@@ -123,284 +145,33 @@ class Arkanoid(Game):
         self.balls.append(ball)
 
     def define_levels(self):
-        """Define all level layouts. Each level is a list of brick definitions."""
-        levels = []
+        """Build level list from NES Arkanoid level data."""
+        return [{'name': d['name'], 'bricks': self.parse_level(d['rows'])}
+                for d in LEVEL_DATA]
 
-        # Level 1: Simple rows (intro level)
-        levels.append({
-            'name': 'GENESIS',
-            'bricks': self.make_rows_level([
-                ('red', 'red', 'red', 'red', 'red', 'red', 'red', 'red'),
-                ('orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange', 'orange'),
-                ('yellow', 'yellow', 'yellow', 'yellow', 'yellow', 'yellow', 'yellow', 'yellow'),
-                ('green', 'green', 'green', 'green', 'green', 'green', 'green', 'green'),
-            ])
-        })
-
-        # Level 2: Checkerboard
-        levels.append({
-            'name': 'CHECKER',
-            'bricks': self.make_checkerboard_level()
-        })
-
-        # Level 3: Diamond
-        levels.append({
-            'name': 'DIAMOND',
-            'bricks': self.make_diamond_level()
-        })
-
-        # Level 4: Space Invader (iconic Arkanoid level)
-        levels.append({
-            'name': 'INVADER',
-            'bricks': self.make_invader_level()
-        })
-
-        # Level 5: Pyramid
-        levels.append({
-            'name': 'PYRAMID',
-            'bricks': self.make_pyramid_level()
-        })
-
-        # Level 6: Fortress (with indestructible bricks)
-        levels.append({
-            'name': 'FORTRESS',
-            'bricks': self.make_fortress_level()
-        })
-
-        # Level 7: Stripes
-        levels.append({
-            'name': 'STRIPES',
-            'bricks': self.make_stripes_level()
-        })
-
-        # Level 8: Heart
-        levels.append({
-            'name': 'HEART',
-            'bricks': self.make_heart_level()
-        })
-
-        return levels
-
-    def make_rows_level(self, rows):
-        """Create bricks from row definitions."""
+    def parse_level(self, rows):
+        """Parse compact row strings into brick dicts."""
         bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 10
-
-        for row_idx, row in enumerate(rows):
-            for col_idx, color in enumerate(row):
-                if color:
-                    bricks.append({
-                        'x': col_idx * brick_width,
-                        'y': start_y + row_idx * (brick_height + 1),
-                        'w': brick_width - 1,
-                        'h': brick_height,
-                        'color': self.BRICK_COLORS.get(color, Colors.WHITE),
-                        'type': self.BRICK_NORMAL,
-                        'hits': 1,
-                        'powerup': random.random() < 0.15,  # 15% chance of powerup
-                    })
-        return bricks
-
-    def make_checkerboard_level(self):
-        """Checkerboard pattern."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 10
-        colors = ['cyan', 'orange']
-
-        for row in range(5):
-            for col in range(8):
-                if (row + col) % 2 == 0:
-                    bricks.append({
-                        'x': col * brick_width,
-                        'y': start_y + row * (brick_height + 1),
-                        'w': brick_width - 1,
-                        'h': brick_height,
-                        'color': self.BRICK_COLORS[colors[row % 2]],
-                        'type': self.BRICK_NORMAL,
-                        'hits': 1,
-                        'powerup': random.random() < 0.2,
-                    })
-        return bricks
-
-    def make_diamond_level(self):
-        """Diamond shape in center."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 8
-
-        # Diamond pattern (which columns have bricks per row)
-        pattern = [
-            [3, 4],
-            [2, 3, 4, 5],
-            [1, 2, 3, 4, 5, 6],
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [1, 2, 3, 4, 5, 6],
-            [2, 3, 4, 5],
-            [3, 4],
-        ]
-        colors = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'pink']
-
-        for row_idx, cols in enumerate(pattern):
-            for col in cols:
-                bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row_idx * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': self.BRICK_COLORS[colors[row_idx % len(colors)]],
-                    'type': self.BRICK_NORMAL,
-                    'hits': 1,
-                    'powerup': random.random() < 0.15,
-                })
-        return bricks
-
-    def make_invader_level(self):
-        """Space Invader shape - iconic Arkanoid level."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 8
-
-        # Classic space invader pattern
-        pattern = [
-            [2, 5],
-            [3, 4],
-            [2, 3, 4, 5],
-            [1, 2, 4, 5, 6],
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [0, 2, 3, 4, 5, 7],
-            [0, 7],
-            [1, 2, 5, 6],
-        ]
-
-        for row_idx, cols in enumerate(pattern):
-            for col in cols:
-                bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row_idx * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': Colors.GREEN,
-                    'type': self.BRICK_NORMAL,
-                    'hits': 1,
-                    'powerup': random.random() < 0.15,
-                })
-        return bricks
-
-    def make_pyramid_level(self):
-        """Pyramid shape."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 10
-
-        for row in range(5):
-            start_col = row
-            end_col = 8 - row
-            for col in range(start_col, end_col):
-                color = ['red', 'orange', 'yellow', 'green', 'cyan'][row]
-                bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': self.BRICK_COLORS[color],
-                    'type': self.BRICK_NORMAL,
-                    'hits': 1,
-                    'powerup': random.random() < 0.15,
-                })
-        return bricks
-
-    def make_fortress_level(self):
-        """Fortress with indestructible walls and hard bricks."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 10
-
-        for row in range(5):
-            for col in range(8):
-                # Gold borders are indestructible
-                if row == 0 or col == 0 or col == 7:
-                    brick_type = self.BRICK_INDESTRUCTIBLE
-                    color = 'gold'
-                    hits = 999
-                # Silver middle row is hard
-                elif row == 2:
+        for row_idx, row_str in enumerate(rows):
+            for col_idx, ch in enumerate(row_str):
+                color_name = BRICK_CHAR_MAP.get(ch)
+                if color_name is None:
+                    continue
+                if ch == '9':
                     brick_type = self.BRICK_HARD
-                    color = 'silver'
-                    hits = 2
+                elif ch == 'A':
+                    brick_type = self.BRICK_INDESTRUCTIBLE
                 else:
                     brick_type = self.BRICK_NORMAL
-                    color = 'cyan'
-                    hits = 1
-
                 bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': self.BRICK_COLORS[color],
+                    'x': PLAY_LEFT + col_idx * BRICK_WIDTH,
+                    'y': BRICK_START_Y + row_idx * BRICK_STRIDE_Y,
+                    'w': BRICK_DRAW_W,
+                    'h': BRICK_HEIGHT,
+                    'color': self.BRICK_COLORS[color_name],
                     'type': brick_type,
-                    'hits': hits,
-                    'powerup': brick_type == self.BRICK_NORMAL and random.random() < 0.2,
-                })
-        return bricks
-
-    def make_stripes_level(self):
-        """Vertical stripes."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 10
-        colors = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'pink', 'white']
-
-        for row in range(4):
-            for col in range(8):
-                bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': self.BRICK_COLORS[colors[col]],
-                    'type': self.BRICK_NORMAL,
-                    'hits': 1,
-                    'powerup': random.random() < 0.15,
-                })
-        return bricks
-
-    def make_heart_level(self):
-        """Heart shape."""
-        bricks = []
-        brick_width = 8
-        brick_height = 3
-        start_y = 8
-
-        pattern = [
-            [1, 2, 5, 6],
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [1, 2, 3, 4, 5, 6],
-            [2, 3, 4, 5],
-            [3, 4],
-        ]
-
-        for row_idx, cols in enumerate(pattern):
-            for col in cols:
-                bricks.append({
-                    'x': col * brick_width,
-                    'y': start_y + row_idx * (brick_height + 1),
-                    'w': brick_width - 1,
-                    'h': brick_height,
-                    'color': Colors.RED if row_idx < 4 else Colors.PINK,
-                    'type': self.BRICK_NORMAL,
-                    'hits': 1,
-                    'powerup': random.random() < 0.15,
+                    'hits': 1,  # adjusted in load_level for silver/gold
+                    'powerup': brick_type == self.BRICK_NORMAL and random.random() < 0.15,
                 })
         return bricks
 
@@ -409,10 +180,16 @@ class Arkanoid(Game):
         if level_idx >= len(self.levels):
             level_idx = level_idx % len(self.levels)  # Loop levels
 
+        silver_hits = 2 + (self.level // 8)  # +1 hit every 8 stages
         level_data = self.levels[level_idx]
         self.bricks = []
         for brick_def in level_data['bricks']:
-            self.bricks.append(dict(brick_def))  # Copy to avoid modifying template
+            brick = dict(brick_def)  # Copy to avoid modifying template
+            if brick['type'] == self.BRICK_HARD:
+                brick['hits'] = silver_hits
+            elif brick['type'] == self.BRICK_INDESTRUCTIBLE:
+                brick['hits'] = 999
+            self.bricks.append(brick)
 
     def launch_ball(self, ball):
         """Launch a ball from the paddle."""
@@ -465,12 +242,12 @@ class Arkanoid(Game):
         if self.state != GameState.PLAYING:
             return
 
-        # Move paddle
+        # Move paddle (constrained within walls)
         paddle_speed = 65
         if input_state.left:
-            self.paddle_x = max(0, self.paddle_x - paddle_speed * dt)
+            self.paddle_x = max(PLAY_LEFT, self.paddle_x - paddle_speed * dt)
         if input_state.right:
-            self.paddle_x = min(GRID_SIZE - self.paddle_width, self.paddle_x + paddle_speed * dt)
+            self.paddle_x = min(PLAY_RIGHT - self.paddle_width, self.paddle_x + paddle_speed * dt)
 
         # Launch ball or fire laser
         if (input_state.action_l or input_state.action_r):
@@ -516,12 +293,12 @@ class Arkanoid(Game):
             ball['x'] += ball['dx'] * dt
             ball['y'] += ball['dy'] * dt
 
-            # Wall collisions
-            if ball['x'] <= 0:
-                ball['x'] = 0
+            # Wall collisions (bounce off side walls)
+            if ball['x'] <= PLAY_LEFT:
+                ball['x'] = PLAY_LEFT
                 ball['dx'] = abs(ball['dx'])
-            if ball['x'] >= GRID_SIZE - 2:
-                ball['x'] = GRID_SIZE - 2
+            if ball['x'] >= PLAY_RIGHT - 2:
+                ball['x'] = PLAY_RIGHT - 2
                 ball['dx'] = -abs(ball['dx'])
             if ball['y'] <= 7:
                 ball['y'] = 7
@@ -648,6 +425,10 @@ class Arkanoid(Game):
 
         # Draw separator
         self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
+
+        # Draw side walls
+        self.display.draw_rect(0, 7, PLAY_LEFT, GRID_SIZE - 7, Colors.DARK_GRAY)
+        self.display.draw_rect(PLAY_RIGHT, 7, GRID_SIZE - PLAY_RIGHT, GRID_SIZE - 7, Colors.DARK_GRAY)
 
         # Draw bricks
         for brick in self.bricks:

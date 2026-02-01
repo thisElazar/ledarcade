@@ -9,7 +9,7 @@ Original rules:
 - Paddle shrinks to half after ball hits top wall
 - Ball speeds up after 4 hits, again after 12 hits
 - Ball is fastest when in orange/red rows
-- 3 lives to clear 2 screens (max score 864)
+- 3 lives to clear 2 screens (max score 896)
 
 Controls:
   Left/Right - Move paddle
@@ -19,6 +19,13 @@ Controls:
 import random
 import math
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
+
+# Playfield layout (64px total)
+# [4px wall][4px x 14 columns = 56px bricks][4px wall]
+WALL_SIZE = 4
+PLAY_LEFT = 4
+PLAY_RIGHT = 60
+BRICKS_PER_ROW = 14
 
 
 class Breakout(Game):
@@ -60,9 +67,9 @@ class Breakout(Game):
         self.hit_count = 0  # Total brick hits this ball
         self.hit_ceiling = False  # Has ball hit top wall this screen?
 
-        # Paddle
+        # Paddle - centered within walled playfield
         self.paddle_width = self.PADDLE_FULL
-        self.paddle_x = GRID_SIZE // 2 - self.paddle_width // 2
+        self.paddle_x = PLAY_LEFT + (PLAY_RIGHT - PLAY_LEFT - self.paddle_width) // 2
         self.paddle_y = GRID_SIZE - 4
 
         # Ball
@@ -83,15 +90,14 @@ class Breakout(Game):
 
         brick_width = 4
         brick_height = 2
-        bricks_per_row = GRID_SIZE // brick_width
         start_y = 8  # Start below score area
 
         # 8 rows, bottom to top (index 0 = bottom yellow, index 7 = top red)
         for row in range(8):
             row_def = self.BRICK_ROWS[row]
-            for col in range(bricks_per_row):
+            for col in range(BRICKS_PER_ROW):
                 brick = {
-                    'x': col * brick_width,
+                    'x': PLAY_LEFT + col * brick_width,
                     'y': start_y + (7 - row) * (brick_height + 1),  # Top rows at top
                     'w': brick_width - 1,
                     'h': brick_height,
@@ -132,12 +138,12 @@ class Breakout(Game):
         if self.state != GameState.PLAYING:
             return
 
-        # Move paddle
+        # Move paddle (constrained within walls)
         paddle_speed = 60
         if input_state.left:
-            self.paddle_x = max(0, self.paddle_x - paddle_speed * dt)
+            self.paddle_x = max(PLAY_LEFT, self.paddle_x - paddle_speed * dt)
         if input_state.right:
-            self.paddle_x = min(GRID_SIZE - self.paddle_width, self.paddle_x + paddle_speed * dt)
+            self.paddle_x = min(PLAY_RIGHT - self.paddle_width, self.paddle_x + paddle_speed * dt)
 
         # Launch ball
         if (input_state.action_l or input_state.action_r) and not self.ball_launched:
@@ -163,12 +169,12 @@ class Breakout(Game):
         self.ball_x += self.ball_dx * dt
         self.ball_y += self.ball_dy * dt
 
-        # Wall collisions (2x2 ball)
-        if self.ball_x <= 0:
-            self.ball_x = 0
+        # Wall collisions (2x2 ball, bounce off side walls)
+        if self.ball_x <= PLAY_LEFT:
+            self.ball_x = PLAY_LEFT
             self.ball_dx = abs(self.ball_dx)
-        if self.ball_x >= GRID_SIZE - 2:
-            self.ball_x = GRID_SIZE - 2
+        if self.ball_x >= PLAY_RIGHT - 2:
+            self.ball_x = PLAY_RIGHT - 2
             self.ball_dx = -abs(self.ball_dx)
 
         # Top wall - shrink paddle (authentic mechanic)
@@ -179,7 +185,7 @@ class Breakout(Game):
                 self.hit_ceiling = True
                 self.paddle_width = self.PADDLE_HALF
                 # Re-center paddle at new width
-                self.paddle_x = min(self.paddle_x, GRID_SIZE - self.paddle_width)
+                self.paddle_x = min(self.paddle_x, PLAY_RIGHT - self.paddle_width)
 
         # Bottom - lose life
         if self.ball_y >= GRID_SIZE - 1:
@@ -222,7 +228,7 @@ class Breakout(Game):
                 self.ball_launched = False
                 self.hit_ceiling = False
                 self.paddle_width = self.PADDLE_FULL
-                self.paddle_x = GRID_SIZE // 2 - self.paddle_width // 2
+                self.paddle_x = PLAY_LEFT + (PLAY_RIGHT - PLAY_LEFT - self.paddle_width) // 2
             else:
                 # Both screens cleared - game complete!
                 self.state = GameState.WIN
@@ -255,6 +261,10 @@ class Breakout(Game):
 
         # Draw separator
         self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
+
+        # Draw side walls
+        self.display.draw_rect(0, 7, PLAY_LEFT, GRID_SIZE - 7, Colors.DARK_GRAY)
+        self.display.draw_rect(PLAY_RIGHT, 7, GRID_SIZE - PLAY_RIGHT, GRID_SIZE - 7, Colors.DARK_GRAY)
 
         # Draw bricks
         for brick in self.bricks:
