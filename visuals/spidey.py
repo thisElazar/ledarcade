@@ -25,7 +25,7 @@ except ImportError:
 class Spidey(Visual):
     name = "SPIDEY"
     description = "Web swing"
-    category = "sprites"
+    category = "superheroes"
 
     GIF_FILE = "spidey_swing.gif"
     BASE_INTERVAL = 0.03  # Match original 30ms frame timing

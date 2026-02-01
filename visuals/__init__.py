@@ -121,7 +121,7 @@ from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
-    SpriteGallery, Demoscene, Complexity,
+    SpriteGallery, SuperheroGallery, Demoscene, Complexity,
 )
 
 # List of all available visuals
@@ -198,6 +198,7 @@ ALL_VISUALS = [
     Energy,
     ArtGallery,
     SpriteGallery,
+    SuperheroGallery,
     Demoscene,
     Complexity,
 ]
@@ -281,6 +282,7 @@ __all__ = [
     'Energy',
     'ArtGallery',
     'SpriteGallery',
+    'SuperheroGallery',
     'Demoscene',
     'Complexity',
 ]

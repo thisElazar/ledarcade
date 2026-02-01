@@ -23,7 +23,7 @@ except ImportError:
 class Batman(Visual):
     name = "BATMAN"
     description = "Dark knight"
-    category = "sprites"
+    category = "superheroes"
 
     GIF_FILE = "batman.gif"
     BASE_INTERVAL = 0.06

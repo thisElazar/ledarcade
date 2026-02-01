@@ -51,6 +51,7 @@ VISUAL_CATEGORIES = [
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
     Category("OUTDOORS", Colors.GREEN, "nature"),
     Category("SPRITES", Colors.LIME, "sprites"),
+    Category("SUPERHEROES", Colors.RED, "superheroes"),
     Category("UTILITY", Colors.WHITE, "utility"),      # Always last
 ]
 

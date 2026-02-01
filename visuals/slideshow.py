@@ -135,8 +135,18 @@ class SpriteGallery(Slideshow):
     description = "Classic game character sprites"
 
     def _get_visual_classes(self):
-        from visuals import Mario, Sonic, Link, MetroidChase, Yoshi, Kirby, Spidey, Batman
-        return [Mario, Sonic, Link, MetroidChase, Yoshi, Kirby, Spidey, Batman]
+        from visuals import Mario, Sonic, Link, MetroidChase, Yoshi, Kirby
+        return [Mario, Sonic, Link, MetroidChase, Yoshi, Kirby]
+
+
+class SuperheroGallery(Slideshow):
+    name = "HERO GALLERY"
+    description = "Superhero sprite animations"
+    category = "superheroes"
+
+    def _get_visual_classes(self):
+        from visuals import Spidey, Batman
+        return [Spidey, Batman]
 
 
 class Demoscene(Slideshow):
