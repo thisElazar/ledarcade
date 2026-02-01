@@ -459,13 +459,16 @@ class BurgerTime(Game):
                 else:
                     self.facing = 1
 
-            # Grab ladder
-            if (input_state.up or input_state.down) and ladder:
+            # Grab ladder — only if there's room to climb in the desired direction
+            if input_state.up and ladder and ladder['y1'] < self.chef_y - 1:
                 self.on_ladder = True
-                self.chef_x = ladder['x']
+                self.chef_x = float(ladder['x'])
+            elif input_state.down and ladder and ladder['y2'] > self.chef_y + 1:
+                self.on_ladder = True
+                self.chef_x = float(ladder['x'])
 
-        # Throw pepper
-        if input_state.action_l and self.peppers > 0 and not self.pepper_active:
+        # Throw pepper (either action button)
+        if (input_state.action_l or input_state.action_r) and self.peppers > 0 and not self.pepper_active:
             self.peppers -= 1
             self.pepper_active = True
             self.pepper_x = self.chef_x + (self.facing * 6)
