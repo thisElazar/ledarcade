@@ -146,12 +146,14 @@ def _density_step(d, d0, u, v, diffusion, dt):
     _advect(0, d, d0, u, v, dt)
 
 
-def _draw_density(display, dens, palette_idx):
+def _draw_density(display, dens, palette_idx, scale=0.3, sqrt_map=False):
     """Map density field to palette and draw."""
     pal_arr = _PAL_ARRAYS[palette_idx]
     n_colors = len(pal_arr)
 
-    t = np.clip(dens[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
+    t = np.clip(dens[1:N+1, 1:N+1] * scale, 0.0, 1.0)
+    if sqrt_map:
+        np.sqrt(t, out=t)
     idx_f = t * (n_colors - 1)
     lo = idx_f.astype(np.intp)
     hi = np.minimum(lo + 1, n_colors - 1)
@@ -168,27 +170,50 @@ def _draw_density(display, dens, palette_idx):
 
 # ── Obstacle shapes ───────────────────────────────────────────────
 
-OBSTACLE_NAMES = ['circle', 'square', 'wedge']
+OBSTACLE_NAMES = [
+    'circle', 'square', 'wedge',
+    'airfoil', 'diamond', 'plate',
+    'arrow', 'cross', 'elbow',
+]
 
 
 def _make_obstacle(shape_idx):
     """Create obstacle mask for the given shape."""
     obs = np.zeros((S, S), dtype=bool)
     cx, cy = N // 3, N // 2
+    dx = _II - cx
+    dy = _JJ - cy
 
     shape = OBSTACLE_NAMES[shape_idx % len(OBSTACLE_NAMES)]
     if shape == 'circle':
-        r = 4
-        dx = _II - cx
-        dy = _JJ - cy
-        obs[1:N+1, 1:N+1] = (dx * dx + dy * dy) <= r * r
+        obs[1:N+1, 1:N+1] = (dx * dx + dy * dy) <= 16  # r=4
     elif shape == 'square':
-        hw = 4
-        obs[1:N+1, 1:N+1] = (np.abs(_II - cx) <= hw) & (np.abs(_JJ - cy) <= hw)
+        obs[1:N+1, 1:N+1] = (np.abs(dx) <= 4) & (np.abs(dy) <= 4)
     elif shape == 'wedge':
-        dx = _II - cx
-        dy = _JJ - cy
         obs[1:N+1, 1:N+1] = (dx >= -2) & (dx <= 6) & (np.abs(dy) <= np.maximum(0, (dx + 3) * 0.6))
+    elif shape == 'airfoil':
+        # Elliptical nose + linear taper tail
+        nose = (dx >= -3) & (dx <= 0) & (dy * dy <= 9.0 * np.maximum(0, 1 - (dx / 3.0) ** 2))
+        tail = (dx > 0) & (dx <= 8) & (np.abs(dy) <= 3.0 * (1 - dx / 8.0))
+        obs[1:N+1, 1:N+1] = nose | tail
+    elif shape == 'diamond':
+        obs[1:N+1, 1:N+1] = (np.abs(dx) + np.abs(dy)) <= 5
+    elif shape == 'plate':
+        # Thin flat plate perpendicular to flow
+        obs[1:N+1, 1:N+1] = (np.abs(dx) <= 1) & (np.abs(dy) <= 6)
+    elif shape == 'arrow':
+        # Triangle pointing into flow + rectangular tail
+        tri = (dx >= -5) & (dx <= 3) & (np.abs(dy) <= (dx + 5) * 0.5)
+        tail = (dx > 3) & (dx <= 8) & (np.abs(dy) <= 1)
+        obs[1:N+1, 1:N+1] = tri | tail
+    elif shape == 'cross':
+        horiz = (np.abs(dx) <= 6) & (np.abs(dy) <= 1)
+        vert = (np.abs(dx) <= 1) & (np.abs(dy) <= 4)
+        obs[1:N+1, 1:N+1] = horiz | vert
+    elif shape == 'elbow':
+        vert_bar = (dx >= -1) & (dx <= 1) & (dy >= -5) & (dy <= 5)
+        horiz_bar = (dx >= -1) & (dx <= 6) & (dy >= 3) & (dy <= 5)
+        obs[1:N+1, 1:N+1] = vert_bar | horiz_bar
     return obs
 
 
@@ -268,7 +293,8 @@ class FluidTunnel(Visual):
         self.dens *= 0.995
 
     def draw(self):
-        _draw_density(self.display, self.dens, self.palette_idx)
+        _draw_density(self.display, self.dens, self.palette_idx,
+                      scale=0.2, sqrt_map=True)
         # Draw obstacle pixels
         obs_ij = np.argwhere(self.obstacle[1:N+1, 1:N+1])
         for k in range(len(obs_ij)):
