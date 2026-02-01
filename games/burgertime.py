@@ -354,7 +354,7 @@ class BurgerTime(Game):
         candidates = []
         for ladder in self.ladders:
             if abs(x - ladder['x']) < 3:
-                if ladder['y1'] <= y <= ladder['y2']:
+                if ladder['y1'] - 2 <= y <= ladder['y2'] + 2:
                     candidates.append(ladder)
 
         if not candidates:
@@ -441,6 +441,11 @@ class BurgerTime(Game):
                 if platform:
                     self.on_ladder = False
         else:
+            # Snap y to nearest floor to prevent drift
+            nearest_floor = min(FLOOR_Y, key=lambda f: abs(f - self.chef_y))
+            if abs(self.chef_y - nearest_floor) < 3:
+                self.chef_y = float(nearest_floor)
+
             # Platform movement with edge checking
             if input_state.left:
                 new_x = self.chef_x - self.MOVE_SPEED * dt
