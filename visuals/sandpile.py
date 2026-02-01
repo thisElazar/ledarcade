@@ -29,7 +29,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Sandpile(Visual):
     name = "SANDPILE"
     description = "Fractal avalanches"
-    category = "digital"
+    category = "automata"
 
     # Color palettes: each maps grain counts 0-3 plus overflow (4+)
     PALETTES = [

@@ -119,6 +119,11 @@ from .shutdown import Shutdown
 from .refresh import Refresh
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
+from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
+from .emfield import EMMotor, EMCircuit, EMFreeAir
+from .turing import TuringSpots, TuringStripes, TuringCoral, TuringWorms
+from .neurons import Neurons
+from .fluid import FluidTunnel, FluidInk, FluidMixing
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -193,6 +198,20 @@ ALL_VISUALS = [
     Refresh,
     NewtonCradle,
     DblPendulum,
+    OrbitsSolar,
+    OrbitsMulti,
+    OrbitsBelt,
+    EMMotor,
+    EMCircuit,
+    EMFreeAir,
+    TuringSpots,
+    TuringStripes,
+    TuringCoral,
+    TuringWorms,
+    Neurons,
+    FluidTunnel,
+    FluidInk,
+    FluidMixing,
     AllVisuals,
     Chill,
     Energy,
@@ -276,6 +295,20 @@ __all__ = [
     'Refresh',
     'NewtonCradle',
     'DblPendulum',
+    'OrbitsSolar',
+    'OrbitsMulti',
+    'OrbitsBelt',
+    'EMMotor',
+    'EMCircuit',
+    'EMFreeAir',
+    'TuringSpots',
+    'TuringStripes',
+    'TuringCoral',
+    'TuringWorms',
+    'Neurons',
+    'FluidTunnel',
+    'FluidInk',
+    'FluidMixing',
     'Slideshow',
     'AllVisuals',
     'Chill',
