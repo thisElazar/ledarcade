@@ -53,15 +53,12 @@ class Earth(Visual):
 
         def process():
             gif = Image.open(path)
-            canvas = None
+            canvas = Image.new("RGBA", gif.size, (0, 0, 0, 255))
             frames = []
             for i in range(getattr(gif, 'n_frames', 1)):
                 gif.seek(i)
                 frame = gif.convert("RGBA")
-                if canvas is None:
-                    canvas = frame.copy()
-                else:
-                    canvas.paste(frame, (0, 0), frame)
+                canvas.paste(frame, (0, 0), frame)
                 scaled = canvas.copy().resize((GRID_SIZE, GRID_SIZE),
                                               Image.Resampling.NEAREST)
                 frames.append(extract_rgb(scaled))

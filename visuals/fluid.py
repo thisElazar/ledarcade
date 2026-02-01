@@ -7,7 +7,7 @@ advection with Gauss-Seidel pressure projection.
 Three standalone visuals share the solver:
   Wind Tunnel  - Flow past obstacle, vortex shedding
   Ink Drops    - Colored density injected at random points
-  Fluid Mix    - Two colored fluids stirred together
+  Color Mix    - Two colored fluids stirred together
 
 Controls:
   Up/Down    - Cycle color palette
@@ -499,12 +499,11 @@ _MIX_PAL_ARRAYS = [
 
 
 class FluidMixing(Visual):
-    name = "FLUID MIX"
-    description = "Two fluids mixing"
+    name = "COLOR MIX"
+    description = "Two colors mixing"
     category = "science"
 
-    # viz_mode: 0..len(MIX_PALETTES)-1 = density, then velocity, then vorticity
-    _N_VIZ_MODES = len(MIX_PALETTES) + 2
+    _N_VIZ_MODES = len(MIX_PALETTES)
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -521,12 +520,15 @@ class FluidMixing(Visual):
         self.v = _new_field()
         self.u_prev = _new_field()
         self.v_prev = _new_field()
-        # Two density fields
+        # Two color density fields
         self.dens_a = _new_field()
         self.dens_b = _new_field()
         self.dens_a_prev = _new_field()
         self.dens_b_prev = _new_field()
-        # Initialize: left half = fluid A, right half = fluid B
+        # White density field (injected from top)
+        self.dens_w = _new_field()
+        self.dens_w_prev = _new_field()
+        # Initialize: left half = color A, right half = color B
         half = N // 2
         self.dens_a[1:half+1, 1:N+1] = 2.0
         self.dens_b[half+1:N+1, 1:N+1] = 2.0
@@ -586,9 +588,10 @@ class FluidMixing(Visual):
         v_int += -dx_b * inv_b
 
     def _replenish_edges(self):
-        """Keep fluid A on left edge and fluid B on right edge."""
+        """Keep color A on left, color B on right, white on top."""
         np.maximum(self.dens_a[1, 1:N+1], 1.5, out=self.dens_a[1, 1:N+1])
         np.maximum(self.dens_b[N, 1:N+1], 1.5, out=self.dens_b[N, 1:N+1])
+        np.maximum(self.dens_w[1:N+1, 1], 1.5, out=self.dens_w[1:N+1, 1])
 
     def update(self, dt: float):
         self.time += dt
@@ -598,41 +601,46 @@ class FluidMixing(Visual):
         self.v_prev[:] = 0.0
         self.dens_a_prev[:] = 0.0
         self.dens_b_prev[:] = 0.0
+        self.dens_w_prev[:] = 0.0
 
         self._add_stirring()
         self._replenish_edges()
 
-        # Velocity step (shared by both densities)
+        # Velocity step (shared by all densities)
         _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
                        self.viscosity, sim_dt)
 
-        # Density steps for both fluids
+        # Density steps for both colors and white
         _density_step(self.dens_a, self.dens_a_prev, self.u, self.v,
                       self.diffusion, sim_dt)
         _density_step(self.dens_b, self.dens_b_prev, self.u, self.v,
                       self.diffusion, sim_dt)
+        _density_step(self.dens_w, self.dens_w_prev, self.u, self.v,
+                      self.diffusion, sim_dt)
 
     def draw(self):
-        if self.viz_mode < len(MIX_PALETTES):
-            pal = _MIX_PAL_ARRAYS[self.viz_mode]
-            ca = pal['a']
-            cb = pal['b']
-            bg = pal['bg']
+        pal = _MIX_PAL_ARRAYS[self.viz_mode]
+        ca = pal['a']
+        cb = pal['b']
+        bg = pal['bg']
 
-            da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
-            np.sqrt(da, out=da)
-            db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
-            np.sqrt(db, out=db)
+        da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
+        np.sqrt(da, out=da)
+        db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
+        np.sqrt(db, out=db)
 
-            colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
-            pixels = np.clip(colors, 0, 255).astype(np.uint8)
+        colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
+        np.clip(colors, 0, 255, out=colors)
 
-            for i in range(N):
-                col = pixels[i]
-                for j in range(N):
-                    p = col[j]
-                    self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
-        elif self.viz_mode == len(MIX_PALETTES):
-            _draw_velocity(self.display, self.u, self.v)
-        else:
-            _draw_vorticity(self.display, self.u, self.v)
+        # Blend toward white based on white density
+        dw = np.clip(self.dens_w[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
+        np.sqrt(dw, out=dw)
+        colors += (255.0 - colors) * dw[:, :, np.newaxis]
+
+        pixels = np.clip(colors, 0, 255).astype(np.uint8)
+
+        for i in range(N):
+            col = pixels[i]
+            for j in range(N):
+                p = col[j]
+                self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
