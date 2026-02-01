@@ -140,9 +140,9 @@ class SpriteGallery(Slideshow):
 
 
 class SuperheroGallery(Slideshow):
-    name = "HERO GALLERY"
+    name = "SUPERHEROES"
     description = "Superhero sprite animations"
-    category = "superheroes"
+    category = "visual_mix"
 
     def _get_visual_classes(self):
         from visuals import Spidey, Batman
