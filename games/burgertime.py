@@ -13,6 +13,168 @@ import random
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
+# =============================================================================
+# Layout constants
+# =============================================================================
+
+FLOOR_Y = [14, 22, 30, 38, 46, 54]   # 6 floors, 8px apart, top-to-bottom
+PLATE_Y = 59                           # Where completed burgers land
+
+BURGER_X = [4, 20, 36, 52]            # Left edge of each 8px ingredient
+INGREDIENT_WIDTH = 8
+
+# Base burger platform zones (always present on every active floor)
+# Each burger column gets a walkable zone around it
+BURGER_ZONES = [
+    (0, 12),    # Burger 0
+    (19, 28),   # Burger 1
+    (35, 44),   # Burger 2
+    (51, 63),   # Burger 3
+]
+
+
+def compute_platform_segments(floor_code):
+    """Convert a 3-char connectivity code into platform segments.
+
+    floor_code is a 3-char string for the 3 gaps between 4 burger zones:
+      'X' = walkway connects adjacent zones
+      '.' = gap (no walkway)
+
+    Returns list of (x1, x2) tuples for each contiguous platform segment.
+    """
+    # Start with 4 isolated zones
+    zones = [list(z) for z in BURGER_ZONES]
+
+    # Merge adjacent zones where connected
+    # Process right-to-left so indices stay valid
+    for i in range(2, -1, -1):
+        if floor_code[i] == 'X':
+            # Merge zone i and zone i+1
+            zones[i][1] = zones[i + 1][1]
+            zones.pop(i + 1)
+
+    return [(z[0], z[1]) for z in zones]
+
+
+# =============================================================================
+# Level definitions
+# =============================================================================
+# Each level defines:
+#   floors  - 6 connectivity codes (top to bottom)
+#   ladders - list of (x, top_floor_idx, bottom_floor_idx)
+#   ingredients - list of (burger_col, floor_idx, type)
+#     burger_col 0-3, floor_idx 0-5
+
+LEVELS = [
+    # Level 1 — "Getting Started" — generous ladders, mostly connected
+    {
+        'floors': ['XXX', 'X.X', 'XXX', '.X.', 'X.X', 'XXX'],
+        'ladders': [
+            (6,  0, 1), (6,  2, 3), (6,  4, 5),
+            (22, 0, 1), (22, 1, 2), (22, 3, 4),
+            (38, 1, 2), (38, 2, 3), (38, 3, 4),
+            (54, 0, 1), (54, 2, 3), (54, 4, 5),
+            (60, 1, 2), (60, 3, 4),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 1, 'lettuce'), (0, 2, 'meat'), (0, 3, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'), (1, 4, 'bun_bottom'),
+            (2, 0, 'bun_top'), (2, 1, 'lettuce'), (2, 2, 'meat'), (2, 3, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 3, 'meat'), (3, 4, 'bun_bottom'),
+        ],
+    },
+    # Level 2 — "Staircase" — zigzag connectivity forces ladder use
+    {
+        'floors': ['X..', '.X.', '..X', 'X..', '.X.', 'XXX'],
+        'ladders': [
+            (6,  0, 1), (6,  3, 4),
+            (10, 2, 3),
+            (26, 0, 1), (26, 1, 2), (26, 4, 5),
+            (38, 1, 2), (38, 3, 4),
+            (54, 2, 3), (54, 4, 5),
+            (60, 0, 1),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 1, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 2, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
+            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 4, 'meat'),    (2, 5, 'bun_bottom'),
+            (3, 1, 'bun_top'), (3, 2, 'tomato'),  (3, 3, 'meat'),    (3, 5, 'bun_bottom'),
+        ],
+    },
+    # Level 3 — "Checkerboard" — alternating center/edge connected
+    {
+        'floors': ['.X.', 'X.X', '.X.', 'X.X', '.X.', 'XXX'],
+        'ladders': [
+            (6,  0, 1), (6,  2, 3), (6,  4, 5),
+            (26, 0, 1), (26, 1, 2), (26, 2, 3), (26, 3, 4), (26, 4, 5),
+            (42, 0, 1), (42, 1, 2), (42, 2, 3), (42, 3, 4), (42, 4, 5),
+            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 2, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
+            (2, 0, 'bun_top'), (2, 2, 'lettuce'), (2, 3, 'meat'),    (2, 4, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 2, 'meat'),    (3, 4, 'bun_bottom'),
+        ],
+    },
+    # Level 4 — "Dense Open" — wide top, fragmented bottom, many ladders
+    {
+        'floors': ['XXX', 'XXX', '.X.', 'XXX', 'XXX', '...'],
+        'ladders': [
+            (6,  0, 1), (6,  2, 3), (6,  4, 5),
+            (22, 0, 1), (22, 1, 2), (22, 3, 4),
+            (26, 2, 3), (26, 4, 5),
+            (38, 1, 2), (38, 2, 3), (38, 3, 4),
+            (42, 0, 1), (42, 4, 5),
+            (54, 1, 2), (54, 3, 4),
+            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 1, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 2, 'tomato'),  (1, 3, 'lettuce'), (1, 4, 'bun_bottom'),
+            (2, 0, 'bun_top'), (2, 2, 'meat'),    (2, 3, 'tomato'),  (2, 4, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'meat'),    (3, 3, 'lettuce'), (3, 4, 'bun_bottom'),
+        ],
+    },
+    # Level 5 — "Most Fragmented" — isolated islands, heavy ladder reliance
+    {
+        'floors': ['...', '.X.', '...', 'X.X', '...', 'XXX'],
+        'ladders': [
+            (6,  0, 1), (6,  2, 3), (6,  4, 5),
+            (10, 1, 2), (10, 3, 4),
+            (26, 0, 1), (26, 2, 3), (26, 4, 5),
+            (42, 0, 1), (42, 1, 2), (42, 2, 3), (42, 3, 4), (42, 4, 5),
+            (54, 1, 2), (54, 3, 4),
+            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 2, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
+            (1, 1, 'bun_top'), (1, 2, 'tomato'),  (1, 3, 'meat'),    (1, 5, 'bun_bottom'),
+            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 3, 'tomato'),  (2, 5, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 2, 'meat'),    (3, 3, 'lettuce'), (3, 4, 'bun_bottom'),
+        ],
+    },
+    # Level 6 — "Split Left-Right" — left on even floors, right on odd
+    {
+        'floors': ['X..', '..X', '...', 'X..', '..X', 'XXX'],
+        'ladders': [
+            (6,  0, 1), (6,  2, 3), (6,  4, 5),
+            (10, 1, 2), (10, 3, 4),
+            (22, 0, 1), (22, 2, 3),
+            (42, 1, 2), (42, 3, 4),
+            (54, 0, 1), (54, 2, 3), (54, 4, 5),
+            (60, 1, 2), (60, 3, 4), (60, 4, 5),
+        ],
+        'ingredients': [
+            (0, 0, 'bun_top'), (0, 2, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
+            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 4, 'meat'),    (2, 5, 'bun_bottom'),
+            (3, 1, 'bun_top'), (3, 2, 'tomato'),  (3, 3, 'lettuce'), (3, 5, 'bun_bottom'),
+        ],
+    },
+]
+
+
 class BurgerTime(Game):
     name = "BURGERTIME"
     description = "Stack the burgers!"
@@ -25,6 +187,7 @@ class BurgerTime(Game):
     CHEF_SKIN = (255, 200, 150)
 
     PLATFORM_COLOR = (100, 80, 60)  # Brown
+    PLATFORM_EDGE = (80, 60, 40)
     LADDER_COLOR = (150, 200, 255)  # Light blue
 
     # Ingredient colors
@@ -48,10 +211,6 @@ class BurgerTime(Game):
     ENEMY_SPEED = 18.0
     INGREDIENT_FALL_SPEED = 80.0
 
-    # Layout constants
-    PLATFORM_Y = [56, 44, 32, 20]  # Y positions of platforms (bottom to top)
-    PLATE_Y = 60  # Where completed burgers land
-
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
@@ -65,7 +224,7 @@ class BurgerTime(Game):
 
         # Chef position
         self.chef_x = 30.0
-        self.chef_y = float(self.PLATFORM_Y[0])
+        self.chef_y = float(FLOOR_Y[5])
         self.on_ladder = False
         self.facing = 1  # 1=right, -1=left
         self.walk_frame = 0
@@ -84,82 +243,84 @@ class BurgerTime(Game):
         self.win_timer = 0.0
 
     def build_level(self):
-        """Build platforms, ladders, ingredients, and enemies."""
+        """Build platforms, ladders, ingredients, and enemies from level data."""
         self.platforms = []
         self.ladders = []
         self.ingredients = []
         self.enemies = []
         self.plates = []
 
-        # Create 4 burger columns
-        burger_x_positions = [6, 22, 38, 54]
+        level_data = LEVELS[(self.level - 1) % len(LEVELS)]
 
-        # Platforms - full width rows
-        for y in self.PLATFORM_Y:
-            self.platforms.append({'x1': 0, 'x2': 64, 'y': y})
-
-        # Ladders connecting platforms
-        ladder_x_positions = [2, 14, 30, 46, 60]
-        for lx in ladder_x_positions:
-            for i in range(len(self.PLATFORM_Y) - 1):
-                self.ladders.append({
-                    'x': lx,
-                    'y1': self.PLATFORM_Y[i+1],
-                    'y2': self.PLATFORM_Y[i]
+        # Build platforms from floor connectivity codes
+        for floor_idx, floor_code in enumerate(level_data['floors']):
+            y = FLOOR_Y[floor_idx]
+            segments = compute_platform_segments(floor_code)
+            for x1, x2 in segments:
+                self.platforms.append({
+                    'x1': x1, 'x2': x2, 'y': y,
+                    'floor_idx': floor_idx,
                 })
 
-        # Ingredients for each burger column
-        ingredient_types = ['bun_top', 'lettuce', 'meat', 'tomato', 'bun_bottom']
+        # Build ladders
+        for lx, top_floor, bot_floor in level_data['ladders']:
+            self.ladders.append({
+                'x': lx,
+                'y1': FLOOR_Y[top_floor],
+                'y2': FLOOR_Y[bot_floor],
+            })
 
-        for bx in burger_x_positions:
-            # Place one ingredient per platform level (except bottom which is plate)
-            for i, ing_type in enumerate(ingredient_types[:4]):
-                platform_idx = 3 - i  # Top platform first
-                if platform_idx >= 0:
-                    self.ingredients.append({
-                        'type': ing_type,
-                        'x': bx - 4,  # Center ingredient on column
-                        'y': self.PLATFORM_Y[platform_idx] - 2,
-                        'width': 8,
-                        'walked': [False] * 8,  # Track which pixels chef walked over
-                        'falling': False,
-                        'fall_speed': 0,
-                        'target_y': None,
-                        'carrying_enemies': []
-                    })
-
-            # Bottom bun starts lower
+        # Build ingredients
+        for burger_col, floor_idx, ing_type in level_data['ingredients']:
             self.ingredients.append({
-                'type': 'bun_bottom',
-                'x': bx - 4,
-                'y': self.PLATFORM_Y[0] - 2,
-                'width': 8,
-                'walked': [False] * 8,
+                'type': ing_type,
+                'x': BURGER_X[burger_col],
+                'y': FLOOR_Y[floor_idx] - 2,
+                'width': INGREDIENT_WIDTH,
+                'walked': [False] * INGREDIENT_WIDTH,
                 'falling': False,
                 'fall_speed': 0,
                 'target_y': None,
-                'carrying_enemies': []
+                'carrying_enemies': [],
+                'col_idx': burger_col,
+                'floor_idx': floor_idx,
             })
 
-            # Plate at bottom
-            self.plates.append({'x': bx - 4, 'y': self.PLATE_Y})
+        # Plates at bottom for each burger column
+        for bx in BURGER_X:
+            self.plates.append({'x': bx, 'y': PLATE_Y})
 
         # Spawn enemies based on level
-        num_enemies = min(2 + self.level, 5)
+        num_enemies = min(2 + self.level, 6)
         enemy_types = ['hotdog', 'egg', 'pickle']
 
         for i in range(num_enemies):
             enemy_type = enemy_types[i % len(enemy_types)]
-            # Start enemies on upper platforms
-            platform_idx = random.randint(1, 3)
+            # Spawn on upper floors (0-3), avoiding bottom floor
+            floor_idx = random.randint(0, 3)
+            ex = self._random_x_on_floor(floor_idx)
             self.enemies.append({
                 'type': enemy_type,
-                'x': random.randint(10, 54),
-                'y': float(self.PLATFORM_Y[platform_idx]),
+                'x': float(ex),
+                'y': float(FLOOR_Y[floor_idx]),
                 'on_ladder': False,
-                'stunned': 0.0,
-                'direction': random.choice([-1, 1])
+                'stunned': 2.0,  # Brief grace period at level start
+                'direction': random.choice([-1, 1]),
             })
+
+    def _random_x_on_floor(self, floor_idx):
+        """Return a random valid x position on the given floor."""
+        level_data = LEVELS[(self.level - 1) % len(LEVELS)]
+        floor_code = level_data['floors'][floor_idx]
+        segments = compute_platform_segments(floor_code)
+        seg = random.choice(segments)
+        # Pick a position with some margin from edges
+        margin = 3
+        x1 = seg[0] + margin
+        x2 = seg[1] - margin
+        if x2 < x1:
+            return (seg[0] + seg[1]) // 2
+        return random.randint(x1, x2)
 
     def get_platform_at(self, x, y):
         """Check if there's a platform at this position."""
@@ -168,6 +329,17 @@ class BurgerTime(Game):
                 if abs(y - platform['y']) < 3:
                     return platform
         return None
+
+    def _on_platform_segment(self, x, y):
+        """Check if position (x, y) is on a valid platform segment.
+
+        Returns True if x is within some platform at floor y.
+        """
+        for platform in self.platforms:
+            if abs(y - platform['y']) < 3:
+                if platform['x1'] <= x <= platform['x2']:
+                    return True
+        return False
 
     def get_ladder_at(self, x, y, prefer_up=False, prefer_down=False):
         """Check if there's a ladder at this position.
@@ -189,12 +361,10 @@ class BurgerTime(Game):
 
         # Multiple ladders at this position (boundary case)
         if prefer_up:
-            # Want the ladder where we can climb up (y1 < current y)
             for ladder in candidates:
                 if ladder['y1'] < y:
                     return ladder
         elif prefer_down:
-            # Want the ladder where we can climb down (y2 > current y)
             for ladder in candidates:
                 if ladder['y2'] > y:
                     return ladder
@@ -239,10 +409,9 @@ class BurgerTime(Game):
             self.score += 100 * self.level
 
     def update_chef(self, input_state: InputState, dt: float):
-        """Update chef movement."""
+        """Update chef movement with platform-edge bounds checking."""
         moved = False
 
-        # When checking for ladder, prefer direction player wants to go
         ladder = self.get_ladder_at(self.chef_x, self.chef_y,
                                      prefer_up=input_state.up,
                                      prefer_down=input_state.down)
@@ -253,14 +422,12 @@ class BurgerTime(Game):
             if input_state.up:
                 self.chef_y -= self.CLIMB_SPEED * dt
                 moved = True
-                # Check if reached top of ladder
                 if ladder and self.chef_y < ladder['y1']:
                     self.chef_y = ladder['y1']
                     self.on_ladder = False
             elif input_state.down:
                 self.chef_y += self.CLIMB_SPEED * dt
                 moved = True
-                # Check if reached bottom of ladder
                 if ladder and self.chef_y > ladder['y2']:
                     self.chef_y = ladder['y2']
                     self.on_ladder = False
@@ -270,15 +437,23 @@ class BurgerTime(Game):
                 if platform:
                     self.on_ladder = False
         else:
-            # Platform movement
+            # Platform movement with edge checking
             if input_state.left:
-                self.chef_x -= self.MOVE_SPEED * dt
-                self.facing = -1
-                moved = True
+                new_x = self.chef_x - self.MOVE_SPEED * dt
+                if self._on_platform_segment(new_x, self.chef_y):
+                    self.chef_x = new_x
+                    self.facing = -1
+                    moved = True
+                else:
+                    self.facing = -1
             elif input_state.right:
-                self.chef_x += self.MOVE_SPEED * dt
-                self.facing = 1
-                moved = True
+                new_x = self.chef_x + self.MOVE_SPEED * dt
+                if self._on_platform_segment(new_x, self.chef_y):
+                    self.chef_x = new_x
+                    self.facing = 1
+                    moved = True
+                else:
+                    self.facing = 1
 
             # Grab ladder
             if (input_state.up or input_state.down) and ladder:
@@ -298,9 +473,6 @@ class BurgerTime(Game):
                 if abs(enemy['x'] - self.pepper_x) < 10 and abs(enemy['y'] - self.pepper_y) < 8:
                     enemy['stunned'] = 3.0
                     self.score += 25
-
-        # Bounds
-        self.chef_x = max(2, min(60, self.chef_x))
 
         # Walk animation
         if moved:
@@ -331,38 +503,60 @@ class BurgerTime(Game):
                     self.drop_ingredient(ing)
 
     def drop_ingredient(self, ingredient):
-        """Start dropping an ingredient."""
+        """Start dropping an ingredient using column-based targeting."""
         ingredient['falling'] = True
         ingredient['fall_speed'] = self.INGREDIENT_FALL_SPEED
         ingredient['walked'] = [False] * ingredient['width']
 
-        # Find target Y (next platform or plate)
+        col = ingredient['col_idx']
         current_y = ingredient['y']
-        target_y = self.PLATE_Y - 2  # Default to plate
 
-        for platform in self.platforms:
-            if platform['y'] > current_y + 4:
-                # Check if there's an ingredient at this level
-                for other in self.ingredients:
-                    if other != ingredient and not other['falling']:
-                        if abs(other['x'] - ingredient['x']) < 4:
-                            if abs(other['y'] - (platform['y'] - 2)) < 4:
-                                target_y = other['y'] - 3
-                                break
-                else:
-                    target_y = platform['y'] - 2
-                break
+        # Find next floor below with a platform under this burger column
+        target_y = PLATE_Y - 2  # Default to plate
+
+        # Check each floor below current position
+        for fy in FLOOR_Y:
+            if fy <= current_y + 4:
+                continue
+            # Is there a platform on this floor covering our burger column?
+            bx_center = BURGER_X[col] + INGREDIENT_WIDTH // 2
+            has_platform = False
+            for plat in self.platforms:
+                if abs(plat['y'] - fy) < 2 and plat['x1'] <= bx_center <= plat['x2']:
+                    has_platform = True
+                    break
+            if not has_platform:
+                continue
+
+            # Check for ingredient already sitting on this floor in same column
+            found_ingredient = False
+            for other in self.ingredients:
+                if other is ingredient or other['falling']:
+                    continue
+                if other['col_idx'] == col and abs(other['y'] - (fy - 2)) < 4:
+                    # Land on top of (push) this ingredient
+                    target_y = other['y'] - 3
+                    found_ingredient = True
+                    break
+            if not found_ingredient:
+                target_y = fy - 2
+            break
 
         ingredient['target_y'] = target_y
 
-        # Check for enemies on this ingredient
+        # Check for enemies riding on this ingredient — scoring: 500 * 2^(n-1)
+        num_riding = 0
         for enemy in self.enemies:
-            if not enemy['stunned']:
-                if (ingredient['x'] <= enemy['x'] <= ingredient['x'] + ingredient['width'] and
-                    abs(enemy['y'] - ingredient['y']) < 5):
-                    ingredient['carrying_enemies'].append(enemy)
-                    enemy['stunned'] = 5.0
-                    self.score += 100
+            if enemy['stunned'] > 0:
+                continue
+            if (ingredient['x'] <= enemy['x'] <= ingredient['x'] + ingredient['width'] and
+                    abs(enemy['y'] - ingredient['y'] - 2) < 5):
+                ingredient['carrying_enemies'].append(enemy)
+                enemy['stunned'] = 5.0
+                num_riding += 1
+
+        if num_riding > 0:
+            self.score += 500 * (2 ** (num_riding - 1))
 
     def update_ingredients(self, dt: float):
         """Update falling ingredients."""
@@ -380,15 +574,15 @@ class BurgerTime(Game):
                     ing['falling'] = False
                     ing['carrying_enemies'] = []
 
-                    # Check if this pushes down ingredients below
+                    # Check if this pushes down ingredients below (same column)
                     for other in self.ingredients:
-                        if other != ing and not other['falling']:
-                            if abs(other['x'] - ing['x']) < 4:
+                        if other is not ing and not other['falling']:
+                            if other['col_idx'] == ing['col_idx']:
                                 if abs(other['y'] - ing['y']) < 4:
                                     self.drop_ingredient(other)
 
     def update_enemies(self, dt: float):
-        """Update enemy AI."""
+        """Update enemy AI with platform-edge awareness."""
         for enemy in self.enemies:
             if enemy['stunned'] > 0:
                 enemy['stunned'] -= dt
@@ -419,23 +613,35 @@ class BurgerTime(Game):
                 else:
                     enemy['on_ladder'] = False
             else:
-                # Horizontal movement
+                # Horizontal movement with platform-edge checking
                 if abs(dx) > 3:
                     if dx < 0:
-                        enemy['x'] -= speed * dt
-                        enemy['direction'] = -1
+                        new_x = enemy['x'] - speed * dt
+                        if self._on_platform_segment(new_x, enemy['y']):
+                            enemy['x'] = new_x
+                            enemy['direction'] = -1
+                        else:
+                            enemy['direction'] = 1  # Reverse at edge
                     else:
-                        enemy['x'] += speed * dt
-                        enemy['direction'] = 1
+                        new_x = enemy['x'] + speed * dt
+                        if self._on_platform_segment(new_x, enemy['y']):
+                            enemy['x'] = new_x
+                            enemy['direction'] = 1
+                        else:
+                            enemy['direction'] = -1  # Reverse at edge
+                else:
+                    # Close to chef horizontally — wander in current direction
+                    new_x = enemy['x'] + enemy['direction'] * speed * dt
+                    if self._on_platform_segment(new_x, enemy['y']):
+                        enemy['x'] = new_x
+                    else:
+                        enemy['direction'] *= -1
 
                 # Try to use ladder
                 if ladder and abs(dy) > 8:
                     if random.random() < 0.02:
                         enemy['on_ladder'] = True
                         enemy['x'] = ladder['x']
-
-            # Bounds
-            enemy['x'] = max(2, min(60, enemy['x']))
 
     def check_enemy_collision(self):
         """Check if chef collides with any enemy."""
@@ -444,7 +650,7 @@ class BurgerTime(Game):
                 continue
 
             if (abs(enemy['x'] - self.chef_x) < 4 and
-                abs(enemy['y'] - self.chef_y) < 4):
+                    abs(enemy['y'] - self.chef_y) < 4):
                 self.die()
                 return
 
@@ -454,23 +660,25 @@ class BurgerTime(Game):
         if self.lives <= 0:
             self.state = GameState.GAME_OVER
         else:
-            # Reset positions
-            self.chef_x = 30.0
-            self.chef_y = float(self.PLATFORM_Y[0])
+            # Respawn chef on bottom floor
+            self.chef_x = float(self._random_x_on_floor(5))
+            self.chef_y = float(FLOOR_Y[5])
             self.on_ladder = False
 
-            # Reset enemies
-            for i, enemy in enumerate(self.enemies):
-                platform_idx = random.randint(1, 3)
-                enemy['x'] = random.randint(10, 54)
-                enemy['y'] = float(self.PLATFORM_Y[platform_idx])
-                enemy['stunned'] = 2.0  # Brief grace period
+            # Reset enemies to upper floors
+            for enemy in self.enemies:
+                floor_idx = random.randint(0, 3)
+                enemy['x'] = float(self._random_x_on_floor(floor_idx))
+                enemy['y'] = float(FLOOR_Y[floor_idx])
+                enemy['stunned'] = 2.0
+                enemy['on_ladder'] = False
 
     def check_win(self):
-        """Check if all burgers are complete."""
-        # All ingredients should be at plate level
+        """Check if all burgers are complete (all ingredients at plate level)."""
         for ing in self.ingredients:
-            if ing['y'] < self.PLATE_Y - 15:
+            if ing['falling']:
+                return False
+            if ing['y'] < PLATE_Y - 15:
                 return False
         return True
 
@@ -478,8 +686,8 @@ class BurgerTime(Game):
         """Advance to next level."""
         self.level += 1
         self.peppers = min(self.peppers + 2, 9)
-        self.chef_x = 30.0
-        self.chef_y = float(self.PLATFORM_Y[0])
+        self.chef_x = float(self._random_x_on_floor(5))
+        self.chef_y = float(FLOOR_Y[5])
         self.on_ladder = False
         self.build_level()
 
@@ -488,13 +696,13 @@ class BurgerTime(Game):
 
         # Draw plates
         for plate in self.plates:
-            self.display.draw_rect(plate['x'], plate['y'], 8, 2, Colors.GRAY)
+            self.display.draw_rect(plate['x'], plate['y'], INGREDIENT_WIDTH, 2, Colors.GRAY)
 
         # Draw platforms
         for platform in self.platforms:
-            for x in range(platform['x1'], platform['x2']):
+            for x in range(platform['x1'], platform['x2'] + 1):
                 self.display.set_pixel(x, platform['y'], self.PLATFORM_COLOR)
-                self.display.set_pixel(x, platform['y'] + 1, (80, 60, 40))
+                self.display.set_pixel(x, platform['y'] + 1, self.PLATFORM_EDGE)
 
         # Draw ladders
         for ladder in self.ladders:
@@ -574,35 +782,28 @@ class BurgerTime(Game):
                 return
 
         if enemy['type'] == 'hotdog':
-            # Hot dog body
             self.display.set_pixel(x, y - 2, self.HOTDOG_COLOR)
             self.display.set_pixel(x, y - 1, self.HOTDOG_COLOR)
             self.display.set_pixel(x, y, self.HOTDOG_COLOR)
-            self.display.set_pixel(x - 1, y - 1, (200, 150, 100))  # Bun
+            self.display.set_pixel(x - 1, y - 1, (200, 150, 100))
             self.display.set_pixel(x + 1, y - 1, (200, 150, 100))
-            # Eyes
             self.display.set_pixel(x - 1, y - 2, Colors.WHITE)
             self.display.set_pixel(x + 1, y - 2, Colors.WHITE)
         elif enemy['type'] == 'egg':
-            # Egg body
             self.display.set_pixel(x, y - 2, self.EGG_COLOR)
             self.display.set_pixel(x - 1, y - 1, self.EGG_COLOR)
             self.display.set_pixel(x, y - 1, self.EGG_YOLK)
             self.display.set_pixel(x + 1, y - 1, self.EGG_COLOR)
             self.display.set_pixel(x, y, self.EGG_COLOR)
-            # Eyes
             self.display.set_pixel(x - 1, y - 2, Colors.BLACK)
             self.display.set_pixel(x + 1, y - 2, Colors.BLACK)
         elif enemy['type'] == 'pickle':
-            # Pickle body
             self.display.set_pixel(x, y - 3, self.PICKLE_COLOR)
             self.display.set_pixel(x, y - 2, self.PICKLE_COLOR)
             self.display.set_pixel(x, y - 1, self.PICKLE_COLOR)
             self.display.set_pixel(x, y, self.PICKLE_COLOR)
-            # Bumps
             self.display.set_pixel(x - 1, y - 2, (60, 140, 60))
             self.display.set_pixel(x + 1, y - 1, (60, 140, 60))
-            # Eyes
             self.display.set_pixel(x - 1, y - 3, Colors.WHITE)
             self.display.set_pixel(x + 1, y - 3, Colors.WHITE)
 
@@ -633,21 +834,18 @@ class BurgerTime(Game):
             self.display.set_pixel(x, y, self.CHEF_BODY)
 
     def draw_hud(self):
-        """Draw the heads-up display."""
-        # Score at top left
-        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-
+        """Draw HUD — all on one line at y=1."""
+        # Score
+        self.display.draw_text_small(2, 1, f"{self.score}", Colors.WHITE)
+        # Pepper count
+        self.display.draw_text_small(2, 8, f"P{self.peppers}", self.PEPPER_COLOR)
         # Level
         self.display.draw_text_small(30, 1, f"L{self.level}", Colors.CYAN)
-
         # Lives (chef icons)
         for i in range(self.lives - 1):
             lx = 50 + i * 5
             self.display.set_pixel(lx, 2, self.CHEF_HAT)
             self.display.set_pixel(lx, 3, self.CHEF_BODY)
-
-        # Pepper count
-        self.display.draw_text_small(1, 8, f"P{self.peppers}", self.PEPPER_COLOR)
 
     def draw_game_over(self, selection: int = 0):
         """Draw game over screen."""
