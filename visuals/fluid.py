@@ -174,6 +174,7 @@ OBSTACLE_NAMES = [
     'circle', 'square', 'wedge',
     'airfoil', 'diamond', 'plate',
     'arrow', 'cross', 'elbow',
+    'tesla',
 ]
 
 
@@ -214,6 +215,21 @@ def _make_obstacle(shape_idx):
         vert_bar = (dx >= -1) & (dx <= 1) & (dy >= -5) & (dy <= 5)
         horiz_bar = (dx >= -1) & (dx <= 6) & (dy >= 3) & (dy <= 5)
         obs[1:N+1, 1:N+1] = vert_bar | horiz_bar
+    elif shape == 'tesla':
+        # Tesla valve: channel walls + asymmetric hook-vane baffles
+        # Top/bottom channel walls
+        walls = (_JJ <= 16) | (_JJ >= 48)
+        # Vane 1: from top wall, angling down toward center
+        y1 = 16.0 + (_II - 16)
+        v1 = (np.abs(_JJ - y1) <= 1.5) & (_II >= 16) & (_II <= 30) & (_JJ >= 16)
+        # Hook 1: horizontal shelf at vane tip, extends right
+        h1 = (np.abs(_JJ - 30) <= 1.5) & (_II >= 28) & (_II <= 36)
+        # Vane 2: from bottom wall, angling up toward center
+        y2 = 48.0 - (_II - 36)
+        v2 = (np.abs(_JJ - y2) <= 1.5) & (_II >= 36) & (_II <= 50) & (_JJ <= 48)
+        # Hook 2: horizontal shelf at vane tip, extends right
+        h2 = (np.abs(_JJ - 34) <= 1.5) & (_II >= 48) & (_II <= 56)
+        obs[1:N+1, 1:N+1] = walls | v1 | h1 | v2 | h2
     return obs
 
 
