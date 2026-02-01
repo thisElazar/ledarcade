@@ -50,12 +50,12 @@ GRID_SIZE = 64
 
 # Button GPIO pins (directly connect button between GPIO and GND)
 BUTTON_PINS = {
-    'up': 25,         # Joystick installed upside-down: physical down = up
-    'down': 19,       # physical up = down
-    'left': 8,        # physical right = left
-    'right': 24,      # physical left = right
-    'action_l': 7,    # Left button (Space)
-    'action_r': 9,    # Right button (Z)
+    'up': 19,         # Joystick wired normally on v2
+    'down': 25,
+    'left': 24,
+    'right': 8,
+    'action_l': 9,    # Buttons wired reversed: physical right = left
+    'action_r': 7,    # physical left = right
 }
 
 
