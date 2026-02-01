@@ -105,6 +105,8 @@ from .sonic import Sonic
 from .link import Link
 from .metroid import MetroidChase
 from .yoshi import Yoshi
+from .kirby import Kirby
+from .spidey import Spidey
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -176,6 +178,8 @@ ALL_VISUALS = [
     Link,
     MetroidChase,
     Yoshi,
+    Kirby,
+    Spidey,
     Settings,
     TestPattern,
     About,
@@ -255,6 +259,8 @@ __all__ = [
     'Link',
     'MetroidChase',
     'Yoshi',
+    'Kirby',
+    'Spidey',
     'Settings',
     'TestPattern',
     'About',
