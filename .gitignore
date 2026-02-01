@@ -20,6 +20,9 @@ build/
 *.swp
 *.swo
 
+# Sprite frame caches (auto-generated on first load)
+*.cache
+
 # Environment
 .env
 .venv/

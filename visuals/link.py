@@ -61,37 +61,29 @@ class Link(Visual):
         if not os.path.exists(path):
             return
 
-        try:
+        from .gifcache import cache_frames, extract_rgba
+
+        def process():
             gif = Image.open(path)
             n_frames = getattr(gif, 'n_frames', 1)
-
+            data = []
             for i in range(n_frames):
                 gif.seek(i)
                 frame = gif.convert("RGBA")
                 frame = frame.resize((GRID_SIZE, GRID_SIZE),
                                      Image.Resampling.NEAREST)
-
-                pixels = []
-                alphas = []
-                for y in range(GRID_SIZE):
-                    row = []
-                    alpha_row = []
-                    for x in range(GRID_SIZE):
-                        r, g, b, a = frame.getpixel((x, y))
-                        row.append((r, g, b))
-                        alpha_row.append(a)
-                    pixels.append(row)
-                    alphas.append(alpha_row)
-
-                self.frames.append(pixels)
-                self.alphas.append(alphas)
-
+                pixels, alphas = extract_rgba(frame)
                 duration_ms = gif.info.get('duration', 100)
                 if duration_ms <= 0:
                     duration_ms = 100
-                self.durations.append(duration_ms / 1000.0)
-        except Exception:
-            pass
+                data.append((pixels, alphas, duration_ms / 1000.0))
+            return data
+
+        cached = cache_frames(path, process)
+        for pixels, alphas, dur in (cached or []):
+            self.frames.append(pixels)
+            self.alphas.append(alphas)
+            self.durations.append(dur)
 
     def _build_background(self):
         """Pre-render Zelda-style grass tile background."""

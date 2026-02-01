@@ -82,26 +82,21 @@ class MetroidChase(Visual):
         path = os.path.join(project_dir, "assets", filename)
         if not os.path.exists(path):
             return []
-        result = []
-        try:
+
+        from .gifcache import cache_frames, extract_rgba
+
+        def process():
             gif = Image.open(path)
+            result = []
             for i in range(getattr(gif, 'n_frames', 1)):
                 gif.seek(i)
                 frame = gif.convert("RGBA")
                 w, h = frame.size
-                pixels, alphas = [], []
-                for y in range(h):
-                    prow, arow = [], []
-                    for x in range(w):
-                        r, g, b, a = frame.getpixel((x, y))
-                        prow.append((r, g, b))
-                        arow.append(a)
-                    pixels.append(prow)
-                    alphas.append(arow)
+                pixels, alphas = extract_rgba(frame)
                 result.append((pixels, alphas, w, h))
-        except Exception:
-            pass
-        return result
+            return result
+
+        return cache_frames(path, process) or []
 
     def _load_all(self):
         self.samus_r = self._load_gif_native(self.SAMUS_R_GIF)

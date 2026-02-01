@@ -75,32 +75,24 @@ class Yoshi(Visual):
         if not os.path.exists(path):
             return
 
-        try:
+        from .gifcache import cache_frames, extract_rgba
+
+        def process():
             gif = Image.open(path)
             orig_w, orig_h = gif.size
             scale = GRID_SIZE / orig_h
             new_w = int(orig_w * scale)
             new_h = GRID_SIZE
-
+            sprites = []
             for i in range(getattr(gif, 'n_frames', 1)):
                 gif.seek(i)
                 frame = gif.convert("RGBA")
                 frame = frame.resize((new_w, new_h), Image.Resampling.NEAREST)
+                pixels, alphas = extract_rgba(frame)
+                sprites.append((pixels, alphas, new_w, new_h))
+            return sprites
 
-                pixels = []
-                alphas = []
-                for y in range(new_h):
-                    prow = []
-                    arow = []
-                    for x in range(new_w):
-                        r, g, b, a = frame.getpixel((x, y))
-                        prow.append((r, g, b))
-                        arow.append(a)
-                    pixels.append(prow)
-                    alphas.append(arow)
-                self.sprites.append((pixels, alphas, new_w, new_h))
-        except Exception:
-            pass
+        self.sprites = cache_frames(path, process)
 
     def _build_background(self):
         """Pre-render Yoshi's Island hillside background."""

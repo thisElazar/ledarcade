@@ -52,33 +52,27 @@ class Kirby(Visual):
         if not os.path.exists(path):
             return
 
-        try:
+        from .gifcache import cache_frames, extract_rgb
+        crop_size = self.CROP_SIZE
+
+        def process():
             gif = Image.open(path)
             canvas = None
-
+            frames = []
             for i in range(getattr(gif, 'n_frames', 1)):
                 gif.seek(i)
                 frame = gif.convert("RGBA")
-
                 if canvas is None:
                     canvas = frame.copy()
                 else:
                     canvas.paste(frame, (0, 0), frame)
-
-                cropped = canvas.copy().crop((0, 0, self.CROP_SIZE, self.CROP_SIZE))
+                cropped = canvas.copy().crop((0, 0, crop_size, crop_size))
                 scaled = cropped.resize((GRID_SIZE, GRID_SIZE),
                                         Image.Resampling.NEAREST)
+                frames.append(extract_rgb(scaled))
+            return frames
 
-                pixels = []
-                for y in range(GRID_SIZE):
-                    row = []
-                    for x in range(GRID_SIZE):
-                        r, g, b, a = scaled.getpixel((x, y))
-                        row.append((r, g, b))
-                    pixels.append(row)
-                self.frames.append(pixels)
-        except Exception:
-            pass
+        self.frames = cache_frames(path, process)
 
     def handle_input(self, input_state) -> bool:
         consumed = False
