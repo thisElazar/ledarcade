@@ -6,7 +6,7 @@ Traces the path of the lower bob, creating beautiful patterns.
 
 Controls:
   Up/Down    - Cycle color palette
-  Left/Right - Adjust trail length
+  Left/Right - Adjust simulation speed
   Button     - Randomize starting angles
 """
 
@@ -69,6 +69,9 @@ class DblPendulum(Visual):
         self.trail = []
         self.max_trail = 600
 
+        # Speed multiplier
+        self.speed = 1.0
+
         # Palette
         self.palette_idx = random.randint(0, len(PALETTES) - 1)
 
@@ -81,12 +84,12 @@ class DblPendulum(Visual):
         elif input_state.down_pressed:
             self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
             consumed = True
-        # Left/Right: adjust trail length (time)
-        if input_state.right_pressed:
-            self.max_trail = min(1200, self.max_trail + 100)
+        # Left/Right: adjust simulation speed
+        if input_state.left:
+            self.speed = max(0.2, self.speed - 0.1)
             consumed = True
-        elif input_state.left_pressed:
-            self.max_trail = max(100, self.max_trail - 100)
+        elif input_state.right:
+            self.speed = min(3.0, self.speed + 0.1)
             consumed = True
         if input_state.action_l or input_state.action_r:
             self.a1 = random.uniform(0.5, math.pi * 1.5)
@@ -126,7 +129,7 @@ class DblPendulum(Visual):
 
         # RK4 integration with sub-steps for stability
         steps = 10
-        h = dt / steps
+        h = dt * self.speed / steps
         for _ in range(steps):
             a1, a2, w1, w2 = self.a1, self.a2, self.w1, self.w2
 

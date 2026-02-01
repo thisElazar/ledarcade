@@ -108,6 +108,7 @@ from .yoshi import Yoshi
 from .kirby import Kirby
 from .spidey import Spidey
 from .batman import Batman
+from .megaman import MegaMan
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -124,9 +125,11 @@ from .emfield import EMMotor, EMCircuit, EMFreeAir
 from .turing import TuringSpots, TuringStripes, TuringCoral, TuringWorms
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
+from .earth import Earth
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
+    ScienceLab,
 )
 
 # List of all available visuals
@@ -187,6 +190,7 @@ ALL_VISUALS = [
     Kirby,
     Spidey,
     Batman,
+    MegaMan,
     Settings,
     TestPattern,
     About,
@@ -212,6 +216,7 @@ ALL_VISUALS = [
     FluidTunnel,
     FluidInk,
     FluidMixing,
+    Earth,
     AllVisuals,
     Chill,
     Energy,
@@ -220,6 +225,7 @@ ALL_VISUALS = [
     SuperheroGallery,
     Demoscene,
     Complexity,
+    ScienceLab,
 ]
 
 __all__ = [
@@ -284,6 +290,7 @@ __all__ = [
     'Kirby',
     'Spidey',
     'Batman',
+    'MegaMan',
     'Settings',
     'TestPattern',
     'About',
@@ -309,6 +316,7 @@ __all__ = [
     'FluidTunnel',
     'FluidInk',
     'FluidMixing',
+    'Earth',
     'Slideshow',
     'AllVisuals',
     'Chill',
@@ -318,4 +326,5 @@ __all__ = [
     'SuperheroGallery',
     'Demoscene',
     'Complexity',
+    'ScienceLab',
 ]

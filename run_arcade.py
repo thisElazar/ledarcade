@@ -457,6 +457,11 @@ def main():
     # Debounce for left/right navigation
     input_cooldown = 0  # Cooldown for initials entry
 
+    # Scroll acceleration state
+    scroll_held_time = 0.0   # How long up/down has been held
+    scroll_accum = 0.0       # Accumulator for auto-scroll timing
+    scroll_dir = 0           # -1 = up, +1 = down, 0 = none
+
     running = True
     while running:
         dt = clock.tick(30) / 1000.0
@@ -569,16 +574,42 @@ def main():
                     if input_state.left_pressed and len(categories) > 1:
                         cat_index = (cat_index - 1) % len(categories)
                         item_index = 0
+                        scroll_held_time = 0.0
+                        scroll_accum = 0.0
+                        scroll_dir = 0
                     elif input_state.right_pressed and len(categories) > 1:
                         cat_index = (cat_index + 1) % len(categories)
                         item_index = 0
+                        scroll_held_time = 0.0
+                        scroll_accum = 0.0
+                        scroll_dir = 0
 
-                    # Item navigation (up/down)
+                    # Item navigation (up/down) with scroll acceleration
                     if category.items:
+                        n_items = len(category.items)
                         if input_state.up_pressed:
-                            item_index = (item_index - 1) % len(category.items)
+                            item_index = (item_index - 1) % n_items
+                            scroll_dir = -1
+                            scroll_held_time = 0.0
+                            scroll_accum = 0.0
                         elif input_state.down_pressed:
-                            item_index = (item_index + 1) % len(category.items)
+                            item_index = (item_index + 1) % n_items
+                            scroll_dir = 1
+                            scroll_held_time = 0.0
+                            scroll_accum = 0.0
+                        elif scroll_dir != 0 and ((scroll_dir == -1 and input_state.up) or (scroll_dir == 1 and input_state.down)):
+                            scroll_held_time += dt
+                            if scroll_held_time >= 0.4:
+                                t_accel = min(scroll_held_time - 0.4, 1.5)
+                                interval = 0.18 - (0.12 * t_accel / 1.5)
+                                scroll_accum += dt
+                                while scroll_accum >= interval:
+                                    scroll_accum -= interval
+                                    item_index = (item_index + scroll_dir) % n_items
+                        else:
+                            scroll_dir = 0
+                            scroll_held_time = 0.0
+                            scroll_accum = 0.0
 
                         # Launch item (skip if mid-konami intercept)
                         if not konami_intercept and (input_state.action_l or input_state.action_r):

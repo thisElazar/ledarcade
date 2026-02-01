@@ -135,8 +135,8 @@ class SpriteGallery(Slideshow):
     description = "Classic game character sprites"
 
     def _get_visual_classes(self):
-        from visuals import Mario, Sonic, Link, MetroidChase, Yoshi, Kirby
-        return [Mario, Sonic, Link, MetroidChase, Yoshi, Kirby]
+        from visuals import Mario, Sonic, Link, MetroidChase, Yoshi, Kirby, MegaMan
+        return [Mario, Sonic, Link, MetroidChase, Yoshi, Kirby, MegaMan]
 
 
 class SuperheroGallery(Slideshow):
@@ -171,3 +171,23 @@ class Complexity(Slideshow):
         return [Rug, Quarks, Hodge, Ripples, Flux, Slime,
                 DemonSpirals, Life, ParticleLife, Aurora,
                 Gyre, Boids, Sandpile, Fireflies]
+
+
+class ScienceLab(Slideshow):
+    name = "SCIENCE LAB"
+    description = "Physics and biology simulations"
+    category = "visual_mix"
+
+    def _get_visual_classes(self):
+        from visuals import (Attractors, DblPendulum, Neurons,
+                             OrbitsSolar, OrbitsMulti, OrbitsBelt,
+                             EMMotor, EMCircuit, EMFreeAir,
+                             FluidTunnel, FluidInk, FluidMixing,
+                             TuringSpots, TuringStripes, TuringCoral,
+                             TuringWorms, Earth)
+        return [Attractors, DblPendulum, Neurons,
+                OrbitsSolar, OrbitsMulti, OrbitsBelt,
+                EMMotor, EMCircuit, EMFreeAir,
+                FluidTunnel, FluidInk, FluidMixing,
+                TuringSpots, TuringStripes, TuringCoral,
+                TuringWorms, Earth]

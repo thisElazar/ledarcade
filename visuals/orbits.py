@@ -204,9 +204,13 @@ class OrbitsSolar(Visual):
     def __init__(self, display: Display):
         super().__init__(display)
 
+    # palette_idx 0 = realistic solar colors, 1+ = from PALETTES
+    _N_PALETTES = 1 + len(PALETTES)
+
     def reset(self):
         self.time = 0.0
         self.speed = 1.0
+        self.palette_idx = 0
         self.dt_sim = 0.0005
         self.steps_per_frame = 8
         self._init_bodies()
@@ -246,6 +250,12 @@ class OrbitsSolar(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        if input_state.up_pressed:
+            self.palette_idx = (self.palette_idx + 1) % self._N_PALETTES
+            consumed = True
+        if input_state.down_pressed:
+            self.palette_idx = (self.palette_idx - 1) % self._N_PALETTES
+            consumed = True
         if input_state.left:
             self.speed = max(0.2, self.speed - 0.1)
             consumed = True
@@ -256,6 +266,13 @@ class OrbitsSolar(Visual):
             self._init_bodies()
             consumed = True
         return consumed
+
+    def _get_body_color(self, idx):
+        """Get body color: palette 0 = realistic, 1+ = from PALETTES."""
+        if self.palette_idx == 0:
+            return self.body_colors[idx]
+        pal = PALETTES[self.palette_idx - 1]
+        return pal[idx % len(pal)]
 
     def update(self, dt: float):
         self.time += dt
@@ -268,7 +285,7 @@ class OrbitsSolar(Visual):
         self.display.clear(Colors.BLACK)
 
         for idx, b in enumerate(self.bodies):
-            color = self.body_colors[idx]
+            color = self._get_body_color(idx)
             draw_r = self.body_draw_radii[idx]
 
             # Draw trail

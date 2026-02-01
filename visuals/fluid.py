@@ -168,6 +168,62 @@ def _draw_density(display, dens, palette_idx, scale=0.3, sqrt_map=False):
             display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
 
 
+# ── Velocity / Vorticity visualization helpers ────────────────────
+
+# Rainbow palette for velocity magnitude (7 stops)
+_VEL_PALETTE = np.array([
+    (0, 0, 0), (0, 0, 180), (0, 180, 255),
+    (0, 255, 80), (255, 255, 0), (255, 100, 0), (255, 255, 255),
+], dtype=np.float64)
+
+# Diverging blue-black-red for vorticity
+_VORT_PALETTE = np.array([
+    (0, 60, 255), (0, 20, 120), (0, 0, 0),
+    (120, 10, 0), (255, 40, 0),
+], dtype=np.float64)
+
+
+def _draw_velocity(display, u, v):
+    """Map velocity magnitude to rainbow palette and draw."""
+    mag = np.sqrt(u[1:N+1, 1:N+1]**2 + v[1:N+1, 1:N+1]**2)
+    t = np.clip(mag * 0.3, 0.0, 1.0)
+    np.sqrt(t, out=t)
+    n_colors = len(_VEL_PALETTE)
+    idx_f = t * (n_colors - 1)
+    lo = idx_f.astype(np.intp)
+    hi = np.minimum(lo + 1, n_colors - 1)
+    frac = (idx_f - lo)[:, :, np.newaxis]
+    colors = _VEL_PALETTE[lo] + (_VEL_PALETTE[hi] - _VEL_PALETTE[lo]) * frac
+    pixels = np.clip(colors, 0, 255).astype(np.uint8)
+    for i in range(N):
+        col = pixels[i]
+        for j in range(N):
+            p = col[j]
+            display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
+
+
+def _draw_vorticity(display, u, v):
+    """Map vorticity (curl) to diverging blue-black-red palette and draw."""
+    # curl = dv/dx - du/dy (central differences on interior)
+    dvdx = (v[2:N+2, 1:N+1] - v[0:N, 1:N+1]) * 0.5
+    dudy = (u[1:N+1, 2:N+2] - u[1:N+1, 0:N]) * 0.5
+    curl = dvdx - dudy
+    # Map to 0..1 with 0.5 = zero curl
+    t = np.clip(curl * 0.15 + 0.5, 0.0, 1.0)
+    n_colors = len(_VORT_PALETTE)
+    idx_f = t * (n_colors - 1)
+    lo = idx_f.astype(np.intp)
+    hi = np.minimum(lo + 1, n_colors - 1)
+    frac = (idx_f - lo)[:, :, np.newaxis]
+    colors = _VORT_PALETTE[lo] + (_VORT_PALETTE[hi] - _VORT_PALETTE[lo]) * frac
+    pixels = np.clip(colors, 0, 255).astype(np.uint8)
+    for i in range(N):
+        col = pixels[i]
+        for j in range(N):
+            p = col[j]
+            display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
+
+
 # ── Obstacle shapes ───────────────────────────────────────────────
 
 OBSTACLE_NAMES = [
@@ -243,9 +299,12 @@ class FluidTunnel(Visual):
     def __init__(self, display: Display):
         super().__init__(display)
 
+    # viz_mode: 0..len(PALETTES)-1 = density palettes, then velocity, then vorticity
+    _N_VIZ_MODES = len(PALETTES) + 2
+
     def reset(self):
         self.time = 0.0
-        self.palette_idx = 0
+        self.viz_mode = 0
         self.viscosity = 0.0001
         self.diffusion = 0.0001
         self.shape_idx = 0
@@ -263,16 +322,16 @@ class FluidTunnel(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
-            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.down_pressed:
-            self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
+            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.left:
-            self.viscosity = max(0.00001, self.viscosity * 0.8)
+            self.viscosity = min(0.01, self.viscosity * 1.25)
             consumed = True
         if input_state.right:
-            self.viscosity = min(0.01, self.viscosity * 1.25)
+            self.viscosity = max(0.00001, self.viscosity * 0.8)
             consumed = True
         if input_state.action_l or input_state.action_r:
             self.shape_idx = (self.shape_idx + 1) % len(OBSTACLE_NAMES)
@@ -309,8 +368,13 @@ class FluidTunnel(Visual):
         self.dens *= 0.995
 
     def draw(self):
-        _draw_density(self.display, self.dens, self.palette_idx,
-                      scale=0.2, sqrt_map=True)
+        if self.viz_mode < len(PALETTES):
+            _draw_density(self.display, self.dens, self.viz_mode,
+                          scale=0.2, sqrt_map=True)
+        elif self.viz_mode == len(PALETTES):
+            _draw_velocity(self.display, self.u, self.v)
+        else:
+            _draw_vorticity(self.display, self.u, self.v)
         # Draw obstacle pixels
         obs_ij = np.argwhere(self.obstacle[1:N+1, 1:N+1])
         for k in range(len(obs_ij)):
@@ -324,12 +388,14 @@ class FluidInk(Visual):
     description = "Swirling ink drops"
     category = "science"
 
+    _N_VIZ_MODES = len(PALETTES) + 2
+
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
-        self.palette_idx = 0
+        self.viz_mode = 0
         self.viscosity = 0.0001
         self.diffusion = 0.0001
         self._init_fields()
@@ -361,16 +427,16 @@ class FluidInk(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
-            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.down_pressed:
-            self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
+            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.left:
-            self.viscosity = max(0.00001, self.viscosity * 0.8)
+            self.viscosity = min(0.01, self.viscosity * 1.25)
             consumed = True
         if input_state.right:
-            self.viscosity = min(0.01, self.viscosity * 1.25)
+            self.viscosity = max(0.00001, self.viscosity * 0.8)
             consumed = True
         if input_state.action_l or input_state.action_r:
             self._add_ink_drop()
@@ -398,23 +464,29 @@ class FluidInk(Visual):
         self.dens *= 0.995
 
     def draw(self):
-        _draw_density(self.display, self.dens, self.palette_idx)
+        if self.viz_mode < len(PALETTES):
+            _draw_density(self.display, self.dens, self.viz_mode)
+        elif self.viz_mode == len(PALETTES):
+            _draw_velocity(self.display, self.u, self.v)
+        else:
+            _draw_vorticity(self.display, self.u, self.v)
 
 
 # ── FluidMixing ──────────────────────────────────────────────────
 
 # Separate palettes for the two-fluid mixing visualization
+# Each pair shares a low channel so additive blend = vivid third color
 MIX_PALETTES = [
-    # Warm vs Cool
-    {'a': (220, 60, 30), 'b': (30, 80, 220), 'bg': (5, 5, 10)},
-    # Green vs Magenta
-    {'a': (40, 220, 60), 'b': (220, 40, 180), 'bg': (5, 5, 5)},
-    # Orange vs Cyan
-    {'a': (240, 160, 30), 'b': (30, 200, 220), 'bg': (5, 5, 8)},
-    # Gold vs Purple
-    {'a': (255, 200, 50), 'b': (120, 40, 200), 'bg': (5, 3, 8)},
-    # Red vs Green
-    {'a': (220, 40, 40), 'b': (40, 200, 80), 'bg': (5, 5, 5)},
+    # Crimson + Sapphire -> Violet (both low G)
+    {'a': (220, 20, 80), 'b': (30, 20, 220), 'bg': (5, 2, 8)},
+    # Lime + Cobalt -> Teal (both low R)
+    {'a': (20, 220, 60), 'b': (20, 60, 220), 'bg': (2, 5, 5)},
+    # Scarlet + Chartreuse -> Gold (both low B)
+    {'a': (220, 40, 20), 'b': (120, 220, 20), 'bg': (5, 5, 2)},
+    # Rose + Indigo -> Magenta (both low G)
+    {'a': (240, 30, 120), 'b': (80, 20, 220), 'bg': (5, 2, 6)},
+    # Amber + Violet -> Lavender (both moderate)
+    {'a': (240, 160, 20), 'b': (100, 20, 220), 'bg': (5, 3, 5)},
 ]
 
 # Precompute palette arrays for mixing
@@ -431,12 +503,15 @@ class FluidMixing(Visual):
     description = "Two fluids mixing"
     category = "science"
 
+    # viz_mode: 0..len(MIX_PALETTES)-1 = density, then velocity, then vorticity
+    _N_VIZ_MODES = len(MIX_PALETTES) + 2
+
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
-        self.palette_idx = 0
+        self.viz_mode = 0
         self.viscosity = 0.001
         self.diffusion = 0.0002
         self._init_fields()
@@ -461,16 +536,16 @@ class FluidMixing(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
-            self.palette_idx = (self.palette_idx + 1) % len(MIX_PALETTES)
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.down_pressed:
-            self.palette_idx = (self.palette_idx - 1) % len(MIX_PALETTES)
+            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
             consumed = True
         if input_state.left:
-            self.viscosity = max(0.00001, self.viscosity * 0.8)
+            self.viscosity = min(0.01, self.viscosity * 1.25)
             consumed = True
         if input_state.right:
-            self.viscosity = min(0.01, self.viscosity * 1.25)
+            self.viscosity = max(0.00001, self.viscosity * 0.8)
             consumed = True
         if input_state.action_l or input_state.action_r:
             self._init_fields()
@@ -538,19 +613,26 @@ class FluidMixing(Visual):
                       self.diffusion, sim_dt)
 
     def draw(self):
-        pal = _MIX_PAL_ARRAYS[self.palette_idx]
-        ca = pal['a']
-        cb = pal['b']
-        bg = pal['bg']
+        if self.viz_mode < len(MIX_PALETTES):
+            pal = _MIX_PAL_ARRAYS[self.viz_mode]
+            ca = pal['a']
+            cb = pal['b']
+            bg = pal['bg']
 
-        da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
-        db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
+            da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
+            np.sqrt(da, out=da)
+            db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
+            np.sqrt(db, out=db)
 
-        colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
-        pixels = np.clip(colors, 0, 255).astype(np.uint8)
+            colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
+            pixels = np.clip(colors, 0, 255).astype(np.uint8)
 
-        for i in range(N):
-            col = pixels[i]
-            for j in range(N):
-                p = col[j]
-                self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
+            for i in range(N):
+                col = pixels[i]
+                for j in range(N):
+                    p = col[j]
+                    self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
+        elif self.viz_mode == len(MIX_PALETTES):
+            _draw_velocity(self.display, self.u, self.v)
+        else:
+            _draw_vorticity(self.display, self.u, self.v)
