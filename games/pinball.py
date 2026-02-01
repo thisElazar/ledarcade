@@ -243,7 +243,7 @@ class Flipper:
         cx, cy = _closest_point_on_seg(bx, by, self.px, self.py, tx, ty)
         dx, dy = bx - cx, by - cy
         dist = _mag(dx, dy)
-        min_dist = BALL_RADIUS + 1.0
+        min_dist = BALL_RADIUS + 1.5
         if dist >= min_dist or dist < 0.001:
             return None
 
@@ -728,9 +728,6 @@ class Pinball(Game):
         self._update_camera(dt)
 
     def _update_playing(self, inp, dt):
-        self.flipper_l.update(inp.action_l_held, dt)
-        self.flipper_r.update(inp.action_r_held, dt)
-
         for b in self.bumpers:
             b.update(dt)
         if self.sling_l_timer > 0:
@@ -749,6 +746,9 @@ class Pinball(Game):
 
         sub_dt = dt / SUBSTEPS
         for _ in range(SUBSTEPS):
+            # Update flippers each substep so they can't sweep through the ball
+            self.flipper_l.update(inp.action_l_held, sub_dt)
+            self.flipper_r.update(inp.action_r_held, sub_dt)
             self._physics_step(sub_dt)
 
         # Stall detection: if ball barely moving for 2s, nudge toward drain
