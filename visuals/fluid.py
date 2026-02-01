@@ -157,16 +157,13 @@ def _draw_density(display, dens, palette_idx):
     hi = np.minimum(lo + 1, n_colors - 1)
     frac = (idx_f - lo)[:, :, np.newaxis]
     colors = pal_arr[lo] + (pal_arr[hi] - pal_arr[lo]) * frac
-    # Transpose to [j, i, c] for row-major buffer writes
-    pixels = np.clip(colors.transpose(1, 0, 2), 0, 255).astype(np.uint8)
+    pixels = np.clip(colors, 0, 255).astype(np.uint8)
 
-    buf = display.buffer
-    for j in range(N):
-        row = buf[j]
-        prow = pixels[j]
-        for i in range(N):
-            p = prow[i]
-            row[i] = (int(p[0]), int(p[1]), int(p[2]))
+    for i in range(N):
+        col = pixels[i]
+        for j in range(N):
+            p = col[j]
+            display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
 
 
 # ── Obstacle shapes ───────────────────────────────────────────────
@@ -508,12 +505,10 @@ class FluidMixing(Visual):
         db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
 
         colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
-        pixels = np.clip(colors.transpose(1, 0, 2), 0, 255).astype(np.uint8)
+        pixels = np.clip(colors, 0, 255).astype(np.uint8)
 
-        buf = self.display.buffer
-        for j in range(N):
-            row = buf[j]
-            prow = pixels[j]
-            for i in range(N):
-                p = prow[i]
-                row[i] = (int(p[0]), int(p[1]), int(p[2]))
+        for i in range(N):
+            col = pixels[i]
+            for j in range(N):
+                p = col[j]
+                self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
