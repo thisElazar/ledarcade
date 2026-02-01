@@ -1,5 +1,5 @@
 """
-Fluid - Stable Fluids Solver
+Fluid - Stable Fluids Solver (numpy-accelerated)
 ==============================
 Jos Stam's "Stable Fluids" on a 64x64 grid: semi-Lagrangian
 advection with Gauss-Seidel pressure projection.
@@ -17,10 +17,10 @@ Controls:
 
 import math
 import random
+import numpy as np
 from . import Visual, Display, Colors, GRID_SIZE
 
 N = GRID_SIZE
-# Use index (i, j) -> i + j*(N+2) on a padded grid of size (N+2)*(N+2)
 S = N + 2  # Padded grid side length
 
 PALETTES = [
@@ -36,96 +36,96 @@ PALETTES = [
     [(0, 0, 0), (40, 40, 40), (90, 90, 90), (150, 150, 150), (210, 210, 210), (255, 255, 255)],
 ]
 
+# Precompute palette arrays for fast LUT drawing
+_PAL_ARRAYS = [np.array(p, dtype=np.float64) for p in PALETTES]
 
-def IX(i, j):
-    return i + j * S
+# Precompute interior coordinate meshgrid (reused by advect / stirring)
+_I_COORDS = np.arange(1, N + 1, dtype=np.float64)
+_J_COORDS = np.arange(1, N + 1, dtype=np.float64)
+_II, _JJ = np.meshgrid(_I_COORDS, _J_COORDS, indexing='ij')
 
 
-# ── Shared Stam solver ────────────────────────────────────────────
+def _new_field():
+    return np.zeros((S, S), dtype=np.float64)
+
+
+# ── Shared Stam solver (numpy) ──────────────────────────────────
 
 def _set_bnd(b, x):
     """Set boundary conditions. b=1 for x-vel, b=2 for y-vel, b=0 for scalar."""
-    for i in range(1, N + 1):
-        x[IX(0, i)]     = -x[IX(1, i)] if b == 1 else x[IX(1, i)]
-        x[IX(N + 1, i)] = -x[IX(N, i)] if b == 1 else x[IX(N, i)]
-        x[IX(i, 0)]     = -x[IX(i, 1)] if b == 2 else x[IX(i, 1)]
-        x[IX(i, N + 1)] = -x[IX(i, N)] if b == 2 else x[IX(i, N)]
+    if b == 1:
+        x[0, 1:N+1] = -x[1, 1:N+1]
+        x[N+1, 1:N+1] = -x[N, 1:N+1]
+    else:
+        x[0, 1:N+1] = x[1, 1:N+1]
+        x[N+1, 1:N+1] = x[N, 1:N+1]
 
-    x[IX(0, 0)]         = 0.5 * (x[IX(1, 0)] + x[IX(0, 1)])
-    x[IX(0, N + 1)]     = 0.5 * (x[IX(1, N + 1)] + x[IX(0, N)])
-    x[IX(N + 1, 0)]     = 0.5 * (x[IX(N, 0)] + x[IX(N + 1, 1)])
-    x[IX(N + 1, N + 1)] = 0.5 * (x[IX(N, N + 1)] + x[IX(N + 1, N)])
+    if b == 2:
+        x[1:N+1, 0] = -x[1:N+1, 1]
+        x[1:N+1, N+1] = -x[1:N+1, N]
+    else:
+        x[1:N+1, 0] = x[1:N+1, 1]
+        x[1:N+1, N+1] = x[1:N+1, N]
+
+    x[0, 0] = 0.5 * (x[1, 0] + x[0, 1])
+    x[0, N+1] = 0.5 * (x[1, N+1] + x[0, N])
+    x[N+1, 0] = 0.5 * (x[N, 0] + x[N+1, 1])
+    x[N+1, N+1] = 0.5 * (x[N, N+1] + x[N+1, N])
 
 
 def _diffuse(b, x, x0, diff, dt, iters=4):
     a = dt * diff * N * N
     if a < 0.00001:
-        for i in range(S * S):
-            x[i] = x0[i]
+        x[:] = x0
         return
+    inv = 1.0 / (1 + 4 * a)
     for _ in range(iters):
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                idx = IX(i, j)
-                x[idx] = (x0[idx] + a * (
-                    x[IX(i - 1, j)] + x[IX(i + 1, j)] +
-                    x[IX(i, j - 1)] + x[IX(i, j + 1)]
-                )) / (1 + 4 * a)
+        x[1:N+1, 1:N+1] = (x0[1:N+1, 1:N+1] + a * (
+            x[0:N, 1:N+1] + x[2:N+2, 1:N+1] +
+            x[1:N+1, 0:N] + x[1:N+1, 2:N+2]
+        )) * inv
         _set_bnd(b, x)
 
 
 def _advect(b, d, d0, u, v, dt):
     dt0 = dt * N
-    for j in range(1, N + 1):
-        for i in range(1, N + 1):
-            idx = IX(i, j)
-            x = i - dt0 * u[idx]
-            y = j - dt0 * v[idx]
+    # Backtrack positions
+    x = _II - dt0 * u[1:N+1, 1:N+1]
+    y = _JJ - dt0 * v[1:N+1, 1:N+1]
+    np.clip(x, 0.5, N + 0.5, out=x)
+    np.clip(y, 0.5, N + 0.5, out=y)
 
-            x = max(0.5, min(N + 0.5, x))
-            y = max(0.5, min(N + 0.5, y))
+    i0 = x.astype(np.intp)
+    j0 = y.astype(np.intp)
+    s1 = x - i0
+    s0 = 1.0 - s1
+    t1 = y - j0
+    t0 = 1.0 - t1
 
-            i0 = int(x)
-            j0 = int(y)
-            i1 = i0 + 1
-            j1 = j0 + 1
-
-            s1 = x - i0
-            s0 = 1 - s1
-            t1 = y - j0
-            t0 = 1 - t1
-
-            d[idx] = (s0 * (t0 * d0[IX(i0, j0)] + t1 * d0[IX(i0, j1)]) +
-                      s1 * (t0 * d0[IX(i1, j0)] + t1 * d0[IX(i1, j1)]))
+    d[1:N+1, 1:N+1] = (
+        s0 * (t0 * d0[i0, j0] + t1 * d0[i0, j0 + 1]) +
+        s1 * (t0 * d0[i0 + 1, j0] + t1 * d0[i0 + 1, j0 + 1]))
     _set_bnd(b, d)
 
 
 def _project(u, v, p, div, iters=6):
     h = 1.0 / N
-    for j in range(1, N + 1):
-        for i in range(1, N + 1):
-            idx = IX(i, j)
-            div[idx] = -0.5 * h * (
-                u[IX(i + 1, j)] - u[IX(i - 1, j)] +
-                v[IX(i, j + 1)] - v[IX(i, j - 1)])
-            p[idx] = 0.0
+    div[1:N+1, 1:N+1] = -0.5 * h * (
+        u[2:N+2, 1:N+1] - u[0:N, 1:N+1] +
+        v[1:N+1, 2:N+2] - v[1:N+1, 0:N])
+    p[1:N+1, 1:N+1] = 0.0
     _set_bnd(0, div)
     _set_bnd(0, p)
 
     for _ in range(iters):
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                idx = IX(i, j)
-                p[idx] = (div[idx] +
-                          p[IX(i - 1, j)] + p[IX(i + 1, j)] +
-                          p[IX(i, j - 1)] + p[IX(i, j + 1)]) / 4.0
+        p[1:N+1, 1:N+1] = (
+            div[1:N+1, 1:N+1] +
+            p[0:N, 1:N+1] + p[2:N+2, 1:N+1] +
+            p[1:N+1, 0:N] + p[1:N+1, 2:N+2]) * 0.25
         _set_bnd(0, p)
 
-    for j in range(1, N + 1):
-        for i in range(1, N + 1):
-            idx = IX(i, j)
-            u[idx] -= 0.5 * (p[IX(i + 1, j)] - p[IX(i - 1, j)]) * N
-            v[idx] -= 0.5 * (p[IX(i, j + 1)] - p[IX(i, j - 1)]) * N
+    u[1:N+1, 1:N+1] -= 0.5 * (p[2:N+2, 1:N+1] - p[0:N, 1:N+1]) * N
+    v[1:N+1, 1:N+1] -= 0.5 * (p[1:N+1, 2:N+2] - p[1:N+1, 0:N]) * N
     _set_bnd(1, u)
     _set_bnd(2, v)
 
@@ -148,30 +148,25 @@ def _density_step(d, d0, u, v, diffusion, dt):
 
 def _draw_density(display, dens, palette_idx):
     """Map density field to palette and draw."""
-    palette = PALETTES[palette_idx]
-    n_colors = len(palette)
+    pal_arr = _PAL_ARRAYS[palette_idx]
+    n_colors = len(pal_arr)
 
+    t = np.clip(dens[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
+    idx_f = t * (n_colors - 1)
+    lo = idx_f.astype(np.intp)
+    hi = np.minimum(lo + 1, n_colors - 1)
+    frac = (idx_f - lo)[:, :, np.newaxis]
+    colors = pal_arr[lo] + (pal_arr[hi] - pal_arr[lo]) * frac
+    # Transpose to [j, i, c] for row-major buffer writes
+    pixels = np.clip(colors.transpose(1, 0, 2), 0, 255).astype(np.uint8)
+
+    buf = display.buffer
     for j in range(N):
+        row = buf[j]
+        prow = pixels[j]
         for i in range(N):
-            d = dens[IX(i + 1, j + 1)]
-            if d < 0:
-                d = 0
-            t = min(1.0, d * 0.3)
-
-            idx_f = t * (n_colors - 1)
-            lo = int(idx_f)
-            hi = min(lo + 1, n_colors - 1)
-            frac = idx_f - lo
-            c0 = palette[lo]
-            c1 = palette[hi]
-            r = int(c0[0] + (c1[0] - c0[0]) * frac)
-            g = int(c0[1] + (c1[1] - c0[1]) * frac)
-            b = int(c0[2] + (c1[2] - c0[2]) * frac)
-            display.set_pixel(i, j, (r, g, b))
-
-
-def _new_field():
-    return [0.0] * (S * S)
+            p = prow[i]
+            row[i] = (int(p[0]), int(p[1]), int(p[2]))
 
 
 # ── Obstacle shapes ───────────────────────────────────────────────
@@ -181,33 +176,22 @@ OBSTACLE_NAMES = ['circle', 'square', 'wedge']
 
 def _make_obstacle(shape_idx):
     """Create obstacle mask for the given shape."""
-    obs = [False] * (S * S)
+    obs = np.zeros((S, S), dtype=bool)
     cx, cy = N // 3, N // 2
 
     shape = OBSTACLE_NAMES[shape_idx % len(OBSTACLE_NAMES)]
     if shape == 'circle':
         r = 4
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                dx = i - cx
-                dy = j - cy
-                if dx * dx + dy * dy <= r * r:
-                    obs[IX(i, j)] = True
+        dx = _II - cx
+        dy = _JJ - cy
+        obs[1:N+1, 1:N+1] = (dx * dx + dy * dy) <= r * r
     elif shape == 'square':
         hw = 4
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                if abs(i - cx) <= hw and abs(j - cy) <= hw:
-                    obs[IX(i, j)] = True
+        obs[1:N+1, 1:N+1] = (np.abs(_II - cx) <= hw) & (np.abs(_JJ - cy) <= hw)
     elif shape == 'wedge':
-        # Airfoil-like wedge pointing left
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                dx = i - cx
-                dy = j - cy
-                # Wedge: widens rightward
-                if -2 <= dx <= 6 and abs(dy) <= max(0, (dx + 3) * 0.6):
-                    obs[IX(i, j)] = True
+        dx = _II - cx
+        dy = _JJ - cy
+        obs[1:N+1, 1:N+1] = (dx >= -2) & (dx <= 6) & (np.abs(dy) <= np.maximum(0, (dx + 3) * 0.6))
     return obs
 
 
@@ -259,30 +243,23 @@ class FluidTunnel(Visual):
         return consumed
 
     def _add_forces(self):
-        speed = 3.0
-        for j in range(1, N + 1):
-            idx = IX(1, j)
-            self.u[idx] = speed
-            if (j + int(self.time * 8)) % 6 < 2:
-                self.dens[idx] = 3.0
+        self.u[1, 1:N+1] = 3.0
+        jj = np.arange(1, N + 1)
+        mask = ((jj + int(self.time * 8)) % 6 < 2)
+        self.dens[1, 1:N+1] = np.where(mask, 3.0, self.dens[1, 1:N+1])
 
     def _apply_obstacle(self):
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                idx = IX(i, j)
-                if self.obstacle[idx]:
-                    self.u[idx] = 0.0
-                    self.v[idx] = 0.0
-                    self.dens[idx] *= 0.5
+        self.u[self.obstacle] = 0.0
+        self.v[self.obstacle] = 0.0
+        self.dens[self.obstacle] *= 0.5
 
     def update(self, dt: float):
         self.time += dt
         sim_dt = 0.1
 
-        for i in range(S * S):
-            self.u_prev[i] = 0.0
-            self.v_prev[i] = 0.0
-            self.dens_prev[i] = 0.0
+        self.u_prev[:] = 0.0
+        self.v_prev[:] = 0.0
+        self.dens_prev[:] = 0.0
 
         self._add_forces()
         _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
@@ -291,16 +268,14 @@ class FluidTunnel(Visual):
                       self.diffusion, sim_dt)
         self._apply_obstacle()
 
-        for i in range(S * S):
-            self.dens[i] *= 0.995
+        self.dens *= 0.995
 
     def draw(self):
         _draw_density(self.display, self.dens, self.palette_idx)
-        # Draw obstacle
-        for j in range(N):
-            for i in range(N):
-                if self.obstacle[IX(i + 1, j + 1)]:
-                    self.display.set_pixel(i, j, (60, 60, 70))
+        # Draw obstacle pixels
+        obs_ij = np.argwhere(self.obstacle[1:N+1, 1:N+1])
+        for k in range(len(obs_ij)):
+            self.display.set_pixel(int(obs_ij[k, 0]), int(obs_ij[k, 1]), (60, 60, 70))
 
 
 # ── FluidInk ─────────────────────────────────────────────────────
@@ -334,22 +309,15 @@ class FluidInk(Visual):
             cx = random.randint(N // 4, 3 * N // 4)
         if cy is None:
             cy = random.randint(N // 4, 3 * N // 4)
-        for dj in range(-2, 3):
-            for di in range(-2, 3):
-                i = cx + di
-                j = cy + dj
-                if 1 <= i <= N and 1 <= j <= N:
-                    self.dens[IX(i, j)] += 5.0
+        i_lo = max(1, cx - 2)
+        i_hi = min(N, cx + 2) + 1
+        j_lo = max(1, cy - 2)
+        j_hi = min(N, cy + 2) + 1
+        self.dens[i_lo:i_hi, j_lo:j_hi] += 5.0
         angle = random.uniform(0, 2 * math.pi)
         force = random.uniform(2, 5)
-        for dj in range(-2, 3):
-            for di in range(-2, 3):
-                i = cx + di
-                j = cy + dj
-                if 1 <= i <= N and 1 <= j <= N:
-                    idx = IX(i, j)
-                    self.u[idx] += force * math.cos(angle)
-                    self.v[idx] += force * math.sin(angle)
+        self.u[i_lo:i_hi, j_lo:j_hi] += force * math.cos(angle)
+        self.v[i_lo:i_hi, j_lo:j_hi] += force * math.sin(angle)
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -378,10 +346,9 @@ class FluidInk(Visual):
         self.time += dt
         sim_dt = 0.1
 
-        for i in range(S * S):
-            self.u_prev[i] = 0.0
-            self.v_prev[i] = 0.0
-            self.dens_prev[i] = 0.0
+        self.u_prev[:] = 0.0
+        self.v_prev[:] = 0.0
+        self.dens_prev[:] = 0.0
 
         self._add_forces()
         _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
@@ -389,8 +356,7 @@ class FluidInk(Visual):
         _density_step(self.dens, self.dens_prev, self.u, self.v,
                       self.diffusion, sim_dt)
 
-        for i in range(S * S):
-            self.dens[i] *= 0.995
+        self.dens *= 0.995
 
     def draw(self):
         _draw_density(self.display, self.dens, self.palette_idx)
@@ -410,6 +376,14 @@ MIX_PALETTES = [
     {'a': (255, 200, 50), 'b': (120, 40, 200), 'bg': (5, 3, 8)},
     # Red vs Green
     {'a': (220, 40, 40), 'b': (40, 200, 80), 'bg': (5, 5, 5)},
+]
+
+# Precompute palette arrays for mixing
+_MIX_PAL_ARRAYS = [
+    {'a': np.array(p['a'], dtype=np.float64),
+     'b': np.array(p['b'], dtype=np.float64),
+     'bg': np.array(p['bg'], dtype=np.float64)}
+    for p in MIX_PALETTES
 ]
 
 
@@ -440,12 +414,8 @@ class FluidMixing(Visual):
         self.dens_b_prev = _new_field()
         # Initialize: left half = fluid A, right half = fluid B
         half = N // 2
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                if i <= half:
-                    self.dens_a[IX(i, j)] = 2.0
-                else:
-                    self.dens_b[IX(i, j)] = 2.0
+        self.dens_a[1:half+1, 1:N+1] = 2.0
+        self.dens_b[half+1:N+1, 1:N+1] = 2.0
         # Stirring vortex state
         self.stir_angle = 0.0
 
@@ -473,54 +443,47 @@ class FluidMixing(Visual):
         cx, cy = N // 2, N // 2
         self.stir_angle += 0.015
         r_stir = N * 0.22
-        # Vortex A
         ax = cx + r_stir * math.cos(self.stir_angle)
         ay = cy + r_stir * math.sin(self.stir_angle)
-        # Vortex B (opposite side)
         bx = cx - r_stir * math.cos(self.stir_angle)
         by = cy - r_stir * math.sin(self.stir_angle)
 
         strength = 2.0
-        radius = 6
-        for j in range(1, N + 1):
-            for i in range(1, N + 1):
-                idx = IX(i, j)
-                # Vortex A (counter-clockwise)
-                dx_a = i - ax
-                dy_a = j - ay
-                d2_a = dx_a * dx_a + dy_a * dy_a
-                if d2_a < radius * radius and d2_a > 0.5:
-                    inv = strength / (d2_a + 2.0)
-                    self.u[idx] += -dy_a * inv
-                    self.v[idx] += dx_a * inv
-                # Vortex B (clockwise)
-                dx_b = i - bx
-                dy_b = j - by
-                d2_b = dx_b * dx_b + dy_b * dy_b
-                if d2_b < radius * radius and d2_b > 0.5:
-                    inv = strength / (d2_b + 2.0)
-                    self.u[idx] += dy_b * inv
-                    self.v[idx] += -dx_b * inv
+        radius_sq = 36  # 6*6
+        u_int = self.u[1:N+1, 1:N+1]
+        v_int = self.v[1:N+1, 1:N+1]
+
+        # Vortex A (counter-clockwise)
+        dx_a = _II - ax
+        dy_a = _JJ - ay
+        d2_a = dx_a * dx_a + dy_a * dy_a
+        mask_a = (d2_a < radius_sq) & (d2_a > 0.5)
+        inv_a = np.where(mask_a, strength / (d2_a + 2.0), 0.0)
+        u_int += -dy_a * inv_a
+        v_int += dx_a * inv_a
+
+        # Vortex B (clockwise)
+        dx_b = _II - bx
+        dy_b = _JJ - by
+        d2_b = dx_b * dx_b + dy_b * dy_b
+        mask_b = (d2_b < radius_sq) & (d2_b > 0.5)
+        inv_b = np.where(mask_b, strength / (d2_b + 2.0), 0.0)
+        u_int += dy_b * inv_b
+        v_int += -dx_b * inv_b
 
     def _replenish_edges(self):
-        """Keep fluid A on left edge and fluid B on right edge to prevent runaway."""
-        for j in range(1, N + 1):
-            # Left edge: replenish fluid A
-            idx_l = IX(1, j)
-            self.dens_a[idx_l] = max(self.dens_a[idx_l], 1.5)
-            # Right edge: replenish fluid B
-            idx_r = IX(N, j)
-            self.dens_b[idx_r] = max(self.dens_b[idx_r], 1.5)
+        """Keep fluid A on left edge and fluid B on right edge."""
+        np.maximum(self.dens_a[1, 1:N+1], 1.5, out=self.dens_a[1, 1:N+1])
+        np.maximum(self.dens_b[N, 1:N+1], 1.5, out=self.dens_b[N, 1:N+1])
 
     def update(self, dt: float):
         self.time += dt
         sim_dt = 0.1
 
-        for i in range(S * S):
-            self.u_prev[i] = 0.0
-            self.v_prev[i] = 0.0
-            self.dens_a_prev[i] = 0.0
-            self.dens_b_prev[i] = 0.0
+        self.u_prev[:] = 0.0
+        self.v_prev[:] = 0.0
+        self.dens_a_prev[:] = 0.0
+        self.dens_b_prev[:] = 0.0
 
         self._add_stirring()
         self._replenish_edges()
@@ -536,28 +499,21 @@ class FluidMixing(Visual):
                       self.diffusion, sim_dt)
 
     def draw(self):
-        pal = MIX_PALETTES[self.palette_idx]
+        pal = _MIX_PAL_ARRAYS[self.palette_idx]
         ca = pal['a']
         cb = pal['b']
         bg = pal['bg']
 
-        for j in range(N):
-            for i in range(N):
-                da = self.dens_a[IX(i + 1, j + 1)]
-                db = self.dens_b[IX(i + 1, j + 1)]
-                if da < 0:
-                    da = 0
-                if db < 0:
-                    db = 0
-                # Normalize
-                ta = min(1.0, da * 0.3)
-                tb = min(1.0, db * 0.3)
+        da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
+        db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.3, 0.0, 1.0)
 
-                # Blend: background + fluid_a color + fluid_b color
-                r = int(bg[0] + (ca[0] - bg[0]) * ta + (cb[0] - bg[0]) * tb)
-                g = int(bg[1] + (ca[1] - bg[1]) * ta + (cb[1] - bg[1]) * tb)
-                b = int(bg[2] + (ca[2] - bg[2]) * ta + (cb[2] - bg[2]) * tb)
-                r = max(0, min(255, r))
-                g = max(0, min(255, g))
-                b = max(0, min(255, b))
-                self.display.set_pixel(i, j, (r, g, b))
+        colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
+        pixels = np.clip(colors.transpose(1, 0, 2), 0, 255).astype(np.uint8)
+
+        buf = self.display.buffer
+        for j in range(N):
+            row = buf[j]
+            prow = pixels[j]
+            for i in range(N):
+                p = prow[i]
+                row[i] = (int(p[0]), int(p[1]), int(p[2]))
