@@ -47,6 +47,7 @@ from .dnd import DnD
 from .bowling import Bowling
 from .darts import Darts
 from .shuffleboard import Shuffleboard
+from .pinball import Pinball
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -96,6 +97,7 @@ ALL_GAMES = [
     DnD,
     Darts,
     Shuffleboard,
+    Pinball,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -153,6 +155,7 @@ __all__ = [
     'DnD',
     'Darts',
     'Shuffleboard',
+    'Pinball',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
