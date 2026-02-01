@@ -17,8 +17,8 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 # Layout constants
 # =============================================================================
 
-FLOOR_Y = [14, 22, 30, 38, 46, 54]   # 6 floors, 8px apart, top-to-bottom
-PLATE_Y = 59                           # Where completed burgers land
+FLOOR_Y = [8, 16, 24, 32, 40, 48]     # 6 floors, 8px apart, shifted up for plate room
+PLATE_Y = 62                           # Where completed burgers land (near bottom)
 
 BURGER_X = [4, 20, 36, 52]            # Left edge of each 8px ingredient
 INGREDIENT_WIDTH = 8
@@ -87,12 +87,11 @@ LEVELS = [
     {
         'floors': ['X..', '.X.', '..X', 'X..', '.X.', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  3, 4),
-            (10, 2, 3),
-            (26, 0, 1), (26, 1, 2), (26, 4, 5),
-            (38, 1, 2), (38, 3, 4),
-            (54, 2, 3), (54, 4, 5),
-            (60, 0, 1),
+            (6,  0, 1), (26, 0, 1), (42, 0, 1), (60, 0, 1),
+            (6,  1, 2), (26, 1, 2), (38, 1, 2), (54, 1, 2),
+            (10, 2, 3), (22, 2, 3), (38, 2, 3), (54, 2, 3),
+            (6,  3, 4), (22, 3, 4), (38, 3, 4), (54, 3, 4),
+            (6,  4, 5), (26, 4, 5), (54, 4, 5),
         ],
         'ingredients': [
             (0, 0, 'bun_top'), (0, 1, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
@@ -158,12 +157,11 @@ LEVELS = [
     {
         'floors': ['X..', '..X', '...', 'X..', '..X', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  2, 3), (6,  4, 5),
-            (10, 1, 2), (10, 3, 4),
-            (22, 0, 1), (22, 2, 3),
-            (42, 1, 2), (42, 3, 4),
-            (54, 0, 1), (54, 2, 3), (54, 4, 5),
-            (60, 1, 2), (60, 3, 4), (60, 4, 5),
+            (6,  0, 1), (22, 0, 1), (42, 0, 1), (54, 0, 1),
+            (10, 1, 2), (42, 1, 2), (60, 1, 2),
+            (6,  2, 3), (22, 2, 3), (54, 2, 3),
+            (10, 3, 4), (26, 3, 4), (42, 3, 4), (60, 3, 4),
+            (6,  4, 5), (26, 4, 5), (54, 4, 5), (60, 4, 5),
         ],
         'ingredients': [
             (0, 0, 'bun_top'), (0, 2, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
@@ -208,8 +206,10 @@ class BurgerTime(Game):
     # Game constants
     MOVE_SPEED = 30.0
     CLIMB_SPEED = 25.0
-    ENEMY_SPEED = 18.0
-    INGREDIENT_FALL_SPEED = 80.0
+    ENEMY_SPEED = 15.0
+    ENEMY_CLIMB_SPEED = 10.0
+    INGREDIENT_FALL_SPEED = 45.0
+    CASCADE_DELAY = 0.12  # Stagger between cascade steps
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -249,6 +249,7 @@ class BurgerTime(Game):
         self.ingredients = []
         self.enemies = []
         self.plates = []
+        self.plate_slots = [0] * len(BURGER_X)  # Track stacking per column
 
         level_data = LEVELS[(self.level - 1) % len(LEVELS)]
 
@@ -280,10 +281,12 @@ class BurgerTime(Game):
                 'walked': [False] * INGREDIENT_WIDTH,
                 'falling': False,
                 'fall_speed': 0,
+                'fall_delay': 0.0,
                 'target_y': None,
                 'carrying_enemies': [],
                 'col_idx': burger_col,
                 'floor_idx': floor_idx,
+                'at_plate': False,
             })
 
         # Plates at bottom for each burger column
@@ -306,6 +309,7 @@ class BurgerTime(Game):
                 'on_ladder': False,
                 'stunned': 2.0,  # Brief grace period at level start
                 'direction': random.choice([-1, 1]),
+                'wander_timer': 0.0,
             })
 
     def _random_x_on_floor(self, floor_idx):
@@ -483,8 +487,8 @@ class BurgerTime(Game):
 
     def check_ingredient_walk(self):
         """Check if chef is walking over any ingredients."""
-        chef_left = int(self.chef_x) - 1
-        chef_right = int(self.chef_x) + 1
+        chef_left = int(self.chef_x) - 2
+        chef_right = int(self.chef_x) + 2
 
         for ing in self.ingredients:
             if ing['falling']:
@@ -499,52 +503,24 @@ class BurgerTime(Game):
 
                 # Check if fully walked - award points for dropping
                 if all(ing['walked']):
-                    self.score += 50
-                    self.drop_ingredient(ing)
+                    # Don't drop if this column already has a cascade in progress
+                    col_busy = any(
+                        o['falling'] and o['col_idx'] == ing['col_idx']
+                        for o in self.ingredients
+                    )
+                    if not col_busy:
+                        self.score += 50
+                        self.drop_ingredient(ing)
 
-    def drop_ingredient(self, ingredient):
-        """Start dropping an ingredient using column-based targeting."""
-        ingredient['falling'] = True
-        ingredient['fall_speed'] = self.INGREDIENT_FALL_SPEED
+    def drop_ingredient(self, ingredient, delay=0.0):
+        """Drop an ingredient to the next floor, recursively cascading anything below.
+
+        The entire cascade chain is set up deterministically with staggered
+        delays so each piece visually pushes the next one down.
+        """
         ingredient['walked'] = [False] * ingredient['width']
 
-        col = ingredient['col_idx']
-        current_y = ingredient['y']
-
-        # Find next floor below with a platform under this burger column
-        target_y = PLATE_Y - 2  # Default to plate
-
-        # Check each floor below current position
-        for fy in FLOOR_Y:
-            if fy <= current_y + 4:
-                continue
-            # Is there a platform on this floor covering our burger column?
-            bx_center = BURGER_X[col] + INGREDIENT_WIDTH // 2
-            has_platform = False
-            for plat in self.platforms:
-                if abs(plat['y'] - fy) < 2 and plat['x1'] <= bx_center <= plat['x2']:
-                    has_platform = True
-                    break
-            if not has_platform:
-                continue
-
-            # Check for ingredient already sitting on this floor in same column
-            found_ingredient = False
-            for other in self.ingredients:
-                if other is ingredient or other['falling']:
-                    continue
-                if other['col_idx'] == col and abs(other['y'] - (fy - 2)) < 4:
-                    # Land on top of (push) this ingredient
-                    target_y = other['y'] - 3
-                    found_ingredient = True
-                    break
-            if not found_ingredient:
-                target_y = fy - 2
-            break
-
-        ingredient['target_y'] = target_y
-
-        # Check for enemies riding on this ingredient — scoring: 500 * 2^(n-1)
+        # Check for enemies riding on this ingredient
         num_riding = 0
         for enemy in self.enemies:
             if enemy['stunned'] > 0:
@@ -558,90 +534,214 @@ class BurgerTime(Game):
         if num_riding > 0:
             self.score += 500 * (2 ** (num_riding - 1))
 
+        extra_levels = num_riding * 2
+
+        col = ingredient['col_idx']
+        current_y = ingredient['y']
+
+        # Find floors below with a platform under this burger column
+        bx_center = BURGER_X[col] + INGREDIENT_WIDTH // 2
+        floors_below = []
+        for fy in FLOOR_Y:
+            if fy <= current_y + 4:
+                continue
+            for plat in self.platforms:
+                if abs(plat['y'] - fy) < 2 and plat['x1'] <= bx_center <= plat['x2']:
+                    floors_below.append(fy)
+                    break
+
+        # Skip extra floors for enemies riding the ingredient
+        target_floor = None
+        skip = extra_levels
+        for fy in floors_below:
+            if skip > 0:
+                skip -= 1
+                continue
+            target_floor = fy
+            break
+
+        if target_floor is not None:
+            target_y = target_floor - 2
+
+            # Recursive cascade: push any ingredient sitting at target floor first
+            for other in self.ingredients:
+                if other is not ingredient and not other['falling']:
+                    if other.get('at_plate'):
+                        continue
+                    if other['col_idx'] == col and abs(other['y'] - target_y) < 3:
+                        self.drop_ingredient(other, delay=delay + self.CASCADE_DELAY)
+        else:
+            # No more floors — land at the plate with proper stacking
+            slot = self.plate_slots[col]
+            target_y = PLATE_Y - 2 - (slot * 2)
+            self.plate_slots[col] += 1
+            ingredient['at_plate'] = True
+
+        ingredient['target_y'] = target_y
+        ingredient['falling'] = True
+        ingredient['fall_delay'] = delay
+        ingredient['fall_speed'] = self.INGREDIENT_FALL_SPEED
+
     def update_ingredients(self, dt: float):
-        """Update falling ingredients."""
+        """Update falling ingredients (cascade is pre-computed in drop_ingredient)."""
         for ing in self.ingredients:
-            if ing['falling']:
-                ing['y'] += ing['fall_speed'] * dt
+            if not ing['falling']:
+                continue
 
-                # Move carried enemies
-                for enemy in ing['carrying_enemies']:
-                    enemy['y'] = ing['y']
+            # Wait for cascade delay before starting to fall
+            if ing['fall_delay'] > 0:
+                ing['fall_delay'] -= dt
+                continue
 
-                # Check if reached target
-                if ing['y'] >= ing['target_y']:
-                    ing['y'] = ing['target_y']
-                    ing['falling'] = False
-                    ing['carrying_enemies'] = []
+            ing['y'] += ing['fall_speed'] * dt
 
-                    # Check if this pushes down ingredients below (same column)
-                    for other in self.ingredients:
-                        if other is not ing and not other['falling']:
-                            if other['col_idx'] == ing['col_idx']:
-                                if abs(other['y'] - ing['y']) < 4:
-                                    self.drop_ingredient(other)
+            # Move carried enemies
+            for enemy in ing['carrying_enemies']:
+                enemy['y'] = ing['y']
+
+            # Check if reached target
+            if ing['y'] >= ing['target_y']:
+                ing['y'] = ing['target_y']
+                ing['falling'] = False
+                ing['carrying_enemies'] = []
+
+    def _find_target_ladder(self, ex, ey, want_up):
+        """Find nearest reachable ladder that goes up or down from (ex, ey)."""
+        # Find which platform segment the enemy is on
+        on_seg = None
+        for plat in self.platforms:
+            if abs(plat['y'] - ey) < 3 and plat['x1'] <= ex <= plat['x2']:
+                on_seg = plat
+                break
+        if not on_seg:
+            return None
+
+        best = None
+        best_dist = float('inf')
+        for ladder in self.ladders:
+            # Ladder must be on our platform segment (walkable)
+            if ladder['x'] < on_seg['x1'] or ladder['x'] > on_seg['x2']:
+                continue
+            # Ladder must span our floor
+            if ladder['y1'] > ey + 3 or ladder['y2'] < ey - 3:
+                continue
+            # Must extend in the desired direction
+            if want_up and ladder['y1'] >= ey - 2:
+                continue
+            if not want_up and ladder['y2'] <= ey + 2:
+                continue
+
+            dist = abs(ladder['x'] - ex)
+            if dist < best_dist:
+                best_dist = dist
+                best = ladder
+
+        return best
 
     def update_enemies(self, dt: float):
-        """Update enemy AI with platform-edge awareness."""
+        """Update enemy AI — pathfind toward player with wander periods."""
         for enemy in self.enemies:
             if enemy['stunned'] > 0:
                 enemy['stunned'] -= dt
                 continue
 
-            # Simple AI: move toward chef
             dx = self.chef_x - enemy['x']
             dy = self.chef_y - enemy['y']
 
-            ladder = self.get_ladder_at(enemy['x'], enemy['y'])
-            platform = self.get_platform_at(enemy['x'], enemy['y'])
-
-            speed = self.ENEMY_SPEED * (1 + self.level * 0.1)
+            h_speed = self.ENEMY_SPEED * (1 + self.level * 0.05)
+            v_speed = self.ENEMY_CLIMB_SPEED * (1 + self.level * 0.05)
 
             if enemy['on_ladder']:
-                # Climbing
+                ladder = self.get_ladder_at(enemy['x'], enemy['y'])
+                # Climb toward chef's floor
                 if abs(dy) > 2:
                     if dy < 0:
-                        enemy['y'] -= speed * dt
+                        enemy['y'] -= v_speed * dt
                         if ladder and enemy['y'] < ladder['y1']:
-                            enemy['y'] = ladder['y1']
+                            enemy['y'] = float(ladder['y1'])
                             enemy['on_ladder'] = False
+                            enemy['wander_timer'] = 0.4  # Pause after exiting ladder
                     else:
-                        enemy['y'] += speed * dt
+                        enemy['y'] += v_speed * dt
                         if ladder and enemy['y'] > ladder['y2']:
-                            enemy['y'] = ladder['y2']
+                            enemy['y'] = float(ladder['y2'])
                             enemy['on_ladder'] = False
+                            enemy['wander_timer'] = 0.4
                 else:
+                    # Reached target floor — snap and step off
                     enemy['on_ladder'] = False
+                    nearest = min(FLOOR_Y, key=lambda f: abs(f - enemy['y']))
+                    enemy['y'] = float(nearest)
+                    enemy['wander_timer'] = 0.4
             else:
-                # Horizontal movement with platform-edge checking
-                if abs(dx) > 3:
-                    if dx < 0:
-                        new_x = enemy['x'] - speed * dt
-                        if self._on_platform_segment(new_x, enemy['y']):
-                            enemy['x'] = new_x
-                            enemy['direction'] = -1
-                        else:
-                            enemy['direction'] = 1  # Reverse at edge
-                    else:
-                        new_x = enemy['x'] + speed * dt
-                        if self._on_platform_segment(new_x, enemy['y']):
-                            enemy['x'] = new_x
-                            enemy['direction'] = 1
-                        else:
-                            enemy['direction'] = -1  # Reverse at edge
-                else:
-                    # Close to chef horizontally — wander in current direction
-                    new_x = enemy['x'] + enemy['direction'] * speed * dt
-                    if self._on_platform_segment(new_x, enemy['y']):
-                        enemy['x'] = new_x
-                    else:
-                        enemy['direction'] *= -1
+                # Snap y to nearest floor to prevent drift
+                nearest = min(FLOOR_Y, key=lambda f: abs(f - enemy['y']))
+                if abs(enemy['y'] - nearest) < 3:
+                    enemy['y'] = float(nearest)
 
-                # Try to use ladder
-                if ladder and abs(dy) > 8:
-                    if random.random() < 0.02:
-                        enemy['on_ladder'] = True
-                        enemy['x'] = ladder['x']
+                # Wander mode: patrol back and forth, don't pathfind
+                if enemy['wander_timer'] > 0:
+                    enemy['wander_timer'] -= dt
+                    self._enemy_wander(enemy, h_speed, dt)
+                elif abs(dy) > 6:
+                    # Different floor — find a ladder to get closer
+                    want_up = dy < 0
+                    target_ladder = self._find_target_ladder(
+                        enemy['x'], enemy['y'], want_up)
+
+                    if target_ladder:
+                        ldx = target_ladder['x'] - enemy['x']
+                        if abs(ldx) < 3:
+                            # At the ladder — take it
+                            enemy['on_ladder'] = True
+                            enemy['x'] = float(target_ladder['x'])
+                        else:
+                            # Walk toward the ladder
+                            direction = 1 if ldx > 0 else -1
+                            new_x = enemy['x'] + direction * h_speed * dt
+                            if self._on_platform_segment(new_x, enemy['y']):
+                                enemy['x'] = new_x
+                                enemy['direction'] = direction
+                            else:
+                                # Can't reach ladder — wander to find another path
+                                enemy['direction'] = -direction
+                                enemy['wander_timer'] = 0.6
+                    else:
+                        # No useful ladder — wander until one becomes reachable
+                        enemy['wander_timer'] = 0.8
+                        self._enemy_wander(enemy, h_speed, dt)
+                else:
+                    # Same floor — chase player, but occasionally wander
+                    if random.random() < 0.005:
+                        enemy['wander_timer'] = random.uniform(0.4, 1.0)
+                        enemy['direction'] = random.choice([-1, 1])
+                    else:
+                        self._enemy_chase_horizontal(enemy, dx, h_speed, dt)
+
+    def _enemy_wander(self, enemy, speed, dt):
+        """Patrol in current direction, reversing at platform edges."""
+        new_x = enemy['x'] + enemy['direction'] * speed * dt
+        if self._on_platform_segment(new_x, enemy['y']):
+            enemy['x'] = new_x
+        else:
+            enemy['direction'] *= -1
+
+    def _enemy_chase_horizontal(self, enemy, dx, speed, dt):
+        """Move enemy toward player horizontally, reversing at platform edges."""
+        if dx < 0:
+            new_x = enemy['x'] - speed * dt
+            if self._on_platform_segment(new_x, enemy['y']):
+                enemy['x'] = new_x
+                enemy['direction'] = -1
+            else:
+                enemy['direction'] = 1
+        else:
+            new_x = enemy['x'] + speed * dt
+            if self._on_platform_segment(new_x, enemy['y']):
+                enemy['x'] = new_x
+                enemy['direction'] = 1
+            else:
+                enemy['direction'] = -1
 
     def check_enemy_collision(self):
         """Check if chef collides with any enemy."""
@@ -672,13 +772,14 @@ class BurgerTime(Game):
                 enemy['y'] = float(FLOOR_Y[floor_idx])
                 enemy['stunned'] = 2.0
                 enemy['on_ladder'] = False
+                enemy['wander_timer'] = 0.0
 
     def check_win(self):
-        """Check if all burgers are complete (all ingredients at plate level)."""
+        """Check if all ingredients have reached the plate."""
         for ing in self.ingredients:
             if ing['falling']:
                 return False
-            if ing['y'] < PLATE_Y - 15:
+            if not ing['at_plate']:
                 return False
         return True
 
@@ -834,16 +935,15 @@ class BurgerTime(Game):
             self.display.set_pixel(x, y, self.CHEF_BODY)
 
     def draw_hud(self):
-        """Draw HUD — all on one line at y=1."""
-        # Score
+        """Draw HUD — single compact line above floor 0."""
+        # Score (left)
         self.display.draw_text_small(2, 1, f"{self.score}", Colors.WHITE)
-        # Pepper count
-        self.display.draw_text_small(2, 8, f"P{self.peppers}", self.PEPPER_COLOR)
-        # Level
-        self.display.draw_text_small(30, 1, f"L{self.level}", Colors.CYAN)
-        # Lives (chef icons)
+        # Level + pepper (center-right)
+        self.display.draw_text_small(26, 1, f"L{self.level}", Colors.CYAN)
+        self.display.draw_text_small(40, 1, f"P{self.peppers}", self.PEPPER_COLOR)
+        # Lives (chef icons, far right)
         for i in range(self.lives - 1):
-            lx = 50 + i * 5
+            lx = 55 + i * 5
             self.display.set_pixel(lx, 2, self.CHEF_HAT)
             self.display.set_pixel(lx, 3, self.CHEF_BODY)
 
