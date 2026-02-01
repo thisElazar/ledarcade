@@ -214,13 +214,12 @@ class Shuffleboard(Game):
                     puck.vx = 0.0
                     puck.vy = 0.0
 
-            # Side rails — puck stops horizontally (no bounce)
-            if puck.x <= TABLE_LEFT + 1:
-                puck.x = TABLE_LEFT + 1
+            # Side edges — puck falls off the table
+            if puck.x <= TABLE_LEFT or puck.x >= TABLE_RIGHT:
+                puck.active = False
                 puck.vx = 0.0
-            elif puck.x >= TABLE_RIGHT - 1:
-                puck.x = TABLE_RIGHT - 1
-                puck.vx = 0.0
+                puck.vy = 0.0
+                continue
 
             # Top edge: puck falls off
             if puck.y < TOP_RAIL:

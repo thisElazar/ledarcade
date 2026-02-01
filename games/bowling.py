@@ -2,24 +2,24 @@
 Bowling - LED Arcade
 ====================
 10-pin bowling with top-down lane view on a 64x64 LED matrix.
-Two-step throw mechanic: position marker then aim direction.
+Three-step throw mechanic: position marker, aim direction, then power/spin.
+Physics-based pin simulation with elastic collisions.
 1P score attack (10 frames) and 2P alternating (highest score wins).
 
 Controls:
-  Space      - Lock position / confirm aim / navigate mode select
-  Joystick   - Cancel aim back to position / navigate mode select
+  Space      - Lock position / confirm aim / confirm power / navigate
+  Joystick   - Cancel aim→position / cancel power→aim / navigate
 """
 
 import math
-import random
 from arcade import Game, GameState, Display, Colors, InputState
 
 # Phases
 PHASE_MODE_SELECT = 0
 PHASE_POSITION = 1
 PHASE_AIM = 2
-PHASE_ROLLING = 3
-PHASE_PIN_FALL = 4
+PHASE_POWER = 3
+PHASE_ROLLING = 4
 PHASE_SCORE_SHOW = 5
 PHASE_TURN_CHANGE = 6
 PHASE_GAME_OVER_2P = 7
@@ -44,39 +44,17 @@ HUD_BOTTOM = 8
 
 # Ball
 BALL_COLOR = (200, 200, 220)
-BALL_SPEED = 60.0  # px/s upward
 BALL_RADIUS = 1.5  # collision radius
 
 # Pin layout: 10-pin triangle, back row at y=12, headpin at y=26
-# Row 0 (back, 4 pins), Row 1 (3 pins), Row 2 (2 pins), Row 3 (headpin)
 PIN_ROWS = [
-    # (x_offset_from_center, y) for each row
-    # Back row: 4 pins, spaced 5px apart, centered on lane
     [(-7, 12), (-2, 12), (3, 12), (8, 12)],
-    # Row 2: 3 pins
     [(-5, 17), (0, 17), (5, 17)],
-    # Row 3: 2 pins
     [(-2, 22), (3, 22)],
-    # Headpin
     [(0, 27)],
 ]
 
-# Standard pin numbering (7-10 back, 4-6, 2-3, 1 headpin)
 PIN_NUMBERS = [7, 8, 9, 10, 4, 5, 6, 2, 3, 1]
-
-# Adjacency map for chain reactions (pin index -> list of adjacent pin indices)
-PIN_ADJACENCY = {
-    0: [1, 4],        # pin 7 -> 8, 4
-    1: [0, 2, 4, 5],  # pin 8 -> 7, 9, 4, 5
-    2: [1, 3, 5, 6],  # pin 9 -> 8, 10, 5, 6
-    3: [2, 6],         # pin 10 -> 9, 6
-    4: [0, 1, 7],      # pin 4 -> 7, 8, 2
-    5: [1, 2, 7, 8],   # pin 5 -> 8, 9, 2, 3
-    6: [2, 3, 8],      # pin 6 -> 9, 10, 3
-    7: [4, 5, 9],      # pin 2 -> 4, 5, 1
-    8: [5, 6, 9],      # pin 3 -> 5, 6, 1
-    9: [7, 8],         # pin 1 -> 2, 3
-}
 
 PIN_COLOR = Colors.WHITE
 PIN_DOWN_COLOR = (60, 40, 30)
@@ -89,8 +67,36 @@ SWEEP_SPEED_PER_FRAME = 3.0
 AIM_LINE_LENGTH = 25
 MAX_AIM_ANGLE = math.pi / 3  # 60 degrees max deflection
 
+# Power / Spin
+BASE_POWER_SPEED = 1.5
+POWER_SPEED_PER_FRAME = 0.08
+MAX_BALL_SPEED = 80.0
+MIN_BALL_SPEED = 48.0
+SPIN_LATERAL_ACCEL = 30.0  # px/s^2 at max spin
+
+# Pin physics
+PIN_RADIUS = 1.5
+PIN_COLLISION_DIST = 3.0
+BALL_PIN_COLLISION_DIST = 3.0
+PIN_FRICTION = 40.0         # px/s^2 deceleration
+BALL_FRICTION = 5.0
+PIN_RESTITUTION = 0.8
+BALL_PIN_RESTITUTION = 0.85
+PIN_KNOCKED_DIST = 2.5      # displacement threshold
+MIN_SPEED = 2.0
+SUBSTEPS = 3
+
+# Mass ratio (ball is heavier)
+BALL_MASS = 3.0
+PIN_MASS = 1.0
+
+# Lane boundaries for pin physics
+LANE_WALL_LEFT = LANE_LEFT + 0.5
+LANE_WALL_RIGHT = LANE_RIGHT - 0.5
+PIN_AREA_TOP = PIN_DECK_TOP - 2.0
+PIN_AREA_BOTTOM = FOUL_LINE_Y
+
 # Timing
-PIN_FALL_TIME = 0.6
 SCORE_SHOW_TIME = 1.2
 TURN_CHANGE_TIME = 0.5
 
@@ -100,7 +106,7 @@ TOTAL_FRAMES = 10
 
 def _build_pin_positions():
     """Build flat list of (x, y) pin positions."""
-    cx = (LANE_LEFT + LANE_RIGHT) // 2  # lane center x
+    cx = (LANE_LEFT + LANE_RIGHT) // 2
     positions = []
     for row in PIN_ROWS:
         for ox, py in row:
@@ -109,6 +115,31 @@ def _build_pin_positions():
 
 
 PIN_POSITIONS = _build_pin_positions()
+
+
+class Pin:
+    __slots__ = ['x', 'y', 'vx', 'vy', 'home_x', 'home_y', 'knocked', 'active']
+
+    def __init__(self, x, y):
+        self.x = float(x)
+        self.y = float(y)
+        self.home_x = float(x)
+        self.home_y = float(y)
+        self.vx = 0.0
+        self.vy = 0.0
+        self.knocked = False
+        self.active = True
+
+    def speed(self):
+        return math.sqrt(self.vx * self.vx + self.vy * self.vy)
+
+    def moving(self):
+        return self.speed() > MIN_SPEED
+
+    def displacement(self):
+        dx = self.x - self.home_x
+        dy = self.y - self.home_y
+        return math.sqrt(dx * dx + dy * dy)
 
 
 class Bowling(Game):
@@ -129,24 +160,31 @@ class Bowling(Game):
         # Game state
         self.two_player = False
         self.current_player = 0
-        self.current_frame = 0   # 0-indexed
-        self.ball_in_frame = 0   # 0 = first ball, 1 = second, 2 = bonus (10th)
+        self.current_frame = 0
+        self.ball_in_frame = 0
 
-        # Scoring arrays: rolls[player][frame] = list of roll values
+        # Scoring arrays
         self.rolls = [[[] for _ in range(TOTAL_FRAMES)] for _ in range(2)]
         self.frame_scores = [[None] * TOTAL_FRAMES for _ in range(2)]
         self.total_scores = [0, 0]
 
-        # Pins: True = standing
-        self.pins = [True] * 10
+        # Pins
+        self.pins = self._create_pins()
+        self.pins_before_roll = 10
 
         # Position sweep
         self.sweep_pos = float((LANE_LEFT + LANE_RIGHT) // 2)
         self.sweep_dir = 1
 
         # Aim sweep
-        self.aim_angle = 0.0  # radians from vertical (negative = left, positive = right)
+        self.aim_angle = 0.0
         self.aim_dir = 1
+
+        # Power/spin
+        self.power_pos = 0.0
+        self.power_dir = 1
+        self.power_value = 1.0
+        self.spin_value = 0.0
 
         # Ball state
         self.ball_x = 0.0
@@ -155,8 +193,7 @@ class Bowling(Game):
         self.ball_vy = 0.0
         self.ball_active = False
 
-        # Pin fall animation
-        self.pins_just_knocked = []
+        # Phase timer
         self.phase_timer = 0.0
 
         # Score display
@@ -164,17 +201,40 @@ class Bowling(Game):
         self.last_was_strike = False
         self.last_was_spare = False
 
+        self._pending_advance = False
+
+    def _create_pins(self):
+        pins = []
+        for i in range(10):
+            px, py = PIN_POSITIONS[i]
+            pins.append(Pin(px, py))
+        return pins
+
     def _sweep_speed(self):
         return BASE_SWEEP_SPEED + SWEEP_SPEED_PER_FRAME * self.current_frame
 
+    def _power_speed(self):
+        return BASE_POWER_SPEED + POWER_SPEED_PER_FRAME * self.current_frame
+
     def _reset_pins(self):
-        self.pins = [True] * 10
+        self.pins = self._create_pins()
+        self.pins_before_roll = 10
 
     def _standing_count(self):
-        return sum(1 for p in self.pins if p)
+        return sum(1 for p in self.pins if not p.knocked and p.active)
 
     def _all_down(self):
         return self._standing_count() == 0
+
+    def _any_pin_moving(self):
+        return any(p.moving() for p in self.pins if p.active)
+
+    def _all_stopped(self):
+        if self.ball_active:
+            bspd = math.sqrt(self.ball_vx ** 2 + self.ball_vy ** 2)
+            if bspd > MIN_SPEED:
+                return False
+        return not self._any_pin_moving()
 
     def _start_position(self):
         self.phase = PHASE_POSITION
@@ -186,51 +246,156 @@ class Bowling(Game):
         self.aim_angle = 0.0
         self.aim_dir = 1
 
+    def _start_power(self):
+        self.phase = PHASE_POWER
+        self.power_pos = 0.0
+        self.power_dir = 1
+
     def _launch_ball(self):
         self.ball_x = self.sweep_pos
         self.ball_y = float(APPROACH_TOP)
-        # Aim: angle from straight up
-        self.ball_vx = math.sin(self.aim_angle) * BALL_SPEED
-        self.ball_vy = -BALL_SPEED  # upward
+        ball_speed = MIN_BALL_SPEED + (MAX_BALL_SPEED - MIN_BALL_SPEED) * self.power_value
+        self.ball_vx = math.sin(self.aim_angle) * ball_speed
+        self.ball_vy = -ball_speed  # upward
         self.ball_active = True
-        self.pins_just_knocked = []
+        self.pins_before_roll = self._standing_count()
         self.phase = PHASE_ROLLING
 
-    def _check_pin_collisions(self):
-        """Check ball against standing pins. Direct hits + chain reactions."""
-        hit_pins = []
-        for i, standing in enumerate(self.pins):
-            if not standing:
+    def _evaluate_knocked_pins(self):
+        """Mark pins as knocked based on displacement from home position."""
+        for pin in self.pins:
+            if not pin.active:
+                pin.knocked = True
+            elif pin.displacement() >= PIN_KNOCKED_DIST:
+                pin.knocked = True
+
+    # ==== PHYSICS ====
+
+    def _physics_step(self, dt):
+        """One substep of physics for ball and all pins."""
+
+        # --- Move ball ---
+        if self.ball_active:
+            # Spin curves the ball laterally
+            self.ball_vx += self.spin_value * SPIN_LATERAL_ACCEL * dt
+
+            self.ball_x += self.ball_vx * dt
+            self.ball_y += self.ball_vy * dt
+
+            # Ball friction (gentle)
+            bspd = math.sqrt(self.ball_vx ** 2 + self.ball_vy ** 2)
+            if bspd > 0:
+                decel = BALL_FRICTION * dt
+                new_spd = max(0, bspd - decel)
+                factor = new_spd / bspd
+                self.ball_vx *= factor
+                self.ball_vy *= factor
+
+            # Ball in gutter
+            if self.ball_x < LANE_LEFT or self.ball_x > LANE_RIGHT:
+                self.ball_active = False
+                self.ball_vx = 0.0
+                self.ball_vy = 0.0
+
+            # Ball past pin deck
+            if self.ball_y < PIN_DECK_TOP - 4:
+                self.ball_active = False
+                self.ball_vx = 0.0
+                self.ball_vy = 0.0
+
+        # --- Move pins ---
+        for pin in self.pins:
+            if not pin.active or not pin.moving():
                 continue
-            px, py = PIN_POSITIONS[i]
-            dx = self.ball_x - px
-            dy = self.ball_y - py
-            dist = math.sqrt(dx * dx + dy * dy)
-            if dist < BALL_RADIUS + 1.5:  # pin radius ~1.5
-                hit_pins.append(i)
 
-        # Knock down direct hits
-        for i in hit_pins:
-            if self.pins[i]:
-                self.pins[i] = False
-                self.pins_just_knocked.append(i)
+            pin.x += pin.vx * dt
+            pin.y += pin.vy * dt
 
-        # Chain reactions with diminishing probability per step
-        chain_queue = [(pin_idx, 0) for pin_idx in hit_pins]
-        while chain_queue:
-            pin_idx, depth = chain_queue.pop(0)
-            prob = 0.3 * (0.5 ** depth)
-            for adj in PIN_ADJACENCY.get(pin_idx, []):
-                if self.pins[adj] and random.random() < prob:
-                    self.pins[adj] = False
-                    self.pins_just_knocked.append(adj)
-                    chain_queue.append((adj, depth + 1))
+            # Pin friction
+            spd = pin.speed()
+            if spd > 0:
+                decel = PIN_FRICTION * dt
+                new_spd = max(0, spd - decel)
+                factor = new_spd / spd
+                pin.vx *= factor
+                pin.vy *= factor
+                if new_spd < MIN_SPEED:
+                    pin.vx = 0.0
+                    pin.vy = 0.0
 
-    def _ball_in_gutter(self):
-        return self.ball_x < LANE_LEFT or self.ball_x > LANE_RIGHT
+            # Pin off lane -> deactivate
+            if (pin.x < LANE_WALL_LEFT or pin.x > LANE_WALL_RIGHT or
+                    pin.y < PIN_AREA_TOP or pin.y > PIN_AREA_BOTTOM):
+                pin.active = False
+                pin.knocked = True
+                pin.vx = 0.0
+                pin.vy = 0.0
 
-    def _ball_past_pins(self):
-        return self.ball_y < PIN_DECK_TOP - 2
+        # --- Ball-to-pin collisions (unequal mass) ---
+        if self.ball_active:
+            for pin in self.pins:
+                if not pin.active:
+                    continue
+                dx = pin.x - self.ball_x
+                dy = pin.y - self.ball_y
+                dist_sq = dx * dx + dy * dy
+                min_dist = BALL_PIN_COLLISION_DIST
+                if dist_sq < min_dist * min_dist and dist_sq > 0:
+                    dist = math.sqrt(dist_sq)
+                    nx = dx / dist
+                    ny = dy / dist
+
+                    # Separate overlap
+                    overlap = min_dist - dist
+                    total_mass = BALL_MASS + PIN_MASS
+                    self.ball_x -= nx * overlap * (PIN_MASS / total_mass)
+                    self.ball_y -= ny * overlap * (PIN_MASS / total_mass)
+                    pin.x += nx * overlap * (BALL_MASS / total_mass)
+                    pin.y += ny * overlap * (BALL_MASS / total_mass)
+
+                    # Impulse
+                    rel_vx = pin.vx - self.ball_vx
+                    rel_vy = pin.vy - self.ball_vy
+                    rel_vn = rel_vx * nx + rel_vy * ny
+
+                    if rel_vn < 0:  # approaching
+                        j = -(1 + BALL_PIN_RESTITUTION) * rel_vn / (1 / BALL_MASS + 1 / PIN_MASS)
+                        self.ball_vx -= (j / BALL_MASS) * nx
+                        self.ball_vy -= (j / BALL_MASS) * ny
+                        pin.vx += (j / PIN_MASS) * nx
+                        pin.vy += (j / PIN_MASS) * ny
+
+        # --- Pin-to-pin collisions (equal mass) ---
+        active_pins = [p for p in self.pins if p.active]
+        for i in range(len(active_pins)):
+            for j in range(i + 1, len(active_pins)):
+                a = active_pins[i]
+                b = active_pins[j]
+                dx = b.x - a.x
+                dy = b.y - a.y
+                dist_sq = dx * dx + dy * dy
+                min_dist = PIN_COLLISION_DIST
+                if dist_sq < min_dist * min_dist and dist_sq > 0:
+                    dist = math.sqrt(dist_sq)
+                    nx = dx / dist
+                    ny = dy / dist
+
+                    # Separate overlap
+                    overlap = min_dist - dist
+                    a.x -= nx * overlap * 0.5
+                    a.y -= ny * overlap * 0.5
+                    b.x += nx * overlap * 0.5
+                    b.y += ny * overlap * 0.5
+
+                    # Elastic collision
+                    rel_vn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny
+                    if rel_vn < 0:
+                        a.vx += rel_vn * nx * PIN_RESTITUTION
+                        a.vy += rel_vn * ny * PIN_RESTITUTION
+                        b.vx -= rel_vn * nx * PIN_RESTITUTION
+                        b.vy -= rel_vn * ny * PIN_RESTITUTION
+
+    # ==== SCORING ====
 
     def _record_roll(self, knocked):
         """Record a roll and handle frame advancement."""
@@ -243,33 +408,27 @@ class Bowling(Game):
         self.last_was_spare = False
 
         if f < 9:
-            # Frames 1-9
             if self.ball_in_frame == 0 and knocked == 10:
-                # Strike
                 self.last_was_strike = True
                 self._advance_turn()
             elif self.ball_in_frame == 1:
-                # Second ball
                 first = self.rolls[p][f][0]
                 if first + knocked == 10:
                     self.last_was_spare = True
                 self._advance_turn()
             else:
-                # First ball, not a strike
                 self.ball_in_frame = 1
                 self.phase = PHASE_SCORE_SHOW
                 self.phase_timer = SCORE_SHOW_TIME
         else:
             # 10th frame special rules
             total_rolls = len(self.rolls[p][f])
-            roll_sum = sum(self.rolls[p][f])
 
             if self.ball_in_frame == 0 and knocked == 10:
                 self.last_was_strike = True
 
             if total_rolls == 1:
                 if knocked == 10:
-                    # Strike in 10th: reset pins, 2 more balls
                     self._reset_pins()
                     self.ball_in_frame = 1
                     self.phase = PHASE_SCORE_SHOW
@@ -282,7 +441,6 @@ class Bowling(Game):
                 first = self.rolls[p][f][0]
                 second = self.rolls[p][f][1]
                 if first == 10:
-                    # First was strike
                     if second == 10:
                         self.last_was_strike = True
                         self._reset_pins()
@@ -293,14 +451,12 @@ class Bowling(Game):
                     self.phase = PHASE_SCORE_SHOW
                     self.phase_timer = SCORE_SHOW_TIME
                 elif first + second == 10:
-                    # Spare
                     self.last_was_spare = True
                     self._reset_pins()
                     self.ball_in_frame = 2
                     self.phase = PHASE_SCORE_SHOW
                     self.phase_timer = SCORE_SHOW_TIME
                 else:
-                    # No mark, frame done
                     self._advance_turn()
             elif total_rolls >= 3:
                 if knocked == 10:
@@ -312,13 +468,11 @@ class Bowling(Game):
         self._calculate_scores()
         self.phase = PHASE_SCORE_SHOW
         self.phase_timer = SCORE_SHOW_TIME
-
-        # After score show, we'll decide what to do in _after_score_show
         self._pending_advance = True
 
     def _after_score_show(self):
         """Called after score display timer expires."""
-        if hasattr(self, '_pending_advance') and self._pending_advance:
+        if self._pending_advance:
             self._pending_advance = False
 
             if self.two_player:
@@ -329,7 +483,6 @@ class Bowling(Game):
                     self.phase = PHASE_TURN_CHANGE
                     self.phase_timer = TURN_CHANGE_TIME
                 else:
-                    # Both players done this frame
                     self.current_frame += 1
                     self.current_player = 0
                     self.ball_in_frame = 0
@@ -353,9 +506,8 @@ class Bowling(Game):
             self._start_position()
 
     def _calculate_scores(self):
-        """Calculate cumulative scores for all frames using standard bowling rules."""
+        """Calculate cumulative scores using standard bowling rules."""
         for p in range(2 if self.two_player else 1):
-            # Flatten all rolls for this player
             all_rolls = []
             for f in range(TOTAL_FRAMES):
                 all_rolls.extend(self.rolls[p][f])
@@ -368,7 +520,6 @@ class Bowling(Game):
 
                 if f < 9:
                     if all_rolls[roll_idx] == 10:
-                        # Strike
                         bonus = 0
                         if roll_idx + 1 < len(all_rolls):
                             bonus += all_rolls[roll_idx + 1]
@@ -381,7 +532,6 @@ class Bowling(Game):
                         first = all_rolls[roll_idx]
                         second = all_rolls[roll_idx + 1]
                         if first + second == 10:
-                            # Spare
                             bonus = 0
                             if roll_idx + 2 < len(all_rolls):
                                 bonus = all_rolls[roll_idx + 2]
@@ -392,10 +542,8 @@ class Bowling(Game):
                             self.frame_scores[p][f] = total
                         roll_idx += 2
                     else:
-                        # Only first ball rolled so far
                         roll_idx += 1
                 else:
-                    # 10th frame: just sum all rolls (up to 3)
                     frame_rolls = self.rolls[p][f]
                     total += sum(frame_rolls)
                     self.frame_scores[p][f] = total
@@ -417,10 +565,10 @@ class Bowling(Game):
             self._update_position(input_state, dt)
         elif self.phase == PHASE_AIM:
             self._update_aim(input_state, dt)
+        elif self.phase == PHASE_POWER:
+            self._update_power(input_state, dt)
         elif self.phase == PHASE_ROLLING:
             self._update_rolling(dt)
-        elif self.phase == PHASE_PIN_FALL:
-            self._update_pin_fall(dt)
         elif self.phase == PHASE_SCORE_SHOW:
             self._update_score_show(dt)
         elif self.phase == PHASE_TURN_CHANGE:
@@ -458,12 +606,11 @@ class Bowling(Game):
             self._start_aim()
 
     def _update_aim(self, inp, dt):
-        # Joystick cancels back to position
         if inp.any_direction:
             self._start_position()
             return
 
-        speed = self._sweep_speed() * 0.04  # radians/s
+        speed = self._sweep_speed() * 0.04
         self.aim_angle += self.aim_dir * speed * dt
 
         if self.aim_angle >= MAX_AIM_ANGLE:
@@ -474,114 +621,41 @@ class Bowling(Game):
             self.aim_dir = 1
 
         if inp.action_l or inp.action_r:
+            self._start_power()
+
+    def _update_power(self, inp, dt):
+        if inp.any_direction:
+            self._start_aim()
+            return
+
+        speed = self._power_speed()
+        self.power_pos += self.power_dir * speed * dt
+        if self.power_pos >= 1.0:
+            self.power_pos = 1.0
+            self.power_dir = -1
+        elif self.power_pos <= 0.0:
+            self.power_pos = 0.0
+            self.power_dir = 1
+
+        if inp.action_l or inp.action_r:
+            center_dist = abs(self.power_pos - 0.5) * 2.0
+            self.power_value = 0.6 + 0.4 * (1.0 - center_dist)
+            self.spin_value = (self.power_pos - 0.5) * 2.0
             self._launch_ball()
 
     def _update_rolling(self, dt):
-        # Move ball
-        self.ball_x += self.ball_vx * dt
-        self.ball_y += self.ball_vy * dt
+        sub_dt = dt / SUBSTEPS
+        for _ in range(SUBSTEPS):
+            self._physics_step(sub_dt)
 
-        # Check gutter
-        if self._ball_in_gutter():
-            self.ball_active = False
-            knocked = len(self.pins_just_knocked)
+        if self._all_stopped():
+            self._evaluate_knocked_pins()
+            knocked = self.pins_before_roll - self._standing_count()
             self._record_roll(knocked)
             if self.phase == PHASE_ROLLING:
-                self.phase = PHASE_PIN_FALL
-                self.phase_timer = PIN_FALL_TIME
-            return
-
-        # Check pin collisions
-        self._check_pin_collisions()
-
-        # Ball past pin area
-        if self._ball_past_pins():
-            self.ball_active = False
-            knocked = len(self.pins_just_knocked)
-            self._record_roll(knocked)
-            if self.phase == PHASE_ROLLING:
-                self.phase = PHASE_PIN_FALL
-                self.phase_timer = PIN_FALL_TIME
-
-    def _update_pin_fall(self, dt):
-        self.phase_timer -= dt
-        if self.phase_timer <= 0:
-            self._calculate_scores()
-            knocked = len(self.pins_just_knocked)
-
-            # Determine if we need another ball or advance
-            p = self.current_player
-            f = self.current_frame
-
-            if f < 9:
-                if self.ball_in_frame == 0 and self._all_down():
-                    # Strike
-                    self.last_was_strike = True
-                    self.last_knock_count = knocked
-                    self.phase = PHASE_SCORE_SHOW
-                    self.phase_timer = SCORE_SHOW_TIME
-                    self._pending_advance = True
-                elif self.ball_in_frame == 1:
-                    if self._all_down():
-                        self.last_was_spare = True
-                    self.last_knock_count = knocked
-                    self.phase = PHASE_SCORE_SHOW
-                    self.phase_timer = SCORE_SHOW_TIME
-                    self._pending_advance = True
-                else:
-                    # First ball, pins remaining
-                    self.last_knock_count = knocked
-                    self.last_was_strike = False
-                    self.last_was_spare = False
-                    self.ball_in_frame = 1
-                    self.phase = PHASE_SCORE_SHOW
-                    self.phase_timer = SCORE_SHOW_TIME
-                    self._pending_advance = False
-            else:
-                # 10th frame
-                total_rolls = len(self.rolls[p][f])
-                self.last_knock_count = knocked
-
-                if total_rolls == 1:
-                    if self._all_down():
-                        self.last_was_strike = True
-                        self._reset_pins()
-                    self.ball_in_frame = 1
-                    self.phase = PHASE_SCORE_SHOW
-                    self.phase_timer = SCORE_SHOW_TIME
-                    self._pending_advance = False
-                elif total_rolls == 2:
-                    first = self.rolls[p][f][0]
-                    second = self.rolls[p][f][1]
-                    if first == 10:
-                        if second == 10:
-                            self.last_was_strike = True
-                            self._reset_pins()
-                        elif self._all_down():
-                            self.last_was_spare = True
-                            self._reset_pins()
-                        self.ball_in_frame = 2
-                        self.phase = PHASE_SCORE_SHOW
-                        self.phase_timer = SCORE_SHOW_TIME
-                        self._pending_advance = False
-                    elif first + second == 10:
-                        self.last_was_spare = True
-                        self._reset_pins()
-                        self.ball_in_frame = 2
-                        self.phase = PHASE_SCORE_SHOW
-                        self.phase_timer = SCORE_SHOW_TIME
-                        self._pending_advance = False
-                    else:
-                        # No mark, done
-                        self.phase = PHASE_SCORE_SHOW
-                        self.phase_timer = SCORE_SHOW_TIME
-                        self._pending_advance = True
-                elif total_rolls >= 3:
-                    if self._all_down():
-                        self.last_was_strike = True
-                    self.phase = PHASE_SCORE_SHOW
-                    self.phase_timer = SCORE_SHOW_TIME
-                    self._pending_advance = True
+                self._calculate_scores()
+                self.phase = PHASE_SCORE_SHOW
+                self.phase_timer = SCORE_SHOW_TIME
 
     def _update_score_show(self, dt):
         self.phase_timer -= dt
@@ -628,6 +702,9 @@ class Bowling(Game):
             self._draw_position_marker()
         elif self.phase == PHASE_AIM:
             self._draw_aim_line()
+        elif self.phase == PHASE_POWER:
+            self._draw_aim_line()
+            self._draw_power_bar()
         elif self.phase == PHASE_SCORE_SHOW:
             self._draw_score_show()
         elif self.phase == PHASE_TURN_CHANGE:
@@ -636,7 +713,6 @@ class Bowling(Game):
     def _draw_mode_select(self):
         self.display.draw_text_small(6, 10, "BOWLING", Colors.WHITE)
 
-        # Simple pin triangle icon
         cx = 31
         self.display.set_pixel(cx, 24, Colors.WHITE)
         self.display.set_pixel(cx - 2, 27, Colors.WHITE)
@@ -676,18 +752,27 @@ class Bowling(Game):
             self.display.set_pixel(cx + offset, 44, (100, 80, 40))
 
     def _draw_pins(self):
-        for i, standing in enumerate(self.pins):
-            px, py = PIN_POSITIONS[i]
-            if standing:
-                # Standing pin: bright white dot
+        for pin in self.pins:
+            if not pin.active:
+                continue
+
+            px = int(round(pin.x))
+            py = int(round(pin.y))
+
+            if pin.knocked:
+                self.display.set_pixel(px, py, PIN_DOWN_COLOR)
+            elif pin.moving():
+                self.display.set_pixel(px, py, (220, 220, 220))
+                self.display.set_pixel(px - 1, py, (140, 140, 140))
+                self.display.set_pixel(px + 1, py, (140, 140, 140))
+                self.display.set_pixel(px, py - 1, (140, 140, 140))
+                self.display.set_pixel(px, py + 1, (140, 140, 140))
+            else:
                 self.display.set_pixel(px, py, PIN_COLOR)
                 self.display.set_pixel(px - 1, py, (180, 180, 180))
                 self.display.set_pixel(px + 1, py, (180, 180, 180))
                 self.display.set_pixel(px, py - 1, (180, 180, 180))
                 self.display.set_pixel(px, py + 1, (180, 180, 180))
-            else:
-                # Down pin: dim dot
-                self.display.set_pixel(px, py, PIN_DOWN_COLOR)
 
     def _draw_ball(self):
         bx = int(round(self.ball_x))
@@ -699,7 +784,6 @@ class Bowling(Game):
         self.display.set_pixel(bx, by + 1, (150, 150, 160))
 
     def _draw_hud(self):
-        # Dark background for HUD
         self.display.draw_rect(0, HUD_TOP, 64, HUD_BOTTOM + 1, Colors.BLACK)
 
         if self.two_player:
@@ -710,41 +794,36 @@ class Bowling(Game):
         else:
             self.display.draw_text_small(2, 1, f"{self.total_scores[0]}", Colors.WHITE)
 
-        # Frame number
         frame_num = min(self.current_frame + 1, TOTAL_FRAMES)
         self.display.draw_text_small(42, 1, f"F{frame_num}", Colors.CYAN)
 
-        # Pin indicator (small dots showing standing pins)
-        # Show 10 dots in a row for standing pins
+        # Pin indicator dots
         for i in range(10):
-            px = 2 + i * 3
-            if self.pins[i]:
-                self.display.set_pixel(px, 7, Colors.WHITE)
+            hx = 2 + i * 3
+            pin = self.pins[i]
+            if not pin.knocked and pin.active:
+                self.display.set_pixel(hx, 7, Colors.WHITE)
             else:
-                self.display.set_pixel(px, 7, (40, 40, 40))
+                self.display.set_pixel(hx, 7, (40, 40, 40))
 
     def _draw_position_marker(self):
-        """Draw sweeping position marker in approach area."""
         sx = int(round(self.sweep_pos))
-        # Vertical marker in approach zone
         for y in range(APPROACH_TOP, APPROACH_BOTTOM + 1):
             self.display.set_pixel(sx, y, Colors.CYAN)
-        # Arrow pointing up
         self.display.set_pixel(sx - 1, APPROACH_TOP + 1, Colors.CYAN)
         self.display.set_pixel(sx + 1, APPROACH_TOP + 1, Colors.CYAN)
 
     def _draw_aim_line(self):
-        """Draw aim direction line from position."""
         sx = int(round(self.sweep_pos))
         start_y = APPROACH_TOP
 
-        # Draw dotted line in aim direction
         dx = math.sin(self.aim_angle)
-        dy = -1.0  # upward
+        dy = -1.0
         length = math.sqrt(dx * dx + dy * dy)
         dx /= length
         dy /= length
 
+        dim = self.phase == PHASE_POWER
         for i in range(1, AIM_LINE_LENGTH):
             lx = sx + dx * i
             ly = start_y + dy * i
@@ -753,14 +832,41 @@ class Bowling(Game):
             if iy < PIN_DECK_TOP:
                 break
             if i % 3 != 0:
-                self.display.set_pixel(ix, iy, Colors.YELLOW)
+                color = (0, 100, 100) if dim else Colors.YELLOW
+                self.display.set_pixel(ix, iy, color)
 
-        # Still show position marker dimly
         for y in range(APPROACH_TOP, APPROACH_BOTTOM + 1):
             self.display.set_pixel(sx, y, (0, 100, 100))
 
+    def _draw_power_bar(self):
+        """Draw power/spin bar: green at center, red at edges."""
+        bar_y = APPROACH_BOTTOM + 2
+        bar_x = LANE_LEFT
+        bar_w = LANE_RIGHT - LANE_LEFT + 1
+
+        # Dim gradient background
+        for x in range(bar_w):
+            frac = x / max(bar_w - 1, 1)
+            center_dist = abs(frac - 0.5) * 2.0
+            r = int(80 * center_dist)
+            g = int(80 * (1.0 - center_dist))
+            self.display.set_pixel(bar_x + x, bar_y, (r, g, 0))
+            self.display.set_pixel(bar_x + x, bar_y + 1, (r, g, 0))
+
+        # Bright marker
+        marker_x = bar_x + int(self.power_pos * (bar_w - 1))
+        center_dist = abs(self.power_pos - 0.5) * 2.0
+        r = int(255 * center_dist)
+        g = int(255 * (1.0 - center_dist))
+        marker_color = (r, g, 0)
+
+        for dx in range(-1, 2):
+            mx = marker_x + dx
+            if bar_x <= mx < bar_x + bar_w:
+                self.display.set_pixel(mx, bar_y, marker_color)
+                self.display.set_pixel(mx, bar_y + 1, marker_color)
+
     def _draw_score_show(self):
-        """Show result of last roll."""
         if self.last_was_strike:
             text = "STRIKE!"
             color = Colors.YELLOW
