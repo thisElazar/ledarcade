@@ -575,10 +575,10 @@ def main():
 
                     # Item navigation (up/down)
                     if category.items:
-                        if input_state.up_pressed and item_index > 0:
-                            item_index -= 1
-                        elif input_state.down_pressed and item_index < len(category.items) - 1:
-                            item_index += 1
+                        if input_state.up_pressed:
+                            item_index = (item_index - 1) % len(category.items)
+                        elif input_state.down_pressed:
+                            item_index = (item_index + 1) % len(category.items)
 
                         # Launch item (skip if mid-konami intercept)
                         if not konami_intercept and (input_state.action_l or input_state.action_r):
