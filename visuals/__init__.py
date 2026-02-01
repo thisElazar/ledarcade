@@ -107,6 +107,7 @@ from .metroid import MetroidChase
 from .yoshi import Yoshi
 from .kirby import Kirby
 from .spidey import Spidey
+from .batman import Batman
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -180,6 +181,7 @@ ALL_VISUALS = [
     Yoshi,
     Kirby,
     Spidey,
+    Batman,
     Settings,
     TestPattern,
     About,
@@ -261,6 +263,7 @@ __all__ = [
     'Yoshi',
     'Kirby',
     'Spidey',
+    'Batman',
     'Settings',
     'TestPattern',
     'About',
