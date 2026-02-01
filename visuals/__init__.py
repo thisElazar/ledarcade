@@ -102,6 +102,9 @@ from .sandpile import Sandpile
 from .scream import Scream
 from .mario import Mario
 from .sonic import Sonic
+from .link import Link
+from .metroid import MetroidChase
+from .yoshi import Yoshi
 from .settings import Settings
 from .testpattern import TestPattern
 from .about import About
@@ -170,6 +173,9 @@ ALL_VISUALS = [
     Scream,
     Mario,
     Sonic,
+    Link,
+    MetroidChase,
+    Yoshi,
     Settings,
     TestPattern,
     About,
@@ -246,6 +252,9 @@ __all__ = [
     'Scream',
     'Mario',
     'Sonic',
+    'Link',
+    'MetroidChase',
+    'Yoshi',
     'Settings',
     'TestPattern',
     'About',
