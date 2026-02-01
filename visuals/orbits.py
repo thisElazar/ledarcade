@@ -330,10 +330,10 @@ class OrbitsMulti(Visual):
             x = cx + r * math.cos(angle)
             y = cy + r * math.sin(angle)
             # Tangential velocity — tuned lower for longer dance
-            v_mag = math.sqrt(G_CONST * 6.0 * 2 / (2 * r + 2)) * 0.45
+            v_mag = math.sqrt(G_CONST * 15.0 * 2 / (2 * r + 2)) * 0.45
             vx = -v_mag * math.sin(angle) + random.uniform(-0.5, 0.5)
             vy = v_mag * math.cos(angle) + random.uniform(-0.5, 0.5)
-            self.bodies.append(Body(x, y, vx, vy, 6.0, i % 6))
+            self.bodies.append(Body(x, y, vx, vy, 15.0, i % 6))
 
     def handle_input(self, input_state) -> bool:
         consumed = False
