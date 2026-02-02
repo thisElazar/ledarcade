@@ -130,6 +130,12 @@ from .molecule import Molecule
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
+from .grandfather import GrandfatherClock
+from .locomotive import Locomotive
+from .modelt import ModelT
+from .singer import Singer
+from .projector import Projector
+from .testrig import TestRig
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -225,6 +231,12 @@ ALL_VISUALS = [
     Metronome,
     WatchGears,
     Camshaft,
+    GrandfatherClock,
+    Locomotive,
+    ModelT,
+    Singer,
+    Projector,
+    TestRig,
     AllVisuals,
     Chill,
     Energy,
@@ -329,6 +341,12 @@ __all__ = [
     'Metronome',
     'WatchGears',
     'Camshaft',
+    'GrandfatherClock',
+    'Locomotive',
+    'ModelT',
+    'Singer',
+    'Projector',
+    'TestRig',
     'Slideshow',
     'AllVisuals',
     'Chill',

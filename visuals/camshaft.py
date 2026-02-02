@@ -58,6 +58,10 @@ def follower_lift(angle):
     return (r - BASE_R) / (LOBE_R - BASE_R)
 
 
+# Speed levels: RPM (camshaft runs at half engine speed)
+SPEED_RPMS = [30, 100, 200, 350, 500, 750]
+
+
 class Camshaft(Visual):
     name = "CAMSHAFT"
     description = "Engine camshaft"
@@ -70,7 +74,7 @@ class Camshaft(Visual):
         self.time = 0.0
         self.rotation = 0.0
         self.speed_level = 3  # 1-6
-        self.rpm = 180
+        self.rpm = SPEED_RPMS[self.speed_level - 1]
         # Phase offsets for each cam (evenly spaced firing order)
         self.phase_offsets = [i * 2 * math.pi / NUM_CAMS for i in range(NUM_CAMS)]
         # X positions for each cam
@@ -81,11 +85,11 @@ class Camshaft(Visual):
         consumed = False
         if input_state.right_pressed:
             self.speed_level = min(6, self.speed_level + 1)
-            self.rpm = 60 * self.speed_level
+            self.rpm = SPEED_RPMS[self.speed_level - 1]
             consumed = True
         elif input_state.left_pressed:
             self.speed_level = max(1, self.speed_level - 1)
-            self.rpm = 60 * self.speed_level
+            self.rpm = SPEED_RPMS[self.speed_level - 1]
             consumed = True
         return consumed
 
