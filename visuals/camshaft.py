@@ -112,7 +112,7 @@ class Camshaft(Visual):
         for i, cx in enumerate(self.cam_xs):
             angle = self.rotation + self.phase_offsets[i]
             self._draw_cam(d, cx, CAM_Y, angle)
-            lift = follower_lift(angle)
+            lift = follower_lift(-math.pi / 2 - angle)
             self._draw_follower(d, cx, lift, i)
 
         # RPM text
