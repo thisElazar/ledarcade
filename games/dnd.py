@@ -28,10 +28,10 @@ class DnD(Game):
     DUNGEON_WIDTH = 160
     DUNGEON_HEIGHT = 120
 
-    # Colors
-    WALL_COLOR = (60, 55, 70)
-    WALL_HIGHLIGHT = (80, 75, 90)
-    FLOOR_COLOR = (35, 30, 25)
+    # Colors - dark green palette (Intellivision style)
+    WALL_COLOR = (35, 70, 30)
+    WALL_HIGHLIGHT = (50, 90, 40)
+    FLOOR_COLOR = (28, 24, 18)
     FOG_COLOR = (0, 0, 0)
     REVEALED_TINT = (20, 18, 15)  # Slightly visible explored areas
 
@@ -39,20 +39,22 @@ class DnD(Game):
     PLAYER_DARK = (0, 180, 180)
     ARROW_COLOR = Colors.YELLOW
 
-    # Monster colors
-    RAT_COLOR = (120, 100, 80)
-    SPIDER_COLOR = (40, 40, 50)
+    # Monster colors - saturated, threatening
+    RAT_COLOR = (160, 110, 60)
+    RAT_EYE = Colors.RED
+    SPIDER_COLOR = (90, 40, 130)   # Purple body, visible on dark floor
     SPIDER_EYE = Colors.RED
-    BLOB_COLOR = (100, 200, 100)  # Green, invincible!
+    BLOB_COLOR = (120, 50, 90)     # Dark magenta, invincible!
     SNAKE_COLOR = (200, 50, 50)
-    SNAKE_PATTERN = (150, 40, 40)
+    SNAKE_PATTERN = (200, 120, 40) # Orange stripe (not red like health)
     DRAGON_COLOR = (200, 150, 50)
     DRAGON_WING = (180, 130, 40)
 
-    # Item colors
+    # Item colors - yellow = collectible
     QUIVER_COLOR = Colors.YELLOW
-    HEALTH_COLOR = Colors.RED
-    EXIT_COLOR = Colors.MAGENTA
+    HEALTH_COLOR = Colors.YELLOW
+    HEALTH_CENTER = Colors.RED     # Red center marks it as health
+    EXIT_COLOR = Colors.YELLOW
 
     # Game constants
     MOVE_SPEED = 40.0
@@ -142,6 +144,7 @@ class DnD(Game):
                 'hp': 2 if boss_type == 'snake' else 3,
                 'is_boss': True,
                 'move_timer': 0.0,
+                'hurt_timer': 0.0,
                 'direction': (-1, 0)
             })
         else:
@@ -206,14 +209,14 @@ class DnD(Game):
     def carve_h_corridor(self, x1, x2, y):
         """Carve a horizontal corridor."""
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            for dy in range(-1, 2):  # 3-wide corridor
+            for dy in range(-2, 3):  # 5-wide corridor
                 if 0 <= y + dy < self.DUNGEON_HEIGHT:
                     self.dungeon[y + dy][x] = self.TILE_FLOOR
 
     def carve_v_corridor(self, y1, y2, x):
         """Carve a vertical corridor."""
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            for dx in range(-1, 2):  # 3-wide corridor
+            for dx in range(-2, 3):  # 5-wide corridor
                 if 0 <= x + dx < self.DUNGEON_WIDTH:
                     self.dungeon[y][x + dx] = self.TILE_FLOOR
 
@@ -241,6 +244,7 @@ class DnD(Game):
                     'hp': hp,
                     'is_boss': False,
                     'move_timer': random.random() * 2,
+                    'hurt_timer': 0.0,
                     'direction': random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)])
                 })
 
@@ -340,15 +344,16 @@ class DnD(Game):
                 new_x = self.player_x + dx * self.MOVE_SPEED * dt
                 new_y = self.player_y + dy * self.MOVE_SPEED * dt
 
-                # Check collision (check multiple points for sprite size)
+                # Check collision (2x2 bounding box)
                 can_move_x = True
                 can_move_y = True
 
-                for check_dy in range(3):  # Player is ~3 pixels tall collision
-                    if not self.is_passable(new_x, self.player_y + check_dy):
-                        can_move_x = False
-                    if not self.is_passable(self.player_x, new_y + check_dy):
-                        can_move_y = False
+                for cy in range(2):
+                    for cx in range(2):
+                        if not self.is_passable(new_x + cx, self.player_y + cy):
+                            can_move_x = False
+                        if not self.is_passable(self.player_x + cx, new_y + cy):
+                            can_move_y = False
 
                 if can_move_x:
                     self.player_x = new_x
@@ -362,14 +367,13 @@ class DnD(Game):
                     # Check item pickup
                     self.check_item_pickup()
 
-                    # Check exit
-                    if (abs(self.player_x - self.exit_x) < 3 and
-                        abs(self.player_y - self.exit_y) < 3):
-                        # Check if boss is dead
-                        boss_alive = any(m['is_boss'] for m in self.monsters)
-                        if not boss_alive:
-                            self.next_level()
-                            return
+        # Check exit (always, not just on movement frames)
+        if (abs(self.player_x - self.exit_x) < 3 and
+            abs(self.player_y - self.exit_y) < 3):
+            boss_alive = any(m['is_boss'] for m in self.monsters)
+            if not boss_alive:
+                self.next_level()
+                return
 
         # Shoot arrow
         if input_state.action_l and self.arrows > 0 and len(self.active_arrows) < 3:
@@ -423,6 +427,7 @@ class DnD(Game):
                         continue
 
                     monster['hp'] -= 1
+                    monster['hurt_timer'] = 0.4
                     arrows_to_remove.append(arrow)
 
                     if monster['hp'] <= 0:
@@ -440,6 +445,8 @@ class DnD(Game):
         """Update monster AI."""
         for monster in self.monsters:
             monster['move_timer'] -= dt
+            if monster['hurt_timer'] > 0:
+                monster['hurt_timer'] -= dt
 
             if monster['move_timer'] <= 0:
                 # Reset timer
@@ -580,43 +587,68 @@ class DnD(Game):
                     # Unrevealed stays black (already cleared)
 
     def draw_items(self):
-        """Draw items."""
+        """Draw items with distinctive pickup shapes."""
+        pulse = int(self.anim_timer * 3) % 3  # 3-phase pulse
+
         for item in self.items:
             sx, sy = self.world_to_screen(item['x'], item['y'])
 
-            if 0 <= sx < self.VIEW_WIDTH and self.HUD_HEIGHT <= sy < GRID_SIZE:
-                # Only draw if revealed
-                if self.revealed[int(item['y'])][int(item['x'])]:
-                    if item['type'] == 'quiver':
-                        self.display.set_pixel(sx, sy, self.QUIVER_COLOR)
-                        self.display.set_pixel(sx + 1, sy, self.QUIVER_COLOR)
-                    elif item['type'] == 'health':
-                        if int(self.anim_timer * 4) % 2 == 0:
-                            self.display.set_pixel(sx, sy, self.HEALTH_COLOR)
+            if not (0 <= sx < self.VIEW_WIDTH - 2 and self.HUD_HEIGHT <= sy < GRID_SIZE - 2):
+                continue
+            if not self.revealed[int(item['y'])][int(item['x'])]:
+                continue
+
+            if item['type'] == 'quiver':
+                # Arrow shape pointing up: bright tip + shaft
+                tip = Colors.WHITE if pulse == 0 else self.QUIVER_COLOR
+                self.display.set_pixel(sx + 1, sy, tip)
+                self.display.set_pixel(sx + 1, sy + 1, self.QUIVER_COLOR)
+                self.display.set_pixel(sx + 1, sy + 2, self.QUIVER_COLOR)
+                # Fletching
+                self.display.set_pixel(sx, sy + 2, (180, 140, 60))
+                self.display.set_pixel(sx + 2, sy + 2, (180, 140, 60))
+
+            elif item['type'] == 'health':
+                # Yellow cross with red center = health pickup
+                bright = Colors.WHITE if pulse == 0 else self.HEALTH_COLOR
+                self.display.set_pixel(sx + 1, sy, bright)
+                self.display.set_pixel(sx, sy + 1, self.HEALTH_COLOR)
+                self.display.set_pixel(sx + 1, sy + 1, self.HEALTH_CENTER)
+                self.display.set_pixel(sx + 2, sy + 1, self.HEALTH_COLOR)
+                self.display.set_pixel(sx + 1, sy + 2, self.HEALTH_COLOR)
 
     def draw_exit(self):
-        """Draw the exit ladder."""
+        """Draw the exit ladder. Locked (dim red) until boss is killed."""
         sx, sy = self.world_to_screen(self.exit_x, self.exit_y)
 
-        if 0 <= sx < self.VIEW_WIDTH and self.HUD_HEIGHT <= sy < GRID_SIZE:
-            if self.revealed[self.exit_y][self.exit_x]:
-                # Ladder shape
-                boss_alive = any(m['is_boss'] for m in self.monsters)
-                color = Colors.GRAY if boss_alive else self.EXIT_COLOR
+        if not (0 <= sx < self.VIEW_WIDTH - 2 and self.HUD_HEIGHT <= sy < GRID_SIZE - 3):
+            return
+        if not self.revealed[self.exit_y][self.exit_x]:
+            return
 
-                # Pulsing if accessible
-                if not boss_alive and int(self.anim_timer * 4) % 2 == 0:
-                    color = Colors.WHITE
+        boss_alive = any(m['is_boss'] for m in self.monsters)
 
-                # Draw ladder
-                for dy in range(4):
-                    self.display.set_pixel(sx, sy + dy, color)
-                    self.display.set_pixel(sx + 2, sy + dy, color)
-                self.display.set_pixel(sx + 1, sy + 1, color)
-                self.display.set_pixel(sx + 1, sy + 3, color)
+        if boss_alive:
+            # Locked: dim red ladder with slow pulse
+            dim = (80, 20, 20) if int(self.anim_timer * 2) % 2 == 0 else (50, 10, 10)
+            color = dim
+            rung = dim
+        else:
+            # Unlocked: yellow/white pulse, auto-climb on contact
+            phase = int(self.anim_timer * 4) % 2
+            color = Colors.WHITE if phase == 0 else self.EXIT_COLOR
+            rung = self.EXIT_COLOR
+
+        # Ladder rails
+        for dy in range(4):
+            self.display.set_pixel(sx, sy + dy, color)
+            self.display.set_pixel(sx + 2, sy + dy, color)
+        # Rungs
+        self.display.set_pixel(sx + 1, sy + 1, rung)
+        self.display.set_pixel(sx + 1, sy + 3, rung)
 
     def draw_monsters(self):
-        """Draw all monsters."""
+        """Draw all monsters with damage flash."""
         for monster in self.monsters:
             mx, my = int(monster['x']), int(monster['y'])
 
@@ -629,60 +661,78 @@ class DnD(Game):
             if not (0 <= sx < self.VIEW_WIDTH - 3 and self.HUD_HEIGHT <= sy < GRID_SIZE - 4):
                 continue
 
+            # Damage flash: alternate white when recently hit
+            hurt = monster.get('hurt_timer', 0) > 0
+            flash = hurt and int(self.anim_timer * 12) % 2 == 0
+
             if monster['type'] == 'rat':
-                # Small rat: 3x2
-                self.display.set_pixel(sx, sy + 1, self.RAT_COLOR)
-                self.display.set_pixel(sx + 1, sy, self.RAT_COLOR)
-                self.display.set_pixel(sx + 1, sy + 1, self.RAT_COLOR)
-                self.display.set_pixel(sx + 2, sy + 1, self.RAT_COLOR)
+                # Small rat: 3x2 with eye
+                c = Colors.WHITE if flash else self.RAT_COLOR
+                self.display.set_pixel(sx, sy + 1, c)
+                self.display.set_pixel(sx + 1, sy, c)
+                self.display.set_pixel(sx + 1, sy + 1, c)
+                self.display.set_pixel(sx + 2, sy + 1, c)
+                # Red eye
+                if not flash:
+                    self.display.set_pixel(sx + 2, sy, self.RAT_EYE)
 
             elif monster['type'] == 'spider':
-                # Spider: 3x3 with eyes
-                self.display.set_pixel(sx, sy, self.SPIDER_COLOR)
-                self.display.set_pixel(sx + 2, sy, self.SPIDER_COLOR)
-                self.display.set_pixel(sx + 1, sy + 1, self.SPIDER_COLOR)
-                self.display.set_pixel(sx, sy + 2, self.SPIDER_COLOR)
-                self.display.set_pixel(sx + 2, sy + 2, self.SPIDER_COLOR)
-                # Eyes
-                if int(self.anim_timer * 6) % 3 == 0:
-                    self.display.set_pixel(sx + 1, sy, self.SPIDER_EYE)
+                # Spider: 3x3 with legs and eyes
+                c = Colors.WHITE if flash else self.SPIDER_COLOR
+                self.display.set_pixel(sx, sy, c)
+                self.display.set_pixel(sx + 2, sy, c)
+                self.display.set_pixel(sx + 1, sy + 1, c)
+                self.display.set_pixel(sx, sy + 2, c)
+                self.display.set_pixel(sx + 2, sy + 2, c)
+                # Eyes (always bright red unless flashing)
+                if not flash:
+                    self.display.set_pixel(sx, sy + 1, self.SPIDER_EYE)
+                    self.display.set_pixel(sx + 2, sy + 1, self.SPIDER_EYE)
 
             elif monster['type'] == 'blob':
-                # Blob: 4x3, pulsing
+                # Blob: pulsing dark mass (invincible, no flash)
                 pulse = int(self.anim_timer * 3) % 2
-                color = self.BLOB_COLOR if pulse == 0 else (80, 180, 80)
+                color = self.BLOB_COLOR if pulse == 0 else (90, 35, 70)
                 for dy in range(3):
                     for dx in range(3 + pulse):
                         self.display.set_pixel(sx + dx, sy + dy, color)
 
             elif monster['type'] == 'snake':
-                # Snake: coiled 4x3
-                self.display.set_pixel(sx + 1, sy, self.SNAKE_COLOR)
-                self.display.set_pixel(sx + 2, sy, self.SNAKE_COLOR)
-                self.display.set_pixel(sx, sy + 1, self.SNAKE_COLOR)
-                self.display.set_pixel(sx + 2, sy + 1, self.SNAKE_PATTERN)
-                self.display.set_pixel(sx + 1, sy + 2, self.SNAKE_COLOR)
-                self.display.set_pixel(sx + 2, sy + 2, self.SNAKE_COLOR)
+                # Snake: coiled 4x3 with orange stripe
+                c = Colors.WHITE if flash else self.SNAKE_COLOR
+                p = Colors.WHITE if flash else self.SNAKE_PATTERN
+                self.display.set_pixel(sx + 1, sy, c)
+                self.display.set_pixel(sx + 2, sy, c)
+                self.display.set_pixel(sx, sy + 1, c)
+                self.display.set_pixel(sx + 1, sy + 1, p)  # Orange stripe
+                self.display.set_pixel(sx + 2, sy + 1, p)  # Orange stripe
+                self.display.set_pixel(sx + 1, sy + 2, c)
+                self.display.set_pixel(sx + 2, sy + 2, c)
                 # Tongue flick
-                if int(self.anim_timer * 5) % 3 == 0:
+                if not flash and int(self.anim_timer * 5) % 3 == 0:
                     self.display.set_pixel(sx + 3, sy + 1, Colors.RED)
 
             elif monster['type'] == 'dragon':
                 # Dragon: 5x4
+                c = Colors.WHITE if flash else self.DRAGON_COLOR
+                w = Colors.WHITE if flash else self.DRAGON_WING
                 # Body
                 for dx in range(4):
-                    self.display.set_pixel(sx + dx, sy + 2, self.DRAGON_COLOR)
+                    self.display.set_pixel(sx + dx, sy + 2, c)
                 # Head
-                self.display.set_pixel(sx + 4, sy + 1, self.DRAGON_COLOR)
-                self.display.set_pixel(sx + 4, sy + 2, self.DRAGON_COLOR)
+                self.display.set_pixel(sx + 4, sy + 1, c)
+                self.display.set_pixel(sx + 4, sy + 2, c)
+                # Eye
+                if not flash:
+                    self.display.set_pixel(sx + 4, sy + 1, Colors.RED)
                 # Wings
                 wing_frame = int(self.anim_timer * 4) % 2
-                self.display.set_pixel(sx + 1, sy + wing_frame, self.DRAGON_WING)
-                self.display.set_pixel(sx + 2, sy + wing_frame, self.DRAGON_WING)
+                self.display.set_pixel(sx + 1, sy + wing_frame, w)
+                self.display.set_pixel(sx + 2, sy + wing_frame, w)
                 # Tail
-                self.display.set_pixel(sx, sy + 3, self.DRAGON_COLOR)
+                self.display.set_pixel(sx, sy + 3, c)
                 # Fire breath
-                if int(self.anim_timer * 6) % 4 == 0:
+                if not flash and int(self.anim_timer * 6) % 4 == 0:
                     self.display.set_pixel(sx + 5, sy + 1, Colors.ORANGE)
                     self.display.set_pixel(sx + 5, sy + 2, Colors.YELLOW)
 
@@ -732,32 +782,24 @@ class DnD(Game):
             self.display.set_pixel(bow_x, bow_y, Colors.YELLOW)
 
     def draw_hud(self):
-        """Draw the heads-up display."""
-        # Background bar
-        self.display.draw_rect(0, 0, 64, self.HUD_HEIGHT, (20, 20, 30))
+        """Draw the heads-up display (single row, clean layout)."""
+        # Dark green background matching dungeon theme
+        self.display.draw_rect(0, 0, 64, self.HUD_HEIGHT, (10, 18, 10))
 
-        # Score
-        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-
-        # Level/Depth
-        self.display.draw_text_small(28, 1, f"D{self.level}", Colors.CYAN)
-
-        # Health hearts
+        # Health hearts (left) - 2x2 blocks
         for i in range(self.max_health):
-            hx = 48 + i * 5
-            color = Colors.RED if i < self.health else Colors.DARK_GRAY
-            self.display.set_pixel(hx, 1, color)
-            self.display.set_pixel(hx + 1, 1, color)
+            hx = 2 + i * 4
+            color = Colors.RED if i < self.health else (40, 20, 20)
             self.display.set_pixel(hx, 2, color)
             self.display.set_pixel(hx + 1, 2, color)
+            self.display.set_pixel(hx, 3, color)
+            self.display.set_pixel(hx + 1, 3, color)
 
-        # Arrow count
-        self.display.draw_text_small(1, 4, f"A{self.arrows}", self.QUIVER_COLOR)
+        # Arrow count (center)
+        self.display.draw_text_small(22, 2, f"A{self.arrows}", self.QUIVER_COLOR)
 
-        # Boss indicator
-        boss_alive = any(m['is_boss'] for m in self.monsters)
-        if boss_alive:
-            self.display.draw_text_small(28, 4, "BOSS", Colors.RED)
+        # Dungeon level (right)
+        self.display.draw_text_small(50, 2, f"D{self.level}", Colors.CYAN)
 
     def draw_game_over(self, selection: int = 0):
         """Draw game over screen."""
