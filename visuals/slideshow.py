@@ -184,10 +184,10 @@ class ScienceLab(Slideshow):
                              EMMotor, EMCircuit, EMFreeAir,
                              FluidTunnel, FluidInk, FluidMixing,
                              TuringSpots, TuringStripes, TuringCoral,
-                             TuringWorms, Earth)
+                             TuringWorms, Mitosis, Earth, Molecule)
         return [Attractors, DblPendulum, Neurons,
                 OrbitsSolar, OrbitsMulti, OrbitsBelt,
                 EMMotor, EMCircuit, EMFreeAir,
                 FluidTunnel, FluidInk, FluidMixing,
                 TuringSpots, TuringStripes, TuringCoral,
-                TuringWorms, Earth]
+                TuringWorms, Mitosis, Earth, Molecule]
