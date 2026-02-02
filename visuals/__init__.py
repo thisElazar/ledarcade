@@ -126,6 +126,7 @@ from .turing import TuringSpots, TuringStripes, TuringCoral, TuringWorms
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
 from .earth import Earth
+from .molecule import Molecule
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -217,6 +218,7 @@ ALL_VISUALS = [
     FluidInk,
     FluidMixing,
     Earth,
+    Molecule,
     AllVisuals,
     Chill,
     Energy,
@@ -317,6 +319,7 @@ __all__ = [
     'FluidInk',
     'FluidMixing',
     'Earth',
+    'Molecule',
     'Slideshow',
     'AllVisuals',
     'Chill',
