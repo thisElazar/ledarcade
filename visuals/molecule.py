@@ -34,7 +34,11 @@ CPK_RADIUS = {
     'S': 3,
 }
 
-BOND_COLOR = (100, 100, 100)
+BOND_COLORS = {
+    1: (80, 80, 80),       # Single: dim gray
+    2: (180, 180, 180),    # Double: bright gray
+    3: (220, 200, 255),    # Triple: bright lavender
+}
 
 # Groups: (key, display_name, color)
 GROUPS = [
@@ -1376,34 +1380,8 @@ class Molecule(Visual):
                     self.display.set_pixel(icx + dx, icy + dy, c)
 
     def _draw_bond(self, x1, y1, x2, y2, order):
-        """Draw a bond line (single, double, or triple)."""
+        """Draw a bond line. Brightness indicates bond order."""
         ix1, iy1 = int(round(x1)), int(round(y1))
         ix2, iy2 = int(round(x2)), int(round(y2))
-
-        if order == 1:
-            self.display.draw_line(ix1, iy1, ix2, iy2, BOND_COLOR)
-        elif order >= 2:
-            # Compute perpendicular offset for parallel lines
-            dx = x2 - x1
-            dy = y2 - y1
-            length = math.sqrt(dx * dx + dy * dy)
-            if length < 0.01:
-                return
-            # Perpendicular unit vector
-            px = -dy / length
-            py = dx / length
-
-            if order == 2:
-                for offset in (-0.5, 0.5):
-                    ox = int(round(px * offset))
-                    oy = int(round(py * offset))
-                    self.display.draw_line(
-                        ix1 + ox, iy1 + oy, ix2 + ox, iy2 + oy, BOND_COLOR
-                    )
-            else:  # triple
-                for offset in (-1, 0, 1):
-                    ox = int(round(px * offset))
-                    oy = int(round(py * offset))
-                    self.display.draw_line(
-                        ix1 + ox, iy1 + oy, ix2 + ox, iy2 + oy, BOND_COLOR
-                    )
+        color = BOND_COLORS.get(order, BOND_COLORS[1])
+        self.display.draw_line(ix1, iy1, ix2, iy2, color)
