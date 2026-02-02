@@ -1,7 +1,8 @@
 """
 Swiss Watch Movement
 ====================
-Meshing gears with visible teeth, jewel bearings, and metallic colors.
+Five-gear watch train (barrel → center → third → fourth → escape)
+with balance wheel, hairspring, and clock hands.
 Gears mesh properly — teeth interleave without overlapping.
 
 Controls:
@@ -25,51 +26,67 @@ COPPER_TOOTH = (215, 145, 95)
 SILVER = (200, 200, 210)
 SILVER_DARK = (150, 150, 160)
 SILVER_TOOTH = (225, 225, 235)
+GOLD = (218, 190, 80)
+GOLD_DARK = (160, 135, 50)
+GOLD_TOOTH = (240, 215, 110)
 JEWEL = (180, 20, 40)
 JEWEL_HIGHLIGHT = (255, 80, 100)
 HUB_COLOR = (90, 90, 100)
 PLATE_COLOR = (25, 25, 30)
 
+# Balance wheel and hairspring colors
+BALANCE_RIM = (180, 180, 195)
+BALANCE_BAR = (200, 200, 215)
+HAIRSPRING_COLOR = (120, 140, 180)
+HAND_MINUTE = (255, 255, 255)
+HAND_HOUR = (200, 200, 210)
+HAND_CENTER = (255, 255, 255)
 
-# Gear definitions
-# Module m=2: pitch_radius = num_teeth (for rendering purposes)
+
+# Gear definitions: 5-gear watch train (linear chain)
+# pitch_radius = num_teeth (for rendering purposes)
 # Center distance for meshing = r1 + r2
 
 GEARS = [
-    # Gear A: 12 teeth, r=12, large drive gear
-    {"teeth": 12, "r": 12, "cx": 22, "cy": 32, "body": BRASS, "dark": BRASS_DARK, "tooth": BRASS_TOOTH},
-    # Gear B: 8 teeth, r=8, meshes with A
-    {"teeth": 8, "r": 8, "cx": 42, "cy": 32, "body": STEEL, "dark": STEEL_DARK, "tooth": STEEL_TOOTH},
-    # Gear C: 6 teeth, r=6, meshes with B
-    {"teeth": 6, "r": 6, "cx": 52, "cy": 20, "body": COPPER, "dark": COPPER_DARK, "tooth": COPPER_TOOTH},
-    # Gear D: 5 teeth, r=5, meshes with A
-    {"teeth": 5, "r": 5, "cx": 15, "cy": 49, "body": SILVER, "dark": SILVER_DARK, "tooth": SILVER_TOOTH},
+    # 0 Barrel: 10 teeth, r=10 — mainspring, slowest
+    {"teeth": 10, "r": 10, "cx": 18, "cy": 16, "body": BRASS, "dark": BRASS_DARK, "tooth": BRASS_TOOTH},
+    # 1 Center: 8 teeth, r=8 — minute hand shaft
+    {"teeth": 8, "r": 8, "cx": 25, "cy": 33, "body": STEEL, "dark": STEEL_DARK, "tooth": STEEL_TOOTH},
+    # 2 Third: 7 teeth, r=7 — intermediate
+    {"teeth": 7, "r": 7, "cx": 40, "cy": 33, "body": COPPER, "dark": COPPER_DARK, "tooth": COPPER_TOOTH},
+    # 3 Fourth: 6 teeth, r=6 — second-hand speed
+    {"teeth": 6, "r": 6, "cx": 47, "cy": 22, "body": SILVER, "dark": SILVER_DARK, "tooth": SILVER_TOOTH},
+    # 4 Escape: 5 teeth, r=5 — fastest, drives balance
+    {"teeth": 5, "r": 5, "cx": 48, "cy": 11, "body": GOLD, "dark": GOLD_DARK, "tooth": GOLD_TOOTH},
 ]
 
-# Mesh relationships: (driver_idx, driven_idx)
-MESHES = [(0, 1), (1, 2), (0, 3)]
+# Mesh relationships: linear chain (0→1→2→3→4)
+MESHES = [(0, 1), (1, 2), (2, 3), (3, 4)]
+
+# Mesh angles (radians) from driver toward driven
+MESH_ANGLES = [1.2, 0.0, -1.0, -1.5]
+
+# Balance wheel position
+BALANCE_CX = 58
+BALANCE_CY = 8
+BALANCE_R = 4
 
 
 def _compute_center_distances():
-    """Adjust gear positions so meshing gears have correct center distance."""
-    # A-B: r_A + r_B = 12 + 8 = 20
-    GEARS[1]["cx"] = GEARS[0]["cx"] + GEARS[0]["r"] + GEARS[1]["r"]
-    GEARS[1]["cy"] = GEARS[0]["cy"]
-
-    # B-C: r_B + r_C = 8 + 6 = 14
-    angle_bc = -1.1
-    dist_bc = GEARS[1]["r"] + GEARS[2]["r"]
-    GEARS[2]["cx"] = int(round(GEARS[1]["cx"] + dist_bc * math.cos(angle_bc)))
-    GEARS[2]["cy"] = int(round(GEARS[1]["cy"] + dist_bc * math.sin(angle_bc)))
-
-    # A-D: r_A + r_D = 12 + 5 = 17
-    angle_ad = 2.0
-    dist_ad = GEARS[0]["r"] + GEARS[3]["r"]
-    GEARS[3]["cx"] = int(round(GEARS[0]["cx"] + dist_ad * math.cos(angle_ad)))
-    GEARS[3]["cy"] = int(round(GEARS[0]["cy"] + dist_ad * math.sin(angle_ad)))
+    """Position gears along the S-curve using mesh angles."""
+    for i, (driver_idx, driven_idx) in enumerate(MESHES):
+        gd = GEARS[driver_idx]
+        gv = GEARS[driven_idx]
+        angle = MESH_ANGLES[i]
+        dist = gd["r"] + gv["r"]
+        gv["cx"] = int(round(gd["cx"] + dist * math.cos(angle)))
+        gv["cy"] = int(round(gd["cy"] + dist * math.sin(angle)))
 
 
 _compute_center_distances()
+
+# Speed levels: barrel RPM
+SPEED_RPMS = [1, 2, 4, 6, 8, 10]
 
 
 class WatchGears(Visual):
@@ -83,44 +100,39 @@ class WatchGears(Visual):
     def reset(self):
         self.time = 0.0
         self.speed_level = 3   # 1-6
-        self.base_speed = self.speed_level * 0.18
+        self.base_speed = SPEED_RPMS[self.speed_level - 1] * 2.0 * math.pi / 60.0
 
-        # Rotation ratios (alternating direction through mesh chain)
+        # Rotation ratios: linear chain, each mesh reverses direction
         self.ratios = [0.0] * len(GEARS)
         self.ratios[0] = 1.0
-        self.ratios[1] = -GEARS[0]["teeth"] / GEARS[1]["teeth"]   # -1.5
-        self.ratios[2] = self.ratios[1] * (-GEARS[1]["teeth"] / GEARS[2]["teeth"])  # 2.0
-        self.ratios[3] = -GEARS[0]["teeth"] / GEARS[3]["teeth"]   # -2.4
+        for i, (driver_idx, driven_idx) in enumerate(MESHES):
+            self.ratios[driven_idx] = self.ratios[driver_idx] * (
+                -GEARS[driver_idx]["teeth"] / GEARS[driven_idx]["teeth"]
+            )
 
         # Phase offsets for teeth to mesh at contact points
         self.phase_offsets = [0.0] * len(GEARS)
         self._calibrate_phases()
 
-        # Accumulated rotation angles — avoids jumps when speed changes
+        # Accumulated rotation angles
         self.rotations = list(self.phase_offsets)
 
+        # Balance wheel oscillation phase (radians)
+        self.balance_phase = 0.0
+
+        # Clock hand angles (radians, 0 = up / 12 o'clock)
+        self.minute_angle = 0.0
+        self.hour_angle = 0.0
+
     def _calibrate_phases(self):
-        """Calculate phase offsets so gear teeth mesh at each contact point.
-
-        The gear ratio makes tooth phases at the contact point change at
-        equal and opposite rates, so phi_driver + phi_driven = const.
-        For correct meshing that constant must be 0 (mod 1): when one
-        gear reads 0.3 (tooth) the other reads 0.7 (gap).
-
-        Process MESHES in order so each driver's offset is already set.
-        """
+        """Calculate phase offsets so gear teeth mesh at each contact point."""
         for driver_idx, driven_idx in MESHES:
             gd = GEARS[driver_idx]
             gv = GEARS[driven_idx]
 
-            # Contact angle from driver center toward driven center
             alpha = math.atan2(gv["cy"] - gd["cy"], gv["cx"] - gd["cx"])
-            beta = alpha + math.pi  # same point, from driven's perspective
+            beta = alpha + math.pi
 
-            # Solve for offset_v such that phi_d + phi_v = 0 (mod 1):
-            #   phi_d = ((alpha - off_d) * Nd / 2pi) % 1
-            #   phi_v = ((beta  - off_v) * Nv / 2pi) % 1
-            #   => off_v = beta + (alpha - off_d) * Nd / Nv
             self.phase_offsets[driven_idx] = (
                 beta + (alpha - self.phase_offsets[driver_idx]) * gd["teeth"] / gv["teeth"]
             )
@@ -129,25 +141,41 @@ class WatchGears(Visual):
         consumed = False
         if input_state.right_pressed:
             self.speed_level = min(6, self.speed_level + 1)
-            self.base_speed = self.speed_level * 0.18
+            self.base_speed = SPEED_RPMS[self.speed_level - 1] * 2.0 * math.pi / 60.0
             consumed = True
         elif input_state.left_pressed:
             self.speed_level = max(1, self.speed_level - 1)
-            self.base_speed = self.speed_level * 0.18
+            self.base_speed = SPEED_RPMS[self.speed_level - 1] * 2.0 * math.pi / 60.0
             consumed = True
         return consumed
 
     def update(self, dt):
         self.time += dt
-        # Accumulate rotation incrementally so speed changes are smooth
+        # Accumulate gear rotations
         for i in range(len(GEARS)):
             self.rotations[i] += self.base_speed * self.ratios[i] * dt
+
+        # Balance wheel: 2 oscillations per escape wheel revolution
+        escape_speed = abs(self.base_speed * self.ratios[4])
+        self.balance_phase += escape_speed * 2.0 * dt
+
+        # Clock hands track center wheel (gear 1), negated for clockwise
+        center_delta = self.base_speed * self.ratios[1] * dt
+        self.minute_angle -= center_delta
+        self.hour_angle -= center_delta / 12.0
 
     def draw(self):
         d = self.display
         d.clear(PLATE_COLOR)
 
-        # Pre-compute per-gear rendering constants
+        self._draw_gears(d)
+        self._draw_jewels(d)
+        self._draw_hairspring(d)
+        self._draw_balance_wheel(d)
+        self._draw_clock_hands(d)
+
+    def _draw_gears(self, d):
+        """Render all gear bodies and teeth."""
         gear_info = []
         for gi, gear in enumerate(GEARS):
             r = gear["r"]
@@ -164,16 +192,11 @@ class WatchGears(Visual):
                 gear["body"], gear["dark"], gear["tooth"],
             ))
 
-        # Bounding box union of all gears
         min_x = max(0, min(g[0] - int(g[5]) - 2 for g in gear_info))
         max_x = min(63, max(g[0] + int(g[5]) + 2 for g in gear_info))
         min_y = max(0, min(g[1] - int(g[5]) - 2 for g in gear_info))
         max_y = min(63, max(g[1] + int(g[5]) + 2 for g in gear_info))
 
-        # Render: for each pixel, the closest gear that claims it wins.
-        # This prevents teeth from two meshing gears from overlapping —
-        # each gear's teeth only extend into the half of the mesh zone
-        # closest to its own center, naturally interleaving with the other.
         TWO_PI = 2.0 * math.pi
         for py in range(min_y, max_y + 1):
             for px in range(min_x, max_x + 1):
@@ -192,13 +215,11 @@ class WatchGears(Visual):
                     if dist_sq <= hub_r_sq:
                         color = HUB_COLOR
                     elif dist_sq <= root_r_sq:
-                        # Gear body — darken near edge
                         if dist_sq > (root_r - 1) * (root_r - 1):
                             color = dark
                         else:
                             color = body
                     else:
-                        # Tooth region — check tooth/gap pattern
                         angle = math.atan2(dy, dx) - rotation
                         tooth_phase = (angle * n_teeth / TWO_PI) % 1.0
                         if tooth_phase < 0:
@@ -213,7 +234,8 @@ class WatchGears(Visual):
                 if best_color is not None:
                     d.set_pixel(px, py, best_color)
 
-        # Jewel bearings on top
+    def _draw_jewels(self, d):
+        """Draw jewel bearings at each gear center."""
         for gear in GEARS:
             gcx, gcy = gear["cx"], gear["cy"]
             d.set_pixel(gcx, gcy, JEWEL)
@@ -222,3 +244,71 @@ class WatchGears(Visual):
             d.set_pixel(gcx, gcy - 1, JEWEL)
             d.set_pixel(gcx, gcy + 1, JEWEL)
             d.set_pixel(gcx - 1, gcy - 1, JEWEL_HIGHLIGHT)
+
+    def _draw_balance_wheel(self, d):
+        """Draw oscillating balance wheel with rim and crossbar."""
+        cx, cy = BALANCE_CX, BALANCE_CY
+        r = BALANCE_R
+        swing = math.sin(self.balance_phase) * (75.0 * math.pi / 180.0)
+
+        # Rim circle (unfilled)
+        for a_step in range(32):
+            a = a_step * 2.0 * math.pi / 32
+            px = int(round(cx + r * math.cos(a)))
+            py = int(round(cy + r * math.sin(a)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, BALANCE_RIM)
+
+        # Crossbar rotates with oscillation
+        for t in range(-r, r + 1):
+            px = int(round(cx + t * math.cos(swing)))
+            py = int(round(cy + t * math.sin(swing)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, BALANCE_BAR)
+
+        # Jewel bearing at center
+        d.set_pixel(cx, cy, JEWEL)
+
+    def _draw_hairspring(self, d):
+        """Draw ~2-turn spiral around balance wheel that coils/uncoils."""
+        cx, cy = BALANCE_CX, BALANCE_CY
+        swing = math.sin(self.balance_phase) * (75.0 * math.pi / 180.0)
+        turns = 2.0
+        steps = 48
+        max_r = BALANCE_R - 0.5
+        min_r = 0.8
+
+        for i in range(steps):
+            frac = i / float(steps)
+            theta = frac * turns * 2.0 * math.pi + swing
+            radius = min_r + (max_r - min_r) * frac
+            px = int(round(cx + radius * math.cos(theta)))
+            py = int(round(cy + radius * math.sin(theta)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, HAIRSPRING_COLOR)
+
+    def _draw_clock_hands(self, d):
+        """Draw minute and hour hands on the center wheel."""
+        cx = GEARS[1]["cx"]
+        cy = GEARS[1]["cy"]
+
+        # Hour hand (4px long, dimmer)
+        h_angle = self.hour_angle - math.pi / 2.0
+        for t_int in range(5):
+            t = t_int * 0.8
+            px = int(round(cx + t * math.cos(h_angle)))
+            py = int(round(cy + t * math.sin(h_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, HAND_HOUR)
+
+        # Minute hand (7px long, bright white)
+        m_angle = self.minute_angle - math.pi / 2.0
+        for t_int in range(8):
+            t = t_int * 0.9
+            px = int(round(cx + t * math.cos(m_angle)))
+            py = int(round(cy + t * math.sin(m_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, HAND_MINUTE)
+
+        # Center pip
+        d.set_pixel(cx, cy, HAND_CENTER)
