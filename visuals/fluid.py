@@ -474,36 +474,38 @@ class FluidInk(Visual):
 
 # ── FluidMixing ──────────────────────────────────────────────────
 
-# Separate palettes for the two-fluid mixing visualization
-# Each pair shares a low channel so additive blend = vivid third color
-MIX_PALETTES = [
-    # Crimson + Sapphire -> Violet (both low G)
-    {'a': (220, 20, 80), 'b': (30, 20, 220), 'bg': (5, 2, 8)},
-    # Lime + Cobalt -> Teal (both low R)
-    {'a': (20, 220, 60), 'b': (20, 60, 220), 'bg': (2, 5, 5)},
-    # Scarlet + Chartreuse -> Gold (both low B)
-    {'a': (220, 40, 20), 'b': (120, 220, 20), 'bg': (5, 5, 2)},
-    # Rose + Indigo -> Magenta (both low G)
-    {'a': (240, 30, 120), 'b': (80, 20, 220), 'bg': (5, 2, 6)},
-    # Amber + Violet -> Lavender (both moderate)
-    {'a': (240, 160, 20), 'b': (100, 20, 220), 'bg': (5, 3, 5)},
+# Paint-like mixing palettes
+# Each pair produces a vivid, recognizable secondary color
+PAINT_PALETTES = [
+    # Vermillion + Ultramarine -> rich Purple
+    {'a': (255, 50, 10), 'b': (10, 30, 255)},
+    # Cadmium Yellow + Cerulean -> army Green
+    {'a': (255, 210, 0), 'b': (0, 80, 255)},
+    # Scarlet + Amber -> burnt Orange
+    {'a': (230, 30, 10), 'b': (255, 200, 0)},
+    # Cyan + Magenta -> vivid Blue
+    {'a': (0, 230, 255), 'b': (255, 0, 220)},
 ]
 
-# Precompute palette arrays for mixing
-_MIX_PAL_ARRAYS = [
+_PAINT_PAL_ARRAYS = [
     {'a': np.array(p['a'], dtype=np.float64),
-     'b': np.array(p['b'], dtype=np.float64),
-     'bg': np.array(p['bg'], dtype=np.float64)}
-    for p in MIX_PALETTES
+     'b': np.array(p['b'], dtype=np.float64)}
+    for p in PAINT_PALETTES
+]
+
+# Starting split patterns for visual variety
+_INIT_PATTERNS = [
+    'spiral', 'diagonal', 'concentric',
+    'horizontal', 'quadrant', 'vertical',
 ]
 
 
 class FluidMixing(Visual):
     name = "COLOR MIX"
-    description = "Two colors mixing"
+    description = "Paint colors mixing"
     category = "science"
 
-    _N_VIZ_MODES = len(MIX_PALETTES)
+    _N_VIZ_MODES = len(PAINT_PALETTES)
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -511,8 +513,13 @@ class FluidMixing(Visual):
     def reset(self):
         self.time = 0.0
         self.viz_mode = 0
-        self.viscosity = 0.001
-        self.diffusion = 0.0002
+        self.viscosity = 0.002
+        self.diffusion = 0.00005
+        self.stir_speed = 1.0
+        self.pattern_idx = 0
+        self.mixed_time = 0.0
+        self.fade_alpha = 1.0
+        self.state = 'mixing'
         self._init_fields()
 
     def _init_fields(self):
@@ -520,122 +527,189 @@ class FluidMixing(Visual):
         self.v = _new_field()
         self.u_prev = _new_field()
         self.v_prev = _new_field()
-        # Two color density fields
         self.dens_a = _new_field()
         self.dens_b = _new_field()
         self.dens_a_prev = _new_field()
         self.dens_b_prev = _new_field()
-        # White density field (injected from top)
-        self.dens_w = _new_field()
-        self.dens_w_prev = _new_field()
-        # Initialize: left half = color A, right half = color B
-        half = N // 2
-        self.dens_a[1:half+1, 1:N+1] = 2.0
-        self.dens_b[half+1:N+1, 1:N+1] = 2.0
-        # Stirring vortex state
-        self.stir_angle = 0.0
+
+        cx, cy = N / 2.0, N / 2.0
+        pattern = _INIT_PATTERNS[self.pattern_idx % len(_INIT_PATTERNS)]
+
+        if pattern == 'diagonal':
+            mask = _II + _JJ < N + 1
+            self.dens_a[1:N+1, 1:N+1] = np.where(mask, 3.0, 0.0)
+            self.dens_b[1:N+1, 1:N+1] = np.where(~mask, 3.0, 0.0)
+        elif pattern == 'concentric':
+            dist = np.sqrt((_II - cx)**2 + (_JJ - cy)**2)
+            self.dens_a[1:N+1, 1:N+1] = np.where(dist < N * 0.32, 3.5, 0.0)
+            self.dens_b[1:N+1, 1:N+1] = np.where(dist >= N * 0.32, 2.5, 0.0)
+        elif pattern == 'horizontal':
+            half = N // 2
+            self.dens_a[1:N+1, 1:half+1] = 3.0
+            self.dens_b[1:N+1, half+1:N+1] = 3.0
+        elif pattern == 'quadrant':
+            qa = ((_II < cx) & (_JJ < cy)) | ((_II >= cx) & (_JJ >= cy))
+            self.dens_a[1:N+1, 1:N+1] = np.where(qa, 3.0, 0.0)
+            self.dens_b[1:N+1, 1:N+1] = np.where(~qa, 3.0, 0.0)
+        elif pattern == 'vertical':
+            half = N // 2
+            self.dens_a[1:half+1, 1:N+1] = 3.0
+            self.dens_b[half+1:N+1, 1:N+1] = 3.0
+        elif pattern == 'spiral':
+            angle = np.arctan2(_JJ - cy, _II - cx)
+            dist = np.sqrt((_II - cx)**2 + (_JJ - cy)**2)
+            spiral = np.sin(angle * 2 + dist * 0.3)
+            self.dens_a[1:N+1, 1:N+1] = np.where(spiral > 0, 3.0, 0.0)
+            self.dens_b[1:N+1, 1:N+1] = np.where(spiral <= 0, 3.0, 0.0)
+
+        # Store initial pigment totals for conservation
+        self.total_a0 = self.dens_a[1:N+1, 1:N+1].sum()
+        self.total_b0 = self.dens_b[1:N+1, 1:N+1].sum()
+
+        self.fade_alpha = 1.0
+        self.state = 'mixing'
+        self.mixed_time = 0.0
+        self.age = 0.0
 
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
-            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+            self.viscosity = min(0.008, self.viscosity * 1.4)
             consumed = True
         if input_state.down_pressed:
-            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
+            self.viscosity = max(0.0003, self.viscosity / 1.4)
             consumed = True
         if input_state.left:
-            self.viscosity = min(0.01, self.viscosity * 1.25)
+            self.stir_speed = max(0.25, self.stir_speed - 0.25)
             consumed = True
         if input_state.right:
-            self.viscosity = max(0.00001, self.viscosity * 0.8)
+            self.stir_speed = min(3.0, self.stir_speed + 0.25)
             consumed = True
         if input_state.action_l or input_state.action_r:
+            self.pattern_idx += 1
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
             self._init_fields()
             consumed = True
         return consumed
 
     def _add_stirring(self):
-        """Two counter-rotating vortex forces that slowly drift."""
-        cx, cy = N // 2, N // 2
-        self.stir_angle += 0.015
-        r_stir = N * 0.22
-        ax = cx + r_stir * math.cos(self.stir_angle)
-        ay = cy + r_stir * math.sin(self.stir_angle)
-        bx = cx - r_stir * math.cos(self.stir_angle)
-        by = cy - r_stir * math.sin(self.stir_angle)
+        """Organic paint-stirring: wandering vortices on Lissajous paths
+        plus slow folding shear for natural-looking streaks."""
+        t = self.time
+        cx, cy = N / 2.0, N / 2.0
 
-        strength = 2.0
-        radius_sq = 36  # 6*6
+        # Gentle ramp-up: quadratic ease-in over ~8 seconds
+        ramp = min(1.0, self.age * 0.12)
+        ramp *= ramp
+        ramp *= self.stir_speed
+
+        # Three vortices on different Lissajous orbits
+        vortex_params = [
+            # (orbit_x, orbit_y, freq_x, freq_y, phase, strength, radius)
+            (0.30, 0.25, 0.40, 0.60, 0.0, 3.0, 8.0),    # large figure-8
+            (0.22, 0.28, 0.55, 0.35, 2.1, -2.2, 10.0),   # reverse orbit
+            (0.18, 0.18, 0.70, 0.50, 4.2, 1.8, 6.0),     # small wanderer
+        ]
+
         u_int = self.u[1:N+1, 1:N+1]
         v_int = self.v[1:N+1, 1:N+1]
 
-        # Vortex A (counter-clockwise)
-        dx_a = _II - ax
-        dy_a = _JJ - ay
-        d2_a = dx_a * dx_a + dy_a * dy_a
-        mask_a = (d2_a < radius_sq) & (d2_a > 0.5)
-        inv_a = np.where(mask_a, strength / (d2_a + 2.0), 0.0)
-        u_int += -dy_a * inv_a
-        v_int += dx_a * inv_a
+        for ox, oy, fx, fy, phase, strength, radius in vortex_params:
+            vx = cx + N * ox * math.sin(fx * t + phase)
+            vy = cy + N * oy * math.cos(fy * t + phase)
+            dx = _II - vx
+            dy = _JJ - vy
+            d2 = dx * dx + dy * dy
+            r2 = radius * radius
+            force = np.where(d2 < r2 * 2,
+                             strength * ramp * np.exp(-d2 / (r2 * 0.5)), 0.0)
+            u_int += -dy * force / (d2 + 4.0)
+            v_int += dx * force / (d2 + 4.0)
 
-        # Vortex B (clockwise)
-        dx_b = _II - bx
-        dy_b = _JJ - by
-        d2_b = dx_b * dx_b + dy_b * dy_b
-        mask_b = (d2_b < radius_sq) & (d2_b > 0.5)
-        inv_b = np.where(mask_b, strength / (d2_b + 2.0), 0.0)
-        u_int += dy_b * inv_b
-        v_int += -dx_b * inv_b
-
-    def _replenish_edges(self):
-        """Keep color A on left, color B on right, white on top."""
-        np.maximum(self.dens_a[1, 1:N+1], 1.5, out=self.dens_a[1, 1:N+1])
-        np.maximum(self.dens_b[N, 1:N+1], 1.5, out=self.dens_b[N, 1:N+1])
-        np.maximum(self.dens_w[1:N+1, 1], 1.5, out=self.dens_w[1:N+1, 1])
+        # Slow large-scale folding (shear) for paint-like stretching
+        shear_y = 0.4 * ramp * math.sin(t * 0.25)
+        u_int += shear_y * ((_JJ - cy) / (N * 0.5))
+        shear_x = 0.3 * ramp * math.cos(t * 0.18)
+        v_int += shear_x * ((_II - cx) / (N * 0.5))
 
     def update(self, dt: float):
         self.time += dt
         sim_dt = 0.1
 
+        if self.state == 'fading':
+            self.dens_a *= 0.92
+            self.dens_b *= 0.92
+            self.fade_alpha -= dt * 0.8
+            if self.fade_alpha <= 0.0:
+                self.pattern_idx += 1
+                self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+                self._init_fields()
+            return
+
+        self.age += dt
+
         self.u_prev[:] = 0.0
         self.v_prev[:] = 0.0
         self.dens_a_prev[:] = 0.0
         self.dens_b_prev[:] = 0.0
-        self.dens_w_prev[:] = 0.0
 
         self._add_stirring()
-        self._replenish_edges()
 
-        # Velocity step (shared by all densities)
         _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
                        self.viscosity, sim_dt)
-
-        # Density steps for both colors and white
         _density_step(self.dens_a, self.dens_a_prev, self.u, self.v,
                       self.diffusion, sim_dt)
         _density_step(self.dens_b, self.dens_b_prev, self.u, self.v,
                       self.diffusion, sim_dt)
-        _density_step(self.dens_w, self.dens_w_prev, self.u, self.v,
-                      self.diffusion, sim_dt)
+
+        # Pigment conservation: zero ghost cells, rescale interior
+        # to preserve exact initial totals (closed system)
+        for dens, total0 in ((self.dens_a, self.total_a0),
+                             (self.dens_b, self.total_b0)):
+            dens[0, :] = 0.0;  dens[N+1, :] = 0.0
+            dens[:, 0] = 0.0;  dens[:, N+1] = 0.0
+            interior = dens[1:N+1, 1:N+1]
+            current = interior.sum()
+            if current > 0.01:
+                interior *= total0 / current
+
+        # Detect fully mixed -> fade out and cycle to next palette/pattern
+        total = self.dens_a[1:N+1, 1:N+1] + self.dens_b[1:N+1, 1:N+1] + 0.001
+        ratio = self.dens_a[1:N+1, 1:N+1] / total
+        if np.var(ratio) < 0.003:
+            self.mixed_time += dt
+            if self.mixed_time > 4.0:
+                self.state = 'fading'
+                self.fade_alpha = 1.0
+        else:
+            self.mixed_time = 0.0
 
     def draw(self):
-        pal = _MIX_PAL_ARRAYS[self.viz_mode]
+        pal = _PAINT_PAL_ARRAYS[self.viz_mode]
         ca = pal['a']
         cb = pal['b']
-        bg = pal['bg']
 
-        da = np.clip(self.dens_a[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
-        np.sqrt(da, out=da)
-        db = np.clip(self.dens_b[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
-        np.sqrt(db, out=db)
+        da = self.dens_a[1:N+1, 1:N+1]
+        db = self.dens_b[1:N+1, 1:N+1]
 
-        colors = bg + (ca - bg) * da[:, :, np.newaxis] + (cb - bg) * db[:, :, np.newaxis]
-        np.clip(colors, 0, 255, out=colors)
+        # Total density -> brightness (sqrt curve for paint-like richness)
+        total = da + db
+        brightness = np.clip(total * 0.25, 0.0, 1.0)
+        np.sqrt(brightness, out=brightness)
 
-        # Blend toward white based on white density
-        dw = np.clip(self.dens_w[1:N+1, 1:N+1] * 0.25, 0.0, 1.0)
-        np.sqrt(dw, out=dw)
-        colors += (255.0 - colors) * dw[:, :, np.newaxis]
+        # Color ratio determines hue (A vs B)
+        ratio_a = da / (total + 0.01)
+        mixed = ca * ratio_a[:, :, np.newaxis] + cb * (1.0 - ratio_a[:, :, np.newaxis])
+
+        # Paint-like subtractive darkening where colors overlap
+        # overlap = 1.0 at 50/50 mix, 0.0 at pure A or pure B
+        overlap = 4.0 * ratio_a * (1.0 - ratio_a)
+        darken = 1.0 - 0.20 * overlap
+
+        colors = mixed * (brightness * darken)[:, :, np.newaxis]
+
+        if self.fade_alpha < 1.0:
+            colors *= max(0.0, self.fade_alpha)
 
         pixels = np.clip(colors, 0, 255).astype(np.uint8)
 

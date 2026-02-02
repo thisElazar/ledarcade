@@ -1,5 +1,5 @@
 """
-Turing - Reaction-Diffusion Patterns
+Turing - Reaction-Diffusion Patterns (numpy-accelerated)
 ======================================
 Gray-Scott model generates organic patterns from two interacting chemicals.
 Four standalone visuals each lock to a specific pattern family:
@@ -15,6 +15,7 @@ Controls:
 """
 
 import random
+import numpy as np
 from . import Visual, Display, Colors, GRID_SIZE
 
 # Diffusion rates
@@ -36,16 +37,31 @@ PALETTES = [
     [(0, 0, 40), (0, 0, 150), (0, 180, 180), (0, 255, 0), (255, 255, 0), (255, 0, 0)],
 ]
 
+# Precompute palette arrays for vectorized color mapping
+_PAL_ARRAYS = [np.array(p, dtype=np.float64) for p in PALETTES]
+
 N = GRID_SIZE
+S = N + 2  # Padded grid side length
 
 
-# ── Shared Gray-Scott solver ───────────────────────────────────────
+# ── Shared Gray-Scott solver (numpy) ──────────────────────────────
+
+def _wrap_boundaries(x):
+    """Copy interior edges to padding cells for toroidal wrapping."""
+    x[0, 1:N+1] = x[N, 1:N+1]
+    x[N+1, 1:N+1] = x[1, 1:N+1]
+    x[1:N+1, 0] = x[1:N+1, N]
+    x[1:N+1, N+1] = x[1:N+1, 1]
+    x[0, 0] = x[N, N]
+    x[0, N+1] = x[N, 1]
+    x[N+1, 0] = x[1, N]
+    x[N+1, N+1] = x[1, 1]
+
 
 def _init_grid():
     """Initialize U=1, V=0 with random seed patches of V."""
-    size = N * N
-    u = [1.0] * size
-    v = [0.0] * size
+    u = np.ones((S, S), dtype=np.float64)
+    v = np.zeros((S, S), dtype=np.float64)
 
     n_seeds = random.randint(3, 6)
     for _ in range(n_seeds):
@@ -55,80 +71,59 @@ def _init_grid():
         for dy in range(-r, r + 1):
             for dx in range(-r, r + 1):
                 if dx * dx + dy * dy <= r * r:
-                    x = (cx + dx) % N
-                    y = (cy + dy) % N
-                    idx = y * N + x
-                    v[idx] = 0.5 + random.uniform(-0.05, 0.05)
-                    u[idx] = 0.5 + random.uniform(-0.05, 0.05)
+                    xi = (cx + dx) % N + 1
+                    yi = (cy + dy) % N + 1
+                    v[yi, xi] = 0.5 + random.uniform(-0.05, 0.05)
+                    u[yi, xi] = 0.5 + random.uniform(-0.05, 0.05)
+    _wrap_boundaries(u)
+    _wrap_boundaries(v)
     return u, v
 
 
 def _step_gray_scott(u, v, f, k, steps):
-    """Run *steps* iterations of the Gray-Scott reaction-diffusion."""
-    n = N
+    """Run *steps* iterations of the Gray-Scott reaction-diffusion (numpy)."""
     du = DU
     dv = DV
+    I = slice(1, N + 1)
+    Im = slice(0, N)
+    Ip = slice(2, N + 2)
 
     for _ in range(steps):
-        new_u = [0.0] * (n * n)
-        new_v = [0.0] * (n * n)
+        _wrap_boundaries(u)
+        _wrap_boundaries(v)
 
-        for y in range(n):
-            ym = (y - 1) % n
-            yp = (y + 1) % n
-            yn = y * n
-            ymn = ym * n
-            ypn = yp * n
+        u_c = u[I, I].copy()
+        v_c = v[I, I].copy()
 
-            for x in range(n):
-                xm = (x - 1) % n
-                xp = (x + 1) % n
-                idx = yn + x
+        lap_u = u[Im, I] + u[Ip, I] + u[I, Im] + u[I, Ip] - 4.0 * u_c
+        lap_v = v[Im, I] + v[Ip, I] + v[I, Im] + v[I, Ip] - 4.0 * v_c
 
-                u_val = u[idx]
-                v_val = v[idx]
+        uvv = u_c * v_c * v_c
 
-                # 5-point Laplacian with wrapping
-                lap_u = (u[yn + xm] + u[yn + xp] + u[ymn + x] + u[ypn + x]) - 4.0 * u_val
-                lap_v = (v[yn + xm] + v[yn + xp] + v[ymn + x] + v[ypn + x]) - 4.0 * v_val
-
-                uvv = u_val * v_val * v_val
-
-                new_u[idx] = u_val + du * lap_u - uvv + f * (1.0 - u_val)
-                new_v[idx] = v_val + dv * lap_v + uvv - (f + k) * v_val
-
-        u = new_u
-        v = new_v
+        u[I, I] = u_c + du * lap_u - uvv + f * (1.0 - u_c)
+        v[I, I] = v_c + dv * lap_v + uvv - (f + k) * v_c
 
     return u, v
 
 
 def _draw_turing(display, v, palette_idx):
-    """Draw V concentration through a color palette."""
-    palette = PALETTES[palette_idx]
-    n_colors = len(palette)
-    n = N
-    set_pixel = display.set_pixel
+    """Draw V concentration through a color palette (vectorized)."""
+    pal_arr = _PAL_ARRAYS[palette_idx]
+    n_colors = len(pal_arr)
 
-    for y in range(n):
-        yn = y * n
-        for x in range(n):
-            val = v[yn + x]
-            if val < 0.0:
-                val = 0.0
-            elif val > 1.0:
-                val = 1.0
+    t = np.clip(v[1:N+1, 1:N+1], 0.0, 1.0)
+    idx_f = t * (n_colors - 1)
+    lo = idx_f.astype(np.intp)
+    hi = np.minimum(lo + 1, n_colors - 1)
+    frac = (idx_f - lo)[:, :, np.newaxis]
+    colors = pal_arr[lo] + (pal_arr[hi] - pal_arr[lo]) * frac
+    pixels = np.clip(colors, 0, 255).astype(np.uint8)
 
-            idx_f = val * (n_colors - 1)
-            lo = int(idx_f)
-            hi = min(lo + 1, n_colors - 1)
-            frac = idx_f - lo
-            c0 = palette[lo]
-            c1 = palette[hi]
-            r = int(c0[0] + (c1[0] - c0[0]) * frac)
-            g = int(c0[1] + (c1[1] - c0[1]) * frac)
-            b = int(c0[2] + (c1[2] - c0[2]) * frac)
-            set_pixel(x, y, (r, g, b))
+    for y in range(N):
+        row = pixels[y]
+        for x in range(N):
+            p = row[x]
+            display.set_pixel(x, y, (int(p[0]), int(p[1]), int(p[2])))
 
 
 # ── Base class (not exported) ─────────────────────────────────────

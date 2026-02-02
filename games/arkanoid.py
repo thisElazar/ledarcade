@@ -6,7 +6,7 @@ power-ups, and different brick types.
 
 Features:
 - Multiple unique level layouts
-- Power-ups (extend paddle, multi-ball, laser)
+- Power-ups (extend paddle, multi-ball, laser, slow, extra life)
 - Different brick types (normal, hard, indestructible)
 - Progressive difficulty
 
@@ -58,6 +58,7 @@ class Arkanoid(Game):
     POWERUP_LASER = 2    # Shoot lasers
     POWERUP_SLOW = 3     # Slow ball
     POWERUP_MULTI = 4    # Multi-ball
+    POWERUP_LIFE = 5     # Extra life (Player)
 
     # Colors for brick types
     BRICK_COLORS = {
@@ -93,6 +94,7 @@ class Arkanoid(Game):
         self.score = 0
         self.lives = 3
         self.level = 0
+        self.next_bonus_life = 20000  # first at 20K, then every 60K
 
         # Paddle (Vaus) - centered within walled playfield
         self.paddle_width = self.PADDLE_NORMAL
@@ -206,6 +208,7 @@ class Arkanoid(Game):
             self.POWERUP_LASER,
             self.POWERUP_SLOW,
             self.POWERUP_MULTI,
+            self.POWERUP_LIFE,
         ])
         self.falling_powerups.append({
             'x': x,
@@ -213,8 +216,31 @@ class Arkanoid(Game):
             'type': powerup_type,
         })
 
+    def deactivate_powerup(self):
+        """Clean up effects of the current active powerup."""
+        if self.active_powerup == self.POWERUP_EXTEND:
+            self.paddle_width = self.PADDLE_NORMAL
+        elif self.active_powerup == self.POWERUP_SLOW:
+            base_speed = self.get_level_base_speed()
+            for ball in self.balls:
+                ball['speed'] = base_speed
+                current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
+                if current_speed > 0:
+                    scale = ball['speed'] / current_speed
+                    ball['dx'] *= scale
+                    ball['dy'] *= scale
+        self.active_powerup = self.POWERUP_NONE
+
     def apply_powerup(self, powerup_type):
         """Apply a power-up effect."""
+        # Life is instant — just add a life, don't replace active powerup
+        if powerup_type == self.POWERUP_LIFE:
+            self.lives += 1
+            return
+
+        # Deactivate previous powerup before applying new one
+        self.deactivate_powerup()
+
         self.active_powerup = powerup_type
         self.powerup_timer = 10.0  # 10 seconds
 
@@ -231,7 +257,6 @@ class Arkanoid(Game):
             slow_speed = self.get_level_base_speed() * 0.67
             for ball in self.balls:
                 ball['speed'] = slow_speed
-                # Update velocity direction to use new speed
                 current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
                 if current_speed > 0:
                     scale = ball['speed'] / current_speed
@@ -269,18 +294,7 @@ class Arkanoid(Game):
         if self.powerup_timer > 0:
             self.powerup_timer -= dt
             if self.powerup_timer <= 0:
-                self.active_powerup = self.POWERUP_NONE
-                self.paddle_width = self.PADDLE_NORMAL
-                # Restore ball speed to level base (slow powerup wore off)
-                base_speed = self.get_level_base_speed()
-                for ball in self.balls:
-                    ball['speed'] = base_speed
-                    # Update velocity direction to use new speed
-                    current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
-                    if current_speed > 0:
-                        scale = ball['speed'] / current_speed
-                        ball['dx'] *= scale
-                        ball['dy'] *= scale
+                self.deactivate_powerup()
 
         # Update balls
         for ball in self.balls[:]:
@@ -376,6 +390,11 @@ class Arkanoid(Game):
                 self.apply_powerup(powerup['type'])
                 self.falling_powerups.remove(powerup)
 
+        # Score-based bonus lives (20K, then every 60K after)
+        while self.score >= self.next_bonus_life:
+            self.lives += 1
+            self.next_bonus_life += 60000
+
         # Check for lost all balls
         if not self.balls:
             self.lives -= 1
@@ -434,9 +453,15 @@ class Arkanoid(Game):
         for brick in self.bricks:
             self.display.draw_rect(brick['x'], brick['y'], brick['w'], brick['h'], brick['color'])
 
-        # Draw paddle
+        # Draw paddle — top row matches active powerup color
         paddle_ix = int(self.paddle_x)
-        color = Colors.CYAN if self.active_powerup == self.POWERUP_NONE else Colors.MAGENTA
+        powerup_paddle_colors = {
+            self.POWERUP_EXTEND: Colors.CYAN,
+            self.POWERUP_LASER: Colors.RED,
+            self.POWERUP_SLOW: Colors.GREEN,
+            self.POWERUP_MULTI: Colors.MAGENTA,
+        }
+        color = powerup_paddle_colors.get(self.active_powerup, Colors.CYAN)
         for i in range(self.paddle_width):
             self.display.set_pixel(paddle_ix + i, self.paddle_y, color)
             self.display.set_pixel(paddle_ix + i, self.paddle_y + 1, Colors.BLUE)
@@ -462,12 +487,14 @@ class Arkanoid(Game):
             self.POWERUP_LASER: Colors.RED,
             self.POWERUP_SLOW: Colors.GREEN,
             self.POWERUP_MULTI: Colors.MAGENTA,
+            self.POWERUP_LIFE: Colors.GRAY,
         }
         powerup_letters = {
             self.POWERUP_EXTEND: 'E',  # Extend
             self.POWERUP_LASER: 'L',   # Laser
             self.POWERUP_SLOW: 'S',    # Slow
             self.POWERUP_MULTI: 'M',   # Multi-ball
+            self.POWERUP_LIFE: 'P',    # Player (extra life)
         }
         for powerup in self.falling_powerups:
             px, py = int(powerup['x']), int(powerup['y'])
