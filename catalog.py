@@ -49,6 +49,7 @@ VISUAL_CATEGORIES = [
     Category("AUTOMATA", Colors.MAGENTA, "automata"),
     Category("DIGITAL", Colors.CYAN, "digital"),
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
+    Category("MECHANICS", Colors.PURPLE, "mechanics"),
     Category("OUTDOORS", Colors.GREEN, "nature"),
     Category("SCIENCE", Colors.BLUE, "science"),
     Category("SPRITES", Colors.LIME, "sprites"),

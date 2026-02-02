@@ -127,6 +127,8 @@ from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
 from .earth import Earth
 from .molecule import Molecule
+from .metronome import Metronome
+from .watchgears import WatchGears
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -219,6 +221,8 @@ ALL_VISUALS = [
     FluidMixing,
     Earth,
     Molecule,
+    Metronome,
+    WatchGears,
     AllVisuals,
     Chill,
     Energy,
@@ -320,6 +324,8 @@ __all__ = [
     'FluidMixing',
     'Earth',
     'Molecule',
+    'Metronome',
+    'WatchGears',
     'Slideshow',
     'AllVisuals',
     'Chill',
