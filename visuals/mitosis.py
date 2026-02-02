@@ -41,9 +41,9 @@ class Colony:
 
 
 class Mitosis(Visual):
-    name = "MITOSIS"
+    name = "TURING SPLIT"
     description = "Cell division"
-    category = "automata"
+    category = "science"
 
     def __init__(self, display: Display):
         super().__init__(display)
