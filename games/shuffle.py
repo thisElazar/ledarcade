@@ -11,7 +11,7 @@ class GamePlaylist:
     """Base class for game playlists."""
     name = "Game Playlist"
     description = "A curated mix of games"
-    category = "game_mix"
+    category = "wildcard"
     games = []
 
 
