@@ -455,7 +455,7 @@ def set_transition_enabled(transition_class, enabled: bool):
 
 def random_transition() -> Transition:
     """Create a random transition instance from enabled transitions."""
-    enabled = list(_enabled_transitions)
+    enabled = list(get_enabled_transitions())
     if not enabled:
         enabled = [FadeToBlack]  # fallback
     cls = random.choice(enabled)
