@@ -343,6 +343,9 @@ def _pick_idle_visual(display):
     vis = cls(display)
     vis.reset()
     _randomize_style(vis)
+    # Preload: call draw() once to trigger any lazy loading (GIF frames, etc.)
+    # This ensures smooth transitions without loading hitches
+    vis.draw()
     return vis
 
 
