@@ -29,13 +29,13 @@ class PacMan(Game):
         "122222222222222222221",  # R4:  Open corridor
         "121121211111112121121",  # R5:  7-wide center block
         "121121211111112121121",  # R6:  7-wide center block (2-tall)
-        "122222222222222222221",  # R7:  Open corridor (Blinky start)
-        "122212221141122212221",  # R8:  Ghost house top + door at (10,8)
-        "022212221000122212220",  # R9:  Tunnel + ghost interior
-        "122212221000122212221",  # R10: Ghost interior
-        "122212221111122212221",  # R11: Ghost house bottom wall
-        "122222222222222222221",  # R12: Open corridor
-        "121112111212111211121",  # R13: Lower blocks
+        "122222222222222222221",  # R7:  Open corridor (Blinky start) - full for T-junctions
+        "121212121141121212121",  # R8:  Ghost house top - alternating 1-wide corridors
+        "021212121000121212120",  # R9:  Tunnel + ghost interior
+        "121212121000121212121",  # R10: Ghost interior
+        "121212121111121212121",  # R11: Ghost house bottom wall
+        "122222222222222222221",  # R12: Open corridor - full for T-junctions
+        "121111111212111111121",  # R13: Lower blocks - walls at 5,15 to prevent surrounded dots
         "122222222222222222221",  # R14: Open corridor (Pac-Man spawn)
         "131211212111212112131",  # R15: Power pellets at (1,15) & (19,15)
         "121211212111212112121",  # R16: Bottom blocks (2-tall)
