@@ -88,53 +88,35 @@ class FlappyDemo(Visual):
                     next_pipe = pipe
 
         if next_pipe is None:
-            # No pipes ahead, just maintain altitude
+            # No pipes ahead, stay in middle
             return bird_y > 30 and bird_vy > 0
 
-        # Calculate target Y (center of gap)
-        gap_center = next_pipe['gap_y'] + game.gap_height / 2
+        # Gap boundaries
+        gap_top = next_pipe['gap_y']
+        gap_bottom = next_pipe['gap_y'] + game.gap_height
+        gap_center = (gap_top + gap_bottom) / 2
 
-        # Predict where bird will be
-        # Simple physics: y' = y + vy*t + 0.5*g*t^2
-        look_ahead = 0.15  # seconds
-        predicted_y = bird_y + bird_vy * look_ahead + 0.5 * game.gravity * look_ahead * look_ahead
+        # Simple approach: aim to be at gap_center + a bit lower (safer)
+        target_y = gap_center + 2  # Aim slightly below center
 
-        # Distance to pipe
-        dist_to_pipe = next_pipe['x'] - game.bird_x
+        # Don't flap if above target and not falling fast
+        if bird_y < target_y - 3:
+            return False
 
-        # Adjust target based on distance
-        # If far away, aim for gap center
-        # If close, be more precise
-        if dist_to_pipe < 15:
-            # Close to pipe - need precise navigation
-            target_offset = -2  # Aim slightly above center
-        else:
-            target_offset = 0
+        # Don't flap if moving up
+        if bird_vy < -20:
+            return False
 
-        target_y = gap_center + target_offset
+        # Flap if below target and falling
+        if bird_y > target_y and bird_vy >= 0:
+            return True
 
-        # Flap conditions:
-        # 1. Bird is below target and falling (or about to fall)
-        # 2. Bird is way below target
-        # 3. About to hit ground
-
-        should_flap = False
+        # Flap if falling fast
+        if bird_vy > 40:
+            return True
 
         # Critical: don't hit ground
-        if bird_y > game.ground_y - 10:
-            should_flap = True
-        # Below target and falling
-        elif bird_y > target_y and bird_vy > -10:
-            should_flap = True
-        # Predicted position too low
-        elif predicted_y > target_y + 5:
-            should_flap = True
-        # Way below target
-        elif bird_y > target_y + 8:
-            should_flap = True
+        if bird_y > game.ground_y - 8:
+            return True
 
-        # Don't flap if too high
-        if bird_y < gap_center - game.gap_height / 2 + 2:
-            should_flap = False
-
-        return should_flap
+        return False

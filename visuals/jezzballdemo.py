@@ -95,32 +95,32 @@ class JezzBallDemo(Visual):
         """AI decision-making for cursor movement and wall building."""
         game = self.game
 
-        # Don't act if walls are currently building
+        # Don't try to build while walls are currently building
         if game.walls:
-            return None
+            return None  # Just wait
 
         # Don't try to build too frequently
         if self.wall_cooldown > 0:
             return self._move_to_target()
 
-        # Find a safe location to build a wall
-        safe_pos = self._find_safe_build_location()
+        # Simple strategy: try to build from current position if safe
+        if not game.grid[game.cursor_y][game.cursor_x]:
+            # Check if any atom is near the cursor
+            safe = True
+            for atom in game.atoms:
+                dist = abs(atom['x'] - game.cursor_x) + abs(atom['y'] - game.cursor_y)
+                if dist < 6:
+                    safe = False
+                    break
 
+            if safe:
+                self.wall_cooldown = 0.8
+                return 'build'
+
+        # Not safe or already filled - find a new spot
+        safe_pos = self._find_safe_build_location()
         if safe_pos:
             self.target_x, self.target_y, self.target_horizontal = safe_pos
-            self.wall_cooldown = 1.0  # Wait after attempting wall
-
-            # Check if we're at the target position
-            if game.cursor_x == self.target_x and game.cursor_y == self.target_y:
-                # Set correct orientation
-                if game.horizontal != self.target_horizontal:
-                    # Need to change direction
-                    if self.target_horizontal:
-                        return 'left'  # Switch to horizontal
-                    else:
-                        return 'up'  # Switch to vertical
-                # Build the wall!
-                return 'build'
 
         return self._move_to_target()
 
@@ -170,8 +170,8 @@ class JezzBallDemo(Visual):
                 'dy': atom['dy'],
             })
 
-        # Safety margin around atoms (larger for faster prediction)
-        safety_margin = 8
+        # Safety margin around atoms
+        safety_margin = 5
 
         # Try to find a good dividing line
         best_pos = None

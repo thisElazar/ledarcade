@@ -91,16 +91,10 @@ class DonkeyKongDemo(Visual):
             action['jump'] = True
             return action
 
-        # If on a ladder, continue climbing
+        # If on a ladder, keep climbing up until we exit at the top
         if game.on_ladder:
-            ladder = game.get_ladder_at(player_x, player_y + game.PLAYER_HEIGHT // 2)
-            if ladder:
-                # Check if we can continue climbing
-                if game.can_climb_ladder(ladder, going_up=True):
-                    action['up'] = True
-                else:
-                    # Broken ladder - need to step off and find another route
-                    action['right'] = True
+            # Always press up to exit ladder at top (game auto-clears on_ladder)
+            action['up'] = True
             return action
 
         # If jumping, don't change direction
@@ -186,25 +180,22 @@ class DonkeyKongDemo(Visual):
         best_score = float('inf')
 
         for ladder in game.ladders:
-            # Skip ladders that don't go up from our position
-            # Ladder must have its bottom near or below our feet
-            if ladder['y2'] < player_feet - 4:
+            # SKIP broken ladders entirely - they only go halfway
+            if ladder.get('broken', False):
                 continue
 
-            # Skip ladders that are above us (we can't reach them)
-            if ladder['y2'] < player_feet - 8:
+            # Skip ladders we're already at the TOP of (already climbed)
+            # If player_feet is at or above ladder top, we've already climbed it
+            if player_feet <= ladder['y1'] + 6:
+                continue
+
+            # Skip ladders whose bottom is too far above us (can't reach)
+            if ladder['y2'] < player_feet - 6:
                 continue
 
             # Check if this ladder is safe (no barrels nearby)
             if not self._is_ladder_safe(ladder):
                 continue
-
-            # For broken ladders, check if we're below the break point
-            if ladder.get('broken', False):
-                halfway = (ladder['y1'] + ladder['y2']) / 2
-                if player_feet < halfway + 4:
-                    # We're above the break, can't use this ladder
-                    continue
 
             # Score: prefer ladders that are closer and lead higher up
             horizontal_dist = abs(ladder['x'] - player_x)

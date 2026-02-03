@@ -105,15 +105,19 @@ class BurgerTimeDemo(Visual):
         # If on a ladder, continue climbing to target floor
         if game.on_ladder:
             target_floor = self._get_target_floor()
+            current_floor = self._get_current_floor()
             if target_floor is not None:
                 target_y = FLOOR_Y[target_floor]
-                if chef_y > target_y + 2:
+                if chef_y > target_y + 3:
                     action['up'] = True
-                elif chef_y < target_y - 2:
+                elif chef_y < target_y - 3:
                     action['down'] = True
                 else:
                     # Reached target floor, step off ladder
-                    action['right'] = True
+                    action['left'] = True
+            elif current_floor == 0:
+                # At top floor, step off
+                action['right'] = True
             else:
                 # No target, just climb up
                 action['up'] = True
