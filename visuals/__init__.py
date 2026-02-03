@@ -136,6 +136,9 @@ from .modelt import ModelT
 from .singer import Singer
 from .projector import Projector
 from .testrig import TestRig
+from .typewriter import Typewriter
+from .musicbox import MusicBox
+from .gutenberg import GutenbergPress
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -237,6 +240,9 @@ ALL_VISUALS = [
     Singer,
     Projector,
     TestRig,
+    Typewriter,
+    MusicBox,
+    GutenbergPress,
     AllVisuals,
     Chill,
     Energy,
@@ -347,6 +353,9 @@ __all__ = [
     'Singer',
     'Projector',
     'TestRig',
+    'Typewriter',
+    'MusicBox',
+    'GutenbergPress',
     'Slideshow',
     'AllVisuals',
     'Chill',

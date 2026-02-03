@@ -5,7 +5,7 @@ Shows real-time joystick and button state for hardware debugging.
 
 Controls:
   All inputs shown live on screen
-  Hold both buttons 2s to exit (normal exit)
+  Hold both buttons 2s to exit
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -15,20 +15,34 @@ class InputTest(Visual):
     name = "INPUT TEST"
     description = "Test inputs"
     category = "utility"
+    custom_exit = True  # bypass runner's default visual exit hold
 
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
+        self.exit_hold = 0.0
 
     def handle_input(self, input_state) -> bool:
         # Store input state for drawing — don't exit on button press
         self._input = input_state
+        # Hold both buttons 2s to exit
+        if input_state.action_l_held and input_state.action_r_held:
+            self.exit_hold += 0  # accumulated in update via dt
+        else:
+            self.exit_hold = 0.0
         return True
 
     def update(self, dt: float):
         self.time += dt
+        inp = getattr(self, '_input', None)
+        if inp and inp.action_l_held and inp.action_r_held:
+            self.exit_hold += dt
+            if self.exit_hold >= 2.0:
+                self.wants_exit = True
+        else:
+            self.exit_hold = 0.0
 
     def _draw_dpad(self, cx, cy):
         """Draw joystick state as a d-pad with lit directions."""
@@ -119,6 +133,13 @@ class InputTest(Visual):
                 self.display.draw_text_small(2, y, "NO INPUT", (60, 60, 60))
         else:
             self.display.draw_text_small(2, y, "NO INPUT", (60, 60, 60))
+
+        # Exit hold progress bar
+        if self.exit_hold > 0:
+            bar_w = int((self.exit_hold / 2.0) * 60)
+            bar_w = min(60, bar_w)
+            if bar_w > 0:
+                self.display.draw_rect(2, 56, bar_w, 2, Colors.RED)
 
         # Blinking dot to show the screen is live
         if int(self.time * 3) % 2 == 0:

@@ -749,20 +749,22 @@ def main():
                             current_item.draw()
                     else:
                         # Visual — hold both buttons 0.5s or either button 1s to return to menu
-                        if input_state.action_l_held and input_state.action_r_held:
-                            exit_hold_both += dt
-                        else:
-                            exit_hold_both = 0.0
-                        if input_state.action_l_held or input_state.action_r_held:
-                            exit_hold += dt
-                        else:
-                            exit_hold = 0.0
-                        if exit_hold_both >= 0.5 or exit_hold >= 1.0:
-                            in_menu = True
-                            current_item = None
-                            exit_hold = 0.0
-                            exit_hold_both = 0.0
-                            idle_timer = 0.0
+                        # Skip for visuals that handle their own exit (e.g. InputTest)
+                        if not getattr(current_item, 'custom_exit', False):
+                            if input_state.action_l_held and input_state.action_r_held:
+                                exit_hold_both += dt
+                            else:
+                                exit_hold_both = 0.0
+                            if input_state.action_l_held or input_state.action_r_held:
+                                exit_hold += dt
+                            else:
+                                exit_hold = 0.0
+                            if exit_hold_both >= 0.5 or exit_hold >= 1.0:
+                                in_menu = True
+                                current_item = None
+                                exit_hold = 0.0
+                                exit_hold_both = 0.0
+                                idle_timer = 0.0
 
                         if current_item:
                             current_item.handle_input(input_state)

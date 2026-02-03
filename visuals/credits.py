@@ -5,7 +5,8 @@ Scrolling display of all sources, inspirations, and credits
 used in the LED Arcade project.
 
 Controls:
-  Any button - Exit to menu
+  Up/Down  - Slow down / speed up scroll
+  Button   - Exit to menu
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -22,7 +23,9 @@ class Credits(Visual):
     def reset(self):
         self.time = 0.0
         self.scroll_y = 0.0
-        self.scroll_speed = 12.0  # pixels per second
+        self.base_speed = 12.0    # default pixels per second
+        self.scroll_speed = 12.0  # current effective speed
+        self.speed_mult = 1.0     # joystick multiplier
 
         # Build the credits content as (text, color) pairs
         # Each entry is one line; empty string = blank spacer line
@@ -283,16 +286,28 @@ class Credits(Visual):
         self.total_height = len(self.lines) * self.line_height
 
     def handle_input(self, input_state) -> bool:
-        if (input_state.action_l or input_state.action_r or
-                input_state.up_pressed or input_state.down_pressed or
-                input_state.left_pressed or input_state.right_pressed):
+        if input_state.action_l or input_state.action_r:
             self.wants_exit = True
             return True
+        # Joystick controls scroll speed (Smash Bros style)
+        if input_state.down:
+            self.speed_mult = 4.0   # fast forward
+            return True
+        elif input_state.up:
+            self.speed_mult = -1.5  # rewind
+            return True
+        else:
+            self.speed_mult = 1.0
         return False
 
     def update(self, dt: float):
         self.time += dt
+        self.scroll_speed = self.base_speed * self.speed_mult
         self.scroll_y += self.scroll_speed * dt
+
+        # Clamp: don't scroll above the start
+        if self.scroll_y < 0.0:
+            self.scroll_y = 0.0
 
         # Loop when all credits have scrolled past
         if self.scroll_y > self.total_height + GRID_SIZE:
