@@ -22,7 +22,7 @@ from games.invaders import Invaders
 
 
 class InvadersDemo(Visual):
-    name = "INVADERS DEMO"
+    name = "INVADERS"
     description = "AI plays Space Invaders"
     category = "demos"
 

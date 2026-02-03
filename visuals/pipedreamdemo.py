@@ -24,7 +24,7 @@ from games.pipedream import PipeDream, PipeType, PIPE_CONNECTIONS
 
 
 class PipeDreamDemo(Visual):
-    name = "PIPE DREAM DEMO"
+    name = "PIPE DREAM"
     description = "AI connects pipes"
     category = "demos"
 

@@ -24,7 +24,7 @@ from games.jezzball import JezzBall
 
 
 class JezzBallDemo(Visual):
-    name = "JEZZBALL DEMO"
+    name = "JEZZBALL"
     description = "AI divides space"
     category = "demos"
 

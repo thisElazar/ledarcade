@@ -29,7 +29,7 @@ from games.bowling import (
 
 
 class BowlingDemo(Visual):
-    name = "BOWLING DEMO"
+    name = "BOWLING"
     description = "AI bowls strikes"
     category = "demos"
 

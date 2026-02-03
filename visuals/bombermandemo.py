@@ -25,7 +25,7 @@ from games.bomberman import Bomberman
 
 
 class BombermanDemo(Visual):
-    name = "BOMBERMAN DEMO"
+    name = "BOMBERMAN"
     description = "AI plays Bomberman"
     category = "demos"
 

@@ -24,7 +24,7 @@ from games.donkeykong import DonkeyKong
 
 
 class DonkeyKongDemo(Visual):
-    name = "DK DEMO"
+    name = "DK"
     description = "AI plays Donkey Kong"
     category = "demos"
 

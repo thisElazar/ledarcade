@@ -21,7 +21,7 @@ from games.game2048 import Game2048
 
 
 class Game2048Demo(Visual):
-    name = "2048 DEMO"
+    name = "2048"
     description = "AI plays 2048"
     category = "demos"
 

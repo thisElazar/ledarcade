@@ -19,7 +19,7 @@ from games.flappy import Flappy
 
 
 class FlappyDemo(Visual):
-    name = "FLAPPY DEMO"
+    name = "FLAPPY"
     description = "AI plays Flappy Bird"
     category = "demos"
 

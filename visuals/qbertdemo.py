@@ -23,7 +23,7 @@ from games.qbert import QBert
 
 
 class QBertDemo(Visual):
-    name = "Q*BERT DEMO"
+    name = "Q*BERT"
     description = "AI plays Q*bert"
     category = "demos"
 

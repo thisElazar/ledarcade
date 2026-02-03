@@ -23,7 +23,7 @@ from games.indy500 import Indy500
 
 
 class Indy500Demo(Visual):
-    name = "INDY 500 DEMO"
+    name = "INDY 500"
     description = "AI races"
     category = "demos"
 

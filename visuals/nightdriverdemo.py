@@ -21,7 +21,7 @@ from games.nightdriver import NightDriver
 
 
 class NightDriverDemo(Visual):
-    name = "NIGHT DRIVER DEMO"
+    name = "NIGHT DRIVER"
     description = "AI drives at night"
     category = "demos"
 

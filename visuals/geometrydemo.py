@@ -20,7 +20,7 @@ from games.geometrydash import GeometryDash
 
 
 class GeometryDemo(Visual):
-    name = "GEOMETRY DEMO"
+    name = "GEOMETRY"
     description = "AI plays Geometry Dash"
     category = "demos"
 

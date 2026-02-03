@@ -46,7 +46,7 @@ AIM_TOLERANCE = 3
 
 
 class DartsDemo(Visual):
-    name = "DARTS DEMO"
+    name = "DARTS"
     description = "AI throws darts"
     category = "demos"
 

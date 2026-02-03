@@ -212,8 +212,8 @@ class ScienceLab(Slideshow):
 
 
 class Demos(Slideshow):
-    name = "DEMOS"
-    description = "AI plays classic games"
+    name = "ALL"
+    description = "AI plays all classic games"
     category = "demos"
     cycle_interval = 60.0  # Give each demo a full minute
 

@@ -22,7 +22,7 @@ from games.galaga import Galaga
 
 
 class GalagaDemo(Visual):
-    name = "GALAGA DEMO"
+    name = "GALAGA"
     description = "AI plays Galaga"
     category = "demos"
 

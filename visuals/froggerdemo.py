@@ -22,7 +22,7 @@ from games.frogger import Frogger
 
 
 class FroggerDemo(Visual):
-    name = "FROGGER DEMO"
+    name = "FROGGER"
     description = "AI plays Frogger"
     category = "demos"
 

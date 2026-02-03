@@ -21,7 +21,7 @@ from games.lunarlander import LunarLander
 
 
 class LunarLanderDemo(Visual):
-    name = "LUNAR LANDER DEMO"
+    name = "LUNAR LANDER"
     description = "AI lands the module"
     category = "demos"
 

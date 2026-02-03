@@ -22,7 +22,7 @@ from games.trashblaster import TrashBlaster
 
 
 class TrashBlasterDemo(Visual):
-    name = "TRASH BLASTER DEMO"
+    name = "TRASH BLASTER"
     description = "AI blasts trash"
     category = "demos"
 

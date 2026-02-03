@@ -24,7 +24,7 @@ from games.spacecruise import SpaceCruise
 
 
 class SpaceCruiseDemo(Visual):
-    name = "SPACE CRUISE DEMO"
+    name = "SPACE CRUISE"
     description = "AI explores space"
     category = "demos"
 

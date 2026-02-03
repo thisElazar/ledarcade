@@ -24,7 +24,7 @@ from games.digdug import DigDug
 
 
 class DigDugDemo(Visual):
-    name = "DIGDUG DEMO"
+    name = "DIGDUG"
     description = "AI plays Dig Dug"
     category = "demos"
 

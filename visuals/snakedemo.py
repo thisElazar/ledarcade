@@ -22,7 +22,7 @@ from games.snake import Snake
 
 
 class SnakeDemo(Visual):
-    name = "SNAKE DEMO"
+    name = "SNAKE"
     description = "AI plays Snake"
     category = "demos"
 

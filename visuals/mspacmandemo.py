@@ -24,7 +24,7 @@ from games.mspacman import MsPacMan
 
 
 class MsPacManDemo(Visual):
-    name = "MS.PAC-MAN DEMO"
+    name = "MS.PAC-MAN"
     description = "AI plays Ms. Pac-Man"
     category = "demos"
 

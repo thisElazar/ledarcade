@@ -23,7 +23,7 @@ from games.arkanoid import Arkanoid, PLAY_LEFT, PLAY_RIGHT
 
 
 class ArkanoidDemo(Visual):
-    name = "ARKANOID DEMO"
+    name = "ARKANOID"
     description = "AI plays Arkanoid"
     category = "demos"
 

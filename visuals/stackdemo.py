@@ -20,7 +20,7 @@ from games.stack import Stack
 
 
 class StackDemo(Visual):
-    name = "STACK DEMO"
+    name = "STACK"
     description = "AI stacks blocks"
     category = "demos"
 

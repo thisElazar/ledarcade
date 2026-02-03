@@ -23,7 +23,7 @@ from games.pong import Pong
 
 
 class PongDemo(Visual):
-    name = "PONG DEMO"
+    name = "PONG"
     description = "AI plays Pong"
     category = "demos"
 

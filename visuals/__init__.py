@@ -141,14 +141,42 @@ from .testrig import TestRig
 from .typewriter import Typewriter
 from .musicbox import MusicBox
 from .gutenberg import GutenbergPress
-from .pacmandemo import PacManDemo
 from .arkanoid_demo import ArkanoidDemo
-from .lunarlanderdemo import LunarLanderDemo
-from .pinballdemo import PinballDemo
+from .asteroidsdemo import AsteroidsDemo
+from .bombermandemo import BombermanDemo
+from .bowlingdemo import BowlingDemo
+from .breakoutdemo import BreakoutDemo
 from .burgertimedemo import BurgerTimeDemo
+from .centipededemo import CentipedeDemo
+from .dartsdemo import DartsDemo
+from .digdugdemo import DigDugDemo
+from .donkeykongdemo import DonkeyKongDemo
+from .flappydemo import FlappyDemo
+from .froggerdemo import FroggerDemo
+from .galagademo import GalagaDemo
+from .game2048demo import Game2048Demo
+from .geometrydemo import GeometryDemo
+from .indy500demo import Indy500Demo
+from .invadersdemo import InvadersDemo
+from .jezzballdemo import JezzBallDemo
+from .lightsoutdemo import LightsOutDemo
 from .loderunnerdemo import LodeRunnerDemo
+from .lunarlanderdemo import LunarLanderDemo
+from .mspacmandemo import MsPacManDemo
+from .nightdriverdemo import NightDriverDemo
+from .pacmandemo import PacManDemo
+from .pinballdemo import PinballDemo
 from .pipedreamdemo import PipeDreamDemo
+from .pongdemo import PongDemo
+from .qbertdemo import QBertDemo
 from .shuffledemo import ShuffleDemo
+from .skifreedemo import SkiFreeDemo
+from .snakedemo import SnakeDemo
+from .spacecruisedemo import SpaceCruiseDemo
+from .stackdemo import StackDemo
+from .stickrunnerdemo import StickRunnerDemo
+from .tetrisdemo import TetrisDemo
+from .trashblasterdemo import TrashBlasterDemo
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
@@ -255,6 +283,7 @@ ALL_VISUALS = [
     Typewriter,
     MusicBox,
     GutenbergPress,
+    # Slideshows (visual playlists)
     AllVisuals,
     Chill,
     Energy,
@@ -264,6 +293,44 @@ ALL_VISUALS = [
     Demoscene,
     Complexity,
     ScienceLab,
+    # Individual game demos
+    ArkanoidDemo,
+    AsteroidsDemo,
+    BombermanDemo,
+    BowlingDemo,
+    BreakoutDemo,
+    BurgerTimeDemo,
+    CentipedeDemo,
+    DartsDemo,
+    DigDugDemo,
+    DonkeyKongDemo,
+    FlappyDemo,
+    FroggerDemo,
+    GalagaDemo,
+    Game2048Demo,
+    GeometryDemo,
+    Indy500Demo,
+    InvadersDemo,
+    JezzBallDemo,
+    LightsOutDemo,
+    LodeRunnerDemo,
+    LunarLanderDemo,
+    MsPacManDemo,
+    NightDriverDemo,
+    PacManDemo,
+    PinballDemo,
+    PipeDreamDemo,
+    PongDemo,
+    QBertDemo,
+    ShuffleDemo,
+    SkiFreeDemo,
+    SnakeDemo,
+    SpaceCruiseDemo,
+    StackDemo,
+    StickRunnerDemo,
+    TetrisDemo,
+    TrashBlasterDemo,
+    # Demo slideshow (plays all demos)
     Demos,
 ]
 

@@ -19,7 +19,7 @@ import random
 
 
 class ShuffleDemo(Visual):
-    name = "SHUFFLE DEMO"
+    name = "SHUFFLE"
     description = "AI solves puzzle"
     category = "demos"
 

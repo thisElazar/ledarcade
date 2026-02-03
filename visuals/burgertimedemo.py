@@ -25,7 +25,7 @@ from games.burgertime import BurgerTime, FLOOR_Y, BURGER_X, INGREDIENT_WIDTH
 
 
 class BurgerTimeDemo(Visual):
-    name = "BURGERTIME DEMO"
+    name = "BURGERTIME"
     description = "AI builds burgers"
     category = "demos"
 

@@ -28,7 +28,7 @@ from games.pinball import (
 
 
 class PinballDemo(Visual):
-    name = "PINBALL DEMO"
+    name = "PINBALL"
     description = "AI plays pinball"
     category = "demos"
 

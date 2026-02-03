@@ -20,7 +20,7 @@ from games.stickrunner import StickRunner
 
 
 class StickRunnerDemo(Visual):
-    name = "STICK RUNNER DEMO"
+    name = "STICK RUNNER"
     description = "AI runs and jumps"
     category = "demos"
 

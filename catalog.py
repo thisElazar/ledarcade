@@ -24,9 +24,10 @@ class Category:
     items: List[Any] = field(default_factory=list)
 
     def add(self, item_class):
-        """Add an item and keep sorted alphabetically by name."""
+        """Add an item and keep sorted alphabetically (numbers after letters)."""
         self.items.append(item_class)
-        self.items.sort(key=lambda x: x.name.upper())
+        # Sort with numbers after letters: prefix digits with ~ (sorts after Z)
+        self.items.sort(key=lambda x: ('~' + x.name.upper()) if x.name[0].isdigit() else x.name.upper())
 
     def __len__(self):
         return len(self.items)
