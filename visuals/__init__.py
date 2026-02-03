@@ -148,6 +148,7 @@ from .bowlingdemo import BowlingDemo
 from .breakoutdemo import BreakoutDemo
 from .burgertimedemo import BurgerTimeDemo
 from .centipededemo import CentipedeDemo
+from .chessdemo import ChessDemo
 from .dartsdemo import DartsDemo
 from .digdugdemo import DigDugDemo
 from .donkeykongdemo import DonkeyKongDemo
@@ -301,6 +302,7 @@ ALL_VISUALS = [
     BreakoutDemo,
     BurgerTimeDemo,
     CentipedeDemo,
+    ChessDemo,
     DartsDemo,
     DigDugDemo,
     DonkeyKongDemo,
