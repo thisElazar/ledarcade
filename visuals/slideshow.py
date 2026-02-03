@@ -258,6 +258,10 @@ class Demos(Slideshow):
         from visuals.bowlingdemo import BowlingDemo
         from visuals.dartsdemo import DartsDemo
         from visuals.shuffledemo import ShuffleDemo
+        # Board games (historical AI)
+        from visuals.chessdemo import ChessDemo
+        from visuals.checkersdemo import CheckersDemo
+        from visuals.othellodemo import OthelloDemo
         return [
             # Classic arcade
             PacManDemo, MsPacManDemo, GalagaDemo, InvadersDemo, CentipedeDemo,
@@ -272,4 +276,6 @@ class Demos(Slideshow):
             LunarLanderDemo, PinballDemo, SkiFreeDemo, NightDriverDemo,
             LodeRunnerDemo, JezzBallDemo, SpaceCruiseDemo, TrashBlasterDemo,
             StickRunnerDemo, PipeDreamDemo, LightsOutDemo, ShuffleDemo,
+            # Board games
+            ChessDemo, CheckersDemo, OthelloDemo,
         ]
