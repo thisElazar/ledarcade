@@ -428,11 +428,17 @@ class Typewriter(Visual):
             d.set_pixel(x, strip_y + 1, PAPER_EDGE)
 
         # Current line text at strike zone
+        line_len = len(self.current_line_text)
         for j, ch in enumerate(self.current_line_text):
             cx = base_x + j * CHAR_SPACING
             if ch != ' ' and 0 <= cx < GRID_SIZE - 1:
-                d.set_pixel(cx, strip_y, INK_COLOR)
-                d.set_pixel(cx + 1, strip_y, INK_COLOR)
+                # Most recent char flashes yellow on strike
+                if j == line_len - 1 and self.strike_flash > 0:
+                    d.set_pixel(cx, strip_y, Colors.YELLOW)
+                    d.set_pixel(cx + 1, strip_y, Colors.YELLOW)
+                else:
+                    d.set_pixel(cx, strip_y, INK_COLOR)
+                    d.set_pixel(cx + 1, strip_y, INK_COLOR)
 
         # Completed lines stack upward continuously from strike zone
         for i, line_text in enumerate(reversed(self.typed_lines)):
