@@ -108,6 +108,7 @@ from .yoshi import Yoshi
 from .kirby import Kirby
 from .spidey import Spidey
 from .batman import Batman
+from .greenlantern import GreenLantern
 from .megaman import MegaMan
 from .settings import Settings
 from .effects import Effects
@@ -140,10 +141,18 @@ from .testrig import TestRig
 from .typewriter import Typewriter
 from .musicbox import MusicBox
 from .gutenberg import GutenbergPress
+from .pacmandemo import PacManDemo
+from .arkanoid_demo import ArkanoidDemo
+from .lunarlanderdemo import LunarLanderDemo
+from .pinballdemo import PinballDemo
+from .burgertimedemo import BurgerTimeDemo
+from .loderunnerdemo import LodeRunnerDemo
+from .pipedreamdemo import PipeDreamDemo
+from .shuffledemo import ShuffleDemo
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
-    ScienceLab,
+    ScienceLab, Demos,
 )
 
 # List of all available visuals
@@ -204,6 +213,7 @@ ALL_VISUALS = [
     Kirby,
     Spidey,
     Batman,
+    GreenLantern,
     MegaMan,
     Settings,
     Effects,
@@ -245,6 +255,10 @@ ALL_VISUALS = [
     Typewriter,
     MusicBox,
     GutenbergPress,
+    BurgerTimeDemo,
+    LodeRunnerDemo,
+    ShuffleDemo,
+    PipeDreamDemo,
     AllVisuals,
     Chill,
     Energy,
@@ -254,6 +268,7 @@ ALL_VISUALS = [
     Demoscene,
     Complexity,
     ScienceLab,
+    Demos,
 ]
 
 __all__ = [
@@ -318,6 +333,7 @@ __all__ = [
     'Kirby',
     'Spidey',
     'Batman',
+    'GreenLantern',
     'MegaMan',
     'Settings',
     'TestPattern',
@@ -358,6 +374,10 @@ __all__ = [
     'Typewriter',
     'MusicBox',
     'GutenbergPress',
+    'BurgerTimeDemo',
+    'LodeRunnerDemo',
+    'ShuffleDemo',
+    'PipeDreamDemo',
     'Slideshow',
     'AllVisuals',
     'Chill',
@@ -368,4 +388,5 @@ __all__ = [
     'Demoscene',
     'Complexity',
     'ScienceLab',
+    'Demos',
 ]

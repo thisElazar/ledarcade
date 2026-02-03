@@ -165,8 +165,8 @@ class SuperheroGallery(Slideshow):
     category = "wildcard"
 
     def _get_visual_classes(self):
-        from visuals import Spidey, Batman
-        return [Spidey, Batman]
+        from visuals import Spidey, Batman, GreenLantern
+        return [Spidey, Batman, GreenLantern]
 
 
 class Demoscene(Slideshow):
@@ -211,3 +211,67 @@ class ScienceLab(Slideshow):
                 FluidTunnel, FluidInk, FluidMixing,
                 TuringSpots, TuringStripes, TuringCoral,
                 TuringWorms, Mitosis, Earth, Molecule]
+
+
+class Demos(Slideshow):
+    name = "DEMOS"
+    description = "AI plays classic games"
+    category = "wildcard"
+    cycle_interval = 60.0  # Give each demo a full minute
+
+    def _get_visual_classes(self):
+        # Original 12 demos
+        from visuals.pacmandemo import PacManDemo
+        from visuals.tetrisdemo import TetrisDemo
+        from visuals.snakedemo import SnakeDemo
+        from visuals.invadersdemo import InvadersDemo
+        from visuals.froggerdemo import FroggerDemo
+        from visuals.breakoutdemo import BreakoutDemo
+        from visuals.galagademo import GalagaDemo
+        from visuals.centipededemo import CentipedeDemo
+        from visuals.donkeykongdemo import DonkeyKongDemo
+        from visuals.qbertdemo import QBertDemo
+        from visuals.asteroidsdemo import AsteroidsDemo
+        from visuals.flappydemo import FlappyDemo
+        # Batch 2: 8 more demos
+        from visuals.pongdemo import PongDemo
+        from visuals.mspacmandemo import MsPacManDemo
+        from visuals.digdugdemo import DigDugDemo
+        from visuals.bombermandemo import BombermanDemo
+        from visuals.arkanoid_demo import ArkanoidDemo
+        from visuals.game2048demo import Game2048Demo
+        from visuals.geometrydemo import GeometryDemo
+        from visuals.lunarlanderdemo import LunarLanderDemo
+        # Batch 3: 8 more demos
+        from visuals.skifreedemo import SkiFreeDemo
+        from visuals.burgertimedemo import BurgerTimeDemo
+        from visuals.loderunnerdemo import LodeRunnerDemo
+        from visuals.nightdriverdemo import NightDriverDemo
+        from visuals.pinballdemo import PinballDemo
+        from visuals.stackdemo import StackDemo
+        from visuals.jezzballdemo import JezzBallDemo
+        from visuals.indy500demo import Indy500Demo
+        # Batch 4: 8 more demos
+        from visuals.spacecruisedemo import SpaceCruiseDemo
+        from visuals.trashblasterdemo import TrashBlasterDemo
+        from visuals.stickrunnerdemo import StickRunnerDemo
+        from visuals.pipedreamdemo import PipeDreamDemo
+        from visuals.lightsoutdemo import LightsOutDemo
+        from visuals.bowlingdemo import BowlingDemo
+        from visuals.dartsdemo import DartsDemo
+        from visuals.shuffledemo import ShuffleDemo
+        return [
+            # Classic arcade
+            PacManDemo, MsPacManDemo, GalagaDemo, InvadersDemo, CentipedeDemo,
+            DonkeyKongDemo, QBertDemo, FroggerDemo, DigDugDemo, BurgerTimeDemo,
+            # Action/puzzle
+            TetrisDemo, BreakoutDemo, ArkanoidDemo, AsteroidsDemo, BombermanDemo,
+            # Modern/casual
+            FlappyDemo, Game2048Demo, SnakeDemo, StackDemo, GeometryDemo,
+            # Racing/sports
+            Indy500Demo, PongDemo, BowlingDemo, DartsDemo,
+            # Simulation/other
+            LunarLanderDemo, PinballDemo, SkiFreeDemo, NightDriverDemo,
+            LodeRunnerDemo, JezzBallDemo, SpaceCruiseDemo, TrashBlasterDemo,
+            StickRunnerDemo, PipeDreamDemo, LightsOutDemo, ShuffleDemo,
+        ]
