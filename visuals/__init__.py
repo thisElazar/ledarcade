@@ -110,6 +110,7 @@ from .spidey import Spidey
 from .batman import Batman
 from .megaman import MegaMan
 from .settings import Settings
+from .effects import Effects
 from .testpattern import TestPattern
 from .about import About
 from .sysinfo import SysInfo
@@ -205,6 +206,7 @@ ALL_VISUALS = [
     Batman,
     MegaMan,
     Settings,
+    Effects,
     TestPattern,
     About,
     SysInfo,

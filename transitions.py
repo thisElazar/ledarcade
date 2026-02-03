@@ -77,15 +77,350 @@ class FadeToBlack(Transition):
                         display.set_pixel(x, y, (r, g, b))
 
 
+class RandomDissolve(Transition):
+    """Random pixels flip from old to new frame."""
+
+    name = "Random Dissolve"
+    duration = 1.5
+
+    def __init__(self):
+        super().__init__()
+        self._pixel_order = None
+
+    def reset(self):
+        super().reset()
+        # Generate shuffled list of all pixel coordinates
+        self._pixel_order = [(x, y) for y in range(GRID_SIZE) for x in range(GRID_SIZE)]
+        random.shuffle(self._pixel_order)
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+
+        # Number of pixels that should show new frame
+        num_new = int(self.progress * GRID_SIZE * GRID_SIZE)
+
+        # Create set of coordinates showing new frame for fast lookup
+        new_pixels = set(self._pixel_order[:num_new])
+
+        display.clear()
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if (x, y) in new_pixels:
+                    display.set_pixel(x, y, new_frame[y][x])
+                else:
+                    display.set_pixel(x, y, old_frame[y][x])
+
+
+class DitherDissolve(Transition):
+    """Ordered 4x4 Bayer dither pattern reveals new image."""
+
+    name = "Dither Dissolve"
+    duration = 1.5
+
+    # Standard Bayer 4x4 dither matrix
+    BAYER_MATRIX = [
+        [0,  8,  2, 10],
+        [12, 4, 14,  6],
+        [3, 11,  1,  9],
+        [15, 7, 13,  5],
+    ]
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+
+        # Threshold scales from 0 to 16 based on progress
+        threshold = self.progress * 16
+
+        display.clear()
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                # Get dither value at this position (tiles the 4x4 pattern)
+                dither_value = self.BAYER_MATRIX[y % 4][x % 4]
+
+                if threshold > dither_value:
+                    display.set_pixel(x, y, new_frame[y][x])
+                else:
+                    display.set_pixel(x, y, old_frame[y][x])
+
+
+class HorizontalWipe(Transition):
+    """Reveal new image from left to right."""
+
+    name = "Horizontal Wipe"
+    duration = 1.0
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+        threshold = int(self.progress * GRID_SIZE)
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if x < threshold:
+                    display.set_pixel(x, y, new_frame[y][x])
+                else:
+                    display.set_pixel(x, y, old_frame[y][x])
+
+
+class VerticalWipe(Transition):
+    """Reveal new image from top to bottom."""
+
+    name = "Vertical Wipe"
+    duration = 1.0
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+        threshold = int(self.progress * GRID_SIZE)
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if y < threshold:
+                    display.set_pixel(x, y, new_frame[y][x])
+                else:
+                    display.set_pixel(x, y, old_frame[y][x])
+
+
+class IrisWipe(Transition):
+    """Circular reveal from center outward."""
+
+    name = "Iris Wipe"
+    duration = 1.2
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+        center_x, center_y = 32, 32
+        radius = self.progress * 45
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = x - center_x
+                dy = y - center_y
+                distance = math.sqrt(dx * dx + dy * dy)
+                if distance < radius:
+                    display.set_pixel(x, y, new_frame[y][x])
+                else:
+                    display.set_pixel(x, y, old_frame[y][x])
+
+
+class CRTOff(Transition):
+    """Classic CRT TV turn-off effect - vertical collapse to line, then horizontal to point."""
+
+    name = "CRT Off"
+    duration = 1.5
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        p = self.progress
+        display.clear(Colors.BLACK)
+
+        if p < 0.5:
+            # First half: old image collapses vertically to horizontal line at y=32
+            frame = get_old_frame()
+            collapse = p / 0.5  # 0 to 1
+            half_height = int((1.0 - collapse) * 32)
+            if half_height < 1:
+                half_height = 1
+
+            center_y = GRID_SIZE // 2
+            for y in range(GRID_SIZE):
+                dist_from_center = y - center_y
+                if abs(dist_from_center) <= half_height:
+                    src_y = center_y + int(dist_from_center * 32 / half_height)
+                    src_y = max(0, min(GRID_SIZE - 1, src_y))
+                    brightness = 1.0 + collapse * 0.5
+                    for x in range(GRID_SIZE):
+                        r, g, b = frame[src_y][x]
+                        r = min(255, int(r * brightness))
+                        g = min(255, int(g * brightness))
+                        b = min(255, int(b * brightness))
+                        display.set_pixel(x, y, (r, g, b))
+        elif p < 0.55:
+            # Bright horizontal line
+            center_y = GRID_SIZE // 2
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, center_y, Colors.WHITE)
+        elif p < 0.75:
+            # Line shrinks horizontally to center point
+            shrink = (p - 0.55) / 0.2
+            half_width = int((1.0 - shrink) * 32)
+            center_x = GRID_SIZE // 2
+            center_y = GRID_SIZE // 2
+            for x in range(center_x - half_width, center_x + half_width + 1):
+                if 0 <= x < GRID_SIZE:
+                    display.set_pixel(x, center_y, Colors.WHITE)
+        elif p < 0.8:
+            # Brief black pause
+            pass
+        else:
+            # New image expands from center
+            frame = get_new_frame()
+            expand = (p - 0.8) / 0.2
+            half_height = max(1, int(expand * 32))
+
+            center_y = GRID_SIZE // 2
+            for y in range(GRID_SIZE):
+                dist_from_center = y - center_y
+                if abs(dist_from_center) <= half_height:
+                    src_y = center_y + int(dist_from_center * 32 / half_height)
+                    src_y = max(0, min(GRID_SIZE - 1, src_y))
+                    brightness = 1.0 + (1.0 - expand) * 0.5
+                    for x in range(GRID_SIZE):
+                        r, g, b = frame[src_y][x]
+                        r = min(255, int(r * brightness))
+                        g = min(255, int(g * brightness))
+                        b = min(255, int(b * brightness))
+                        display.set_pixel(x, y, (r, g, b))
+
+
+class Scanline(Transition):
+    """Reveals new image row by row with bright scan line at edge."""
+
+    name = "Scanline"
+    duration = 1.2
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+        scan_row = int(self.progress * GRID_SIZE)
+
+        for y in range(GRID_SIZE):
+            if y < scan_row:
+                for x in range(GRID_SIZE):
+                    display.set_pixel(x, y, new_frame[y][x])
+            elif y == scan_row:
+                for x in range(GRID_SIZE):
+                    r, g, b = new_frame[y][x]
+                    r = min(255, int(r * 1.5) + 80)
+                    g = min(255, int(g * 1.5) + 80)
+                    b = min(255, int(b * 1.5) + 80)
+                    display.set_pixel(x, y, (r, g, b))
+            else:
+                for x in range(GRID_SIZE):
+                    r, g, b = old_frame[y][x]
+                    r = int(r * 0.7)
+                    g = int(g * 0.7)
+                    b = int(b * 0.7)
+                    display.set_pixel(x, y, (r, g, b))
+
+
+class Pixelate(Transition):
+    """Mosaic effect - old image pixelates, swaps to new, then de-pixelates."""
+
+    name = "Pixelate"
+    duration = 1.5
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        p = self.progress
+
+        if p < 0.5:
+            frame = get_old_frame()
+            block_size = int(1 + (p / 0.5) * 7)
+        else:
+            frame = get_new_frame()
+            block_size = int(8 - ((p - 0.5) / 0.5) * 7)
+
+        block_size = max(1, min(8, block_size))
+
+        for by in range(0, GRID_SIZE, block_size):
+            for bx in range(0, GRID_SIZE, block_size):
+                r_sum, g_sum, b_sum = 0, 0, 0
+                count = 0
+
+                for y in range(by, min(by + block_size, GRID_SIZE)):
+                    for x in range(bx, min(bx + block_size, GRID_SIZE)):
+                        r, g, b = frame[y][x]
+                        r_sum += r
+                        g_sum += g
+                        b_sum += b
+                        count += 1
+
+                if count > 0:
+                    avg_color = (r_sum // count, g_sum // count, b_sum // count)
+                    for y in range(by, min(by + block_size, GRID_SIZE)):
+                        for x in range(bx, min(bx + block_size, GRID_SIZE)):
+                            display.set_pixel(x, y, avg_color)
+
+
+class Blinds(Transition):
+    """Vertical blinds flip to reveal new image with staggered timing."""
+
+    name = "Blinds"
+    duration = 1.5
+
+    def draw(self, display, get_old_frame, get_new_frame):
+        old_frame = get_old_frame()
+        new_frame = get_new_frame()
+
+        num_blinds = 8
+        blind_width = GRID_SIZE // num_blinds
+
+        for i in range(num_blinds):
+            flip_start = i / (num_blinds + 2)
+            flip_end = flip_start + 0.15
+
+            x_start = i * blind_width
+            x_end = x_start + blind_width
+
+            if self.progress < flip_start:
+                for y in range(GRID_SIZE):
+                    for x in range(x_start, x_end):
+                        display.set_pixel(x, y, old_frame[y][x])
+            elif self.progress < flip_end:
+                mid_x = x_start + blind_width // 2
+                for y in range(GRID_SIZE):
+                    for x in range(x_start, x_end):
+                        if x == mid_x or x == mid_x - 1:
+                            display.set_pixel(x, y, (255, 255, 255))
+                        else:
+                            display.set_pixel(x, y, (40, 40, 40))
+            else:
+                for y in range(GRID_SIZE):
+                    for x in range(x_start, x_end):
+                        display.set_pixel(x, y, new_frame[y][x])
+
+
 # List of available transition types - add new ones here
 TRANSITION_TYPES = [
     FadeToBlack,
+    RandomDissolve,
+    DitherDissolve,
+    HorizontalWipe,
+    VerticalWipe,
+    IrisWipe,
+    CRTOff,
+    Scanline,
+    Pixelate,
+    Blinds,
 ]
+
+# Enabled transitions (all enabled by default)
+_enabled_transitions = set(TRANSITION_TYPES)
+
+
+def get_enabled_transitions() -> set:
+    """Return the set of currently enabled transition classes."""
+    return _enabled_transitions
+
+
+def set_transition_enabled(transition_class, enabled: bool):
+    """Enable or disable a transition type."""
+    if enabled:
+        _enabled_transitions.add(transition_class)
+    else:
+        # Don't allow disabling all transitions - keep at least one
+        if len(_enabled_transitions) > 1 or enabled:
+            _enabled_transitions.discard(transition_class)
 
 
 def random_transition() -> Transition:
-    """Create a random transition instance."""
-    cls = random.choice(TRANSITION_TYPES)
+    """Create a random transition instance from enabled transitions."""
+    enabled = list(_enabled_transitions)
+    if not enabled:
+        enabled = [FadeToBlack]  # fallback
+    cls = random.choice(enabled)
     return cls()
 
 
