@@ -23,6 +23,9 @@ build/
 # Sprite frame caches (auto-generated on first load)
 *.cache
 
+# User settings (persistent across restarts)
+user_settings.json
+
 # Environment
 .env
 .venv/

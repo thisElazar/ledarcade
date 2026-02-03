@@ -22,18 +22,22 @@ class Settings(Visual):
 
     def reset(self):
         self.time = 0.0
-        # Initialize brightness from hardware if available, otherwise default to 80
+        # Load brightness from persistent settings
+        import settings as persistent
+        self.brightness = persistent.get_brightness()
+        # Apply to hardware if available
         if hasattr(self.display, 'matrix'):
-            self.brightness = self.display.matrix.brightness
-        else:
-            self.brightness = 80
+            self.display.matrix.brightness = self.brightness
         self.step = 5  # Brightness adjustment step
 
     def set_brightness(self, value):
-        """Set brightness and apply to hardware if available."""
+        """Set brightness, apply to hardware, and persist."""
+        import settings as persistent
         # Clamp to valid range (minimum 10 to avoid black screen)
         value = max(10, min(100, value))
         self.brightness = value
+        # Save to persistent settings
+        persistent.set_brightness(value)
         # Try to apply to hardware if available
         if hasattr(self.display, 'matrix'):
             self.display.matrix.brightness = value

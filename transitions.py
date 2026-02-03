@@ -396,23 +396,61 @@ TRANSITION_TYPES = [
     Blinds,
 ]
 
-# Enabled transitions (all enabled by default)
-_enabled_transitions = set(TRANSITION_TYPES)
+# Enabled transitions - loaded from persistent settings
+_enabled_transitions = None
+
+
+def _load_enabled_transitions():
+    """Load enabled transitions from persistent settings."""
+    global _enabled_transitions
+    import settings
+    names = settings.get_enabled_transition_names()
+    if names is None:
+        # All enabled by default
+        _enabled_transitions = set(TRANSITION_TYPES)
+    else:
+        # Map names back to classes
+        name_to_class = {t.name: t for t in TRANSITION_TYPES}
+        _enabled_transitions = set()
+        for name in names:
+            if name in name_to_class:
+                _enabled_transitions.add(name_to_class[name])
+        # Ensure at least one is enabled
+        if not _enabled_transitions:
+            _enabled_transitions = set(TRANSITION_TYPES)
+
+
+def _save_enabled_transitions():
+    """Save enabled transitions to persistent settings."""
+    import settings
+    if _enabled_transitions is None or _enabled_transitions == set(TRANSITION_TYPES):
+        # All enabled - save as None (default)
+        settings.set_enabled_transition_names(None)
+    else:
+        names = [t.name for t in _enabled_transitions]
+        settings.set_enabled_transition_names(names)
 
 
 def get_enabled_transitions() -> set:
     """Return the set of currently enabled transition classes."""
+    global _enabled_transitions
+    if _enabled_transitions is None:
+        _load_enabled_transitions()
     return _enabled_transitions
 
 
 def set_transition_enabled(transition_class, enabled: bool):
     """Enable or disable a transition type."""
+    global _enabled_transitions
+    if _enabled_transitions is None:
+        _load_enabled_transitions()
     if enabled:
         _enabled_transitions.add(transition_class)
     else:
         # Don't allow disabling all transitions - keep at least one
-        if len(_enabled_transitions) > 1 or enabled:
+        if len(_enabled_transitions) > 1:
             _enabled_transitions.discard(transition_class)
+    _save_enabled_transitions()
 
 
 def random_transition() -> Transition:
