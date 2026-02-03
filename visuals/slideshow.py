@@ -25,7 +25,7 @@ class Slideshow(Visual):
 
     name = "Slideshow"
     description = "Auto-cycling visual playlist"
-    category = "wildcard"
+    category = "visual_mix"
     cycle_interval = 30.0  # seconds between visual changes
 
     # Subclasses override this with a list of visual classes
@@ -162,7 +162,6 @@ class SpriteGallery(Slideshow):
 class SuperheroGallery(Slideshow):
     name = "SUPERHEROES"
     description = "Superhero sprite animations"
-    category = "wildcard"
 
     def _get_visual_classes(self):
         from visuals import Spidey, Batman, GreenLantern
@@ -196,7 +195,6 @@ class Complexity(Slideshow):
 class ScienceLab(Slideshow):
     name = "SCIENCE LAB"
     description = "Physics and biology simulations"
-    category = "wildcard"
 
     def _get_visual_classes(self):
         from visuals import (Attractors, DblPendulum, Neurons,
@@ -216,7 +214,7 @@ class ScienceLab(Slideshow):
 class Demos(Slideshow):
     name = "DEMOS"
     description = "AI plays classic games"
-    category = "wildcard"
+    category = "demos"
     cycle_interval = 60.0  # Give each demo a full minute
 
     def _get_visual_classes(self):

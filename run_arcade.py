@@ -180,11 +180,34 @@ def draw_menu(display, categories, cat_index, item_index):
         display.set_pixel(63, 5, Colors.GRAY)
         display.set_pixel(62, 6, Colors.GRAY)
 
-    # Category indicator dots
-    dot_start_x = 32 - (len(categories) * 2)
-    for i, _ in enumerate(categories):
+    # Category indicator dots (scrolling window of 12 visible)
+    n = len(categories)
+    visible_dots = 12
+    spacing = 4
+
+    # Calculate window position (keep selected dot roughly centered)
+    window_start = max(0, min(cat_index - visible_dots // 2, n - visible_dots))
+    window_end = min(window_start + visible_dots, n)
+
+    # Center the visible dots
+    total_width = (window_end - window_start) * spacing
+    dot_start_x = 32 - total_width // 2
+
+    # Draw arrow hints if there are more categories beyond view
+    if window_start > 0:
+        display.set_pixel(2, 9, Colors.GRAY)
+        display.set_pixel(3, 8, Colors.GRAY)
+        display.set_pixel(3, 10, Colors.GRAY)
+    if window_end < n:
+        display.set_pixel(61, 9, Colors.GRAY)
+        display.set_pixel(60, 8, Colors.GRAY)
+        display.set_pixel(60, 10, Colors.GRAY)
+
+    # Draw visible dots
+    for i in range(window_start, window_end):
+        x = dot_start_x + (i - window_start) * spacing
         color = Colors.WHITE if i == cat_index else Colors.DARK_GRAY
-        display.set_pixel(dot_start_x + i * 4, 9, color)
+        display.set_pixel(x, 9, color)
 
     display.draw_line(0, 11, 63, 11, Colors.DARK_GRAY)
 
