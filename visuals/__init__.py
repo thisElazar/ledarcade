@@ -148,6 +148,7 @@ from .bowlingdemo import BowlingDemo
 from .breakoutdemo import BreakoutDemo
 from .burgertimedemo import BurgerTimeDemo
 from .centipededemo import CentipedeDemo
+from .checkersdemo import CheckersDemo
 from .chessdemo import ChessDemo
 from .dartsdemo import DartsDemo
 from .digdugdemo import DigDugDemo
@@ -165,6 +166,7 @@ from .loderunnerdemo import LodeRunnerDemo
 from .lunarlanderdemo import LunarLanderDemo
 from .mspacmandemo import MsPacManDemo
 from .nightdriverdemo import NightDriverDemo
+from .othellodemo import OthelloDemo
 from .pacmandemo import PacManDemo
 from .pinballdemo import PinballDemo
 from .pipedreamdemo import PipeDreamDemo
@@ -302,6 +304,7 @@ ALL_VISUALS = [
     BreakoutDemo,
     BurgerTimeDemo,
     CentipedeDemo,
+    CheckersDemo,
     ChessDemo,
     DartsDemo,
     DigDugDemo,
@@ -319,6 +322,7 @@ ALL_VISUALS = [
     LunarLanderDemo,
     MsPacManDemo,
     NightDriverDemo,
+    OthelloDemo,
     PacManDemo,
     PinballDemo,
     PipeDreamDemo,
