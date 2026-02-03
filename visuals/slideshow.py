@@ -92,11 +92,31 @@ class AllVisuals(Slideshow):
     name = "ALL VISUALS"
     description = "Every non-utility visual, shuffled"
 
+    # Category weights: higher = more frequent in rotation
+    CATEGORY_WEIGHTS = {
+        'automata': 4,
+        'science': 4,
+        'digital': 3,
+        'nature': 3,
+        'sprites': 3,
+        'household': 3,
+        'art': 2,
+        'superheroes': 2,
+        'mechanics': 1,  # show less often
+    }
+
     def _get_visual_classes(self):
         from visuals import ALL_VISUALS
-        return [v for v in ALL_VISUALS
-                if not issubclass(v, Slideshow)
-                and getattr(v, 'category', '') != 'utility']
+        result = []
+        for v in ALL_VISUALS:
+            if issubclass(v, Slideshow):
+                continue
+            cat = getattr(v, 'category', '')
+            if cat == 'utility':
+                continue
+            weight = self.CATEGORY_WEIGHTS.get(cat, 2)
+            result.extend([v] * weight)
+        return result
 
 
 class Chill(Slideshow):

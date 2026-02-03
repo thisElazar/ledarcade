@@ -38,7 +38,7 @@ KEY_FLASH = (160, 160, 90)
 PAPER_COLOR = (220, 210, 190)
 PAPER_EDGE = (200, 190, 170)
 INK_COLOR = (40, 30, 20)
-CHAR_FLASH = (255, 240, 200)
+CHAR_FLASH = (255, 255, 0)  # bright yellow for legibility
 
 BELL_FLASH = (255, 220, 80)
 RIBBON_COLOR = (30, 30, 30)
@@ -294,7 +294,7 @@ class Typewriter(Visual):
             if t >= 1.0:
                 self.state = STATE_STRIKE
                 self.state_timer = 0.0
-                self.strike_flash = 0.15
+                self.strike_flash = 0.4  # longer display for readability
                 self.current_line_text += self.current_char
 
         elif self.state == STATE_STRIKE:
@@ -428,17 +428,11 @@ class Typewriter(Visual):
             d.set_pixel(x, strip_y + 1, PAPER_EDGE)
 
         # Current line text at strike zone
-        line_len = len(self.current_line_text)
         for j, ch in enumerate(self.current_line_text):
             cx = base_x + j * CHAR_SPACING
             if ch != ' ' and 0 <= cx < GRID_SIZE - 1:
-                # Most recent char flashes yellow on strike
-                if j == line_len - 1 and self.strike_flash > 0:
-                    d.set_pixel(cx, strip_y, Colors.YELLOW)
-                    d.set_pixel(cx + 1, strip_y, Colors.YELLOW)
-                else:
-                    d.set_pixel(cx, strip_y, INK_COLOR)
-                    d.set_pixel(cx + 1, strip_y, INK_COLOR)
+                d.set_pixel(cx, strip_y, INK_COLOR)
+                d.set_pixel(cx + 1, strip_y, INK_COLOR)
 
         # Completed lines stack upward continuously from strike zone
         for i, line_text in enumerate(reversed(self.typed_lines)):
@@ -486,15 +480,21 @@ class Typewriter(Visual):
         itx, ity = int(tip_x), int(tip_y)
         d.set_pixel(itx, ity, BAR_BRIGHT)
 
-        # Strike flash — show the actual character
-        if self.strike_flash > 0 and self.bar_progress > 0.9:
-            bright = min(1.0, self.strike_flash / 0.12)
-            fr = int(CHAR_FLASH[0] * bright)
-            fg = int(CHAR_FLASH[1] * bright)
-            fb = int(CHAR_FLASH[2] * bright)
-            flash = (min(255, fr), min(255, fg), min(255, fb))
-            if self.current_char != ' ':
-                d.draw_text_small(STRIKE_X - 2, STRIKE_Y - 2, self.current_char, flash)
+        # Strike flash — show the actual character in yellow, fading smoothly
+        if self.strike_flash > 0 and self.current_char != ' ':
+            # Smooth fade: full brightness for first half, then fade out
+            t = self.strike_flash / 0.4
+            if t > 0.5:
+                bright = 1.0
+            else:
+                bright = t / 0.5  # fade from 1.0 to 0 over second half
+            # Ease the fade for smoothness
+            bright = bright * bright * (3 - 2 * bright)  # smoothstep
+            r = int(CHAR_FLASH[0] * bright)
+            g = int(CHAR_FLASH[1] * bright)
+            b = int(CHAR_FLASH[2] * bright)
+            if r > 10 or g > 10:  # only draw if visible
+                d.draw_text_small(STRIKE_X - 2, STRIKE_Y - 2, self.current_char, (r, g, b))
 
     def _draw_keyboard(self, d):
         for row in range(3):

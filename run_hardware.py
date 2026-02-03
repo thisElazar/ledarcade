@@ -323,12 +323,20 @@ def has_any_input(input_state):
 
 
 def _pick_idle_visual(display):
-    """Pick a random non-utility, non-slideshow visual and instantiate it."""
+    """Pick a weighted random visual for idle screen."""
     from visuals import ALL_VISUALS
-    from visuals.slideshow import Slideshow, _randomize_style
-    candidates = [v for v in ALL_VISUALS
-                  if not issubclass(v, Slideshow)
-                  and getattr(v, 'category', '') != 'utility']
+    from visuals.slideshow import Slideshow, AllVisuals, _randomize_style
+    # Use same category weights as AllVisuals slideshow
+    weights = AllVisuals.CATEGORY_WEIGHTS
+    candidates = []
+    for v in ALL_VISUALS:
+        if issubclass(v, Slideshow):
+            continue
+        cat = getattr(v, 'category', '')
+        if cat == 'utility':
+            continue
+        weight = weights.get(cat, 2)
+        candidates.extend([v] * weight)
     if not candidates:
         return None
     cls = random.choice(candidates)
@@ -390,6 +398,10 @@ def main():
     idle_visual = None
     idle_cycle_timer = 0.0
 
+    # Idle transition manager
+    from transitions import TransitionManager
+    idle_transition = TransitionManager()
+
     # Shuffle mode state
     in_shuffle_mode = False
     shuffle_playlist = None
@@ -450,14 +462,28 @@ def main():
                         in_idle = False
                         idle_visual = None
                         idle_timer = 0.0
+                        idle_transition.transitioning = False
                     else:
-                        idle_cycle_timer += dt
-                        if idle_cycle_timer >= 30.0:
-                            idle_visual = _pick_idle_visual(display)
-                            idle_cycle_timer = 0.0
-                        if idle_visual:
-                            idle_visual.update(dt)
-                            idle_visual.draw()
+                        # Handle ongoing transition
+                        if idle_transition.transitioning:
+                            idle_transition.update(dt)
+                            idle_transition.draw(display)
+                            # Also update new visual during transition
+                            if idle_visual:
+                                idle_visual.update(dt)
+                        else:
+                            idle_cycle_timer += dt
+                            if idle_cycle_timer >= 30.0:
+                                # Start transition to new visual
+                                old_visual = idle_visual
+                                new_visual = _pick_idle_visual(display)
+                                if old_visual and new_visual:
+                                    idle_transition.start(old_visual, new_visual)
+                                idle_visual = new_visual
+                                idle_cycle_timer = 0.0
+                            if idle_visual:
+                                idle_visual.update(dt)
+                                idle_visual.draw()
                 elif konami_active:
                     konami_timer += dt
                     if konami_timer >= 2.0:
