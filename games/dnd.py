@@ -376,7 +376,7 @@ class DnD(Game):
                 return
 
         # Shoot arrow
-        if input_state.action_l and self.arrows > 0 and len(self.active_arrows) < 3:
+        if (input_state.action_l or input_state.action_r) and self.arrows > 0 and len(self.active_arrows) < 3:
             self.arrows -= 1
             # Shoot in facing direction
             dir_x = self.facing_x if self.facing_x != 0 else 0
