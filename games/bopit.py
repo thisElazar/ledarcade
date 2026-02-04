@@ -6,10 +6,9 @@ Follow the commands as fast as you can!
 Speed increases with each successful action.
 
 Commands:
-  BOP IT   - Press Space/Action
-  TWIST IT - Press Left + Right together
-  PULL IT  - Press Up + Down together
-  FLICK IT - Tap Left or Right quickly twice
+  BOP IT   - Press Action button
+  TWIST IT - Press Left or Right
+  PULL IT  - Press Up or Down
 """
 
 import random
@@ -99,26 +98,21 @@ class BopIt(Game):
                 self.fail()
             return True
 
-        # TWIST - press left AND right together
-        if input_state.left and input_state.right:
+        # TWIST - press left or right (horizontal)
+        if input_state.left or input_state.right:
             if self.command == self.CMD_TWIST:
                 self.success()
             else:
                 self.fail()
             return True
 
-        # PULL - press up AND down together
-        if input_state.up and input_state.down:
+        # PULL - press up or down (vertical)
+        if input_state.up or input_state.down:
             if self.command == self.CMD_PULL:
                 self.success()
             else:
                 self.fail()
             return True
-
-        # Wrong single button press
-        if input_state.left or input_state.right or input_state.up or input_state.down:
-            # Give a tiny grace period for combo inputs
-            pass
 
         return False
 
@@ -178,9 +172,9 @@ class BopIt(Game):
             if self.command == self.CMD_BOP:
                 hint = "BUTTON"
             elif self.command == self.CMD_TWIST:
-                hint = "L + R"
+                hint = "< or >"
             elif self.command == self.CMD_PULL:
-                hint = "U + D"
+                hint = "^ or v"
             else:
                 hint = ""
             hx = 32 - len(hint) * 2
