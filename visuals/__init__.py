@@ -135,12 +135,21 @@ from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
 from .locomotive import Locomotive
 from .modelt import ModelT
+from .beamengine import BeamEngine
 from .singer import Singer
 from .projector import Projector
-from .testrig import TestRig
 from .typewriter import Typewriter
 from .musicbox import MusicBox
 from .gutenberg import GutenbergPress
+from .orrery import Orrery
+from .gyroscope import Gyroscope
+from .curta import Curta
+from .loom import Loom
+from .jacquard import Jacquard
+from .hurdygurdy import HurdyGurdy
+from .antikythera import Antikythera
+from .astrolabe import Astrolabe
+from .archimedes import Archimedes
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -280,12 +289,21 @@ ALL_VISUALS = [
     GrandfatherClock,
     Locomotive,
     ModelT,
+    BeamEngine,
     Singer,
     Projector,
-    TestRig,
     Typewriter,
     MusicBox,
     GutenbergPress,
+    Orrery,
+    Gyroscope,
+    Curta,
+    Loom,
+    Jacquard,
+    HurdyGurdy,
+    Antikythera,
+    Astrolabe,
+    Archimedes,
     # Slideshows (visual playlists)
     AllVisuals,
     Chill,
@@ -437,12 +455,21 @@ __all__ = [
     'GrandfatherClock',
     'Locomotive',
     'ModelT',
+    'BeamEngine',
     'Singer',
     'Projector',
-    'TestRig',
     'Typewriter',
     'MusicBox',
     'GutenbergPress',
+    'Orrery',
+    'Gyroscope',
+    'Curta',
+    'Loom',
+    'Jacquard',
+    'HurdyGurdy',
+    'Antikythera',
+    'Astrolabe',
+    'Archimedes',
     'Slideshow',
     'AllVisuals',
     'Chill',
