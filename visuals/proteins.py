@@ -6,10 +6,10 @@ Color-coded by secondary structure: helix (red), sheet (yellow), coil (gray).
 Real Cα coordinates from RCSB Protein Data Bank.
 
 Controls:
-  Joystick   - Rotate protein in 3D (left/right spins, up/down tilts)
-  Z/X        - Cycle through proteins
+  Joystick   - Rotate protein in 3D (pauses auto-cycle to let you explore)
+  Z/X        - Cycle through proteins (resumes auto-cycle)
 
-Auto-rotates around Z-axis continuously.
+Auto-rotates around Z-axis. Manual rotation pauses cycling until you move on.
 """
 
 import math
@@ -530,28 +530,35 @@ class Proteins(Visual):
         tilt_speed = 1.5
 
         # Joystick controls rotation (Y and X axes)
+        # Any manual rotation pauses auto-cycle until button press
         if input_state.left:
             self.rotation_y -= rotation_speed * 0.016  # Assume ~60fps
+            self.auto_cycle = False  # Pause auto-cycle while exploring
             consumed = True
         if input_state.right:
             self.rotation_y += rotation_speed * 0.016
+            self.auto_cycle = False
             consumed = True
         if input_state.up:
             self.tilt_x -= tilt_speed * 0.016
+            self.auto_cycle = False
             consumed = True
         if input_state.down:
             self.tilt_x += tilt_speed * 0.016
+            self.auto_cycle = False
             consumed = True
 
-        # Action buttons cycle through proteins
+        # Action buttons cycle through proteins and resume auto-cycle
         if input_state.action_l:
             self.protein_idx = (self.protein_idx - 1) % len(PROTEINS)
             self.cycle_timer = 0.0
+            self.auto_cycle = True  # Resume auto-cycle
             self._prepare_protein()
             consumed = True
         if input_state.action_r:
             self.protein_idx = (self.protein_idx + 1) % len(PROTEINS)
             self.cycle_timer = 0.0
+            self.auto_cycle = True  # Resume auto-cycle
             self._prepare_protein()
             consumed = True
 
