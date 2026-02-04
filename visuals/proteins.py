@@ -203,11 +203,11 @@ class Proteins(Visual):
             self.manual_timeout = 2.0
             consumed = True
         if input_state.up:
-            self.tilt_x = max(-1.2, self.tilt_x - tilt_speed * 0.016)
+            self.tilt_x -= tilt_speed * 0.016
             self.manual_timeout = 2.0
             consumed = True
         if input_state.down:
-            self.tilt_x = min(1.2, self.tilt_x + tilt_speed * 0.016)
+            self.tilt_x += tilt_speed * 0.016
             self.manual_timeout = 2.0
             consumed = True
 
@@ -347,7 +347,7 @@ class Proteins(Visual):
                 self.display.set_pixel(ix, iy, dot_color)
 
         # Draw label at bottom - cycle through name, description, PDB ID
-        cycle = int(self.label_timer / 3) % 3
+        cycle = int(self.label_timer / 6) % 3
         if cycle == 0:
             label = protein['name']
         elif cycle == 1:

@@ -102,7 +102,7 @@ class Synapse:
 
 
 class Neurons(Visual):
-    name = "NEURONS"
+    name = "BRAIN"
     description = "Spiking neural net"
     category = "science"
 
