@@ -15,8 +15,8 @@ import random
 
 class LightsOut(Game):
     name = "LIGHTS OUT"
-    description = "Toggle Puzzle"
-    category = "modern"
+    description = "1995 Tiger Electronics"
+    category = "toys"
 
     # Grid layout
     GRID_CELLS = 5
@@ -34,6 +34,8 @@ class LightsOut(Game):
 
     def __init__(self, display: Display):
         super().__init__(display)
+        self.high_score = 0
+        self.best_level = 0
         self.reset()
 
     def reset(self):
@@ -156,6 +158,8 @@ class LightsOut(Game):
 
             if self.check_win():
                 self.score += max(1, 100 - self.moves * 5)  # Bonus for fewer moves
+                self.high_score = max(self.high_score, self.score)
+                self.best_level = max(self.best_level, self.level)
                 self.state = GameState.GAME_OVER
 
     def draw(self):
@@ -190,6 +194,10 @@ class LightsOut(Game):
 
         lights_on = self.count_lights_on()
         self.display.draw_text_small(44, 1, f"{lights_on}", self.LIGHT_ON if lights_on > 0 else Colors.GREEN)
+
+        # Show best level at bottom if achieved
+        if self.best_level > 0:
+            self.display.draw_text_small(2, 57, f"BEST:L{self.best_level}", Colors.GRAY)
 
     def draw_light(self, col: int, row: int):
         """Draw a single light."""
@@ -255,3 +263,5 @@ class LightsOut(Game):
     def draw_win(self):
         """Draw win message."""
         self.display.draw_text_small(12, 1, "CLEAR!", Colors.GREEN)
+        if self.level >= self.best_level:
+            self.display.draw_text_small(30, 57, "NEW BEST!", Colors.YELLOW)

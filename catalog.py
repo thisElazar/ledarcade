@@ -38,6 +38,7 @@ GAME_CATEGORIES = [
     Category("ARCADE GAMES", Colors.YELLOW, "arcade"),
     Category("RETRO GAMES", Colors.GREEN, "retro"),
     Category("MODERN GAMES", Colors.CYAN, "modern"),
+    Category("TOYS", Colors.PINK, "toys"),
     Category("2 PLAYER GAMES", Colors.MAGENTA, "2_player"),
     Category("BAR GAMES", (200, 150, 50), "bar"),
     Category("GAME MIX", Colors.ORANGE, "game_mix"),

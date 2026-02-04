@@ -48,6 +48,10 @@ from .bowling import Bowling
 from .darts import Darts
 from .shuffleboard import Shuffleboard
 from .pinball import Pinball
+from .fifteenpuzzle import FifteenPuzzle
+from .simon import Simon
+from .bopit import BopIt
+from .mastermind import Mastermind
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -98,6 +102,10 @@ ALL_GAMES = [
     Darts,
     Shuffleboard,
     Pinball,
+    FifteenPuzzle,
+    Simon,
+    BopIt,
+    Mastermind,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -156,6 +164,10 @@ __all__ = [
     'Darts',
     'Shuffleboard',
     'Pinball',
+    'FifteenPuzzle',
+    'Simon',
+    'BopIt',
+    'Mastermind',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
