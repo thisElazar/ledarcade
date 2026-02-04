@@ -7,8 +7,8 @@ Speed increases with each successful action.
 
 Commands:
   BOP IT   - Press Action button
-  TWIST IT - Press Left or Right
-  PULL IT  - Press Up or Down
+  TWIST IT - Left then Right (or Right then Left)
+  PULL IT  - Up then Down (or Down then Up)
 """
 
 import random
@@ -53,11 +53,15 @@ class BopIt(Game):
         self.time_limit = 2.0  # Time to respond
         self.speed_mult = 1.0
 
-        # Input state tracking
+        # Input state tracking for motion detection
         self.last_left = False
         self.last_right = False
         self.last_up = False
         self.last_down = False
+
+        # Motion tracking - first direction of a twist/pull
+        self.motion_start = None  # 'left', 'right', 'up', 'down'
+        self.motion_timer = 0  # Time window to complete motion
 
     def start_game(self):
         """Start a new game."""
@@ -96,28 +100,53 @@ class BopIt(Game):
                 self.success()
             else:
                 self.fail()
+            self.motion_start = None
             return True
 
-        # TWIST - press left or right (horizontal)
-        if input_state.left or input_state.right:
-            if self.command == self.CMD_TWIST:
-                self.success()
-            else:
-                self.fail()
-            return True
+        # Detect new direction presses (edge detection)
+        left_pressed = input_state.left and not self.last_left
+        right_pressed = input_state.right and not self.last_right
+        up_pressed = input_state.up and not self.last_up
+        down_pressed = input_state.down and not self.last_down
 
-        # PULL - press up or down (vertical)
-        if input_state.up or input_state.down:
-            if self.command == self.CMD_PULL:
-                self.success()
-            else:
-                self.fail()
-            return True
+        # TWIST - left then right, or right then left
+        if left_pressed or right_pressed:
+            if self.motion_start in ('left', 'right') and self.motion_timer > 0:
+                # Check if this completes a twist (opposite direction)
+                if (self.motion_start == 'left' and right_pressed) or \
+                   (self.motion_start == 'right' and left_pressed):
+                    if self.command == self.CMD_TWIST:
+                        self.success()
+                    else:
+                        self.fail()
+                    self.motion_start = None
+                    return True
+            # Start a new horizontal motion
+            self.motion_start = 'left' if left_pressed else 'right'
+            self.motion_timer = 0.5  # 500ms to complete the motion
+
+        # PULL - up then down, or down then up
+        if up_pressed or down_pressed:
+            if self.motion_start in ('up', 'down') and self.motion_timer > 0:
+                # Check if this completes a pull (opposite direction)
+                if (self.motion_start == 'up' and down_pressed) or \
+                   (self.motion_start == 'down' and up_pressed):
+                    if self.command == self.CMD_PULL:
+                        self.success()
+                    else:
+                        self.fail()
+                    self.motion_start = None
+                    return True
+            # Start a new vertical motion
+            self.motion_start = 'up' if up_pressed else 'down'
+            self.motion_timer = 0.5  # 500ms to complete the motion
 
         return False
 
     def update(self, input_state: InputState, dt: float):
         self.timer -= dt
+        if self.motion_timer > 0:
+            self.motion_timer -= dt
 
         if self.phase == self.PHASE_IDLE:
             if input_state.action_l or input_state.action_r:
@@ -172,9 +201,9 @@ class BopIt(Game):
             if self.command == self.CMD_BOP:
                 hint = "BUTTON"
             elif self.command == self.CMD_TWIST:
-                hint = "< or >"
+                hint = "<< >>"
             elif self.command == self.CMD_PULL:
-                hint = "^ or v"
+                hint = "^^ vv"
             else:
                 hint = ""
             hx = 32 - len(hint) * 2
