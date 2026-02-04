@@ -123,7 +123,10 @@ class Snake(Game):
         self.display.clear(Colors.BLACK)
 
         # Draw border for play area (at pixel level)
-        self.display.draw_line(0, 7, 63, 7, Colors.DARK_GRAY)
+        self.display.draw_line(0, 7, 63, 7, Colors.DARK_GRAY)    # Top
+        self.display.draw_line(0, 63, 63, 63, Colors.DARK_GRAY)  # Bottom
+        self.display.draw_line(0, 7, 0, 63, Colors.DARK_GRAY)    # Left
+        self.display.draw_line(63, 7, 63, 63, Colors.DARK_GRAY)  # Right
 
         # Draw snake (2x2 blocks)
         for i, (x, y) in enumerate(self.snake):

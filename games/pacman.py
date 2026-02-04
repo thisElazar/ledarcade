@@ -84,15 +84,16 @@ class PacMan(Game):
         self.mouth_timer = 0
 
         # Ghosts - positioned in/around ghost house (rows 8-11)
+        # Scatter targets must be in passable tiles (row 0 and 18 are walls)
         self.ghosts = [
             {'name': 'blinky', 'x': 10.0, 'y': 7.0, 'dir': (-1, 0), 'color': Colors.RED,
-             'scatter_target': (19, 0), 'in_house': False, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False},
             {'name': 'pinky', 'x': 10.0, 'y': 9.0, 'dir': (0, 1), 'color': Colors.PINK,
-             'scatter_target': (1, 0), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False},
             {'name': 'inky', 'x': 9.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.CYAN,
-             'scatter_target': (19, 18), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False},
             {'name': 'clyde', 'x': 11.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.ORANGE,
-             'scatter_target': (0, 18), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False},
         ]
         # Base speeds (will be modified by level)
         self.base_ghost_speed = 4.5
