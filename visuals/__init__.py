@@ -130,6 +130,7 @@ from .fluid import FluidTunnel, FluidInk, FluidMixing
 from .earth import Earth
 from .molecule import Molecule
 from .lattice import Lattice
+from .proteins import Proteins
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
@@ -285,6 +286,7 @@ ALL_VISUALS = [
     Earth,
     Molecule,
     Lattice,
+    Proteins,
     Metronome,
     WatchGears,
     Camshaft,
@@ -452,6 +454,7 @@ __all__ = [
     'Earth',
     'Molecule',
     'Lattice',
+    'Proteins',
     'Metronome',
     'WatchGears',
     'Camshaft',

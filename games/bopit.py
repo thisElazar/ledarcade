@@ -201,9 +201,9 @@ class BopIt(Game):
             if self.command == self.CMD_BOP:
                 hint = "BUTTON"
             elif self.command == self.CMD_TWIST:
-                hint = "<< >>"
+                hint = "L-R"
             elif self.command == self.CMD_PULL:
-                hint = "^^ vv"
+                hint = "U-D"
             else:
                 hint = ""
             hx = 32 - len(hint) * 2
