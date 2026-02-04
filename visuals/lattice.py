@@ -32,6 +32,9 @@ LATTICE_COLORS.update({
     'Be': (194, 255, 0),       # Beryllium - lime
     'B': (255, 181, 181),      # Boron - salmon
     'Zr': (148, 224, 224),     # Zirconium - cyan
+    'Ni': (80, 208, 80),       # Nickel - green-gray
+    'Sn': (102, 128, 128),     # Tin - gray
+    'K': (143, 64, 212),       # Potassium - purple
 })
 
 LATTICE_RADIUS = dict(CPK_RADIUS)
@@ -49,6 +52,9 @@ LATTICE_RADIUS.update({
     'Be': 2,
     'B': 2,
     'Zr': 3,
+    'Ni': 3,
+    'Sn': 3,
+    'K': 3,
 })
 
 BOND_COLOR = (60, 60, 60)  # Dim gray for lattice bonds
@@ -431,6 +437,21 @@ CRYSTALS = [
         'bond_cutoff': 0.75,
     },
     {
+        'name': 'BRONZE',
+        'formula': 'Cu3Sn',
+        'system': 'FCC',
+        'categories': ['metals'],
+        'a': 3.68,  # Alpha bronze (Cu-Sn alloy)
+        'basis': [
+            # FCC copper with tin substitution
+            ('Cu', 0.0, 0.0, 0.0),
+            ('Cu', 0.5, 0.5, 0.0),
+            ('Cu', 0.5, 0.0, 0.5),
+            ('Sn', 0.0, 0.5, 0.5),  # Sn substitutes ~10% in real bronze
+        ],
+        'bond_cutoff': 0.75,
+    },
+    {
         'name': 'TITANIUM',
         'formula': 'Ti',
         'system': 'Hexagonal',
@@ -539,6 +560,21 @@ CRYSTALS = [
             ('Fe', 0.5, 0.5, 0.5),
         ],
         'bond_cutoff': 0.90,
+    },
+    {
+        'name': 'STAINLESS',
+        'formula': 'FeCrNi',
+        'system': 'FCC',
+        'categories': ['steel', 'metals'],
+        'a': 3.59,  # 304 stainless, austenitic
+        'basis': [
+            # FCC with Cr and Ni substitution (simplified)
+            ('Fe', 0.0, 0.0, 0.0),
+            ('Cr', 0.5, 0.5, 0.0),
+            ('Fe', 0.5, 0.0, 0.5),
+            ('Ni', 0.0, 0.5, 0.5),
+        ],
+        'bond_cutoff': 0.75,
     },
 
     # ══════════════════════════════════════════════════════════════════
@@ -659,6 +695,36 @@ CRYSTALS = [
             ('C', 0.25, 0.75, 0.75),
         ],
         'bond_cutoff': 0.45,
+    },
+    {
+        'name': 'PORCELAIN',
+        'formula': 'Al6Si2O13',
+        'system': 'Orthorhombic',
+        'categories': ['ceramics'],
+        'a': 7.54,  # Mullite - key crystal phase in porcelain
+        'b': 7.69,
+        'c': 2.88,
+        'basis': [
+            # Mullite structure (simplified)
+            # Al in octahedral and tetrahedral sites
+            ('Al', 0.0, 0.0, 0.0),
+            ('Al', 0.5, 0.5, 0.0),
+            ('Al', 0.15, 0.34, 0.5),
+            ('Al', 0.85, 0.66, 0.5),
+            ('Al', 0.34, 0.85, 0.5),
+            ('Al', 0.66, 0.15, 0.5),
+            # Si in tetrahedral sites
+            ('Si', 0.25, 0.21, 0.0),
+            ('Si', 0.75, 0.79, 0.0),
+            # Oxygen framework
+            ('O', 0.0, 0.0, 0.5),
+            ('O', 0.5, 0.5, 0.5),
+            ('O', 0.14, 0.44, 0.0),
+            ('O', 0.86, 0.56, 0.0),
+            ('O', 0.35, 0.07, 0.5),
+            ('O', 0.65, 0.93, 0.5),
+        ],
+        'bond_cutoff': 0.35,
     },
 
     # ══════════════════════════════════════════════════════════════════
