@@ -83,10 +83,14 @@ class PipeDream(Game):
         # Flow state: how full each cell is (0.0 to 1.0)
         self.flow = [[0.0] * self.GRID_CELLS for _ in range(self.GRID_CELLS)]
 
+        # Flow entry direction for each cell (for correct fill animation)
+        self.flow_entry_dir = [[None] * self.GRID_CELLS for _ in range(self.GRID_CELLS)]
+
         # Place start pipe on left edge
         self.start_row = random.randint(1, self.GRID_CELLS - 2)
         self.grid[self.start_row][0] = PipeType.START
         self.flow[self.start_row][0] = 0.0
+        self.flow_entry_dir[self.start_row][0] = 'right'
 
         # Current flow position and direction
         self.flow_col = 0
@@ -243,6 +247,9 @@ class PipeDream(Game):
 
             # Check if flow can continue
             if self.can_flow_into(next_col, next_row, self.flow_dir):
+                # Record the direction flow entered this cell (for rendering)
+                self.flow_entry_dir[next_row][next_col] = self.flow_dir
+
                 self.flow_col = next_col
                 self.flow_row = next_row
                 self.flow_progress = 0.0
@@ -354,6 +361,7 @@ class PipeDream(Game):
 
         pipe = self.grid[row][col]
         fill = self.flow[row][col]
+        entry_dir = self.flow_entry_dir[row][col]
 
         if pipe == PipeType.EMPTY:
             return
@@ -361,7 +369,7 @@ class PipeDream(Game):
         if pipe == PipeType.START:
             self.draw_start_pipe(x, y, fill)
         else:
-            self.draw_pipe(x, y, pipe, fill)
+            self.draw_pipe(x, y, pipe, fill, entry_dir)
 
     def draw_start_pipe(self, x: int, y: int, fill: float):
         """Draw the starting pipe."""
@@ -376,79 +384,133 @@ class PipeDream(Game):
             flow_width = int(self.CELL_SIZE * fill)
             self.display.draw_rect(x, cy - 1, flow_width, 3, self.FLOW_COLOR)
 
-    def draw_pipe(self, x: int, y: int, pipe: PipeType, fill: float):
-        """Draw a pipe piece with optional flow."""
+    def draw_pipe(self, x: int, y: int, pipe: PipeType, fill: float, entry_dir: str = None):
+        """Draw a pipe piece with optional flow. entry_dir is the direction flow was traveling when entering."""
         cx = x + self.CELL_SIZE // 2
         cy = y + self.CELL_SIZE // 2
         half = self.CELL_SIZE // 2
+        size = self.CELL_SIZE
 
         # Draw pipe shape
         if pipe == PipeType.HORIZONTAL:
-            self.display.draw_rect(x, cy - 1, self.CELL_SIZE, 3, self.PIPE_COLOR)
+            self.display.draw_rect(x, cy - 1, size, 3, self.PIPE_COLOR)
             if fill > 0:
-                fw = int(self.CELL_SIZE * fill)
-                self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
+                fw = int(size * fill)
+                if entry_dir == 'left':  # Flow going left, fill right to left
+                    self.display.draw_rect(x + size - fw, cy - 1, fw, 3, self.FLOW_COLOR)
+                else:  # Flow going right (default), fill left to right
+                    self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
 
         elif pipe == PipeType.VERTICAL:
-            self.display.draw_rect(cx - 1, y, 3, self.CELL_SIZE, self.PIPE_COLOR)
+            self.display.draw_rect(cx - 1, y, 3, size, self.PIPE_COLOR)
             if fill > 0:
-                fh = int(self.CELL_SIZE * fill)
-                self.display.draw_rect(cx - 1, y, 3, fh, self.FLOW_COLOR)
+                fh = int(size * fill)
+                if entry_dir == 'up':  # Flow going up, fill bottom to top
+                    self.display.draw_rect(cx - 1, y + size - fh, 3, fh, self.FLOW_COLOR)
+                else:  # Flow going down (default), fill top to bottom
+                    self.display.draw_rect(cx - 1, y, 3, fh, self.FLOW_COLOR)
 
-        elif pipe == PipeType.CORNER_NE:  # └
+        elif pipe == PipeType.CORNER_NE:  # └ connects UP and LEFT
             self.display.draw_rect(x, cy - 1, half + 2, 3, self.PIPE_COLOR)
             self.display.draw_rect(cx - 1, y, 3, half + 2, self.PIPE_COLOR)
             if fill > 0:
-                if fill < 0.5:
-                    fw = int(half * fill * 2)
-                    self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
-                else:
-                    self.display.draw_rect(x, cy - 1, half + 1, 3, self.FLOW_COLOR)
-                    fh = int(half * (fill - 0.5) * 2)
-                    self.display.draw_rect(cx - 1, cy - fh, 3, fh + 1, self.FLOW_COLOR)
+                if entry_dir == 'down':  # Flow going DOWN, entered from UP opening, exits LEFT
+                    if fill < 0.5:
+                        fh = int(half * fill * 2)
+                        self.display.draw_rect(cx - 1, y, 3, fh, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, y, 3, half + 1, self.FLOW_COLOR)
+                        fw = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - fw, cy - 1, fw + 1, 3, self.FLOW_COLOR)
+                else:  # Flow going RIGHT (entry_dir == 'right'), entered from LEFT opening, exits UP
+                    if fill < 0.5:
+                        fw = int(half * fill * 2)
+                        self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(x, cy - 1, half + 1, 3, self.FLOW_COLOR)
+                        fh = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy - fh, 3, fh + 1, self.FLOW_COLOR)
 
-        elif pipe == PipeType.CORNER_NW:  # ┘
+        elif pipe == PipeType.CORNER_NW:  # ┘ connects UP and RIGHT
             self.display.draw_rect(cx - 1, cy - 1, half + 2, 3, self.PIPE_COLOR)
             self.display.draw_rect(cx - 1, y, 3, half + 2, self.PIPE_COLOR)
             if fill > 0:
-                if fill < 0.5:
-                    fw = int(half * fill * 2)
-                    self.display.draw_rect(x + self.CELL_SIZE - fw, cy - 1, fw, 3, self.FLOW_COLOR)
-                else:
-                    self.display.draw_rect(cx - 1, cy - 1, half + 1, 3, self.FLOW_COLOR)
-                    fh = int(half * (fill - 0.5) * 2)
-                    self.display.draw_rect(cx - 1, cy - fh, 3, fh + 1, self.FLOW_COLOR)
+                if entry_dir == 'down':  # Flow going DOWN, entered from UP opening, exits RIGHT
+                    if fill < 0.5:
+                        fh = int(half * fill * 2)
+                        self.display.draw_rect(cx - 1, y, 3, fh, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, y, 3, half + 1, self.FLOW_COLOR)
+                        fw = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy - 1, fw + 1, 3, self.FLOW_COLOR)
+                else:  # Flow going LEFT (entry_dir == 'left'), entered from RIGHT opening, exits UP
+                    if fill < 0.5:
+                        fw = int(half * fill * 2)
+                        self.display.draw_rect(x + size - fw, cy - 1, fw, 3, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, cy - 1, half + 1, 3, self.FLOW_COLOR)
+                        fh = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy - fh, 3, fh + 1, self.FLOW_COLOR)
 
-        elif pipe == PipeType.CORNER_SE:  # ┌
+        elif pipe == PipeType.CORNER_SE:  # ┌ connects DOWN and LEFT
             self.display.draw_rect(x, cy - 1, half + 2, 3, self.PIPE_COLOR)
             self.display.draw_rect(cx - 1, cy - 1, 3, half + 2, self.PIPE_COLOR)
             if fill > 0:
-                if fill < 0.5:
-                    fw = int(half * fill * 2)
-                    self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
-                else:
-                    self.display.draw_rect(x, cy - 1, half + 1, 3, self.FLOW_COLOR)
-                    fh = int(half * (fill - 0.5) * 2)
-                    self.display.draw_rect(cx - 1, cy, 3, fh + 1, self.FLOW_COLOR)
+                if entry_dir == 'up':  # Flow going UP, entered from DOWN opening, exits LEFT
+                    if fill < 0.5:
+                        fh = int(half * fill * 2)
+                        self.display.draw_rect(cx - 1, cy + half - fh, 3, fh + 1, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, cy - 1, 3, half + 2, self.FLOW_COLOR)
+                        fw = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - fw, cy - 1, fw + 1, 3, self.FLOW_COLOR)
+                else:  # Flow going RIGHT (entry_dir == 'right'), entered from LEFT opening, exits DOWN
+                    if fill < 0.5:
+                        fw = int(half * fill * 2)
+                        self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(x, cy - 1, half + 1, 3, self.FLOW_COLOR)
+                        fh = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy, 3, fh + 1, self.FLOW_COLOR)
 
-        elif pipe == PipeType.CORNER_SW:  # ┐
+        elif pipe == PipeType.CORNER_SW:  # ┐ connects DOWN and RIGHT
             self.display.draw_rect(cx - 1, cy - 1, half + 2, 3, self.PIPE_COLOR)
             self.display.draw_rect(cx - 1, cy - 1, 3, half + 2, self.PIPE_COLOR)
             if fill > 0:
-                if fill < 0.5:
-                    fw = int(half * fill * 2)
-                    self.display.draw_rect(x + self.CELL_SIZE - fw, cy - 1, fw, 3, self.FLOW_COLOR)
-                else:
-                    self.display.draw_rect(cx - 1, cy - 1, half + 1, 3, self.FLOW_COLOR)
-                    fh = int(half * (fill - 0.5) * 2)
-                    self.display.draw_rect(cx - 1, cy, 3, fh + 1, self.FLOW_COLOR)
+                if entry_dir == 'up':  # Flow going UP, entered from DOWN opening, exits RIGHT
+                    if fill < 0.5:
+                        fh = int(half * fill * 2)
+                        self.display.draw_rect(cx - 1, cy + half - fh, 3, fh + 1, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, cy - 1, 3, half + 2, self.FLOW_COLOR)
+                        fw = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy - 1, fw + 1, 3, self.FLOW_COLOR)
+                else:  # Flow going LEFT (entry_dir == 'left'), entered from RIGHT opening, exits DOWN
+                    if fill < 0.5:
+                        fw = int(half * fill * 2)
+                        self.display.draw_rect(x + size - fw, cy - 1, fw, 3, self.FLOW_COLOR)
+                    else:
+                        self.display.draw_rect(cx - 1, cy - 1, half + 1, 3, self.FLOW_COLOR)
+                        fh = int(half * (fill - 0.5) * 2)
+                        self.display.draw_rect(cx - 1, cy, 3, fh + 1, self.FLOW_COLOR)
 
         elif pipe == PipeType.CROSS:
-            self.display.draw_rect(x, cy - 1, self.CELL_SIZE, 3, self.PIPE_COLOR)
-            self.display.draw_rect(cx - 1, y, 3, self.CELL_SIZE, self.PIPE_COLOR)
+            self.display.draw_rect(x, cy - 1, size, 3, self.PIPE_COLOR)
+            self.display.draw_rect(cx - 1, y, 3, size, self.PIPE_COLOR)
             if fill > 0:
-                # Cross fills from entry direction - simplified: just fill center
-                self.display.draw_rect(cx - 1, cy - 1, 3, 3, self.FLOW_COLOR)
+                # Cross fills along the flow direction
+                fw = int(size * fill)
+                if entry_dir == 'right':
+                    self.display.draw_rect(x, cy - 1, fw, 3, self.FLOW_COLOR)
+                elif entry_dir == 'left':
+                    self.display.draw_rect(x + size - fw, cy - 1, fw, 3, self.FLOW_COLOR)
+                elif entry_dir == 'down':
+                    self.display.draw_rect(cx - 1, y, 3, fw, self.FLOW_COLOR)
+                elif entry_dir == 'up':
+                    self.display.draw_rect(cx - 1, y + size - fw, 3, fw, self.FLOW_COLOR)
+                else:
+                    # Fallback: fill center
+                    self.display.draw_rect(cx - 1, cy - 1, 3, 3, self.FLOW_COLOR)
 
     def draw_cursor(self):
         """Draw cursor around selected cell."""
