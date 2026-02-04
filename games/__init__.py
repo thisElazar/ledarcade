@@ -52,6 +52,7 @@ from .fifteenpuzzle import FifteenPuzzle
 from .simon import Simon
 from .bopit import BopIt
 from .mastermind import Mastermind
+from .rushhour import RushHour
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -106,6 +107,7 @@ ALL_GAMES = [
     Simon,
     BopIt,
     Mastermind,
+    RushHour,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -168,6 +170,7 @@ __all__ = [
     'Simon',
     'BopIt',
     'Mastermind',
+    'RushHour',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
