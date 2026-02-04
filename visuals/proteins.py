@@ -150,9 +150,8 @@ class Proteins(Visual):
         self.protein_idx = 0
         self.rotation_y = 0.0  # Manual: left/right
         self.tilt_x = 0.0      # Manual: up/down
-        self.rotation_z = 0.0  # Auto-rotate around Z (the uncontrolled axis)
+        self.rotation_z = 0.0  # Continuous auto-rotate around Z
         self.auto_rotate_speed = 0.3
-        self.manual_timeout = 0.0  # Time since last manual input
         self.auto_cycle = True
         self.cycle_timer = 0.0
         self.cycle_duration = 15.0  # Longer view time for proteins
@@ -193,22 +192,18 @@ class Proteins(Visual):
         rotation_speed = 2.0  # Radians per second for manual control
         tilt_speed = 1.5
 
-        # Joystick controls rotation
+        # Joystick controls rotation (Y and X axes)
         if input_state.left:
             self.rotation_y -= rotation_speed * 0.016  # Assume ~60fps
-            self.manual_timeout = 2.0  # Pause auto-rotate for 2 seconds
             consumed = True
         if input_state.right:
             self.rotation_y += rotation_speed * 0.016
-            self.manual_timeout = 2.0
             consumed = True
         if input_state.up:
             self.tilt_x -= tilt_speed * 0.016
-            self.manual_timeout = 2.0
             consumed = True
         if input_state.down:
             self.tilt_x += tilt_speed * 0.016
-            self.manual_timeout = 2.0
             consumed = True
 
         # Action buttons cycle through proteins
@@ -230,19 +225,8 @@ class Proteins(Visual):
         self.label_timer += dt
         self.scroll_offset += dt * 20  # Scroll speed in pixels/sec
 
-        # Countdown manual input timeout
-        if self.manual_timeout > 0:
-            self.manual_timeout -= dt
-
-        # Auto-rotate around Z axis (the axis user can't control)
+        # Continuous auto-rotate around Z axis
         self.rotation_z += self.auto_rotate_speed * dt
-
-        # When idle, gently return manual rotations toward neutral
-        if self.manual_timeout <= 0:
-            if abs(self.tilt_x) > 0.01:
-                self.tilt_x *= 0.98
-            if abs(self.rotation_y) > 0.01:
-                self.rotation_y *= 0.98
 
         if self.auto_cycle:
             self.cycle_timer += dt
