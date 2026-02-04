@@ -57,71 +57,69 @@ class RushHour(Game):
     # Puzzles organized by difficulty (moves to solve)
     # Format: 36-char string, row-major order
     # 'o' = empty, 'x' = wall, 'A' = red car, B-O = other vehicles
+    # Puzzles verified solvable, sorted by actual moves required
+    # Data from Michael Fogleman's Rush Hour database (MIT License)
+    # https://github.com/fogleman/rush
     PUZZLES = {
-        'beginner': [
-            # 5-10 moves
-            "oBBooFooDooFAADooFooEoCCooEooooooooo",  # Simple
-            "oooBBoooxoGoAAFoGooEFooooEDDoooooooo",
-            "ooooxoooFoHxAAFoHIooFDDIEEEGoooooGoo",
-            "oooEoooooEooAAoEooDBBBooDoooooxooooo",
-            "oooooxooFooGAAFooGooCCDDooooEEoooooo",
-            "ooDoooooDooEAADooEoBBoooCCCooooooooo",
-            "BBBooKooHooKooHAAKooIJCCooIJDDxoFFxo",
-            "oooIJxCCCIJKAAHooKDDHoooGEEFFFGooooo",
-            "BBCCoMJDDDoMJAALoMEEKLooooKFFFxHHIIo",
-            "FBBBooFooGCCAAoGHIoooxHIoooEEooooooo",
+        'beginner': [  # 7-14 moves
+            "ooHBBBooHCCJoAAIoJoooIDDooooooooxFFx",  # 7 moves
+            "oBBBoooCCCooAAoGoooooGooDDEExooooooo",  # 8 moves
+            "ooxCCoooooGoAAooGooDDEEooooFFooooooo",  # 9 moves
+            "oooBBxooooFGAAooFGoooooooDDoEEoooooo",  # 9 moves
+            "HBBBooHooJKoIAAJKoIoooooIxDDoxFFFGGo",  # 10 moves
+            "oBBxooooFGoHAAFGoHooooooooxEEooooooo",  # 10 moves
+            "ooCCoxoEEKLMxAAKLMIoJFFFIoJoooIGGHHH",  # 12 moves
+            "ooxoxoooEoFoAAEoFoooDDDooooooooooooo",  # 12 moves
+            "ooxCCCDDoIJoAAoIJoHEEEJoHoooooxooGGo",  # 13 moves
+            "GBBBoKGoCCoKAAIJoKooIJDDHoooooHEEFFo",  # 14 moves
         ],
-        'easy': [
-            # 11-15 moves
-            "ooxCCCDDoIJoAAoIJoHEEEJoHoooooxooGGo",
-            "ooGoKoooGIKLAAHIKLFoHJBBFCCJoooDDEEo",
-            "ooCCoxoEEKLMxAAKLMIoJFFFIoJoooIGGHHH",
-            "BBBCCooooIKooAAIKoDDHJEEGoHJoLGFFFoL",
-            "BBoJoooHxJKLGHAAKLGDDDKMooIEEMFFIooo",
-            "ooxoCCooKDDoAAKoLMEEFFLMoJoGGooJoHHx",
-            "HoJBBMHoJoLMHAAoLMoICCxooIoKEEFFFKGG",
-            "oHBBKMoHIJKMAAIJLNGooxLNGoxooNGEEEFF",
-            "BBBKoooooKCCoAAoLMDDJxLMIoJFFMIoxoHH",
-            "BBCCoxIooooLIAAKoLEEJKooooJFFFGGGxoo",
+        'easy': [  # 16-22 moves
+            "xCCoJKooIoJKAAIooKoHDDoooHEEEooHFFGG",  # 16 moves
+            "oooIBBCCoIKLHoAAKLHDDDxLoooJooFFoJGG",  # 17 moves
+            "ooooxLxDDoKLAAJoKLoIJEEoHIooooHIFFGG",  # 17 moves
+            "oxCCCJooooIJAAoHIJDDDHIoGEEEooGoFFFo",  # 19 moves
+            "ooBBCCoDDDxKoAAIJKooHIJxooHIGGoooooo",  # 19 moves
+            "oBBCCCxooLEEAAoLooKooFFFKxHHoMIIIJJM",  # 21 moves
+            "HIooooHIBBCCAAoJKLDDoJKLooEExoooGGoo",  # 21 moves
+            "oHBBBooHJoooAAJoKoCCJoKoGIDDDoGIEEFF",  # 22 moves
+            "HBBBoMHCCCoMHAALoMIJKLDDIJKoooxJFFGG",  # 22 moves
+            "HoIBBxHoIJooHAAJooDDoxoKoooooKFFFGGK",  # 22 moves
         ],
-        'medium': [
-            # 16-25 moves
-            "HIBBLNHIJoLNAAJoMooCCCMoDDoKoxoxoKGG",
-            "BBBKLMoCCKLMAAJooNIoJDDNIoEEFFGGHHoo",
-            "EBBoJKEGooJKEGoAAKCCCIooFoHIooFoHDDD",
-            "oIBBBMxIoKoMHAAKLNHDDDLNooJoEEFFJoGG",
-            "oooBBoCCCxKLAAoJKLGEEJKLGHIoooGHIFFo",
-            "xoKoCCIoKDDNIAAMoNoJLMEEoJLFFOxHHooO",
-            "BBBKooIooKCCIAALMoDDJLMNooJEENoxGGxo",
-            "BBBoIKoGooIKoGAAJoCCHoJxooHEEoFFFooo",
-            "HxoCCoHJooMxIJAAMNIEELoNIoKLFFGGKooo",
-            "GHoJBBGHIJoKoHIAAKooxooxEEEoooFFFooo",
+        'medium': [  # 27-31 moves
+            "GHoJBBGHIJoKoHIAAKooxooxEEEoooFFFooo",  # 27 moves
+            "oooHIJBBBHIJoAAoIoooGoooxoGDDxoooFFo",  # 27 moves
+            "BBCCCLDDDoKLAAooKMJEEFFMJooGGMJHHoII",  # 27 moves
+            "BBCCMNHDDoMNHJKAANIJKLEEIJoLooIFFGGo",  # 28 moves
+            "ooooooooxHIoAAGHIoCCGoJoFDDoJoFEEooo",  # 28 moves
+            "oxoCCCooxoLooAAKLooEEKFFooJGGMHHJIIM",  # 29 moves
+            "oHBBLMGHoKLMGAAKooCCJKoooIJDDooIEEFF",  # 29 moves
+            "JBBBoxJoLDDDAALooNKEEFFNKGGMooHHoMox",  # 30 moves
+            "oooBBoCCCxKLAAoJKLGEEJKLGHIoooGHIFFo",  # 31 moves
+            "ooJoBBCCJoLMHIAALMHIDDDMoooKooxxoKGG",  # 31 moves
         ],
-        'hard': [
-            # 26-35 moves
-            "oBBKCCDDDKLMIoAALMIEEFFMJoGGooJHHHoo",
-            "oHBBBooHJoooAAJoKoCCJoKoGIDDDoGIEEFF",
-            "HBBBoMHCCCoMHAALoMIJKLDDIJKoooxJFFGG",
-            "oBBBLooxDDLoAAoKLMEEEKoMJFFGGMJxIIoo",
-            "HBBBooHooJKoIAAJKoIoooooIxDDoxFFFGGo",
-            "JoBBBxJooMDDKAAMooKLEENoxLGGNOHHIINO",
-            "FHBBKLFHoIKLGAAIooGCCCoxEEoJoooooJoo",
-            "oooHIJBBBHIJoAAoIoooGoooxoGDDxoooFFo",
-            "BBoLoMCCCLoMAAoooNJoDDxNJxKGGGHHKoII",
-            "oHoBBooHoxKLAAoJKLGDDJoLGoIEEoGoIFFF",
+        'hard': [  # 41-43 moves
+            "BBoxLoooxoLMAAJoLMooJEEMIFFKooIGGKHH",  # 41 moves
+            "ooBBCCooxoxLAAJooLFFJoKMoIGGKMoIHHHM",  # 41 moves
+            "oooxooxooJDDHAAJKLHoEEKLooIFFFGGIooo",  # 41 moves
+            "xJCCCMIJDDLMIAAoLNEEKoLNooKFFFxHHooo",  # 41 moves
+            "HIBBLNHIJoLNAAJoMooCCCMoDDoKoxoxoKGG",  # 42 moves
+            "HoJBBMHoJoLMHAAoLMoICCxooIoKEEFFFKGG",  # 42 moves
+            "oooIxoCCCIJoAAoIJoGoDDJoGoHEEoFFHooo",  # 42 moves
+            "oIBBLMHIoKLMHAAKoNCCDDoNooJxoooxJGGG",  # 42 moves
+            "HxoCCoHJooMxIJAAMNIEELoNIoKLFFGGKooo",  # 43 moves
+            "oIxooooIJoCCAAJooLHDDEELHFFKoLGGGKoo",  # 43 moves
         ],
-        'expert': [
-            # 36+ moves
-            "oxCCCJooooIJAAoHIJDDDHIoGEEEooGoFFFo",
-            "GBBBoKGoCCoKAAIJoKooIJDDHoooooHEEFFo",
-            "HooJBBHCCJoMooIAAMooIDDxFFFKLoGGGKLo",
-            "BBBooMHxDDDMHoAALNIEEKLNIoJKFFooJoGG",
-            "oIxooooIJoCCAAJooLHDDEELHFFKoLGGGKoo",
-            "BBBCCMooJDDMAAJKLNIEEKLNIFFKoNGGooxo",
-            "oooIxoCCCIJoAAoIJoGoDDJoGoHEEoFFHooo",
-            "oBBoxoooIJoxAAIJooooIKEEHFFKoLHGGGoL",
-            "BBBooLGxDDDLGIAAKLHIJoKoHoJEEEoooFFF",
-            "ooJCCLooJKoLxAAKooHIDDEEHIFFoxoIoooo",
+        'expert': [  # 56-61 moves
+            "BBoLoMCCCLoMAAoooNJoDDxNJxKGGGHHKoII",  # 56 moves
+            "GoJBBBGoJKoLHAAKoLHCCDDLoIEEooxIoooo",  # 56 moves
+            "ooHxooooHICCoAAIoooGDDJooGooJKEEFFJK",  # 56 moves
+            "oHoBBooHoxKLAAoJKLGDDJoLGoIEEoGoIFFF",  # 57 moves
+            "BBBJoooooJxoAAoKLoHDDKLoHoIEEoFFIGGG",  # 57 moves
+            "HooJBBHCCJoLooIAALooIKDDEEEKoooxGGGo",  # 57 moves
+            "oBBoxKooIDDKAAIJoKHEEJooHooJFFHGGGoo",  # 58 moves
+            "HoBBxoHooJoMAAIJoMDDIKEEFFFKLooGGGLo",  # 58 moves
+            "oBBoxoooIJoxAAIJooooIKEEHFFKoLHGGGoL",  # 59 moves
+            "BBBKxoooJKDDAAJKLooxFFLoIoGGooIooHHo",  # 61 moves
         ],
     }
 
