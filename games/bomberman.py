@@ -123,8 +123,8 @@ class Bomberman(Game):
                 elif x % 2 == 0 and y % 2 == 0:
                     self.grid[y][x] = self.WALL
 
-        # Place destructible bricks randomly
-        brick_chance = 0.4 + self.level * 0.05
+        # Place destructible bricks randomly (capped at 85% to ensure playability)
+        brick_chance = min(0.85, 0.4 + self.level * 0.05)
         for y in range(1, self.GRID_HEIGHT - 1):
             for x in range(1, self.GRID_WIDTH - 1):
                 if self.grid[y][x] == self.EMPTY:

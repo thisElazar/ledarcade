@@ -359,8 +359,8 @@ class DigDug(Game):
                     # If moving vertically, fire in a random horizontal direction
                     fire_dir = random.choice([-1, 1])
 
-                # Fire extends up to 8 pixels horizontally
-                fire_length = 8 + self.level  # Fire gets longer at higher levels
+                # Fire extends up to 8 pixels horizontally (capped at 16 for playability)
+                fire_length = min(16, 8 + self.level)  # Fire gets longer, capped at 16
                 for i in range(1, fire_length + 1):
                     fire_x = enemy['x'] + fire_dir * i
                     fire_y = enemy['y']
@@ -581,7 +581,7 @@ class DigDug(Game):
         if fire_dir == 0:
             return  # No horizontal direction, no fire to draw
 
-        fire_length = 8 + self.level
+        fire_length = min(16, 8 + self.level)  # Capped at 16
         for i in range(1, fire_length + 1):
             fire_x = x + fire_dir * i
             fire_y = y

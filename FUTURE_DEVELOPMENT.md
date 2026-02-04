@@ -1,5 +1,7 @@
 # Future Development Notes
 
+**Last Updated:** February 3, 2026
+
 This document tracks improvements and missing features identified for future development.
 
 ---
@@ -19,15 +21,16 @@ Comprehensive review comparing each game's difficulty progression to its origina
 | **Lights Out** | Puzzle complexity scales (more toggles per level) | Good implementation |
 | **2048** | Emergent difficulty as board fills | Working as designed |
 | **Geometry Dash** | Pattern complexity unlocks progressively | Good learning curve |
-| **Arkanoid** | 8 levels, brick types, power-ups, ball speed scales per hit/level | ⏳ Updated, pending verification |
-| **Pong** | AI reaction/speed scales with score, ball speed increases | ⏳ Updated, pending verification |
-| **Asteroids** | Asteroid speed scales, UFO enemies added | ⏳ Updated, pending verification |
-| **Pac-Man** | Frightened duration scales, ghost speed/release timing | ⏳ Updated, pending verification |
-| **Space Invaders** | Enemy speed + UFO mystery ship | ⏳ Updated, pending verification |
-| **Dig Dug** | Enemy speed scales, Fygar fire breath | ⏳ Updated, pending verification |
-| **Galaga** | Diver count/speed scales, formation oscillates | ⏳ Updated, pending verification |
-| **Bomberman** | Enemy speed/count scales, 3 enemy types | ⏳ Updated, pending verification |
-| **Night Driver** | Speed increases, oncoming traffic, hairpins, chicanes, road signs | ⏳ Updated, pending verification |
+| **Arkanoid** | 33 levels, brick types, power-ups, ball speed scales per hit/level | ✅ Verified |
+| **Pac-Man** | Ghost AI personalities, frightened 6s→0s, speed +5%/level, release 4s→1s | ✅ Verified |
+| **Ms. Pac-Man** | Same as Pac-Man + 25% random ghost turns, 4 cycling mazes | ✅ Verified |
+| **Pong** | AI reaction/speed scales with score, ball speed increases | ⏳ Pending verification |
+| **Asteroids** | Asteroid speed scales, UFO enemies added | ⏳ Pending verification |
+| **Space Invaders** | Enemy speed + UFO mystery ship | ⏳ Pending verification |
+| **Dig Dug** | Enemy speed scales, Fygar fire breath | ⏳ Pending verification |
+| **Galaga** | Diver count/speed scales, formation oscillates | ⏳ Pending verification |
+| **Bomberman** | Enemy speed/count scales, 3 enemy types | ⏳ Pending verification |
+| **Night Driver** | Speed increases, oncoming traffic, hairpins, chicanes, road signs | ⏳ Pending verification |
 
 ### Good - Has Scaling, Missing Some Features
 
@@ -109,7 +112,8 @@ These are intentionally 2-player only, true to arcade cabinet style:
 | ~~**Space Invaders**~~ | ~~UFO bonus~~ | ✓ Added (pending verification) |
 | ~~**Galaga**~~ | ~~Formation movement~~ | ✓ Added oscillation (pending verification) |
 | **Galaga** | Dual-ship firing | Captured ship mechanic incomplete |
-| **Pac-Man** | Distinct ghost AI | Pinky, Inky, Clyde need proper targeting behaviors |
+| ~~**Pac-Man**~~ | ~~Distinct ghost AI~~ | ✅ COMPLETE - Blinky/Pinky/Inky/Clyde all have proper targeting |
+| ~~**Ms. Pac-Man**~~ | ~~Ghost AI~~ | ✅ COMPLETE - Same as Pac-Man + 25% random turns |
 | **Donkey Kong** | Fireballs | Additional obstacle type missing |
 | **Q*bert** | Multi-hop cubes | Core mechanic - cubes need 2 hops to change |
 
@@ -166,14 +170,21 @@ These are intentionally 2-player only, true to arcade cabinet style:
 
 ## Completed Improvements
 
-- [x] Breakout - Authentic 1976 mechanics (speed tiers, paddle shrink)
-- [x] Arkanoid - Created as separate Retro game with varied levels
-- [x] Lunar Lander - Full level progression with scaling difficulty
+### Core Systems
 - [x] High score system with initials entry
 - [x] Game over menu (Play Again / Return to Menu)
 - [x] Visual exit via 2-second hold
+- [x] Transitions system (10 types) for idle screen
+- [x] Idle/attract mode with visual cycling
+
+### Game-Specific
+- [x] Breakout - Authentic 1976 mechanics (speed tiers, paddle shrink)
+- [x] Arkanoid - 33 NES levels, ball speed scaling per hit/level
+- [x] Lunar Lander - Full level progression with scaling difficulty
 - [x] Snake - 2x scaling for visibility
 - [x] Ball size 2x2 in Breakout/Arkanoid
+- [x] Pac-Man - Authentic ghost AI (Blinky/Pinky/Inky/Clyde personalities)
+- [x] Ms. Pac-Man - Ghost AI + 25% random turns + 4 cycling mazes
 
 ---
 
@@ -185,13 +196,24 @@ The following difficulty scaling improvements have been implemented but need pla
 |------|--------------|--------|
 | **Pong** | AI reaction delay decreases with player score, AI speed increases, ball speed increases per volley | ⏳ Awaiting review |
 | **Asteroids** | Asteroid speed scales per wave, added UFO system (small/large, shoots at player, 200-1000 pts) | ⏳ Awaiting review |
-| **Pac-Man** | Frightened duration decreases per level (6s→0s by level 19), ghost speed scales, faster pen release | ⏳ Awaiting review |
-| **Space Invaders** | Added UFO mystery ship (appears every 20-30s, awards 50-300 pts) | ⏳ Awaiting review |
-| **Dig Dug** | Enemy speed scales with level, added Fygar fire breath (horizontal through tunnels) | ⏳ Awaiting review |
-| **Arkanoid** | Ball speed +0.5 per brick hit, +3.0 per level, capped at 90 max | ⏳ Awaiting review |
-| **Galaga** | More simultaneous divers (scales 1-2 → 3-5), bullet speed scales, formation oscillation | ⏳ Awaiting review |
-| **Bomberman** | Enemy speed scales, more enemies spawn, 3 enemy types (random/chaser/fast with colors) | ⏳ Awaiting review |
-| **Night Driver** | Complete overhaul (see details below) | ⏳ Awaiting review |
+| **Space Invaders** | UFO mystery ship with level scaling (speed 25→50, interval 20-30s→10-15s) | ✅ Fixed Feb 2026 |
+| **Dig Dug** | Enemy speed scales, Fygar fire breath (capped at 16px range) | ✅ Fixed Feb 2026 |
+| **Galaga** | Diver speed capped at 110, bullet speed capped at 120 | ✅ Fixed Feb 2026 |
+| **Bomberman** | Enemy scaling + brick density capped at 85% | ✅ Fixed Feb 2026 |
+| **Night Driver** | Curve system with physics-balanced caps (already properly capped) | ✅ Reviewed Feb 2026 |
+
+## Recently Verified ✅
+
+| Game | Changes Made | Verified |
+|------|--------------|----------|
+| **Pac-Man** | Ghost AI (Blinky/Pinky/Inky/Clyde targeting), frightened 6s→0s, speed +5%/level, release 4s→1s | ✅ Feb 2026 |
+| **Ms. Pac-Man** | Same ghost AI + 25% random turns at intersections, 4 cycling mazes with different colors | ✅ Feb 2026 |
+| **Arkanoid** | 33 NES levels, ball speed +0.5/hit +3.0/level (max 90), silver bricks scale hits | ✅ Feb 2026 |
+| **Galaga** | Diver speed capped at 110 px/s, bullet speed capped at 120 px/s | ✅ Feb 2026 |
+| **Space Invaders** | UFO speed scales 25→50 with level, spawn interval 20-30s→10-15s | ✅ Feb 2026 |
+| **Bomberman** | Brick density capped at 85% (was uncapped, would exceed 100% at level 12) | ✅ Feb 2026 |
+| **Dig Dug** | Fygar fire range capped at 16 pixels (was uncapped) | ✅ Feb 2026 |
+| **Night Driver** | Reviewed - curve physics already properly balanced with caps | ✅ Feb 2026 |
 
 ### Night Driver Details
 
@@ -233,3 +255,7 @@ Major enhancements to Night Driver:
 This document was generated from comprehensive code review comparing implementations against classic originals. The difficulty scaling analysis was performed by reviewing each game's update() method and comparing progression mechanics to documented original arcade behavior.
 
 Two-player board games are intentionally kept as 2-player only to maintain the classic arcade cabinet experience where two players would compete at the same machine.
+
+---
+
+*Last updated: February 3, 2026 - Marked Pac-Man/Ms. Pac-Man ghost AI and Arkanoid levels as verified complete.*

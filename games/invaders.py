@@ -107,18 +107,24 @@ class Invaders(Game):
             self.player_hit_timer -= dt
             return
 
-        # UFO/Mystery ship logic
+        # UFO/Mystery ship logic - spawns more frequently at higher levels
         self.ufo_timer -= dt
         if self.ufo_timer <= 0 and self.ufo is None:
             # Spawn UFO from random side
             direction = random.choice([-1, 1])
             start_x = -5 if direction == 1 else GRID_SIZE + 5
-            self.ufo = {'x': float(start_x), 'dir': direction}
-            self.ufo_timer = random.uniform(20, 30)  # Reset timer for next UFO
+            # UFO speed increases with level (25 base, +3 per level, max 50)
+            ufo_speed = min(50, 25 + (self.level - 1) * 3)
+            self.ufo = {'x': float(start_x), 'dir': direction, 'speed': ufo_speed}
+            # UFO appears more frequently at higher levels (20-30s at level 1, down to 10-15s)
+            min_interval = max(10, 20 - (self.level - 1) * 2)
+            max_interval = max(15, 30 - (self.level - 1) * 3)
+            self.ufo_timer = random.uniform(min_interval, max_interval)
 
         # Update UFO position
         if self.ufo is not None:
-            self.ufo['x'] += self.ufo['dir'] * 25 * dt  # UFO speed
+            ufo_speed = self.ufo.get('speed', 25)
+            self.ufo['x'] += self.ufo['dir'] * ufo_speed * dt
             # Check if UFO went off screen
             if self.ufo['dir'] == 1 and self.ufo['x'] > GRID_SIZE + 5:
                 self.ufo = None
