@@ -434,5 +434,5 @@ class GutenbergPress(Visual):
         d.draw_text_small(2, 58, f"PG {self.print_count}", HUD_COLOR)
 
     def _draw_hud(self, d):
-        cpm = SPEED_CPMS[self.speed_level - 1]
-        d.draw_text_small(2, 2, f"{cpm} CPM", HUD_COLOR)
+        ppm = SPEED_CPMS[self.speed_level - 1]
+        d.draw_text_small(2, 2, f"{ppm} PPM", HUD_COLOR)

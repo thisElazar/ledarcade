@@ -627,9 +627,9 @@ class Singer(Visual):
                 d.set_pixel(nx, ny, (fr2, fg2, fb2))
 
     def _draw_hud(self, d):
-        """Draw speed/RPM indicator."""
-        rpm = SPEED_RPMS[self.speed_level - 1]
-        d.draw_text_small(2, 2, f"{rpm} RPM", HUD_COLOR)
+        """Draw speed indicator."""
+        spm = SPEED_RPMS[self.speed_level - 1]
+        d.draw_text_small(2, 2, f"{spm} SPM", HUD_COLOR)
 
         # Stitch counter
         d.draw_text_small(2, 8, f"{self.stitch_count} ST", HUD_COLOR)

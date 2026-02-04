@@ -294,8 +294,8 @@ class Curta(Visual):
 
     def _draw_hud(self, d):
         """Draw speed indicator."""
-        # CPM (cranks per minute) at bottom
-        d.draw_text_small(2, 59, f"{self.cpm}CPM", HUD_COLOR)
+        # OPM (operations per minute) at bottom
+        d.draw_text_small(2, 59, f"{self.cpm}OPM", HUD_COLOR)
 
         # Speed level indicator (dots)
         dot_start_x = 44

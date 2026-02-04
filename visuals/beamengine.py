@@ -389,8 +389,8 @@ class BeamEngine(Visual):
 
     def _draw_hud(self, d):
         """Draw speed indicator."""
-        # Show cycles per minute
-        d.draw_text_small(2, 1, f"{self.cpm}CPM", HUD_COLOR)
+        # Show strokes per minute (steam engine standard)
+        d.draw_text_small(2, 1, f"{self.cpm}SPM", HUD_COLOR)
 
         # Speed bar indicator
         bar_x = 48
