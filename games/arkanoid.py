@@ -436,11 +436,11 @@ class Arkanoid(Game):
     def draw(self):
         self.display.clear(Colors.BLACK)
 
-        # Draw score and lives
+        # Draw score and lives (up to 6 visible)
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-        for i in range(self.lives):
-            self.display.set_pixel(52 + i * 4, 2, Colors.CYAN)
-            self.display.set_pixel(53 + i * 4, 2, Colors.CYAN)
+        for i in range(min(self.lives, 6)):
+            self.display.set_pixel(46 + i * 3, 2, Colors.CYAN)
+            self.display.set_pixel(47 + i * 3, 2, Colors.CYAN)
 
         # Draw separator
         self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
