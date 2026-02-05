@@ -619,7 +619,7 @@ def main():
                                 idle_transition.start(old_visual, new_visual)
                             idle_visual = new_visual
                             idle_cycle_timer = 0.0
-                        if idle_visual:
+                        if idle_visual and not idle_transition.transitioning:
                             idle_visual.update(dt)
                             idle_visual.draw()
             elif konami_active:
