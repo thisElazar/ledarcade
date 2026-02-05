@@ -488,7 +488,10 @@ def main():
     print("Initializing display...")
     import settings as persistent
     saved_brightness = persistent.get_brightness()
-    display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4)
+    saved_gamma = persistent.get_gamma()
+    saved_toe = persistent.get_toe()
+    display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4,
+                              gamma=saved_gamma, toe=saved_toe)
 
     print("Initializing input...")
     input_handler = HardwareInput(use_gpio=True)

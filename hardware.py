@@ -117,12 +117,21 @@ class HardwareDisplay:
         # The toe term [toe * x * (1-x)^2] lifts shadows while fading out
         # in highlights, so colors still pop but grays remain visible.
         # Black (0) and white (255) are pinned. toe=0 gives pure gamma.
-        self._gamma_lut = bytes([
+        self._gamma_lut = self._build_lut(gamma, toe)
+
+    @staticmethod
+    def _build_lut(gamma, toe):
+        """Build gamma lookup table with toe lift."""
+        return bytes([
             min(255, max(0, int(round(255 * (
                 (i / 255) ** gamma + toe * (i / 255) * (1 - i / 255) ** 2
             )))))
             for i in range(256)
         ])
+
+    def set_gamma(self, gamma, toe):
+        """Rebuild gamma LUT at runtime. Takes effect on next render()."""
+        self._gamma_lut = self._build_lut(gamma, toe)
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""

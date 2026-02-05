@@ -285,6 +285,10 @@ class Display:
                             self.set_pixel(cursor + col_idx, y + row_idx, color)
             cursor += 4  # 3 pixels + 1 space
     
+    def set_gamma(self, gamma, toe):
+        """No-op in emulator (gamma only applies to LED hardware)."""
+        pass
+
     def render(self):
         """Render the buffer to the screen."""
         for y in range(GRID_SIZE):

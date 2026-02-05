@@ -16,6 +16,8 @@ SETTINGS_FILE = os.path.join(_SCRIPT_DIR, "user_settings.json")
 DEFAULTS = {
     "brightness": 80,
     "enabled_transitions": None,  # None means all enabled
+    "gamma": 2.2,
+    "toe": 0.25,
 }
 
 # In-memory settings cache
@@ -84,3 +86,25 @@ def get_enabled_transition_names():
 def set_enabled_transition_names(names):
     """Set list of enabled transition names, or None for all."""
     set("enabled_transitions", names)
+
+
+def get_gamma():
+    """Get gamma setting (1.0-3.0)."""
+    return get("gamma", 2.2)
+
+
+def set_gamma(value):
+    """Set gamma setting (1.0-3.0)."""
+    value = max(1.0, min(3.0, round(value, 1)))
+    set("gamma", value)
+
+
+def get_toe():
+    """Get toe setting (0.0-0.5)."""
+    return get("toe", 0.25)
+
+
+def set_toe(value):
+    """Set toe setting (0.0-0.5)."""
+    value = max(0.0, min(0.5, round(value, 2)))
+    set("toe", value)

@@ -111,6 +111,7 @@ from .batman import Batman
 from .greenlantern import GreenLantern
 from .megaman import MegaMan
 from .settings import Settings
+from .gamma import Gamma
 from .effects import Effects
 from .testpattern import TestPattern
 from .about import About
@@ -273,6 +274,7 @@ ALL_VISUALS = [
     GreenLantern,
     MegaMan,
     Settings,
+    Gamma,
     Effects,
     TestPattern,
     About,
@@ -483,6 +485,7 @@ __all__ = [
     'GreenLantern',
     'MegaMan',
     'Settings',
+    'Gamma',
     'TestPattern',
     'About',
     'SysInfo',
