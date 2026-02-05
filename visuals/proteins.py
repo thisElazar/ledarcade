@@ -1963,17 +1963,22 @@ PLASTOCYANIN = {
 # PROTEIN CATEGORIES - Thematic playlists
 # =============================================================================
 
-CATEGORIES = {
-    'ALL': None,  # Special: shows all proteins without duplicates
-    'NOBEL': ['UBIQUITIN', 'MYOGLOBIN', 'HEMOGLOBIN', 'GFP', 'ATP SYNTHASE', 'K CHANNEL'],
-    'ANCIENT': ['CYTOCHROME C', 'FERREDOXIN', 'THIOREDOXIN', 'RIBOSOMAL', 'ATP SYNTHASE', 'PLASTOCYANIN'],
-    'ANIMALS': ['MYOGLOBIN', 'HEMOGLOBIN', 'INSULIN', 'COLLAGEN', 'K CHANNEL', 'PRION'],
-    'PLANTS': ['CRAMBIN', 'PLASTOCYANIN'],
-    'FUNGI': ['HYDROPHOBIN'],
-    'DISEASE': ['AMYLOID BETA', 'PRION', 'HEMOGLOBIN', 'UBIQUITIN'],
-}
-
-CATEGORY_ORDER = ['ALL', 'NOBEL', 'ANCIENT', 'ANIMALS', 'PLANTS', 'FUNGI', 'DISEASE']
+# Each category: (filter_list_or_None, display_name, color)
+CATEGORIES = [
+    (None,       'ALL',     (180, 180, 180)),  # All proteins
+    (['UBIQUITIN', 'MYOGLOBIN', 'HEMOGLOBIN', 'GFP', 'ATP SYNTHASE', 'K CHANNEL'],
+                 'NOBEL',   (255, 215,   0)),  # Gold
+    (['CYTOCHROME C', 'FERREDOXIN', 'THIOREDOXIN', 'RIBOSOMAL', 'ATP SYNTHASE', 'PLASTOCYANIN'],
+                 'ANCIENT', (100, 200, 255)),  # Sky blue
+    (['MYOGLOBIN', 'HEMOGLOBIN', 'INSULIN', 'COLLAGEN', 'K CHANNEL', 'PRION'],
+                 'ANIMALS', (255, 140,  60)),  # Orange
+    (['CRAMBIN', 'PLASTOCYANIN'],
+                 'PLANTS',  ( 80, 220,  80)),  # Green
+    (['HYDROPHOBIN'],
+                 'FUNGI',   (180, 120, 255)),  # Purple
+    (['AMYLOID BETA', 'PRION', 'HEMOGLOBIN', 'UBIQUITIN'],
+                 'DISEASE', (255,  80,  80)),  # Red
+]
 
 # List of all proteins
 PROTEINS = [
@@ -2024,13 +2029,13 @@ class Proteins(Visual):
         # Category/playlist system
         self.category_idx = 0  # Start with 'ALL'
         self.playlist_idx = 0
+        self.overlay_timer = 0.0  # Category name overlay at top
         self._build_playlist()
         self._prepare_protein()
 
     def _build_playlist(self):
         """Build list of proteins for current category."""
-        cat_name = CATEGORY_ORDER[self.category_idx]
-        cat_filter = CATEGORIES[cat_name]
+        cat_filter, _, _ = CATEGORIES[self.category_idx]
 
         if cat_filter is None:  # 'ALL' category
             self.playlist = PROTEINS[:]
@@ -2100,11 +2105,12 @@ class Proteins(Visual):
 
         # Two-button press (Z+X together) cycles through categories
         if input_state.action_l and input_state.action_r:
-            self.category_idx = (self.category_idx + 1) % len(CATEGORY_ORDER)
+            self.category_idx = (self.category_idx + 1) % len(CATEGORIES)
             self.playlist_idx = 0
             self._build_playlist()
             self.cycle_timer = 0.0
             self.auto_cycle = True
+            self.overlay_timer = 2.5  # Show category name
             self._prepare_protein()
             consumed = True
         # Single button cycles through proteins in current playlist
@@ -2127,6 +2133,10 @@ class Proteins(Visual):
         self.time += dt
         self.label_timer += dt
         self.scroll_offset += dt * 20  # Scroll speed in pixels/sec
+
+        # Category overlay countdown
+        if self.overlay_timer > 0:
+            self.overlay_timer -= dt
 
         # Continuous auto-rotate around Z axis
         self.rotation_z += self.auto_rotate_speed * dt
@@ -2233,17 +2243,23 @@ class Proteins(Visual):
             if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
                 self.display.set_pixel(ix, iy, dot_color)
 
-        # Draw label at bottom - cycle through name, description, PDB, category
-        cat_name = CATEGORY_ORDER[self.category_idx]
-        cycle = int(self.label_timer / 5) % 4
+        # Category overlay at top (fades after switching categories)
+        if self.overlay_timer > 0:
+            _, cat_name, cat_color = CATEGORIES[self.category_idx]
+            alpha = min(1.0, self.overlay_timer / 0.5)
+            oc = (int(cat_color[0] * alpha),
+                  int(cat_color[1] * alpha),
+                  int(cat_color[2] * alpha))
+            self.display.draw_text_small(2, 2, cat_name, oc)
+
+        # Draw label at bottom - cycle through name, description, PDB
+        cycle = int(self.label_timer / 6) % 3
         if cycle == 0:
             label = protein['name']
         elif cycle == 1:
             label = protein['description']
-        elif cycle == 2:
-            label = f"PDB: {protein['pdb']}"
         else:
-            label = f"[{cat_name}]"
+            label = f"PDB: {protein['pdb']}"
 
         # Reset scroll when label changes
         if not hasattr(self, '_last_cycle') or self._last_cycle != cycle:
