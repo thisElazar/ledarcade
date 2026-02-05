@@ -338,8 +338,8 @@ def draw_spin_egg(display, timer):
     display.draw_text_small(tx, ty, "TURBO!", color)
 
 
-def _show_splash(display):
-    """Show the WONDER CABINET startup splash (~3 seconds)."""
+def _show_splash(display, input_handler=None):
+    """Show the WONDER CABINET startup splash (~3 seconds). Skippable."""
     duration = 3.0
     t = 0.0
     last = time.time()
@@ -411,12 +411,11 @@ def _show_splash(display):
 
         display.render()
 
-        # Skip splash on any key press
-        import select
-        if sys.stdin.isatty() and select.select([sys.stdin], [], [], 0)[0]:
-            while select.select([sys.stdin], [], [], 0)[0]:
-                sys.stdin.read(1)
-            return
+        # Skip splash on any input (buttons or keys)
+        if input_handler:
+            input_state = input_handler.update()
+            if has_any_input(input_state):
+                return
 
         # Frame rate limit
         elapsed = time.time() - now
@@ -490,10 +489,11 @@ def main():
     import settings as persistent
     saved_brightness = persistent.get_brightness()
     display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4)
-    _show_splash(display)
 
     print("Initializing input...")
     input_handler = HardwareInput(use_gpio=True)
+
+    _show_splash(display, input_handler)
 
     print("=" * 50)
     print("READY!")
