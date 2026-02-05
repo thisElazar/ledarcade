@@ -131,6 +131,7 @@ from .earth import Earth
 from .molecule import Molecule
 from .lattice import Lattice
 from .proteins import Proteins
+from .periodic import Periodic
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
@@ -183,7 +184,6 @@ from .pinballdemo import PinballDemo
 from .pipedreamdemo import PipeDreamDemo
 from .pongdemo import PongDemo
 from .qbertdemo import QBertDemo
-from .shuffledemo import ShuffleDemo
 from .skifreedemo import SkiFreeDemo
 from .snakedemo import SnakeDemo
 from .spacecruisedemo import SpaceCruiseDemo
@@ -287,6 +287,7 @@ ALL_VISUALS = [
     Molecule,
     Lattice,
     Proteins,
+    Periodic,
     Metronome,
     WatchGears,
     Camshaft,
@@ -350,7 +351,6 @@ ALL_VISUALS = [
     PipeDreamDemo,
     PongDemo,
     QBertDemo,
-    ShuffleDemo,
     SkiFreeDemo,
     SnakeDemo,
     SpaceCruiseDemo,
@@ -455,6 +455,7 @@ __all__ = [
     'Molecule',
     'Lattice',
     'Proteins',
+    'Periodic',
     'Metronome',
     'WatchGears',
     'Camshaft',

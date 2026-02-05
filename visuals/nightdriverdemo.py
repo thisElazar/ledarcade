@@ -80,103 +80,62 @@ class NightDriverDemo(Visual):
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
     def _decide_action(self):
-        """AI decision-making for Night Driver."""
+        """AI decision-making for Night Driver.
+
+        Physics-based approach: calculate the curve push rate the game applies,
+        add a position correction term, and steer based on the net desired rate.
+        """
         game = self.game
 
-        # Reset actions
         self.ai_steer_left = False
         self.ai_steer_right = False
 
-        # Get current state
         player_x = game.player_x  # -1.0 to 1.0, 0 = center
-        curve = game.curve  # Current curve amount (positive = road bends right)
-        target_curve = game.target_curve  # Where we're heading
+        curve = game.curve
         speed = game.speed
         max_speed = game.max_speed
 
-        # Road edges are at +/- 0.85 (crash at 0.85)
-        # Want to stay well within that range
-        safe_margin = 0.65  # Stay within +/- 0.65 for safety buffer
-
-        # === AI LOGIC ===
-
-        # 1. Calculate target position
-        # We want to stay near center, but anticipate curves
-        # When a curve is coming, pre-position slightly into the curve direction
-        # This counters the curve push that will push us outward
-
-        # Anticipation factor based on current and upcoming curve
-        # Positive curve pushes player left (player_x decreases)
-        # So we want to be positioned slightly right (positive x) before right curves
-        curve_anticipation = 0.0
-
-        if abs(target_curve) > 0.5:
-            # Anticipate the upcoming curve direction
-            # Position ourselves slightly into the curve to counter the push
-            curve_anticipation = target_curve * 0.15
-
-        if abs(curve) > 0.5:
-            # Also react to current curve - counter the push
-            curve_anticipation += curve * 0.2
-
-        # Clamp anticipation to reasonable range
-        curve_anticipation = max(-0.3, min(0.3, curve_anticipation))
-
-        # Target position: slightly offset based on curve anticipation
-        target_x = curve_anticipation
-
-        # 2. Calculate position error
-        position_error = target_x - player_x
-
-        # 3. Steering decision
-        # Use proportional control with some dead zone to avoid oscillation
+        # Replicate the game's physics to know the exact push rate
         speed_factor = speed / max_speed
+        steer_speed = 2.0 + speed_factor * 1.5
+        curve_push = curve * 0.5
+        curve_push = max(-steer_speed * 0.75, min(steer_speed * 0.75, curve_push))
+        # Positive curve_push → player_x decreases (pushed left)
+        # To counter, we need positive steer rate (steer right)
 
-        # Steering sensitivity increases with speed since we need faster reactions
-        # but also the game's steering is already speed-scaled
-        dead_zone = 0.05  # Small dead zone to prevent jitter
+        # Check for oncoming traffic - emergency dodge if in danger zone
+        oncoming_near = False
+        for car in game.oncoming_cars:
+            if car['z'] < 0.7 and car['z'] > -0.05:
+                oncoming_near = True
+                break
 
-        # Urgency increases if we're getting close to the edge
-        edge_urgency = 0.0
-        if abs(player_x) > 0.6:
-            # Getting close to edge - increase urgency
-            edge_urgency = (abs(player_x) - 0.6) * 3.0
-
-        # Strong urgency when very close to crash zone
-        if abs(player_x) > 0.75:
-            edge_urgency = 2.0
-
-        # Combine position error with edge urgency
-        if player_x > 0.6:
-            # Too far right - need to go left
-            position_error -= edge_urgency
-        elif player_x < -0.6:
-            # Too far left - need to go right
-            position_error += edge_urgency
-
-        # Apply steering
-        if position_error > dead_zone:
+        # Emergency: oncoming car close and we're in their lane
+        # Danger zone extends to x~0.14 for wide vehicles (semi trucks)
+        if oncoming_near and player_x < 0.2:
             self.ai_steer_right = True
-        elif position_error < -dead_zone:
+            return
+
+        # Drive on right side (positive x) to avoid oncoming traffic in left lane
+        # Oncoming cars at x = -0.55 to -0.35, collision width ~0.35
+        target_x = 0.3 if oncoming_near else 0.2
+
+        # Position correction: steer toward target with proportional gain
+        correction = (target_x - player_x) * 4.0
+
+        # Total desired steering rate = counter curve + correct position
+        desired_rate = curve_push + correction
+
+        # Dead zone to prevent oscillation when nearly centered
+        if desired_rate > 0.15:
+            self.ai_steer_right = True
+        elif desired_rate < -0.15:
             self.ai_steer_left = True
 
-        # 4. Emergency steering near edges
-        # If very close to crash, override everything
-        if player_x > 0.8:
+        # Emergency override near road edges (crash at ±0.85)
+        if player_x > 0.75:
             self.ai_steer_left = True
             self.ai_steer_right = False
-        elif player_x < -0.8:
+        elif player_x < -0.75:
             self.ai_steer_right = True
             self.ai_steer_left = False
-
-        # 5. Counter the curve push actively
-        # The game pushes the player outward during curves
-        # We need to steer into the curve to counter this
-        if abs(curve) > 1.0:
-            # Curve is pushing us - steer to counter
-            # Positive curve pushes player_x negative (leftward)
-            # So we steer right to counter positive curves
-            if curve > 1.0 and not self.ai_steer_left:
-                self.ai_steer_right = True
-            elif curve < -1.0 and not self.ai_steer_right:
-                self.ai_steer_left = True

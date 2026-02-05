@@ -257,7 +257,6 @@ class Demos(Slideshow):
         from visuals.lightsoutdemo import LightsOutDemo
         from visuals.bowlingdemo import BowlingDemo
         from visuals.dartsdemo import DartsDemo
-        from visuals.shuffledemo import ShuffleDemo
         # Board games (historical AI)
         from visuals.chessdemo import ChessDemo
         from visuals.checkersdemo import CheckersDemo
@@ -275,7 +274,7 @@ class Demos(Slideshow):
             # Simulation/other
             LunarLanderDemo, PinballDemo, SkiFreeDemo, NightDriverDemo,
             LodeRunnerDemo, JezzBallDemo, SpaceCruiseDemo, TrashBlasterDemo,
-            StickRunnerDemo, PipeDreamDemo, LightsOutDemo, ShuffleDemo,
+            StickRunnerDemo, PipeDreamDemo, LightsOutDemo,
             # Board games
             ChessDemo, CheckersDemo, OthelloDemo,
         ]
