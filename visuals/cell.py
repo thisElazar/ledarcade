@@ -183,7 +183,6 @@ class Cell(Visual):
         self.cycle_timer = 0.0
         self.cycle_duration = 10.0
         self.overlay_timer = 0.0
-        self.label_timer = 0.0
         self.scroll_offset = 0.0
         self.active_particles = []
         self.spawn_timers = []
@@ -206,13 +205,17 @@ class Cell(Visual):
     def _prepare_pathway(self):
         idx = self._current_pw_index()
         self.cur_pw = PATHWAYS[idx]
-        self.label_timer = 0.0
         self.scroll_offset = 0.0
         self.active_particles = []
         flows = self.cur_pw['flows']
         self.spawn_timers = [random.uniform(0, f['interval'] * 0.5)
                              for f in flows]
         self.flow_lengths = [_path_length(f['path']) for f in flows]
+        # Build continuous scroll text from name + sci_name + notes
+        labels = [self.cur_pw['name'], self.cur_pw['sci_name']]
+        labels += self.cur_pw.get('notes', [])
+        self.scroll_text = '  --  '.join(labels)
+        self.scroll_len = len(self.scroll_text + '  --  ') * 4
 
     # -------------------------------------------------------------------
     # Input
@@ -257,8 +260,7 @@ class Cell(Visual):
     # -------------------------------------------------------------------
     def update(self, dt: float):
         self.time += dt
-        self.label_timer += dt
-        self.scroll_offset += dt * 20
+        self.scroll_offset += dt * 18
         if self.overlay_timer > 0:
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
         if self.auto_cycle:
@@ -457,19 +459,11 @@ class Cell(Visual):
     # -------------------------------------------------------------------
     def _draw_label(self):
         d = self.display
-        pw = self.cur_pw
-        # Build full label sequence: name, sci_name, then all notes
-        labels = [pw['name'], pw['sci_name']] + pw.get('notes', [])
-        phase = int(self.label_timer / 4) % len(labels)
-        label = labels[phase]
-        max_chars = 14
-        if len(label) > max_chars:
-            padded = label + "    " + label
-            total_w = len(label + "    ") * 4
-            offset = int(self.scroll_offset) % total_w
-            d.draw_text_small(2 - offset, 58, padded, Colors.WHITE)
-        else:
-            d.draw_text_small(2, 58, label, Colors.WHITE)
+        # Continuous scrolling ticker
+        sep = '  --  '
+        full = self.scroll_text + sep + self.scroll_text
+        offset = int(self.scroll_offset) % self.scroll_len
+        d.draw_text_small(2 - offset, 58, full, Colors.WHITE)
 
     def _draw_overlay(self):
         if self.overlay_timer > 0:
