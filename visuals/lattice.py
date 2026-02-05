@@ -17,29 +17,32 @@ from .molecule import CPK_COLORS, CPK_RADIUS
 
 
 # Extend CPK colors with additional elements for crystals
+# Shiny/precious metals are boosted bright for LED visibility
 LATTICE_COLORS = dict(CPK_COLORS)
 LATTICE_COLORS.update({
-    'Cu': (200, 128, 51),      # Copper - copper/orange
+    'C':  (210, 210, 210),     # Carbon - bright (diamond, graphite)
+    'Fe': (224, 130, 75),      # Iron - warm metallic
+    'Cu': (255, 175, 90),      # Copper - bright copper
     'Ca': (61, 255, 0),        # Calcium - lime green
-    'Ti': (191, 194, 199),     # Titanium - silver-gray
-    'Au': (255, 209, 35),      # Gold - gold
-    'Ag': (192, 192, 192),     # Silver - silver
-    'Zn': (125, 128, 176),     # Zinc - slate blue
-    'Al': (191, 166, 166),     # Aluminum - pink-gray
-    'Cr': (138, 153, 199),     # Chromium - steel blue
+    'Ti': (225, 230, 235),     # Titanium - bright silver
+    'Au': (255, 230, 80),      # Gold - brilliant gold
+    'Ag': (235, 235, 245),     # Silver - brilliant silver
+    'Zn': (160, 165, 210),     # Zinc - bright blue-gray
+    'Al': (225, 215, 225),     # Aluminum - bright silver
+    'Cr': (195, 210, 240),     # Chromium - bright chrome
     'Mg': (138, 255, 0),       # Magnesium - bright green
     'F': (144, 224, 80),       # Fluorine - yellow-green
     'Be': (194, 255, 0),       # Beryllium - lime
     'B': (255, 181, 181),      # Boron - salmon
     'Zr': (148, 224, 224),     # Zirconium - cyan
-    'Ni': (80, 208, 80),       # Nickel - green-gray
-    'Sn': (102, 128, 128),     # Tin - gray
+    'Ni': (210, 220, 210),     # Nickel - bright silvery
+    'Sn': (190, 200, 200),     # Tin - bright silver-gray
     'K': (143, 64, 212),       # Potassium - purple
-    'W': (33, 148, 214),       # Tungsten - steel blue
-    'Pb': (87, 89, 97),        # Lead - dark gray
+    'W': (190, 200, 220),      # Tungsten - bright steel
+    'Pb': (120, 122, 130),     # Lead - dull gray
     'Sb': (158, 99, 181),      # Antimony - purple-gray
-    'Hg': (184, 184, 208),     # Mercury - silver
-    'Co': (240, 144, 160),     # Cobalt - pink
+    'Hg': (225, 225, 240),     # Mercury - bright liquid silver
+    'Co': (240, 160, 175),     # Cobalt - bright pink
 })
 
 LATTICE_RADIUS = dict(CPK_RADIUS)
@@ -68,6 +71,14 @@ LATTICE_RADIUS.update({
 })
 
 BOND_COLOR = (60, 60, 60)  # Dim gray for lattice bonds
+
+# Full names for crystal system acronyms
+SYSTEM_NAMES = {
+    'FCC': 'Face-Centered Cubic',
+    'BCC': 'Body-Centered Cubic',
+    'HCP': 'Hexagonal Close-Packed',
+    'BCT': 'Body-Centered Tetragonal',
+}
 
 
 # Categories: (key, display_name, color)
@@ -1111,6 +1122,7 @@ class Lattice(Visual):
         self.cycle_duration = 10.0
         self.tiles = 2
         self.label_timer = 0.0
+        self.scroll_offset = 0.0
         self.overlay_timer = 0.0
         self._prepare_crystal()
 
@@ -1182,6 +1194,7 @@ class Lattice(Visual):
 
         self._generate_bonds(crystal)
         self.label_timer = 0.0
+        self.scroll_offset = 0.0
 
     def _generate_bonds(self, crystal):
         """Generate bonds between atoms within cutoff distance."""
@@ -1244,6 +1257,7 @@ class Lattice(Visual):
     def update(self, dt: float):
         self.time += dt
         self.label_timer += dt
+        self.scroll_offset += dt * 20
         self.rotation_y += self.rotation_speed * dt
         self.tilt_phase += dt * 0.3
 
@@ -1321,14 +1335,30 @@ class Lattice(Visual):
                 self._draw_atom(sx, sy, r, color, fade)
 
         # Bottom label: cycle between name, system, formula
-        label_phase = int(self.label_timer / 3) % 3
+        label_phase = int(self.label_timer / 4) % 3
         if label_phase == 0:
             label = crystal['name']
         elif label_phase == 1:
-            label = crystal['system']
+            # Expand acronyms to full names
+            label = SYSTEM_NAMES.get(crystal['system'], crystal['system'])
         else:
             label = crystal['formula']
-        self.display.draw_text_small(2, 58, label, Colors.WHITE)
+
+        # Reset scroll when label changes
+        if not hasattr(self, '_last_phase') or self._last_phase != label_phase:
+            self._last_phase = label_phase
+            self.scroll_offset = 0
+
+        # Scroll long text (4px per char, ~14 chars fit on screen)
+        max_chars = 14
+        if len(label) > max_chars:
+            padded = label + "    " + label
+            char_width = 4
+            total_width = len(label + "    ") * char_width
+            offset = int(self.scroll_offset) % total_width
+            self.display.draw_text_small(2 - offset, 58, padded, Colors.WHITE)
+        else:
+            self.display.draw_text_small(2, 58, label, Colors.WHITE)
 
         # Category overlay at top
         if self.overlay_timer > 0:
