@@ -1488,7 +1488,7 @@ class WonderBoids(Visual):
     name = "WONDER FLOCK"
     description = "Boid flocking from title seed"
     category = "digital"
-    _INTERVAL = 1.0 / 20
+    _INTERVAL = 1.0 / 10
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -1497,10 +1497,14 @@ class WonderBoids(Visual):
         mask = _text_mask()
         self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
         self.boids = []
+        count = 0
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
                     self.grid[y][x] = 255
+                    count += 1
+                    if count % 2 == 0:
+                        continue
                     angle = (x * 0.7 + y * 1.3) % (2 * math.pi)
                     self.boids.append([float(x), float(y),
                                        math.cos(angle) * 0.8,
