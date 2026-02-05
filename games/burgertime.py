@@ -618,6 +618,12 @@ class BurgerTime(Game):
                 ing['y'] = ing['target_y']
                 ing['falling'] = False
                 ing['carrying_enemies'] = []
+                # Update floor_idx to match new y position
+                if not ing.get('at_plate'):
+                    for fi, fy in enumerate(FLOOR_Y):
+                        if abs((ing['y'] + 2) - fy) < 3:
+                            ing['floor_idx'] = fi
+                            break
 
     def _find_target_ladder(self, ex, ey, want_up):
         """Find nearest reachable ladder that goes up or down from (ex, ey)."""
