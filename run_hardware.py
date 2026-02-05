@@ -370,7 +370,7 @@ def _show_splash(display):
             brightness = min(1.0, progress)
             c = int(255 * brightness)
             color = (c, c, c)
-            cx = center_x("CABINET")
+            cx = center_x("CABINET") + 1
             display.draw_text_small(cx, 34, "CABINET", color)
         else:
             # Rainbow glow + sparkles
@@ -400,7 +400,7 @@ def _show_splash(display):
             hue2 = (hue + 0.15) % 1.0
             color2 = _hue_to_rgb(hue2)
             color2 = (int(color2[0] * pulse), int(color2[1] * pulse), int(color2[2] * pulse))
-            cx = center_x("CABINET")
+            cx = center_x("CABINET") + 1
             for ox in [-1, 0, 1]:
                 for oy in [-1, 0, 1]:
                     if ox == 0 and oy == 0:

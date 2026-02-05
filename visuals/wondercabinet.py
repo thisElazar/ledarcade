@@ -33,7 +33,7 @@ def _center_x(text):
 
 # Precomputed centered x positions
 WONDER_X = _center_x("WONDER")   # 18
-CABINET_X = _center_x("CABINET") # 15
+CABINET_X = _center_x("CABINET") + 1  # 16 (visual nudge)
 WONDER_W = len("WONDER") * 5 - 1   # 29
 CABINET_W = len("CABINET") * 5 - 1 # 34
 # Vertical center positions for the two-line layout
