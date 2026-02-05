@@ -133,6 +133,7 @@ from .lattice import Lattice
 from .proteins import Proteins
 from .periodic import Periodic
 from .microscope import Microscope
+from .cell import Cell
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
@@ -297,6 +298,7 @@ ALL_VISUALS = [
     Proteins,
     Periodic,
     Microscope,
+    Cell,
     Metronome,
     WatchGears,
     Camshaft,
@@ -487,6 +489,7 @@ __all__ = [
     'Proteins',
     'Periodic',
     'Microscope',
+    'Cell',
     'Metronome',
     'WatchGears',
     'Camshaft',
