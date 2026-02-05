@@ -185,8 +185,7 @@ class DonkeyKongDemo(Visual):
                 continue
 
             # Skip ladders we're already at the TOP of (already climbed)
-            # If player_feet is at or above ladder top, we've already climbed it
-            if player_feet <= ladder['y1'] + 6:
+            if player_feet <= ladder['y1'] + 2:
                 continue
 
             # Skip ladders whose bottom is too far above us (can't reach)

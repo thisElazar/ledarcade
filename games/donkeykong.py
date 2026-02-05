@@ -246,8 +246,15 @@ class DonkeyKong(Game):
 
         # Handle climbing
         if self.on_ladder:
+            # Safety: if we've climbed past the ladder bounds, exit ladder
+            if not ladder:
+                self.on_ladder = False
+                girder_check, sy = self.get_platform_at(self.player_x, self.player_y + self.PLAYER_HEIGHT)
+                if girder_check:
+                    self.player_y = sy - self.PLAYER_HEIGHT
+                    self.on_ground = True
             # On ladder - can move up/down
-            if input_state.up and ladder:
+            elif input_state.up and ladder:
                 if self.can_climb_ladder(ladder, going_up=True):
                     self.player_y -= self.CLIMB_SPEED * dt
                     # Check if reached top

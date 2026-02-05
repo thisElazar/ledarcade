@@ -108,9 +108,9 @@ class BurgerTimeDemo(Visual):
             current_floor = self._get_current_floor()
             if target_floor is not None:
                 target_y = FLOOR_Y[target_floor]
-                if chef_y > target_y + 3:
+                if chef_y > target_y + 1:
                     action['up'] = True
-                elif chef_y < target_y - 3:
+                elif chef_y < target_y - 1:
                     action['down'] = True
                 else:
                     # Reached target floor, step off ladder

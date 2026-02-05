@@ -422,8 +422,14 @@ class BurgerTime(Game):
         platform = self.get_platform_at(self.chef_x, self.chef_y)
 
         if self.on_ladder:
+            # Safety: if we've climbed past the ladder bounds, exit ladder
+            if not ladder:
+                self.on_ladder = False
+                nearest_floor = min(FLOOR_Y, key=lambda f: abs(f - self.chef_y))
+                if abs(self.chef_y - nearest_floor) < 4:
+                    self.chef_y = float(nearest_floor)
             # Climbing movement
-            if input_state.up:
+            elif input_state.up:
                 self.chef_y -= self.CLIMB_SPEED * dt
                 moved = True
                 if ladder and self.chef_y < ladder['y1']:
