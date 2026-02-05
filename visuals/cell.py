@@ -100,16 +100,17 @@ PATHWAYS = [
             {'type': 'oxygen', 'path': [(13, 36), (14, 46)],
              'speed': 2, 'interval': 4.5, 'max': 1},
         ],
+        # Notes: (text, color) — color matches the on-screen element
         'notes': [
-            'THYLAKOID MEMBRANE',
-            'LIGHT HITS PHOTOSYSTEM II',
-            'WATER SPLITS INTO H+ O2 E-',
-            'ELECTRONS PASS TO CYT B6F',
-            'H+ PUMPED INTO LUMEN',
-            'ELECTRONS REACH PHOTOSYSTEM I',
-            'NADPH MADE IN STROMA',
-            'H+ GRADIENT DRIVES ATP SYNTHASE',
-            'THE GOLD MOTOR SPINS TO MAKE ATP',
+            ('THYLAKOID MEMBRANE',              (180, 170, 100)),  # membrane
+            ('LIGHT HITS PHOTOSYSTEM II',       (255, 255, 150)),  # photon
+            ('WATER SPLITS INTO H+ O2 E-',      (80, 140, 255)),  # water
+            ('ELECTRONS PASS TO CYT B6F',       (255, 255, 80)),   # electron
+            ('H+ PUMPED INTO LUMEN',            (255, 110, 70)),   # H+
+            ('ELECTRONS REACH PHOTOSYSTEM I',   (255, 255, 80)),   # electron
+            ('NADPH MADE IN STROMA',            (100, 200, 255)),  # nadph
+            ('H+ GRADIENT DRIVES ATP SYNTHASE', (255, 200, 60)),   # atp synthase
+            ('THE GOLD MOTOR SPINS TO MAKE ATP',(255, 200, 50)),   # atp
         ],
     },
 ]
@@ -211,11 +212,30 @@ class Cell(Visual):
         self.spawn_timers = [random.uniform(0, f['interval'] * 0.5)
                              for f in flows]
         self.flow_lengths = [_path_length(f['path']) for f in flows]
-        # Build continuous scroll text from name + sci_name + notes
-        labels = [self.cur_pw['name'], self.cur_pw['sci_name']]
-        labels += self.cur_pw.get('notes', [])
-        self.scroll_text = '  --  '.join(labels)
-        self.scroll_len = len(self.scroll_text + '  --  ') * 4
+        # Build color-keyed scroll segments
+        labels = [
+            (self.cur_pw['name'], Colors.WHITE),
+            (self.cur_pw['sci_name'], Colors.WHITE),
+        ]
+        for note in self.cur_pw.get('notes', []):
+            if isinstance(note, tuple):
+                labels.append(note)
+            else:
+                labels.append((note, Colors.WHITE))
+        sep = '  --  '
+        sep_color = (60, 55, 50)
+        segments = []
+        px_off = 0
+        for i, (text, color) in enumerate(labels):
+            if i > 0:
+                segments.append((px_off, sep, sep_color))
+                px_off += len(sep) * 4
+            segments.append((px_off, text, color))
+            px_off += len(text) * 4
+        segments.append((px_off, sep, sep_color))
+        px_off += len(sep) * 4
+        self.scroll_segments = segments
+        self.scroll_len = px_off
 
     # -------------------------------------------------------------------
     # Input
@@ -459,11 +479,15 @@ class Cell(Visual):
     # -------------------------------------------------------------------
     def _draw_label(self):
         d = self.display
-        # Continuous scrolling ticker
-        sep = '  --  '
-        full = self.scroll_text + sep + self.scroll_text
-        offset = int(self.scroll_offset) % self.scroll_len
-        d.draw_text_small(2 - offset, 58, full, Colors.WHITE)
+        scroll_x = int(self.scroll_offset) % self.scroll_len
+        # Draw two copies for seamless wrap
+        for copy in (0, self.scroll_len):
+            for seg_off, text, color in self.scroll_segments:
+                px = 2 + seg_off + copy - scroll_x
+                text_w = len(text) * 4
+                if px + text_w < 0 or px > 64:
+                    continue
+                d.draw_text_small(px, 58, text, color)
 
     def _draw_overlay(self):
         if self.overlay_timer > 0:
