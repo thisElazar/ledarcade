@@ -154,7 +154,8 @@ from .hurdygurdy import HurdyGurdy
 from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
-from .wondercabinet import WonderGlow, WonderMarquee
+from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
+                            WonderSlide, WonderDrop, WonderSpin)
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -314,6 +315,10 @@ ALL_VISUALS = [
     Archimedes,
     WonderGlow,
     WonderMarquee,
+    WonderCrawl,
+    WonderSlide,
+    WonderDrop,
+    WonderSpin,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,

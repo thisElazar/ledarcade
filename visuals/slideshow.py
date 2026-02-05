@@ -217,8 +217,11 @@ class Title(Slideshow):
     category = "digital"
 
     def _get_visual_classes(self):
-        from visuals.wondercabinet import WonderGlow, WonderMarquee
-        return [WonderGlow, WonderMarquee]
+        from visuals.wondercabinet import (WonderGlow, WonderMarquee,
+                                           WonderCrawl, WonderSlide,
+                                           WonderDrop, WonderSpin)
+        return [WonderGlow, WonderMarquee, WonderCrawl,
+                WonderSlide, WonderDrop, WonderSpin]
 
 
 class Demos(Slideshow):

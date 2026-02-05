@@ -392,11 +392,11 @@ def _show_splash(display):
             brightness = min(1.0, progress)
             c = int(255 * brightness)
             color = (c, c, c)
-            wx = center_x("WONDER")
+            wx = center_x("WONDER") + 1
             display.draw_text_small(wx, 24, "WONDER", color)
         elif t < 1.7:
             # "WONDER" stays, "CABINET" fades in
-            wx = center_x("WONDER")
+            wx = center_x("WONDER") + 1
             display.draw_text_small(wx, 24, "WONDER", Colors.WHITE)
             progress = (t - 1.0) / 0.7
             brightness = min(1.0, progress)
@@ -419,7 +419,7 @@ def _show_splash(display):
                 display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.5) % 1.0))
 
             # "WONDER" with glow
-            wx = center_x("WONDER")
+            wx = center_x("WONDER") + 1
             for ox in [-1, 0, 1]:
                 for oy in [-1, 0, 1]:
                     if ox == 0 and oy == 0:
