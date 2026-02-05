@@ -22,26 +22,26 @@ LATTICE_COLORS = dict(CPK_COLORS)
 LATTICE_COLORS.update({
     'C':  (210, 210, 210),     # Carbon - bright (diamond, graphite)
     'Fe': (224, 130, 75),      # Iron - warm metallic
-    'Cu': (255, 175, 90),      # Copper - bright copper
+    'Cu': (255, 200, 120),     # Copper - bright shiny copper
     'Ca': (61, 255, 0),        # Calcium - lime green
-    'Ti': (225, 230, 235),     # Titanium - bright silver
-    'Au': (255, 230, 80),      # Gold - brilliant gold
-    'Ag': (235, 235, 245),     # Silver - brilliant silver
+    'Ti': (240, 243, 248),     # Titanium - gleaming silver
+    'Au': (255, 245, 130),     # Gold - blazing gold
+    'Ag': (245, 245, 255),     # Silver - gleaming silver
     'Zn': (160, 165, 210),     # Zinc - bright blue-gray
     'Al': (225, 215, 225),     # Aluminum - bright silver
-    'Cr': (195, 210, 240),     # Chromium - bright chrome
+    'Cr': (220, 230, 250),     # Chromium - gleaming chrome
     'Mg': (138, 255, 0),       # Magnesium - bright green
     'F': (144, 224, 80),       # Fluorine - yellow-green
     'Be': (194, 255, 0),       # Beryllium - lime
     'B': (255, 181, 181),      # Boron - salmon
     'Zr': (148, 224, 224),     # Zirconium - cyan
-    'Ni': (210, 220, 210),     # Nickel - bright silvery
-    'Sn': (190, 200, 200),     # Tin - bright silver-gray
+    'Ni': (230, 238, 230),     # Nickel - bright silvery
+    'Sn': (210, 218, 218),     # Tin - bright silver-gray
     'K': (143, 64, 212),       # Potassium - purple
-    'W': (190, 200, 220),      # Tungsten - bright steel
+    'W': (210, 218, 235),      # Tungsten - bright steel
     'Pb': (120, 122, 130),     # Lead - dull gray
     'Sb': (158, 99, 181),      # Antimony - purple-gray
-    'Hg': (225, 225, 240),     # Mercury - bright liquid silver
+    'Hg': (240, 240, 252),     # Mercury - bright liquid silver
     'Co': (240, 160, 175),     # Cobalt - bright pink
 })
 
