@@ -43,6 +43,7 @@ class BurgerTimeDemo(Visual):
         self.path_recalc_timer = 0.0
         self.game_over_timer = 0.0
         self.climb_direction = 'up'  # Direction to maintain while on a ladder
+        self.ladder_exit_y = None  # Y position to step off ladder at
 
     def handle_input(self, input_state):
         # Demo doesn't respond to input (auto-plays)
@@ -103,10 +104,13 @@ class BurgerTimeDemo(Visual):
             action[flee_direction] = True
             return action
 
-        # If on a ladder, keep climbing in the committed direction.
-        # The game auto-exits at the ladder's top/bottom.
+        # If on a ladder, climb toward the target floor and step off there.
         if game.on_ladder:
-            action[self.climb_direction] = True
+            if self.ladder_exit_y is not None and abs(chef_y - self.ladder_exit_y) < 1.5:
+                # At target floor - step off horizontally
+                action['right' if game.facing > 0 else 'left'] = True
+            else:
+                action[self.climb_direction] = True
             return action
 
         # Find the best ingredient to walk over (stick with current if still valid)
@@ -164,9 +168,10 @@ class BurgerTimeDemo(Visual):
             # Need to navigate via ladders - use BFS pathfinding
             step = self._plan_route(current_floor, target_floor, target_x_center)
             if step:
-                ladder, direction = step
+                ladder, direction, dest_floor = step
                 if abs(chef_x - ladder['x']) < 3:
                     self.climb_direction = direction
+                    self.ladder_exit_y = FLOOR_Y[dest_floor]
                     action[direction] = True
                 else:
                     if chef_x < ladder['x']:
@@ -304,10 +309,10 @@ class BurgerTimeDemo(Visual):
                     visited.add(state)
 
                     direction = 'up' if adj_floor < floor else 'down'
-                    new_path = path + [(ladder, direction)]
+                    new_path = path + [(ladder, direction, adj_floor)]
 
                     if state == goal:
-                        return new_path[0]  # First step: (ladder, direction)
+                        return new_path[0]  # First step: (ladder, direction, dest_floor)
 
                     queue.append((state, new_path))
 

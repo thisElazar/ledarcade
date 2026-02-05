@@ -206,8 +206,8 @@ class BurgerTime(Game):
     # Game constants
     MOVE_SPEED = 30.0
     CLIMB_SPEED = 25.0
-    ENEMY_SPEED = 15.0
-    ENEMY_CLIMB_SPEED = 10.0
+    ENEMY_SPEED = 12.0
+    ENEMY_CLIMB_SPEED = 8.0
     INGREDIENT_FALL_SPEED = 45.0
     CASCADE_DELAY = 0.12  # Stagger between cascade steps
 
@@ -613,6 +613,17 @@ class BurgerTime(Game):
             for enemy in ing['carrying_enemies']:
                 enemy['y'] = ing['y']
 
+            # Crush enemies in the path of the falling ingredient
+            for enemy in self.enemies:
+                if enemy in ing['carrying_enemies']:
+                    continue
+                if enemy['stunned'] > 0:
+                    continue
+                if (ing['x'] - 1 <= enemy['x'] <= ing['x'] + ing['width'] + 1 and
+                        abs(enemy['y'] - ing['y'] - 2) < 4):
+                    enemy['stunned'] = 5.0
+                    self.score += 300
+
             # Check if reached target
             if ing['y'] >= ing['target_y']:
                 ing['y'] = ing['target_y']
@@ -769,8 +780,8 @@ class BurgerTime(Game):
             if enemy['stunned'] > 0:
                 continue
 
-            if (abs(enemy['x'] - self.chef_x) < 4 and
-                    abs(enemy['y'] - self.chef_y) < 4):
+            if (abs(enemy['x'] - self.chef_x) < 3 and
+                    abs(enemy['y'] - self.chef_y) < 3):
                 self.die()
                 return
 
