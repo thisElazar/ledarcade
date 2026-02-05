@@ -102,6 +102,7 @@ class AllVisuals(Slideshow):
         'household': 3,
         'art': 2,
         'superheroes': 2,
+        'road_rail': 2,
         'mechanics': 1,  # show less often
     }
 

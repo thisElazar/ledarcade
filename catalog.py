@@ -53,6 +53,7 @@ VISUAL_CATEGORIES = [
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
     Category("MECHANICS", Colors.PURPLE, "mechanics"),
     Category("OUTDOORS", Colors.GREEN, "nature"),
+    Category("ROAD+RAIL", (255, 160, 0), "road_rail"),
     Category("SCIENCE", Colors.BLUE, "science"),
     Category("SPRITES", Colors.LIME, "sprites"),
     Category("SUPERHEROES", Colors.RED, "superheroes"),

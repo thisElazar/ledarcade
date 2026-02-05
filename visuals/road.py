@@ -19,7 +19,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Road(Visual):
     name = "ROAD"
     description = "Desert drive"
-    category = "nature"
+    category = "road_rail"
 
     # Color palette - beautiful desert day
     SKY_TOP = (135, 206, 235)      # Light sky blue
