@@ -47,9 +47,9 @@ class Gamma(Visual):
         if input_state.left_pressed or input_state.right_pressed:
             delta = 1 if input_state.right_pressed else -1
             if self.selected == 0:
-                self.gamma = max(1.0, min(3.0, round(self.gamma + delta * 0.1, 1)))
+                self.gamma = max(0.5, min(4.0, round(self.gamma + delta * 0.1, 1)))
             else:
-                self.toe = max(0.0, min(0.50, round(self.toe + delta * 0.05, 2)))
+                self.toe = max(0.0, min(1.0, round(self.toe + delta * 0.05, 2)))
             self._apply()
             return True
 
@@ -102,25 +102,52 @@ class Gamma(Visual):
 
         d.draw_line(0, 28, 63, 28, Colors.DARK_GRAY)
 
-        # Gradient bar: corrected (through gamma+toe curve)
-        d.draw_text_small(2, 31, "CURVE", Colors.GRAY)
-        bar_y = 37
+        # Gradient bars through current gamma+toe curve
+        # Each bar is 2px tall with 1px gap between
+        curve = self._curve
+        y0 = 30
         for x in range(64):
             norm = x / 63.0
-            val = int(self._curve(norm) * 255)
-            d.set_pixel(x, bar_y, (val, val, val))
-            d.set_pixel(x, bar_y + 1, (val, val, val))
-            d.set_pixel(x, bar_y + 2, (val, val, val))
+            val = int(curve(norm) * 255)
+            # White (gray ramp)
+            d.set_pixel(x, y0, (val, val, val))
+            d.set_pixel(x, y0 + 1, (val, val, val))
+            # Red
+            d.set_pixel(x, y0 + 3, (val, 0, 0))
+            d.set_pixel(x, y0 + 4, (val, 0, 0))
+            # Green
+            d.set_pixel(x, y0 + 6, (0, val, 0))
+            d.set_pixel(x, y0 + 7, (0, val, 0))
+            # Blue
+            d.set_pixel(x, y0 + 9, (0, 0, val))
+            d.set_pixel(x, y0 + 10, (0, 0, val))
 
-        # Gradient bar: linear reference
-        d.draw_text_small(2, 42, "LINEAR", Colors.GRAY)
-        ref_y = 48
+        # Color swatch row: flat saturated colors through the curve
+        # Shows how the curve affects actual game colors
+        swatches = [
+            Colors.RED, Colors.ORANGE, Colors.YELLOW, Colors.GREEN,
+            Colors.CYAN, Colors.BLUE, Colors.PURPLE, Colors.MAGENTA,
+        ]
+        swatch_y = y0 + 12
+        sw = 64 // len(swatches)  # 8px each
+        for i, col in enumerate(swatches):
+            # Apply curve to each channel
+            r = int(curve(col[0] / 255.0) * 255)
+            g = int(curve(col[1] / 255.0) * 255)
+            b = int(curve(col[2] / 255.0) * 255)
+            for dx in range(sw):
+                px = i * sw + dx
+                d.set_pixel(px, swatch_y, (r, g, b))
+                d.set_pixel(px, swatch_y + 1, (r, g, b))
+                d.set_pixel(px, swatch_y + 2, (r, g, b))
+
+        # Linear reference bar (gray only, 2px)
+        ref_y = swatch_y + 4
         for x in range(64):
             val = int((x / 63.0) * 255)
             d.set_pixel(x, ref_y, (val, val, val))
             d.set_pixel(x, ref_y + 1, (val, val, val))
-            d.set_pixel(x, ref_y + 2, (val, val, val))
 
         # Footer
-        d.draw_line(0, 53, 63, 53, Colors.DARK_GRAY)
-        d.draw_text_small(2, 56, "BTN:ACCEPT", Colors.GRAY)
+        d.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
+        d.draw_text_small(2, 58, "BTN:ACCEPT", Colors.GRAY)

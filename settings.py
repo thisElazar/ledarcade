@@ -94,8 +94,8 @@ def get_gamma():
 
 
 def set_gamma(value):
-    """Set gamma setting (1.0-3.0)."""
-    value = max(1.0, min(3.0, round(value, 1)))
+    """Set gamma setting (0.5-4.0)."""
+    value = max(0.5, min(4.0, round(value, 1)))
     set("gamma", value)
 
 
@@ -105,6 +105,6 @@ def get_toe():
 
 
 def set_toe(value):
-    """Set toe setting (0.0-0.5)."""
-    value = max(0.0, min(0.5, round(value, 2)))
+    """Set toe setting (0.0-1.0)."""
+    value = max(0.0, min(1.0, round(value, 2)))
     set("toe", value)
