@@ -53,8 +53,9 @@ class NightDriverDemo(Visual):
                 self.restart_timer = 0.0
             return
 
-        # If crashed but not yet game over, wait
+        # If crashed but not yet game over, keep updating so crash_timer runs
         if self.game.crashed:
+            self.game.update(InputState(), dt)
             return
 
         # Make AI decisions periodically
@@ -112,13 +113,13 @@ class NightDriverDemo(Visual):
 
         # Emergency: oncoming car close and we're in their lane
         # Danger zone extends to x~0.14 for wide vehicles (semi trucks)
-        if oncoming_near and player_x < 0.2:
+        if oncoming_near and player_x < 0.15:
             self.ai_steer_right = True
             return
 
-        # Drive on right side (positive x) to avoid oncoming traffic in left lane
+        # Slight right bias to avoid oncoming traffic in left lane
         # Oncoming cars at x = -0.55 to -0.35, collision width ~0.35
-        target_x = 0.3 if oncoming_near else 0.2
+        target_x = 0.2 if oncoming_near else 0.08
 
         # Position correction: steer toward target with proportional gain
         correction = (target_x - player_x) * 4.0
