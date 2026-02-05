@@ -13,7 +13,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Timers(Visual):
-    name = "TIMERS"
+    name = "IDLE"
     description = "Idle, cycle, sleep timers"
     category = "utility"
     custom_exit = True

@@ -16,7 +16,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Clock(Visual):
     name = "CLOCK"
     description = "Animated clock"
-    category = "utility"
+    category = "household"
 
     def __init__(self, display: Display):
         super().__init__(display)
