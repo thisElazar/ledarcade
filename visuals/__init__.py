@@ -162,7 +162,12 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderRetroTV, WonderDK, WonderFrogger,
                             WonderLife, WonderHodge, WonderStarWars,
                             WonderBoids, WonderSlime, WonderDiffusion,
-                            WonderBrain, WonderFlow, WonderSand)
+                            WonderBrain, WonderFlow, WonderSand,
+                            WonderPong, WonderSega, WonderPS1,
+                            WonderInsertCoin, WonderCreeper, WonderNyanCat,
+                            WonderC64, WonderGameBoy, WonderDOS,
+                            WonderBSOD, WonderLoading, WonderColorBars,
+                            WonderVHS, WonderBoing)
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -345,6 +350,20 @@ ALL_VISUALS = [
     WonderBrain,
     WonderFlow,
     WonderSand,
+    WonderPong,
+    WonderSega,
+    WonderPS1,
+    WonderInsertCoin,
+    WonderCreeper,
+    WonderNyanCat,
+    WonderC64,
+    WonderGameBoy,
+    WonderDOS,
+    WonderBSOD,
+    WonderLoading,
+    WonderColorBars,
+    WonderVHS,
+    WonderBoing,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
