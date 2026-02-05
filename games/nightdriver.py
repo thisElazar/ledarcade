@@ -81,9 +81,11 @@ class NightDriver(Game):
         self.player_x = 0.0
 
         # Speed and distance
-        self.speed = 30.0       # Units per second
-        self.max_speed = 120.0  # Higher top speed for more intensity
+        self.speed = 25.0       # Units per second
+        self.max_speed = 120.0  # Top speed when holding gas
+        self.base_speed = 25.0  # Coast speed (no gas) - rises over time
         self.distance = 0.0     # Total distance traveled
+        self.gas = False        # Whether gas button is held
 
         # Post positions (0.0 to POST_SPACING, cycles)
         self.post_offset = 0.0
@@ -201,8 +203,16 @@ class NightDriver(Game):
                     self.next_turn = self.plan_next_turn()
                     self.warning_spawned = False
 
-        # Update speed (gradually increases)
-        self.speed = min(self.speed + 2.5 * dt, self.max_speed)
+        # Gas pedal: button to accelerate, release to coast down to base speed
+        self.gas = input_state.action_l or input_state.action_r
+        if self.gas:
+            self.speed = min(self.speed + 20.0 * dt, self.max_speed)
+        else:
+            self.speed = max(self.speed - 25.0 * dt, self.base_speed)
+
+        # Base speed rises slowly over time (game gets harder)
+        # 25 → ~55 after 2 minutes
+        self.base_speed = min(self.base_speed + 0.25 * dt, 60.0)
 
         # Difficulty scaling: tighter curves at higher speeds
         # But since push is capped, intensity mainly affects visual bend appearance

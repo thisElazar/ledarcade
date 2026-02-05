@@ -37,6 +37,7 @@ class NightDriverDemo(Visual):
         self.decision_interval = 0.03  # Recalculate every 30ms for responsive steering
         self.ai_steer_left = False
         self.ai_steer_right = False
+        self.ai_gas = True  # AI holds gas by default
 
     def handle_input(self, input_state):
         # Demo doesn't respond to input (auto-plays)
@@ -45,11 +46,13 @@ class NightDriverDemo(Visual):
     def update(self, dt):
         self.time += dt
 
-        # If game over, restart after a pause
+        # If game over, restart after a pause by pressing gas
         if self.game.state == GameState.GAME_OVER:
             self.restart_timer += dt
             if self.restart_timer > 3.0:
-                self.game.reset()
+                restart_input = InputState()
+                restart_input.action_l = True
+                self.game.update(restart_input, dt)
                 self.restart_timer = 0.0
             return
 
@@ -70,6 +73,8 @@ class NightDriverDemo(Visual):
             ai_input.left = True
         if self.ai_steer_right:
             ai_input.right = True
+        if self.ai_gas:
+            ai_input.action_l = True
 
         self.game.update(ai_input, dt)
 
@@ -95,6 +100,11 @@ class NightDriverDemo(Visual):
         curve = game.curve
         speed = game.speed
         max_speed = game.max_speed
+
+        # Gas control: let off gas in sharp curves, floor it on straights
+        # Sharper curve + higher speed = more reason to coast
+        curve_severity = abs(curve) * (speed / max_speed)
+        self.ai_gas = curve_severity < 0.4
 
         # Replicate the game's physics to know the exact push rate
         speed_factor = speed / max_speed
