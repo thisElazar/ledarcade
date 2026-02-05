@@ -74,7 +74,7 @@ class NightDriverDemo(Visual):
         if self.ai_steer_right:
             ai_input.right = True
         if self.ai_gas:
-            ai_input.action_l = True
+            ai_input.action_l_held = True
 
         self.game.update(ai_input, dt)
 

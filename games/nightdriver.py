@@ -203,8 +203,8 @@ class NightDriver(Game):
                     self.next_turn = self.plan_next_turn()
                     self.warning_spawned = False
 
-        # Gas pedal: button to accelerate, release to coast down to base speed
-        self.gas = input_state.action_l or input_state.action_r
+        # Gas pedal: hold button to accelerate, release to coast down to base speed
+        self.gas = input_state.action_l_held or input_state.action_r_held
         if self.gas:
             self.speed = min(self.speed + 20.0 * dt, self.max_speed)
         else:
