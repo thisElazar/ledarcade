@@ -443,9 +443,11 @@ def _show_splash(display):
 
         display.render()
 
-        # Allow quitting during splash
+        # Allow quitting or skipping during splash
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                return
+            if event.type == pygame.KEYDOWN:
                 return
 
 

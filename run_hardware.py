@@ -411,6 +411,13 @@ def _show_splash(display):
 
         display.render()
 
+        # Skip splash on any key press
+        import select
+        if sys.stdin.isatty() and select.select([sys.stdin], [], [], 0)[0]:
+            while select.select([sys.stdin], [], [], 0)[0]:
+                sys.stdin.read(1)
+            return
+
         # Frame rate limit
         elapsed = time.time() - now
         sleep_time = (1.0 / 30) - elapsed
