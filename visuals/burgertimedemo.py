@@ -135,8 +135,12 @@ class BurgerTimeDemo(Visual):
         # Determine which floor we're on
         current_floor = self._get_current_floor()
 
-        # If we're on the target floor, walk across the ingredient
-        if current_floor == target_floor:
+        # If we're on the target floor AND can reach the ingredient, walk across it
+        floor_y = FLOOR_Y[current_floor]
+        reachable = (current_floor == target_floor and
+                     self._on_same_segment(chef_x, target_x_center, floor_y))
+
+        if reachable:
             # Walk across the ingredient
             ing_left = target['x']
             ing_right = target['x'] + INGREDIENT_WIDTH - 1
@@ -169,15 +173,28 @@ class BurgerTimeDemo(Visual):
                         else:
                             action['left'] = True
         else:
-            # Need to change floors - find a ladder
-            need_up = current_floor > target_floor
-            ladder = self._find_best_ladder(current_floor, need_up)
+            # Need to change floors (or cross a gap) - find a ladder
+            if current_floor != target_floor:
+                need_up = current_floor > target_floor
+                ladder = self._find_best_ladder(current_floor, need_up)
+            else:
+                ladder = None
+
+            # If no directional ladder, find any ladder to escape this segment
+            if not ladder:
+                ladder = self._find_escape_ladder(current_floor)
 
             if ladder:
                 # Navigate to the ladder
                 if abs(chef_x - ladder['x']) < 3:
-                    # At the ladder, climb it
-                    if need_up:
+                    # At the ladder - determine which way to go
+                    ladder_goes_up = ladder['y1'] < floor_y - 1
+                    ladder_goes_down = ladder['y2'] > floor_y + 1
+                    if current_floor > target_floor and ladder_goes_up:
+                        action['up'] = True
+                    elif current_floor < target_floor and ladder_goes_down:
+                        action['down'] = True
+                    elif ladder_goes_up:
                         action['up'] = True
                     else:
                         action['down'] = True
@@ -188,7 +205,7 @@ class BurgerTimeDemo(Visual):
                     else:
                         action['left'] = True
             else:
-                # No suitable ladder found, try moving toward target x
+                # No ladder available, try moving toward target x
                 if chef_x < target_x_center:
                     action['right'] = True
                 else:
@@ -252,19 +269,24 @@ class BurgerTimeDemo(Visual):
 
         return best_target
 
+    def _on_same_segment(self, x1, x2, floor_y):
+        """Check if two x positions are on the same platform segment."""
+        for platform in self.game.platforms:
+            if abs(floor_y - platform['y']) < 3:
+                if platform['x1'] <= x1 <= platform['x2'] and platform['x1'] <= x2 <= platform['x2']:
+                    return True
+        return False
+
     def _find_best_ladder(self, current_floor, need_up):
-        """Find the best ladder to reach target floor."""
+        """Find the best ladder to reach target floor on the chef's segment."""
         game = self.game
         chef_x = game.chef_x
-        chef_y = game.chef_y
+        floor_y = FLOOR_Y[current_floor]
 
         best_ladder = None
         best_dist = float('inf')
 
         for ladder in game.ladders:
-            # Check if this ladder spans our current floor
-            floor_y = FLOOR_Y[current_floor]
-
             # Ladder must be accessible from current floor
             if ladder['y1'] > floor_y + 3 or ladder['y2'] < floor_y - 3:
                 continue
@@ -275,13 +297,37 @@ class BurgerTimeDemo(Visual):
             if not need_up and ladder['y2'] <= floor_y + 1:
                 continue  # Ladder doesn't go down from here
 
-            # Check if ladder is reachable on current platform
-            if not game._on_platform_segment(ladder['x'], floor_y):
+            # Ladder must be on the same platform segment as the chef
+            if not self._on_same_segment(chef_x, ladder['x'], floor_y):
                 continue
 
-            # Calculate distance to this ladder
             dist = abs(chef_x - ladder['x'])
+            if dist < best_dist:
+                best_dist = dist
+                best_ladder = ladder
 
+        return best_ladder
+
+    def _find_escape_ladder(self, current_floor):
+        """Find any ladder on the chef's current segment (either direction)."""
+        game = self.game
+        chef_x = game.chef_x
+        floor_y = FLOOR_Y[current_floor]
+
+        best_ladder = None
+        best_dist = float('inf')
+
+        for ladder in game.ladders:
+            if ladder['y1'] > floor_y + 3 or ladder['y2'] < floor_y - 3:
+                continue
+            # Must actually go somewhere
+            if ladder['y1'] >= floor_y - 1 and ladder['y2'] <= floor_y + 1:
+                continue
+            # Must be on the same segment as the chef
+            if not self._on_same_segment(chef_x, ladder['x'], floor_y):
+                continue
+
+            dist = abs(chef_x - ladder['x'])
             if dist < best_dist:
                 best_dist = dist
                 best_ladder = ladder
