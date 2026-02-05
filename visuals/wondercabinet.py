@@ -1179,8 +1179,6 @@ class WonderLife(Visual):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
                     self.grid[y][x] = True
-                elif random.random() < 0.03:
-                    self.grid[y][x] = True
 
     def reset(self):
         self.time = 0.0
@@ -1280,8 +1278,6 @@ class WonderHodge(Visual):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
                     self.grid[y][x] = self.n
-                elif random.random() < 0.05:
-                    self.grid[y][x] = random.randint(1, self.n // 2)
 
     def reset(self):
         self.time = 0.0
@@ -1398,8 +1394,6 @@ class WonderStarWars(Visual):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
                     self.grid[y][x] = 1
-                elif random.random() < 0.08:
-                    self.grid[y][x] = 1
 
     def reset(self):
         self.time = 0.0
@@ -1504,8 +1498,6 @@ class WonderSpirals(Visual):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
                     self.grid[y][x] = mid
-                else:
-                    self.grid[y][x] = random.randint(0, self.num_states - 1)
 
     def reset(self):
         self.time = 0.0
