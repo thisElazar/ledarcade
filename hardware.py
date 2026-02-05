@@ -90,7 +90,7 @@ class HardwareDisplay:
     Drop-in replacement for arcade.py Display class.
     """
 
-    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2, gamma: float = 2.2):
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2, gamma: float = 2.2, toe: float = 0.25):
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
@@ -112,9 +112,17 @@ class HardwareDisplay:
         # Pre-allocated zero buffer for fast black clear
         self._zeros = bytes(GRID_SIZE * GRID_SIZE * 3)
 
-        # Gamma correction LUT - applied in render() so get_pixel() returns logical values
-        # Uses bytes.translate() for fast C-level per-byte mapping
-        self._gamma_lut = bytes([int(round(255 * (i / 255) ** gamma)) for i in range(256)])
+        # Gamma correction with toe lift for shadow detail preservation.
+        # Pure gamma (x^2.2) crushes darks too aggressively on LED panels.
+        # The toe term [toe * x * (1-x)^2] lifts shadows while fading out
+        # in highlights, so colors still pop but grays remain visible.
+        # Black (0) and white (255) are pinned. toe=0 gives pure gamma.
+        self._gamma_lut = bytes([
+            min(255, max(0, int(round(255 * (
+                (i / 255) ** gamma + toe * (i / 255) * (1 - i / 255) ** 2
+            )))))
+            for i in range(256)
+        ])
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
