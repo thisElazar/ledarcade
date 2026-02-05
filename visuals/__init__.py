@@ -132,6 +132,7 @@ from .molecule import Molecule
 from .lattice import Lattice
 from .proteins import Proteins
 from .periodic import Periodic
+from .microscope import Microscope
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
@@ -153,6 +154,7 @@ from .hurdygurdy import HurdyGurdy
 from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
+from .wondercabinet import WonderGlow, WonderMarquee
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -194,7 +196,7 @@ from .trashblasterdemo import TrashBlasterDemo
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
-    ScienceLab, Demos,
+    ScienceLab, Title, Demos,
 )
 
 # List of all available visuals
@@ -288,6 +290,7 @@ ALL_VISUALS = [
     Lattice,
     Proteins,
     Periodic,
+    Microscope,
     Metronome,
     WatchGears,
     Camshaft,
@@ -309,7 +312,10 @@ ALL_VISUALS = [
     Antikythera,
     Astrolabe,
     Archimedes,
+    WonderGlow,
+    WonderMarquee,
     # Slideshows (visual playlists)
+    Title,
     AllVisuals,
     Chill,
     Energy,
@@ -456,6 +462,7 @@ __all__ = [
     'Lattice',
     'Proteins',
     'Periodic',
+    'Microscope',
     'Metronome',
     'WatchGears',
     'Camshaft',

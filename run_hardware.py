@@ -338,6 +338,86 @@ def draw_spin_egg(display, timer):
     display.draw_text_small(tx, ty, "TURBO!", color)
 
 
+def _show_splash(display):
+    """Show the WONDER CABINET startup splash (~3 seconds)."""
+    duration = 3.0
+    t = 0.0
+    last = time.time()
+    while t < duration:
+        now = time.time()
+        dt = now - last
+        last = now
+        t += dt
+
+        display.clear(Colors.BLACK)
+
+        if t < 0.3:
+            # Black screen
+            pass
+        elif t < 1.0:
+            # "WONDER" fades in
+            progress = (t - 0.3) / 0.7
+            brightness = min(1.0, progress)
+            c = int(255 * brightness)
+            color = (c, c, c)
+            wx = center_x("WONDER")
+            display.draw_text_small(wx, 24, "WONDER", color)
+        elif t < 1.7:
+            # "WONDER" stays, "CABINET" fades in
+            wx = center_x("WONDER")
+            display.draw_text_small(wx, 24, "WONDER", Colors.WHITE)
+            progress = (t - 1.0) / 0.7
+            brightness = min(1.0, progress)
+            c = int(255 * brightness)
+            color = (c, c, c)
+            cx = center_x("CABINET")
+            display.draw_text_small(cx, 34, "CABINET", color)
+        else:
+            # Rainbow glow + sparkles
+            phase = t - 1.7
+            hue = (phase * 0.5) % 1.0
+            pulse = 0.7 + 0.3 * math.sin(phase * 4.0)
+            color = _hue_to_rgb(hue)
+            color = (int(color[0] * pulse), int(color[1] * pulse), int(color[2] * pulse))
+
+            # Sparkles
+            for _ in range(20):
+                sx = random.randint(0, GRID_SIZE - 1)
+                sy = random.randint(0, GRID_SIZE - 1)
+                display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.5) % 1.0))
+
+            # "WONDER" with glow
+            wx = center_x("WONDER")
+            for ox in [-1, 0, 1]:
+                for oy in [-1, 0, 1]:
+                    if ox == 0 and oy == 0:
+                        continue
+                    glow = (color[0] // 4, color[1] // 4, color[2] // 4)
+                    display.draw_text_small(wx + ox, 24 + oy, "WONDER", glow)
+            display.draw_text_small(wx, 24, "WONDER", color)
+
+            # "CABINET" with glow
+            hue2 = (hue + 0.15) % 1.0
+            color2 = _hue_to_rgb(hue2)
+            color2 = (int(color2[0] * pulse), int(color2[1] * pulse), int(color2[2] * pulse))
+            cx = center_x("CABINET")
+            for ox in [-1, 0, 1]:
+                for oy in [-1, 0, 1]:
+                    if ox == 0 and oy == 0:
+                        continue
+                    glow2 = (color2[0] // 4, color2[1] // 4, color2[2] // 4)
+                    display.draw_text_small(cx + ox, 34 + oy, "CABINET", glow2)
+            display.draw_text_small(cx, 34, "CABINET", color2)
+
+        display.render()
+
+        # Frame rate limit
+        elapsed = time.time() - now
+        sleep_time = (1.0 / 30) - elapsed
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
+
 def has_any_input(input_state):
     """Return True if any button or direction is active."""
     return (input_state.up_pressed or input_state.down_pressed or
@@ -403,6 +483,7 @@ def main():
     import settings as persistent
     saved_brightness = persistent.get_brightness()
     display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4)
+    _show_splash(display)
 
     print("Initializing input...")
     input_handler = HardwareInput(use_gpio=True)

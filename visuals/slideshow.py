@@ -211,6 +211,16 @@ class ScienceLab(Slideshow):
                 TuringWorms, Mitosis, Earth, Molecule]
 
 
+class Title(Slideshow):
+    name = "TITLE"
+    description = "Wonder Cabinet title screens"
+    category = "digital"
+
+    def _get_visual_classes(self):
+        from visuals.wondercabinet import WonderGlow, WonderMarquee
+        return [WonderGlow, WonderMarquee]
+
+
 class Demos(Slideshow):
     name = "ALL"
     description = "AI plays all classic games"
