@@ -161,7 +161,8 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderMatrix, WonderNeon, WonderFilm,
                             WonderRetroTV, WonderDK, WonderFrogger,
                             WonderLife, WonderHodge, WonderStarWars,
-                            WonderSpirals, WonderSand)
+                            WonderBoids, WonderSlime, WonderDiffusion,
+                            WonderBrain, WonderFlow, WonderSand)
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -338,7 +339,11 @@ ALL_VISUALS = [
     WonderLife,
     WonderHodge,
     WonderStarWars,
-    WonderSpirals,
+    WonderBoids,
+    WonderSlime,
+    WonderDiffusion,
+    WonderBrain,
+    WonderFlow,
     WonderSand,
     # Slideshows (visual playlists)
     Title,

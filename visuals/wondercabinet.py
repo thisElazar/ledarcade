@@ -1480,11 +1480,15 @@ class WonderStarWars(Visual):
 # WonderSpirals - Cyclic CA seeded with title text
 # =========================================================================
 
-class WonderSpirals(Visual):
-    name = "WONDER SPIRAL"
-    description = "Demon spirals title seed"
+# =========================================================================
+# WonderBoids - Boid flocking seeded from title text pixels
+# =========================================================================
+
+class WonderBoids(Visual):
+    name = "WONDER FLOCK"
+    description = "Boid flocking from title seed"
     category = "digital"
-    _INTERVAL = 0.08
+    _INTERVAL = 1.0 / 20
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -1492,12 +1496,15 @@ class WonderSpirals(Visual):
     def _init_grid(self):
         mask = _text_mask()
         self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-        self.next_grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
-        mid = self.num_states // 2
+        self.boids = []
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
-                    self.grid[y][x] = (x + y * 3) % self.num_states
+                    self.grid[y][x] = 255
+                    angle = (x * 0.7 + y * 1.3) % (2 * math.pi)
+                    self.boids.append([float(x), float(y),
+                                       math.cos(angle) * 0.8,
+                                       math.sin(angle) * 0.8])
 
     def reset(self):
         self.time = 0.0
@@ -1506,27 +1513,408 @@ class WonderSpirals(Visual):
         self.step_accum = 0.0
         self.history = []
         self.rev_idx = 0
-        self.num_states = 12
-        self.colors = [_hue_to_rgb(i / self.num_states) for i in range(self.num_states)]
         self._init_grid()
 
     def _step(self):
-        ns = self.num_states
+        # Decay trail
+        for y in range(GRID_SIZE):
+            row = self.grid[y]
+            for x in range(GRID_SIZE):
+                if row[x] > 0:
+                    row[x] = max(0, row[x] - 6)
+        N = len(self.boids)
+        if N == 0:
+            return
+        for i in range(N):
+            bx, by, bvx, bvy = self.boids[i]
+            sx, sy, ax, ay, cx, cy = 0., 0., 0., 0., 0., 0.
+            sc, ac, cc = 0, 0, 0
+            for j in range(N):
+                if i == j:
+                    continue
+                ox, oy = self.boids[j][0], self.boids[j][1]
+                dx = ox - bx
+                dy = oy - by
+                # Wrap distance
+                if dx > 32: dx -= 64
+                elif dx < -32: dx += 64
+                if dy > 32: dy -= 64
+                elif dy < -32: dy += 64
+                d = math.sqrt(dx * dx + dy * dy)
+                if d < 0.5:
+                    continue
+                if d < 3.0:
+                    sx -= dx / d
+                    sy -= dy / d
+                    sc += 1
+                if d < 8.0:
+                    ax += self.boids[j][2]
+                    ay += self.boids[j][3]
+                    ac += 1
+                if d < 12.0:
+                    cx += dx
+                    cy += dy
+                    cc += 1
+            if sc > 0:
+                bvx += sx * 0.15
+                bvy += sy * 0.15
+            if ac > 0:
+                bvx += (ax / ac - bvx) * 0.05
+                bvy += (ay / ac - bvy) * 0.05
+            if cc > 0:
+                bvx += (cx / cc) * 0.01
+                bvy += (cy / cc) * 0.01
+            speed = math.sqrt(bvx * bvx + bvy * bvy)
+            if speed > 1.5:
+                bvx = bvx / speed * 1.5
+                bvy = bvy / speed * 1.5
+            elif speed < 0.3:
+                bvx = bvx / max(speed, 0.01) * 0.3
+                bvy = bvy / max(speed, 0.01) * 0.3
+            bx = (bx + bvx) % GRID_SIZE
+            by = (by + bvy) % GRID_SIZE
+            self.boids[i] = [bx, by, bvx, bvy]
+            ix = int(bx) % GRID_SIZE
+            iy = int(by) % GRID_SIZE
+            self.grid[iy][ix] = 255
+
+    def update(self, dt: float):
+        self.time += dt
+        self.phase_timer += dt
+        if self.phase == 'text':
+            if self.phase_timer >= _TEXT_HOLD:
+                self.phase = 'forward'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.history = [_snap(self.grid)]
+        elif self.phase == 'forward':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL:
+                self.step_accum -= self._INTERVAL
+                self._step()
+                if len(self.history) < _MAX_SNAPS:
+                    self.history.append(_snap(self.grid))
+            if self.phase_timer >= _FORWARD:
+                self.phase = 'reverse'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.rev_idx = len(self.history) - 1
+        elif self.phase == 'reverse':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL and self.rev_idx > 0:
+                self.step_accum -= self._INTERVAL
+                self.rev_idx -= 1
+                self.grid = _restore(self.history[self.rev_idx])
+            if self.rev_idx <= 0:
+                self.phase = 'text'
+                self.phase_timer = 0.0
+                self.grid = _restore(self.history[0])
+                self.history = []
+                self._init_grid()
+
+    def draw(self):
+        if self.phase == 'text':
+            self.display.clear(Colors.BLACK)
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", (255, 180, 60))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", (255, 180, 60))
+        else:
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    v = self.grid[y][x]
+                    if v > 0:
+                        t = v / 255.0
+                        r = int(255 * t)
+                        g = int(140 * t)
+                        b = int(30 * t * t)
+                        self.display.set_pixel(x, y, (r, g, b))
+                    else:
+                        self.display.set_pixel(x, y, (0, 0, 0))
+
+
+# =========================================================================
+# WonderSlime - Slime mold agents seeded from title text pixels
+# =========================================================================
+
+class WonderSlime(Visual):
+    name = "WONDER SLIME"
+    description = "Slime mold from title seed"
+    category = "digital"
+    _INTERVAL = 1.0 / 20
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def _init_grid(self):
+        mask = _text_mask()
+        self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self.agents = []
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
-                state = self.grid[y][x]
-                successor = (state + 1) % ns
-                found = False
+                if mask[y][x]:
+                    self.grid[y][x] = 255
+                    angle = (x * 2.1 + y * 0.7) % (2 * math.pi)
+                    self.agents.append([float(x), float(y), angle])
+
+    def reset(self):
+        self.time = 0.0
+        self.phase = 'text'
+        self.phase_timer = 0.0
+        self.step_accum = 0.0
+        self.history = []
+        self.rev_idx = 0
+        self._init_grid()
+
+    def _step(self):
+        SZ = GRID_SIZE
+        trail = self.grid
+        sensor_dist = 4.0
+        sensor_angle = 0.6
+        turn_speed = 0.4
+        deposit = 80
+        # Move agents
+        for a in self.agents:
+            x, y, angle = a[0], a[1], a[2]
+            # Sense left, center, right
+            sl = sr = sc_val = 0
+            for da, accum in ((-sensor_angle, 'l'), (0, 'c'), (sensor_angle, 'r')):
+                sa = angle + da
+                sx = int(x + math.cos(sa) * sensor_dist) % SZ
+                sy = int(y + math.sin(sa) * sensor_dist) % SZ
+                val = trail[sy][sx]
+                if da < 0:
+                    sl = val
+                elif da > 0:
+                    sr = val
+                else:
+                    sc_val = val
+            # Steer toward strongest trail
+            if sc_val >= sl and sc_val >= sr:
+                pass  # go straight
+            elif sl > sr:
+                angle -= turn_speed
+            elif sr > sl:
+                angle += turn_speed
+            # Move
+            nx = (x + math.cos(angle) * 1.0) % SZ
+            ny = (y + math.sin(angle) * 1.0) % SZ
+            a[0], a[1], a[2] = nx, ny, angle
+            # Deposit
+            ix, iy = int(nx) % SZ, int(ny) % SZ
+            trail[iy][ix] = min(255, trail[iy][ix] + deposit)
+        # Diffuse and decay
+        new = [row[:] for row in trail]
+        for y in range(SZ):
+            for x in range(SZ):
+                total = 0
                 for dy in (-1, 0, 1):
                     for dx in (-1, 0, 1):
-                        if dx == 0 and dy == 0:
-                            continue
-                        if self.grid[(y + dy) % GRID_SIZE][(x + dx) % GRID_SIZE] == successor:
-                            found = True
-                            break
-                    if found:
-                        break
-                self.next_grid[y][x] = successor if found else state
+                        total += trail[(y + dy) % SZ][(x + dx) % SZ]
+                new[y][x] = max(0, total // 9 - 2)
+        self.grid = new
+
+    def update(self, dt: float):
+        self.time += dt
+        self.phase_timer += dt
+        if self.phase == 'text':
+            if self.phase_timer >= _TEXT_HOLD:
+                self.phase = 'forward'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.history = [_snap(self.grid)]
+        elif self.phase == 'forward':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL:
+                self.step_accum -= self._INTERVAL
+                self._step()
+                if len(self.history) < _MAX_SNAPS:
+                    self.history.append(_snap(self.grid))
+            if self.phase_timer >= _FORWARD:
+                self.phase = 'reverse'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.rev_idx = len(self.history) - 1
+        elif self.phase == 'reverse':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL and self.rev_idx > 0:
+                self.step_accum -= self._INTERVAL
+                self.rev_idx -= 1
+                self.grid = _restore(self.history[self.rev_idx])
+            if self.rev_idx <= 0:
+                self.phase = 'text'
+                self.phase_timer = 0.0
+                self.grid = _restore(self.history[0])
+                self.history = []
+                self._init_grid()
+
+    def draw(self):
+        if self.phase == 'text':
+            self.display.clear(Colors.BLACK)
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", (80, 255, 80))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", (80, 255, 80))
+        else:
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    v = self.grid[y][x]
+                    if v > 0:
+                        t = v / 255.0
+                        g = int(255 * t)
+                        r = int(80 * t * t)
+                        b = int(40 * t * t)
+                        self.display.set_pixel(x, y, (r, g, b))
+                    else:
+                        self.display.set_pixel(x, y, (0, 0, 0))
+
+
+# =========================================================================
+# WonderDiffusion - Heat diffusion from title text pixels
+# =========================================================================
+
+class WonderDiffusion(Visual):
+    name = "WONDER HEAT"
+    description = "Heat diffusion from title seed"
+    category = "digital"
+    _INTERVAL = 1.0 / 20
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def _init_grid(self):
+        mask = _text_mask()
+        self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if mask[y][x]:
+                    self.grid[y][x] = 255
+
+    def reset(self):
+        self.time = 0.0
+        self.phase = 'text'
+        self.phase_timer = 0.0
+        self.step_accum = 0.0
+        self.history = []
+        self.rev_idx = 0
+        self._init_grid()
+
+    def _step(self):
+        SZ = GRID_SIZE
+        old = self.grid
+        new = [[0] * SZ for _ in range(SZ)]
+        for y in range(SZ):
+            for x in range(SZ):
+                # 5-point laplacian diffusion
+                c = old[y][x]
+                n = old[(y - 1) % SZ][x]
+                s = old[(y + 1) % SZ][x]
+                w = old[y][(x - 1) % SZ]
+                e = old[y][(x + 1) % SZ]
+                # Diffuse: blend with neighbors, slight decay
+                val = c + 0.2 * (n + s + w + e - 4 * c) - 0.3
+                new[y][x] = max(0, min(255, int(val)))
+        self.grid = new
+
+    def update(self, dt: float):
+        self.time += dt
+        self.phase_timer += dt
+        if self.phase == 'text':
+            if self.phase_timer >= _TEXT_HOLD:
+                self.phase = 'forward'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.history = [_snap(self.grid)]
+        elif self.phase == 'forward':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL:
+                self.step_accum -= self._INTERVAL
+                self._step()
+                if len(self.history) < _MAX_SNAPS:
+                    self.history.append(_snap(self.grid))
+            if self.phase_timer >= _FORWARD:
+                self.phase = 'reverse'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.rev_idx = len(self.history) - 1
+        elif self.phase == 'reverse':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL and self.rev_idx > 0:
+                self.step_accum -= self._INTERVAL
+                self.rev_idx -= 1
+                self.grid = _restore(self.history[self.rev_idx])
+            if self.rev_idx <= 0:
+                self.phase = 'text'
+                self.phase_timer = 0.0
+                self.grid = _restore(self.history[0])
+                self.history = []
+
+    def draw(self):
+        if self.phase == 'text':
+            self.display.clear(Colors.BLACK)
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", (255, 200, 100))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", (255, 200, 100))
+        else:
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    v = self.grid[y][x]
+                    if v > 0:
+                        t = v / 255.0
+                        r = int(255 * min(1.0, t * 1.5))
+                        g = int(200 * t * t)
+                        b = int(80 * t * t * t)
+                        self.display.set_pixel(x, y, (r, g, b))
+                    else:
+                        self.display.set_pixel(x, y, (0, 0, 0))
+
+
+# =========================================================================
+# WonderBrain - Brian's Brain CA seeded from title text pixels
+# =========================================================================
+
+class WonderBrain(Visual):
+    name = "WONDER BRAIN"
+    description = "Brian's Brain from title seed"
+    category = "digital"
+    _INTERVAL = 0.1
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def _init_grid(self):
+        mask = _text_mask()
+        # States: 0=off, 1=on, 2=dying
+        self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self.next_grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if mask[y][x]:
+                    self.grid[y][x] = 1
+
+    def reset(self):
+        self.time = 0.0
+        self.phase = 'text'
+        self.phase_timer = 0.0
+        self.step_accum = 0.0
+        self.history = []
+        self.rev_idx = 0
+        self._init_grid()
+
+    def _step(self):
+        SZ = GRID_SIZE
+        for y in range(SZ):
+            for x in range(SZ):
+                state = self.grid[y][x]
+                if state == 1:
+                    self.next_grid[y][x] = 2  # on -> dying
+                elif state == 2:
+                    self.next_grid[y][x] = 0  # dying -> off
+                else:
+                    # Count ON neighbors
+                    count = 0
+                    for dy in (-1, 0, 1):
+                        for dx in (-1, 0, 1):
+                            if dx == 0 and dy == 0:
+                                continue
+                            if self.grid[(y + dy) % SZ][(x + dx) % SZ] == 1:
+                                count += 1
+                    self.next_grid[y][x] = 1 if count == 2 else 0
         self.grid, self.next_grid = self.next_grid, self.grid
 
     def update(self, dt: float):
@@ -1565,13 +1953,130 @@ class WonderSpirals(Visual):
     def draw(self):
         if self.phase == 'text':
             self.display.clear(Colors.BLACK)
-            mid = self.num_states // 2
-            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", self.colors[mid])
-            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", self.colors[mid])
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", (200, 200, 255))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", (200, 200, 255))
         else:
             for y in range(GRID_SIZE):
                 for x in range(GRID_SIZE):
-                    self.display.set_pixel(x, y, self.colors[self.grid[y][x]])
+                    s = self.grid[y][x]
+                    if s == 1:
+                        self.display.set_pixel(x, y, (255, 255, 255))
+                    elif s == 2:
+                        self.display.set_pixel(x, y, (40, 60, 200))
+                    else:
+                        self.display.set_pixel(x, y, (0, 0, 0))
+
+
+# =========================================================================
+# WonderFlow - Flow field particles seeded from title text pixels
+# =========================================================================
+
+class WonderFlow(Visual):
+    name = "WONDER FLOW"
+    description = "Flow field from title seed"
+    category = "digital"
+    _INTERVAL = 1.0 / 20
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def _init_grid(self):
+        mask = _text_mask()
+        self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self.particles = []
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if mask[y][x]:
+                    self.grid[y][x] = 255
+                    self.particles.append([float(x), float(y)])
+
+    def reset(self):
+        self.time = 0.0
+        self.phase = 'text'
+        self.phase_timer = 0.0
+        self.step_accum = 0.0
+        self.history = []
+        self.rev_idx = 0
+        self.flow_time = 0.0
+        self._init_grid()
+
+    def _flow_angle(self, x, y, t):
+        """Smooth time-varying flow field from layered sinusoids."""
+        return (math.sin(x * 0.12 + t * 0.4) * math.cos(y * 0.1)
+                + math.sin(y * 0.15 - t * 0.3) * math.cos(x * 0.08 + t * 0.2)
+                ) * math.pi
+
+    def _step(self):
+        SZ = GRID_SIZE
+        trail = self.grid
+        self.flow_time += self._INTERVAL
+        t = self.flow_time
+        # Decay trail
+        for y in range(SZ):
+            row = trail[y]
+            for x in range(SZ):
+                if row[x] > 0:
+                    row[x] = max(0, row[x] - 5)
+        # Move particles along flow field
+        for p in self.particles:
+            angle = self._flow_angle(p[0], p[1], t)
+            p[0] = (p[0] + math.cos(angle) * 0.8) % SZ
+            p[1] = (p[1] + math.sin(angle) * 0.8) % SZ
+            ix = int(p[0]) % SZ
+            iy = int(p[1]) % SZ
+            trail[iy][ix] = 255
+
+    def update(self, dt: float):
+        self.time += dt
+        self.phase_timer += dt
+        if self.phase == 'text':
+            if self.phase_timer >= _TEXT_HOLD:
+                self.phase = 'forward'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.flow_time = 0.0
+                self.history = [_snap(self.grid)]
+        elif self.phase == 'forward':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL:
+                self.step_accum -= self._INTERVAL
+                self._step()
+                if len(self.history) < _MAX_SNAPS:
+                    self.history.append(_snap(self.grid))
+            if self.phase_timer >= _FORWARD:
+                self.phase = 'reverse'
+                self.phase_timer = 0.0
+                self.step_accum = 0.0
+                self.rev_idx = len(self.history) - 1
+        elif self.phase == 'reverse':
+            self.step_accum += dt
+            while self.step_accum >= self._INTERVAL and self.rev_idx > 0:
+                self.step_accum -= self._INTERVAL
+                self.rev_idx -= 1
+                self.grid = _restore(self.history[self.rev_idx])
+            if self.rev_idx <= 0:
+                self.phase = 'text'
+                self.phase_timer = 0.0
+                self.grid = _restore(self.history[0])
+                self.history = []
+                self._init_grid()
+
+    def draw(self):
+        if self.phase == 'text':
+            self.display.clear(Colors.BLACK)
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", (100, 180, 255))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", (100, 180, 255))
+        else:
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    v = self.grid[y][x]
+                    if v > 0:
+                        t = v / 255.0
+                        h = (x * 0.02 + y * 0.01 + self.time * 0.1) % 1.0
+                        r, g, b = _hue_to_rgb(h)
+                        self.display.set_pixel(x, y, (int(r * t), int(g * t), int(b * t)))
+                    else:
+                        self.display.set_pixel(x, y, (0, 0, 0))
 
 
 # =========================================================================

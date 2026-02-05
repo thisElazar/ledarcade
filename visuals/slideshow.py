@@ -223,13 +223,15 @@ class Title(Slideshow):
             WonderTetris, WonderMatrix, WonderNeon, WonderFilm,
             WonderRetroTV, WonderDK, WonderFrogger,
             WonderLife, WonderHodge, WonderStarWars,
-            WonderSpirals, WonderSand)
+            WonderBoids, WonderSlime, WonderDiffusion,
+            WonderBrain, WonderFlow, WonderSand)
         return [WonderGlow, WonderMarquee, WonderCrawl, WonderSlide,
                 WonderDrop, WonderSpin, WonderPacMan, WonderInvaders,
                 WonderTetris, WonderMatrix, WonderNeon, WonderFilm,
                 WonderRetroTV, WonderDK, WonderFrogger,
                 WonderLife, WonderHodge, WonderStarWars,
-                WonderSpirals, WonderSand]
+                WonderBoids, WonderSlime, WonderDiffusion,
+                WonderBrain, WonderFlow, WonderSand]
 
 
 class Demos(Slideshow):
