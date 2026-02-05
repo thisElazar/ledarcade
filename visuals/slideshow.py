@@ -217,31 +217,10 @@ class Title(Slideshow):
     category = "digital"
 
     def _get_visual_classes(self):
-        from visuals.wondercabinet import (
-            WonderGlow, WonderMarquee, WonderCrawl, WonderSlide,
-            WonderDrop, WonderSpin, WonderPacMan, WonderInvaders,
-            WonderTetris, WonderMatrix, WonderNeon, WonderFilm,
-            WonderRetroTV, WonderDK, WonderFrogger,
-            WonderLife, WonderHodge, WonderStarWars,
-            WonderBoids, WonderSlime, WonderDiffusion,
-            WonderBrain, WonderFlow, WonderSand,
-            WonderPong, WonderSega, WonderPS1,
-            WonderInsertCoin, WonderCreeper, WonderNyanCat,
-            WonderC64, WonderGameBoy, WonderDOS,
-            WonderBSOD, WonderLoading, WonderColorBars,
-            WonderVHS, WonderBoing)
-        return [WonderGlow, WonderMarquee, WonderCrawl, WonderSlide,
-                WonderDrop, WonderSpin, WonderPacMan, WonderInvaders,
-                WonderTetris, WonderMatrix, WonderNeon, WonderFilm,
-                WonderRetroTV, WonderDK, WonderFrogger,
-                WonderLife, WonderHodge, WonderStarWars,
-                WonderBoids, WonderSlime, WonderDiffusion,
-                WonderBrain, WonderFlow, WonderSand,
-                WonderPong, WonderSega, WonderPS1,
-                WonderInsertCoin, WonderCreeper, WonderNyanCat,
-                WonderC64, WonderGameBoy, WonderDOS,
-                WonderBSOD, WonderLoading, WonderColorBars,
-                WonderVHS, WonderBoing]
+        import inspect
+        import visuals.wondercabinet as wc
+        return [obj for _, obj in inspect.getmembers(wc, inspect.isclass)
+                if issubclass(obj, Visual) and obj is not Visual]
 
 
 class Demos(Slideshow):
