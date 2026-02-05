@@ -155,7 +155,10 @@ from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
-                            WonderSlide, WonderDrop, WonderSpin)
+                            WonderSlide, WonderDrop, WonderSpin,
+                            WonderPacMan, WonderInvaders, WonderTetris,
+                            WonderMatrix, WonderNeon, WonderFilm,
+                            WonderRetroTV, WonderDK, WonderFrogger)
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -319,6 +322,15 @@ ALL_VISUALS = [
     WonderSlide,
     WonderDrop,
     WonderSpin,
+    WonderPacMan,
+    WonderInvaders,
+    WonderTetris,
+    WonderMatrix,
+    WonderNeon,
+    WonderFilm,
+    WonderRetroTV,
+    WonderDK,
+    WonderFrogger,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
