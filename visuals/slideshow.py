@@ -224,14 +224,24 @@ class Title(Slideshow):
             WonderRetroTV, WonderDK, WonderFrogger,
             WonderLife, WonderHodge, WonderStarWars,
             WonderBoids, WonderSlime, WonderDiffusion,
-            WonderBrain, WonderFlow, WonderSand)
+            WonderBrain, WonderFlow, WonderSand,
+            WonderPong, WonderSega, WonderPS1,
+            WonderInsertCoin, WonderCreeper, WonderNyanCat,
+            WonderC64, WonderGameBoy, WonderDOS,
+            WonderBSOD, WonderLoading, WonderColorBars,
+            WonderVHS, WonderBoing)
         return [WonderGlow, WonderMarquee, WonderCrawl, WonderSlide,
                 WonderDrop, WonderSpin, WonderPacMan, WonderInvaders,
                 WonderTetris, WonderMatrix, WonderNeon, WonderFilm,
                 WonderRetroTV, WonderDK, WonderFrogger,
                 WonderLife, WonderHodge, WonderStarWars,
                 WonderBoids, WonderSlime, WonderDiffusion,
-                WonderBrain, WonderFlow, WonderSand]
+                WonderBrain, WonderFlow, WonderSand,
+                WonderPong, WonderSega, WonderPS1,
+                WonderInsertCoin, WonderCreeper, WonderNyanCat,
+                WonderC64, WonderGameBoy, WonderDOS,
+                WonderBSOD, WonderLoading, WonderColorBars,
+                WonderVHS, WonderBoing]
 
 
 class Demos(Slideshow):
