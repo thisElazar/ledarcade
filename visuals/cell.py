@@ -100,6 +100,17 @@ PATHWAYS = [
             {'type': 'oxygen', 'path': [(13, 36), (14, 46)],
              'speed': 2, 'interval': 4.5, 'max': 1},
         ],
+        'notes': [
+            'THYLAKOID MEMBRANE',
+            'LIGHT HITS PHOTOSYSTEM II',
+            'WATER SPLITS INTO H+ O2 E-',
+            'ELECTRONS PASS TO CYT B6F',
+            'H+ PUMPED INTO LUMEN',
+            'ELECTRONS REACH PHOTOSYSTEM I',
+            'NADPH MADE IN STROMA',
+            'H+ GRADIENT DRIVES ATP SYNTHASE',
+            'THE GOLD MOTOR SPINS TO MAKE ATP',
+        ],
     },
 ]
 
@@ -447,8 +458,10 @@ class Cell(Visual):
     def _draw_label(self):
         d = self.display
         pw = self.cur_pw
-        phase = int(self.label_timer / 4) % 2
-        label = pw['name'] if phase == 0 else pw['sci_name']
+        # Build full label sequence: name, sci_name, then all notes
+        labels = [pw['name'], pw['sci_name']] + pw.get('notes', [])
+        phase = int(self.label_timer / 4) % len(labels)
+        label = labels[phase]
         max_chars = 14
         if len(label) > max_chars:
             padded = label + "    " + label
