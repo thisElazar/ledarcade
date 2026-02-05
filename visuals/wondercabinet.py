@@ -1277,7 +1277,7 @@ class WonderHodge(Visual):
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
-                    self.grid[y][x] = self.n
+                    self.grid[y][x] = (x * 7 + y * 3) % (self.n + 1)
 
     def reset(self):
         self.time = 0.0
@@ -1497,7 +1497,7 @@ class WonderSpirals(Visual):
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 if mask[y][x]:
-                    self.grid[y][x] = mid
+                    self.grid[y][x] = (x + y * 3) % self.num_states
 
     def reset(self):
         self.time = 0.0
