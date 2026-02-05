@@ -45,6 +45,11 @@ class PinballDemo(Visual):
         self.plunger_charge_time = 0.0
         self.launch_delay = 0.5  # Wait before launching
 
+        # Flipper timing — hold briefly after flipping, then release
+        self.flip_l_timer = 0.0
+        self.flip_r_timer = 0.0
+        self.flip_hold_duration = 0.12  # hold flipper up this long after trigger
+
     def handle_input(self, input_state):
         # Demo doesn't respond to input (auto-plays)
         return False
@@ -101,75 +106,56 @@ class PinballDemo(Visual):
         ball_vx = game.ball_vx
         ball_vy = game.ball_vy
 
-        # Get flipper positions
-        left_pivot_x, left_pivot_y = FLIPPER_LEFT_PIVOT
-        right_pivot_x, right_pivot_y = FLIPPER_RIGHT_PIVOT
+        flipper_y = FLIPPER_LEFT_PIVOT[1]  # Both at same y (173)
 
-        # Define flipper activation zones
-        # Flippers are at y~173, activate when ball is approaching and nearby
-        flipper_y = left_pivot_y  # Both at same y
+        # Decrement flip hold timers
+        self.flip_l_timer = max(0.0, self.flip_l_timer - dt)
+        self.flip_r_timer = max(0.0, self.flip_r_timer - dt)
 
-        # Predict where ball will be when it reaches flipper level
-        if ball_vy > 5:  # Ball moving down toward flippers
-            time_to_flipper = (flipper_y - ball_y) / ball_vy if ball_vy > 0 else 999
+        # The key insight: the flipper must be SWINGING when it contacts the
+        # ball (angular_vel > 1.0) for a strong hit.  If we raise it too early,
+        # the flipper is stationary and the ball just sits on it.
+        #
+        # Flipper extends in ~0.06s (1.05 rad / 18 rad/s).  So we trigger
+        # when the ball is only ~3-6 px away (≈0.03-0.06s at typical speeds).
+
+        distance_to_flippers = flipper_y - ball_y
+        trigger_new_flip = False
+
+        if ball_vy > 5 and 0 < distance_to_flippers < 30:
+            # Ball approaching flippers — predict x at flipper level
+            time_to_flipper = distance_to_flippers / ball_vy
             predicted_x = ball_x + ball_vx * time_to_flipper
-
-            # Account for wall bounces (simplified)
             if predicted_x < 2:
                 predicted_x = 4 - predicted_x
             elif predicted_x > 55:
                 predicted_x = 110 - predicted_x
 
-            # Activation distance - how close the ball needs to be
-            activation_distance_y = 25  # Start preparing when ball is this close
-            trigger_distance_y = 12     # Actually flip when ball is this close
+            # Trigger distance: scale with speed so fast balls are flipped a
+            # little earlier (flipper needs to already be moving on contact)
+            speed = math.sqrt(ball_vx * ball_vx + ball_vy * ball_vy)
+            trigger_dist = 4.0 + min(4.0, speed / 80.0)
 
-            distance_to_flippers = flipper_y - ball_y
+            if distance_to_flippers < trigger_dist:
+                # Left flipper zone (pivot x=18, tip sweeps to ~x=7)
+                if 5 < predicted_x < 33 and self.flip_l_timer <= 0:
+                    self.flip_l_timer = self.flip_hold_duration
+                    trigger_new_flip = True
+                # Right flipper zone (pivot x=45, tip sweeps to ~x=56)
+                if 30 < predicted_x < 58 and self.flip_r_timer <= 0:
+                    self.flip_r_timer = self.flip_hold_duration
+                    trigger_new_flip = True
 
-            if distance_to_flippers < activation_distance_y and distance_to_flippers > 0:
-                # Ball is approaching flippers
+        # If the ball is rolling slowly right at flipper level (e.g. rolling
+        # along a raised flipper), let it drop first then flip
+        # — don't hold the flipper up, that traps it.
 
-                # Left flipper: activate for balls on left side
-                # Left flipper pivot at x=18, covers roughly x=7 to x=29
-                left_zone_min = 5
-                left_zone_max = 32
-
-                # Right flipper: activate for balls on right side
-                # Right flipper pivot at x=45, covers roughly x=34 to x=56
-                right_zone_min = 30
-                right_zone_max = 56
-
-                # Use predicted position for early activation, current position for triggering
-                use_predicted = distance_to_flippers > trigger_distance_y
-                check_x = predicted_x if use_predicted else ball_x
-
-                # Timing adjustment - flip earlier for faster balls
-                speed = math.sqrt(ball_vx * ball_vx + ball_vy * ball_vy)
-                speed_factor = min(1.0, speed / 150.0)  # Normalize speed
-                adjusted_trigger = trigger_distance_y + speed_factor * 8
-
-                # Left flipper activation
-                if left_zone_min < check_x < left_zone_max:
-                    if distance_to_flippers < adjusted_trigger:
-                        ai_input.action_l_held = True
-                        ai_input.action_l = True
-
-                # Right flipper activation
-                if right_zone_min < check_x < right_zone_max:
-                    if distance_to_flippers < adjusted_trigger:
-                        ai_input.action_r_held = True
-                        ai_input.action_r = True
-
-        else:
-            # Ball going up or sideways - hold flippers down (rest position)
-            # But activate if ball is very close and moving across
-            if ball_y > flipper_y - 10 and ball_y < flipper_y + 5:
-                # Ball is at flipper level, react quickly
-                if ball_x < 32 and ball_vy > -20:
-                    ai_input.action_l_held = True
-                    ai_input.action_l = True
-                if ball_x > 32 and ball_vy > -20:
-                    ai_input.action_r_held = True
-                    ai_input.action_r = True
+        # Activate flippers based on hold timers
+        if self.flip_l_timer > 0:
+            ai_input.action_l_held = True
+            ai_input.action_l = True
+        if self.flip_r_timer > 0:
+            ai_input.action_r_held = True
+            ai_input.action_r = True
 
         return ai_input
