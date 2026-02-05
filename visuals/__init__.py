@@ -65,6 +65,13 @@ from .slime import Slime
 from .solitaire import Solitaire
 from .polaroid import Polaroid
 from .road import Road
+from .bml import BML
+from .highway import Highway
+from .intersection import Intersection
+from .roundabout import Roundabout
+from .interchange import Interchange
+from .greenwave import GreenWave
+from .merge import Merge
 from .waterlilies import WaterLilies
 from .starrynight import StarryNight
 from .mobius import Mobius
@@ -112,6 +119,7 @@ from .greenlantern import GreenLantern
 from .megaman import MegaMan
 from .settings import Settings
 from .gamma import Gamma
+from .timers import Timers
 from .effects import Effects
 from .testpattern import TestPattern
 from .about import About
@@ -275,6 +283,7 @@ ALL_VISUALS = [
     MegaMan,
     Settings,
     Gamma,
+    Timers,
     Effects,
     TestPattern,
     About,
@@ -366,6 +375,13 @@ ALL_VISUALS = [
     WonderColorBars,
     WonderVHS,
     WonderBoing,
+    BML,
+    Highway,
+    Intersection,
+    Roundabout,
+    Interchange,
+    GreenWave,
+    Merge,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
@@ -486,6 +502,7 @@ __all__ = [
     'MegaMan',
     'Settings',
     'Gamma',
+    'Timers',
     'TestPattern',
     'About',
     'SysInfo',
@@ -538,6 +555,13 @@ __all__ = [
     'Antikythera',
     'Astrolabe',
     'Archimedes',
+    'BML',
+    'Highway',
+    'Intersection',
+    'Roundabout',
+    'Interchange',
+    'GreenWave',
+    'Merge',
     'Slideshow',
     'AllVisuals',
     'Chill',

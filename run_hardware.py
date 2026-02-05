@@ -518,6 +518,12 @@ def main():
     idle_visual = None
     idle_cycle_timer = 0.0
 
+    # Load timer settings
+    idle_timeout = persistent.get_idle_timeout()
+    cycle_duration = persistent.get_cycle_duration()
+    sleep_minutes = persistent.get_sleep_timer()
+    uptime = 0.0  # Total runtime for sleep timer
+
     # Idle transition manager
     from transitions import TransitionManager
     idle_transition = TransitionManager()
@@ -572,6 +578,12 @@ def main():
 
             input_cooldown = max(0, input_cooldown - dt)
 
+            # Sleep timer
+            uptime += dt
+            if sleep_minutes > 0 and uptime >= sleep_minutes * 60:
+                import os
+                os.system("sudo shutdown -h now")
+
             # Update input
             input_state = input_handler.update()
 
@@ -593,7 +605,7 @@ def main():
                                 idle_visual.update(dt)
                         else:
                             idle_cycle_timer += dt
-                            if idle_cycle_timer >= 30.0:
+                            if idle_cycle_timer >= cycle_duration:
                                 # Start transition to new visual
                                 old_visual = idle_visual
                                 new_visual = _pick_idle_visual(display)
@@ -624,7 +636,7 @@ def main():
                         idle_timer = 0.0
                     else:
                         idle_timer += dt
-                        if idle_timer >= 60.0:
+                        if idle_timer >= idle_timeout:
                             in_idle = True
                             idle_visual = _pick_idle_visual(display)
                             idle_cycle_timer = 0.0
@@ -918,6 +930,10 @@ def main():
                                 in_menu = True
                                 current_item = None
                                 idle_timer = 0.0
+                                # Reload timer settings (may have changed)
+                                idle_timeout = persistent.get_idle_timeout()
+                                cycle_duration = persistent.get_cycle_duration()
+                                sleep_minutes = persistent.get_sleep_timer()
                             else:
                                 current_item.update(dt)
                                 current_item.draw()

@@ -18,6 +18,9 @@ DEFAULTS = {
     "enabled_transitions": None,  # None means all enabled
     "gamma": 2.2,
     "toe": 0.25,
+    "idle_timeout": 60,
+    "cycle_duration": 30,
+    "sleep_timer": 0,
 }
 
 # In-memory settings cache
@@ -108,3 +111,36 @@ def set_toe(value):
     """Set toe setting (0.0-1.0)."""
     value = max(0.0, min(1.0, round(value, 2)))
     set("toe", value)
+
+
+def get_idle_timeout():
+    """Get idle timeout in seconds (15-300)."""
+    return get("idle_timeout", 60)
+
+
+def set_idle_timeout(value):
+    """Set idle timeout in seconds (15-300)."""
+    value = max(15, min(300, int(value)))
+    set("idle_timeout", value)
+
+
+def get_cycle_duration():
+    """Get visual cycle duration in seconds (10-120)."""
+    return get("cycle_duration", 30)
+
+
+def set_cycle_duration(value):
+    """Set visual cycle duration in seconds (10-120)."""
+    value = max(10, min(120, int(value)))
+    set("cycle_duration", value)
+
+
+def get_sleep_timer():
+    """Get sleep timer in minutes (0=off, 5-180)."""
+    return get("sleep_timer", 0)
+
+
+def set_sleep_timer(value):
+    """Set sleep timer in minutes (0=off, 5-180)."""
+    value = max(0, min(180, int(value)))
+    set("sleep_timer", value)
