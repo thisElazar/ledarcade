@@ -460,9 +460,9 @@ class NightDriver(Game):
         # Draw score
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
 
-        # Draw speed indicator
-        speed_pct = int((self.speed / self.max_speed) * 99)
-        self.display.draw_text_small(45, 1, f"{speed_pct}", Colors.YELLOW)
+        # Draw speed as MPH
+        speed_mph = int(self.speed)
+        self.display.draw_text_small(45, 1, f"{speed_mph}", Colors.YELLOW)
 
         # Draw turn indicator (flashing orange for hairpin/chicane)
         if abs(self.curve) > 0.3:
