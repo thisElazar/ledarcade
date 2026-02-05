@@ -90,7 +90,7 @@ class HardwareDisplay:
     Drop-in replacement for arcade.py Display class.
     """
 
-    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2):
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2, gamma: float = 2.2):
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
@@ -111,6 +111,10 @@ class HardwareDisplay:
         self._fb = bytearray(GRID_SIZE * GRID_SIZE * 3)
         # Pre-allocated zero buffer for fast black clear
         self._zeros = bytes(GRID_SIZE * GRID_SIZE * 3)
+
+        # Gamma correction LUT - applied in render() so get_pixel() returns logical values
+        # Uses bytes.translate() for fast C-level per-byte mapping
+        self._gamma_lut = bytes([int(round(255 * (i / 255) ** gamma)) for i in range(256)])
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
@@ -238,18 +242,19 @@ class HardwareDisplay:
     def render(self):
         """Render the buffer to the LED matrix using bulk SetImage."""
         canvas = self.canvas
+        # Apply gamma correction to a copy (keeps _fb at logical values for get_pixel)
+        corrected = self._fb.translate(self._gamma_lut)
         if HAS_PIL:
             # Bulk transfer: PIL Image from bytearray, single C call to matrix
-            img = Image.frombuffer('RGB', (GRID_SIZE, GRID_SIZE), self._fb, 'raw', 'RGB', 0, 1)
+            img = Image.frombuffer('RGB', (GRID_SIZE, GRID_SIZE), corrected, 'raw', 'RGB', 0, 1)
             canvas.SetImage(img)
         else:
             # Fallback: per-pixel from flat bytearray (slower)
-            fb = self._fb
             for y in range(GRID_SIZE):
                 row_offset = y * GRID_SIZE * 3
                 for x in range(GRID_SIZE):
                     offset = row_offset + x * 3
-                    canvas.SetPixel(x, y, fb[offset], fb[offset+1], fb[offset+2])
+                    canvas.SetPixel(x, y, corrected[offset], corrected[offset+1], corrected[offset+2])
         self.canvas = self.matrix.SwapOnVSync(canvas)
 
 

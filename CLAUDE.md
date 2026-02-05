@@ -43,19 +43,27 @@ python3 run_arcade.py
 - `run_hardware.py` - Hardware launcher for Pi
 - `catalog.py` - Category system for menu organization
 
-## Game Categories (35 games)
-- `arcade` - Classic arcade machines (17): Pac-Man, Galaga, Invaders, Tetris, etc.
+## Game Categories (52 games)
+- `arcade` - Classic arcade machines (17): Pac-Man, Galaga, Invaders, Tetris, BurgerTime, etc.
 - `retro` - Computer/console classics (6): Arkanoid, JezzBall, Pipe Dream, etc.
 - `modern` - Mobile-era games (6): Flappy, 2048, Geometry Dash, etc.
+- `bar` - Bar games (6): Bowling, Darts, Pinball, Pool, Shuffleboard
+- `toys` - Toys & puzzles (6): Bop It, Fifteen Puzzle, Mastermind, Rush Hour, Simon, Tetris
 - `2_player` - Turn-based multiplayer (6): Chess, Go, Checkers, etc.
+- `shuffle` - Playlist modes (6): AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics
 
-## Visual Categories (44 visuals)
+## Visual Categories (142 files, 110+ unique effects)
 - `automata` - Cellular automata & agents (11): Life, Boids, Slime, Hodge, etc.
-- `nature` - Natural phenomena (7): Fire, Plasma, Starfield, Weather, etc.
+- `art` - Famous paintings (5): Starry Night, Water Lilies, Mondrian, Great Wave, Scream
+- `demos` - AI-controlled gameplay demos (42)
 - `digital` - Math/computer viz (13): Matrix, Rotozoom, Copper Bars, etc.
-- `art` - Famous paintings (3): Starry Night, Water Lilies, Mondrian
 - `household` - Domestic nostalgia (5): DVD, Lava Lamp, Solitaire, Cat, etc.
-- `utility` - Functional displays (5): Clock, Sysinfo, Settings, etc.
+- `mechanics` - Historical machines (21): Swiss Watch, Locomotive, Orrery, Curta, etc.
+- `outdoors` - Natural phenomena (7): Fire, Plasma, Starfield, Weather, Aurora, etc.
+- `science` - Scientific viz (18): Turing patterns, Orbits, EM fields, Fluid, Neurons, etc.
+- `sprites` - Game character animations (9): Mario, Sonic, Link, Yoshi, etc.
+- `superheroes` - Comic characters (4): Spidey, Batman, Green Lantern
+- `utility` - Functional displays (9): Clock, Settings, Test Pattern, About, Shutdown
 
 ## Design Guidelines
 - 64x64 pixel canvas - keep visuals simple and bold
