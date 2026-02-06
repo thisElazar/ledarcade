@@ -241,6 +241,7 @@ class Demos(Slideshow):
         from visuals.froggerdemo import FroggerDemo
         from visuals.breakoutdemo import BreakoutDemo
         from visuals.galagademo import GalagaDemo
+        from visuals.defenderdemo import DefenderDemo
         from visuals.centipededemo import CentipedeDemo
         from visuals.donkeykongdemo import DonkeyKongDemo
         from visuals.qbertdemo import QBertDemo
@@ -279,8 +280,9 @@ class Demos(Slideshow):
         from visuals.agariodemo import AgarioDemo
         return [
             # Classic arcade
-            PacManDemo, MsPacManDemo, GalagaDemo, InvadersDemo, CentipedeDemo,
-            DonkeyKongDemo, QBertDemo, FroggerDemo, DigDugDemo, BurgerTimeDemo,
+            PacManDemo, MsPacManDemo, GalagaDemo, DefenderDemo, InvadersDemo,
+            CentipedeDemo, DonkeyKongDemo, QBertDemo, FroggerDemo, DigDugDemo,
+            BurgerTimeDemo,
             # Action/puzzle
             TetrisDemo, BreakoutDemo, ArkanoidDemo, AsteroidsDemo, BombermanDemo,
             # Modern/casual

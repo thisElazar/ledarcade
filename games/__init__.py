@@ -32,6 +32,7 @@ from .stack import Stack
 from .geometrydash import GeometryDash
 from .agario import Agario
 from .galaga import Galaga
+from .defender import Defender
 from .centipede import Centipede
 from .mancala import Mancala
 from .go import Go
@@ -88,6 +89,7 @@ ALL_GAMES = [
     GeometryDash,
     Agario,
     Galaga,
+    Defender,
     Centipede,
     Mancala,
     Go,
@@ -152,6 +154,7 @@ __all__ = [
     'GeometryDash',
     'Agario',
     'Galaga',
+    'Defender',
     'Centipede',
     'Mancala',
     'Go',

@@ -197,6 +197,7 @@ from .centipededemo import CentipedeDemo
 from .checkersdemo import CheckersDemo
 from .chessdemo import ChessDemo
 from .dartsdemo import DartsDemo
+from .defenderdemo import DefenderDemo
 from .digdugdemo import DigDugDemo
 from .donkeykongdemo import DonkeyKongDemo
 from .flappydemo import FlappyDemo
@@ -433,6 +434,7 @@ ALL_VISUALS = [
     CheckersDemo,
     ChessDemo,
     DartsDemo,
+    DefenderDemo,
     DigDugDemo,
     DonkeyKongDemo,
     FlappyDemo,
@@ -607,4 +609,5 @@ __all__ = [
     'ScienceLab',
     'Demos',
     'AgarioDemo',
+    'DefenderDemo',
 ]
