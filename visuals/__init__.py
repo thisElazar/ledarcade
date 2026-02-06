@@ -143,6 +143,10 @@ from .proteins import Proteins
 from .periodic import Periodic
 from .microscope import Microscope
 from .cell import Cell
+from .dna import DNA
+from .spectroscope import Spectroscope
+from .oscilloscope import Oscilloscope
+from .chladni import Chladni
 from .metronome import Metronome
 from .watchgears import WatchGears
 from .camshaft import Camshaft
@@ -321,6 +325,10 @@ ALL_VISUALS = [
     Periodic,
     Microscope,
     Cell,
+    DNA,
+    Spectroscope,
+    Oscilloscope,
+    Chladni,
     Metronome,
     WatchGears,
     Camshaft,
@@ -553,6 +561,10 @@ __all__ = [
     'Periodic',
     'Microscope',
     'Cell',
+    'DNA',
+    'Spectroscope',
+    'Oscilloscope',
+    'Chladni',
     'Metronome',
     'WatchGears',
     'Camshaft',
