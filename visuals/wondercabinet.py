@@ -3528,6 +3528,37 @@ class WonderN64(Visual):
     description = "N64 spinning logo"
     category = "titles"
 
+    # 9x11 "W" bitmap
+    W_SHAPE = [
+        "100000001",
+        "100000001",
+        "100000001",
+        "010000010",
+        "010000010",
+        "010010010",
+        "010010010",
+        "001010100",
+        "001010100",
+        "001010100",
+        "000101000",
+    ]
+    # 7x11 "C" bitmap
+    C_SHAPE = [
+        "0011111",
+        "0100001",
+        "1000000",
+        "1000000",
+        "1000000",
+        "1000000",
+        "1000000",
+        "1000000",
+        "1000000",
+        "0100001",
+        "0011111",
+    ]
+
+    N64_COLORS = [(0, 150, 0), (200, 0, 0), (0, 0, 200), (220, 180, 0)]
+
     def __init__(self, display: Display):
         super().__init__(display)
 
@@ -3537,46 +3568,48 @@ class WonderN64(Visual):
     def update(self, dt: float):
         self.time += dt
 
+    def _draw_letter(self, shape, cx, cy, angle, color_idx):
+        """Draw a bitmap letter with fake 3D rotation on vertical axis."""
+        h = len(shape)
+        w = len(shape[0])
+        cos_a = math.cos(angle)
+        squeeze = abs(cos_a)  # horizontal compression
+        face = int((angle / (math.pi * 2)) * 4) % 4
+        c = self.N64_COLORS[(color_idx + face) % 4]
+        # Darken back-facing side
+        if cos_a < 0:
+            c = (c[0] // 2, c[1] // 2, c[2] // 2)
+
+        for row in range(h):
+            for col in range(w):
+                if shape[row][col] == '1':
+                    # Apply horizontal squeeze around center
+                    dx = (col - w / 2.0) * squeeze
+                    px = cx + int(dx)
+                    py = cy + row - h // 2
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, c)
+                        # Thicken when face-on
+                        if squeeze > 0.5 and px + 1 < GRID_SIZE:
+                            self.display.set_pixel(px + 1, py, c)
+
     def draw(self):
         self.display.clear(Colors.BLACK)
         cycle = 8.0
         t = self.time % cycle
-        cx, cy = 32, 22
+        angle = t * 1.8  # rotation speed
 
-        # Spinning N made of 4 colored faces
-        angle = t * 1.5
-        scale = min(1.0, t / 1.5) * 12  # zoom in
-        n_colors = [(0, 120, 0), (255, 0, 0), (0, 0, 200), (255, 200, 0)]
+        # Zoom in during first 1.5s
+        if t < 1.5:
+            frac = t / 1.5
+            scale = frac
+        else:
+            scale = 1.0
 
-        # Draw 4 rotated bars forming the N shape
-        for i in range(4):
-            a = angle + i * math.pi / 2
-            cos_a = math.cos(a)
-            sin_a = math.sin(a)
-
-            # N shape: two verticals and a diagonal
-            if i % 2 == 0:
-                # Vertical bars
-                for dy in range(-8, 9):
-                    offset = -5 if i == 0 else 5
-                    px = cx + int(offset * cos_a * scale / 12)
-                    py = cy + dy * int(max(1, scale)) // 12
-                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
-                        self.display.set_pixel(px, py, n_colors[i])
-                        if abs(cos_a) > 0.3:
-                            nx = px + (1 if cos_a > 0 else -1)
-                            if 0 <= nx < GRID_SIZE:
-                                self.display.set_pixel(nx, py, n_colors[i])
-            else:
-                # Diagonal connector
-                for step in range(17):
-                    frac = step / 16.0
-                    dx = -5 + 10 * frac
-                    dy = 8 - 16 * frac
-                    px = cx + int(dx * cos_a * scale / 12)
-                    py = cy + int(dy * scale / 12)
-                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
-                        self.display.set_pixel(px, py, n_colors[i])
+        if scale > 0.3:
+            # W centered at left, C centered at right
+            self._draw_letter(self.W_SHAPE, 22, 22, angle, 0)
+            self._draw_letter(self.C_SHAPE, 42, 22, angle + 0.5, 2)
 
         # Title text fades in
         if t > 3.0:
@@ -3664,90 +3697,120 @@ class WonderBreakout(Visual):
 
     def reset(self):
         self.time = 0.0
-        # Build brick grid
+        self.title_time = 0.0
+        # Build brick grid — 3 rows for faster clearing
         self.bricks = []
-        colors = [(255, 50, 50), (255, 160, 0), (255, 255, 50),
-                  (50, 255, 50), (50, 180, 255)]
-        for row in range(5):
+        colors = [(255, 50, 50), (255, 200, 50), (50, 200, 255)]
+        for row in range(3):
             for col in range(8):
                 self.bricks.append({
-                    'x': col * 8, 'y': 4 + row * 5,
-                    'w': 7, 'h': 4,
+                    'x': col * 8, 'y': 4 + row * 6,
+                    'w': 7, 'h': 5,
                     'color': colors[row],
                     'alive': True,
                     'break_time': None,
                 })
         # Ball
         self.ball_x = 32.0
-        self.ball_y = 50.0
-        self.ball_vx = 25.0
-        self.ball_vy = -30.0
+        self.ball_y = 40.0
+        self.ball_vx = 45.0
+        self.ball_vy = -55.0
         # Paddle
         self.paddle_x = 28.0
 
+    def _aim_at_bricks(self):
+        """Aim ball towards a column that still has bricks."""
+        alive_bricks = [b for b in self.bricks if b['alive']]
+        if alive_bricks:
+            target = random.choice(alive_bricks)
+            target_x = target['x'] + target['w'] // 2
+            self.ball_vx = (target_x - self.ball_x) * 4
+            self.ball_vx = max(-60, min(60, self.ball_vx))
+
     def update(self, dt: float):
         self.time += dt
-        if self.time > 7.0:
-            self.reset()
+        alive = sum(1 for b in self.bricks if b['alive'])
+        if alive == 0:
+            self.title_time += dt
+            if self.title_time > 3.0:
+                self.reset()
             return
-        # Move ball
-        self.ball_x += self.ball_vx * dt
-        self.ball_y += self.ball_vy * dt
-        # Wall bounces
-        if self.ball_x < 1 or self.ball_x > 62:
-            self.ball_vx = -self.ball_vx
-        if self.ball_y < 1:
-            self.ball_vy = abs(self.ball_vy)
-        # Paddle bounce
-        if self.ball_y > 54 and self.ball_vy > 0:
-            self.ball_vy = -abs(self.ball_vy)
-            self.ball_vx += random.uniform(-5, 5)
-        # Brick collisions
-        bx, by = int(self.ball_x), int(self.ball_y)
-        for brick in self.bricks:
-            if not brick['alive']:
-                continue
-            if (brick['x'] <= bx < brick['x'] + brick['w'] and
-                    brick['y'] <= by < brick['y'] + brick['h']):
-                brick['alive'] = False
-                brick['break_time'] = self.time
-                self.ball_vy = -self.ball_vy
-                break
+        # After 10s, clear all remaining stragglers
+        if self.time > 10.0:
+            for b in self.bricks:
+                if b['alive']:
+                    b['alive'] = False
+                    b['break_time'] = self.time
+            return
+        # Sub-step for collision reliability
+        steps = 4
+        sub_dt = dt / steps
+        for _ in range(steps):
+            self.ball_x += self.ball_vx * sub_dt
+            self.ball_y += self.ball_vy * sub_dt
+            # Wall bounces
+            if self.ball_x < 1:
+                self.ball_x = 1
+                self.ball_vx = abs(self.ball_vx)
+            elif self.ball_x > 62:
+                self.ball_x = 62
+                self.ball_vx = -abs(self.ball_vx)
+            if self.ball_y < 1:
+                self.ball_y = 1
+                self.ball_vy = abs(self.ball_vy)
+            # Paddle bounce — aim towards remaining bricks
+            if self.ball_y > 48 and self.ball_vy > 0:
+                self.ball_y = 48
+                self.ball_vy = -abs(self.ball_vy)
+                self._aim_at_bricks()
+            # Brick collisions — ball plows through, no bounce
+            bx, by = int(self.ball_x), int(self.ball_y)
+            for brick in self.bricks:
+                if not brick['alive']:
+                    continue
+                cx = brick['x'] + brick['w'] // 2
+                cy = brick['y'] + brick['h'] // 2
+                if abs(bx - cx) < 7 and abs(by - cy) < 5:
+                    brick['alive'] = False
+                    brick['break_time'] = self.time
         # Auto-aim paddle
-        self.paddle_x += (self.ball_x - self.paddle_x - 6) * 3 * dt
+        self.paddle_x += (self.ball_x - self.paddle_x - 6) * 5 * dt
 
     def draw(self):
         self.display.clear(Colors.BLACK)
-        # Draw alive bricks
         for brick in self.bricks:
             if brick['alive']:
                 self.display.draw_rect(brick['x'], brick['y'],
                                        brick['w'], brick['h'], brick['color'])
             elif brick['break_time']:
-                # Crumble particles
-                dt = self.time - brick['break_time']
-                if dt < 1.0:
+                elapsed = self.time - brick['break_time']
+                if elapsed < 0.8:
                     for i in range(4):
                         px = brick['x'] + brick['w'] // 2 + int(
-                            math.cos(i * 1.5) * dt * 15)
-                        py = brick['y'] + int(dt * 20 + math.sin(i * 2) * 5)
+                            math.cos(i * 1.5) * elapsed * 15)
+                        py = brick['y'] + int(elapsed * 20 + math.sin(i * 2) * 5)
                         if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
-                            fade = max(0, 1.0 - dt)
+                            fade = max(0, 1.0 - elapsed / 0.8)
                             c = brick['color']
                             c = (int(c[0] * fade), int(c[1] * fade),
                                  int(c[2] * fade))
                             self.display.set_pixel(px, py, c)
-        # Ball
+        # Ball (3px)
         bx, by = int(self.ball_x), int(self.ball_y)
-        if 0 <= bx < GRID_SIZE and 0 <= by < GRID_SIZE:
-            self.display.set_pixel(bx, by, Colors.WHITE)
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
+                if dx * dx + dy * dy <= 1:
+                    px, py = bx + dx, by + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, Colors.WHITE)
         # Paddle
         px = int(self.paddle_x)
-        self.display.draw_rect(max(0, px), 56, 12, 2, (180, 180, 255))
-        # Title appears as bricks clear
+        self.display.draw_rect(max(0, px), 50, 12, 2, (180, 180, 255))
+        # Title fades in as bricks clear
         alive = sum(1 for b in self.bricks if b['alive'])
-        if alive < 30:
-            fade = 1.0 - alive / 30.0
+        total = len(self.bricks)
+        if alive < total:
+            fade = 1.0 - alive / total
             hue = (self.time * 0.2) % 1.0
             c = _hue_to_rgb(hue)
             c = (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade))
