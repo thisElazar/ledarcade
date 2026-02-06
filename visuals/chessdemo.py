@@ -85,8 +85,12 @@ class BernsteinAI:
         [0, 0, 0, 0, 0, 0, 0, 0],
     ]
 
+    OPENING_MOVES = 4  # Per side: add variety for first N moves
+    OPENING_JITTER = 8  # Extra randomness during opening
+
     def __init__(self):
         self._move_stack = []
+        self.move_count = 0
 
     def get_best_move(self, game, color):
         """Find the best move using selective search with alpha-beta."""
@@ -165,8 +169,11 @@ class BernsteinAI:
                     table_y = ty if color == WHITE else 7 - ty
                     score += self.PAWN_TABLE[table_y][tx]
 
-            # Small random for variety
-            score += random.randint(0, 2)
+            # Opening variety: extra jitter for the first few moves per side
+            if self.move_count < self.OPENING_MOVES * 2:
+                score += random.randint(0, self.OPENING_JITTER)
+            else:
+                score += random.randint(0, 2)
 
             scored_moves.append((score, random.random(), from_pos, to_pos))
 
@@ -355,6 +362,7 @@ class ChessDemo(Visual):
             self.game_over_timer += dt
             if self.game_over_timer > 5.0:
                 self.game.reset()
+                self.ai.move_count = 0
                 self.game_over_timer = 0.0
                 self.pending_move = None
             return
@@ -376,6 +384,7 @@ class ChessDemo(Visual):
         if self.pending_move:
             from_pos, to_pos = self.pending_move
             self.game.make_move(from_pos[0], from_pos[1], to_pos[0], to_pos[1])
+            self.ai.move_count += 1
             self.pending_move = None
             self.move_timer = 0.0
 
