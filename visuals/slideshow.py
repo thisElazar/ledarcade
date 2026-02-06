@@ -6,7 +6,7 @@ Hold 2 seconds to exit back to menu (handled by main loop).
 """
 
 import random
-from visuals import Visual
+from . import Visual
 from arcade import InputState
 
 
@@ -215,7 +215,7 @@ class ScienceLab(Slideshow):
 class Title(Slideshow):
     name = "TITLE"
     description = "Wonder Cabinet title screens"
-    category = "digital"
+    category = "visual_mix"
 
     def _get_visual_classes(self):
         import inspect

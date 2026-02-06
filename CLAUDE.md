@@ -60,9 +60,12 @@ python3 run_arcade.py
 - `household` - Domestic nostalgia (5): DVD, Lava Lamp, Solitaire, Cat, etc.
 - `mechanics` - Historical machines (21): Swiss Watch, Locomotive, Orrery, Curta, etc.
 - `outdoors` - Natural phenomena (7): Fire, Plasma, Starfield, Weather, Aurora, etc.
+- `road_rail` - Traffic simulations (8): Highway, Intersection, BML, etc.
 - `science` - Scientific viz (18): Turing patterns, Orbits, EM fields, Fluid, Neurons, etc.
 - `sprites` - Game character animations (9): Mario, Sonic, Link, Yoshi, etc.
 - `superheroes` - Comic characters (4): Spidey, Batman, Green Lantern
+- `titles` - Wonder Cabinet branded title screens (38)
+- `visual_mix` - Curated slideshow playlists (10): All Visuals, Chill, Energy, etc.
 - `utility` - Functional displays (9): Clock, Settings, Test Pattern, About, Shutdown
 
 ## Design Guidelines

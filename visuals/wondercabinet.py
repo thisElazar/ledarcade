@@ -63,7 +63,7 @@ def _ease_in_out(t):
 class WonderGlow(Visual):
     name = "WONDER GLOW"
     description = "Wonder Cabinet ambient glow"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -125,7 +125,7 @@ class WonderGlow(Visual):
 class WonderMarquee(Visual):
     name = "WONDER MARQUEE"
     description = "Arcade marquee border"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -176,7 +176,7 @@ class WonderMarquee(Visual):
 class WonderCrawl(Visual):
     name = "WONDER CRAWL"
     description = "Star Wars title crawl"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -233,7 +233,7 @@ class WonderCrawl(Visual):
 class WonderSlide(Visual):
     name = "WONDER SLIDE"
     description = "Sliding text from sides"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -288,7 +288,7 @@ class WonderSlide(Visual):
 class WonderDrop(Visual):
     name = "WONDER DROP"
     description = "Bouncing text from above"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -364,7 +364,7 @@ class WonderDrop(Visual):
 class WonderSpin(Visual):
     name = "WONDER SPIN"
     description = "Orbiting title text"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -419,7 +419,7 @@ class WonderSpin(Visual):
 class WonderPacMan(Visual):
     name = "WONDER PAC"
     description = "Pac-Man reveals title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -508,7 +508,7 @@ class WonderPacMan(Visual):
 class WonderInvaders(Visual):
     name = "WONDER INVADE"
     description = "Space Invaders title"
-    category = "digital"
+    category = "titles"
 
     # 5x3 invader sprite
     INVADER = [
@@ -572,7 +572,7 @@ class WonderInvaders(Visual):
 class WonderTetris(Visual):
     name = "WONDER TETRIS"
     description = "Tetris blocks title"
-    category = "digital"
+    category = "titles"
 
     PIECE_COLORS = [
         (0, 255, 255),   # I - cyan
@@ -656,7 +656,7 @@ class WonderTetris(Visual):
 class WonderMatrix(Visual):
     name = "WONDER MATRIX"
     description = "Matrix rain title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -729,7 +729,7 @@ class WonderMatrix(Visual):
 class WonderNeon(Visual):
     name = "WONDER NEON"
     description = "Neon sign title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -807,7 +807,7 @@ class WonderNeon(Visual):
 class WonderFilm(Visual):
     name = "WONDER FILM"
     description = "Film countdown title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -908,7 +908,7 @@ class WonderFilm(Visual):
 class WonderRetroTV(Visual):
     name = "WONDER TV"
     description = "Retro TV static title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -977,7 +977,7 @@ class WonderRetroTV(Visual):
 class WonderDK(Visual):
     name = "WONDER DK"
     description = "Donkey Kong girder title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -1034,7 +1034,7 @@ class WonderDK(Visual):
 class WonderFrogger(Visual):
     name = "WONDER FROG"
     description = "Frogger lane title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -1166,7 +1166,7 @@ _MAX_SNAPS = 120    # cap on stored snapshots
 class WonderLife(Visual):
     name = "WONDER LIFE"
     description = "Game of Life title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 0.12
 
     def __init__(self, display: Display):
@@ -1264,7 +1264,7 @@ class WonderLife(Visual):
 class WonderHodge(Visual):
     name = "WONDER HODGE"
     description = "BZ reaction title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 0.08
 
     def __init__(self, display: Display):
@@ -1373,7 +1373,7 @@ class WonderHodge(Visual):
 class WonderStarWars(Visual):
     name = "WONDER WARS"
     description = "Star Wars CA title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 0.1
 
     PALETTES = [
@@ -1487,7 +1487,7 @@ class WonderStarWars(Visual):
 class WonderBoids(Visual):
     name = "WONDER FLOCK"
     description = "Boid flocking from title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 1.0 / 10
 
     def __init__(self, display: Display):
@@ -1642,7 +1642,7 @@ class WonderBoids(Visual):
 class WonderSlime(Visual):
     name = "WONDER SLIME"
     description = "Slime mold from title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 1.0 / 20
 
     def __init__(self, display: Display):
@@ -1776,7 +1776,7 @@ class WonderSlime(Visual):
 class WonderDiffusion(Visual):
     name = "WONDER HEAT"
     description = "Heat diffusion from title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 1.0 / 20
 
     def __init__(self, display: Display):
@@ -1875,7 +1875,7 @@ class WonderDiffusion(Visual):
 class WonderBrain(Visual):
     name = "WONDER BRAIN"
     description = "Brian's Brain from title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 0.1
 
     def __init__(self, display: Display):
@@ -1978,7 +1978,7 @@ class WonderBrain(Visual):
 class WonderFlow(Visual):
     name = "WONDER FLOW"
     description = "Flow field from title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 1.0 / 20
 
     def __init__(self, display: Display):
@@ -2090,7 +2090,7 @@ class WonderFlow(Visual):
 class WonderSand(Visual):
     name = "WONDER SAND"
     description = "Sandpile title seed"
-    category = "digital"
+    category = "titles"
     _INTERVAL = 0.03
 
     COLORS = [
@@ -2194,7 +2194,7 @@ class WonderSand(Visual):
 class WonderPong(Visual):
     name = "WONDER PONG"
     description = "Pong rally title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2299,7 +2299,7 @@ class WonderPong(Visual):
 class WonderSega(Visual):
     name = "WONDER SEGA"
     description = "Sega zoom splash"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2379,7 +2379,7 @@ class WonderSega(Visual):
 class WonderPS1(Visual):
     name = "WONDER PS1"
     description = "PS1 startup particles"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2474,7 +2474,7 @@ class WonderPS1(Visual):
 class WonderInsertCoin(Visual):
     name = "WONDER COIN"
     description = "Insert coin title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2560,7 +2560,7 @@ class WonderInsertCoin(Visual):
 class WonderCreeper(Visual):
     name = "WONDER CREEP"
     description = "Creeper explosion title"
-    category = "digital"
+    category = "titles"
 
     # 8x8 creeper face pattern (1 = dark green feature)
     FACE = [
@@ -2676,7 +2676,7 @@ class WonderCreeper(Visual):
 class WonderNyanCat(Visual):
     name = "WONDER NYAN"
     description = "Nyan Cat rainbow title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2754,7 +2754,7 @@ class WonderNyanCat(Visual):
 class WonderC64(Visual):
     name = "WONDER C64"
     description = "C64 boot screen"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2835,7 +2835,7 @@ class WonderC64(Visual):
 class WonderGameBoy(Visual):
     name = "WONDER GBOY"
     description = "Game Boy startup"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2915,7 +2915,7 @@ class WonderGameBoy(Visual):
 class WonderDOS(Visual):
     name = "WONDER DOS"
     description = "DOS boot sequence"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -2995,7 +2995,7 @@ class WonderDOS(Visual):
 class WonderBSOD(Visual):
     name = "WONDER BSOD"
     description = "Blue screen of death"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -3087,7 +3087,7 @@ class WonderBSOD(Visual):
 class WonderLoading(Visual):
     name = "WONDER LOAD"
     description = "Loading bar comedy"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -3183,7 +3183,7 @@ class WonderLoading(Visual):
 class WonderColorBars(Visual):
     name = "WONDER BARS"
     description = "SMPTE color bars title"
-    category = "digital"
+    category = "titles"
 
     BARS = [
         (191, 191, 191),  # gray
@@ -3290,7 +3290,7 @@ class WonderColorBars(Visual):
 class WonderVHS(Visual):
     name = "WONDER VHS"
     description = "VHS tracking title"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -3378,7 +3378,7 @@ class WonderVHS(Visual):
 class WonderBoing(Visual):
     name = "WONDER BOING"
     description = "Amiga Boing Ball"
-    category = "digital"
+    category = "titles"
 
     def __init__(self, display: Display):
         super().__init__(display)

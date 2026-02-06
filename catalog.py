@@ -57,6 +57,7 @@ VISUAL_CATEGORIES = [
     Category("SCIENCE", Colors.BLUE, "science"),
     Category("SPRITES", Colors.LIME, "sprites"),
     Category("SUPERHEROES", Colors.RED, "superheroes"),
+    Category("TITLES", (200, 180, 255), "titles"),
     Category("VISUAL MIX", (100, 255, 100), "visual_mix"),
     Category("UTILITY", Colors.WHITE, "utility"),      # Always last
 ]
