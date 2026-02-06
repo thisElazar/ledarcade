@@ -86,7 +86,7 @@ PIN_PATTERN = [
 class MusicBox(Visual):
     name = "MUSIC BOX"
     description = "Cylinder music box"
-    category = "mechanics"
+    category = "music"
 
     def __init__(self, display: Display):
         super().__init__(display)

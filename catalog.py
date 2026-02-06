@@ -52,6 +52,7 @@ VISUAL_CATEGORIES = [
     Category("DIGITAL", Colors.CYAN, "digital"),
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
     Category("MECHANICS", Colors.PURPLE, "mechanics"),
+    Category("MUSIC", (255, 180, 50), "music"),
     Category("OUTDOORS", Colors.GREEN, "nature"),
     Category("ROAD+RAIL", (255, 160, 0), "road_rail"),
     Category("SCIENCE", Colors.BLUE, "science"),

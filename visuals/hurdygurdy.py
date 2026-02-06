@@ -120,7 +120,7 @@ FOLK_MELODY = [
 class HurdyGurdy(Visual):
     name = "HURDY GURDY"
     description = "Crank string instrument"
-    category = "mechanics"
+    category = "music"
 
     def __init__(self, display: Display):
         super().__init__(display)

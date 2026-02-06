@@ -147,7 +147,13 @@ from .dna import DNA
 from .spectroscope import Spectroscope
 from .oscilloscope import Oscilloscope
 from .chladni import Chladni
+from .theremin import Theremin
+from .equalizer import Equalizer
 from .metronome import Metronome
+from .turntable import Turntable
+from .drummachine import DrumMachine
+from .jukebox import Jukebox
+from .synthesizer import Synthesizer
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -158,12 +164,14 @@ from .singer import Singer
 from .projector import Projector
 from .typewriter import Typewriter
 from .musicbox import MusicBox
+from .pianoroll import PianoRoll
 from .gutenberg import GutenbergPress
 from .orrery import Orrery
 from .gyroscope import Gyroscope
 from .curta import Curta
 from .loom import Loom
 from .jacquard import Jacquard
+from .gramophone import Gramophone
 from .hurdygurdy import HurdyGurdy
 from .antikythera import Antikythera
 from .astrolabe import Astrolabe
@@ -229,7 +237,7 @@ from .trashblasterdemo import TrashBlasterDemo
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
-    ScienceLab, Title, Demos,
+    ScienceLab, Title, Demos, MusicMix,
 )
 
 # List of all available visuals
@@ -331,7 +339,13 @@ ALL_VISUALS = [
     Spectroscope,
     Oscilloscope,
     Chladni,
+    Theremin,
+    Equalizer,
     Metronome,
+    Turntable,
+    DrumMachine,
+    Jukebox,
+    Synthesizer,
     WatchGears,
     Camshaft,
     GrandfatherClock,
@@ -342,12 +356,14 @@ ALL_VISUALS = [
     Projector,
     Typewriter,
     MusicBox,
+    PianoRoll,
     GutenbergPress,
     Orrery,
     Gyroscope,
     Curta,
     Loom,
     Jacquard,
+    Gramophone,
     HurdyGurdy,
     Antikythera,
     Astrolabe,
@@ -422,6 +438,7 @@ ALL_VISUALS = [
     Demoscene,
     Complexity,
     ScienceLab,
+    MusicMix,
     # Individual game demos
     AgarioDemo,
     ArkanoidDemo,
@@ -569,7 +586,13 @@ __all__ = [
     'Spectroscope',
     'Oscilloscope',
     'Chladni',
+    'Theremin',
+    'Equalizer',
     'Metronome',
+    'Turntable',
+    'DrumMachine',
+    'Jukebox',
+    'Synthesizer',
     'WatchGears',
     'Camshaft',
     'GrandfatherClock',
@@ -580,12 +603,14 @@ __all__ = [
     'Projector',
     'Typewriter',
     'MusicBox',
+    'PianoRoll',
     'GutenbergPress',
     'Orrery',
     'Gyroscope',
     'Curta',
     'Loom',
     'Jacquard',
+    'Gramophone',
     'HurdyGurdy',
     'Antikythera',
     'Astrolabe',
@@ -607,6 +632,7 @@ __all__ = [
     'Demoscene',
     'Complexity',
     'ScienceLab',
+    'MusicMix',
     'Demos',
     'AgarioDemo',
     'DefenderDemo',

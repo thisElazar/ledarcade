@@ -30,7 +30,7 @@ BEAT_TEXT = (255, 60, 60)
 class Metronome(Visual):
     name = "METRONOME"
     description = "Mechanical metronome"
-    category = "mechanics"
+    category = "music"
 
     # Layout
     PIVOT_X = 32

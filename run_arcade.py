@@ -619,6 +619,8 @@ def main():
                             new_visual = _pick_idle_visual(display)
                             if old_visual and new_visual:
                                 idle_transition.start(old_visual, new_visual)
+                                # Draw first transition frame to mask preload flash
+                                idle_transition.draw(display)
                             idle_visual = new_visual
                             idle_cycle_timer = 0.0
                         if idle_visual and not idle_transition.transitioning:

@@ -52,20 +52,21 @@ python3 run_arcade.py
 - `2_player` - Turn-based multiplayer (6): Chess, Go, Checkers, etc.
 - `shuffle` - Playlist modes (6): AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics
 
-## Visual Categories (142 files, 110+ unique effects)
+## Visual Categories (151 files, 119+ unique effects)
 - `automata` - Cellular automata & agents (11): Life, Boids, Slime, Hodge, etc.
 - `art` - Famous paintings (5): Starry Night, Water Lilies, Mondrian, Great Wave, Scream
 - `demos` - AI-controlled gameplay demos (44)
 - `digital` - Math/computer viz (13): Matrix, Rotozoom, Copper Bars, etc.
 - `household` - Domestic nostalgia (5): DVD, Lava Lamp, Solitaire, Cat, etc.
-- `mechanics` - Historical machines (21): Swiss Watch, Locomotive, Orrery, Curta, etc.
+- `mechanics` - Historical machines (18): Swiss Watch, Locomotive, Orrery, Curta, etc.
+- `music` - Musical instruments & audio (11): Equalizer, Turntable, Drum Machine, Piano Roll, etc.
 - `outdoors` - Natural phenomena (7): Fire, Plasma, Starfield, Weather, Aurora, etc.
 - `road_rail` - Traffic simulations (8): Highway, Intersection, BML, etc.
 - `science` - Scientific viz (28): Turing patterns, Orbits, EM fields, Fluid, Neurons, DNA, Spectroscope, etc.
 - `sprites` - Game character animations (9): Mario, Sonic, Link, Yoshi, etc.
 - `superheroes` - Comic characters (4): Spidey, Batman, Green Lantern
 - `titles` - Wonder Cabinet branded title screens (52)
-- `visual_mix` - Curated slideshow playlists (10): All Visuals, Chill, Energy, etc.
+- `visual_mix` - Curated slideshow playlists (11): All Visuals, Chill, Energy, Music Mix, etc.
 - `utility` - Functional displays (9): Clock, Settings, Test Pattern, About, Shutdown
 
 ## Design Guidelines

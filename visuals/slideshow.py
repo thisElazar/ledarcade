@@ -104,6 +104,7 @@ class AllVisuals(Slideshow):
         'superheroes': 2,
         'road_rail': 2,
         'mechanics': 1,  # show less often
+        'music': 3,
     }
 
     def _get_visual_classes(self):
@@ -224,6 +225,20 @@ class Title(Slideshow):
         import visuals.wondercabinet as wc
         return [obj for _, obj in inspect.getmembers(wc, inspect.isclass)
                 if issubclass(obj, Visual) and obj is not Visual]
+
+
+class MusicMix(Slideshow):
+    name = "MUSIC MIX"
+    description = "All music visuals"
+    category = "visual_mix"
+
+    def _get_visual_classes(self):
+        from visuals import (MusicBox, Metronome, HurdyGurdy, Equalizer,
+                             Turntable, PianoRoll, DrumMachine, Jukebox,
+                             Theremin, Gramophone, Synthesizer)
+        return [MusicBox, Metronome, HurdyGurdy, Equalizer,
+                Turntable, PianoRoll, DrumMachine, Jukebox,
+                Theremin, Gramophone, Synthesizer]
 
 
 class Demos(Slideshow):
