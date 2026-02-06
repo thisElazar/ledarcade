@@ -276,6 +276,7 @@ class Demos(Slideshow):
         from visuals.chessdemo import ChessDemo
         from visuals.checkersdemo import CheckersDemo
         from visuals.othellodemo import OthelloDemo
+        from visuals.agariodemo import AgarioDemo
         return [
             # Classic arcade
             PacManDemo, MsPacManDemo, GalagaDemo, InvadersDemo, CentipedeDemo,
@@ -283,7 +284,7 @@ class Demos(Slideshow):
             # Action/puzzle
             TetrisDemo, BreakoutDemo, ArkanoidDemo, AsteroidsDemo, BombermanDemo,
             # Modern/casual
-            FlappyDemo, Game2048Demo, SnakeDemo, StackDemo, GeometryDemo,
+            FlappyDemo, Game2048Demo, SnakeDemo, StackDemo, GeometryDemo, AgarioDemo,
             # Racing/sports
             Indy500Demo, PongDemo, BowlingDemo, DartsDemo,
             # Simulation/other

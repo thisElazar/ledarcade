@@ -186,6 +186,7 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderDoom, WonderPipe, WonderWinXP,
                             WonderGlitch, WonderTypewriter, WonderZoom,
                             WonderVinyl, WonderCassette)
+from .agariodemo import AgarioDemo
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
@@ -421,6 +422,7 @@ ALL_VISUALS = [
     Complexity,
     ScienceLab,
     # Individual game demos
+    AgarioDemo,
     ArkanoidDemo,
     AsteroidsDemo,
     BombermanDemo,
@@ -604,4 +606,5 @@ __all__ = [
     'Complexity',
     'ScienceLab',
     'Demos',
+    'AgarioDemo',
 ]

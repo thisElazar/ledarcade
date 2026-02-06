@@ -43,10 +43,10 @@ python3 run_arcade.py
 - `run_hardware.py` - Hardware launcher for Pi
 - `catalog.py` - Category system for menu organization
 
-## Game Categories (52 games)
+## Game Categories (53 games)
 - `arcade` - Classic arcade machines (17): Pac-Man, Galaga, Invaders, Tetris, BurgerTime, etc.
 - `retro` - Computer/console classics (6): Arkanoid, JezzBall, Pipe Dream, etc.
-- `modern` - Mobile-era games (6): Flappy, 2048, Geometry Dash, etc.
+- `modern` - Mobile-era games (7): Flappy, 2048, Geometry Dash, Agar.io, etc.
 - `bar` - Bar games (6): Bowling, Darts, Pinball, Pool, Shuffleboard
 - `toys` - Toys & puzzles (6): Bop It, Fifteen Puzzle, Mastermind, Rush Hour, Simon, Tetris
 - `2_player` - Turn-based multiplayer (6): Chess, Go, Checkers, etc.
@@ -55,7 +55,7 @@ python3 run_arcade.py
 ## Visual Categories (142 files, 110+ unique effects)
 - `automata` - Cellular automata & agents (11): Life, Boids, Slime, Hodge, etc.
 - `art` - Famous paintings (5): Starry Night, Water Lilies, Mondrian, Great Wave, Scream
-- `demos` - AI-controlled gameplay demos (42)
+- `demos` - AI-controlled gameplay demos (43)
 - `digital` - Math/computer viz (13): Matrix, Rotozoom, Copper Bars, etc.
 - `household` - Domestic nostalgia (5): DVD, Lava Lamp, Solitaire, Cat, etc.
 - `mechanics` - Historical machines (21): Swiss Watch, Locomotive, Orrery, Curta, etc.

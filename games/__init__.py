@@ -30,6 +30,7 @@ from .indy500 import Indy500
 from .stickrunner import StickRunner
 from .stack import Stack
 from .geometrydash import GeometryDash
+from .agario import Agario
 from .galaga import Galaga
 from .centipede import Centipede
 from .mancala import Mancala
@@ -85,6 +86,7 @@ ALL_GAMES = [
     StickRunner,
     Stack,
     GeometryDash,
+    Agario,
     Galaga,
     Centipede,
     Mancala,
@@ -148,6 +150,7 @@ __all__ = [
     'StickRunner',
     'Stack',
     'GeometryDash',
+    'Agario',
     'Galaga',
     'Centipede',
     'Mancala',
