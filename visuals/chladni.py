@@ -95,23 +95,45 @@ class Chladni(Visual):
                    - math.cos(m * math.pi * x) * math.cos(n * math.pi * y))
             return val
 
+    # Modes sorted by ascending frequency (n² + m²).
+    # For a ~20cm square brass plate, f ≈ 28 * (n² + m²) Hz.
+    FREQ_CONST = 28.0  # Hz per unit of (n² + m²)
+    MODES = [
+        (1, 2),  #  140 Hz
+        (1, 3),  #  280 Hz
+        (2, 3),  #  364 Hz
+        (1, 4),  #  476 Hz
+        (2, 4),  #  560 Hz
+        (3, 4),  #  700 Hz
+        (2, 5),  #  812 Hz
+        (3, 5),  #  952 Hz
+        (1, 5),  #  728 Hz — close to (3,4), keeps sweep interesting
+        (4, 5),  # 1148 Hz
+        (5, 6),  # 1708 Hz
+        (3, 7),  # 1624 Hz
+        (4, 7),  # 1820 Hz
+        (5, 8),  # 2492 Hz
+        (6, 7),  # 2380 Hz
+    ]
+
+    def _mode_hz(self, n, m):
+        """Real frequency in Hz for mode (n, m)."""
+        return self.FREQ_CONST * (n * n + m * m)
+
     def _get_blended_modes(self):
-        """Get two mode pairs and a blend factor from the frequency float."""
-        # Map frequency to pairs of (n, m) modes
-        modes = [
-            (1, 2), (2, 3), (1, 3), (3, 4), (2, 5),
-            (3, 5), (1, 4), (4, 5), (2, 4), (5, 6),
-            (3, 7), (4, 7), (1, 5), (5, 8), (6, 7),
-        ]
+        """Get two mode pairs, blend factor, and interpolated Hz."""
         idx = self.frequency
-        i = int(idx) % len(modes)
-        j = (i + 1) % len(modes)
+        i = int(idx) % len(self.MODES)
+        j = (i + 1) % len(self.MODES)
         blend = idx - int(idx)
-        return modes[i], modes[j], blend
+        n1, m1 = self.MODES[i]
+        n2, m2 = self.MODES[j]
+        hz = self._mode_hz(n1, m1) * (1.0 - blend) + self._mode_hz(n2, m2) * blend
+        return (n1, m1), (n2, m2), blend, hz
 
     def _blended_amplitude(self, x, y, shape):
         """Compute blended amplitude between two mode pairs."""
-        (n1, m1), (n2, m2), blend = self._get_blended_modes()
+        (n1, m1), (n2, m2), blend, _hz = self._get_blended_modes()
         a1 = self._chladni_amplitude(x, y, n1, m1, shape)
         a2 = self._chladni_amplitude(x, y, n2, m2, shape)
         return a1 * (1.0 - blend) + a2 * blend
@@ -237,14 +259,14 @@ class Chladni(Visual):
                 d.set_pixel(px, py, p[2])
 
         # Bottom label
-        (n1, m1), (n2, m2), blend = self._get_blended_modes()
+        (n1, m1), (n2, m2), blend, hz = self._get_blended_modes()
         phase = int(self.label_timer / 4) % 3
         if phase == 0:
-            label = f"MODE {n1}.{m1}"
+            label = f"{int(hz)} HZ"
         elif phase == 1:
-            label = shape_name
+            label = f"MODE {n1}.{m1}"
         else:
-            label = "CHLADNI PLATE"
+            label = shape_name
         d.draw_text_small(2, 58, label, Colors.WHITE)
 
         # Shape overlay
