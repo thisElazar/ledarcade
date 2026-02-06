@@ -3528,36 +3528,40 @@ class WonderN64(Visual):
     description = "N64 spinning logo"
     category = "titles"
 
-    # 9x11 "W" bitmap
+    # 11x13 "W" bitmap (wide enough to read at low res)
     W_SHAPE = [
-        "100000001",
-        "100000001",
-        "100000001",
-        "010000010",
-        "010000010",
-        "010010010",
-        "010010010",
-        "001010100",
-        "001010100",
-        "001010100",
-        "000101000",
+        "11000000011",
+        "11000000011",
+        "11000000011",
+        "11000000011",
+        "01100000110",
+        "01100000110",
+        "01100110110",
+        "01100110110",
+        "00101101100",
+        "00101101100",
+        "00101101100",
+        "00011011000",
+        "00011011000",
     ]
-    # 7x11 "C" bitmap
+    # 11x13 "C" bitmap (same dimensions as W)
     C_SHAPE = [
-        "0011111",
-        "0100001",
-        "1000000",
-        "1000000",
-        "1000000",
-        "1000000",
-        "1000000",
-        "1000000",
-        "1000000",
-        "0100001",
-        "0011111",
+        "00011111100",
+        "00111111110",
+        "01100000011",
+        "11000000000",
+        "11000000000",
+        "11000000000",
+        "11000000000",
+        "11000000000",
+        "11000000000",
+        "11000000000",
+        "01100000011",
+        "00111111110",
+        "00011111100",
     ]
 
-    N64_COLORS = [(0, 150, 0), (200, 0, 0), (0, 0, 200), (220, 180, 0)]
+    N64_COLORS = [(0, 180, 0), (220, 30, 30), (30, 30, 220), (230, 190, 0)]
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -3569,47 +3573,42 @@ class WonderN64(Visual):
         self.time += dt
 
     def _draw_letter(self, shape, cx, cy, angle, color_idx):
-        """Draw a bitmap letter with fake 3D rotation on vertical axis."""
+        """Draw a bitmap letter with fake 3D Y-axis rotation."""
         h = len(shape)
         w = len(shape[0])
         cos_a = math.cos(angle)
-        squeeze = abs(cos_a)  # horizontal compression
-        face = int((angle / (math.pi * 2)) * 4) % 4
+        squeeze = abs(cos_a)
+        # Skip when edge-on (too thin to see)
+        if squeeze < 0.08:
+            return
+        # Pick color based on which face is showing
+        face = int(((angle % (math.pi * 2)) / (math.pi * 2)) * 4) % 4
         c = self.N64_COLORS[(color_idx + face) % 4]
-        # Darken back-facing side
-        if cos_a < 0:
-            c = (c[0] // 2, c[1] // 2, c[2] // 2)
+        # Slightly darken when angled away
+        shade = 0.5 + 0.5 * squeeze
+        c = (int(c[0] * shade), int(c[1] * shade), int(c[2] * shade))
 
         for row in range(h):
             for col in range(w):
                 if shape[row][col] == '1':
-                    # Apply horizontal squeeze around center
                     dx = (col - w / 2.0) * squeeze
-                    px = cx + int(dx)
+                    px = cx + int(round(dx))
                     py = cy + row - h // 2
                     if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                         self.display.set_pixel(px, py, c)
-                        # Thicken when face-on
-                        if squeeze > 0.5 and px + 1 < GRID_SIZE:
-                            self.display.set_pixel(px + 1, py, c)
 
     def draw(self):
         self.display.clear(Colors.BLACK)
         cycle = 8.0
         t = self.time % cycle
-        angle = t * 1.8  # rotation speed
+        # Shared center point, like the real N64 logo
+        cx, cy = 32, 22
+        angle = t * 2.0
 
-        # Zoom in during first 1.5s
-        if t < 1.5:
-            frac = t / 1.5
-            scale = frac
-        else:
-            scale = 1.0
-
-        if scale > 0.3:
-            # W centered at left, C centered at right
-            self._draw_letter(self.W_SHAPE, 22, 22, angle, 0)
-            self._draw_letter(self.C_SHAPE, 42, 22, angle + 0.5, 2)
+        # W and C share the same center, offset by 90 degrees
+        # So when W is face-on, C is edge-on (invisible), and vice versa
+        self._draw_letter(self.W_SHAPE, cx, cy, angle, 0)
+        self._draw_letter(self.C_SHAPE, cx, cy, angle + math.pi / 2, 2)
 
         # Title text fades in
         if t > 3.0:
