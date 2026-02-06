@@ -64,7 +64,7 @@ python3 run_arcade.py
 - `science` - Scientific viz (18): Turing patterns, Orbits, EM fields, Fluid, Neurons, etc.
 - `sprites` - Game character animations (9): Mario, Sonic, Link, Yoshi, etc.
 - `superheroes` - Comic characters (4): Spidey, Batman, Green Lantern
-- `titles` - Wonder Cabinet branded title screens (38)
+- `titles` - Wonder Cabinet branded title screens (52)
 - `visual_mix` - Curated slideshow playlists (10): All Visuals, Chill, Energy, etc.
 - `utility` - Functional displays (9): Clock, Settings, Test Pattern, About, Shutdown
 

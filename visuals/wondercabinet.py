@@ -3455,3 +3455,1081 @@ class WonderBoing(Visual):
         # Title text below
         self.display.draw_text_small(WONDER_X, 50, "WONDER", (40, 40, 80))
         self.display.draw_text_small(CABINET_X, 57, "CABINET", (40, 40, 80))
+
+
+# =========================================================================
+# WonderNES - Nintendo-style red curtain reveal
+# =========================================================================
+
+class WonderNES(Visual):
+    name = "WONDER NES"
+    description = "NES startup curtain"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        cycle = 8.0
+        t = self.time % cycle
+
+        if t < 3.0:
+            # Red curtain covers screen, then splits open
+            open_frac = max(0.0, (t - 1.0) / 2.0)
+            open_px = int(open_frac * 33)
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    # Left curtain
+                    if x < 32 - open_px:
+                        wave = int(2 * math.sin(y * 0.3 + self.time * 2))
+                        shade = max(0.4, 1.0 - abs(x - 16 + wave) / 32)
+                        self.display.set_pixel(x, y,
+                            (int(200 * shade), int(20 * shade), int(20 * shade)))
+                    # Right curtain
+                    elif x >= 32 + open_px:
+                        wave = int(2 * math.sin(y * 0.3 + self.time * 2 + 1))
+                        shade = max(0.4, 1.0 - abs(x - 48 + wave) / 32)
+                        self.display.set_pixel(x, y,
+                            (int(200 * shade), int(20 * shade), int(20 * shade)))
+        elif t < 4.5:
+            # Blank pause
+            pass
+        elif t < 6.0:
+            # NES-style blink: red rectangle with white text
+            blink = int(t * 6) % 2
+            if blink:
+                self.display.draw_rect(8, 20, 48, 24, (180, 0, 0), filled=True)
+                self.display.draw_rect(8, 20, 48, 24, (255, 60, 60), filled=False)
+                self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", Colors.WHITE)
+                self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", Colors.WHITE)
+        else:
+            # Steady title with NES palette
+            self.display.draw_rect(8, 20, 48, 24, (180, 0, 0), filled=True)
+            self.display.draw_rect(8, 20, 48, 24, (255, 60, 60), filled=False)
+            pulse = 0.85 + 0.15 * math.sin(t * 4)
+            c = (int(255 * pulse), int(255 * pulse), int(255 * pulse))
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c)
+
+
+# =========================================================================
+# WonderN64 - Spinning N logo
+# =========================================================================
+
+class WonderN64(Visual):
+    name = "WONDER N64"
+    description = "N64 spinning logo"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        cycle = 8.0
+        t = self.time % cycle
+        cx, cy = 32, 22
+
+        # Spinning N made of 4 colored faces
+        angle = t * 1.5
+        scale = min(1.0, t / 1.5) * 12  # zoom in
+        n_colors = [(0, 120, 0), (255, 0, 0), (0, 0, 200), (255, 200, 0)]
+
+        # Draw 4 rotated bars forming the N shape
+        for i in range(4):
+            a = angle + i * math.pi / 2
+            cos_a = math.cos(a)
+            sin_a = math.sin(a)
+
+            # N shape: two verticals and a diagonal
+            if i % 2 == 0:
+                # Vertical bars
+                for dy in range(-8, 9):
+                    offset = -5 if i == 0 else 5
+                    px = cx + int(offset * cos_a * scale / 12)
+                    py = cy + dy * int(max(1, scale)) // 12
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, n_colors[i])
+                        if abs(cos_a) > 0.3:
+                            nx = px + (1 if cos_a > 0 else -1)
+                            if 0 <= nx < GRID_SIZE:
+                                self.display.set_pixel(nx, py, n_colors[i])
+            else:
+                # Diagonal connector
+                for step in range(17):
+                    frac = step / 16.0
+                    dx = -5 + 10 * frac
+                    dy = 8 - 16 * frac
+                    px = cx + int(dx * cos_a * scale / 12)
+                    py = cy + int(dy * scale / 12)
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, n_colors[i])
+
+        # Title text fades in
+        if t > 3.0:
+            fade = min(1.0, (t - 3.0) / 1.5)
+            c1 = (int(100 * fade), int(200 * fade), int(100 * fade))
+            c2 = (int(200 * fade), int(100 * fade), int(100 * fade))
+            self.display.draw_text_small(WONDER_X, 42, "WONDER", c1)
+            self.display.draw_text_small(CABINET_X, 50, "CABINET", c2)
+
+
+# =========================================================================
+# WonderAtari - Rainbow-stripe Fuji logo
+# =========================================================================
+
+class WonderAtari(Visual):
+    name = "WONDER ATARI"
+    description = "Atari rainbow logo"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        t = self.time
+
+        # Atari Fuji: three vertical prongs with a peak
+        cx = 32
+        peak_y = 8
+        base_y = 38
+        prong_w = 3
+        gap = 5
+
+        # Rainbow stripe colors cycling
+        stripes = [
+            (255, 50, 50), (255, 140, 0), (255, 255, 50),
+            (50, 255, 50), (50, 150, 255), (150, 50, 255),
+        ]
+
+        # Fade in
+        fade = min(1.0, t / 2.0)
+
+        # Draw the three prongs
+        for prong in range(-1, 2):
+            px = cx + prong * gap
+            for y in range(peak_y, base_y):
+                # Taper at top
+                frac = (y - peak_y) / max(1, base_y - peak_y)
+                w = max(1, int(prong_w * min(1.0, frac * 3)))
+                if prong == 0 and y < peak_y + 6:
+                    w = max(1, int(prong_w * frac * 2))
+                for dx in range(-w, w + 1):
+                    stripe_idx = int((y + t * 8) / 5) % len(stripes)
+                    c = stripes[stripe_idx]
+                    c = (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade))
+                    sx = px + dx
+                    if 0 <= sx < GRID_SIZE and 0 <= y < GRID_SIZE:
+                        self.display.set_pixel(sx, y, c)
+
+        # Title text
+        if t > 1.5:
+            text_fade = min(1.0, (t - 1.5) / 1.0)
+            c = (int(255 * text_fade), int(255 * text_fade), int(255 * text_fade))
+            self.display.draw_text_small(WONDER_X, 44, "WONDER", c)
+            self.display.draw_text_small(CABINET_X, 52, "CABINET", c)
+
+
+# =========================================================================
+# WonderBreakout - Bricks crumble to reveal title
+# =========================================================================
+
+class WonderBreakout(Visual):
+    name = "WONDER BREAK"
+    description = "Breakout bricks title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # Build brick grid
+        self.bricks = []
+        colors = [(255, 50, 50), (255, 160, 0), (255, 255, 50),
+                  (50, 255, 50), (50, 180, 255)]
+        for row in range(5):
+            for col in range(8):
+                self.bricks.append({
+                    'x': col * 8, 'y': 4 + row * 5,
+                    'w': 7, 'h': 4,
+                    'color': colors[row],
+                    'alive': True,
+                    'break_time': None,
+                })
+        # Ball
+        self.ball_x = 32.0
+        self.ball_y = 50.0
+        self.ball_vx = 25.0
+        self.ball_vy = -30.0
+        # Paddle
+        self.paddle_x = 28.0
+
+    def update(self, dt: float):
+        self.time += dt
+        if self.time > 7.0:
+            self.reset()
+            return
+        # Move ball
+        self.ball_x += self.ball_vx * dt
+        self.ball_y += self.ball_vy * dt
+        # Wall bounces
+        if self.ball_x < 1 or self.ball_x > 62:
+            self.ball_vx = -self.ball_vx
+        if self.ball_y < 1:
+            self.ball_vy = abs(self.ball_vy)
+        # Paddle bounce
+        if self.ball_y > 54 and self.ball_vy > 0:
+            self.ball_vy = -abs(self.ball_vy)
+            self.ball_vx += random.uniform(-5, 5)
+        # Brick collisions
+        bx, by = int(self.ball_x), int(self.ball_y)
+        for brick in self.bricks:
+            if not brick['alive']:
+                continue
+            if (brick['x'] <= bx < brick['x'] + brick['w'] and
+                    brick['y'] <= by < brick['y'] + brick['h']):
+                brick['alive'] = False
+                brick['break_time'] = self.time
+                self.ball_vy = -self.ball_vy
+                break
+        # Auto-aim paddle
+        self.paddle_x += (self.ball_x - self.paddle_x - 6) * 3 * dt
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        # Draw alive bricks
+        for brick in self.bricks:
+            if brick['alive']:
+                self.display.draw_rect(brick['x'], brick['y'],
+                                       brick['w'], brick['h'], brick['color'])
+            elif brick['break_time']:
+                # Crumble particles
+                dt = self.time - brick['break_time']
+                if dt < 1.0:
+                    for i in range(4):
+                        px = brick['x'] + brick['w'] // 2 + int(
+                            math.cos(i * 1.5) * dt * 15)
+                        py = brick['y'] + int(dt * 20 + math.sin(i * 2) * 5)
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            fade = max(0, 1.0 - dt)
+                            c = brick['color']
+                            c = (int(c[0] * fade), int(c[1] * fade),
+                                 int(c[2] * fade))
+                            self.display.set_pixel(px, py, c)
+        # Ball
+        bx, by = int(self.ball_x), int(self.ball_y)
+        if 0 <= bx < GRID_SIZE and 0 <= by < GRID_SIZE:
+            self.display.set_pixel(bx, by, Colors.WHITE)
+        # Paddle
+        px = int(self.paddle_x)
+        self.display.draw_rect(max(0, px), 56, 12, 2, (180, 180, 255))
+        # Title appears as bricks clear
+        alive = sum(1 for b in self.bricks if b['alive'])
+        if alive < 30:
+            fade = 1.0 - alive / 30.0
+            hue = (self.time * 0.2) % 1.0
+            c = _hue_to_rgb(hue)
+            c = (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade))
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+            c2 = _hue_to_rgb((hue + 0.15) % 1.0)
+            c2 = (int(c2[0] * fade), int(c2[1] * fade), int(c2[2] * fade))
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c2)
+
+
+# =========================================================================
+# WonderSnake - Snake traces out the title letters
+# =========================================================================
+
+class WonderSnake(Visual):
+    name = "WONDER SNAKE"
+    description = "Snake traces title"
+    category = "titles"
+
+    # Pixel positions for WONDER CABINET text (simplified path)
+    def _build_path(self):
+        """Build a list of pixel coords that trace 'WONDER CABINET'."""
+        path = []
+        # Trace WONDER at y=WONDER_Y, then CABINET at y=CABINET_Y
+        for text, bx, by in [("WONDER", WONDER_X, WONDER_Y),
+                               ("CABINET", CABINET_X, CABINET_Y)]:
+            for ci, ch in enumerate(text):
+                cx = bx + ci * 4
+                # Simple raster: go through each column of 3x5 glyph
+                for col in range(3):
+                    for row in range(5):
+                        path.append((cx + col, by + row))
+        return path
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.path = self._build_path()
+        self.trail = []
+        self.head_idx = 0
+        self.step_timer = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+        self.step_timer += dt
+        speed = 0.01  # seconds per step
+        while self.step_timer >= speed and self.head_idx < len(self.path):
+            self.trail.append(self.path[self.head_idx])
+            self.head_idx += 1
+            self.step_timer -= speed
+            # Keep trail finite for snake body look
+            if len(self.trail) > 30:
+                self.trail.pop(0)
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+
+        # Draw completed letters (already traced)
+        completed = self.head_idx
+        for i in range(completed - len(self.trail)):
+            if 0 <= i < len(self.path):
+                px, py = self.path[i]
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    self.display.set_pixel(px, py, (0, 100, 0))
+
+        # Draw snake body (fading green)
+        for i, (px, py) in enumerate(self.trail):
+            frac = i / max(1, len(self.trail) - 1)
+            bright = int(80 + 175 * frac)
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                self.display.set_pixel(px, py, (0, bright, 0))
+
+        # Snake head
+        if self.trail:
+            hx, hy = self.trail[-1]
+            if 0 <= hx < GRID_SIZE and 0 <= hy < GRID_SIZE:
+                self.display.set_pixel(hx, hy, (0, 255, 0))
+                # Eyes
+                if hx + 1 < GRID_SIZE:
+                    self.display.set_pixel(hx + 1, hy, (255, 50, 50))
+
+        # After path complete, show full title cycling
+        if self.head_idx >= len(self.path):
+            hold = self.time - (len(self.path) * 0.01)
+            if hold > 0.5:
+                hue = (self.time * 0.2) % 1.0
+                c = _hue_to_rgb(hue)
+                self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+                c2 = _hue_to_rgb((hue + 0.15) % 1.0)
+                self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c2)
+            if hold > 4.0:
+                self.reset()
+
+
+# =========================================================================
+# WonderAsteroids - Vector-style floating letters
+# =========================================================================
+
+class WonderAsteroids(Visual):
+    name = "WONDER ASTRDS"
+    description = "Asteroids vector title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # Floating letter chunks
+        self.chunks = []
+        for text, bx, by in [("WONDER", WONDER_X, WONDER_Y),
+                               ("CABINET", CABINET_X, CABINET_Y)]:
+            for i, ch in enumerate(text):
+                self.chunks.append({
+                    'char': ch,
+                    'home_x': bx + i * 4,
+                    'home_y': by,
+                    'x': random.uniform(0, 60),
+                    'y': random.uniform(0, 60),
+                    'vx': random.uniform(-10, 10),
+                    'vy': random.uniform(-10, 10),
+                    'angle': random.uniform(0, math.pi * 2),
+                    'spin': random.uniform(-2, 2),
+                })
+
+    def update(self, dt: float):
+        self.time += dt
+        for chunk in self.chunks:
+            if self.time < 4.0:
+                # Drift phase
+                chunk['x'] += chunk['vx'] * dt
+                chunk['y'] += chunk['vy'] * dt
+                chunk['angle'] += chunk['spin'] * dt
+                # Wrap around
+                chunk['x'] = chunk['x'] % GRID_SIZE
+                chunk['y'] = chunk['y'] % GRID_SIZE
+            else:
+                # Converge to home positions
+                frac = min(1.0, (self.time - 4.0) / 2.0)
+                ease = frac * frac * (3 - 2 * frac)
+                chunk['x'] += (chunk['home_x'] - chunk['x']) * ease * dt * 3
+                chunk['y'] += (chunk['home_y'] - chunk['y']) * ease * dt * 3
+                chunk['angle'] *= (1.0 - ease * dt * 3)
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+
+        # Vector-style: draw letters at their positions
+        for chunk in self.chunks:
+            x, y = int(chunk['x']), int(chunk['y'])
+            # Green vector glow
+            self.display.draw_text_small(x, y, chunk['char'], (0, 255, 100))
+
+        # Ship in center during drift phase
+        if self.time < 4.0:
+            sx, sy = 32, 32
+            a = self.time * 0.5
+            # Simple triangle ship
+            pts = [
+                (sx + int(3 * math.cos(a)), sy + int(3 * math.sin(a))),
+                (sx + int(3 * math.cos(a + 2.3)), sy + int(3 * math.sin(a + 2.3))),
+                (sx + int(3 * math.cos(a - 2.3)), sy + int(3 * math.sin(a - 2.3))),
+            ]
+            for i in range(3):
+                x0, y0 = pts[i]
+                x1, y1 = pts[(i + 1) % 3]
+                self.display.draw_line(x0, y0, x1, y1, (0, 255, 100))
+
+        # Reset after converged + hold
+        if self.time > 8.0:
+            self.reset()
+
+
+# =========================================================================
+# WonderDoom - Fire-engulfed title
+# =========================================================================
+
+class WonderDoom(Visual):
+    name = "WONDER DOOM"
+    description = "Fire engulfed title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # Fire buffer (bottom-up heat simulation)
+        self.fire = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+
+    def update(self, dt: float):
+        self.time += dt
+        # Seed bottom row with random heat
+        for x in range(GRID_SIZE):
+            self.fire[GRID_SIZE - 1][x] = random.uniform(0.3, 1.0)
+        # Propagate upward
+        for y in range(0, GRID_SIZE - 1):
+            for x in range(GRID_SIZE):
+                below = self.fire[min(GRID_SIZE - 1, y + 1)][x]
+                left = self.fire[min(GRID_SIZE - 1, y + 1)][max(0, x - 1)]
+                right = self.fire[min(GRID_SIZE - 1, y + 1)][min(63, x + 1)]
+                below2 = self.fire[min(GRID_SIZE - 1, y + 2)][x] if y + 2 < GRID_SIZE else 0
+                self.fire[y][x] = (below + left + right + below2) / 4.08
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        # Draw fire
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                heat = self.fire[y][x]
+                if heat > 0.01:
+                    r = min(255, int(heat * 380))
+                    g = min(255, max(0, int((heat - 0.3) * 400)))
+                    b = min(255, max(0, int((heat - 0.7) * 500)))
+                    self.display.set_pixel(x, y, (r, g, b))
+
+        # Title text with ember glow
+        t = self.time
+        pulse = 0.7 + 0.3 * math.sin(t * 3)
+        r = int(255 * pulse)
+        g = int(120 * pulse)
+        # Glow behind text
+        for ox in [-1, 0, 1]:
+            for oy in [-1, 0, 1]:
+                if ox == 0 and oy == 0:
+                    continue
+                self.display.draw_text_small(WONDER_X + ox, WONDER_Y + oy,
+                                             "WONDER", (r // 3, g // 4, 0))
+                self.display.draw_text_small(CABINET_X + ox, CABINET_Y + oy,
+                                             "CABINET", (r // 3, g // 4, 0))
+        self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                                     (r, g, 0))
+        self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                                     (r, int(g * 0.8), 0))
+
+
+# =========================================================================
+# WonderPipe - Screensaver pipes reveal title
+# =========================================================================
+
+class WonderPipe(Visual):
+    name = "WONDER PIPE"
+    description = "Pipes screensaver title"
+    category = "titles"
+
+    DIRS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # up, right, down, left
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.pipes = []
+        self.grid = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self._start_pipe()
+        self.step_timer = 0.0
+
+    def _start_pipe(self):
+        self.pipe_x = random.randint(4, 59)
+        self.pipe_y = random.randint(4, 59)
+        self.pipe_dir = random.randint(0, 3)
+        self.pipe_color = _hue_to_rgb(random.random())
+        self.pipe_steps = 0
+
+    def update(self, dt: float):
+        self.time += dt
+        self.step_timer += dt
+        while self.step_timer >= 0.03:
+            self.step_timer -= 0.03
+            # Advance pipe
+            dx, dy = self.DIRS[self.pipe_dir]
+            nx = self.pipe_x + dx
+            ny = self.pipe_y + dy
+            # Turn randomly or if hitting edge/existing pipe
+            if (not (1 <= nx < GRID_SIZE - 1 and 1 <= ny < GRID_SIZE - 1) or
+                    self.grid[ny][nx] or random.random() < 0.15):
+                self.pipe_dir = (self.pipe_dir + random.choice([-1, 1])) % 4
+                # Joint
+                if 0 <= self.pipe_x < GRID_SIZE and 0 <= self.pipe_y < GRID_SIZE:
+                    self.display.set_pixel(self.pipe_x, self.pipe_y,
+                                           (min(255, self.pipe_color[0] + 60),
+                                            min(255, self.pipe_color[1] + 60),
+                                            min(255, self.pipe_color[2] + 60)))
+                self.pipe_steps += 1
+            else:
+                self.pipe_x = nx
+                self.pipe_y = ny
+                if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
+                    self.grid[ny][nx] = True
+                    self.pipes.append((nx, ny, self.pipe_color))
+                self.pipe_steps += 1
+
+            # New pipe after enough steps
+            if self.pipe_steps > 80:
+                self._start_pipe()
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        # Draw pipes
+        for px, py, color in self.pipes:
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                self.display.set_pixel(px, py, color)
+
+        # Title over pipes
+        if self.time > 2.0:
+            fade = min(1.0, (self.time - 2.0) / 1.0)
+            c = (int(255 * fade), int(255 * fade), int(255 * fade))
+            # Dark backing for readability
+            self.display.draw_rect(WONDER_X - 1, WONDER_Y - 1,
+                                   WONDER_W + 2, 7, Colors.BLACK)
+            self.display.draw_rect(CABINET_X - 1, CABINET_Y - 1,
+                                   CABINET_W + 2, 7, Colors.BLACK)
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c)
+
+        # Reset periodically
+        if self.time > 12.0:
+            self.reset()
+
+
+# =========================================================================
+# WonderWinXP - Bliss hillside with title
+# =========================================================================
+
+class WonderWinXP(Visual):
+    name = "WONDER XP"
+    description = "Windows XP Bliss hill"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # Precompute hill profile
+        self.hill = []
+        for x in range(GRID_SIZE):
+            # Rolling hill shape
+            h = 38 + int(6 * math.sin(x * 0.08) + 3 * math.sin(x * 0.15 + 1))
+            self.hill.append(h)
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear((100, 160, 255))  # sky blue
+        t = self.time
+
+        # Clouds
+        for ci in range(3):
+            cx = int((ci * 25 + t * 3) % 80) - 8
+            cy = 6 + ci * 7
+            for dx in range(-5, 6):
+                for dy in range(-2, 3):
+                    if dx * dx + dy * dy * 4 < 20:
+                        px = cx + dx
+                        if 0 <= px < GRID_SIZE and 0 <= cy + dy < GRID_SIZE:
+                            self.display.set_pixel(px, cy + dy, (240, 245, 255))
+
+        # Green hill
+        for x in range(GRID_SIZE):
+            hill_y = self.hill[x]
+            for y in range(hill_y, GRID_SIZE):
+                # Gradient green
+                frac = (y - hill_y) / max(1, GRID_SIZE - hill_y)
+                g = int(180 - 80 * frac)
+                r = int(60 - 30 * frac)
+                b = int(30 - 15 * frac)
+                self.display.set_pixel(x, y, (r, g, b))
+
+        # XP-style window with title
+        if t > 1.0:
+            fade = min(1.0, (t - 1.0) / 1.0)
+            # Window border
+            wx, wy, ww, wh = 6, 14, 52, 28
+            # Blue title bar
+            self.display.draw_rect(wx, wy, ww, 7,
+                (int(0 * fade), int(80 * fade), int(215 * fade)))
+            # White window body
+            self.display.draw_rect(wx, wy + 7, ww, wh - 7,
+                (int(240 * fade), int(240 * fade), int(240 * fade)))
+            # Border
+            self.display.draw_rect(wx, wy, ww, wh,
+                (int(100 * fade), int(100 * fade), int(200 * fade)), filled=False)
+            # Title text in window
+            c = (int(40 * fade), int(40 * fade), int(120 * fade))
+            self.display.draw_text_small(WONDER_X, wy + 10, "WONDER", c)
+            self.display.draw_text_small(CABINET_X, wy + 18, "CABINET", c)
+
+
+# =========================================================================
+# WonderGlitch - Datamosh corruption reveal
+# =========================================================================
+
+class WonderGlitch(Visual):
+    name = "WONDER GLITCH"
+    description = "Glitch art title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.glitch_rows = {}  # y -> (offset, color_shift, duration)
+        self.next_glitch = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+        # Trigger glitch bursts
+        if self.time > self.next_glitch:
+            intensity = min(1.0, self.time / 4.0)
+            count = random.randint(2, int(8 * intensity) + 2)
+            for _ in range(count):
+                y = random.randint(0, GRID_SIZE - 1)
+                self.glitch_rows[y] = (
+                    random.randint(-20, 20),        # x offset
+                    random.choice([(1,0,0), (0,1,0), (0,0,1), (1,1,0)]),  # channel
+                    self.time + random.uniform(0.05, 0.3),  # expiry
+                )
+            self.next_glitch = self.time + random.uniform(0.1, 0.5)
+
+        # Expire old glitches
+        expired = [y for y, (_, _, exp) in self.glitch_rows.items()
+                   if self.time > exp]
+        for y in expired:
+            del self.glitch_rows[y]
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        t = self.time
+
+        # Base: title text that gradually assembles
+        reveal = min(1.0, t / 5.0)
+
+        # Draw text
+        hue = (t * 0.15) % 1.0
+        c1 = _hue_to_rgb(hue)
+        c2 = _hue_to_rgb((hue + 0.15) % 1.0)
+
+        # Scanlines / static background
+        for y in range(GRID_SIZE):
+            if y in self.glitch_rows:
+                offset, channel, _ = self.glitch_rows[y]
+                for x in range(GRID_SIZE):
+                    sx = (x + offset) % GRID_SIZE
+                    bright = random.randint(30, 100)
+                    c = (bright * channel[0], bright * channel[1],
+                         bright * channel[2])
+                    self.display.set_pixel(x, y, c)
+            else:
+                # Subtle scanlines
+                if random.random() < 0.02:
+                    gray = random.randint(10, 30)
+                    for x in range(GRID_SIZE):
+                        self.display.set_pixel(x, y, (gray, gray, gray))
+
+        # Title with glitch displacement
+        if reveal > 0.3:
+            alpha = min(1.0, (reveal - 0.3) / 0.7)
+            tc1 = (int(c1[0] * alpha), int(c1[1] * alpha), int(c1[2] * alpha))
+            tc2 = (int(c2[0] * alpha), int(c2[1] * alpha), int(c2[2] * alpha))
+            # Occasional RGB split
+            if random.random() < 0.3 and self.glitch_rows:
+                self.display.draw_text_small(WONDER_X - 1, WONDER_Y,
+                    "WONDER", (tc1[0], 0, 0))
+                self.display.draw_text_small(WONDER_X + 1, WONDER_Y,
+                    "WONDER", (0, 0, tc1[2]))
+                self.display.draw_text_small(CABINET_X - 1, CABINET_Y,
+                    "CABINET", (tc2[0], 0, 0))
+                self.display.draw_text_small(CABINET_X + 1, CABINET_Y,
+                    "CABINET", (0, 0, tc2[2]))
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", tc1)
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", tc2)
+
+
+# =========================================================================
+# WonderTypewriter - Letter-by-letter with carriage return
+# =========================================================================
+
+class WonderTypewriter(Visual):
+    name = "WONDER TYPE"
+    description = "Typewriter title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.text = "WONDER  CABINET"
+        self.typed = 0
+        self.type_timer = 0.0
+        self.carriage_x = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+        if self.typed < len(self.text):
+            self.type_timer += dt
+            if self.type_timer > 0.2:
+                self.type_timer = 0.0
+                self.typed += 1
+                # Carriage return between words
+                if self.typed == 7:  # After "WONDER "
+                    self.carriage_x = 60.0
+
+    def draw(self):
+        self.display.clear((30, 25, 20))  # Warm paper color
+        t = self.time
+
+        # Paper texture - subtle horizontal lines
+        for y in range(0, GRID_SIZE, 3):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, (35, 30, 25))
+
+        # Ink ribbon line at top
+        self.display.draw_rect(0, 8, GRID_SIZE, 1, (20, 15, 10))
+
+        # Typed text - WONDER
+        wonder_chars = min(6, self.typed)
+        if wonder_chars > 0:
+            text = "WONDER"[:wonder_chars]
+            self.display.draw_text_small(WONDER_X, WONDER_Y, text, (15, 10, 5))
+
+        # Typed text - CABINET
+        if self.typed > 8:
+            cab_chars = min(7, self.typed - 8)
+            text = "CABINET"[:cab_chars]
+            self.display.draw_text_small(CABINET_X, CABINET_Y, text, (15, 10, 5))
+
+        # Carriage / cursor
+        if self.typed < len(self.text):
+            blink = int(t * 4) % 2
+            if self.typed <= 6:
+                cx = WONDER_X + self.typed * 4
+                cy = WONDER_Y
+            else:
+                cab_idx = max(0, self.typed - 8)
+                cx = CABINET_X + cab_idx * 4
+                cy = CABINET_Y
+            if blink:
+                self.display.draw_rect(cx, cy, 1, 5, (60, 40, 20))
+        else:
+            # After typing complete, warm color cycle
+            hold = t - self.typed * 0.2
+            if hold > 1.0:
+                pulse = 0.7 + 0.3 * math.sin(hold * 2)
+                c = (int(120 * pulse), int(80 * pulse), int(40 * pulse))
+                self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+                self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c)
+
+            # Reset after hold
+            if hold > 5.0:
+                self.reset()
+
+
+# =========================================================================
+# WonderZoom - Starfield rush into title
+# =========================================================================
+
+class WonderZoom(Visual):
+    name = "WONDER ZOOM"
+    description = "Starfield zoom title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.stars = []
+        for _ in range(80):
+            self.stars.append({
+                'x': random.uniform(-1, 1),
+                'y': random.uniform(-1, 1),
+                'z': random.uniform(0.1, 1.0),
+                'speed': random.uniform(0.3, 1.0),
+            })
+
+    def update(self, dt: float):
+        self.time += dt
+        for star in self.stars:
+            star['z'] -= star['speed'] * dt * 0.8
+            if star['z'] <= 0.01:
+                star['x'] = random.uniform(-1, 1)
+                star['y'] = random.uniform(-1, 1)
+                star['z'] = 1.0
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        t = self.time
+        cx, cy = 32, 32
+
+        # Draw stars with perspective projection
+        for star in self.stars:
+            # Project to screen
+            sx = cx + int(star['x'] / star['z'] * 30)
+            sy = cy + int(star['y'] / star['z'] * 30)
+            # Brightness based on closeness
+            bright = int(min(255, 50 + 200 * (1.0 - star['z'])))
+            if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                self.display.set_pixel(sx, sy, (bright, bright, bright))
+                # Streak for close stars
+                if star['z'] < 0.3:
+                    streak = int(3 * (1.0 - star['z']) / 0.3)
+                    dx = star['x'] / max(0.01, star['z'])
+                    dy = star['y'] / max(0.01, star['z'])
+                    mag = max(0.01, math.sqrt(dx * dx + dy * dy))
+                    dx, dy = dx / mag, dy / mag
+                    for s in range(1, streak + 1):
+                        tx = sx - int(dx * s)
+                        ty = sy - int(dy * s)
+                        if 0 <= tx < GRID_SIZE and 0 <= ty < GRID_SIZE:
+                            trail_b = bright // (s + 1)
+                            self.display.set_pixel(tx, ty,
+                                (trail_b, trail_b, trail_b))
+
+        # Title appears from center, growing
+        if t > 2.0:
+            scale = min(1.0, (t - 2.0) / 2.0)
+            ease = scale * scale * (3 - 2 * scale)
+            alpha = ease
+            c = (int(200 * alpha), int(220 * alpha), int(255 * alpha))
+            c2 = (int(180 * alpha), int(200 * alpha), int(255 * alpha))
+            self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", c)
+            self.display.draw_text_small(CABINET_X, CABINET_Y, "CABINET", c2)
+
+
+# =========================================================================
+# WonderVinyl - Spinning record with title on label
+# =========================================================================
+
+class WonderVinyl(Visual):
+    name = "WONDER VINYL"
+    description = "Spinning record title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+        t = self.time
+        cx, cy = 32, 30
+        radius = 28
+
+        # Record disc (dark with grooves)
+        for dy in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= radius:
+                    # Groove pattern
+                    groove = int(dist * 2 + t * 8) % 3
+                    if dist < 8:
+                        # Label area - colored
+                        angle = math.atan2(dy, dx) + t * 2
+                        hue = (angle / (math.pi * 2) + 0.5) % 1.0
+                        c = _hue_to_rgb(hue)
+                        c = (c[0] // 2 + 40, c[1] // 2 + 40, c[2] // 2 + 40)
+                    elif dist < 3:
+                        # Center hole
+                        c = (20, 20, 20)
+                    else:
+                        # Vinyl grooves
+                        base = 15 + groove * 8
+                        # Light reflection sweeping across
+                        angle = math.atan2(dy, dx)
+                        ref = math.cos(angle - t * 1.5)
+                        highlight = max(0, int(ref * 25))
+                        c = (base + highlight, base + highlight, base + highlight + 5)
+                    px, py = cx + dx, cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, c)
+
+        # Label text (rotates with record)
+        # Just draw static centered text on the label
+        self.display.draw_text_small(cx - 11, cy - 3, "WONDER", (220, 220, 240))
+        self.display.draw_text_small(cx - 13, cy + 3, "CABINET", (220, 220, 240))
+
+        # Tonearm
+        arm_angle = 0.3 + 0.1 * math.sin(t * 0.2)
+        ax = cx + int(radius * math.cos(arm_angle)) + 5
+        ay = 2
+        tip_x = cx + int(12 * math.cos(arm_angle + 0.5))
+        tip_y = cy + int(12 * math.sin(arm_angle + 0.5)) - 8
+        self.display.draw_line(ax, ay, tip_x, tip_y, (160, 160, 170))
+
+
+# =========================================================================
+# WonderCassette - Tape deck rewind and play
+# =========================================================================
+
+class WonderCassette(Visual):
+    name = "WONDER TAPE"
+    description = "Cassette tape title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        self.display.clear((40, 35, 30))  # Brown tape player bg
+        t = self.time
+
+        # Cassette body
+        body_x, body_y = 8, 10
+        body_w, body_h = 48, 30
+        self.display.draw_rect(body_x, body_y, body_w, body_h,
+                               (80, 75, 65))  # Cassette shell
+        self.display.draw_rect(body_x, body_y, body_w, body_h,
+                               (60, 55, 45), filled=False)  # Border
+
+        # Tape window
+        win_x, win_y = 16, 15
+        win_w, win_h = 32, 12
+        self.display.draw_rect(win_x, win_y, win_w, win_h, (20, 18, 15))
+
+        # Tape reels (two circles spinning)
+        reel_speed = 4.0 if t < 3.0 else 1.0  # Fast rewind, then play
+        reel_r = 4
+
+        # Left reel (feeds out)
+        lr_x, lr_y = win_x + 8, win_y + win_h // 2
+        lr_size = reel_r - int(min(2, t * 0.3))  # Shrinks during rewind
+        for dy in range(-reel_r, reel_r + 1):
+            for dx in range(-reel_r, reel_r + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= reel_r:
+                    angle = math.atan2(dy, dx) + t * reel_speed
+                    spoke = int(angle * 3 / math.pi) % 2
+                    c = (60, 50, 40) if spoke else (35, 30, 25)
+                    if dist <= lr_size:
+                        c = (70, 55, 35)  # Tape on reel
+                    px, py = lr_x + dx, lr_y + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, c)
+
+        # Right reel (takes up)
+        rr_x, rr_y = win_x + win_w - 8, win_y + win_h // 2
+        rr_size = 1 + int(min(3, t * 0.3))  # Grows during play
+        for dy in range(-reel_r, reel_r + 1):
+            for dx in range(-reel_r, reel_r + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= reel_r:
+                    angle = math.atan2(dy, dx) - t * reel_speed
+                    spoke = int(angle * 3 / math.pi) % 2
+                    c = (60, 50, 40) if spoke else (35, 30, 25)
+                    if dist <= rr_size:
+                        c = (70, 55, 35)
+                    px, py = rr_x + dx, rr_y + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        self.display.set_pixel(px, py, c)
+
+        # Tape running between reels
+        self.display.draw_line(lr_x + reel_r, lr_y, rr_x - reel_r, rr_y,
+                               (45, 35, 25))
+
+        # Label on cassette
+        self.display.draw_rect(body_x + 4, body_y + 2, body_w - 8, 8,
+                               (200, 195, 180))  # White label
+        # Title on label
+        label_c = (40, 30, 20) if t > 1.0 else (
+            int(40 * t), int(30 * t), int(20 * t))
+        self.display.draw_text_small(body_x + 8, body_y + 3, "WONDER", label_c)
+
+        # CABINET below cassette
+        if t > 2.0:
+            fade = min(1.0, (t - 2.0) / 1.0)
+            hue = (t * 0.1) % 1.0
+            c = _hue_to_rgb(hue)
+            c = (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade))
+            self.display.draw_text_small(CABINET_X, 46, "CABINET", c)
