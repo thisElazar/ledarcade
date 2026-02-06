@@ -37,9 +37,9 @@ NODAL_DIM = (30, 25, 18)
 NUM_PARTICLES = 400
 
 # Drawing area
-DRAW_SIZE = 54  # Leave room for label
+DRAW_SIZE = 48  # Leave room for labels top and bottom
 DRAW_OFFSET_X = (GRID_SIZE - DRAW_SIZE) // 2
-DRAW_OFFSET_Y = 1
+DRAW_OFFSET_Y = 8
 
 
 class Chladni(Visual):
@@ -258,18 +258,19 @@ class Chladni(Visual):
             if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                 d.set_pixel(px, py, p[2])
 
-        # Bottom label
+        # Top: always-visible Hz readout
         (n1, m1), (n2, m2), blend, hz = self._get_blended_modes()
-        phase = int(self.label_timer / 4) % 3
+        d.draw_text_small(2, 2, f"{int(hz)} HZ", (220, 190, 130))
+
+        # Bottom label: cycles mode and shape
+        phase = int(self.label_timer / 4) % 2
         if phase == 0:
-            label = f"{int(hz)} HZ"
-        elif phase == 1:
             label = f"MODE {n1}.{m1}"
         else:
             label = shape_name
         d.draw_text_small(2, 58, label, Colors.WHITE)
 
-        # Shape overlay
+        # Shape overlay (temporarily replaces Hz on shape change)
         if self.overlay_timer > 0:
             alpha = min(1.0, self.overlay_timer / 0.5)
             oc = (int(220 * alpha), int(190 * alpha), int(130 * alpha))

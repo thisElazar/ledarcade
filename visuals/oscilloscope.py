@@ -11,6 +11,7 @@ Controls:
 """
 
 import math
+import random
 from . import Visual, Display, Colors, GRID_SIZE
 
 # Oscilloscope color palette (phosphor green)
@@ -24,9 +25,13 @@ GRID_AXIS = (0, 50, 15)
 # Display modes
 MODES = [
     'SINE WAVE',
+    'SQUARE WAVE',
+    'TRIANGLE',
+    'SAWTOOTH',
     'LISSAJOUS',
     'SUPERPOSITION',
     'FREQ SWEEP',
+    'NOISE',
 ]
 
 # Lissajous frequency ratios (a:b)
@@ -147,6 +152,33 @@ class Oscilloscope(Visual):
                 y = CY - y_val * (HALF_H - 2)
                 points.append((x, y))
 
+        elif mode == 'SQUARE WAVE':
+            for i in range(n_samples):
+                t = i / n_samples
+                x = DRAW_X_MIN + t * (DRAW_X_MAX - DRAW_X_MIN)
+                s = math.sin(2 * math.pi * self.freq * t + self.phase)
+                y_val = 1.0 if s >= 0 else -1.0
+                y = CY - y_val * (HALF_H - 4)
+                points.append((x, y))
+
+        elif mode == 'TRIANGLE':
+            for i in range(n_samples):
+                t = i / n_samples
+                x = DRAW_X_MIN + t * (DRAW_X_MAX - DRAW_X_MIN)
+                p = (self.freq * t + self.phase / (2 * math.pi)) % 1.0
+                y_val = 4 * abs(p - 0.5) - 1.0
+                y = CY - y_val * (HALF_H - 2)
+                points.append((x, y))
+
+        elif mode == 'SAWTOOTH':
+            for i in range(n_samples):
+                t = i / n_samples
+                x = DRAW_X_MIN + t * (DRAW_X_MAX - DRAW_X_MIN)
+                p = (self.freq * t + self.phase / (2 * math.pi)) % 1.0
+                y_val = 2 * p - 1.0
+                y = CY - y_val * (HALF_H - 2)
+                points.append((x, y))
+
         elif mode == 'LISSAJOUS':
             a, b = RATIOS[self.ratio_idx]
             delta = self.phase * 0.5
@@ -174,6 +206,18 @@ class Oscilloscope(Visual):
                 t = i / n_samples
                 x = DRAW_X_MIN + t * (DRAW_X_MAX - DRAW_X_MIN)
                 y_val = math.sin(2 * math.pi * self.sweep_freq * t + self.phase)
+                y = CY - y_val * (HALF_H - 2)
+                points.append((x, y))
+
+        elif mode == 'NOISE':
+            prev_y = 0.0
+            for i in range(n_samples):
+                t = i / n_samples
+                x = DRAW_X_MIN + t * (DRAW_X_MAX - DRAW_X_MIN)
+                # Filtered noise: random walk smoothed by frequency
+                prev_y += random.uniform(-0.3, 0.3)
+                prev_y *= 0.95  # Decay toward center
+                y_val = max(-1.0, min(1.0, prev_y))
                 y = CY - y_val * (HALF_H - 2)
                 points.append((x, y))
 
