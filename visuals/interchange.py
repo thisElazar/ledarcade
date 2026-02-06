@@ -2,8 +2,9 @@
 Cloverleaf - Highway Interchanges
 ===================================
 Pre-computed path geometry for three interchange types:
-cloverleaf (loop ramps), diamond (diagonal ramps), turbine (sweeping curves).
-Vehicles follow paths as colored dots. Auto-cycles between types.
+cloverleaf (270-degree loop ramps), diamond (diagonal ramps),
+turbine (sweeping Bezier curves). Vehicles follow complete
+origin-to-destination paths. Auto-cycles between types.
 
 Controls:
   Space    - Switch interchange type
@@ -15,31 +16,52 @@ import random
 from . import Visual, Display, Colors, GRID_SIZE
 
 
-CENTER = GRID_SIZE // 2
+CENTER = GRID_SIZE // 2  # 32
+
+# Highway lane centers (driving on right)
+# NB (going up): east side = x=33, SB (going down): west side = x=31
+# EB (going right): south side = y=33, WB (going left): north side = y=31
+NB_X = 33
+SB_X = 31
+EB_Y = 33
+WB_Y = 31
 
 
-def bezier(p0, p1, p2, p3, t):
-    """Cubic Bezier curve evaluation."""
-    u = 1 - t
-    return (
-        u*u*u*p0[0] + 3*u*u*t*p1[0] + 3*u*t*t*p2[0] + t*t*t*p3[0],
-        u*u*u*p0[1] + 3*u*u*t*p1[1] + 3*u*t*t*p2[1] + t*t*t*p3[1],
-    )
+def _densify(waypoints):
+    """Interpolate waypoints into ~1px-apart path points."""
+    pts = []
+    for i in range(len(waypoints) - 1):
+        x0, y0 = waypoints[i]
+        x1, y1 = waypoints[i + 1]
+        d = math.hypot(x1 - x0, y1 - y0)
+        n = max(1, int(d * 1.5))
+        for j in range(n):
+            t = j / n
+            pts.append((x0 + (x1 - x0) * t, y0 + (y1 - y0) * t))
+    pts.append(waypoints[-1])
+    return pts
 
 
-def make_polyline(points, steps=40):
-    """Sample a Bezier path into a polyline."""
-    if len(points) == 4:
-        return [bezier(points[0], points[1], points[2], points[3], t / steps) for t in range(steps + 1)]
-    # Linear path
-    result = []
-    for i in range(len(points) - 1):
-        for t in range(steps // (len(points) - 1) + 1):
-            frac = t / (steps // (len(points) - 1))
-            x = points[i][0] + (points[i+1][0] - points[i][0]) * frac
-            y = points[i][1] + (points[i+1][1] - points[i][1]) * frac
-            result.append((x, y))
-    return result
+def _arc(cx, cy, r, start_deg, sweep_deg, n=30):
+    """Arc points. Positive sweep = CW in screen coords (y-down)."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        a = math.radians(start_deg + sweep_deg * t)
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    return pts
+
+
+def _bezier(p0, p1, p2, p3, n=40):
+    """Cubic Bezier curve points."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        u = 1 - t
+        x = u*u*u*p0[0] + 3*u*u*t*p1[0] + 3*u*t*t*p2[0] + t*t*t*p3[0]
+        y = u*u*u*p0[1] + 3*u*u*t*p1[1] + 3*u*t*t*p2[1] + t*t*t*p3[1]
+        pts.append((x, y))
+    return pts
 
 
 class Interchange(Visual):
@@ -50,16 +72,17 @@ class Interchange(Visual):
     TYPES = ['cloverleaf', 'diamond', 'turbine']
 
     HWY_COLOR = (55, 55, 60)
-    RAMP_COLOR = (45, 45, 50)
+    RAMP_COLOR = (48, 48, 53)
     SHOULDER = (70, 70, 60)
     GROUND = (30, 45, 30)
     LANE_DASH = (80, 70, 20)
 
-    CAR_COLORS = {
-        'N': (255, 80, 80),
-        'S': (80, 120, 255),
-        'E': (80, 255, 80),
-        'W': (255, 255, 80),
+    # Color by origin direction
+    DIR_COLORS = {
+        'NB': (255, 80, 80),
+        'SB': (80, 120, 255),
+        'EB': (80, 255, 80),
+        'WB': (255, 255, 80),
     }
 
     def __init__(self, display: Display):
@@ -68,123 +91,153 @@ class Interchange(Visual):
     def reset(self):
         self.time = 0.0
         self.type_index = 0
-        self.spawn_rate = 2.0
+        self.spawn_rate = 2.5
         self.spawn_timer = 0.0
         self.auto_timer = 0.0
         self.auto_interval = 18.0
+        self.vehicles = []
+        self._build()
 
-        self.paths = {}
+    def _build(self):
+        """Build road geometry and vehicle paths for current type."""
         self.road_pixels = set()
-        self._build_paths()
-
-        self.vehicles = []  # {path_key, progress, speed, color}
-
-    def _build_paths(self):
-        """Build paths for current interchange type."""
         self.paths = {}
-        self.road_pixels = set()
-        itype = self.TYPES[self.type_index]
 
-        # Main highways (always present)
-        # NS highway (vertical)
+        # Main highways (6px wide: x/y 29-34)
         for y in range(GRID_SIZE):
-            for x in range(CENTER - 3, CENTER + 4):
+            for x in range(29, 35):
                 self.road_pixels.add((x, y))
-        # EW highway (horizontal)
         for x in range(GRID_SIZE):
-            for y in range(CENTER - 3, CENTER + 4):
+            for y in range(29, 35):
                 self.road_pixels.add((x, y))
 
-        # Through paths
-        self.paths['N_thru'] = [(CENTER + 2, GRID_SIZE + 2)] + [(CENTER + 2, y) for y in range(GRID_SIZE, -3, -1)]
-        self.paths['S_thru'] = [(CENTER - 2, -3)] + [(CENTER - 2, y) for y in range(-2, GRID_SIZE + 3)]
-        self.paths['E_thru'] = [(-3, CENTER + 2)] + [(x, CENTER + 2) for x in range(-2, GRID_SIZE + 3)]
-        self.paths['W_thru'] = [(GRID_SIZE + 2, CENTER - 2)] + [(x, CENTER - 2) for x in range(GRID_SIZE + 1, -4, -1)]
+        # Through paths (always available)
+        self.paths['NB_thru'] = _densify([(NB_X, 66), (NB_X, -3)])
+        self.paths['SB_thru'] = _densify([(SB_X, -3), (SB_X, 66)])
+        self.paths['EB_thru'] = _densify([(-3, EB_Y), (66, EB_Y)])
+        self.paths['WB_thru'] = _densify([(66, WB_Y), (-3, WB_Y)])
 
-        if itype == 'cloverleaf':
-            self._build_cloverleaf_ramps()
-        elif itype == 'diamond':
-            self._build_diamond_ramps()
-        else:
-            self._build_turbine_ramps()
+        builders = {
+            'cloverleaf': self._build_cloverleaf,
+            'diamond': self._build_diamond,
+            'turbine': self._build_turbine,
+        }
+        builders[self.TYPES[self.type_index]]()
 
-    def _build_cloverleaf_ramps(self):
-        """Build cloverleaf loop ramp paths."""
-        # Four loops in quadrants: NE, NW, SW, SE
-        loop_r = 9
-        offsets = [
-            ('NE', CENTER + 6, CENTER - 6, 0),
-            ('NW', CENTER - 6, CENTER - 6, math.pi / 2),
-            ('SW', CENTER - 6, CENTER + 6, math.pi),
-            ('SE', CENTER + 6, CENTER + 6, 3 * math.pi / 2),
-        ]
+    def _paint_path(self, pts, thickness=1):
+        """Add path pixels to road surface."""
+        for x, y in pts:
+            for dx in range(-thickness, thickness + 1):
+                for dy in range(-thickness, thickness + 1):
+                    ix, iy = int(x + dx), int(y + dy)
+                    if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                        self.road_pixels.add((ix, iy))
 
-        for name, cx, cy, start_angle in offsets:
-            path = []
-            steps = 40
-            for i in range(steps + 1):
-                angle = start_angle + (2 * math.pi * i / steps)
-                x = cx + loop_r * math.cos(angle)
-                y = cy + loop_r * math.sin(angle)
-                path.append((x, y))
-                ix, iy = int(x), int(y)
-                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                    self.road_pixels.add((ix, iy))
-            self.paths[f'ramp_{name}'] = path
+    # ------------------------------------------------------------------
+    # Cloverleaf: four 270-degree loop ramps for left turns
+    # ------------------------------------------------------------------
+    def _build_cloverleaf(self):
+        LOOP_R = 7
+        # NE loop (NB->WB): center (42, 22)
+        # Entry at 180deg = (35,22) heading UP; exit at 90deg = (42,29) heading LEFT
+        ne_arc = _arc(42, 22, LOOP_R, 180, 270, 30)
+        self._paint_path(ne_arc, 1)
+        ne_wp = ([(NB_X, 66), (NB_X, 26), (34, 24), (35, 22)]
+                 + ne_arc
+                 + [(42, 29), (40, 30), (38, WB_Y), (-3, WB_Y)])
+        self.paths['NB_WB'] = _densify(ne_wp)
 
-    def _build_diamond_ramps(self):
-        """Build diamond interchange ramp paths."""
-        # Four diagonal ramps connecting the highways
-        ramp_len = 18
-        ramp_configs = [
-            ('NE', CENTER + 4, CENTER - 4, 1, -1),
-            ('NW', CENTER - 4, CENTER - 4, -1, -1),
-            ('SW', CENTER - 4, CENTER + 4, -1, 1),
-            ('SE', CENTER + 4, CENTER + 4, 1, 1),
-        ]
+        # SE loop (EB->NB): center (42, 42)
+        # Entry at 270deg = (42,35) heading RIGHT; exit at 180deg = (35,42) heading UP
+        se_arc = _arc(42, 42, LOOP_R, 270, 270, 30)
+        self._paint_path(se_arc, 1)
+        se_wp = ([(-3, EB_Y), (36, EB_Y), (40, 34), (42, 35)]
+                 + se_arc
+                 + [(35, 42), (34, 40), (NB_X, 38), (NB_X, -3)])
+        self.paths['EB_NB'] = _densify(se_wp)
 
-        for name, sx, sy, dx, dy in ramp_configs:
-            path = []
-            for i in range(ramp_len + 1):
-                t = i / ramp_len
-                x = sx + dx * t * 14
-                y = sy + dy * t * 14
-                path.append((x, y))
-                ix, iy = int(x), int(y)
-                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                    self.road_pixels.add((ix, iy))
-            self.paths[f'ramp_{name}'] = path
+        # SW loop (SB->EB): center (22, 42)
+        # Entry at 0deg = (29,42) heading DOWN; exit at 270deg = (22,35) heading RIGHT
+        sw_arc = _arc(22, 42, LOOP_R, 0, 270, 30)
+        self._paint_path(sw_arc, 1)
+        sw_wp = ([(SB_X, -3), (SB_X, 38), (30, 40), (29, 42)]
+                 + sw_arc
+                 + [(22, 35), (24, 34), (26, EB_Y), (66, EB_Y)])
+        self.paths['SB_EB'] = _densify(sw_wp)
 
-    def _build_turbine_ramps(self):
-        """Build turbine interchange ramp paths (sweeping curves)."""
-        # Four sweeping curves
-        configs = [
-            ('NE', math.pi, 3 * math.pi / 2),
-            ('NW', 3 * math.pi / 2, 2 * math.pi),
-            ('SW', 0, math.pi / 2),
-            ('SE', math.pi / 2, math.pi),
-        ]
+        # NW loop (WB->SB): center (22, 22)
+        # Entry at 90deg = (22,29) heading LEFT; exit at 0deg = (29,22) heading DOWN
+        nw_arc = _arc(22, 22, LOOP_R, 90, 270, 30)
+        self._paint_path(nw_arc, 1)
+        nw_wp = ([(66, WB_Y), (28, WB_Y), (24, 30), (22, 29)]
+                 + nw_arc
+                 + [(29, 22), (30, 24), (SB_X, 26), (SB_X, 66)])
+        self.paths['WB_SB'] = _densify(nw_wp)
 
-        for name, start_a, end_a in configs:
-            path = []
-            steps = 35
-            for i in range(steps + 1):
-                t = i / steps
-                angle = start_a + (end_a - start_a) * t
-                r = 10 + 12 * t
-                x = CENTER + r * math.cos(angle)
-                y = CENTER + r * math.sin(angle)
-                path.append((x, y))
-                ix, iy = int(x), int(y)
-                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                    self.road_pixels.add((ix, iy))
-            self.paths[f'ramp_{name}'] = path
+    # ------------------------------------------------------------------
+    # Diamond: four short diagonal ramps
+    # ------------------------------------------------------------------
+    def _build_diamond(self):
+        # NE ramp (NB->WB via diagonal)
+        ne_wp = [(NB_X, 66), (NB_X, 27), (36, 25), (40, WB_Y), (-3, WB_Y)]
+        ne_pts = _densify(ne_wp)
+        self._paint_path(ne_pts, 1)
+        self.paths['NB_WB'] = ne_pts
 
+        # SE ramp (EB->NB via diagonal)
+        se_wp = [(-3, EB_Y), (37, EB_Y), (39, 36), (NB_X, 39), (NB_X, -3)]
+        se_pts = _densify(se_wp)
+        self._paint_path(se_pts, 1)
+        self.paths['EB_NB'] = se_pts
+
+        # SW ramp (SB->EB via diagonal)
+        sw_wp = [(SB_X, -3), (SB_X, 37), (28, 39), (24, EB_Y), (66, EB_Y)]
+        sw_pts = _densify(sw_wp)
+        self._paint_path(sw_pts, 1)
+        self.paths['SB_EB'] = sw_pts
+
+        # NW ramp (WB->SB via diagonal)
+        nw_wp = [(66, WB_Y), (27, WB_Y), (25, 28), (SB_X, 25), (SB_X, 66)]
+        nw_pts = _densify(nw_wp)
+        self._paint_path(nw_pts, 1)
+        self.paths['WB_SB'] = nw_pts
+
+    # ------------------------------------------------------------------
+    # Turbine: four sweeping Bezier curves
+    # ------------------------------------------------------------------
+    def _build_turbine(self):
+        # NE curve (NB->WB): sweeps through upper-right
+        ne_pts = _bezier((NB_X, 22), (NB_X, 6), (56, WB_Y), (42, WB_Y), 40)
+        ne_full = _densify([(NB_X, 66), (NB_X, 22)]) + ne_pts + _densify([(42, WB_Y), (-3, WB_Y)])
+        self._paint_path(ne_pts, 1)
+        self.paths['NB_WB'] = ne_full
+
+        # SE curve (EB->NB): sweeps through lower-right
+        se_pts = _bezier((42, EB_Y), (58, EB_Y), (NB_X, 58), (NB_X, 42), 40)
+        se_full = _densify([(-3, EB_Y), (42, EB_Y)]) + se_pts + _densify([(NB_X, 42), (NB_X, -3)])
+        self._paint_path(se_pts, 1)
+        self.paths['EB_NB'] = se_full
+
+        # SW curve (SB->EB): sweeps through lower-left
+        sw_pts = _bezier((SB_X, 42), (SB_X, 58), (8, EB_Y), (22, EB_Y), 40)
+        sw_full = _densify([(SB_X, -3), (SB_X, 42)]) + sw_pts + _densify([(22, EB_Y), (66, EB_Y)])
+        self._paint_path(sw_pts, 1)
+        self.paths['SB_EB'] = sw_full
+
+        # NW curve (WB->SB): sweeps through upper-left
+        nw_pts = _bezier((22, WB_Y), (6, WB_Y), (SB_X, 6), (SB_X, 22), 40)
+        nw_full = _densify([(66, WB_Y), (22, WB_Y)]) + nw_pts + _densify([(SB_X, 22), (SB_X, 66)])
+        self._paint_path(nw_pts, 1)
+        self.paths['WB_SB'] = nw_full
+
+    # ------------------------------------------------------------------
+    # Input
+    # ------------------------------------------------------------------
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.action_l or input_state.action_r:
             self.type_index = (self.type_index + 1) % len(self.TYPES)
-            self._build_paths()
+            self._build()
             self.vehicles = []
             consumed = True
         if input_state.up_pressed:
@@ -195,6 +248,9 @@ class Interchange(Visual):
             consumed = True
         return consumed
 
+    # ------------------------------------------------------------------
+    # Update
+    # ------------------------------------------------------------------
     def update(self, dt: float):
         self.time += dt
 
@@ -203,77 +259,87 @@ class Interchange(Visual):
         if self.auto_timer >= self.auto_interval:
             self.auto_timer = 0
             self.type_index = (self.type_index + 1) % len(self.TYPES)
-            self._build_paths()
+            self._build()
             self.vehicles = []
 
         # Spawn vehicles
         self.spawn_timer += dt
         if self.spawn_timer >= 1.0 / max(0.1, self.spawn_rate):
             self.spawn_timer = 0
-            self._spawn_vehicle()
+            self._spawn()
 
         # Update vehicles
         for v in self.vehicles:
-            path = self.paths.get(v['path'])
-            if path:
-                v['progress'] += v['speed'] * dt
-                if v['progress'] >= len(path) - 1:
-                    v['done'] = True
+            v['progress'] += v['speed'] * dt
 
-        self.vehicles = [v for v in self.vehicles if not v.get('done')]
+        # Remove finished vehicles
+        self.vehicles = [v for v in self.vehicles
+                         if v['progress'] < len(self.paths[v['key']]) - 1]
 
-    def _spawn_vehicle(self):
+    def _spawn(self):
         """Spawn a vehicle on a random path."""
-        path_keys = list(self.paths.keys())
-        if not path_keys:
+        keys = list(self.paths.keys())
+        if not keys:
             return
-        key = random.choice(path_keys)
-        # Determine direction for color
-        if key.startswith('N'):
-            color = self.CAR_COLORS['N']
-        elif key.startswith('S'):
-            color = self.CAR_COLORS['S']
-        elif key.startswith('E'):
-            color = self.CAR_COLORS['E']
-        elif key.startswith('W'):
-            color = self.CAR_COLORS['W']
+        # Weight: more through traffic than ramp traffic
+        thru_keys = [k for k in keys if k.endswith('_thru')]
+        ramp_keys = [k for k in keys if not k.endswith('_thru')]
+        if ramp_keys and random.random() < 0.4:
+            key = random.choice(ramp_keys)
+        elif thru_keys:
+            key = random.choice(thru_keys)
         else:
-            color = random.choice(list(self.CAR_COLORS.values()))
+            key = random.choice(keys)
+
+        # Color by origin direction
+        origin = key.split('_')[0]
+        color = self.DIR_COLORS.get(origin, (255, 255, 255))
 
         self.vehicles.append({
-            'path': key,
+            'key': key,
             'progress': 0.0,
-            'speed': random.uniform(15, 25),
+            'speed': random.uniform(18, 28),
             'color': color,
         })
+
+    # ------------------------------------------------------------------
+    # Draw
+    # ------------------------------------------------------------------
+    def _vehicle_pos(self, v):
+        """Get interpolated screen position for a vehicle."""
+        path = self.paths[v['key']]
+        idx = v['progress']
+        i = int(idx)
+        if i >= len(path) - 1:
+            return path[-1]
+        frac = idx - i
+        x0, y0 = path[i]
+        x1, y1 = path[i + 1]
+        return (x0 + (x1 - x0) * frac, y0 + (y1 - y0) * frac)
 
     def draw(self):
         self.display.clear(self.GROUND)
 
-        # Draw all road pixels
+        # Draw road surface
         for x, y in self.road_pixels:
             if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
                 self.display.set_pixel(x, y, self.HWY_COLOR)
 
-        # Lane dashes on main highways
+        # Lane dashes on main highways (skip intersection zone)
         for y in range(GRID_SIZE):
-            if CENTER - 3 <= y <= CENTER + 3:
+            if 28 <= y <= 35:
                 continue
             if y % 4 < 2:
                 self.display.set_pixel(CENTER, y, self.LANE_DASH)
         for x in range(GRID_SIZE):
-            if CENTER - 3 <= x <= CENTER + 3:
+            if 28 <= x <= 35:
                 continue
             if x % 4 < 2:
                 self.display.set_pixel(x, CENTER, self.LANE_DASH)
 
-        # Draw vehicles
+        # Draw vehicles (2px each)
         for v in self.vehicles:
-            path = self.paths.get(v['path'])
-            if not path:
-                continue
-            idx = min(int(v['progress']), len(path) - 1)
-            x, y = path[idx]
+            x, y = self._vehicle_pos(v)
             ix, iy = int(x), int(y)
             if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
                 self.display.set_pixel(ix, iy, v['color'])
