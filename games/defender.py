@@ -219,14 +219,20 @@ class Defender(Game):
             self.py -= PLAYER_VERT_SPEED * dt
         if input_state.down:
             self.py += PLAYER_VERT_SPEED * dt
-        self.py = max(3, min(VIEW_HEIGHT - 4, self.py))
+        self.py = max(2, min(VIEW_HEIGHT - 3, self.py))
 
-        # Camera follows player
-        target_cam = self.px - VIEW_WIDTH / 2
-        # Smooth camera with offset for facing direction
-        target_cam += self.facing * 10
+        # Camera follows player with facing offset
+        target_cam = self.px - VIEW_WIDTH / 2 + self.facing * 10
         cam_diff = self._world_dist_x(self.cam_x, target_cam)
-        self.cam_x = self._wrap_x(self.cam_x + cam_diff * 0.15)
+        self.cam_x = self._wrap_x(self.cam_x + cam_diff * 0.3)
+
+        # Hard clamp: ensure player stays on visible screen with margin
+        screen_x = self._world_dist_x(self.cam_x, self.px)
+        margin = 6
+        if screen_x < margin:
+            self.cam_x = self._wrap_x(self.px - margin)
+        elif screen_x > VIEW_WIDTH - margin:
+            self.cam_x = self._wrap_x(self.px - VIEW_WIDTH + margin)
 
         # Firing
         self.fire_cooldown -= dt
