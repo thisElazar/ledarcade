@@ -176,10 +176,10 @@ _VEL_PALETTE = np.array([
     (0, 255, 80), (255, 255, 0), (255, 100, 0), (255, 255, 255),
 ], dtype=np.float64)
 
-# Diverging blue-black-red for vorticity
+# Diverging blue-neutral-red for vorticity
 _VORT_PALETTE = np.array([
-    (0, 60, 255), (0, 20, 120), (0, 0, 0),
-    (120, 10, 0), (255, 40, 0),
+    (0, 120, 255), (0, 50, 180), (12, 8, 16),
+    (180, 40, 0), (255, 120, 0),
 ], dtype=np.float64)
 
 
@@ -209,7 +209,7 @@ def _draw_vorticity(display, u, v):
     dudy = (u[1:N+1, 2:N+2] - u[1:N+1, 0:N]) * 0.5
     curl = dvdx - dudy
     # Map to 0..1 with 0.5 = zero curl
-    t = np.clip(curl * 0.15 + 0.5, 0.0, 1.0)
+    t = np.clip(curl * 0.5 + 0.5, 0.0, 1.0)
     n_colors = len(_VORT_PALETTE)
     idx_f = t * (n_colors - 1)
     lo = idx_f.astype(np.intp)
