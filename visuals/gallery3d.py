@@ -1168,40 +1168,50 @@ class GallerySMB3(_Gallery3DBase):
         rows = []
         waypoints = []
         placed = 0
+        side_idx = 0  # cycles through sprite IDs for side walls
+
+        def _side():
+            """Return a cycling cell ID for side-wall sprites."""
+            nonlocal side_idx
+            sid = 2 + (side_idx % n_sprites)
+            side_idx += 1
+            return sid
 
         rows.append([1] * W)  # top wall
 
-        # First painting row (full width, 14 paintings)
+        # First painting row (full width, 14 paintings + side sprites)
         row = [1] * W
+        row[0] = _side()
         for c in range(1, 15):
             if placed < n_sprites:
                 row[c] = cell_id; cell_id += 1; placed += 1
+        row[15] = _side()
         rows.append(row)
 
         corridor_num = 0
         while placed < n_sprites:
-            # Corridor row
-            rows.append([1] + [0] * 14 + [1])
+            # Corridor row — sprites on side walls
+            row = [_side()] + [0] * 14 + [_side()]
+            rows.append(row)
             cy = len(rows) - 1
             if corridor_num % 2 == 0:
-                # Walk east
                 waypoints.append((2.0, cy + 0.5))
                 waypoints.append((13.5, cy + 0.5))
             else:
-                # Walk west
                 waypoints.append((13.5, cy + 0.5))
                 waypoints.append((2.0, cy + 0.5))
             corridor_num += 1
 
             # Painting row with doorway for serpentine turn
             row = [1] * W
+            row[0] = _side()
+            row[15] = _side()
             if corridor_num % 2 == 1:
                 # Opening on right (col 14)
                 for c in range(1, 14):
                     if placed < n_sprites:
                         row[c] = cell_id; cell_id += 1; placed += 1
                 row[14] = 0
-                # Turn waypoints: move to opening, go through to next corridor
                 waypoints.append((14.5, cy + 0.5))
                 waypoints.append((14.5, cy + 2.5))
             else:
@@ -1210,13 +1220,13 @@ class GallerySMB3(_Gallery3DBase):
                 for c in range(2, 15):
                     if placed < n_sprites:
                         row[c] = cell_id; cell_id += 1; placed += 1
-                # Turn waypoints
                 waypoints.append((1.5, cy + 0.5))
                 waypoints.append((1.5, cy + 2.5))
             rows.append(row)
 
         # Final corridor to view last painting row
-        rows.append([1] + [0] * 14 + [1])
+        row = [_side()] + [0] * 14 + [_side()]
+        rows.append(row)
         cy = len(rows) - 1
         if corridor_num % 2 == 0:
             waypoints.append((2.0, cy + 0.5))
