@@ -796,8 +796,8 @@ class DNA(Visual):
         t = self.time % total
         phase = int(t / phase_dur)
 
-        labels = ['2 NM: DNA', '11 NM: NUCLEOSOME',
-                  '30 NM: FIBER', 'CHROMOSOME']
+        labels = ['2NM DNA', '11NM NUCLEOSOME',
+                  '30NM FIBER', 'CHROMOSOME']
 
         if phase == 0:
             self._draw_bare_dna(pal)
