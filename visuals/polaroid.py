@@ -26,7 +26,7 @@ class Polaroid(Visual):
         self.time = 0.0
         self.angle = 0.0  # Rotation angle in radians
         self.target_angle = 0.0
-        self.scale = 0.9
+        self.scale = 0.85
 
         # Flash effect
         self.flash_intensity = 0.0
