@@ -100,7 +100,9 @@ from .sinescroller import SineScroller
 from .mondrian import Mondrian
 from .copperbars import CopperBars
 from .greatwave import GreatWave
-from .gallery3d import Gallery3D
+from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
+                        GalleryScience, GalleryDigital, GalleryEffects,
+                        GallerySalon, GallerySMB3, GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
 from .particlelife import ParticleLife
@@ -289,7 +291,14 @@ ALL_VISUALS = [
     Mondrian,
     CopperBars,
     GreatWave,
-    Gallery3D,
+    GalleryArt,
+    GallerySprites,
+    GalleryAutomata,
+    GalleryScience,
+    GalleryDigital,
+    GalleryEffects,
+    GallerySalon,
+    GallerySMB3,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -538,6 +547,14 @@ __all__ = [
     'Mondrian',
     'CopperBars',
     'GreatWave',
+    'GalleryArt',
+    'GallerySprites',
+    'GalleryAutomata',
+    'GalleryScience',
+    'GalleryDigital',
+    'GalleryEffects',
+    'GallerySalon',
+    'GallerySMB3',
     'Gallery3D',
     'Win95Maze',
     'DemonSpirals',
