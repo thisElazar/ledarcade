@@ -1184,9 +1184,11 @@ class GallerySMB3(_Gallery3DBase):
             rows.append([1] + [0] * 14 + [1])
             cy = len(rows) - 1
             if corridor_num % 2 == 0:
+                # Walk east
                 waypoints.append((2.0, cy + 0.5))
                 waypoints.append((13.5, cy + 0.5))
             else:
+                # Walk west
                 waypoints.append((13.5, cy + 0.5))
                 waypoints.append((2.0, cy + 0.5))
             corridor_num += 1
@@ -1194,17 +1196,23 @@ class GallerySMB3(_Gallery3DBase):
             # Painting row with doorway for serpentine turn
             row = [1] * W
             if corridor_num % 2 == 1:
-                # Opening on right
+                # Opening on right (col 14)
                 for c in range(1, 14):
                     if placed < n_sprites:
                         row[c] = cell_id; cell_id += 1; placed += 1
                 row[14] = 0
+                # Turn waypoints: move to opening, go through to next corridor
+                waypoints.append((14.5, cy + 0.5))
+                waypoints.append((14.5, cy + 2.5))
             else:
-                # Opening on left
+                # Opening on left (col 1)
                 row[1] = 0
                 for c in range(2, 15):
                     if placed < n_sprites:
                         row[c] = cell_id; cell_id += 1; placed += 1
+                # Turn waypoints
+                waypoints.append((1.5, cy + 0.5))
+                waypoints.append((1.5, cy + 2.5))
             rows.append(row)
 
         # Final corridor to view last painting row
