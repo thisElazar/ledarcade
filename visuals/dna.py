@@ -135,14 +135,55 @@ class DNA(Visual):
 
     def _get_notes(self):
         mid = PALETTES[self.palette_idx]['note']
-        return [
-            ("DEOXYRIBONUCLEIC ACID", (255, 255, 255)),
-            ("A=T  G=C  BASE PAIRING", mid),
-            ("3 BILLION BASE PAIRS PER CELL", mid),
-            ("DNA TO RNA TO PROTEIN", mid),
-            ("WATSON AND CRICK 1953", (255, 255, 255)),
-            ("ROSALIND FRANKLIN X-RAY DIFFRACTION", mid),
-        ]
+        scenario = _SCENARIOS[self.scenario_idx]
+        if scenario == 'DOUBLE HELIX':
+            return [
+                ("DEOXYRIBONUCLEIC ACID", (255, 255, 255)),
+                ("A=T  G=C  BASE PAIRING", mid),
+                ("3 BILLION BASE PAIRS PER CELL", mid),
+                ("WATSON AND CRICK 1953", (255, 255, 255)),
+                ("ROSALIND FRANKLIN X-RAY DIFFRACTION", mid),
+            ]
+        elif scenario == 'REPLICATION':
+            return [
+                ("DNA REPLICATION", (255, 255, 255)),
+                ("HELICASE UNZIPS THE DOUBLE HELIX", mid),
+                ("EACH STRAND SERVES AS A TEMPLATE", mid),
+                ("DNA POLYMERASE ADDS NEW BASES", mid),
+                ("ONE CELL BECOMES TWO IDENTICAL COPIES", mid),
+            ]
+        elif scenario == 'TRANSCRIPTION':
+            return [
+                ("TRANSCRIPTION", (255, 255, 255)),
+                ("RNA POLYMERASE READS THE TEMPLATE STRAND", mid),
+                ("URACIL REPLACES THYMINE IN RNA", mid),
+                ("MRNA CARRIES THE MESSAGE TO RIBOSOMES", mid),
+                ("FIRST STEP OF GENE EXPRESSION", mid),
+            ]
+        elif scenario == 'CODONS':
+            return [
+                ("THE GENETIC CODE", (255, 255, 255)),
+                ("EACH CODON IS THREE RNA BASES", mid),
+                ("64 CODONS ENCODE 20 AMINO ACIDS", mid),
+                ("AUG = START  UAA UAG UGA = STOP", mid),
+                ("AMINO ACIDS FOLD INTO PROTEINS", mid),
+            ]
+        elif scenario == 'MUTATION':
+            return [
+                ("DNA MUTATION", (255, 255, 255)),
+                ("POINT MUTATIONS CHANGE A SINGLE BASE", mid),
+                ("MISMATCHES DETECTED BY REPAIR ENZYMES", mid),
+                ("SOME MUTATIONS ESCAPE REPAIR", mid),
+                ("EVOLUTION DEPENDS ON RARE ERRORS", mid),
+            ]
+        else:  # CHROMATIN
+            return [
+                ("CHROMATIN PACKAGING", (255, 255, 255)),
+                ("2 METERS OF DNA PER HUMAN CELL", mid),
+                ("DNA WRAPS AROUND HISTONE PROTEINS", mid),
+                ("NUCLEOSOMES FOLD INTO 30NM FIBER", mid),
+                ("FIBERS CONDENSE INTO CHROMOSOMES", mid),
+            ]
 
     def _build_notes_segments(self):
         sep = '  --  '
@@ -261,6 +302,9 @@ class DNA(Visual):
         self.rotation_y = 0.0
         self.mutations = {}
         self.mutation_timer = 0.0
+        if self.show_notes:
+            self._build_notes_segments()
+            self.notes_scroll_offset = 0.0
 
     # ── input ─────────────────────────────────────────────────
 
@@ -324,18 +368,20 @@ class DNA(Visual):
 
     def _update_mutations(self, dt):
         self.mutation_timer += dt * self.speed
-        if self.mutation_timer > 3.0:
+        if self.mutation_timer > 1.2:
             self.mutation_timer = 0.0
-            idx = random.randint(0, len(self.sequence) - 1)
-            original = self.sequence[idx]
-            mutated = random.choice([b for b in 'ATGC' if b != original])
-            self.mutations[idx] = {
-                'original': original,
-                'mutated': mutated,
-                'timer': 0.0,
-                'repaired': random.random() < 0.5,
-            }
-            self.sequence[idx] = mutated
+            # Bias toward center of helix (bases 5-15) where they're visible
+            idx = random.randint(5, min(15, len(self.sequence) - 1))
+            if idx not in self.mutations:
+                original = self.sequence[idx]
+                mutated = random.choice([b for b in 'ATGC' if b != original])
+                self.mutations[idx] = {
+                    'original': original,
+                    'mutated': mutated,
+                    'timer': 0.0,
+                    'repaired': random.random() < 0.5,
+                }
+                self.sequence[idx] = mutated
 
         to_remove = []
         for idx, m in self.mutations.items():
