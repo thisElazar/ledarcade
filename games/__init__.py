@@ -35,6 +35,7 @@ from .galaga import Galaga
 from .defender import Defender
 from .centipede import Centipede
 from .mancala import Mancala
+from .monstermaze import MonsterMaze
 from .go import Go
 from .digdug import DigDug
 from .loderunner import LodeRunner
@@ -92,6 +93,7 @@ ALL_GAMES = [
     Defender,
     Centipede,
     Mancala,
+    MonsterMaze,
     Go,
     DigDug,
     LodeRunner,
@@ -157,6 +159,7 @@ __all__ = [
     'Defender',
     'Centipede',
     'Mancala',
+    'MonsterMaze',
     'Go',
     'DigDug',
     'LodeRunner',

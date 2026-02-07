@@ -100,6 +100,7 @@ from .sinescroller import SineScroller
 from .mondrian import Mondrian
 from .copperbars import CopperBars
 from .greatwave import GreatWave
+from .gallery3d import Gallery3D
 from .demonspirals import DemonSpirals
 from .particlelife import ParticleLife
 from .fireflies import Fireflies
@@ -222,6 +223,7 @@ from .jezzballdemo import JezzBallDemo
 from .lightsoutdemo import LightsOutDemo
 from .loderunnerdemo import LodeRunnerDemo
 from .lunarlanderdemo import LunarLanderDemo
+from .monstermazedemo import MonsterMazeDemo
 from .mspacmandemo import MsPacManDemo
 from .nightdriverdemo import NightDriverDemo
 from .othellodemo import OthelloDemo
@@ -286,6 +288,7 @@ ALL_VISUALS = [
     Mondrian,
     CopperBars,
     GreatWave,
+    Gallery3D,
     DemonSpirals,
     ParticleLife,
     Fireflies,
@@ -466,6 +469,7 @@ ALL_VISUALS = [
     LightsOutDemo,
     LodeRunnerDemo,
     LunarLanderDemo,
+    MonsterMazeDemo,
     MsPacManDemo,
     NightDriverDemo,
     OthelloDemo,
@@ -532,6 +536,7 @@ __all__ = [
     'Mondrian',
     'CopperBars',
     'GreatWave',
+    'Gallery3D',
     'DemonSpirals',
     'ParticleLife',
     'Fireflies',
@@ -635,4 +640,5 @@ __all__ = [
     'Demos',
     'AgarioDemo',
     'DefenderDemo',
+    'MonsterMazeDemo',
 ]
