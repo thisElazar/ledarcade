@@ -314,8 +314,8 @@ class Arkanoid(Game):
             if ball['x'] >= PLAY_RIGHT - 2:
                 ball['x'] = PLAY_RIGHT - 2
                 ball['dx'] = -abs(ball['dx'])
-            if ball['y'] <= 7:
-                ball['y'] = 7
+            if ball['y'] <= 0:
+                ball['y'] = 0
                 ball['dy'] = abs(ball['dy'])
 
             # Bottom - remove ball
@@ -361,7 +361,7 @@ class Arkanoid(Game):
         # Update lasers
         for laser in self.lasers[:]:
             laser['y'] -= 120 * dt
-            if laser['y'] < 7:
+            if laser['y'] < 0:
                 self.lasers.remove(laser)
                 continue
 
@@ -436,18 +436,9 @@ class Arkanoid(Game):
     def draw(self):
         self.display.clear(Colors.BLACK)
 
-        # Draw score and lives (up to 6 visible)
-        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
-        for i in range(min(self.lives, 6)):
-            self.display.set_pixel(46 + i * 3, 2, Colors.CYAN)
-            self.display.set_pixel(47 + i * 3, 2, Colors.CYAN)
-
-        # Draw separator
-        self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
-
-        # Draw side walls
-        self.display.draw_rect(0, 7, PLAY_LEFT, GRID_SIZE - 7, Colors.DARK_GRAY)
-        self.display.draw_rect(PLAY_RIGHT, 7, GRID_SIZE - PLAY_RIGHT, GRID_SIZE - 7, Colors.DARK_GRAY)
+        # Draw side walls (full height — ceiling is top of screen)
+        self.display.draw_rect(0, 0, PLAY_LEFT, GRID_SIZE, Colors.DARK_GRAY)
+        self.display.draw_rect(PLAY_RIGHT, 0, GRID_SIZE - PLAY_RIGHT, GRID_SIZE, Colors.DARK_GRAY)
 
         # Draw bricks
         for brick in self.bricks:
@@ -515,3 +506,9 @@ class Arkanoid(Game):
             level_name = self.levels[self.level % len(self.levels)]['name']
             self.display.draw_text_small(12, 38, level_name, Colors.YELLOW)
             self.display.draw_text_small(8, 50, "BTN:START", Colors.GRAY)
+
+        # HUD on top of everything (overlaps play area slightly)
+        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
+        for i in range(min(self.lives, 6)):
+            self.display.set_pixel(46 + i * 3, 2, Colors.CYAN)
+            self.display.set_pixel(47 + i * 3, 2, Colors.CYAN)
