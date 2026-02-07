@@ -26,7 +26,7 @@ class Polaroid(Visual):
         self.time = 0.0
         self.angle = 0.0  # Rotation angle in radians
         self.target_angle = 0.0
-        self.scale = 0.80
+        self.scale = 1.0
 
         # Flash effect
         self.flash_intensity = 0.0
@@ -358,36 +358,82 @@ class Polaroid(Visual):
         return (new_x + cx, new_y + cy)
 
     def draw_rotated_rect(self, cx: int, cy: int, x: int, y: int, w: int, h: int, color: tuple):
-        """Draw a filled rectangle rotated around center."""
+        """Draw a filled rectangle rotated around center (inverse mapping)."""
         center_x, center_y = GRID_SIZE // 2, GRID_SIZE // 2
+        cos_a = math.cos(self.angle)
+        sin_a = math.sin(self.angle)
 
-        for dy in range(h):
-            for dx in range(w):
-                px, py = x + dx - cx, y + dy - cy
-                rx, ry = self.rotate_point(px + center_x, py + center_y, center_x, center_y)
-                ix, iy = int(rx), int(ry)
-                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                    self.display.set_pixel(ix, iy, color)
+        # Source rect bounds in local coords
+        lx1, ly1 = x - cx, y - cy
+        lx2, ly2 = lx1 + w, ly1 + h
+
+        # Forward-map corners to find screen bounding box
+        corners = [(lx1, ly1), (lx2, ly1), (lx1, ly2), (lx2, ly2)]
+        sxs = []
+        sys = []
+        for lx, ly in corners:
+            sx = lx * self.scale
+            sy = ly * self.scale
+            sxs.append(sx * cos_a - sy * sin_a + center_x)
+            sys.append(sx * sin_a + sy * cos_a + center_y)
+
+        min_sx = max(0, int(min(sxs)) - 1)
+        max_sx = min(GRID_SIZE - 1, int(max(sxs)) + 1)
+        min_sy = max(0, int(min(sys)) - 1)
+        max_sy = min(GRID_SIZE - 1, int(max(sys)) + 1)
+
+        inv_scale = 1.0 / self.scale if self.scale != 0 else 1.0
+
+        for sy in range(min_sy, max_sy + 1):
+            for sx in range(min_sx, max_sx + 1):
+                dx = sx - center_x
+                dy = sy - center_y
+                lx = (dx * cos_a + dy * sin_a) * inv_scale
+                ly = (-dx * sin_a + dy * cos_a) * inv_scale
+                if lx1 <= lx < lx2 and ly1 <= ly < ly2:
+                    self.display.set_pixel(sx, sy, color)
 
     def draw_rotated_circle(self, cx: int, cy: int, x: int, y: int, r: int, color: tuple, filled: bool = True):
-        """Draw a circle rotated around center."""
+        """Draw a circle rotated around center (inverse mapping)."""
         center_x, center_y = GRID_SIZE // 2, GRID_SIZE // 2
+        cos_a = math.cos(self.angle)
+        sin_a = math.sin(self.angle)
 
-        for dy in range(-r, r + 1):
-            for dx in range(-r, r + 1):
-                dist_sq = dx * dx + dy * dy
+        # Circle center in local coords
+        ccx, ccy = x - cx, y - cy
+
+        # Forward-map bounding box corners to find screen bounds
+        corners = [(ccx - r, ccy - r), (ccx + r, ccy - r),
+                    (ccx - r, ccy + r), (ccx + r, ccy + r)]
+        sxs = []
+        sys = []
+        for lx, ly in corners:
+            sx = lx * self.scale
+            sy = ly * self.scale
+            sxs.append(sx * cos_a - sy * sin_a + center_x)
+            sys.append(sx * sin_a + sy * cos_a + center_y)
+
+        min_sx = max(0, int(min(sxs)) - 1)
+        max_sx = min(GRID_SIZE - 1, int(max(sxs)) + 1)
+        min_sy = max(0, int(min(sys)) - 1)
+        max_sy = min(GRID_SIZE - 1, int(max(sys)) + 1)
+
+        inv_scale = 1.0 / self.scale if self.scale != 0 else 1.0
+        r_sq = r * r
+
+        for sy in range(min_sy, max_sy + 1):
+            for sx in range(min_sx, max_sx + 1):
+                dx = sx - center_x
+                dy = sy - center_y
+                lx = (dx * cos_a + dy * sin_a) * inv_scale
+                ly = (-dx * sin_a + dy * cos_a) * inv_scale
+                dist_sq = (lx - ccx) ** 2 + (ly - ccy) ** 2
                 if filled:
-                    if dist_sq > r * r:
-                        continue
+                    if dist_sq <= r_sq:
+                        self.display.set_pixel(sx, sy, color)
                 else:
-                    if abs(dist_sq - r * r) >= r * 2:
-                        continue
-
-                px, py = x + dx - cx, y + dy - cy
-                rx, ry = self.rotate_point(px + center_x, py + center_y, center_x, center_y)
-                ix, iy = int(rx), int(ry)
-                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                    self.display.set_pixel(ix, iy, color)
+                    if abs(dist_sq - r_sq) < r * 2:
+                        self.display.set_pixel(sx, sy, color)
 
     def draw(self):
         # Background with flash effect
