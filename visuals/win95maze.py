@@ -30,7 +30,7 @@ TEX_SIZE = 16
 
 
 class Win95Maze(Visual):
-    name = "WIN95 MAZE"
+    name = "MAZE"
     description = "3D maze screensaver"
     category = "digital"
 
