@@ -203,15 +203,13 @@ class ScienceLab(Slideshow):
                              OrbitsSolar, OrbitsMulti, OrbitsBelt,
                              EMMotor, EMCircuit, EMFreeAir,
                              FluidTunnel, FluidInk, FluidMixing,
-                             TuringSpots, TuringStripes, TuringCoral,
-                             TuringWorms, Mitosis, Earth, Molecule,
+                             TuringPatterns, Mitosis, Earth, Molecule,
                              DNA, Spectroscope, Oscilloscope, Chladni)
         return [Attractors, DblPendulum, Neurons,
                 OrbitsSolar, OrbitsMulti, OrbitsBelt,
                 EMMotor, EMCircuit, EMFreeAir,
                 FluidTunnel, FluidInk, FluidMixing,
-                TuringSpots, TuringStripes, TuringCoral,
-                TuringWorms, Mitosis, Earth, Molecule,
+                TuringPatterns, Mitosis, Earth, Molecule,
                 DNA, Spectroscope, Oscilloscope, Chladni]
 
 

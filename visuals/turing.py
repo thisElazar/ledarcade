@@ -126,6 +126,45 @@ def _draw_turing(display, v, palette_idx):
             display.set_pixel(x, y, (int(p[0]), int(p[1]), int(p[2])))
 
 
+# ── Pearson classification (documented sample points) ────────────
+# From Pearson 1993 "Complex Patterns in a Simple System" + Munafo extensions.
+# Each entry is (F, k, label) at a documented example coordinate.
+
+_PEARSON_POINTS = [
+    (0.010, 0.047, 'ALPHA'),   (0.014, 0.053, 'ALPHA'),
+    (0.014, 0.039, 'BETA'),    (0.026, 0.051, 'BETA'),
+    (0.022, 0.051, 'GAMMA'),   (0.026, 0.055, 'GAMMA'),
+    (0.030, 0.055, 'DELTA'),   (0.042, 0.059, 'DELTA'),
+    (0.018, 0.055, 'EPSILON'), (0.022, 0.059, 'EPSILON'),
+    (0.022, 0.061, 'ZETA'),    (0.026, 0.059, 'ZETA'),
+    (0.034, 0.063, 'ETA'),
+    (0.030, 0.057, 'THETA'),   (0.038, 0.061, 'THETA'),
+    (0.046, 0.0594, 'IOTA'),
+    (0.050, 0.063, 'KAPPA'),   (0.058, 0.063, 'KAPPA'),
+    (0.026, 0.061, 'LAMBDA'),  (0.034, 0.065, 'LAMBDA'),
+    (0.046, 0.065, 'MU'),      (0.058, 0.065, 'MU'),
+    (0.046, 0.067, 'NU'),      (0.054, 0.067, 'NU'),
+    (0.082, 0.063, 'NU'),
+    (0.010, 0.041, 'XI'),      (0.014, 0.047, 'XI'),
+    (0.062, 0.061, 'PI'),      (0.060, 0.0609, 'PI'),
+    (0.090, 0.059, 'RHO'),     (0.102, 0.055, 'RHO'),
+    (0.090, 0.057, 'SIGMA'),   (0.110, 0.0523, 'SIGMA'),
+]
+
+_PEARSON_THRESHOLD = 0.005  # max Euclidean distance to show a label
+
+
+def _nearest_pearson(f, k):
+    best_name = ''
+    best_dist = _PEARSON_THRESHOLD
+    for pf, pk, name in _PEARSON_POINTS:
+        d = ((f - pf) ** 2 + (k - pk) ** 2) ** 0.5
+        if d < best_dist:
+            best_dist = d
+            best_name = name
+    return best_name
+
+
 # ── Base class (not exported) ─────────────────────────────────────
 
 class _TuringBase(Visual):
@@ -338,5 +377,76 @@ class TuringWorms(_TuringBase):
             ("GRAY-SCOTT MODEL", mid),
             ("WORM-LIKE LABYRINTHINE PATTERN", mid),
             ("SIMILAR TO BRAIN CORAL SURFACE", mid),
+            ("ALAN TURING 1952", (255, 255, 255)),
+        ]
+
+
+class TuringPatterns(_TuringBase):
+    name = "TURING PATTERNS"
+    description = "Explore the full Gray-Scott parameter space"
+    category = "science"
+    _f_center = 0.035
+    _k_center = 0.065
+    _f_min = 0.010
+    _f_max = 0.100
+    _k_min = 0.040
+    _k_max = 0.075
+
+    def handle_input(self, input_state) -> bool:
+        consumed = False
+        if input_state.left_pressed:
+            self.f = max(self._f_min, round(self.f - 0.001, 3))
+            self.param_overlay_timer = 2.0
+            consumed = True
+        if input_state.right_pressed:
+            self.f = min(self._f_max, round(self.f + 0.001, 3))
+            self.param_overlay_timer = 2.0
+            consumed = True
+        if input_state.up_pressed:
+            self.k = min(self._k_max, round(self.k + 0.001, 3))
+            self.param_overlay_timer = 2.0
+            consumed = True
+        if input_state.down_pressed:
+            self.k = max(self._k_min, round(self.k - 0.001, 3))
+            self.param_overlay_timer = 2.0
+            consumed = True
+        # Both buttons simultaneously toggles notes
+        both = input_state.action_l and input_state.action_r
+        if both and not self._both_pressed_prev:
+            self.show_notes = not self.show_notes
+            self.notes_scroll_offset = 0.0
+            if self.show_notes:
+                self._build_notes_segments()
+            consumed = True
+        elif input_state.action_l or input_state.action_r:
+            if not both:
+                self.u, self.v = _init_grid()
+                self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+                if self.show_notes:
+                    self._build_notes_segments()
+                consumed = True
+        self._both_pressed_prev = both
+        return consumed
+
+    def _draw_param_overlay(self):
+        alpha = min(1.0, self.param_overlay_timer / 0.5)
+        c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+        pearson = _nearest_pearson(self.f, self.k)
+        if pearson:
+            self.display.draw_text_small(2, 2, pearson, c)
+            self.display.draw_text_small(2, 8, "F=%.3f K=%.3f" % (self.f, self.k), c)
+        else:
+            self.display.draw_text_small(2, 2, "F=%.3f K=%.3f" % (self.f, self.k), c)
+
+    def _get_notes(self):
+        mid = PALETTES[self.palette_idx][3]
+        return [
+            ("TURING PATTERNS", (255, 255, 255)),
+            ("GRAY-SCOTT REACTION-DIFFUSION", mid),
+            ("PEARSON 1993 CLASSIFICATION", mid),
+            ("F = FEED RATE (REPLENISH U)", (255, 255, 255)),
+            ("K = KILL RATE (REMOVE V)", (255, 255, 255)),
+            ("JOYSTICK EXPLORES PARAMETER SPACE", mid),
+            ("BUTTON RESEEDS THE GRID", mid),
             ("ALAN TURING 1952", (255, 255, 255)),
         ]
