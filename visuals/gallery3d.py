@@ -20,29 +20,55 @@ try:
 except ImportError:
     HAS_PIL = False
 
-# 16x16 map: 0=empty, 1=wall, 2-9=painting (textured wall)
-# 8 painting slots numbered 2..9
+# Map dimensions
+MAP_W = 16
+MAP_H = 36
+
+# 16x36 map: 0=empty, 1=wall, 2-9=painting, 10-15=immersive room walls
 MAP = [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
-    [1,0,0,0,2,0,0,0,0,0,0,3,0,0,0,1],
-    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
-    [1,1,4,1,1,0,0,0,0,0,0,1,1,5,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,1,6,1,1,0,0,0,0,0,0,1,1,7,1,1],
-    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
-    [1,0,0,0,8,0,0,0,0,0,0,9,0,0,0,1],
-    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    # --- Original gallery (rows 0-15) ---
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],       # 0
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],       # 1
+    [1,0,0,0,2,0,0,0,0,0,0,3,0,0,0,1],       # 2
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],       # 3
+    [1,1,4,1,1,0,0,0,0,0,0,1,1,5,1,1],       # 4
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],       # 5
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],       # 6
+    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1],       # 7
+    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1],       # 8
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],       # 9
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],       # 10
+    [1,1,6,1,1,0,0,0,0,0,0,1,1,7,1,1],       # 11
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],       # 12
+    [1,0,0,0,8,0,0,0,0,0,0,9,0,0,0,1],       # 13
+    [1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1],       # 14
+    [1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1],       # 15 doorway at cols 7-8
+    # --- South corridor + rooms (rows 16-35) ---
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],       # 16 corridor
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],       # 17 corridor
+    [1,10,10,10,10,1,1,0,0,1,1,11,11,11,11,1],# 18 room top walls
+    [1,10,0,0,10,10,1,0,0,1,11,11,0,0,11,1], # 19
+    [1,10,0,0,0,0,0,0,0,0,0,0,0,0,11,1],     # 20 doorways face corridor
+    [1,10,0,0,10,10,1,0,0,1,11,11,0,0,11,1], # 21
+    [1,10,10,10,10,1,1,0,0,1,1,11,11,11,11,1],# 22 room bottom walls
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],       # 23 corridor
+    [1,12,12,12,12,1,1,0,0,1,1,13,13,13,13,1],# 24 room top walls
+    [1,12,0,0,12,12,1,0,0,1,13,13,0,0,13,1], # 25
+    [1,12,0,0,0,0,0,0,0,0,0,0,0,0,13,1],     # 26 doorways
+    [1,12,0,0,12,12,1,0,0,1,13,13,0,0,13,1], # 27
+    [1,12,12,12,12,1,1,0,0,1,1,13,13,13,13,1],# 28 room bottom walls
+    [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],       # 29 corridor
+    [1,14,14,14,14,1,1,0,0,1,1,15,15,15,15,1],# 30 room top walls
+    [1,14,0,0,14,14,1,0,0,1,15,15,0,0,15,1], # 31
+    [1,14,0,0,0,0,0,0,0,0,0,0,0,0,15,1],     # 32 doorways
+    [1,14,0,0,14,14,1,0,0,1,15,15,0,0,15,1], # 33
+    [1,14,14,14,14,1,1,0,0,1,1,15,15,15,15,1],# 34 room bottom walls
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],       # 35 dead-end wall
 ]
 
 # Auto-walk waypoints (x, y) in map coords
 WAYPOINTS = [
+    # --- Original gallery tour ---
     (2.5, 2.5),   # NW room
     (2.5, 6.0),   # exit NW room south
     (5.5, 6.0),   # central hall west
@@ -62,12 +88,63 @@ WAYPOINTS = [
     (5.5, 13.5),  # look at painting 8 (east wall SW)
     (2.5, 13.5),  # SW room
     (2.5, 9.5),   # exit SW room north
+    (8.0, 9.5),   # center south
+    # --- South wing tour ---
+    (7.5, 15.5),  # enter corridor doorway
+    (7.5, 17.5),  # corridor south
+    # Room 1: Plasma (left)
+    (5.0, 20.5),  # enter Plasma room
+    (3.0, 20.5),  # center of Plasma room
+    (5.0, 20.5),  # exit Plasma room
+    # Room 2: Fire (right)
+    (11.0, 20.5), # enter Fire room
+    (13.0, 20.5), # center of Fire room
+    (11.0, 20.5), # exit Fire room
+    (7.5, 20.5),  # corridor
+    (7.5, 23.5),  # corridor south
+    # Room 3: Matrix (left)
+    (5.0, 26.5),  # enter Matrix room
+    (3.0, 26.5),  # center of Matrix room
+    (5.0, 26.5),  # exit Matrix room
+    # Room 4: Starfield (right)
+    (11.0, 26.5), # enter Starfield room
+    (13.0, 26.5), # center of Starfield room
+    (11.0, 26.5), # exit Starfield room
+    (7.5, 26.5),  # corridor
+    (7.5, 29.5),  # corridor south
+    # Room 5: Demon Spirals (left)
+    (5.0, 32.5),  # enter DemonSpirals room
+    (3.0, 32.5),  # center of DemonSpirals room
+    (5.0, 32.5),  # exit DemonSpirals room
+    # Room 6: Moire (right)
+    (11.0, 32.5), # enter Moire room
+    (13.0, 32.5), # center of Moire room
+    (11.0, 32.5), # exit Moire room
+    # Return north
+    (7.5, 32.5),  # corridor
+    (7.5, 23.5),  # corridor north
+    (7.5, 17.5),  # corridor north
+    (7.5, 14.0),  # back through doorway
     (5.5, 6.0),   # back to center
 ]
 
 # Gold frame color
 GOLD = (180, 150, 50)
 GOLD_DARK = (120, 100, 30)
+
+# Immersive room definitions: cell_id -> (module, class, ceiling_tint, floor_tint)
+IMMERSIVE_ROOMS = {
+    10: ("plasma",       "Plasma",       (40, 20, 50), (50, 25, 60)),
+    11: ("fire",         "Fire",         (60, 25, 10), (70, 30, 10)),
+    12: ("matrix",       "Matrix",       (5, 30, 10),  (10, 40, 15)),
+    13: ("starfield",    "Starfield",    (5, 5, 20),   (10, 10, 30)),
+    14: ("demonspirals", "DemonSpirals", (40, 10, 40), (50, 15, 50)),
+    15: ("moire",        "Moire",        (20, 20, 40), (30, 30, 50)),
+}
+
+# Immersive animation constants
+IMMERSIVE_FPS = 8
+IMMERSIVE_FRAMES = 24
 
 
 class Gallery3D(Visual):
@@ -109,7 +186,7 @@ class Gallery3D(Visual):
     # ------------------------------------------------------------------
 
     def _load_textures(self):
-        """Load all 8 painting textures (sprites get multiple animation frames)."""
+        """Load all painting textures, sprites, and immersive room textures."""
         project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         assets = os.path.join(project_dir, "assets")
 
@@ -134,6 +211,9 @@ class Gallery3D(Visual):
         ])
         self._load_gif_frames(9, os.path.join(assets, "ani_link_spin.gif"))
 
+        # Immersive room textures (multi-frame animated)
+        self._load_immersive_textures()
+
     def _load_png(self, slot, path):
         """Load a single PNG as a one-frame texture."""
         self.textures[slot] = [self._read_png(path)]
@@ -157,10 +237,6 @@ class Gallery3D(Visual):
             return tex
         except Exception:
             return self._solid_texture((80, 80, 80))
-
-    def _capture_visual(self, slot, module_name, class_name):
-        """Instantiate a visual, render one frame, capture as single-frame texture."""
-        self.textures[slot] = [self._capture_frame(module_name, class_name, 0.5)]
 
     def _load_gif_frames(self, slot, path, max_frames=12):
         """Load frames from an animated GIF with alpha onto a dark background."""
@@ -209,6 +285,28 @@ class Gallery3D(Visual):
             self.textures[slot] = [tex]
         except Exception:
             self.textures[slot] = [self._solid_texture((80, 80, 80))]
+
+    def _load_immersive_textures(self):
+        """Capture multi-frame animation sequences for immersive room walls."""
+        import importlib
+        dt = 1.0 / IMMERSIVE_FPS
+        for cell_id, (mod_name, cls_name, _, _) in IMMERSIVE_ROOMS.items():
+            try:
+                mod = importlib.import_module(f".{mod_name}", package="visuals")
+                cls = getattr(mod, cls_name)
+                vis = cls(self.display)
+                frames = []
+                for _ in range(IMMERSIVE_FRAMES):
+                    vis.update(dt)
+                    vis.draw()
+                    tex = []
+                    for y in range(GRID_SIZE):
+                        for x in range(GRID_SIZE):
+                            tex.append(self.display.get_pixel(x, y))
+                    frames.append(tex)
+                self.textures[cell_id] = frames
+            except Exception:
+                self.textures[cell_id] = [self._solid_texture((80, 80, 80))]
 
     @staticmethod
     def _solid_texture(color):
@@ -302,11 +400,26 @@ class Gallery3D(Visual):
             for dy in (-margin, margin):
                 mx = int(x + dx)
                 my = int(y + dy)
-                if mx < 0 or mx >= 16 or my < 0 or my >= 16:
+                if mx < 0 or mx >= MAP_W or my < 0 or my >= MAP_H:
                     return True
                 if MAP[my][mx] != 0:
                     return True
         return False
+
+    def _get_room_cell(self):
+        """Return the immersive cell ID if player is inside one, else 0."""
+        mx, my = int(self.px), int(self.py)
+        if mx < 0 or mx >= MAP_W or my < 0 or my >= MAP_H:
+            return 0
+        # Check surrounding walls to detect which room we're in
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                cx, cy = mx + dx, my + dy
+                if 0 <= cx < MAP_W and 0 <= cy < MAP_H:
+                    c = MAP[cy][cx]
+                    if c >= 10:
+                        return c
+        return 0
 
     # ------------------------------------------------------------------
     # Raycaster + draw
@@ -316,9 +429,13 @@ class Gallery3D(Visual):
         self._render_frame()
 
     def _render_frame(self):
-        # Ceiling and floor colors
-        ceil_color = (30, 30, 50)
-        floor_color = (50, 40, 35)
+        # Check if player is in an immersive room for atmosphere tinting
+        room_cell = self._get_room_cell()
+        if room_cell in IMMERSIVE_ROOMS:
+            _, _, ceil_color, floor_color = IMMERSIVE_ROOMS[room_cell]
+        else:
+            ceil_color = (30, 30, 50)
+            floor_color = (50, 40, 35)
         half = GRID_SIZE // 2
 
         # Fill ceiling and floor
@@ -369,7 +486,7 @@ class Gallery3D(Visual):
         # DDA loop
         hit = False
         side = 0  # 0 = x-side, 1 = y-side
-        for _ in range(20):
+        for _ in range(50):
             if side_dist_x < side_dist_y:
                 side_dist_x += delta_x
                 map_x += step_x
@@ -379,7 +496,7 @@ class Gallery3D(Visual):
                 map_y += step_y
                 side = 1
 
-            if map_x < 0 or map_x >= 16 or map_y < 0 or map_y >= 16:
+            if map_x < 0 or map_x >= MAP_W or map_y < 0 or map_y >= MAP_H:
                 break
             cell = MAP[map_y][map_x]
             if cell != 0:
@@ -416,16 +533,18 @@ class Gallery3D(Visual):
         if side == 1:
             fog *= 0.75
 
-        is_painting = cell >= 2
+        is_textured = cell >= 2
+        is_immersive = cell >= 10
         tex_col = int(wall_x * GRID_SIZE)
         if tex_col >= GRID_SIZE:
             tex_col = GRID_SIZE - 1
 
         # Select animation frame for this texture
         tex = None
-        if is_painting and cell in self.textures:
+        if is_textured and cell in self.textures:
             frames = self.textures[cell]
-            frame_idx = int(self.time * self.SPRITE_FPS) % len(frames)
+            fps = IMMERSIVE_FPS if is_immersive else self.SPRITE_FPS
+            frame_idx = int(self.time * fps) % len(frames)
             tex = frames[frame_idx]
 
         for y in range(draw_start, draw_end + 1):
@@ -439,9 +558,10 @@ class Gallery3D(Visual):
             if tex is not None:
                 r, g, b = tex[tex_y * GRID_SIZE + tex_col]
 
-                # Gold frame border (1px on texture edges)
-                if tex_col <= 1 or tex_col >= GRID_SIZE - 2 or tex_y <= 1 or tex_y >= GRID_SIZE - 2:
-                    r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
+                # Gold frame border only for gallery paintings (not immersive)
+                if not is_immersive:
+                    if tex_col <= 1 or tex_col >= GRID_SIZE - 2 or tex_y <= 1 or tex_y >= GRID_SIZE - 2:
+                        r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
             else:
                 # Plain wall — stone gray
                 r, g, b = 100, 100, 110
