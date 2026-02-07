@@ -55,6 +55,22 @@ PARTICLE_STYLES = {
     # Synaptic transmission
     'neurotransmitter': {'color': (80, 255, 200), 'size': 1},
     'calcium':     {'color': (255, 255, 80),  'size': 1},
+    # Glycolysis
+    'glucose':     {'color': (255, 180, 50),  'size': 2},
+    'pyruvate':    {'color': (200, 140, 60),  'size': 2},
+    # GPCR signaling
+    'camp':        {'color': (50, 255, 150),  'size': 1},
+    'ligand':      {'color': (255, 100, 200), 'size': 1},
+    'g_alpha':     {'color': (200, 50, 255),  'size': 2},
+    # Transcription / splicing
+    'guide_rna':   {'color': (255, 120, 50),  'size': 2},
+    'snrnp':       {'color': (100, 200, 255), 'size': 2},
+    'intron':      {'color': (80, 80, 80),    'size': 1},
+    'exon':        {'color': (100, 255, 120), 'size': 2},
+    # Muscle contraction
+    'myosin':      {'color': (200, 80, 80),   'size': 2},
+    'actin':       {'color': (80, 200, 150),  'size': 1},
+    'pi':          {'color': (200, 200, 100), 'size': 1},
 }
 
 # ---------------------------------------------------------------------------
@@ -709,6 +725,436 @@ PATHWAYS = [
             ('REUPTAKE RECYCLES',            (180, 100, 60)),
         ],
     },
+    # ==================================================================
+    # Glycolysis — cytoplasmic glucose breakdown
+    # ==================================================================
+    {
+        'name': 'GLYCOLYSIS',
+        'sci_name': 'GLUCOSE CATABOLISM',
+        'group': 'energy',
+        'bg_color': (12, 10, 8),
+        'region_labels': [
+            {'text': 'CYTOPLASM', 'x': 2, 'y': 4, 'color': (22, 20, 16)},
+        ],
+        'connectors': [
+            # Zigzag path connecting 6 enzyme stations
+            {'from': (8, 16), 'to': (18, 22), 'style': 'dotted',
+             'arrow': True, 'color': (50, 45, 30)},
+            {'from': (22, 22), 'to': (32, 16), 'style': 'dotted',
+             'arrow': True, 'color': (50, 45, 30)},
+            {'from': (36, 16), 'to': (42, 28), 'style': 'dotted',
+             'arrow': True, 'color': (50, 45, 30)},
+            {'from': (42, 32), 'to': (50, 38), 'style': 'dotted',
+             'arrow': True, 'color': (50, 45, 30)},
+            {'from': (50, 42), 'to': (56, 48), 'style': 'dotted',
+             'arrow': True, 'color': (50, 45, 30)},
+        ],
+        'complexes': [
+            # Hexokinase — first committed step, phosphorylates glucose
+            {'id': 'hk', 'x': 6, 'y': 14, 'w': 7, 'color': (180, 120, 50),
+             'above': 3, 'below': 3},
+            # PFK-1 — rate-limiting step
+            {'id': 'pfk', 'x': 20, 'y': 22, 'w': 7, 'color': (200, 80, 60),
+             'above': 3, 'below': 3},
+            # Aldolase — splits 6C into two 3C
+            {'id': 'aldo', 'x': 34, 'y': 16, 'w': 5, 'color': (60, 140, 120),
+             'above': 2, 'below': 2},
+            # G3P Dehydrogenase — NADH producing step
+            {'id': 'g3pdh', 'x': 42, 'y': 30, 'w': 7, 'color': (60, 100, 180),
+             'above': 3, 'below': 3},
+            # Pyruvate Kinase — final ATP-producing step
+            {'id': 'pk', 'x': 52, 'y': 40, 'w': 7, 'color': (160, 60, 120),
+             'above': 3, 'below': 3},
+        ],
+        'flows': [
+            # Glucose enters at hexokinase
+            {'type': 'glucose', 'path': [(2, 8), (4, 12)],
+             'speed': 5, 'interval': 3.5, 'max': 1},
+            # ATP consumed at hexokinase
+            {'type': 'atp', 'path': [(2, 20), (4, 16)],
+             'speed': 6, 'interval': 4.0, 'max': 1},
+            # ATP consumed at PFK-1
+            {'type': 'atp', 'path': [(16, 28), (18, 24)],
+             'speed': 6, 'interval': 4.5, 'max': 1},
+            # Metabolite flows between stations
+            {'type': 'metabolite', 'path': [(10, 16), (14, 18), (18, 20)],
+             'speed': 7, 'interval': 3.0, 'max': 2},
+            {'type': 'metabolite', 'path': [(24, 22), (28, 18), (32, 16)],
+             'speed': 7, 'interval': 3.0, 'max': 2},
+            {'type': 'metabolite', 'path': [(37, 18), (40, 24), (42, 28)],
+             'speed': 7, 'interval': 3.0, 'max': 2},
+            {'type': 'metabolite', 'path': [(44, 32), (48, 36), (50, 38)],
+             'speed': 7, 'interval': 3.0, 'max': 2},
+            # NADH produced at G3P-DH
+            {'type': 'nadh', 'path': [(46, 28), (50, 24)],
+             'speed': 4, 'interval': 4.0, 'max': 1},
+            # Second NADH (two 3C molecules processed)
+            {'type': 'nadh', 'path': [(46, 32), (50, 36)],
+             'speed': 4, 'interval': 4.5, 'max': 1},
+            # ATP produced at pyruvate kinase (2 per 3C, 4 total)
+            {'type': 'atp', 'path': [(56, 38), (60, 34)],
+             'speed': 4, 'interval': 2.5, 'max': 2},
+            # Pyruvate exits
+            {'type': 'pyruvate', 'path': [(56, 44), (60, 50)],
+             'speed': 4, 'interval': 3.0, 'max': 2},
+        ],
+        'notes': [
+            ('GLYCOLYSIS',                    (255, 180, 50)),
+            ('GLUCOSE SPLIT INTO PYRUVATE',   (200, 140, 60)),
+            ('2 ATP INVESTED',                (255, 200, 50)),
+            ('4 ATP RETURNED',                (255, 200, 50)),
+            ('NET GAIN 2 ATP PER GLUCOSE',    (255, 200, 50)),
+            ('2 NADH PRODUCED',               (80, 160, 255)),
+            ('OLDEST METABOLIC PATHWAY',      (200, 140, 60)),
+        ],
+    },
+    # ==================================================================
+    # Transcription — RNA polymerase reads DNA
+    # ==================================================================
+    {
+        'name': 'TRANSCRIPTION',
+        'sci_name': 'DNA TO MRNA',
+        'group': 'genetic',
+        'bg_color': (6, 6, 16),
+        'region_labels': [
+            {'text': 'NUCLEUS', 'x': 2, 'y': 4, 'color': (16, 16, 30)},
+        ],
+        'connectors': [
+            # DNA template strand (horizontal, below)
+            {'from': (2, 36), 'to': (62, 36), 'style': 'dotted',
+             'color': (50, 100, 180)},
+            # DNA coding strand (horizontal, above template)
+            {'from': (2, 32), 'to': (20, 32), 'style': 'dotted',
+             'color': (180, 100, 50)},
+            {'from': (46, 32), 'to': (62, 32), 'style': 'dotted',
+             'color': (180, 100, 50)},
+            # mRNA growing strand (above, leftward from polymerase)
+            {'from': (2, 22), 'to': (28, 22), 'style': 'dotted',
+             'color': (255, 160, 60)},
+        ],
+        'complexes': [
+            # Sigma factor — finds promoter, detaches after initiation
+            {'id': 'sigma', 'x': 12, 'y': 34, 'w': 5,
+             'color': (200, 180, 60), 'above': 2, 'below': 2},
+            # RNA Polymerase — reads template, builds mRNA
+            {'id': 'rnap', 'x': 34, 'y': 30, 'w': 13,
+             'color': (60, 150, 120), 'above': 5, 'below': 5},
+            # Rho factor — termination
+            {'id': 'rho', 'x': 56, 'y': 34, 'w': 5,
+             'color': (180, 60, 60), 'above': 2, 'below': 2},
+        ],
+        'flows': [
+            # Nucleotides arriving at RNA polymerase active site
+            {'type': 'nucleotide', 'path': [(34, 14), (34, 24)],
+             'speed': 8, 'interval': 1.5, 'max': 2},
+            # mRNA strand extending 5' to 3' (leftward from pol)
+            {'type': 'mrna', 'path': [(28, 26), (20, 24), (12, 22)],
+             'speed': 6, 'interval': 2.0, 'max': 3},
+            # Sigma factor detaching (moves away from promoter)
+            {'type': 'metabolite', 'path': [(12, 30), (10, 22), (8, 14)],
+             'speed': 3, 'interval': 8.0, 'max': 1},
+            # DNA entering polymerase (template read 3' to 5')
+            {'type': 'nucleotide', 'path': [(48, 36), (42, 36)],
+             'speed': 5, 'interval': 2.0, 'max': 2},
+            # mRNA exits polymerase toward 5' end
+            {'type': 'mrna', 'path': [(28, 28), (22, 24), (14, 22)],
+             'speed': 5, 'interval': 2.5, 'max': 2},
+        ],
+        'notes': [
+            ('TRANSCRIPTION',                  (60, 150, 120)),
+            ('RNA POLYMERASE READS DNA',       (60, 150, 120)),
+            ('MRNA COPY GROWS 5 TO 3',         (255, 160, 60)),
+            ('SIGMA FINDS PROMOTER',           (200, 180, 60)),
+            ('TEMPLATE STRAND READ 3 TO 5',    (50, 100, 180)),
+        ],
+    },
+    # ==================================================================
+    # mRNA Splicing — spliceosome removes introns
+    # ==================================================================
+    {
+        'name': 'MRNA SPLICING',
+        'sci_name': 'PRE-MRNA PROCESSING',
+        'group': 'genetic',
+        'bg_color': (8, 6, 16),
+        'region_labels': [
+            {'text': 'NUCLEUS', 'x': 2, 'y': 4, 'color': (18, 14, 30)},
+        ],
+        'connectors': [
+            # Pre-mRNA strand with exon/intron coloring (horizontal)
+            {'from': (2, 20), 'to': (14, 20), 'style': 'dotted',
+             'color': (100, 255, 120)},   # exon 1
+            {'from': (14, 20), 'to': (28, 20), 'style': 'dotted',
+             'color': (80, 80, 80)},      # intron
+            {'from': (28, 20), 'to': (40, 20), 'style': 'dotted',
+             'color': (100, 255, 120)},   # exon 2
+            {'from': (40, 20), 'to': (52, 20), 'style': 'dotted',
+             'color': (80, 80, 80)},      # intron 2
+            {'from': (52, 20), 'to': (62, 20), 'style': 'dotted',
+             'color': (100, 255, 120)},   # exon 3
+            # Mature mRNA exits below
+            {'from': (2, 48), 'to': (62, 48), 'style': 'dotted',
+             'color': (100, 255, 120)},
+        ],
+        'complexes': [
+            # Spliceosome — large, multi-state
+            {'id': 'spliceosome', 'x': 32, 'y': 28, 'w': 15,
+             'color': (100, 60, 180), 'above': 5, 'below': 5,
+             'states': [
+                 {'duration': 3.0, 'color': (100, 60, 180),
+                  'label': 'ASSEMBLE'},
+                 {'duration': 3.0, 'color': (140, 80, 220),
+                  'spawn_flows': [2], 'label': 'LARIAT'},
+                 {'duration': 3.0, 'color': (180, 100, 255),
+                  'spawn_flows': [3], 'label': 'SPLICE'},
+             ]},
+            # snRNP — small nuclear ribonucleoprotein
+            {'id': 'snrnp1', 'x': 14, 'y': 28, 'w': 5,
+             'color': (60, 140, 200), 'above': 2, 'below': 2},
+        ],
+        'flows': [
+            # Pre-mRNA enters spliceosome
+            {'type': 'mrna', 'path': [(2, 20), (10, 20), (20, 22)],
+             'speed': 5, 'interval': 2.5, 'max': 2},
+            # snRNPs approach spliceosome
+            {'type': 'snrnp', 'path': [(8, 14), (12, 20), (18, 26)],
+             'speed': 4, 'interval': 4.0, 'max': 1},
+            # Intron lariat loops out (gated: LARIAT state)
+            {'type': 'intron', 'path': [(32, 22), (36, 14), (42, 10), (48, 14)],
+             'speed': 5, 'interval': 2.0, 'max': 2},
+            # Mature mRNA exits (gated: SPLICE state)
+            {'type': 'exon', 'path': [(32, 34), (28, 40), (20, 46), (10, 48)],
+             'speed': 6, 'interval': 2.0, 'max': 2},
+            # Pre-mRNA continues entering from right
+            {'type': 'mrna', 'path': [(50, 20), (42, 20), (38, 22)],
+             'speed': 5, 'interval': 2.5, 'max': 2},
+        ],
+        'notes': [
+            ('MRNA SPLICING',                  (140, 80, 220)),
+            ('SPLICEOSOME REMOVES INTRONS',    (100, 60, 180)),
+            ('EXONS JOINED TOGETHER',          (100, 255, 120)),
+            ('LARIAT LOOP CUT OUT',            (80, 80, 80)),
+            ('MATURE MRNA EXITS NUCLEUS',      (100, 255, 120)),
+        ],
+    },
+    # ==================================================================
+    # CRISPR/Cas9 — gene editing
+    # ==================================================================
+    {
+        'name': 'CRISPR CAS9',
+        'sci_name': 'GENE EDITING',
+        'group': 'genetic',
+        'bg_color': (6, 8, 14),
+        'region_labels': [
+            {'text': 'NUCLEUS', 'x': 2, 'y': 4, 'color': (16, 18, 28)},
+        ],
+        'connectors': [
+            # Target DNA double strand (horizontal)
+            {'from': (2, 30), 'to': (62, 30), 'style': 'dotted',
+             'color': (50, 100, 180)},
+            {'from': (2, 34), 'to': (62, 34), 'style': 'dotted',
+             'color': (180, 100, 50)},
+        ],
+        'complexes': [
+            # Cas9 protein — large, multi-state
+            {'id': 'cas9', 'x': 32, 'y': 32, 'w': 13,
+             'color': (60, 130, 100), 'above': 6, 'below': 6,
+             'states': [
+                 {'duration': 3.0, 'color': (60, 130, 100),
+                  'label': 'SCANNING',
+                  'spawn_flows': [0]},
+                 {'duration': 2.5, 'color': (100, 180, 60),
+                  'label': 'PAM FOUND',
+                  'spawn_flows': [1]},
+                 {'duration': 2.5, 'color': (200, 180, 60),
+                  'label': 'R-LOOP'},
+                 {'duration': 3.0, 'color': (220, 60, 60),
+                  'label': 'CUT',
+                  'spawn_flows': [3]},
+             ]},
+            # Guide RNA — associated with Cas9
+            {'id': 'grna', 'x': 32, 'y': 20, 'w': 9,
+             'color': (255, 120, 50), 'above': 2, 'below': 2},
+        ],
+        'flows': [
+            # Cas9 scanning along DNA (gated: SCANNING)
+            {'type': 'electron', 'path': [(16, 32), (22, 32), (26, 32)],
+             'speed': 10, 'interval': 1.5, 'max': 2},
+            # Guide RNA approaching Cas9 (gated: PAM FOUND)
+            {'type': 'guide_rna', 'path': [(18, 10), (24, 14), (30, 18)],
+             'speed': 5, 'interval': 3.0, 'max': 1},
+            # Nucleotides for R-loop formation
+            {'type': 'nucleotide', 'path': [(32, 24), (32, 28)],
+             'speed': 6, 'interval': 2.0, 'max': 2},
+            # DNA fragments after cut (gated: CUT)
+            {'type': 'nucleotide', 'path': [(26, 32), (18, 36), (10, 42)],
+             'speed': 5, 'interval': 2.0, 'max': 2},
+            {'type': 'nucleotide', 'path': [(38, 32), (46, 36), (54, 42)],
+             'speed': 5, 'interval': 2.0, 'max': 2},
+        ],
+        'notes': [
+            ('CRISPR CAS9',                    (60, 130, 100)),
+            ('GUIDE RNA FINDS TARGET',         (255, 120, 50)),
+            ('PAM SEQUENCE RECOGNIZED',        (100, 180, 60)),
+            ('CAS9 CUTS BOTH STRANDS',         (220, 60, 60)),
+            ('GENE EDITING TOOL',              (60, 130, 100)),
+        ],
+    },
+    # ==================================================================
+    # GPCR Signaling — membrane receptor cascade
+    # ==================================================================
+    {
+        'name': 'GPCR SIGNALING',
+        'sci_name': 'G-PROTEIN COUPLED RECEPTOR',
+        'group': 'signaling',
+        'membrane': {
+            'y': 30,
+            'head_color': (90, 90, 110),
+            'tail_color': (40, 40, 55),
+        },
+        'stroma_color': (6, 8, 14),    # extracellular (above)
+        'lumen_color': (10, 8, 14),    # intracellular (below)
+        'lumen_warm': False,
+        'region_labels': [
+            {'text': 'EXTRA', 'x': 2, 'y': 8, 'color': (14, 16, 28)},
+            {'text': 'INTRA', 'x': 2, 'y': 48, 'color': (20, 16, 28)},
+        ],
+        'complexes': [
+            # GPCR receptor — 7-transmembrane, multi-state
+            {'id': 'gpcr', 'x': 14, 'w': 9, 'color': (120, 60, 160),
+             'above': 5, 'below': 5, 'channel_w': 0,
+             'states': [
+                 {'duration': 3.0, 'color': (120, 60, 160),
+                  'label': 'INACTIVE'},
+                 {'duration': 2.5, 'color': (180, 80, 220),
+                  'spawn_flows': [0], 'label': 'LIGAND BOUND'},
+                 {'duration': 3.0, 'color': (220, 100, 255),
+                  'spawn_flows': [2], 'label': 'G-PROT ACTIVE'},
+             ]},
+            # G-protein (alpha/beta/gamma)
+            {'id': 'gprot', 'x': 28, 'w': 7, 'color': (200, 50, 255),
+             'above': 3, 'below': 4, 'channel_w': 0},
+            # Adenylyl Cyclase — membrane enzyme
+            {'id': 'ac', 'x': 44, 'w': 7, 'color': (60, 180, 120),
+             'above': 4, 'below': 4, 'channel_w': 0},
+            # PKA — cytoplasmic kinase
+            {'id': 'pka', 'x': 56, 'y': 48, 'w': 7,
+             'color': (255, 160, 60), 'above': 3, 'below': 3},
+        ],
+        'flows': [
+            # Ligand arrives from extracellular (gated: LIGAND BOUND)
+            {'type': 'ligand', 'path': [(14, 8), (14, 22)],
+             'speed': 6, 'interval': 3.0, 'max': 1},
+            # ATP consumed by adenylyl cyclase
+            {'type': 'atp', 'path': [(38, 42), (42, 38)],
+             'speed': 5, 'interval': 3.5, 'max': 1},
+            # G-alpha detaches and activates AC (gated: G-PROT ACTIVE)
+            {'type': 'g_alpha', 'path': [(22, 34), (28, 36), (36, 36), (40, 34)],
+             'speed': 6, 'interval': 3.5, 'max': 1},
+            # cAMP produced by adenylyl cyclase
+            {'type': 'camp', 'path': [(46, 36), (50, 40), (54, 44)],
+             'speed': 6, 'interval': 2.0, 'max': 3},
+            # PKA phosphorylates targets (downstream)
+            {'type': 'atp', 'path': [(58, 46), (60, 42), (62, 38)],
+             'speed': 4, 'interval': 4.0, 'max': 1},
+        ],
+        'notes': [
+            ('GPCR SIGNALING',                 (180, 80, 220)),
+            ('LIGAND BINDS RECEPTOR',          (255, 100, 200)),
+            ('G PROTEIN ACTIVATED',            (200, 50, 255)),
+            ('ADENYLYL CYCLASE MAKES CAMP',    (50, 255, 150)),
+            ('PKA PHOSPHORYLATES TARGETS',     (255, 160, 60)),
+            ('MOST COMMON DRUG TARGET',        (180, 80, 220)),
+        ],
+    },
+    # ==================================================================
+    # Actin-Myosin Cross-Bridge — muscle contraction
+    # ==================================================================
+    {
+        'name': 'MUSCLE CONTRACTION',
+        'sci_name': 'ACTIN-MYOSIN CROSS-BRIDGE',
+        'group': 'muscle',
+        'bg_color': (14, 8, 8),
+        'region_labels': [
+            {'text': 'SARCOMERE', 'x': 2, 'y': 4, 'color': (28, 16, 16)},
+        ],
+        'connectors': [
+            # Actin filament (horizontal bar across middle)
+            {'from': (2, 26), 'to': (62, 26), 'style': 'dotted',
+             'color': (80, 200, 150)},
+            # Z-line markers
+            {'from': (2, 20), 'to': (2, 32), 'style': 'dotted',
+             'color': (100, 100, 120)},
+            {'from': (62, 20), 'to': (62, 32), 'style': 'dotted',
+             'color': (100, 100, 120)},
+        ],
+        'complexes': [
+            # Myosin head 1 — multi-state cross-bridge cycle
+            {'id': 'myosin1', 'x': 20, 'y': 38, 'w': 9,
+             'color': (200, 80, 80), 'above': 4, 'below': 4,
+             'states': [
+                 {'duration': 2.5, 'color': (200, 80, 80),
+                  'label': 'RIGOR',
+                  'spawn_flows': [0]},
+                 {'duration': 2.0, 'color': (200, 140, 60),
+                  'label': 'ATP BIND',
+                  'spawn_flows': [1]},
+                 {'duration': 2.0, 'color': (180, 180, 60),
+                  'label': 'COCKED'},
+                 {'duration': 2.5, 'color': (255, 100, 80),
+                  'label': 'POWER STROKE',
+                  'spawn_flows': [3]},
+             ]},
+            # Myosin head 2 — offset in cycle
+            {'id': 'myosin2', 'x': 44, 'y': 38, 'w': 9,
+             'color': (200, 80, 80), 'above': 4, 'below': 4,
+             'states': [
+                 {'duration': 2.0, 'color': (180, 180, 60),
+                  'label': 'COCKED'},
+                 {'duration': 2.5, 'color': (255, 100, 80),
+                  'label': 'POWER STROKE',
+                  'spawn_flows': [5]},
+                 {'duration': 2.5, 'color': (200, 80, 80),
+                  'label': 'RIGOR',
+                  'spawn_flows': [4]},
+                 {'duration': 2.0, 'color': (200, 140, 60),
+                  'label': 'ATP BIND'},
+             ]},
+            # Troponin/Tropomyosin — calcium-sensitive gatekeeper
+            {'id': 'trop', 'x': 32, 'y': 20, 'w': 11,
+             'color': (60, 140, 160), 'above': 3, 'below': 3},
+        ],
+        'flows': [
+            # Myosin 1: binds actin (gated: RIGOR)
+            {'type': 'myosin', 'path': [(20, 34), (20, 30)],
+             'speed': 8, 'interval': 2.0, 'max': 1},
+            # ATP arrives at myosin 1 (gated: ATP BIND)
+            {'type': 'atp', 'path': [(12, 46), (16, 40)],
+             'speed': 6, 'interval': 3.0, 'max': 1},
+            # Calcium triggers troponin shift
+            {'type': 'calcium', 'path': [(32, 8), (32, 16)],
+             'speed': 8, 'interval': 3.5, 'max': 2},
+            # ADP + Pi released after power stroke (gated: POWER STROKE myosin1)
+            {'type': 'pi', 'path': [(22, 34), (26, 42), (28, 50)],
+             'speed': 5, 'interval': 2.5, 'max': 1},
+            # Myosin 2: binds actin (gated: RIGOR in myosin2)
+            {'type': 'myosin', 'path': [(44, 34), (44, 30)],
+             'speed': 8, 'interval': 2.0, 'max': 1},
+            # ADP + Pi from myosin 2 power stroke (gated: POWER STROKE myosin2)
+            {'type': 'pi', 'path': [(46, 34), (50, 42), (52, 50)],
+             'speed': 5, 'interval': 2.5, 'max': 1},
+            # ATP arrives at myosin 2
+            {'type': 'atp', 'path': [(52, 46), (48, 40)],
+             'speed': 6, 'interval': 3.5, 'max': 1},
+        ],
+        'notes': [
+            ('MUSCLE CONTRACTION',             (200, 80, 80)),
+            ('MYOSIN BINDS ACTIN',             (200, 80, 80)),
+            ('ATP DETACHES MYOSIN',            (255, 200, 50)),
+            ('POWER STROKE SLIDES FILAMENT',   (255, 100, 80)),
+            ('CALCIUM TRIGGERS CONTRACTION',   (255, 255, 80)),
+            ('CROSS-BRIDGE CYCLE',             (200, 80, 80)),
+        ],
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -721,6 +1167,7 @@ GROUPS = [
     ('degradation', 'DEGRADATION', (255, 140, 50)),
     ('genetic', 'GENETIC', (100, 255, 120)),
     ('signaling', 'SIGNALING', (80, 200, 255)),
+    ('muscle', 'MUSCLE', (255, 100, 80)),
 ]
 
 

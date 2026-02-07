@@ -142,6 +142,26 @@ class _TuringBase(Visual):
     def __init__(self, display: Display):
         super().__init__(display)
 
+    def _get_notes(self):
+        """Return list of (text, color) tuples. Subclasses override."""
+        return [("TURING PATTERN", (255, 255, 255))]
+
+    def _build_notes_segments(self):
+        sep = '  --  '
+        sep_color = (60, 55, 50)
+        segments = []
+        px_off = 0
+        for i, (text, color) in enumerate(self._get_notes()):
+            if i > 0:
+                segments.append((px_off, sep, sep_color))
+                px_off += len(sep) * 4
+            segments.append((px_off, text, color))
+            px_off += len(text) * 4
+        segments.append((px_off, sep, sep_color))
+        px_off += len(sep) * 4
+        self.notes_segments = segments
+        self.notes_scroll_len = px_off
+
     def reset(self):
         self.time = 0.0
         self.palette_idx = 0
@@ -149,39 +169,85 @@ class _TuringBase(Visual):
         self.f = self._f_center
         self.k = self._k_center
         self.u, self.v = _init_grid()
+        self.show_notes = False
+        self.notes_scroll_offset = 0.0
+        self.param_overlay_timer = 0.0
+        self._build_notes_segments()
+        self._both_pressed_prev = False
 
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
             self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+            if self.show_notes:
+                self._build_notes_segments()
             consumed = True
         if input_state.down_pressed:
             self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
+            if self.show_notes:
+                self._build_notes_segments()
             consumed = True
         if input_state.left_pressed:
             # Decrease F, adjust k proportionally
             self.f = max(self._f_min, self.f - 0.001)
             t = (self.f - self._f_min) / max(0.001, self._f_max - self._f_min)
             self.k = self._k_min + t * (self._k_max - self._k_min)
+            self.param_overlay_timer = 2.0
             consumed = True
         if input_state.right_pressed:
             # Increase F, adjust k proportionally
             self.f = min(self._f_max, self.f + 0.001)
             t = (self.f - self._f_min) / max(0.001, self._f_max - self._f_min)
             self.k = self._k_min + t * (self._k_max - self._k_min)
+            self.param_overlay_timer = 2.0
             consumed = True
-        if input_state.action_l or input_state.action_r:
-            self.u, self.v = _init_grid()
+        # Both buttons simultaneously toggles notes
+        both = input_state.action_l and input_state.action_r
+        if both and not self._both_pressed_prev:
+            self.show_notes = not self.show_notes
+            self.notes_scroll_offset = 0.0
+            if self.show_notes:
+                self._build_notes_segments()
             consumed = True
+        elif input_state.action_l or input_state.action_r:
+            if not both:
+                self.u, self.v = _init_grid()
+                consumed = True
+        self._both_pressed_prev = both
         return consumed
 
     def update(self, dt: float):
         self.time += dt
         self.u, self.v = _step_gray_scott(self.u, self.v, self.f, self.k,
                                            self.steps_per_frame)
+        if self.show_notes:
+            self.notes_scroll_offset += dt * 18
+        if self.param_overlay_timer > 0:
+            self.param_overlay_timer = max(0.0, self.param_overlay_timer - dt)
 
     def draw(self):
         _draw_turing(self.display, self.v, self.palette_idx)
+        if self.show_notes:
+            self._draw_notes()
+        if self.param_overlay_timer > 0:
+            self._draw_param_overlay()
+
+    def _draw_notes(self):
+        d = self.display
+        scroll_x = int(self.notes_scroll_offset) % self.notes_scroll_len
+        for copy in (0, self.notes_scroll_len):
+            for seg_off, text, color in self.notes_segments:
+                px = 2 + seg_off + copy - scroll_x
+                text_w = len(text) * 4
+                if px + text_w < 0 or px > 64:
+                    continue
+                d.draw_text_small(px, 58, text, color)
+
+    def _draw_param_overlay(self):
+        alpha = min(1.0, self.param_overlay_timer / 0.5)
+        c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+        text = "F=%.3f K=%.3f" % (self.f, self.k)
+        self.display.draw_text_small(2, 2, text, c)
 
 
 # ── Exported visuals ──────────────────────────────────────────────
@@ -197,6 +263,18 @@ class TuringSpots(_TuringBase):
     _k_min = 0.060
     _k_max = 0.070
 
+    def _get_notes(self):
+        mid = PALETTES[self.palette_idx][3]
+        return [
+            ("TURING SPOTS", (255, 255, 255)),
+            ("GRAY-SCOTT MODEL", mid),
+            ("TWO CHEMICALS REACT AND DIFFUSE", mid),
+            ("F CONTROLS FEED RATE", (255, 255, 255)),
+            ("K CONTROLS REMOVAL RATE", (255, 255, 255)),
+            ("SAME MATH MAKES LEOPARD SPOTS", mid),
+            ("ALAN TURING 1952", (255, 255, 255)),
+        ]
+
 
 class TuringStripes(_TuringBase):
     name = "TURING LINES"
@@ -208,6 +286,16 @@ class TuringStripes(_TuringBase):
     _f_max = 0.032
     _k_min = 0.050
     _k_max = 0.062
+
+    def _get_notes(self):
+        mid = PALETTES[self.palette_idx][3]
+        return [
+            ("TURING STRIPES", (255, 255, 255)),
+            ("GRAY-SCOTT MODEL", mid),
+            ("STRIPES FORM AT HIGHER FEED RATES", mid),
+            ("SEEN IN ZEBRAFISH PIGMENTATION", mid),
+            ("ALAN TURING 1952", (255, 255, 255)),
+        ]
 
 
 class TuringCoral(_TuringBase):
@@ -221,6 +309,16 @@ class TuringCoral(_TuringBase):
     _k_min = 0.052
     _k_max = 0.063
 
+    def _get_notes(self):
+        mid = PALETTES[self.palette_idx][3]
+        return [
+            ("TURING CORAL", (255, 255, 255)),
+            ("GRAY-SCOTT MODEL", mid),
+            ("BRANCHING CORAL-LIKE GROWTH", mid),
+            ("REACTION-DIFFUSION INSTABILITY", mid),
+            ("ALAN TURING 1952", (255, 255, 255)),
+        ]
+
 
 class TuringWorms(_TuringBase):
     name = "TURING WORMS"
@@ -232,3 +330,13 @@ class TuringWorms(_TuringBase):
     _f_max = 0.086
     _k_min = 0.055
     _k_max = 0.067
+
+    def _get_notes(self):
+        mid = PALETTES[self.palette_idx][3]
+        return [
+            ("TURING WORMS", (255, 255, 255)),
+            ("GRAY-SCOTT MODEL", mid),
+            ("WORM-LIKE LABYRINTHINE PATTERN", mid),
+            ("SIMILAR TO BRAIN CORAL SURFACE", mid),
+            ("ALAN TURING 1952", (255, 255, 255)),
+        ]

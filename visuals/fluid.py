@@ -308,6 +308,8 @@ class FluidTunnel(Visual):
         self.viscosity = 0.0001
         self.diffusion = 0.0001
         self.shape_idx = 0
+        self.overlay_text = ""
+        self.overlay_timer = 0.0
         self._init_fields()
 
     def _init_fields(self):
@@ -319,23 +321,50 @@ class FluidTunnel(Visual):
         self.dens_prev = _new_field()
         self.obstacle = _make_obstacle(self.shape_idx)
 
+    def _viz_mode_name(self):
+        if self.viz_mode < len(PALETTES):
+            names = ['THERMAL', 'FIRE', 'NEON', 'OCEAN', 'MONO']
+            return names[self.viz_mode]
+        elif self.viz_mode == len(PALETTES):
+            return 'VELOCITY'
+        else:
+            return 'VORTICITY'
+
+    def _visc_label(self):
+        if self.viscosity >= 0.005:
+            return 'HIGH VISC'
+        elif self.viscosity >= 0.0005:
+            return 'MED VISC'
+        else:
+            return 'LOW VISC'
+
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
             self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
             consumed = True
         if input_state.down_pressed:
             self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
             consumed = True
         if input_state.left:
             self.viscosity = min(0.01, self.viscosity * 1.25)
+            self.overlay_text = self._visc_label()
+            self.overlay_timer = 2.0
             consumed = True
         if input_state.right:
             self.viscosity = max(0.00001, self.viscosity * 0.8)
+            self.overlay_text = self._visc_label()
+            self.overlay_timer = 2.0
             consumed = True
         if input_state.action_l or input_state.action_r:
             self.shape_idx = (self.shape_idx + 1) % len(OBSTACLE_NAMES)
             self._init_fields()
+            self.overlay_text = OBSTACLE_NAMES[self.shape_idx].upper()
+            self.overlay_timer = 2.0
             consumed = True
         return consumed
 
@@ -353,6 +382,8 @@ class FluidTunnel(Visual):
     def update(self, dt: float):
         self.time += dt
         sim_dt = 0.1
+        if self.overlay_timer > 0:
+            self.overlay_timer = max(0.0, self.overlay_timer - dt)
 
         self.u_prev[:] = 0.0
         self.v_prev[:] = 0.0
@@ -379,6 +410,11 @@ class FluidTunnel(Visual):
         obs_ij = np.argwhere(self.obstacle[1:N+1, 1:N+1])
         for k in range(len(obs_ij)):
             self.display.set_pixel(int(obs_ij[k, 0]), int(obs_ij[k, 1]), (60, 60, 70))
+        # Transient parameter overlay
+        if self.overlay_timer > 0 and self.overlay_text:
+            alpha = min(1.0, self.overlay_timer / 0.5)
+            c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+            self.display.draw_text_small(2, 2, self.overlay_text, c)
 
 
 # ── FluidInk ─────────────────────────────────────────────────────
