@@ -161,19 +161,22 @@ class Pong(Game):
         self.ball_x += self.ball_dx * dt
         self.ball_y += self.ball_dy * dt
         
-        # Top/bottom wall bounce
+        # Top/bottom wall bounce (ball is 2x2, so bottom pixel is ball_y + 1)
         if self.ball_y <= 8:
             self.ball_y = 8
             self.ball_dy = abs(self.ball_dy)
-        if self.ball_y >= GRID_SIZE - 1:
-            self.ball_y = GRID_SIZE - 1
+        if self.ball_y >= GRID_SIZE - 2:
+            self.ball_y = GRID_SIZE - 2
             self.ball_dy = -abs(self.ball_dy)
-        
+
         # Player paddle collision (left side)
+        # Use <= paddle face instead of a narrow range to prevent tunneling
         player_paddle_x = 3
+        paddle_face_right = player_paddle_x + self.paddle_width  # right edge of paddle
         if (self.ball_dx < 0 and
-            player_paddle_x <= self.ball_x <= player_paddle_x + self.paddle_width + 1 and
-            self.player_y <= self.ball_y <= self.player_y + self.paddle_height):
+            self.ball_x <= paddle_face_right + 1 and
+            self.ball_x > 0 and
+            self.player_y - 1 <= self.ball_y <= self.player_y + self.paddle_height):
 
             # Bounce with angle based on hit position
             hit_pos = (self.ball_y - self.player_y) / self.paddle_height
@@ -185,13 +188,16 @@ class Pong(Game):
 
             self.ball_dx = abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)
-            self.ball_x = player_paddle_x + self.paddle_width + 1
+            self.ball_x = paddle_face_right + 1
 
         # AI paddle collision (right side)
+        # Use >= paddle face instead of a narrow range to prevent tunneling
         ai_paddle_x = GRID_SIZE - 5
+        paddle_face_left = ai_paddle_x  # left edge of paddle
         if (self.ball_dx > 0 and
-            ai_paddle_x - 1 <= self.ball_x <= ai_paddle_x + self.paddle_width and
-            self.ai_y <= self.ball_y <= self.ai_y + self.paddle_height):
+            self.ball_x >= paddle_face_left - 2 and
+            self.ball_x < GRID_SIZE - 2 and
+            self.ai_y - 1 <= self.ball_y <= self.ai_y + self.paddle_height):
 
             hit_pos = (self.ball_y - self.ai_y) / self.paddle_height
             angle = (hit_pos - 0.5) * 1.2
@@ -202,9 +208,9 @@ class Pong(Game):
 
             self.ball_dx = -abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)
-            self.ball_x = ai_paddle_x - 1
-        
-        # Scoring
+            self.ball_x = paddle_face_left - 2
+
+        # Scoring (ball is 2x2, right pixel at ball_x + 1)
         if self.ball_x <= 0:
             # AI scores
             self.ai_score += 1
@@ -213,12 +219,11 @@ class Pong(Game):
             self.serving = True
             self.flash_timer = 0.3
             self.flash_side = 'left'
-            # Ball speed will be reset in serve_ball() based on total points
 
             if self.ai_score >= self.win_score:
                 self.state = GameState.GAME_OVER
 
-        elif self.ball_x >= GRID_SIZE - 1:
+        elif self.ball_x >= GRID_SIZE - 2:
             # Player scores
             self.score += 1
             self.last_scorer = 'player'
@@ -226,7 +231,6 @@ class Pong(Game):
             self.serving = True
             self.flash_timer = 0.3
             self.flash_side = 'right'
-            # Ball speed will be reset in serve_ball() based on total points
 
             if self.score >= self.win_score:
                 self.state = GameState.WIN
