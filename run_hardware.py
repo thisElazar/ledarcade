@@ -589,6 +589,7 @@ def main():
                     wake_input = input_handler.update()
                     if has_any_input(wake_input):
                         break
+                _show_splash(display, input_handler)
                 uptime = 0.0
                 last_time = time.time()
                 idle_timer = 0.0
