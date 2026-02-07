@@ -101,6 +101,7 @@ from .mondrian import Mondrian
 from .copperbars import CopperBars
 from .greatwave import GreatWave
 from .gallery3d import Gallery3D
+from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
 from .particlelife import ParticleLife
 from .fireflies import Fireflies
@@ -289,6 +290,7 @@ ALL_VISUALS = [
     CopperBars,
     GreatWave,
     Gallery3D,
+    Win95Maze,
     DemonSpirals,
     ParticleLife,
     Fireflies,
@@ -537,6 +539,7 @@ __all__ = [
     'CopperBars',
     'GreatWave',
     'Gallery3D',
+    'Win95Maze',
     'DemonSpirals',
     'ParticleLife',
     'Fireflies',
