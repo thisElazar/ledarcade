@@ -132,7 +132,7 @@ from .refresh import Refresh
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
-from .emfield import EMMotor, EMCircuit, EMFreeAir
+from .emfield import Coulomb
 from .turing import TuringPatterns
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
@@ -317,9 +317,7 @@ ALL_VISUALS = [
     OrbitsSolar,
     OrbitsMulti,
     OrbitsBelt,
-    EMMotor,
-    EMCircuit,
-    EMFreeAir,
+    Coulomb,
     TuringPatterns,
     Neurons,
     FluidTunnel,
@@ -561,9 +559,7 @@ __all__ = [
     'OrbitsSolar',
     'OrbitsMulti',
     'OrbitsBelt',
-    'EMMotor',
-    'EMCircuit',
-    'EMFreeAir',
+    'Coulomb',
     'TuringPatterns',
     'Neurons',
     'FluidTunnel',

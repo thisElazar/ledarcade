@@ -1,15 +1,15 @@
 """
 EMField - Electric & Magnetic Field Visualization
 ===================================================
-Three standalone visuals exploring electromagnetic phenomena:
-  EM Motor   - Stator/rotor charges showing electromagnetic torque
-  EM Circuit - Current flow along a circuit with magnetic field glow
-  EM Field   - Free charges on Lissajous paths with field lines
+Coulomb: unified electrostatics sandbox with 5 scenarios (DIPOLE,
+QUADRUPOLE, MOTOR, CIRCUIT, RANDOM) sharing one Coulomb physics engine,
+field-line tracer, equipotential renderer, and palette system.
 
 Controls:
-  Up/Down    - Cycle color palette
-  Left/Right - Adjust speed
-  Space      - Variant-specific action
+  Left/Right     - Cycle scenario
+  Up/Down        - Cycle color palette
+  Single button  - Toggle view mode (field lines / equipotential / circuit wire)
+  Both buttons   - Toggle scrolling notes
 """
 
 import math
@@ -613,3 +613,382 @@ class EMFreeAir(Visual):
             _draw_equipotential(self.display, self.charges, self.palette_idx)
 
         _draw_charges(self.display, self.charges, pal)
+
+
+# ── Coulomb (unified EM visual) ──────────────────────────────────
+
+_SCENARIOS = ['DIPOLE', 'QUADRUPOLE', 'MOTOR', 'CIRCUIT', 'RANDOM']
+_VIEW_MODES = ['FIELD LINES', 'POTENTIAL', 'CIRCUIT']
+
+
+class Coulomb(Visual):
+    name = "COULOMB"
+    description = "Electrostatics sandbox"
+    category = "science"
+
+    NUM_STATOR = 8
+    NUM_ROTOR = 4
+    NUM_DOTS = 24
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    # ── notes ────────────────────────────────────────────────────
+
+    def _get_notes(self):
+        pal = PALETTES[self.palette_idx]
+        mid = pal['line']
+        return [
+            ("COULOMB'S LAW", (255, 255, 255)),
+            ("F = K * Q1 * Q2 / R^2", mid),
+            ("FIELD LINES FLOW + TO -", mid),
+            ("EQUIPOTENTIALS ARE PERPENDICULAR TO FIELD LINES", mid),
+            ("CHARLES-AUGUSTIN DE COULOMB 1785", (255, 255, 255)),
+        ]
+
+    def _build_notes_segments(self):
+        sep = '  --  '
+        sep_color = (60, 55, 50)
+        segments = []
+        px_off = 0
+        for i, (text, color) in enumerate(self._get_notes()):
+            if i > 0:
+                segments.append((px_off, sep, sep_color))
+                px_off += len(sep) * 4
+            segments.append((px_off, text, color))
+            px_off += len(text) * 4
+        segments.append((px_off, sep, sep_color))
+        px_off += len(sep) * 4
+        self.notes_segments = segments
+        self.notes_scroll_len = px_off
+
+    def _draw_notes(self):
+        d = self.display
+        scroll_x = int(self.notes_scroll_offset) % self.notes_scroll_len
+        for copy in (0, self.notes_scroll_len):
+            for seg_off, text, color in self.notes_segments:
+                px = 2 + seg_off + copy - scroll_x
+                text_w = len(text) * 4
+                if px + text_w < 0 or px > 64:
+                    continue
+                d.draw_text_small(px, 58, text, color)
+
+    # ── overlay ──────────────────────────────────────────────────
+
+    def _draw_overlay(self):
+        if self.overlay_timer <= 0:
+            return
+        alpha = min(1.0, self.overlay_timer / 0.5)
+        c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+        self.display.draw_text_small(2, 2, self.overlay_text, c)
+
+    def _show_overlay(self, text):
+        self.overlay_text = text
+        self.overlay_timer = 2.0
+
+    # ── scenario setup ───────────────────────────────────────────
+
+    def reset(self):
+        self.time = 0.0
+        self.speed = 1.0
+        self.palette_idx = 0
+        self.scenario_idx = 0
+        self.view_mode = 0  # 0=field lines, 1=potential, 2=circuit wire
+        self.charges = []
+        self._cached_lines = []
+        self._cache_time = -1.0
+        self.overlay_text = ''
+        self.overlay_timer = 0.0
+        self.show_notes = False
+        self.notes_scroll_offset = 0.0
+        self.notes_segments = []
+        self.notes_scroll_len = 1
+        self._both_pressed_prev = False
+        self._build_notes_segments()
+        self._setup_scenario()
+
+    def _setup_scenario(self):
+        """Build charges + scenario-specific state for current scenario_idx."""
+        self.charges = []
+        self._cached_lines = []
+        self._cache_time = -1.0
+        scenario = _SCENARIOS[self.scenario_idx]
+
+        if scenario == 'DIPOLE':
+            self._setup_lissajous([{'q': 1.0}, {'q': -1.0}])
+        elif scenario == 'QUADRUPOLE':
+            self._setup_lissajous([{'q': 1.0}, {'q': -1.0},
+                                    {'q': 1.0}, {'q': -1.0}])
+        elif scenario == 'MOTOR':
+            self._setup_motor()
+        elif scenario == 'CIRCUIT':
+            self._setup_circuit()
+        elif scenario == 'RANDOM':
+            n = random.randint(4, 6)
+            config = [{'q': 1.0 if i % 2 == 0 else -1.0} for i in range(n)]
+            self._setup_lissajous(config)
+
+    def _setup_lissajous(self, config):
+        """Create charges on Lissajous orbits."""
+        cx, cy = GRID_SIZE / 2, GRID_SIZE / 2
+        n = len(config)
+        for i, cfg in enumerate(config):
+            angle = 2 * math.pi * i / n
+            r = 12 + random.uniform(-2, 2)
+            ch_cx = cx + r * math.cos(angle)
+            ch_cy = cy + r * math.sin(angle)
+            freq_x = random.uniform(0.15, 0.4)
+            freq_y = random.uniform(0.15, 0.4)
+            phase_x = random.uniform(0, 2 * math.pi)
+            phase_y = random.uniform(0, 2 * math.pi)
+            amp_x = random.uniform(4, 10)
+            amp_y = random.uniform(4, 10)
+            self.charges.append(Charge(cfg['q'], ch_cx, ch_cy,
+                                       freq_x, freq_y, phase_x, phase_y,
+                                       amp_x, amp_y))
+
+    def _setup_motor(self):
+        """Stator ring + spinning rotor."""
+        cx, cy = GRID_SIZE / 2, GRID_SIZE / 2
+        self.cx = cx
+        self.cy = cy
+        self.r_rotor = 10
+        self.rotor_angle = 0.0
+
+        self.stator_charges = []
+        r_stator = 22
+        for i in range(self.NUM_STATOR):
+            angle = 2 * math.pi * i / self.NUM_STATOR
+            q = 1.0 if i % 2 == 0 else -1.0
+            x = cx + r_stator * math.cos(angle)
+            y = cy + r_stator * math.sin(angle)
+            c = Charge(q, x, y)
+            self.stator_charges.append(c)
+            self.charges.append(c)
+
+        self.rotor_charges = []
+        for i in range(self.NUM_ROTOR):
+            q = 1.0 if i % 2 == 0 else -1.0
+            c = Charge(q, cx, cy)
+            self.rotor_charges.append(c)
+            self.charges.append(c)
+
+    def _setup_circuit(self):
+        """Rectangular circuit with flowing dot charges."""
+        margin = 10
+        self.x0 = margin
+        self.y0 = margin
+        self.x1 = GRID_SIZE - margin
+        self.y1 = GRID_SIZE - margin
+        w = self.x1 - self.x0
+        h = self.y1 - self.y0
+        self.perimeter = 2 * w + 2 * h
+        self.resistor_start = w + h + w // 3
+        self.resistor_end = w + h + 2 * w // 3
+        self.dot_phases = [i / self.NUM_DOTS for i in range(self.NUM_DOTS)]
+
+        corners = [
+            (self.x0, self.y0), (self.x1, self.y0),
+            (self.x1, self.y1), (self.x0, self.y1),
+        ]
+        mids = [
+            ((self.x0 + self.x1) / 2, self.y0),
+            (self.x1, (self.y0 + self.y1) / 2),
+            ((self.x0 + self.x1) / 2, self.y1),
+            (self.x0, (self.y0 + self.y1) / 2),
+        ]
+        for i, (cx, cy) in enumerate(corners + mids):
+            q = 1.0 if i % 2 == 0 else -1.0
+            self.charges.append(Charge(q, cx, cy))
+
+    # ── circuit helpers ──────────────────────────────────────────
+
+    def _perimeter_to_xy(self, frac):
+        w = self.x1 - self.x0
+        h = self.y1 - self.y0
+        d = (frac % 1.0) * self.perimeter
+        if d < w:
+            return self.x0 + d, self.y0
+        d -= w
+        if d < h:
+            return self.x1, self.y0 + d
+        d -= h
+        if d < w:
+            return self.x1 - d, self.y1
+        d -= w
+        return self.x0, self.y1 - d
+
+    def _in_resistor(self, frac):
+        d = (frac % 1.0) * self.perimeter
+        return self.resistor_start <= d <= self.resistor_end
+
+    # ── input ────────────────────────────────────────────────────
+
+    def handle_input(self, input_state) -> bool:
+        consumed = False
+
+        # Left/Right: cycle scenario
+        if input_state.left_pressed:
+            self.scenario_idx = (self.scenario_idx - 1) % len(_SCENARIOS)
+            self._setup_scenario()
+            self._show_overlay(_SCENARIOS[self.scenario_idx])
+            if self.view_mode == 2 and _SCENARIOS[self.scenario_idx] != 'CIRCUIT':
+                self.view_mode = 0
+            consumed = True
+        if input_state.right_pressed:
+            self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
+            self._setup_scenario()
+            self._show_overlay(_SCENARIOS[self.scenario_idx])
+            if self.view_mode == 2 and _SCENARIOS[self.scenario_idx] != 'CIRCUIT':
+                self.view_mode = 0
+            consumed = True
+
+        # Up/Down: cycle palette
+        if input_state.up_pressed:
+            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+            if self.show_notes:
+                self._build_notes_segments()
+            consumed = True
+        if input_state.down_pressed:
+            self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
+            if self.show_notes:
+                self._build_notes_segments()
+            consumed = True
+
+        # Both buttons: toggle notes
+        both = input_state.action_l and input_state.action_r
+        if both and not self._both_pressed_prev:
+            self.show_notes = not self.show_notes
+            self.notes_scroll_offset = 0.0
+            if self.show_notes:
+                self._build_notes_segments()
+            consumed = True
+        elif input_state.action_l or input_state.action_r:
+            if not both:
+                # Single button: cycle view mode
+                is_circuit = _SCENARIOS[self.scenario_idx] == 'CIRCUIT'
+                max_mode = 3 if is_circuit else 2
+                self.view_mode = (self.view_mode + 1) % max_mode
+                self._cache_time = -1.0
+                self._show_overlay(_VIEW_MODES[self.view_mode])
+                consumed = True
+        self._both_pressed_prev = both
+
+        return consumed
+
+    # ── update ───────────────────────────────────────────────────
+
+    def update(self, dt: float):
+        self.time += dt
+        scenario = _SCENARIOS[self.scenario_idx]
+
+        if scenario in ('DIPOLE', 'QUADRUPOLE', 'RANDOM'):
+            t = self.time * self.speed
+            for c in self.charges:
+                c.x = c.cx + c.amp_x * math.sin(c.freq_x * t + c.phase_x)
+                c.y = c.cy + c.amp_y * math.sin(c.freq_y * t + c.phase_y)
+                c.x = max(3, min(GRID_SIZE - 4, c.x))
+                c.y = max(3, min(GRID_SIZE - 4, c.y))
+
+        elif scenario == 'MOTOR':
+            self.rotor_angle += dt * self.speed * 0.8
+            for i, c in enumerate(self.rotor_charges):
+                angle = self.rotor_angle + 2 * math.pi * i / self.NUM_ROTOR
+                c.x = self.cx + self.r_rotor * math.cos(angle)
+                c.y = self.cy + self.r_rotor * math.sin(angle)
+                c.x = max(3, min(GRID_SIZE - 4, c.x))
+                c.y = max(3, min(GRID_SIZE - 4, c.y))
+
+        elif scenario == 'CIRCUIT':
+            base_speed = 0.15 * self.speed * dt
+            for i in range(len(self.dot_phases)):
+                if self._in_resistor(self.dot_phases[i]):
+                    self.dot_phases[i] += base_speed * 0.3
+                else:
+                    self.dot_phases[i] += base_speed
+                self.dot_phases[i] %= 1.0
+            for k, c in enumerate(self.charges):
+                frac = (k / len(self.charges) + self.time * 0.02 * self.speed) % 1.0
+                x, y = self._perimeter_to_xy(frac)
+                c.x = x
+                c.y = y
+
+        # Recompute field lines when in field line view
+        if self.view_mode == 0:
+            if self.time - self._cache_time > 0.15:
+                self._cached_lines = _compute_field_lines(self.charges)
+                self._cache_time = self.time
+
+        if self.overlay_timer > 0:
+            self.overlay_timer = max(0.0, self.overlay_timer - dt)
+
+        if self.show_notes:
+            self.notes_scroll_offset += dt * 18
+
+    # ── draw ─────────────────────────────────────────────────────
+
+    def draw(self):
+        pal = PALETTES[self.palette_idx]
+        self.display.clear(pal['bg'])
+
+        if self.view_mode == 0:
+            _draw_field_lines(self.display, self._cached_lines, pal)
+            _draw_charges(self.display, self.charges, pal)
+        elif self.view_mode == 1:
+            _draw_equipotential(self.display, self.charges, self.palette_idx)
+        elif self.view_mode == 2:
+            self._draw_circuit_view(pal)
+
+        if self.show_notes:
+            self._draw_notes()
+        self._draw_overlay()
+
+    def _draw_circuit_view(self, pal):
+        """Draw wire path + magnetic glow + flowing charge dots."""
+        wire_color = (40, 40, 50)
+        self.display.draw_line(self.x0, self.y0, self.x1, self.y0, wire_color)
+        self.display.draw_line(self.x1, self.y0, self.x1, self.y1, wire_color)
+        self.display.draw_line(self.x1, self.y1, self.x0, self.y1, wire_color)
+        self.display.draw_line(self.x0, self.y1, self.x0, self.y0, wire_color)
+
+        w = self.x1 - self.x0
+        rx0 = self.x1 - w // 3
+        rx1 = self.x1 - 2 * w // 3
+        resistor_color = (60, 30, 15)
+        self.display.draw_line(rx0, self.y1, rx1, self.y1, resistor_color)
+
+        glow_color = pal['line']
+        for frac_i in range(80):
+            frac = frac_i / 80.0
+            x, y = self._perimeter_to_xy(frac)
+            ix, iy = int(x), int(y)
+            intensity = 0.15 + 0.1 * math.sin(self.time * 4 + frac * 12)
+            gc = (
+                int(glow_color[0] * intensity),
+                int(glow_color[1] * intensity),
+                int(glow_color[2] * intensity),
+            )
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nx, ny = ix + dx, iy + dy
+                if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
+                    cur = self.display.get_pixel(nx, ny)
+                    blended = (
+                        min(255, cur[0] + gc[0]),
+                        min(255, cur[1] + gc[1]),
+                        min(255, cur[2] + gc[2]),
+                    )
+                    self.display.set_pixel(nx, ny, blended)
+
+        for phase in self.dot_phases:
+            x, y = self._perimeter_to_xy(phase)
+            ix, iy = int(x), int(y)
+            if self._in_resistor(phase):
+                color = (
+                    int(pal['pos'][0] * 0.5),
+                    int(pal['pos'][1] * 0.5),
+                    int(pal['pos'][2] * 0.5),
+                )
+            else:
+                color = pal['pos']
+            if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                self.display.set_pixel(ix, iy, color)
