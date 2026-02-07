@@ -201,13 +201,15 @@ class ScienceLab(Slideshow):
     def _get_visual_classes(self):
         from visuals import (Attractors, DblPendulum, Neurons,
                              OrbitsSolar, OrbitsMulti, OrbitsBelt,
-                             Coulomb,
+                             Coulomb, WaveTank, Optics,
+                             PendulumWave, Radioactive,
                              FluidTunnel, FluidInk, FluidMixing,
                              TuringPatterns, Mitosis, Earth, Molecule,
                              DNA, Spectroscope, Oscilloscope, Chladni)
         return [Attractors, DblPendulum, Neurons,
                 OrbitsSolar, OrbitsMulti, OrbitsBelt,
-                Coulomb,
+                Coulomb, WaveTank, Optics,
+                PendulumWave, Radioactive,
                 FluidTunnel, FluidInk, FluidMixing,
                 TuringPatterns, Mitosis, Earth, Molecule,
                 DNA, Spectroscope, Oscilloscope, Chladni]

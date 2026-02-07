@@ -133,6 +133,10 @@ from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
 from .emfield import Coulomb
+from .wavetank import WaveTank
+from .optics import Optics
+from .pendwave import PendulumWave
+from .radioactive import Radioactive
 from .turing import TuringPatterns
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
@@ -318,6 +322,10 @@ ALL_VISUALS = [
     OrbitsMulti,
     OrbitsBelt,
     Coulomb,
+    WaveTank,
+    Optics,
+    PendulumWave,
+    Radioactive,
     TuringPatterns,
     Neurons,
     FluidTunnel,
@@ -560,6 +568,10 @@ __all__ = [
     'OrbitsMulti',
     'OrbitsBelt',
     'Coulomb',
+    'WaveTank',
+    'Optics',
+    'PendulumWave',
+    'Radioactive',
     'TuringPatterns',
     'Neurons',
     'FluidTunnel',
