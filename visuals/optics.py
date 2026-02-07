@@ -8,9 +8,9 @@ Snell's law and reflection.
 Scenarios: PRISM, LENS, MIRRORS, DOUBLE PRISM, KALEIDOSCOPE
 
 Controls:
-  Left/Right     - Cycle scenario
+  Left/Right     - Adjust beam angle (or kaleidoscope rotation speed)
   Up/Down        - Cycle color palette
-  Single button  - Cycle sub-variant within scenario
+  Single button  - Cycle scenario / sub-variant
   Both buttons   - Toggle scrolling notes
 """
 
@@ -227,6 +227,10 @@ class Optics(Visual):
         self.notes_segments = []
         self.notes_scroll_len = 1
         self._both_pressed_prev = False
+
+        # User-controlled angle / speed
+        self.user_angle = 0.0            # beam angle offset (radians)
+        self.kaleidoscope_speed = 0.15   # rotation speed for kaleidoscope
 
         # Optical elements
         self.prisms = []
@@ -521,17 +525,20 @@ class Optics(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        scenario = _SCENARIOS[self.scenario_idx]
 
-        # Left/Right: cycle scenario
-        if input_state.left_pressed:
-            self.scenario_idx = (self.scenario_idx - 1) % len(_SCENARIOS)
-            self._setup_scenario()
-            self._show_overlay(_SCENARIOS[self.scenario_idx])
+        # Left/Right: adjust beam angle or kaleidoscope rotation speed
+        if input_state.left_pressed or input_state.left:
+            if scenario == 'KALEIDOSCOPE':
+                self.kaleidoscope_speed = max(-1.0, self.kaleidoscope_speed - 0.05)
+            else:
+                self.user_angle -= 0.06
             consumed = True
-        if input_state.right_pressed:
-            self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
-            self._setup_scenario()
-            self._show_overlay(_SCENARIOS[self.scenario_idx])
+        if input_state.right_pressed or input_state.right:
+            if scenario == 'KALEIDOSCOPE':
+                self.kaleidoscope_speed = min(1.0, self.kaleidoscope_speed + 0.05)
+            else:
+                self.user_angle += 0.06
             consumed = True
 
         # Up/Down: cycle palette
@@ -556,28 +563,55 @@ class Optics(Visual):
             consumed = True
         elif input_state.action_l or input_state.action_r:
             if not both:
-                # Single button: cycle sub-variant
-                scenario = _SCENARIOS[self.scenario_idx]
-                if scenario == 'LENS':
-                    self.sub_variant = 1 - self.sub_variant
-                    label = 'CONCAVE' if self.sub_variant == 1 else 'CONVEX'
-                    self._show_overlay(label)
-                elif scenario == 'MIRRORS':
-                    self.sub_variant = (self.sub_variant + 1) % 3
-                    labels = ['DOUBLE', 'CORNER', 'PARALLEL']
-                    self._rearrange_mirrors()
-                    self._show_overlay(labels[self.sub_variant])
-                elif scenario == 'KALEIDOSCOPE':
-                    self.sub_variant = (self.sub_variant + 1) % 3
-                    labels = ['3-FOLD', '4-FOLD', '6-FOLD']
-                    self._rearrange_kaleidoscope()
-                    self._show_overlay(labels[self.sub_variant])
-                else:
-                    self.sub_variant = (self.sub_variant + 1) % 2
+                # Single button: cycle through scenario, then sub-variants
+                self._cycle_scenario()
                 consumed = True
         self._both_pressed_prev = both
 
         return consumed
+
+    def _cycle_scenario(self):
+        """Advance to next sub-variant, or next scenario if at last sub-variant."""
+        scenario = _SCENARIOS[self.scenario_idx]
+        max_sub = self._max_sub_variant(scenario)
+
+        if self.sub_variant < max_sub - 1:
+            # Advance sub-variant within current scenario
+            self.sub_variant += 1
+            label = self._sub_variant_label(scenario, self.sub_variant)
+            if scenario == 'MIRRORS':
+                self._rearrange_mirrors()
+            elif scenario == 'KALEIDOSCOPE':
+                self._rearrange_kaleidoscope()
+            self._show_overlay(label)
+        else:
+            # Advance to next scenario
+            self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
+            self.user_angle = 0.0
+            self._setup_scenario()
+            new_scenario = _SCENARIOS[self.scenario_idx]
+            label = self._sub_variant_label(new_scenario, 0)
+            self._show_overlay(label)
+
+    @staticmethod
+    def _max_sub_variant(scenario):
+        if scenario == 'LENS':
+            return 2        # convex, concave
+        elif scenario == 'MIRRORS':
+            return 3        # double, corner, parallel
+        elif scenario == 'KALEIDOSCOPE':
+            return 3        # 3-fold, 4-fold, 6-fold
+        return 1            # PRISM, DOUBLE PRISM have no sub-variants
+
+    @staticmethod
+    def _sub_variant_label(scenario, sub):
+        if scenario == 'LENS':
+            return ['CONVEX LENS', 'CONCAVE LENS'][sub]
+        elif scenario == 'MIRRORS':
+            return ['DOUBLE', 'CORNER', 'PARALLEL'][sub]
+        elif scenario == 'KALEIDOSCOPE':
+            return ['3-FOLD', '4-FOLD', '6-FOLD'][sub]
+        return scenario
 
     def _rearrange_mirrors(self):
         """Rearrange mirrors for sub-variants."""
@@ -692,19 +726,10 @@ class Optics(Visual):
         self._draw_overlay()
 
     def _get_anim_angle(self, scenario):
-        """Return a slow animation offset for the current scenario."""
-        if scenario == 'PRISM':
-            return math.sin(self.time * 0.4) * 0.09  # +/- ~5 degrees
-        elif scenario == 'LENS':
-            return math.sin(self.time * 0.3) * 0.07
-        elif scenario == 'MIRRORS':
-            # Slowly shift mirror angle
-            return math.sin(self.time * 0.25) * 0.05
-        elif scenario == 'DOUBLE PRISM':
-            return math.sin(self.time * 0.35) * 0.06
-        elif scenario == 'KALEIDOSCOPE':
-            return self.time * 0.15  # Slow continuous rotation
-        return 0.0
+        """Return beam angle based on user control."""
+        if scenario == 'KALEIDOSCOPE':
+            return self.time * self.kaleidoscope_speed
+        return self.user_angle
 
     def _draw_elements(self, pal):
         """Draw prisms, lenses, and mirrors."""

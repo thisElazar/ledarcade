@@ -135,7 +135,6 @@ from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
 from .emfield import Coulomb
 from .wavetank import WaveTank
 from .optics import Optics
-from .pendwave import PendulumWave
 from .radioactive import Radioactive
 from .turing import TuringPatterns
 from .neurons import Neurons
@@ -324,7 +323,6 @@ ALL_VISUALS = [
     Coulomb,
     WaveTank,
     Optics,
-    PendulumWave,
     Radioactive,
     TuringPatterns,
     Neurons,
@@ -570,7 +568,6 @@ __all__ = [
     'Coulomb',
     'WaveTank',
     'Optics',
-    'PendulumWave',
     'Radioactive',
     'TuringPatterns',
     'Neurons',

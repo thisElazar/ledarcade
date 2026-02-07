@@ -7,9 +7,9 @@ double-slit diffraction, two-source interference, rain ripples, and
 reflection off angled barriers.
 
 Controls:
-  Left/Right     - Cycle scenario
-  Up/Down        - Cycle color palette
-  Single button  - Toggle view mode (waves / energy)
+  Left/Right     - Adjust simulation speed
+  Up/Down        - Cycle visual style (view mode + palette)
+  Single button  - Cycle scenario
   Both buttons   - Toggle scrolling notes
 """
 
@@ -164,6 +164,8 @@ class WaveTank(Visual):
         self.scenario_idx = 0
         self.palette_idx = 0
         self.view_mode = 0  # 0=waves, 1=energy
+        self.style_idx = 0  # combined view_mode * num_palettes + palette_idx
+        self.speed = 1.0    # simulation speed multiplier
 
         # Wave arrays
         self.u = np.zeros((N, N), dtype=np.float64)
@@ -288,25 +290,26 @@ class WaveTank(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        num_styles = len(_VIEW_MODES) * len(PALETTES)
 
-        # Left/Right: cycle scenario
+        # Left/Right: adjust simulation speed
         if input_state.left_pressed:
-            self.scenario_idx = (self.scenario_idx - 1) % len(_SCENARIOS)
-            self._setup_scenario()
-            self._show_overlay(_SCENARIOS[self.scenario_idx])
+            self.speed = max(0.1, round(self.speed - 0.2, 1))
+            self._show_overlay(f'{self.speed:.1f}X')
             consumed = True
         if input_state.right_pressed:
-            self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
-            self._setup_scenario()
-            self._show_overlay(_SCENARIOS[self.scenario_idx])
+            self.speed = min(3.0, round(self.speed + 0.2, 1))
+            self._show_overlay(f'{self.speed:.1f}X')
             consumed = True
 
-        # Up/Down: cycle palette
+        # Up/Down: cycle visual style (view mode + palette)
         if input_state.up_pressed:
-            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
+            self.style_idx = (self.style_idx + 1) % num_styles
+            self._apply_style()
             consumed = True
         if input_state.down_pressed:
-            self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
+            self.style_idx = (self.style_idx - 1) % num_styles
+            self._apply_style()
             consumed = True
 
         # Both buttons: toggle notes
@@ -319,13 +322,22 @@ class WaveTank(Visual):
             consumed = True
         elif input_state.action_l or input_state.action_r:
             if not both:
-                # Single button: toggle view mode
-                self.view_mode = (self.view_mode + 1) % len(_VIEW_MODES)
-                self._show_overlay(_VIEW_MODES[self.view_mode])
+                # Single button: cycle scenario
+                self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
+                self._setup_scenario()
+                self._show_overlay(_SCENARIOS[self.scenario_idx])
                 consumed = True
         self._both_pressed_prev = both
 
         return consumed
+
+    def _apply_style(self):
+        """Update view_mode and palette_idx from combined style_idx."""
+        self.view_mode = self.style_idx // len(PALETTES)
+        self.palette_idx = self.style_idx % len(PALETTES)
+        mode_name = _VIEW_MODES[self.view_mode]
+        pal_name = PALETTES[self.palette_idx]['name']
+        self._show_overlay(f'{pal_name} {mode_name}')
 
     # ── physics ──────────────────────────────────────────────────
 
@@ -383,15 +395,16 @@ class WaveTank(Visual):
 
         # Ripple scenario: spawn random drops
         if _SCENARIOS[self.scenario_idx] == 'RIPPLE':
-            self.ripple_timer += dt
+            self.ripple_timer += dt * self.speed
             if self.ripple_timer > 0.35:
                 self.ripple_timer = 0.0
                 rx = random.randint(4, N - 5)
                 ry = random.randint(4, N - 5)
                 self.u[ry, rx] = random.uniform(0.6, 1.0)
 
-        # Run substeps
-        for _ in range(SUB_STEPS):
+        # Run substeps (scaled by speed)
+        steps = max(1, int(SUB_STEPS * self.speed))
+        for _ in range(steps):
             self._apply_sources()
             self._step_wave()
             self.phys_time += DT_SUB
