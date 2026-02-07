@@ -44,7 +44,6 @@ class AgarioDemo(Visual):
         # AI: build input by chasing nearest edible or fleeing threat
         ai_input = InputState()
         player = self.game.player
-        import math
 
         # Find nearest threat (bigger cell)
         nearest_threat = None
@@ -55,7 +54,7 @@ class AgarioDemo(Visual):
 
         # Check AI cells
         for ai in self.game.ai_cells:
-            d = math.sqrt((player.x - ai.x) ** 2 + (player.y - ai.y) ** 2)
+            d = self.game._wrap_dist(player.x, player.y, ai.x, ai.y)
             if ai.radius > player.radius:
                 if d < threat_dist:
                     threat_dist = d
@@ -67,27 +66,22 @@ class AgarioDemo(Visual):
 
         # Check food
         for f in self.game.food:
-            d = math.sqrt((player.x - f['x']) ** 2 + (player.y - f['y']) ** 2)
+            d = self.game._wrap_dist(player.x, player.y, f['x'], f['y'])
             if d < edible_dist:
                 edible_dist = d
                 nearest_edible = f
 
-        # Decide direction
-        tx, ty = player.x, player.y
+        # Decide direction (using wrapped deltas)
+        dx, dy = 0, 0
         if nearest_threat and threat_dist < 12:
-            # Flee
-            tx = player.x - (nearest_threat.x - player.x)
-            ty = player.y - (nearest_threat.y - player.y)
+            # Flee: direction from threat toward player (away)
+            dx, dy = self.game._wrap_delta(nearest_threat.x, nearest_threat.y, player.x, player.y)
         elif nearest_edible:
             if hasattr(nearest_edible, 'x'):
-                tx = nearest_edible.x
-                ty = nearest_edible.y
+                dx, dy = self.game._wrap_delta(player.x, player.y, nearest_edible.x, nearest_edible.y)
             else:
-                tx = nearest_edible['x']
-                ty = nearest_edible['y']
+                dx, dy = self.game._wrap_delta(player.x, player.y, nearest_edible['x'], nearest_edible['y'])
 
-        dx = tx - player.x
-        dy = ty - player.y
         if abs(dx) > 0.5 or abs(dy) > 0.5:
             if abs(dx) > abs(dy):
                 if dx > 0:

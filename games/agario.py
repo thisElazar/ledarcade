@@ -2,16 +2,19 @@
 Agar.io - Eat or be eaten
 =========================
 Control a cell in a petri dish. Eat food pellets and smaller cells to grow.
-Avoid bigger cells or get consumed!
+Avoid bigger cells or get consumed! 3-minute timed challenge.
 
 Controls:
   Arrow Keys  - Move direction (held = continuous)
-  Space       - Speed boost (costs 10% mass)
+  Space       - Speed boost (3s, costs 10% mass)
+  Z           - Eject mass forward
 """
 
 import random
 import math
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
+
+WORLD_SIZE = 192  # Toroidal open world (3x screen)
 
 
 class Cell:
@@ -55,8 +58,8 @@ class Agario(Game):
     description = "Eat cells to grow, avoid bigger ones!"
     category = "modern"
 
-    NUM_FOOD = 40
-    NUM_AI = 7
+    NUM_FOOD = 120
+    NUM_AI = 12
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -66,12 +69,22 @@ class Agario(Game):
         self.state = GameState.PLAYING
         self.score = 0
 
-        # Player cell
+        # Player cell - start near center of world
+        cx = WORLD_SIZE // 2
         self.player = Cell(
-            random.randint(16, 48), random.randint(16, 48),
+            cx + random.randint(-16, 16),
+            cx + random.randint(-16, 16),
             10, Colors.CYAN
         )
         self.boost_timer = 0.0
+        self.face_x = 1.0
+        self.face_y = 0.0
+        self.ejects = []  # flying ejected blobs
+        self.time_left = 180.0  # 3-minute challenge
+
+        # Camera follows player
+        self.cam_x = self.player.x
+        self.cam_y = self.player.y
 
         # Food pellets
         self.food = []
@@ -83,10 +96,31 @@ class Agario(Game):
         for _ in range(self.NUM_AI):
             self.ai_cells.append(self._spawn_ai())
 
+    # --- World wrapping helpers ---
+
+    def _wrap_delta(self, x1, y1, x2, y2):
+        """Shortest delta from (x1,y1) to (x2,y2) on toroidal world."""
+        dx = (x2 - x1 + WORLD_SIZE / 2) % WORLD_SIZE - WORLD_SIZE / 2
+        dy = (y2 - y1 + WORLD_SIZE / 2) % WORLD_SIZE - WORLD_SIZE / 2
+        return dx, dy
+
+    def _wrap_dist(self, x1, y1, x2, y2):
+        dx, dy = self._wrap_delta(x1, y1, x2, y2)
+        return math.sqrt(dx * dx + dy * dy)
+
+    def _world_to_screen(self, wx, wy):
+        """Convert world coords to screen coords relative to camera."""
+        half = GRID_SIZE // 2
+        dx = (wx - self.cam_x + WORLD_SIZE / 2) % WORLD_SIZE - WORLD_SIZE / 2
+        dy = (wy - self.cam_y + WORLD_SIZE / 2) % WORLD_SIZE - WORLD_SIZE / 2
+        return int(half + dx), int(half + dy)
+
+    # --- Spawning ---
+
     def _spawn_food(self):
         return {
-            'x': random.randint(1, GRID_SIZE - 2),
-            'y': random.randint(1, GRID_SIZE - 2),
+            'x': random.randint(0, WORLD_SIZE - 1),
+            'y': random.randint(0, WORLD_SIZE - 1),
             'color': random.choice(FOOD_COLORS),
         }
 
@@ -94,22 +128,27 @@ class Agario(Game):
         mass = random.uniform(5, 25)
         color = random.choice(CELL_COLORS)
         if edge:
-            side = random.randint(0, 3)
-            if side == 0:
-                x, y = random.randint(2, GRID_SIZE - 3), 1
-            elif side == 1:
-                x, y = random.randint(2, GRID_SIZE - 3), GRID_SIZE - 2
-            elif side == 2:
-                x, y = 1, random.randint(2, GRID_SIZE - 3)
-            else:
-                x, y = GRID_SIZE - 2, random.randint(2, GRID_SIZE - 3)
+            # Spawn just outside visible area around player
+            angle = random.uniform(0, 2 * math.pi)
+            dist = GRID_SIZE // 2 + random.randint(5, 20)
+            x = (self.player.x + math.cos(angle) * dist) % WORLD_SIZE
+            y = (self.player.y + math.sin(angle) * dist) % WORLD_SIZE
         else:
-            x = random.randint(4, GRID_SIZE - 5)
-            y = random.randint(4, GRID_SIZE - 5)
+            x = random.randint(0, WORLD_SIZE - 1)
+            y = random.randint(0, WORLD_SIZE - 1)
         return Cell(x, y, mass, color)
+
+    # --- Update ---
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
+            return
+
+        # Countdown timer
+        self.time_left -= dt
+        if self.time_left <= 0:
+            self.time_left = 0
+            self.state = GameState.GAME_OVER
             return
 
         # Player movement
@@ -119,8 +158,9 @@ class Agario(Game):
             length = math.sqrt(dx * dx + dy * dy)
             dx /= length
             dy /= length
+            self.face_x = dx
+            self.face_y = dy
             speed = self.player.speed
-            # Boost
             if self.boost_timer > 0:
                 speed *= 2.0
                 self.boost_timer -= dt
@@ -130,16 +170,45 @@ class Agario(Game):
             if self.boost_timer > 0:
                 self.boost_timer -= dt
 
-        # Speed boost on action
-        if input_state.action_l or input_state.action_r:
-            if self.player.mass > 12:
+        # Speed boost (Space)
+        if input_state.action_l:
+            if self.player.mass > 12 and self.boost_timer <= 0:
                 self.player.mass *= 0.9
-                self.boost_timer = 0.3
+                self.boost_timer = 3.0
 
-        # Clamp player to arena
-        r = self.player.radius
-        self.player.x = max(r, min(GRID_SIZE - 1 - r, self.player.x))
-        self.player.y = max(r, min(GRID_SIZE - 1 - r, self.player.y))
+        # Eject mass forward (Z)
+        if input_state.action_r:
+            if self.player.mass > 15:
+                eject_mass = max(3, self.player.mass * 0.1)
+                self.player.mass -= eject_mass
+                self.ejects.append({
+                    'x': self.player.x,
+                    'y': self.player.y,
+                    'vx': self.face_x * 50.0,
+                    'vy': self.face_y * 50.0,
+                    'color': self.player.color,
+                    'life': 0.4,
+                })
+
+        # Wrap player position (toroidal world - no edges!)
+        self.player.x %= WORLD_SIZE
+        self.player.y %= WORLD_SIZE
+
+        # Camera follows player
+        self.cam_x = self.player.x
+        self.cam_y = self.player.y
+
+        # Update ejected blobs
+        for e in self.ejects:
+            e['x'] = (e['x'] + e['vx'] * dt) % WORLD_SIZE
+            e['y'] = (e['y'] + e['vy'] * dt) % WORLD_SIZE
+            e['vx'] *= 0.92
+            e['vy'] *= 0.92
+            e['life'] -= dt
+        expired = [i for i, e in enumerate(self.ejects) if e['life'] <= 0]
+        for i in reversed(expired):
+            e = self.ejects.pop(i)
+            self.food.append({'x': e['x'], 'y': e['y'], 'color': e['color']})
 
         # AI movement
         self._update_ai(dt)
@@ -165,7 +234,7 @@ class Agario(Game):
         r = cell.radius
         eaten = []
         for i, f in enumerate(self.food):
-            dist = math.sqrt((cell.x - f['x']) ** 2 + (cell.y - f['y']) ** 2)
+            dist = self._wrap_dist(cell.x, cell.y, f['x'], f['y'])
             if dist < r + 0.5:
                 eaten.append(i)
                 cell.mass += 1
@@ -178,7 +247,7 @@ class Agario(Game):
         pr = self.player.radius
         for i, ai in enumerate(self.ai_cells):
             ar = ai.radius
-            dist = math.sqrt((self.player.x - ai.x) ** 2 + (self.player.y - ai.y) ** 2)
+            dist = self._wrap_dist(self.player.x, self.player.y, ai.x, ai.y)
             if dist < max(pr, ar):
                 if pr >= ar:
                     # Player eats AI
@@ -195,7 +264,7 @@ class Agario(Game):
             for j in range(i + 1, len(self.ai_cells)):
                 a = self.ai_cells[i]
                 b = self.ai_cells[j]
-                dist = math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
+                dist = self._wrap_dist(a.x, a.y, b.x, b.y)
                 if dist < max(a.radius, b.radius):
                     if a.radius >= b.radius:
                         a.mass += b.mass
@@ -212,19 +281,19 @@ class Agario(Game):
             best_food = None
             best_food_dist = float('inf')
             for f in self.food:
-                d = math.sqrt((ai.x - f['x']) ** 2 + (ai.y - f['y']) ** 2)
+                d = self._wrap_dist(ai.x, ai.y, f['x'], f['y'])
                 if d < best_food_dist:
                     best_food_dist = d
                     best_food = f
 
-            # Find nearest threat and nearest prey among other cells
+            # Find nearest threat and nearest prey
             nearest_threat = None
             threat_dist = float('inf')
             nearest_prey = None
             prey_dist = float('inf')
 
             # Check player
-            d = math.sqrt((ai.x - self.player.x) ** 2 + (ai.y - self.player.y) ** 2)
+            d = self._wrap_dist(ai.x, ai.y, self.player.x, self.player.y)
             if self.player.radius > ai.radius:
                 if d < threat_dist:
                     threat_dist = d
@@ -238,7 +307,7 @@ class Agario(Game):
             for other in self.ai_cells:
                 if other is ai:
                     continue
-                d = math.sqrt((ai.x - other.x) ** 2 + (ai.y - other.y) ** 2)
+                d = self._wrap_dist(ai.x, ai.y, other.x, other.y)
                 if other.radius > ai.radius:
                     if d < threat_dist:
                         threat_dist = d
@@ -251,13 +320,12 @@ class Agario(Game):
             # Decide target: flee threats within 12px, else chase prey or food
             tx, ty = ai.x, ai.y
             if nearest_threat and threat_dist < 12:
-                # Flee: move away from threat
-                dx = ai.x - nearest_threat.x
-                dy = ai.y - nearest_threat.y
-                if dx == 0 and dy == 0:
-                    dx, dy = random.uniform(-1, 1), random.uniform(-1, 1)
-                tx = ai.x + dx
-                ty = ai.y + dy
+                # Flee: direction away from threat (wrapped)
+                fdx, fdy = self._wrap_delta(nearest_threat.x, nearest_threat.y, ai.x, ai.y)
+                if fdx == 0 and fdy == 0:
+                    fdx, fdy = random.uniform(-1, 1), random.uniform(-1, 1)
+                tx = ai.x + fdx
+                ty = ai.y + fdy
             elif nearest_prey and prey_dist < 15:
                 tx = nearest_prey.x
                 ty = nearest_prey.y
@@ -265,9 +333,8 @@ class Agario(Game):
                 tx = best_food['x']
                 ty = best_food['y']
 
-            # Move toward target
-            dx = tx - ai.x
-            dy = ty - ai.y
+            # Move toward target (using wrapped direction)
+            dx, dy = self._wrap_delta(ai.x, ai.y, tx, ty)
             dist = math.sqrt(dx * dx + dy * dy)
             if dist > 0.5:
                 dx /= dist
@@ -276,23 +343,39 @@ class Agario(Game):
                 ai.x += dx * speed * dt
                 ai.y += dy * speed * dt
 
-            # Clamp to arena
-            ar = ai.radius
-            ai.x = max(ar, min(GRID_SIZE - 1 - ar, ai.x))
-            ai.y = max(ar, min(GRID_SIZE - 1 - ar, ai.y))
+            # Wrap position
+            ai.x %= WORLD_SIZE
+            ai.y %= WORLD_SIZE
+
+    # --- Drawing ---
 
     def draw(self):
         self.display.clear(Colors.BLACK)
 
-        # Draw subtle grid
-        for i in range(0, GRID_SIZE, 8):
-            for j in range(GRID_SIZE):
-                self.display.set_pixel(i, j, (10, 10, 10))
-                self.display.set_pixel(j, i, (10, 10, 10))
+        # Draw scrolling grid
+        half = GRID_SIZE // 2
+        cam_ix = int(round(self.cam_x))
+        cam_iy = int(round(self.cam_y))
+        gx = (-(cam_ix - half)) % 8
+        gy = (-(cam_iy - half)) % 8
+        for sx in range(gx, GRID_SIZE, 8):
+            for sy in range(GRID_SIZE):
+                self.display.set_pixel(sx, sy, (10, 10, 10))
+        for sy in range(gy, GRID_SIZE, 8):
+            for sx in range(GRID_SIZE):
+                self.display.set_pixel(sx, sy, (10, 10, 10))
 
-        # Draw food
+        # Draw food (only visible)
         for f in self.food:
-            self.display.set_pixel(f['x'], f['y'], f['color'])
+            sx, sy = self._world_to_screen(f['x'], f['y'])
+            if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                self.display.set_pixel(sx, sy, f['color'])
+
+        # Draw ejected blobs (only visible)
+        for e in self.ejects:
+            sx, sy = self._world_to_screen(e['x'], e['y'])
+            if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                self.display.set_pixel(sx, sy, e['color'])
 
         # Draw AI cells (sorted by size so bigger ones render on top)
         all_cells = sorted(self.ai_cells, key=lambda c: c.radius)
@@ -302,16 +385,23 @@ class Agario(Game):
         # Draw player on top
         self._draw_cell(self.player)
 
-        # HUD: score
+        # HUD: score (left) and timer (right)
         self.display.draw_text_small(2, 1, f"{self.score}", Colors.WHITE)
+        mins = int(self.time_left) // 60
+        secs = int(self.time_left) % 60
+        timer_str = f"{mins}:{secs:02d}"
+        timer_color = Colors.RED if self.time_left < 30 else Colors.WHITE
+        self.display.draw_text_small(44, 1, timer_str, timer_color)
 
     def _draw_cell(self, cell):
+        sx, sy = self._world_to_screen(cell.x, cell.y)
         r = cell.draw_radius()
-        cx, cy = int(cell.x), int(cell.y)
-        # Darker outline color
+        # Cull off-screen cells
+        if sx + r < 0 or sx - r >= GRID_SIZE or sy + r < 0 or sy - r >= GRID_SIZE:
+            return
         dark = tuple(max(0, c // 3) for c in cell.color)
         if r >= 2:
-            self.display.draw_circle(cx, cy, r, dark, filled=True)
-            self.display.draw_circle(cx, cy, r - 1, cell.color, filled=True)
+            self.display.draw_circle(sx, sy, r, dark, filled=True)
+            self.display.draw_circle(sx, sy, r - 1, cell.color, filled=True)
         else:
-            self.display.draw_circle(cx, cy, r, cell.color, filled=True)
+            self.display.draw_circle(sx, sy, r, cell.color, filled=True)
