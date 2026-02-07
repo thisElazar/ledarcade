@@ -293,12 +293,22 @@ class BurgerTime(Game):
         for bx in BURGER_X:
             self.plates.append({'x': bx, 'y': PLATE_Y})
 
-        # Spawn enemies based on level
-        num_enemies = min(2 + self.level, 6)
-        enemy_types = ['hotdog', 'egg', 'pickle']
+        # Spawn enemies — arcade-accurate staged composition
+        # (hotdogs, eggs, pickles) per level
+        spawn_table = [
+            (2, 1, 0),  # Level 1: 2 hotdogs, 1 egg
+            (3, 1, 0),  # Level 2: 3 hotdogs, 1 egg
+            (2, 1, 1),  # Level 3: 2 hotdogs, 1 egg, 1 pickle
+            (2, 1, 2),  # Level 4: 2 hotdogs, 1 egg, 2 pickles
+            (3, 1, 2),  # Level 5+: 3 hotdogs, 1 egg, 2 pickles
+        ]
+        idx = min(self.level - 1, len(spawn_table) - 1)
+        n_hotdog, n_egg, n_pickle = spawn_table[idx]
+        enemy_list = (['hotdog'] * n_hotdog +
+                      ['egg'] * n_egg +
+                      ['pickle'] * n_pickle)
 
-        for i in range(num_enemies):
-            enemy_type = enemy_types[i % len(enemy_types)]
+        for enemy_type in enemy_list:
             # Spawn on upper floors (0-3), avoiding bottom floor
             floor_idx = random.randint(0, 3)
             ex = self._random_x_on_floor(floor_idx)
@@ -310,6 +320,9 @@ class BurgerTime(Game):
                 'stunned': 2.0,  # Brief grace period at level start
                 'direction': random.choice([-1, 1]),
                 'wander_timer': 0.0,
+                'reverse_cooldown': 0.0,
+                'ladder_target_y': None,
+                'ladder_encounter_cd': 0.0,
             })
 
     def _random_x_on_floor(self, floor_idx):
@@ -670,11 +683,17 @@ class BurgerTime(Game):
         return best
 
     def update_enemies(self, dt: float):
-        """Update enemy AI — pathfind toward player with wander periods."""
+        """Update enemy AI — ladder-happy pathfinding with no-reverse constraint."""
         for enemy in self.enemies:
             if enemy['stunned'] > 0:
                 enemy['stunned'] -= dt
                 continue
+
+            # Tick down cooldowns
+            if enemy['reverse_cooldown'] > 0:
+                enemy['reverse_cooldown'] -= dt
+            if enemy['ladder_encounter_cd'] > 0:
+                enemy['ladder_encounter_cd'] -= dt
 
             dx = self.chef_x - enemy['x']
             dy = self.chef_y - enemy['y']
@@ -684,23 +703,33 @@ class BurgerTime(Game):
 
             if enemy['on_ladder']:
                 ladder = self.get_ladder_at(enemy['x'], enemy['y'])
-                # Climb toward chef's floor
-                if abs(dy) > 2:
-                    if dy < 0:
+                # Use ladder_target_y if set (from ladder-happy encounter),
+                # otherwise climb toward chef's floor
+                target_y = enemy.get('ladder_target_y')
+                if target_y is not None:
+                    climb_dy = target_y - enemy['y']
+                else:
+                    climb_dy = dy
+
+                if abs(climb_dy) > 2:
+                    if climb_dy < 0:
                         enemy['y'] -= v_speed * dt
                         if ladder and enemy['y'] < ladder['y1']:
                             enemy['y'] = float(ladder['y1'])
                             enemy['on_ladder'] = False
-                            enemy['wander_timer'] = 0.4  # Pause after exiting ladder
+                            enemy['ladder_target_y'] = None
+                            enemy['wander_timer'] = 0.4
                     else:
                         enemy['y'] += v_speed * dt
                         if ladder and enemy['y'] > ladder['y2']:
                             enemy['y'] = float(ladder['y2'])
                             enemy['on_ladder'] = False
+                            enemy['ladder_target_y'] = None
                             enemy['wander_timer'] = 0.4
                 else:
                     # Reached target floor — snap and step off
                     enemy['on_ladder'] = False
+                    enemy['ladder_target_y'] = None
                     nearest = min(FLOOR_Y, key=lambda f: abs(f - enemy['y']))
                     enemy['y'] = float(nearest)
                     enemy['wander_timer'] = 0.4
@@ -729,13 +758,19 @@ class BurgerTime(Game):
                         else:
                             # Walk toward the ladder
                             direction = 1 if ldx > 0 else -1
+                            # Respect reverse cooldown
+                            if direction != enemy['direction'] and enemy['reverse_cooldown'] > 0:
+                                direction = enemy['direction']
                             new_x = enemy['x'] + direction * h_speed * dt
                             if self._on_platform_segment(new_x, enemy['y']):
                                 enemy['x'] = new_x
+                                if direction != enemy['direction']:
+                                    enemy['reverse_cooldown'] = 0.3
                                 enemy['direction'] = direction
                             else:
                                 # Can't reach ladder — wander to find another path
                                 enemy['direction'] = -direction
+                                enemy['reverse_cooldown'] = 0.3
                                 enemy['wander_timer'] = 0.6
                     else:
                         # No useful ladder — wander until one becomes reachable
@@ -749,30 +784,93 @@ class BurgerTime(Game):
                     else:
                         self._enemy_chase_horizontal(enemy, dx, h_speed, dt)
 
+                # Ladder-happy: check if we walked over a ladder (even on same floor).
+                # Skip during wander (post-ladder cooldown) and encounter cooldown
+                # (ensures one roll per ladder crossing, not per frame).
+                if (not enemy['on_ladder'] and enemy['wander_timer'] <= 0
+                        and enemy['ladder_encounter_cd'] <= 0):
+                    self._check_ladder_encounter(enemy)
+
     def _enemy_wander(self, enemy, speed, dt):
-        """Patrol in current direction, reversing at platform edges."""
+        """Patrol in current direction, reversing at platform edges (with cooldown)."""
         new_x = enemy['x'] + enemy['direction'] * speed * dt
         if self._on_platform_segment(new_x, enemy['y']):
             enemy['x'] = new_x
         else:
-            enemy['direction'] *= -1
+            # Only reverse if cooldown has expired
+            if enemy['reverse_cooldown'] <= 0:
+                enemy['direction'] *= -1
+                enemy['reverse_cooldown'] = 0.3
 
     def _enemy_chase_horizontal(self, enemy, dx, speed, dt):
-        """Move enemy toward player horizontally, reversing at platform edges."""
-        if dx < 0:
-            new_x = enemy['x'] - speed * dt
-            if self._on_platform_segment(new_x, enemy['y']):
-                enemy['x'] = new_x
-                enemy['direction'] = -1
-            else:
-                enemy['direction'] = 1
+        """Move enemy toward player horizontally, with no-reverse cooldown."""
+        # Determine chase direction
+        chase_dir = -1 if dx < 0 else 1
+
+        # If chase wants a reversal but cooldown is active, keep current direction
+        if chase_dir != enemy['direction'] and enemy['reverse_cooldown'] > 0:
+            chase_dir = enemy['direction']
+
+        new_x = enemy['x'] + chase_dir * speed * dt
+        if self._on_platform_segment(new_x, enemy['y']):
+            enemy['x'] = new_x
+            if chase_dir != enemy['direction']:
+                enemy['reverse_cooldown'] = 0.3
+            enemy['direction'] = chase_dir
         else:
-            new_x = enemy['x'] + speed * dt
-            if self._on_platform_segment(new_x, enemy['y']):
-                enemy['x'] = new_x
-                enemy['direction'] = 1
-            else:
-                enemy['direction'] = -1
+            # Hit edge — only reverse if cooldown allows
+            if enemy['reverse_cooldown'] <= 0:
+                enemy['direction'] = -chase_dir
+                enemy['reverse_cooldown'] = 0.3
+
+    def _check_ladder_encounter(self, enemy):
+        """Ladder-happy: 30% chance to grab any ladder the enemy walks over.
+
+        Sets ladder_target_y so the climbing code knows which floor to exit at,
+        like the demo AI's ladder_exit_y pattern.
+        """
+        for ladder in self.ladders:
+            if abs(enemy['x'] - ladder['x']) < 3:
+                # Must span our current floor
+                if ladder['y1'] > enemy['y'] + 3 or ladder['y2'] < enemy['y'] - 3:
+                    continue
+                # Find adjacent floors reachable via this ladder
+                floors_up = [fy for fy in FLOOR_Y
+                             if fy < enemy['y'] - 2 and fy >= ladder['y1'] - 2]
+                floors_down = [fy for fy in FLOOR_Y
+                               if fy > enemy['y'] + 2 and fy <= ladder['y2'] + 2]
+                if not floors_up and not floors_down:
+                    continue
+                # One roll per ladder crossing — cooldown prevents re-checking
+                enemy['ladder_encounter_cd'] = 1.0
+                # 30% chance to take it
+                if random.random() < 0.30:
+                    # Pick climb direction: prefer toward player, 30% wrong way
+                    dy = self.chef_y - enemy['y']
+                    want_up = dy < 0
+                    if floors_up and floors_down:
+                        if random.random() < 0.30:
+                            want_up = not want_up  # Go wrong way
+                    elif floors_up:
+                        want_up = True
+                    else:
+                        want_up = False
+
+                    # Pick the nearest floor in the chosen direction
+                    if want_up and floors_up:
+                        target_y = max(floors_up)  # closest floor above
+                    elif not want_up and floors_down:
+                        target_y = min(floors_down)  # closest floor below
+                    elif floors_up:
+                        target_y = max(floors_up)
+                    else:
+                        target_y = min(floors_down)
+
+                    enemy['on_ladder'] = True
+                    enemy['x'] = float(ladder['x'])
+                    enemy['ladder_target_y'] = float(target_y)
+                    return
+                break  # Decided to walk past — skip remaining ladders
 
     def check_enemy_collision(self):
         """Check if chef collides with any enemy."""
@@ -804,6 +902,9 @@ class BurgerTime(Game):
                 enemy['stunned'] = 2.0
                 enemy['on_ladder'] = False
                 enemy['wander_timer'] = 0.0
+                enemy['reverse_cooldown'] = 0.0
+                enemy['ladder_target_y'] = None
+                enemy['ladder_encounter_cd'] = 0.0
 
     def check_win(self):
         """Check if all ingredients have reached the plate."""
