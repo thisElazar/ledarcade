@@ -7,6 +7,7 @@ Supports per-game leaderboards with player initials.
 
 import json
 import os
+import time
 from typing import List, Tuple, Optional
 from pathlib import Path
 
@@ -39,7 +40,7 @@ class HighScoreManager:
         else:
             self.filepath = Path(filepath)
 
-        self.scores = {}  # {game_name: [(initials, score), ...]}
+        self.scores = {}  # {game_name: [(initials, score, timestamp), ...]}
         self.load_scores()
         self._migrate_renamed_games()
 
@@ -50,8 +51,12 @@ class HighScoreManager:
                 with open(self.filepath, 'r') as f:
                     data = json.load(f)
                     # Convert lists back to list of tuples
+                    # Backward-compatible: old 2-element entries get timestamp 0
                     self.scores = {
-                        game: [(entry[0], entry[1]) for entry in entries]
+                        game: [
+                            (entry[0], entry[1], entry[2] if len(entry) > 2 else 0)
+                            for entry in entries
+                        ]
                         for game, entries in data.items()
                     }
             except (json.JSONDecodeError, KeyError, IndexError):
@@ -141,8 +146,8 @@ class HighScoreManager:
         if game_name not in self.scores:
             self.scores[game_name] = []
 
-        # Add the new score
-        self.scores[game_name].append((initials, score))
+        # Add the new score with timestamp
+        self.scores[game_name].append((initials, score, int(time.time())))
 
         # Sort by score descending
         self.scores[game_name].sort(key=lambda x: x[1], reverse=True)
@@ -151,7 +156,7 @@ class HighScoreManager:
         self.scores[game_name] = self.scores[game_name][:self.MAX_SCORES_PER_GAME]
 
         # Find the rank of the new score
-        for i, (init, sc) in enumerate(self.scores[game_name]):
+        for i, (init, sc, _ts) in enumerate(self.scores[game_name]):
             if init == initials and sc == score:
                 self.save_scores()
                 return i + 1  # 1-indexed rank
@@ -176,7 +181,7 @@ class HighScoreManager:
 
         # Count how many scores are higher
         rank = 1
-        for _, existing_score in current_scores:
+        for _, existing_score, *_ in current_scores:
             if existing_score > score:
                 rank += 1
 
@@ -188,6 +193,21 @@ class HighScoreManager:
             return len(current_scores) + 1
 
         return -1
+
+    def log_play(self, game_name: str, score: int, initials: str = ""):
+        """Log a game play to the play history file (JSONL, one line per play)."""
+        try:
+            history_path = self.filepath.parent / "play_history.jsonl"
+            entry = json.dumps({
+                "game": game_name,
+                "score": score,
+                "initials": initials,
+                "ts": int(time.time()),
+            })
+            with open(history_path, 'a') as f:
+                f.write(entry + "\n")
+        except IOError:
+            pass
 
 
 # Global instance for easy access

@@ -72,7 +72,7 @@ def draw_leaderboard(display, game_name, highlight_rank=-1):
         return
 
     y = 14
-    for i, (initials, score) in enumerate(scores):
+    for i, (initials, score, _ts) in enumerate(scores):
         rank = i + 1
         # Highlight the player's new score
         if rank == highlight_rank:
@@ -797,6 +797,7 @@ def main():
                         if not game_over_initialized:
                             game_over_initialized = True
                             final_score = current_item.score
+                            hsm.log_play(current_item.name, final_score)
                             game_over_lockout = 1.5  # Ignore inputs for 1.5 seconds
 
                             if is_two_player:
