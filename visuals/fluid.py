@@ -305,7 +305,7 @@ class FluidTunnel(Visual):
     def reset(self):
         self.time = 0.0
         self.viz_mode = 0
-        self.viscosity = 0.0001
+        self.viscosity = 0.001
         self.diffusion = 0.0001
         self.shape_idx = 0
         self.overlay_text = ""
@@ -330,13 +330,14 @@ class FluidTunnel(Visual):
         else:
             return 'VORTICITY'
 
-    def _visc_label(self):
-        if self.viscosity >= 0.005:
-            return 'HIGH VISC'
-        elif self.viscosity >= 0.0005:
-            return 'MED VISC'
-        else:
-            return 'LOW VISC'
+    # Re = U * L / viscosity.  U = 3.0 (inflow), L = 8/N (circle diameter).
+    _RE_UL = 3.0 * 8.0 / N
+    _VISC_MIN = 0.0002
+    _VISC_MAX = 0.006
+
+    def _re_label(self):
+        re = self._RE_UL / self.viscosity
+        return 'Re=%d' % int(re)
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -351,13 +352,13 @@ class FluidTunnel(Visual):
             self.overlay_timer = 2.0
             consumed = True
         if input_state.left:
-            self.viscosity = min(0.01, self.viscosity * 1.25)
-            self.overlay_text = self._visc_label()
+            self.viscosity = min(self._VISC_MAX, self.viscosity * 1.25)
+            self.overlay_text = self._re_label()
             self.overlay_timer = 2.0
             consumed = True
         if input_state.right:
-            self.viscosity = max(0.00001, self.viscosity * 0.8)
-            self.overlay_text = self._visc_label()
+            self.viscosity = max(self._VISC_MIN, self.viscosity * 0.8)
+            self.overlay_text = self._re_label()
             self.overlay_timer = 2.0
             consumed = True
         if input_state.action_l or input_state.action_r:
