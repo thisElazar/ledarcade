@@ -382,7 +382,7 @@ class TuringWorms(_TuringBase):
 
 
 class TuringPatterns(_TuringBase):
-    name = "TURING PATTERNS"
+    name = "GRAY-SCOTT"
     description = "Explore the full Gray-Scott parameter space"
     category = "science"
     _f_center = 0.035
@@ -441,8 +441,8 @@ class TuringPatterns(_TuringBase):
     def _get_notes(self):
         mid = PALETTES[self.palette_idx][3]
         return [
-            ("TURING PATTERNS", (255, 255, 255)),
-            ("GRAY-SCOTT REACTION-DIFFUSION", mid),
+            ("GRAY-SCOTT MODEL", (255, 255, 255)),
+            ("REACTION-DIFFUSION SYSTEM", mid),
             ("PEARSON 1993 CLASSIFICATION", mid),
             ("F = FEED RATE (REPLENISH U)", (255, 255, 255)),
             ("K = KILL RATE (REMOVE V)", (255, 255, 255)),
