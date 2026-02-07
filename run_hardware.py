@@ -578,11 +578,22 @@ def main():
 
             input_cooldown = max(0, input_cooldown - dt)
 
-            # Sleep timer
+            # Sleep timer — blank display, wake on any input
             uptime += dt
             if sleep_minutes > 0 and uptime >= sleep_minutes * 60:
-                import os
-                os.system("sudo shutdown -h now")
+                display.clear()
+                display.render()
+                # Wait for any input to wake
+                while True:
+                    time.sleep(0.05)
+                    wake_input = input_handler.update()
+                    if has_any_input(wake_input):
+                        break
+                uptime = 0.0
+                last_time = time.time()
+                idle_timer = 0.0
+                in_idle = False
+                idle_visual = None
 
             # Update input
             input_state = input_handler.update()
