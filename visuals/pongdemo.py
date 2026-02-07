@@ -73,9 +73,10 @@ class PongDemo(Visual):
 
             if self.left_reaction_timer >= self.left_reaction_delay:
                 self.left_reaction_timer = 0.0
-                # Target ball Y with some randomness
-                self.left_target_y = self.game.ball_y - self.game.paddle_height / 2
-                self.left_target_y += random.uniform(-self.left_tracking_error, self.left_tracking_error)
+                # Target ball Y with some randomness, smoothed to reduce jitter
+                raw_target = self.game.ball_y - self.game.paddle_height / 2
+                raw_target += random.uniform(-self.left_tracking_error, self.left_tracking_error)
+                self.left_target_y += (raw_target - self.left_target_y) * 0.3
 
             # Move toward target
             if self.game.player_y < self.left_target_y - 1:

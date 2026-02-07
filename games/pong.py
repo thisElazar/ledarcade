@@ -145,8 +145,10 @@ class Pong(Game):
         if self.ai_reaction_timer >= reaction_delay:
             self.ai_reaction_timer = 0.0
             # AI tracks ball with some randomness (less at higher difficulty)
-            self.ai_target_y = self.ball_y - self.paddle_height / 2
-            self.ai_target_y += random.uniform(-tracking_error, tracking_error)
+            raw_target = self.ball_y - self.paddle_height / 2
+            raw_target += random.uniform(-tracking_error, tracking_error)
+            # Smooth toward new target to reduce jitter
+            self.ai_target_y += (raw_target - self.ai_target_y) * 0.3
 
         # AI moves toward its delayed target position
         if self.ai_y < self.ai_target_y - 1:
