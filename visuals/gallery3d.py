@@ -1011,9 +1011,9 @@ class GallerySalon(_Gallery3DBase):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Gallery 8: SMB3 MUSEUM — NES sprite sheets auto-extracted
-#  Dynamically generates a serpentine corridor map sized to fit
-#  ALL extracted sprites, kept in sheet order for animation grouping.
+#  Gallery 8: SMB3 MUSEUM — all 3 NES sprite sheets, 3x-wide
+#  serpentine corridors with return shaft loop + ceiling lights.
+#  Textures stored as compact bytes (12KB each) for Pi memory.
 # ══════════════════════════════════════════════════════════════════
 
 class GallerySMB3(_Gallery3DBase):
@@ -1021,14 +1021,15 @@ class GallerySMB3(_Gallery3DBase):
     description = "Super Mario Bros. 3 sprites"
     category = "gallery"
 
-    # Defaults — overridden dynamically in reset()
-    MAP_W = 16
-    MAP_H = 4
-    START_POS = (7.5, 2.5)
-    MAP = [[1]*16, [1]*16, [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], [1]*16]
-    WAYPOINTS = [(7.5, 2.5)]
+    _CW = 42           # corridor width (3x original 14)
+    _SHEETS = ["smb3_heroes.png", "smb3_enemies.png", "smb3_bosses.png"]
 
-    _SHEET = "smb3_heroes.png"
+    # Defaults — overridden dynamically in reset()
+    MAP_W = 48
+    MAP_H = 4
+    START_POS = (21.5, 2.5)
+    MAP = [[1]*48, [1]*48, [1]+[0]*46+[1], [1]*48]
+    WAYPOINTS = [(21.5, 2.5)]
 
     def reset(self):
         self.time = 0.0
@@ -1046,8 +1047,11 @@ class GallerySMB3(_Gallery3DBase):
         sx, sy = self.START_POS
         self.px, self.py, self.pa = sx, sy, 0.0
 
+    # ------------------------------------------------------------------
+    # Texture loading — all 3 sheets, compact bytes format
+    # ------------------------------------------------------------------
+
     def _load_textures(self):
-        """Extract ALL sprites from sheet, build map to fit."""
         if not HAS_PIL:
             return
         project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1055,40 +1059,38 @@ class GallerySMB3(_Gallery3DBase):
         cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                  ".gallery_cache")
         os.makedirs(cache_dir, exist_ok=True)
-        sheet_path = os.path.join(assets, self._SHEET)
-        if not os.path.exists(sheet_path):
-            return
 
-        # Try cache
-        cache_path = os.path.join(cache_dir, f"{self._SHEET}.all.cache")
-        textures_list = None
-        if os.path.exists(cache_path):
-            if os.path.getmtime(cache_path) >= os.path.getmtime(sheet_path):
+        all_textures = []
+        for sheet_file in self._SHEETS:
+            sheet_path = os.path.join(assets, sheet_file)
+            if not os.path.exists(sheet_path):
+                continue
+            cache_path = os.path.join(cache_dir, f"{sheet_file}.all.cache")
+            sheet_tex = None
+            if os.path.exists(cache_path):
+                if os.path.getmtime(cache_path) >= os.path.getmtime(sheet_path):
+                    try:
+                        with open(cache_path, 'rb') as f:
+                            sheet_tex = pickle.load(f)
+                    except Exception:
+                        pass
+            if sheet_tex is None:
+                sheet_tex = self._extract_all(sheet_path)
                 try:
-                    with open(cache_path, 'rb') as f:
-                        textures_list = pickle.load(f)
+                    with open(cache_path, 'wb') as f:
+                        pickle.dump(sheet_tex, f, protocol=pickle.HIGHEST_PROTOCOL)
                 except Exception:
                     pass
+            all_textures.extend(sheet_tex)
 
-        if textures_list is None:
-            textures_list = self._extract_all(sheet_path)
-            try:
-                with open(cache_path, 'wb') as f:
-                    pickle.dump(textures_list, f, protocol=pickle.HIGHEST_PROTOCOL)
-            except Exception:
-                pass
-
-        n = len(textures_list)
-        if n == 0:
+        if not all_textures:
             return
-
-        # Build serpentine map and assign textures
-        self._build_serpentine(n)
-        for i, tex in enumerate(textures_list):
-            self.textures[i + 2] = [tex]  # cell IDs start at 2
+        self._build_serpentine(len(all_textures))
+        for i, tex in enumerate(all_textures):
+            self.textures[i + 2] = [tex]
 
     def _extract_all(self, path):
-        """BFS-extract ALL sprites from sheet, in sheet order (y then x)."""
+        """BFS-extract ALL sprites, return list of bytes textures (compact)."""
         from PIL import Image
         import numpy as np
         from collections import deque
@@ -1105,143 +1107,363 @@ class GallerySMB3(_Gallery3DBase):
 
         visited = np.zeros((h, w), dtype=bool)
         components = []
-
         for sy in range(h):
             for sx in range(w):
                 if mask[sy, sx] and not visited[sy, sx]:
                     queue = deque([(sy, sx)])
                     visited[sy, sx] = True
-                    min_x, max_x = sx, sx
-                    min_y, max_y = sy, sy
-                    area = 0
+                    mnx, mxx, mny, mxy, area = sx, sx, sy, sy, 0
                     while queue:
                         cy, cx = queue.popleft()
                         area += 1
-                        min_x = min(min_x, cx)
-                        max_x = max(max_x, cx)
-                        min_y = min(min_y, cy)
-                        max_y = max(max_y, cy)
+                        mnx = min(mnx, cx); mxx = max(mxx, cx)
+                        mny = min(mny, cy); mxy = max(mxy, cy)
                         for dy, dx in [(-1,0),(1,0),(0,-1),(0,1)]:
                             ny, nx = cy+dy, cx+dx
                             if 0 <= ny < h and 0 <= nx < w and not visited[ny, nx] and mask[ny, nx]:
                                 visited[ny, nx] = True
                                 queue.append((ny, nx))
-                    cw = max_x - min_x + 1
-                    ch = max_y - min_y + 1
+                    cw, ch = mxx-mnx+1, mxy-mny+1
                     if (min(cw, ch) >= 14 and max(cw, ch) <= 120
                             and 0.2 <= cw/ch <= 5.0 and area / (cw*ch) > 0.08):
-                        components.append((min_x, min_y, cw, ch, area))
+                        components.append((mnx, mny, cw, ch, area))
 
-        # Sheet order: sort by y then x — preserves animation grouping
         components.sort(key=lambda c: (c[1], c[0]))
 
-        # Convert all to 64x64 textures
-        dark_bg = (20, 20, 30)
+        dark = (20, 20, 30)
         textures = []
         for (cx, cy, cw, ch, _) in components:
             crop = img.crop((cx, cy, cx+cw, cy+ch))
             sz = max(cw, ch)
-            square = Image.new("RGBA", (sz, sz), (0, 0, 0, 0))
-            square.paste(crop, ((sz-cw)//2, (sz-ch)//2))
-            sized = square.resize((GRID_SIZE, GRID_SIZE), Image.Resampling.NEAREST)
-            tex = []
+            sq = Image.new("RGBA", (sz, sz), (0, 0, 0, 0))
+            sq.paste(crop, ((sz-cw)//2, (sz-ch)//2))
+            sized = sq.resize((GRID_SIZE, GRID_SIZE), Image.Resampling.NEAREST)
+            data = bytearray(GRID_SIZE * GRID_SIZE * 3)
+            idx = 0
             for y in range(GRID_SIZE):
                 for x in range(GRID_SIZE):
                     r, g, b, a = sized.getpixel((x, y))
                     if a > 128 and not (abs(r-bg_rgb[0]) < 30
                                         and abs(g-bg_rgb[1]) < 30
                                         and abs(b-bg_rgb[2]) < 30):
-                        tex.append((r, g, b))
+                        data[idx] = r; data[idx+1] = g; data[idx+2] = b
                     else:
-                        tex.append(dark_bg)
-            textures.append(tex)
+                        data[idx] = dark[0]; data[idx+1] = dark[1]; data[idx+2] = dark[2]
+                    idx += 3
+            textures.append(bytes(data))
         return textures
 
-    def _build_serpentine(self, n_sprites):
-        """Generate a serpentine corridor map sized to fit n_sprites paintings.
+    # ------------------------------------------------------------------
+    # Serpentine map builder — 42-wide corridors + return shaft loop
+    # ------------------------------------------------------------------
 
-        Layout: painting rows alternate with corridor rows. Painting walls
-        have a 1-cell opening at alternating ends to create a serpentine path.
-        """
-        W = 16
+    def _build_serpentine(self, n_sprites):
+        CW = self._CW             # 42 corridor tiles
+        W = CW + 6                # +col0, +col43(east), +col44(sep), +col45-46(shaft), +col47
         cell_id = 2
         rows = []
-        waypoints = []
+        waypoints = []             # (x, y, pause) — pause=0 for transit
         placed = 0
-        side_idx = 0  # cycles through sprite IDs for side walls
+        side_idx = 0
+        first_corridor_y = None
+        last_corridor_y = None
 
         def _side():
-            """Return a cycling cell ID for side-wall sprites."""
             nonlocal side_idx
             sid = 2 + (side_idx % n_sprites)
             side_idx += 1
             return sid
 
-        rows.append([1] * W)  # top wall
+        # --- Row 0: outer wall ---
+        rows.append([1] * W)
 
-        # First painting row (full width, 14 paintings + side sprites)
-        row = [1] * W
-        row[0] = _side()
-        for c in range(1, 15):
+        # --- First painting row (full CW paintings) ---
+        row = [_side()]
+        for c in range(CW):
             if placed < n_sprites:
-                row[c] = cell_id; cell_id += 1; placed += 1
-        row[15] = _side()
+                row.append(cell_id); cell_id += 1; placed += 1
+            else:
+                row.append(1)
+        row += [_side(), _side(), 0, 0, _side()]  # east wall, shaft sep, shaft, shaft east
         rows.append(row)
 
         corridor_num = 0
         while placed < n_sprites:
-            # Corridor row — sprites on side walls
-            row = [_side()] + [0] * 14 + [_side()]
+            # --- Corridor row ---
+            is_first = (corridor_num == 0)
+            row = [_side()] + [0]*CW + [_side()]
+            if is_first:
+                row += [0, 0, 0, _side()]     # shaft connection open
+            else:
+                row += [_side(), 0, 0, _side()]  # shaft sealed
             rows.append(row)
             cy = len(rows) - 1
+            last_corridor_y = cy   # track every corridor row
+            if is_first:
+                first_corridor_y = cy
+
+            # Waypoints: stop at far end only (pause=1.5), start end no pause
             if corridor_num % 2 == 0:
-                waypoints.append((2.0, cy + 0.5))
-                waypoints.append((13.5, cy + 0.5))
+                waypoints.append((2.0, cy + 0.5, 0.0))
+                waypoints.append((float(CW), cy + 0.5, 1.5))
             else:
-                waypoints.append((13.5, cy + 0.5))
-                waypoints.append((2.0, cy + 0.5))
+                waypoints.append((float(CW), cy + 0.5, 0.0))
+                waypoints.append((2.0, cy + 0.5, 1.5))
             corridor_num += 1
 
-            # Painting row with doorway for serpentine turn
-            row = [1] * W
-            row[0] = _side()
-            row[15] = _side()
+            if placed >= n_sprites:
+                break
+
+            # --- Painting row with serpentine opening ---
+            row = [_side()]
             if corridor_num % 2 == 1:
-                # Opening on right (col 14)
-                for c in range(1, 14):
+                # Opening on right (last corridor col)
+                for c in range(CW - 1):
                     if placed < n_sprites:
-                        row[c] = cell_id; cell_id += 1; placed += 1
-                row[14] = 0
-                waypoints.append((14.5, cy + 0.5))
-                waypoints.append((14.5, cy + 2.5))
+                        row.append(cell_id); cell_id += 1; placed += 1
+                    else:
+                        row.append(1)
+                row.append(0)  # opening
+                # Turn waypoints (transit, no pause)
+                waypoints.append((CW + 0.5, cy + 0.5, 0.0))
+                waypoints.append((CW + 0.5, cy + 2.5, 0.0))
             else:
                 # Opening on left (col 1)
-                row[1] = 0
-                for c in range(2, 15):
+                row.append(0)  # opening
+                for c in range(CW - 1):
                     if placed < n_sprites:
-                        row[c] = cell_id; cell_id += 1; placed += 1
-                waypoints.append((1.5, cy + 0.5))
-                waypoints.append((1.5, cy + 2.5))
+                        row.append(cell_id); cell_id += 1; placed += 1
+                    else:
+                        row.append(1)
+                waypoints.append((1.5, cy + 0.5, 0.0))
+                waypoints.append((1.5, cy + 2.5, 0.0))
+            row += [_side(), _side(), 0, 0, _side()]
             rows.append(row)
 
-        # Final corridor to view last painting row
-        row = [_side()] + [0] * 14 + [_side()]
-        rows.append(row)
-        cy = len(rows) - 1
+        # --- Ensure last corridor walks east (for shaft connection) ---
         if corridor_num % 2 == 0:
-            waypoints.append((2.0, cy + 0.5))
-            waypoints.append((13.5, cy + 0.5))
-        else:
-            waypoints.append((13.5, cy + 0.5))
-            waypoints.append((2.0, cy + 0.5))
+            # Last walks west — add one more painting row + east-walking corridor
+            row = [_side()] + [1]*CW + [_side(), _side(), 0, 0, _side()]
+            rows.append(row)
+            # Turn to get there
+            waypoints.append((1.5, last_corridor_y + 0.5, 0.0))
+            waypoints.append((1.5, last_corridor_y + 2.5, 0.0))
+            row = [_side()] + [0]*CW + [_side(), _side(), 0, 0, _side()]
+            rows.append(row)
+            cy = len(rows) - 1
+            last_corridor_y = cy
+            waypoints.append((2.0, cy + 0.5, 0.0))
+            waypoints.append((float(CW), cy + 0.5, 1.5))
+            corridor_num += 1
 
-        rows.append([1] * W)  # bottom wall
+        # --- Last painting row (south wall) ---
+        row = [_side()] + [1]*CW + [_side(), _side(), 0, 0, _side()]
+        rows.append(row)
+
+        # --- Final corridor (shaft connection at east end) ---
+        row = [_side()] + [0]*CW + [0, 0, 0, 0, _side()]  # fully open to shaft
+        rows.append(row)
+        final_cy = len(rows) - 1
+
+        # Waypoint: walk east to shaft entrance
+        waypoints.append((float(CW), final_cy + 0.5, 0.0))
+
+        # --- Bottom wall ---
+        rows.append([1] * W)
+
+        # --- Fix first corridor shaft connection ---
+        if first_corridor_y is not None:
+            rows[first_corridor_y][CW + 1] = 0  # open east wall
+            rows[first_corridor_y][CW + 2] = 0  # open shaft separator
+
+        # --- Shaft return waypoints ---
+        shaft_x = CW + 3.5  # center of shaft cols (CW+3, CW+4)
+        waypoints.append((shaft_x, final_cy + 0.5, 0.0))    # enter shaft
+        waypoints.append((shaft_x, first_corridor_y + 0.5, 0.0))  # walk north
+        waypoints.append((2.0, first_corridor_y + 0.5, 0.0))  # exit into first corridor
 
         self.MAP = rows
         self.MAP_W = W
         self.MAP_H = len(rows)
         self.WAYPOINTS = waypoints
-        self.START_POS = (7.5, 2.5)
+        self.START_POS = (float(CW // 2), first_corridor_y + 0.5)
+
+    # ------------------------------------------------------------------
+    # Auto-walk override — supports (x, y, pause) waypoint tuples
+    # ------------------------------------------------------------------
+
+    def _auto_walk(self, dt):
+        if not self.WAYPOINTS:
+            return
+        if self.wp_pause > 0:
+            self.wp_pause -= dt
+            return
+        wp = self.WAYPOINTS[self.wp_idx]
+        tx, ty = wp[0], wp[1]
+        pause = wp[2] if len(wp) > 2 else 0.8
+        dx = tx - self.px
+        dy = ty - self.py
+        dist = math.sqrt(dx * dx + dy * dy)
+        if dist < 0.3:
+            self.wp_pause = pause
+            self.wp_idx = (self.wp_idx + 1) % len(self.WAYPOINTS)
+            return
+        target_a = math.atan2(dy, dx)
+        diff = target_a - self.pa
+        while diff > math.pi:
+            diff -= 2 * math.pi
+        while diff < -math.pi:
+            diff += 2 * math.pi
+        self.pa += diff * min(1.0, 4.0 * dt)
+        speed = self.move_speed * dt
+        cos_a = math.cos(self.pa)
+        sin_a = math.sin(self.pa)
+        nx = self.px + cos_a * speed
+        ny = self.py + sin_a * speed
+        margin = 0.25
+        if not self._solid(nx, self.py, margin):
+            self.px = nx
+        if not self._solid(self.px, ny, margin):
+            self.py = ny
+
+    # ------------------------------------------------------------------
+    # Rendering override — ceiling light strip + bytes texture support
+    # ------------------------------------------------------------------
+
+    def _render_frame(self):
+        ceil_color = (25, 25, 40)
+        floor_color = (45, 35, 30)
+        light_bright = (90, 85, 60)
+        light_dim = (55, 52, 42)
+        half = GRID_SIZE // 2
+        cx = GRID_SIZE // 2
+
+        # Ceiling with warm light strip (perspective: narrows toward horizon)
+        for y in range(half):
+            t = y / half
+            hw = max(1, int(5 * (1.0 - t * 0.7)))
+            for x in range(GRID_SIZE):
+                dx = abs(x - cx)
+                if dx <= 1:
+                    self.display.set_pixel(x, y, light_bright)
+                elif dx <= hw:
+                    self.display.set_pixel(x, y, light_dim)
+                else:
+                    self.display.set_pixel(x, y, ceil_color)
+
+        for y in range(half, GRID_SIZE):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, floor_color)
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            self._cast_ray_bytes(col, ray_angle)
+
+    def _cast_ray_bytes(self, col, angle):
+        """Raycaster with bytes texture support for compact sprite storage."""
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        if abs(cos_a) < 1e-8:
+            cos_a = 1e-8
+        if abs(sin_a) < 1e-8:
+            sin_a = 1e-8
+
+        map_x = int(self.px)
+        map_y = int(self.py)
+        delta_x = abs(1.0 / cos_a)
+        delta_y = abs(1.0 / sin_a)
+
+        if cos_a < 0:
+            step_x = -1
+            side_dist_x = (self.px - map_x) * delta_x
+        else:
+            step_x = 1
+            side_dist_x = (map_x + 1.0 - self.px) * delta_x
+
+        if sin_a < 0:
+            step_y = -1
+            side_dist_y = (self.py - map_y) * delta_y
+        else:
+            step_y = 1
+            side_dist_y = (map_y + 1.0 - self.py) * delta_y
+
+        hit = False
+        side = 0
+        for _ in range(80):
+            if side_dist_x < side_dist_y:
+                side_dist_x += delta_x
+                map_x += step_x
+                side = 0
+            else:
+                side_dist_y += delta_y
+                map_y += step_y
+                side = 1
+
+            if map_x < 0 or map_x >= self.MAP_W or map_y < 0 or map_y >= self.MAP_H:
+                break
+            cell = self.MAP[map_y][map_x]
+            if cell != 0:
+                hit = True
+                break
+
+        if not hit:
+            return
+
+        if side == 0:
+            perp_dist = (map_x - self.px + (1 - step_x) / 2) / cos_a
+        else:
+            perp_dist = (map_y - self.py + (1 - step_y) / 2) / sin_a
+        if perp_dist < 0.01:
+            perp_dist = 0.01
+
+        line_height = int(GRID_SIZE / perp_dist)
+        draw_start = max(0, GRID_SIZE // 2 - line_height // 2)
+        draw_end = min(GRID_SIZE - 1, GRID_SIZE // 2 + line_height // 2)
+
+        if side == 0:
+            wall_x = self.py + perp_dist * sin_a
+        else:
+            wall_x = self.px + perp_dist * cos_a
+        wall_x -= int(wall_x)
+
+        fog = min(1.0, 2.0 / (perp_dist + 0.5))
+        if side == 1:
+            fog *= 0.75
+
+        is_textured = cell >= 2
+        tex_col = int(wall_x * GRID_SIZE)
+        if tex_col >= GRID_SIZE:
+            tex_col = GRID_SIZE - 1
+
+        tex = None
+        if is_textured and cell in self.textures:
+            frames = self.textures[cell]
+            frame_idx = int(self.time * SPRITE_FPS) % len(frames)
+            tex = frames[frame_idx]
+
+        for y in range(draw_start, draw_end + 1):
+            tex_y = int((y - (GRID_SIZE // 2 - line_height // 2)) * GRID_SIZE / line_height)
+            if tex_y >= GRID_SIZE:
+                tex_y = GRID_SIZE - 1
+            if tex_y < 0:
+                tex_y = 0
+
+            if tex is not None:
+                if isinstance(tex, (bytes, bytearray)):
+                    idx = (tex_y * GRID_SIZE + tex_col) * 3
+                    r, g, b = tex[idx], tex[idx+1], tex[idx+2]
+                else:
+                    r, g, b = tex[tex_y * GRID_SIZE + tex_col]
+                # Gold frame border
+                if tex_col <= 1 or tex_col >= GRID_SIZE - 2 or tex_y <= 1 or tex_y >= GRID_SIZE - 2:
+                    r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
+            else:
+                r, g, b = 100, 100, 110
+
+            r = int(r * fog)
+            g = int(g * fog)
+            b = int(b * fog)
+            self.display.set_pixel(col, y, (r, g, b))
 
 
 # Legacy alias — keep old import working
