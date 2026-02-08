@@ -1131,36 +1131,13 @@ class GallerySMB3(_Gallery3DBase):
             self._loading = False
 
     def _draw_loading(self):
-        # Black background
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                self.display.set_pixel(x, y, (0, 0, 0))
-        # Title
-        self.display.draw_text_small(2, 20, "SMB3 MUSEUM", (200, 160, 40))
-        # Sheet label
         phase = max(0, self._load_phase)
-        if phase < len(self._SHEET_LABELS):
-            self.display.draw_text_small(2, 28, self._SHEET_LABELS[phase],
-                                         (180, 180, 180))
-        else:
-            self.display.draw_text_small(2, 28, "BUILDING MAP",
-                                         (180, 180, 180))
-        # Progress bar: 4 steps (3 sheets + build)
         n_steps = len(self._SHEETS) + 1
-        progress = phase / n_steps
-        bar_x, bar_y, bar_w, bar_h = 4, 38, 56, 6
-        # Outline
-        for x in range(bar_x, bar_x + bar_w):
-            self.display.set_pixel(x, bar_y, (80, 80, 80))
-            self.display.set_pixel(x, bar_y + bar_h - 1, (80, 80, 80))
-        for y in range(bar_y, bar_y + bar_h):
-            self.display.set_pixel(bar_x, y, (80, 80, 80))
-            self.display.set_pixel(bar_x + bar_w - 1, y, (80, 80, 80))
-        # Green fill
-        fill_w = int((bar_w - 2) * progress)
-        for y in range(bar_y + 1, bar_y + bar_h - 1):
-            for x in range(bar_x + 1, bar_x + 1 + fill_w):
-                self.display.set_pixel(x, y, (0, 200, 0))
+        if phase < len(self._SHEET_LABELS):
+            label = self._SHEET_LABELS[phase]
+        else:
+            label = "BUILDING MAP"
+        super()._draw_loading(phase / n_steps, label)
 
     def _extract_all(self, path):
         """BFS-extract ALL sprites, return list of bytes textures (compact)."""

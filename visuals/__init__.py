@@ -50,6 +50,25 @@ class Visual(ABC):
         """
         return False
 
+    def _draw_loading(self, progress, label=""):
+        """Draw a universal loading screen with green progress bar.
+
+        Args:
+            progress: 0.0 to 1.0 fill amount
+            label: optional text shown below the title (e.g. "HEROES")
+        """
+        self.display.clear()
+        self.display.draw_text_small(2, 20, self.name, (200, 160, 40))
+        if label:
+            self.display.draw_text_small(2, 28, label, (180, 180, 180))
+        bar_x, bar_y, bar_w, bar_h = 4, 38, 56, 6
+        self.display.draw_rect(bar_x, bar_y, bar_w, bar_h, (80, 80, 80),
+                               filled=False)
+        fill_w = int((bar_w - 2) * max(0.0, min(1.0, progress)))
+        if fill_w > 0:
+            self.display.draw_rect(bar_x + 1, bar_y + 1, fill_w, bar_h - 2,
+                                   (0, 200, 0))
+
 
 # Import all visuals
 from .plasma import Plasma
