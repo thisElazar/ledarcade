@@ -22,7 +22,8 @@ PHASE_LEVEL_WIN = 4
 PHASE_LEVEL_FAIL = 5
 
 # Physics
-MAX_SPEED = 120.0      # px/s at full power
+MAX_SPEED = 120.0      # max horizontal px/s at full power
+BASE_VY = 50.0         # vertical launch speed (angle-dependent, power-independent)
 GRAVITY = 60.0         # px/s^2
 DART_RADIUS = 3.5      # collision radius
 TRAIL_LEN = 3
@@ -226,12 +227,13 @@ class Bloons(Game):
         return [b for b in self.bloons if b['alive']]
 
     def _fire_dart(self):
-        """Launch dart from monkey position."""
+        """Launch dart from monkey position.
+        Angle controls arc height (vy), power controls distance (vx).
+        """
         self.dart_x = float(MONKEY_X + 3)
         self.dart_y = float(MONKEY_Y - 2)
-        speed = self.power * MAX_SPEED
-        self.dart_vx = math.cos(self.angle) * speed
-        self.dart_vy = -math.sin(self.angle) * speed
+        self.dart_vx = math.cos(self.angle) * self.power * MAX_SPEED
+        self.dart_vy = -math.sin(self.angle) * BASE_VY
         self.trail = []
         self.pops_this_throw = 0
         self.phase = PHASE_FLIGHT
@@ -401,8 +403,8 @@ class Bloons(Game):
         if self.phase == PHASE_POWER:
             self._draw_power_bar()
 
-        # Trajectory preview (during aim)
-        if self.phase == PHASE_AIM:
+        # Trajectory preview (during aim and power phases)
+        if self.phase in (PHASE_AIM, PHASE_POWER):
             self._draw_trajectory_preview()
 
         # Dart in flight
@@ -512,17 +514,17 @@ class Bloons(Game):
         self.display.draw_line(mx + 2, my - 1, ax, ay, dark_brown)
 
     def _draw_trajectory_preview(self):
-        """Dotted line showing approximate trajectory at mid power."""
-        preview_power = 0.5
-        speed = preview_power * MAX_SPEED
-        vx = math.cos(self.angle) * speed
-        vy = -math.sin(self.angle) * speed
+        """Dotted line showing trajectory. Uses current power during POWER phase."""
+        preview_power = self.power if self.phase == PHASE_POWER else 0.5
+        preview_power = max(0.15, preview_power)
+        vx = math.cos(self.angle) * preview_power * MAX_SPEED
+        vy = -math.sin(self.angle) * BASE_VY
         px = float(MONKEY_X + 3)
         py = float(MONKEY_Y - 2)
         dt = 0.05
         gray = (80, 80, 80)
         step = 0
-        for _ in range(40):
+        for _ in range(50):
             vy += GRAVITY * dt
             px += vx * dt
             py += vy * dt
