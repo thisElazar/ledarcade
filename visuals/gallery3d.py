@@ -298,7 +298,9 @@ class _Gallery3DBase(Visual):
             diff -= 2 * math.pi
         while diff < -math.pi:
             diff += 2 * math.pi
-        self.pa += diff * min(1.0, 4.0 * dt)
+        # Scale rotation rate with movement speed for tight turns at high speeds
+        speed_factor = self.move_speed / 3.0  # 3.0 is default/medium speed
+        self.pa += diff * min(1.0, 4.0 * dt * speed_factor)
         speed = self.move_speed * dt
         cos_a = math.cos(self.pa)
         sin_a = math.sin(self.pa)
@@ -1404,7 +1406,9 @@ class GallerySMB3(_Gallery3DBase):
             diff -= 2 * math.pi
         while diff < -math.pi:
             diff += 2 * math.pi
-        self.pa += diff * min(1.0, 8.0 * dt)
+        # Scale rotation rate with movement speed for tight turns at high speeds
+        speed_factor = self.move_speed / 3.0  # 3.0 is default/medium speed
+        self.pa += diff * min(1.0, 8.0 * dt * speed_factor)
         speed = self.move_speed * dt
         cos_a = math.cos(self.pa)
         sin_a = math.sin(self.pa)
