@@ -65,7 +65,7 @@ class Pit(Visual):
     VIEW_OFFSET = 8
     BASE_SPEED = 25.0
     FLAP_INTERVAL = 0.12
-    DIR_CHANGE_MIN = 3.0
+    DIR_CHANGE_MIN = 1.0
     DIR_CHANGE_MAX = 6.0
 
     def __init__(self, display):
@@ -88,6 +88,8 @@ class Pit(Visual):
         self._next_dir_change = random.uniform(self.DIR_CHANGE_MIN, self.DIR_CHANGE_MAX)
 
         self.sky_idx = 0
+        self._prev_up = False
+        self._prev_down = False
         self._build_all_backgrounds()
 
     def _load_gif_native(self, filename):
@@ -178,12 +180,14 @@ class Pit(Visual):
         if input_state.right:
             self.speed_mult = min(3.0, self.speed_mult + 0.15)
             consumed = True
-        if input_state.up:
+        if input_state.up and not self._prev_up:
             self.sky_idx = (self.sky_idx - 1) % len(_SKY_ORDER)
             consumed = True
-        if input_state.down:
+        if input_state.down and not self._prev_down:
             self.sky_idx = (self.sky_idx + 1) % len(_SKY_ORDER)
             consumed = True
+        self._prev_up = input_state.up
+        self._prev_down = input_state.down
         if input_state.action_l or input_state.action_r:
             self.speed_mult = 1.0
             self.pit_dir = 1
