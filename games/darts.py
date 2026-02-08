@@ -443,12 +443,9 @@ class Darts(Game):
         if self.two_player:
             p1_c = Colors.YELLOW if self.current_player == 0 else Colors.GRAY
             p2_c = Colors.YELLOW if self.current_player == 1 else Colors.GRAY
-            # Dark backdrop for readability
-            self.display.draw_rect(0, 0, 64, 7, (0, 0, 0))
             self.display.draw_text_small(2, 1, f"P1:{self.scores[0]}", p1_c)
             self.display.draw_text_small(34, 1, f"P2:{self.scores[1]}", p2_c)
         else:
-            self.display.draw_rect(0, 0, 30, 7, (0, 0, 0))
             self.display.draw_text_small(2, 1, f"{self.score}", Colors.WHITE)
 
         # Darts remaining as dots (top-right)
@@ -460,7 +457,6 @@ class Darts(Game):
 
         # Round indicator (bottom-left)
         rnd = self.current_round + 1
-        self.display.draw_rect(0, 58, 22, 6, (0, 0, 0))
         self.display.draw_text_small(2, 59, f"R{rnd}/{ROUNDS}", Colors.GRAY)
 
     def _draw_aim_x(self):
