@@ -142,6 +142,7 @@ from .pit import Pit
 from .spidey import Spidey
 from .batman import Batman
 from .greenlantern import GreenLantern
+from .jakemusic import JakeMusic
 from .megaman import MegaMan
 from .settings import Settings
 from .gamma import Gamma
@@ -222,7 +223,7 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderBreakout, WonderSnake, WonderAsteroids,
                             WonderDoom, WonderPipe, WonderWinXP,
                             WonderGlitch, WonderTypewriter, WonderZoom,
-                            WonderVinyl, WonderCassette)
+                            WonderVinyl, WonderCassette, WonderJake)
 from .agariodemo import AgarioDemo
 from .arkanoid_demo import ArkanoidDemo
 from .asteroidsdemo import AsteroidsDemo
@@ -342,6 +343,7 @@ ALL_VISUALS = [
     Spidey,
     Batman,
     GreenLantern,
+    JakeMusic,
     MegaMan,
     Settings,
     Gamma,
@@ -461,6 +463,7 @@ ALL_VISUALS = [
     WonderZoom,
     WonderVinyl,
     WonderCassette,
+    WonderJake,
     BML,
     Highway,
     Intersection,
