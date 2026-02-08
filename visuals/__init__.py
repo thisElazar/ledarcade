@@ -138,6 +138,7 @@ from .link import Link
 from .metroid import MetroidChase
 from .yoshi import Yoshi
 from .kirby import Kirby
+from .pit import Pit
 from .spidey import Spidey
 from .batman import Batman
 from .greenlantern import GreenLantern
@@ -337,6 +338,7 @@ ALL_VISUALS = [
     MetroidChase,
     Yoshi,
     Kirby,
+    Pit,
     Spidey,
     Batman,
     GreenLantern,
@@ -597,6 +599,7 @@ __all__ = [
     'MetroidChase',
     'Yoshi',
     'Kirby',
+    'Pit',
     'Spidey',
     'Batman',
     'GreenLantern',
