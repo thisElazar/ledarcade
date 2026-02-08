@@ -4553,9 +4553,10 @@ class Molecule(Visual):
         self.group_indices = _build_group_indices()
         self.group_idx = 0  # Index into GROUPS (starts on ALL)
         self.mol_pos = random.randint(0, len(MOLECULES) - 1)
-        self.rotation_y = 0.0
-        self.rotation_speed = 0.6
-        self.tilt_phase = 0.0
+        self.rotation_y = 0.0  # Manual: left/right
+        self.tilt_x = 0.0      # Manual: up/down
+        self.rotation_z = 0.0  # Continuous auto-rotate around Z
+        self.auto_rotate_speed = 0.3
         self.auto_cycle = True
         self.cycle_timer = 0.0
         self.cycle_duration = 8.0
@@ -4596,44 +4597,62 @@ class Molecule(Visual):
             r = math.sqrt(dx * dx + dy * dy + dz * dz)
             max_r = max(max_r, r)
 
-        target_radius = 22.0
-        self.scale = target_radius / max_r if max_r > 0 else 10.0
-        self.large = len(atoms) > 15
+        # Fixed scale: ~6 pixels per Ångström, capped to fit display
+        pixels_per_angstrom = 6.0
+        max_radius = 26.0  # Max pixel radius before clipping
+        self.scale = min(pixels_per_angstrom, max_radius / max_r if max_r > 0 else 10.0)
+        self.large = False
         self.label_timer = 0.0
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        rotation_speed = 2.0  # Radians per second for manual control
+        tilt_speed = 1.5
 
-        if input_state.up_pressed:
-            self.group_idx = (self.group_idx - 1) % len(GROUPS)
-            self.mol_pos = 0
-            self.cycle_timer = 0.0
-            self.overlay_timer = 2.5
-            self._prepare_molecule()
+        # Joystick controls rotation (Y and X axes)
+        # Any manual rotation pauses auto-cycle until button press
+        if input_state.left:
+            self.rotation_y -= rotation_speed * 0.016
+            self.auto_cycle = False
             consumed = True
-        if input_state.down_pressed:
+        if input_state.right:
+            self.rotation_y += rotation_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+        if input_state.up:
+            self.tilt_x -= tilt_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+        if input_state.down:
+            self.tilt_x += tilt_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+
+        # Two-button press (Z+X together) cycles through groups
+        if input_state.action_l and input_state.action_r:
             self.group_idx = (self.group_idx + 1) % len(GROUPS)
             self.mol_pos = 0
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self.overlay_timer = 2.5
             self._prepare_molecule()
             consumed = True
-        if input_state.left_pressed:
+        # Single button cycles through molecules in current group
+        elif input_state.action_l:
             mol_list = self._current_mol_list()
             if mol_list:
                 self.mol_pos = (self.mol_pos - 1) % len(mol_list)
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self._prepare_molecule()
             consumed = True
-        if input_state.right_pressed:
+        elif input_state.action_r:
             mol_list = self._current_mol_list()
             if mol_list:
                 self.mol_pos = (self.mol_pos + 1) % len(mol_list)
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self._prepare_molecule()
-            consumed = True
-        if input_state.action_l or input_state.action_r:
-            self.auto_cycle = not self.auto_cycle
             consumed = True
 
         return consumed
@@ -4641,8 +4660,7 @@ class Molecule(Visual):
     def update(self, dt: float):
         self.time += dt
         self.label_timer += dt
-        self.rotation_y += self.rotation_speed * dt
-        self.tilt_phase += dt * 0.4
+        self.rotation_z += self.auto_rotate_speed * dt
 
         if self.overlay_timer > 0:
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
@@ -4665,14 +4683,20 @@ class Molecule(Visual):
         y *= self.scale
         z *= self.scale
 
-        tilt = 0.26 * math.sin(self.tilt_phase)
-        cos_t, sin_t = math.cos(tilt), math.sin(tilt)
-        y2 = y * cos_t - z * sin_t
-        z2 = y * sin_t + z * cos_t
+        # Auto-rotation around Z axis (constant tumble)
+        cos_z, sin_z = math.cos(self.rotation_z), math.sin(self.rotation_z)
+        x1 = x * cos_z - y * sin_z
+        y1 = x * sin_z + y * cos_z
 
+        # Manual tilt (rotation around X axis) - controlled by up/down
+        cos_t, sin_t = math.cos(self.tilt_x), math.sin(self.tilt_x)
+        y2 = y1 * cos_t - z * sin_t
+        z2 = y1 * sin_t + z * cos_t
+
+        # Manual rotation around Y axis - controlled by left/right
         cos_r, sin_r = math.cos(self.rotation_y), math.sin(self.rotation_y)
-        x2 = x * cos_r + z2 * sin_r
-        z3 = -x * sin_r + z2 * cos_r
+        x2 = x1 * cos_r + z2 * sin_r
+        z3 = -x1 * sin_r + z2 * cos_r
 
         screen_x = GRID_SIZE // 2 + x2
         screen_y = 28 - y2
