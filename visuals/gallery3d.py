@@ -1859,6 +1859,7 @@ class GalleryAdventureTime(GallerySMB3):
     description = "Land of Ooo sprites"
 
     _MAX_SPRITE_DIM = 350  # PC game sprites are larger than NES
+    _INTERLEAVE_CHUNK = 15  # sprites per character before rotating
 
     _SHEETS = [
         # Playable characters (11)
@@ -1901,6 +1902,69 @@ class GalleryAdventureTime(GallerySMB3):
         # Effects
         "MARCELINE FX",
     ]
+
+    def reset(self):
+        super().reset()
+        self._sheet_counts = []  # track sprite count per sheet
+
+    def _load_next(self):
+        # Track how many sprites each sheet contributes
+        before = len(self._all_textures)
+        super()._load_next()
+        phase = self._load_phase
+        # After a sheet loads (phase advanced but still loading), record count
+        if self._loading and phase is not None and phase > 0:
+            added = len(self._all_textures) - before
+            if added > 0:
+                self._sheet_counts.append(added)
+        # After parent finishes loading, re-interleave the textures
+        if not self._loading and hasattr(self, '_sheet_counts') and self._sheet_counts:
+            self._interleave()
+            self._sheet_counts = []
+
+    def _interleave(self):
+        """Round-robin interleave textures across characters in small chunks."""
+        # Split flat texture list back into per-sheet groups
+        groups = []
+        offset = 0
+        for count in self._sheet_counts:
+            groups.append(list(range(offset, offset + count)))
+            offset += count
+        if not groups:
+            return
+        # Collect all current textures (keyed as id+2 in self.textures)
+        all_tex = []
+        for i in range(offset):
+            tex_list = self.textures.get(i + 2)
+            if tex_list:
+                all_tex.append(tex_list[0])
+            else:
+                all_tex.append(None)
+        # Round-robin across groups in chunks
+        chunk = self._INTERLEAVE_CHUNK
+        interleaved = []
+        cursors = [0] * len(groups)
+        while True:
+            any_left = False
+            for gi, group in enumerate(groups):
+                c = cursors[gi]
+                if c < len(group):
+                    any_left = True
+                    end = min(c + chunk, len(group))
+                    for idx in group[c:end]:
+                        if idx < len(all_tex) and all_tex[idx] is not None:
+                            interleaved.append(all_tex[idx])
+                    cursors[gi] = end
+            if not any_left:
+                break
+        # Rebuild texture map and serpentine for new order
+        if interleaved:
+            self._build_serpentine(len(interleaved))
+            self.textures = {}
+            for i, tex in enumerate(interleaved):
+                self.textures[i + 2] = [tex]
+            sx, sy = self.START_POS
+            self.px, self.py, self.pa = sx, sy, 0.0
 
     # Candy-colored sparkle positions for Ooo sky (x, y)
     _SPARKLES = [
