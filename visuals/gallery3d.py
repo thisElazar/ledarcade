@@ -1031,6 +1031,9 @@ class GallerySMB3(_Gallery3DBase):
     MAP = [[1]*48, [1]*48, [1]+[0]*46+[1], [1]*48]
     WAYPOINTS = [(21.5, 2.5)]
 
+    # Sheet labels for loading screen
+    _SHEET_LABELS = ["HEROES", "ENEMIES", "BOSSES"]
+
     def reset(self):
         self.time = 0.0
         self.move_speed = 3.0
@@ -1043,59 +1046,121 @@ class GallerySMB3(_Gallery3DBase):
         self.wp_idx = 0
         self.wp_pause = 0.0
         self.textures = {}
-        self._load_textures()
-        sx, sy = self.START_POS
-        self.px, self.py, self.pa = sx, sy, 0.0
+        self.px, self.py, self.pa = 21.0, 2.5, 0.0
+        # Deferred loading — one sheet per frame so progress bar can update
+        self._loading = True
+        self._load_phase = -1
+        self._all_textures = []
 
-    # ------------------------------------------------------------------
-    # Texture loading — all 3 sheets, compact bytes format
-    # ------------------------------------------------------------------
-
-    def _load_textures(self):
-        if not HAS_PIL:
+    def update(self, dt):
+        if self._loading:
+            self._load_next()
             return
+        self.time += dt
+        if self.auto_walk:
+            self._auto_walk(dt)
+        else:
+            self._manual_move(dt)
+
+    def draw(self):
+        if self._loading:
+            self._draw_loading()
+            return
+        self._render_frame()
+
+    # ------------------------------------------------------------------
+    # Step-based texture loading — one sheet per frame with progress bar
+    # ------------------------------------------------------------------
+
+    def _load_next(self):
         import gc
-        project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        assets = os.path.join(project_dir, "assets")
-        cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 ".gallery_cache")
-        os.makedirs(cache_dir, exist_ok=True)
-
-        all_textures = []
-        for sheet_file in self._SHEETS:
-            sheet_path = os.path.join(assets, sheet_file)
-            if not os.path.exists(sheet_path):
-                continue
-            cache_path = os.path.join(cache_dir, f"{sheet_file}.all.cache")
-            sheet_tex = None
-            if os.path.exists(cache_path):
-                if os.path.getmtime(cache_path) >= os.path.getmtime(sheet_path):
+        phase = self._load_phase
+        if phase == -1:
+            # First frame: just show loading screen, set up paths
+            if not HAS_PIL:
+                self._loading = False
+                return
+            self._cache_dir = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), ".gallery_cache")
+            os.makedirs(self._cache_dir, exist_ok=True)
+            self._assets_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "assets")
+            self._load_phase = 0
+        elif phase < len(self._SHEETS):
+            # Load one sheet
+            sheet_file = self._SHEETS[phase]
+            sheet_path = os.path.join(self._assets_dir, sheet_file)
+            if os.path.exists(sheet_path):
+                cache_path = os.path.join(
+                    self._cache_dir, f"{sheet_file}.all.cache")
+                sheet_tex = None
+                if os.path.exists(cache_path):
+                    if os.path.getmtime(cache_path) >= os.path.getmtime(sheet_path):
+                        try:
+                            with open(cache_path, 'rb') as f:
+                                sheet_tex = pickle.load(f)
+                            if sheet_tex and not isinstance(sheet_tex[0], bytes):
+                                sheet_tex = None
+                        except Exception:
+                            sheet_tex = None
+                if sheet_tex is None:
                     try:
-                        with open(cache_path, 'rb') as f:
-                            sheet_tex = pickle.load(f)
-                        # Ensure cached textures are bytes format
-                        if sheet_tex and not isinstance(sheet_tex[0], bytes):
-                            sheet_tex = None  # re-extract in compact format
+                        sheet_tex = self._extract_all(sheet_path)
                     except Exception:
-                        sheet_tex = None
-            if sheet_tex is None:
-                try:
-                    sheet_tex = self._extract_all(sheet_path)
-                except Exception:
-                    continue
-                try:
-                    with open(cache_path, 'wb') as f:
-                        pickle.dump(sheet_tex, f, protocol=pickle.HIGHEST_PROTOCOL)
-                except Exception:
-                    pass
-            all_textures.extend(sheet_tex)
+                        sheet_tex = []
+                    if sheet_tex:
+                        try:
+                            with open(cache_path, 'wb') as f:
+                                pickle.dump(sheet_tex, f,
+                                            protocol=pickle.HIGHEST_PROTOCOL)
+                        except Exception:
+                            pass
+                self._all_textures.extend(sheet_tex)
+            self._load_phase = phase + 1
             gc.collect()
+        else:
+            # All sheets loaded — build map and finish
+            if self._all_textures:
+                self._build_serpentine(len(self._all_textures))
+                for i, tex in enumerate(self._all_textures):
+                    self.textures[i + 2] = [tex]
+            self._all_textures = []
+            sx, sy = self.START_POS
+            self.px, self.py, self.pa = sx, sy, 0.0
+            self._loading = False
 
-        if not all_textures:
-            return
-        self._build_serpentine(len(all_textures))
-        for i, tex in enumerate(all_textures):
-            self.textures[i + 2] = [tex]
+    def _draw_loading(self):
+        # Black background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, (0, 0, 0))
+        # Title
+        self.display.draw_text_small(2, 20, "SMB3 MUSEUM", (200, 160, 40))
+        # Sheet label
+        phase = max(0, self._load_phase)
+        if phase < len(self._SHEET_LABELS):
+            self.display.draw_text_small(2, 28, self._SHEET_LABELS[phase],
+                                         (180, 180, 180))
+        else:
+            self.display.draw_text_small(2, 28, "BUILDING MAP",
+                                         (180, 180, 180))
+        # Progress bar: 4 steps (3 sheets + build)
+        n_steps = len(self._SHEETS) + 1
+        progress = phase / n_steps
+        bar_x, bar_y, bar_w, bar_h = 4, 38, 56, 6
+        # Outline
+        for x in range(bar_x, bar_x + bar_w):
+            self.display.set_pixel(x, bar_y, (80, 80, 80))
+            self.display.set_pixel(x, bar_y + bar_h - 1, (80, 80, 80))
+        for y in range(bar_y, bar_y + bar_h):
+            self.display.set_pixel(bar_x, y, (80, 80, 80))
+            self.display.set_pixel(bar_x + bar_w - 1, y, (80, 80, 80))
+        # Green fill
+        fill_w = int((bar_w - 2) * progress)
+        for y in range(bar_y + 1, bar_y + bar_h - 1):
+            for x in range(bar_x + 1, bar_x + 1 + fill_w):
+                self.display.set_pixel(x, y, (0, 200, 0))
 
     def _extract_all(self, path):
         """BFS-extract ALL sprites, return list of bytes textures (compact)."""
