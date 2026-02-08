@@ -6,6 +6,7 @@ Motion, game-inspired, film-inspired, and ad-inspired title screens.
 """
 
 import math
+import os
 import random
 from . import Visual, Display, Colors, GRID_SIZE
 
