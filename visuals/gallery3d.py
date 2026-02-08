@@ -1171,11 +1171,19 @@ class GallerySMB3(_Gallery3DBase):
 
         img = Image.open(path).convert("RGBA")
         w, h = img.size
+        # Downscale large sheets to cap memory (all sprites end up 64×64 anyway)
+        max_px = getattr(self, '_MAX_SHEET_PIXELS', 4_000_000)
+        total_px = w * h
+        if total_px > max_px:
+            scale = (max_px / total_px) ** 0.5
+            w = max(64, int(w * scale))
+            h = max(64, int(h * scale))
+            img = img.resize((w, h), Image.Resampling.NEAREST)
         pixels = np.array(img)
-        bg = pixels[0, 0, :3].astype(int)
-        bg_rgb = tuple(bg)
+        bg = pixels[0, 0, :3].astype(np.int16)
+        bg_rgb = tuple(int(v) for v in bg)
 
-        diff = np.abs(pixels[:, :, :3].astype(int) - bg[None, None, :])
+        diff = np.abs(pixels[:, :, :3].astype(np.int16) - bg[None, None, :])
         alpha = pixels[:, :, 3]
         mask = (diff.max(axis=2) > 30) & (alpha > 128)
 
