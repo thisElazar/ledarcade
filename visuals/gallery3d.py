@@ -1746,12 +1746,12 @@ class GalleryZelda(GallerySMB3):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Gallery 11: KID ICARUS MUSEUM — Kid Icarus NES sprite sheets
+#  Gallery 11: ICARUS MUSEUM — Kid Icarus NES sprite sheets
 #  Extends SMB3 Museum base with Skyworld-themed sky and floor.
 # ══════════════════════════════════════════════════════════════════
 
 class GalleryKidIcarus(GallerySMB3):
-    name = "KID ICARUS MUSEUM"
+    name = "ICARUS MUSEUM"
     description = "Kid Icarus sprites"
 
     _SHEETS = ["kidicarus_heroes.png", "kidicarus_enemies.png",

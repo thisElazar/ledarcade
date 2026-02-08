@@ -5,8 +5,15 @@ Side view of a theremin with pitch antenna, volume loop,
 moving hands, EM field arcs, and a scrolling waveform display.
 
 Controls:
-  Left/Right - Adjust hand oscillation speed
-  Up/Down    - Cycle waveform type (Sine/Square/Triangle/Sawtooth)
+  Button     - Toggle user mode (manual hand control)
+
+  Auto mode:
+    Left/Right - Adjust hand oscillation speed
+    Up/Down    - Cycle waveform type (Sine/Square/Triangle/Sawtooth)
+
+  User mode:
+    Left/Right - Control volume hand (left hand, affects volume)
+    Up/Down    - Control pitch hand (right hand, affects frequency)
 """
 
 import math
@@ -43,32 +50,73 @@ class Theremin(Visual):
         self.hand_speed = 1.0
         self.wave_idx = 0
         self.overlay_timer = 0.0
+        self.overlay_text = ''
         # Waveform scroll buffer (stores columns of y-values)
         self.wave_buffer = []
         self.wave_width = GRID_SIZE  # 64 columns
 
+        # User control mode
+        self.user_mode = False
+        self.pitch_hand_x = 50.0
+        self.pitch_hand_y = 18.0
+        self.volume_hand_x = 18.0
+        self.volume_hand_y = 28.0
+
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.left_pressed:
-            self.hand_speed = max(0.3, self.hand_speed - 0.2)
-            consumed = True
-        if input_state.right_pressed:
-            self.hand_speed = min(3.0, self.hand_speed + 0.2)
-            consumed = True
-        if input_state.up_pressed:
-            self.wave_idx = (self.wave_idx - 1) % len(WAVE_TYPES)
+
+        # Button press: toggle user mode
+        if input_state.action_l or input_state.action_r:
+            self.user_mode = not self.user_mode
+            self.overlay_text = 'USER MODE' if self.user_mode else 'AUTO MODE'
             self.overlay_timer = 2.0
+            # Sync user positions with current auto positions when entering user mode
+            if self.user_mode:
+                self.pitch_hand_x, self.pitch_hand_y = self._auto_pitch_hand_pos()
+                self.volume_hand_x, self.volume_hand_y = self._auto_volume_hand_pos()
             consumed = True
-        if input_state.down_pressed:
-            self.wave_idx = (self.wave_idx + 1) % len(WAVE_TYPES)
-            self.overlay_timer = 2.0
-            consumed = True
+
+        if self.user_mode:
+            # User mode: joystick controls both hands
+            # Left/Right: control volume hand (left hand) horizontally
+            if input_state.left:
+                self.volume_hand_x = max(4, self.volume_hand_x - 40.0 * 0.016)
+                consumed = True
+            if input_state.right:
+                self.volume_hand_x = min(28, self.volume_hand_x + 40.0 * 0.016)
+                consumed = True
+            # Up/Down: control pitch hand (right hand) vertically
+            if input_state.up:
+                self.pitch_hand_y = max(4, self.pitch_hand_y - 40.0 * 0.016)
+                consumed = True
+            if input_state.down:
+                self.pitch_hand_y = min(38, self.pitch_hand_y + 40.0 * 0.016)
+                consumed = True
+        else:
+            # Auto mode: original controls
+            if input_state.left_pressed:
+                self.hand_speed = max(0.3, self.hand_speed - 0.2)
+                consumed = True
+            if input_state.right_pressed:
+                self.hand_speed = min(3.0, self.hand_speed + 0.2)
+                consumed = True
+            if input_state.up_pressed:
+                self.wave_idx = (self.wave_idx - 1) % len(WAVE_TYPES)
+                self.overlay_text = WAVE_TYPES[self.wave_idx]
+                self.overlay_timer = 2.0
+                consumed = True
+            if input_state.down_pressed:
+                self.wave_idx = (self.wave_idx + 1) % len(WAVE_TYPES)
+                self.overlay_text = WAVE_TYPES[self.wave_idx]
+                self.overlay_timer = 2.0
+                consumed = True
+
         return consumed
 
     # -- Hand position helpers --
 
-    def _pitch_hand_pos(self):
-        """Right hand near pitch antenna - sinusoidal vertical motion."""
+    def _auto_pitch_hand_pos(self):
+        """Right hand auto position - sinusoidal vertical motion."""
         t = self.time * self.hand_speed * 0.7
         # Oscillates vertically near antenna (right side)
         base_x = 50
@@ -77,14 +125,26 @@ class Theremin(Visual):
         y = base_y + 10.0 * math.sin(t * 0.6)
         return x, y
 
-    def _volume_hand_pos(self):
-        """Left hand near volume loop - sinusoidal horizontal motion."""
+    def _auto_volume_hand_pos(self):
+        """Left hand auto position - sinusoidal horizontal motion."""
         t = self.time * self.hand_speed * 0.5
         base_x = 18
         base_y = 28
         x = base_x + 6.0 * math.sin(t * 0.8)
         y = base_y + 3.0 * math.sin(t * 1.1)
         return x, y
+
+    def _pitch_hand_pos(self):
+        """Right hand position - auto or user controlled."""
+        if self.user_mode:
+            return self.pitch_hand_x, self.pitch_hand_y
+        return self._auto_pitch_hand_pos()
+
+    def _volume_hand_pos(self):
+        """Left hand position - auto or user controlled."""
+        if self.user_mode:
+            return self.volume_hand_x, self.volume_hand_y
+        return self._auto_volume_hand_pos()
 
     def _get_frequency(self):
         """Derive frequency from pitch hand distance to antenna tip."""
@@ -289,22 +349,27 @@ class Theremin(Visual):
             prev_y = py
 
     def _draw_label(self):
-        """Draw waveform type label at top."""
+        """Draw waveform type label or mode indicator at top."""
         d = self.display
         wtype = WAVE_TYPES[self.wave_idx]
         freq = self._get_frequency()
 
         if self.overlay_timer > 0:
+            # Show overlay text (mode or waveform change)
             alpha = min(1.0, self.overlay_timer / 0.5)
-            c = (int(180 * alpha), int(180 * alpha), int(200 * alpha))
-            d.draw_text_small(2, 0, wtype, c)
+            c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+            d.draw_text_small(2, 0, self.overlay_text, c)
         else:
-            # Alternate between type and frequency display
-            phase = int(self.time / 3) % 2
-            if phase == 0:
-                d.draw_text_small(2, 0, wtype, (60, 60, 80))
+            # Show mode indicator or alternate info
+            if self.user_mode:
+                d.draw_text_small(2, 0, "USER", (100, 255, 100))
             else:
-                d.draw_text_small(2, 0, f"F={freq:.1f}", (60, 60, 80))
+                # Alternate between type and frequency display
+                phase = int(self.time / 3) % 2
+                if phase == 0:
+                    d.draw_text_small(2, 0, wtype, (60, 60, 80))
+                else:
+                    d.draw_text_small(2, 0, f"F={freq:.1f}", (60, 60, 80))
 
     def draw(self):
         d = self.display

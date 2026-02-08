@@ -726,10 +726,12 @@ class Optics(Visual):
         self._draw_overlay()
 
     def _get_anim_angle(self, scenario):
-        """Return beam angle based on user control."""
+        """Return beam angle based on user control and auto-animation."""
         if scenario == 'KALEIDOSCOPE':
             return self.time * self.kaleidoscope_speed
-        return self.user_angle
+        # Auto-animate beam angle for all other scenarios, plus user offset
+        auto_angle = self.time * 0.08  # slow automatic sweep
+        return auto_angle + self.user_angle
 
     def _draw_elements(self, pal):
         """Draw prisms, lenses, and mirrors."""

@@ -1438,7 +1438,7 @@
           "is_game": false
         },
         {
-          "name": "KID ICARUS MUSEUM",
+          "name": "ICARUS MUSEUM",
           "cls": "GalleryKidIcarus",
           "module": "visuals/gallery3d.py",
           "is_game": false
