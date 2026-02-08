@@ -1114,9 +1114,10 @@ class Lattice(Visual):
         self.category_indices = _build_category_indices()
         self.category_idx = 0
         self.crystal_pos = random.randint(0, len(CRYSTALS) - 1)
-        self.rotation_y = 0.0
-        self.rotation_speed = 0.3
-        self.tilt_phase = 0.0
+        self.rotation_y = 0.0  # Manual: left/right
+        self.tilt_x = 0.0      # Manual: up/down
+        self.rotation_z = 0.0  # Continuous auto-rotate around Z
+        self.auto_rotate_speed = 0.3
         self.auto_cycle = True
         self.cycle_timer = 0.0
         self.cycle_duration = 10.0
@@ -1217,39 +1218,52 @@ class Lattice(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
+        rotation_speed = 2.0
+        tilt_speed = 1.5
 
-        if input_state.up_pressed:
-            self.category_idx = (self.category_idx - 1) % len(CATEGORIES)
-            self.crystal_pos = 0
-            self.cycle_timer = 0.0
-            self.overlay_timer = 2.5
-            self._prepare_crystal()
+        # Joystick controls rotation
+        if input_state.left:
+            self.rotation_y -= rotation_speed * 0.016
+            self.auto_cycle = False
             consumed = True
-        if input_state.down_pressed:
+        if input_state.right:
+            self.rotation_y += rotation_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+        if input_state.up:
+            self.tilt_x -= tilt_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+        if input_state.down:
+            self.tilt_x += tilt_speed * 0.016
+            self.auto_cycle = False
+            consumed = True
+
+        # Two-button press cycles through categories
+        if input_state.action_l and input_state.action_r:
             self.category_idx = (self.category_idx + 1) % len(CATEGORIES)
             self.crystal_pos = 0
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self.overlay_timer = 2.5
             self._prepare_crystal()
             consumed = True
-
-        if input_state.left_pressed:
+        # Single button cycles crystals in current category
+        elif input_state.action_l:
             crystal_list = self._current_crystal_list()
             if crystal_list:
                 self.crystal_pos = (self.crystal_pos - 1) % len(crystal_list)
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self._prepare_crystal()
             consumed = True
-        if input_state.right_pressed:
+        elif input_state.action_r:
             crystal_list = self._current_crystal_list()
             if crystal_list:
                 self.crystal_pos = (self.crystal_pos + 1) % len(crystal_list)
             self.cycle_timer = 0.0
+            self.auto_cycle = True
             self._prepare_crystal()
-            consumed = True
-
-        if input_state.action_l or input_state.action_r:
-            self.auto_cycle = not self.auto_cycle
             consumed = True
 
         return consumed
@@ -1258,8 +1272,7 @@ class Lattice(Visual):
         self.time += dt
         self.label_timer += dt
         self.scroll_offset += dt * 20
-        self.rotation_y += self.rotation_speed * dt
-        self.tilt_phase += dt * 0.3
+        self.rotation_z += self.auto_rotate_speed * dt
 
         if self.overlay_timer > 0:
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
@@ -1282,14 +1295,20 @@ class Lattice(Visual):
         y *= self.scale
         z *= self.scale
 
-        tilt = 0.26 * math.sin(self.tilt_phase)
-        cos_t, sin_t = math.cos(tilt), math.sin(tilt)
-        y2 = y * cos_t - z * sin_t
-        z2 = y * sin_t + z * cos_t
+        # Auto-rotation around Z axis (constant tumble)
+        cos_z, sin_z = math.cos(self.rotation_z), math.sin(self.rotation_z)
+        x1 = x * cos_z - y * sin_z
+        y1 = x * sin_z + y * cos_z
 
+        # Manual tilt (rotation around X axis) - controlled by up/down
+        cos_t, sin_t = math.cos(self.tilt_x), math.sin(self.tilt_x)
+        y2 = y1 * cos_t - z * sin_t
+        z2 = y1 * sin_t + z * cos_t
+
+        # Manual rotation around Y axis - controlled by left/right
         cos_r, sin_r = math.cos(self.rotation_y), math.sin(self.rotation_y)
-        x2 = x * cos_r + z2 * sin_r
-        z3 = -x * sin_r + z2 * cos_r
+        x2 = x1 * cos_r + z2 * sin_r
+        z3 = -x1 * sin_r + z2 * cos_r
 
         screen_x = GRID_SIZE // 2 + x2
         screen_y = 28 - y2
@@ -1334,31 +1353,44 @@ class Lattice(Visual):
                 _, _, sx, sy, r, color, fade = item
                 self._draw_atom(sx, sy, r, color, fade)
 
-        # Bottom label: cycle between name, system, formula
+        # Bottom label: cycle between name, system, color-coded formula
         label_phase = int(self.label_timer / 4) % 3
-        if label_phase == 0:
-            label = crystal['name']
-        elif label_phase == 1:
-            # Expand acronyms to full names
-            label = SYSTEM_NAMES.get(crystal['system'], crystal['system'])
+        if label_phase == 2:
+            # Color-coded formula
+            formula = crystal['formula']
+            # Reset scroll when label changes
+            if not hasattr(self, '_last_phase') or self._last_phase != label_phase:
+                self._last_phase = label_phase
+                self.scroll_offset = 0
+            max_chars = 14
+            if len(formula) > max_chars:
+                # Scroll long formulas by drawing twice with offset
+                char_width = 4
+                total_width = (len(formula) + 4) * char_width
+                offset = int(self.scroll_offset) % total_width
+                self._draw_formula(formula + "    " + formula, 2 - offset, 58)
+            else:
+                self._draw_formula(formula, 2, 58)
         else:
-            label = crystal['formula']
+            if label_phase == 0:
+                label = crystal['name']
+            else:
+                label = SYSTEM_NAMES.get(crystal['system'], crystal['system'])
 
-        # Reset scroll when label changes
-        if not hasattr(self, '_last_phase') or self._last_phase != label_phase:
-            self._last_phase = label_phase
-            self.scroll_offset = 0
+            # Reset scroll when label changes
+            if not hasattr(self, '_last_phase') or self._last_phase != label_phase:
+                self._last_phase = label_phase
+                self.scroll_offset = 0
 
-        # Scroll long text (4px per char, ~14 chars fit on screen)
-        max_chars = 14
-        if len(label) > max_chars:
-            padded = label + "    " + label
-            char_width = 4
-            total_width = len(label + "    ") * char_width
-            offset = int(self.scroll_offset) % total_width
-            self.display.draw_text_small(2 - offset, 58, padded, Colors.WHITE)
-        else:
-            self.display.draw_text_small(2, 58, label, Colors.WHITE)
+            max_chars = 14
+            if len(label) > max_chars:
+                padded = label + "    " + label
+                char_width = 4
+                total_width = len(label + "    ") * char_width
+                offset = int(self.scroll_offset) % total_width
+                self.display.draw_text_small(2 - offset, 58, padded, Colors.WHITE)
+            else:
+                self.display.draw_text_small(2, 58, label, Colors.WHITE)
 
         # Category overlay at top
         if self.overlay_timer > 0:
@@ -1368,6 +1400,31 @@ class Lattice(Visual):
                   int(cat_color[1] * alpha),
                   int(cat_color[2] * alpha))
             self.display.draw_text_small(2, 2, cat_name, oc)
+
+    def _draw_formula(self, formula, x, y):
+        """Draw chemical formula with each element colored to match its atom."""
+        tokens = []
+        i = 0
+        while i < len(formula):
+            if formula[i].isupper():
+                elem = formula[i]
+                i += 1
+                if i < len(formula) and formula[i].islower():
+                    elem += formula[i]
+                    i += 1
+                num = ''
+                while i < len(formula) and formula[i].isdigit():
+                    num += formula[i]
+                    i += 1
+                tokens.append((elem + num, elem))
+            else:
+                tokens.append((formula[i], None))
+                i += 1
+        cursor = x
+        for text, elem in tokens:
+            color = LATTICE_COLORS.get(elem, (200, 200, 200)) if elem else Colors.WHITE
+            self.display.draw_text_small(cursor, y, text, color)
+            cursor += len(text) * 4
 
     def _draw_atom(self, cx, cy, r, color, fade):
         """Draw a filled circle with simple shading and fade."""
