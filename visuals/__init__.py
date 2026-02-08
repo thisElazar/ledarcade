@@ -122,7 +122,7 @@ from .greatwave import GreatWave
 from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GalleryScience, GalleryDigital, GalleryEffects,
                         GallerySalon, GallerySMB3, GalleryKirby,
-                        GalleryArt as Gallery3D)
+                        GalleryZelda, GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
 from .particlelife import ParticleLife
@@ -320,6 +320,7 @@ ALL_VISUALS = [
     GallerySalon,
     GallerySMB3,
     GalleryKirby,
+    GalleryZelda,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -577,6 +578,7 @@ __all__ = [
     'GallerySalon',
     'GallerySMB3',
     'GalleryKirby',
+    'GalleryZelda',
     'Gallery3D',
     'Win95Maze',
     'DemonSpirals',

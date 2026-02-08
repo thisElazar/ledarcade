@@ -216,10 +216,24 @@ class _Gallery3DBase(Visual):
     # ------------------------------------------------------------------
 
     def handle_input(self, input_state) -> bool:
-        if input_state.any_direction:
-            self.auto_walk = False
+        if input_state.action_l or input_state.action_r:
+            self.auto_walk = not self.auto_walk
+            if self.auto_walk and self.WAYPOINTS:
+                self._snap_to_nearest_waypoint()
+                self.wp_pause = 0.0
         self._input = input_state
-        return input_state.any_direction
+        return input_state.any_direction or input_state.action_l or input_state.action_r
+
+    def _snap_to_nearest_waypoint(self):
+        best_i, best_d = 0, float('inf')
+        for i, wp in enumerate(self.WAYPOINTS):
+            dx = wp[0] - self.px
+            dy = wp[1] - self.py
+            d = dx * dx + dy * dy
+            if d < best_d:
+                best_d = d
+                best_i = i
+        self.wp_idx = best_i
 
     def update(self, dt: float):
         self.time += dt
@@ -1641,6 +1655,87 @@ class GalleryKirby(GallerySMB3):
                 wy = fy + x * sy
                 checker = (int(wx * 2) + int(wy * 2)) % 2
                 self.display.set_pixel(x, y, ga if checker else gb)
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            self._cast_ray_bytes(col, ray_angle)
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Gallery 10: ZELDA MUSEUM — The Legend of Zelda NES sprite sheets
+#  Extends SMB3 Museum base with Hyrule-themed sky and floor.
+# ══════════════════════════════════════════════════════════════════
+
+class GalleryZelda(GallerySMB3):
+    name = "ZELDA MUSEUM"
+    description = "Legend of Zelda sprites"
+
+    _SHEETS = ["zelda_heroes.png", "zelda_npcs.png", "zelda_items.png",
+               "zelda_enemies_ow.png", "zelda_enemies_dg.png", "zelda_bosses.png"]
+    _SHEET_LABELS = ["LINK", "NPCS", "ITEMS", "OVERWORLD", "DUNGEON", "BOSSES"]
+
+    # Rupee sparkle positions for Hyrule sky (x, y)
+    _SPARKLES = [
+        (5, 3), (14, 1), (25, 5), (37, 2), (48, 4), (60, 1),
+        (9, 11), (20, 8), (32, 13), (44, 10), (55, 7), (62, 12),
+        (3, 18), (16, 22), (28, 16), (40, 20), (52, 19), (61, 24),
+        (7, 26), (19, 28), (34, 25), (46, 27), (57, 23), (1, 14),
+    ]
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        # --- Hyrule sky: dark olive-brown gradient (NES overworld feel) ---
+        for y in range(half):
+            t = y / half
+            # Gradient from deep midnight blue (top) to warm brown (horizon)
+            r = int(20 + 60 * t)
+            g = int(16 + 50 * t)
+            b = int(40 - 10 * t)
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, (r, g, b))
+        # Triforce-gold sparkles
+        phase = self.time * 1.8
+        for i, (sx, sy) in enumerate(self._SPARKLES):
+            if 0 <= sx < GRID_SIZE and 0 <= sy < half:
+                bright = 0.4 + 0.6 * math.sin(phase + i * 2.1)
+                v = int(160 + 95 * bright)
+                self.display.set_pixel(sx, sy, (v, int(v * 0.75), int(v * 0.2)))
+
+        # --- Dungeon stone floor with perspective ---
+        stone_a = (140, 120, 80)   # light sandstone
+        stone_b = (100, 85, 55)    # dark sandstone
+        cos_l = math.cos(self.pa - self.fov * 0.5)
+        sin_l = math.sin(self.pa - self.fov * 0.5)
+        step_cx = (math.cos(self.pa + self.fov * 0.5) - cos_l) / GRID_SIZE
+        step_cy = (math.sin(self.pa + self.fov * 0.5) - sin_l) / GRID_SIZE
+        for y in range(half, GRID_SIZE):
+            p = y - half
+            if p == 0:
+                for x in range(GRID_SIZE):
+                    self.display.set_pixel(x, y, (0, 0, 0))
+                continue
+            row_dist = float(half) / p
+            fx = self.px + row_dist * cos_l
+            fy = self.py + row_dist * sin_l
+            sx = row_dist * step_cx
+            sy = row_dist * step_cy
+            fog = min(1.0, 1.5 / (row_dist + 0.5))
+            sa = (int(stone_a[0] * fog), int(stone_a[1] * fog),
+                  int(stone_a[2] * fog))
+            sb = (int(stone_b[0] * fog), int(stone_b[1] * fog),
+                  int(stone_b[2] * fog))
+            mortar_c = (int(50 * fog), int(40 * fog), int(25 * fog))
+            for x in range(GRID_SIZE):
+                wx = fx + x * sx
+                wy = fy + x * sy
+                # Stone tile pattern with mortar lines
+                tx = wx * 3.0
+                ty = wy * 3.0
+                if tx % 1.0 < 0.1 or ty % 1.0 < 0.1:
+                    self.display.set_pixel(x, y, mortar_c)
+                else:
+                    checker = (int(tx) + int(ty)) % 2
+                    self.display.set_pixel(x, y, sa if checker else sb)
 
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]
