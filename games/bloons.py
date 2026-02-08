@@ -22,9 +22,9 @@ PHASE_LEVEL_WIN = 4
 PHASE_LEVEL_FAIL = 5
 
 # Physics
-MAX_SPEED = 100.0      # px/s at full power
+MAX_SPEED = 120.0      # px/s at full power
 GRAVITY = 60.0         # px/s^2
-DART_RADIUS = 3.0      # collision radius
+DART_RADIUS = 3.5      # collision radius
 TRAIL_LEN = 3
 
 # Display regions
@@ -57,19 +57,18 @@ BLOON_TYPES = [
 ]
 
 # Levels: list of (darts, [(type_index, x, y), ...])
-LEVELS = [
-    # L1-6: target = all bloons (clear them all)
-    # L7+: target < total, just need to pop enough
+MAX_TARGET_PCT = 0.80  # never need more than 80% to pass
 
+LEVELS = [
     # L1: Big red cluster, easy pickings
-    {'darts': 4, 'target': 16, 'bloons': [
+    {'darts': 4, 'bloons': [
         (0, 35, 28), (0, 39, 28), (0, 43, 28), (0, 47, 28), (0, 51, 28),
         (0, 37, 24), (0, 41, 24), (0, 45, 24), (0, 49, 24),
         (0, 39, 20), (0, 43, 20), (0, 47, 20),
         (0, 37, 32), (0, 41, 32), (0, 45, 32), (0, 49, 32),
     ]},
     # L2: Red pyramid right side
-    {'darts': 4, 'target': 14, 'bloons': [
+    {'darts': 4, 'bloons': [
         (0, 44, 38), (0, 48, 38), (0, 52, 38), (0, 56, 38),
         (0, 46, 34), (0, 50, 34), (0, 54, 34),
         (0, 48, 30), (0, 52, 30),
@@ -77,28 +76,28 @@ LEVELS = [
         (0, 44, 42), (0, 48, 42), (0, 52, 42), (0, 56, 42),
     ]},
     # L3: Reds everywhere
-    {'darts': 5, 'target': 19, 'bloons': [
+    {'darts': 5, 'bloons': [
         (0, 25, 15), (0, 30, 15), (0, 35, 15), (0, 40, 15),
         (0, 28, 25), (0, 33, 25), (0, 38, 25), (0, 43, 25), (0, 48, 25),
         (0, 30, 35), (0, 35, 35), (0, 40, 35), (0, 45, 35), (0, 50, 35),
         (0, 35, 45), (0, 40, 45), (0, 45, 45), (0, 50, 45), (0, 55, 45),
     ]},
     # L4: Blues introduced, dense cluster
-    {'darts': 4, 'target': 17, 'bloons': [
+    {'darts': 4, 'bloons': [
         (1, 38, 26), (1, 42, 26), (1, 46, 26), (1, 50, 26), (1, 54, 26),
         (1, 40, 22), (1, 44, 22), (1, 48, 22), (1, 52, 22),
         (0, 42, 18), (0, 46, 18), (0, 50, 18),
         (0, 38, 30), (0, 42, 30), (0, 46, 30), (0, 50, 30), (0, 54, 30),
     ]},
     # L5: Blue columns
-    {'darts': 5, 'target': 18, 'bloons': [
+    {'darts': 5, 'bloons': [
         (1, 35, 12), (1, 35, 18), (1, 35, 24), (1, 35, 30), (1, 35, 36),
         (1, 45, 12), (1, 45, 18), (1, 45, 24), (1, 45, 30), (1, 45, 36),
         (1, 55, 12), (1, 55, 18), (1, 55, 24), (1, 55, 30), (1, 55, 36),
         (0, 40, 42), (0, 50, 42), (0, 45, 46),
     ]},
     # L6: Blue diamond
-    {'darts': 5, 'target': 18, 'bloons': [
+    {'darts': 5, 'bloons': [
         (1, 44, 14),
         (1, 40, 18), (1, 48, 18),
         (1, 36, 22), (1, 44, 22), (1, 52, 22),
@@ -107,70 +106,70 @@ LEVELS = [
         (0, 36, 34), (0, 40, 34), (0, 44, 34), (0, 48, 34), (0, 52, 34),
         (0, 38, 38), (0, 42, 38), (0, 46, 38), (0, 50, 38),
     ]},
-    # L7: Greens with red/blue fillers — pop 14 of 19
-    {'darts': 5, 'target': 14, 'bloons': [
+    # L7: Greens with red/blue fillers
+    {'darts': 5, 'bloons': [
         (2, 40, 20), (2, 44, 20), (2, 48, 20), (2, 52, 20),
         (2, 42, 16), (2, 46, 16), (2, 50, 16),
         (1, 38, 24), (1, 42, 24), (1, 46, 24), (1, 50, 24), (1, 54, 24),
         (0, 40, 28), (0, 44, 28), (0, 48, 28), (0, 52, 28),
         (0, 42, 32), (0, 46, 32), (0, 50, 32),
     ]},
-    # L8: Green and blue mix, wide spread — pop 12 of 18
-    {'darts': 5, 'target': 12, 'bloons': [
+    # L8: Green and blue mix, wide spread
+    {'darts': 5, 'bloons': [
         (2, 30, 18), (2, 35, 18), (2, 40, 18), (2, 50, 18), (2, 55, 18),
         (1, 28, 28), (1, 33, 28), (1, 38, 28), (1, 43, 28), (1, 48, 28),
         (1, 53, 28), (1, 58, 28),
         (0, 30, 38), (0, 35, 38), (0, 40, 38), (0, 45, 38),
         (0, 50, 38), (0, 55, 38),
     ]},
-    # L9: Green wall, tight grid — pop 15 of 22
-    {'darts': 5, 'target': 15, 'bloons': [
+    # L9: Green wall, tight grid
+    {'darts': 5, 'bloons': [
         (2, 36, 14), (2, 40, 14), (2, 44, 14), (2, 48, 14), (2, 52, 14), (2, 56, 14),
         (2, 38, 18), (2, 42, 18), (2, 46, 18), (2, 50, 18), (2, 54, 18),
         (2, 36, 22), (2, 40, 22), (2, 44, 22), (2, 48, 22), (2, 52, 22), (2, 56, 22),
         (1, 38, 26), (1, 42, 26), (1, 46, 26), (1, 50, 26), (1, 54, 26),
     ]},
-    # L10: Yellows with supporting bloons — pop 12 of 19
-    {'darts': 6, 'target': 12, 'bloons': [
+    # L10: Yellows with supporting bloons
+    {'darts': 6, 'bloons': [
         (3, 50, 12), (3, 55, 12), (3, 50, 18), (3, 55, 18),
         (2, 40, 22), (2, 45, 22), (2, 50, 22), (2, 55, 22),
         (1, 35, 30), (1, 40, 30), (1, 45, 30), (1, 50, 30), (1, 55, 30),
         (0, 30, 38), (0, 35, 38), (0, 40, 38), (0, 45, 38),
         (0, 50, 38), (0, 55, 38),
     ]},
-    # L11: Yellow cluster with green base — pop 13 of 19
-    {'darts': 5, 'target': 13, 'bloons': [
+    # L11: Yellow cluster with green base
+    {'darts': 5, 'bloons': [
         (3, 40, 16), (3, 44, 16), (3, 48, 16), (3, 52, 16),
         (3, 42, 12), (3, 46, 12), (3, 50, 12),
         (2, 38, 20), (2, 42, 20), (2, 46, 20), (2, 50, 20), (2, 54, 20),
         (1, 40, 24), (1, 44, 24), (1, 48, 24), (1, 52, 24),
         (0, 42, 28), (0, 46, 28), (0, 50, 28),
     ]},
-    # L12: Spread yellows and greens — pop 12 of 18
-    {'darts': 6, 'target': 12, 'bloons': [
+    # L12: Spread yellows and greens
+    {'darts': 6, 'bloons': [
         (3, 28, 14), (3, 38, 14), (3, 48, 14), (3, 58, 14),
         (3, 33, 24), (3, 43, 24), (3, 53, 24),
         (2, 28, 34), (2, 38, 34), (2, 48, 34), (2, 58, 34),
         (1, 33, 44), (1, 43, 44), (1, 53, 44),
         (0, 28, 48), (0, 38, 48), (0, 48, 48), (0, 58, 48),
     ]},
-    # L13: Pinks introduced with big support — pop 13 of 20
-    {'darts': 5, 'target': 13, 'bloons': [
+    # L13: Pinks introduced with big support
+    {'darts': 5, 'bloons': [
         (4, 44, 16), (4, 48, 16), (4, 52, 16),
         (3, 40, 20), (3, 44, 20), (3, 48, 20), (3, 52, 20), (3, 56, 20),
         (2, 42, 24), (2, 46, 24), (2, 50, 24), (2, 54, 24),
         (1, 40, 30), (1, 44, 30), (1, 48, 30), (1, 52, 30),
         (0, 42, 36), (0, 46, 36), (0, 50, 36), (0, 54, 36),
     ]},
-    # L14: Pink cluster, lots of pops — pop 12 of 18
-    {'darts': 5, 'target': 12, 'bloons': [
+    # L14: Pink cluster, lots of pops
+    {'darts': 5, 'bloons': [
         (4, 38, 16), (4, 42, 16), (4, 46, 16), (4, 50, 16), (4, 54, 16),
         (4, 40, 20), (4, 44, 20), (4, 48, 20), (4, 52, 20),
         (3, 38, 24), (3, 42, 24), (3, 46, 24), (3, 50, 24), (3, 54, 24),
         (2, 40, 28), (2, 44, 28), (2, 48, 28), (2, 52, 28),
     ]},
-    # L15: Grand finale, packed field — pop 18 of 27
-    {'darts': 6, 'target': 18, 'bloons': [
+    # L15: Grand finale, packed field
+    {'darts': 6, 'bloons': [
         (4, 35, 12), (4, 40, 12), (4, 45, 12), (4, 50, 12), (4, 55, 12),
         (4, 37, 18), (4, 42, 18), (4, 47, 18), (4, 52, 18),
         (3, 35, 24), (3, 40, 24), (3, 45, 24), (3, 50, 24), (3, 55, 24),
@@ -200,7 +199,8 @@ class Bloons(Game):
         """Load current level data."""
         lvl = LEVELS[self.level]
         self.darts_left = lvl['darts']
-        self.target_pops = lvl['target']
+        total = len(lvl['bloons'])
+        self.target_pops = max(1, int(total * MAX_TARGET_PCT))
         self.level_pops = 0
         self.bloons = []
         for type_idx, bx, by in lvl['bloons']:
@@ -421,14 +421,25 @@ class Bloons(Game):
             _, color, _, _ = BLOON_TYPES[bloon['type']]
             bx = int(bloon['x'])
             by = int(bloon['y'])
-            # 3x3 sprite (cross shape for roundness)
-            for dy in range(3):
-                for dx in range(3):
+            # 4x4 rounded balloon shape (clipped corners)
+            #  .XX.
+            #  XXXX
+            #  XXXX
+            #  .XX.
+            for dx in range(1, 3):
+                self.display.set_pixel(bx + dx, by, color)
+            for dy in range(1, 3):
+                for dx in range(4):
                     self.display.set_pixel(bx + dx, by + dy, color)
-            # Highlight top-left 2x1 for shine
+            for dx in range(1, 3):
+                self.display.set_pixel(bx + dx, by + 3, color)
+            # Highlight top for shine
             highlight = (min(255, color[0] + 60), min(255, color[1] + 60), min(255, color[2] + 60))
-            self.display.set_pixel(bx, by, highlight)
             self.display.set_pixel(bx + 1, by, highlight)
+            self.display.set_pixel(bx + 2, by, highlight)
+            self.display.set_pixel(bx + 1, by + 1, highlight)
+            # Knot at bottom
+            self.display.set_pixel(bx + 2, by + 3, (min(255, color[0] + 30), min(255, color[1] + 30), min(255, color[2] + 30)))
 
     def _draw_clouds(self):
         """Draw a few small clouds in the sky."""
@@ -457,27 +468,42 @@ class Bloons(Game):
             self.display.set_pixel(50 + dx, 37, cloud)
 
     def _draw_monkey(self):
-        """Draw monkey sprite at fixed position."""
+        """Draw monkey sprite with feet and tail."""
         brown = (139, 90, 43)
         dark_brown = (100, 60, 30)
         face = (200, 150, 100)
 
         mx, my = MONKEY_X, MONKEY_Y
+        # Tail (curls left and down from back)
+        self.display.set_pixel(mx - 1, my + 1, brown)
+        self.display.set_pixel(mx - 2, my + 1, brown)
+        self.display.set_pixel(mx - 2, my + 2, brown)
+        self.display.set_pixel(mx - 1, my + 3, brown)
         # Body (3x4)
         for dy in range(4):
             for dx in range(3):
                 self.display.set_pixel(mx + dx, my + dy, brown)
-        # Head (3x2)
-        for dy in range(-2, 0):
+        # Head (3x3 for rounder look)
+        for dy in range(-3, 0):
             for dx in range(3):
                 self.display.set_pixel(mx + dx, my + dy, brown)
-        # Face
+        # Ears
+        self.display.set_pixel(mx - 1, my - 2, brown)
+        self.display.set_pixel(mx + 3, my - 2, brown)
+        # Face (2x2 lighter patch)
         self.display.set_pixel(mx + 1, my - 2, face)
         self.display.set_pixel(mx + 2, my - 2, face)
         self.display.set_pixel(mx + 1, my - 1, face)
         self.display.set_pixel(mx + 2, my - 1, face)
-        # Eye
-        self.display.set_pixel(mx + 2, my - 2, dark_brown)
+        # Eyes
+        self.display.set_pixel(mx + 2, my - 3, dark_brown)
+        self.display.set_pixel(mx + 1, my - 3, Colors.WHITE)
+        # Mouth
+        self.display.set_pixel(mx + 2, my - 1, dark_brown)
+        # Feet (2 little bumps below body)
+        self.display.set_pixel(mx, my + 4, dark_brown)
+        self.display.set_pixel(mx + 1, my + 4, dark_brown)
+        self.display.set_pixel(mx + 2, my + 4, dark_brown)
 
         # Arm line at aim angle
         arm_len = 4
