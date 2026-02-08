@@ -1745,5 +1745,88 @@ class GalleryZelda(GallerySMB3):
             self._cast_ray_bytes(col, ray_angle)
 
 
+# ══════════════════════════════════════════════════════════════════
+#  Gallery 11: KID ICARUS MUSEUM — Kid Icarus NES sprite sheets
+#  Extends SMB3 Museum base with Skyworld-themed sky and floor.
+# ══════════════════════════════════════════════════════════════════
+
+class GalleryKidIcarus(GallerySMB3):
+    name = "KID ICARUS MUSEUM"
+    description = "Kid Icarus sprites"
+
+    _SHEETS = ["kidicarus_heroes.png", "kidicarus_enemies.png",
+               "kidicarus_items.png"]
+    _SHEET_LABELS = ["PIT", "ENEMIES", "ITEMS"]
+
+    # Cloud wisp positions for Skyworld sky (x, y, width)
+    _CLOUDS = [
+        (4, 3, 6, 3), (28, 1, 8, 3), (50, 4, 7, 2),
+        (16, 8, 5, 2), (40, 10, 6, 3), (60, 7, 4, 2),
+        (7, 15, 7, 3), (35, 17, 5, 2), (55, 14, 6, 2),
+        (20, 22, 4, 2), (45, 24, 5, 2), (10, 26, 3, 2),
+    ]
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        # --- Skyworld sky: bright blue gradient with clouds ---
+        for y in range(half):
+            t = y / half
+            # Light blue top to pale horizon
+            r = int(100 + 80 * t)
+            g = int(160 + 60 * t)
+            b = int(255 - 20 * t)
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, (r, g, b))
+        # White clouds (rounded rectangles)
+        cloud_c = (240, 240, 248)
+        for cx, cy, cw, ch in self._CLOUDS:
+            for dy in range(ch):
+                for dx in range(cw):
+                    if (dy == 0 or dy == ch - 1) and (dx == 0 or dx == cw - 1):
+                        continue
+                    px, py = cx + dx, cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < half:
+                        self.display.set_pixel(px, py, cloud_c)
+
+        # --- Marble temple floor with perspective ---
+        marble_a = (210, 205, 220)   # light marble
+        marble_b = (170, 165, 185)   # darker marble vein
+        cos_l = math.cos(self.pa - self.fov * 0.5)
+        sin_l = math.sin(self.pa - self.fov * 0.5)
+        step_cx = (math.cos(self.pa + self.fov * 0.5) - cos_l) / GRID_SIZE
+        step_cy = (math.sin(self.pa + self.fov * 0.5) - sin_l) / GRID_SIZE
+        for y in range(half, GRID_SIZE):
+            p = y - half
+            if p == 0:
+                for x in range(GRID_SIZE):
+                    self.display.set_pixel(x, y, (0, 0, 0))
+                continue
+            row_dist = float(half) / p
+            fx = self.px + row_dist * cos_l
+            fy = self.py + row_dist * sin_l
+            sx = row_dist * step_cx
+            sy = row_dist * step_cy
+            fog = min(1.0, 1.5 / (row_dist + 0.5))
+            ma = (int(marble_a[0] * fog), int(marble_a[1] * fog),
+                  int(marble_a[2] * fog))
+            mb = (int(marble_b[0] * fog), int(marble_b[1] * fog),
+                  int(marble_b[2] * fog))
+            grout = (int(130 * fog), int(125 * fog), int(140 * fog))
+            for x in range(GRID_SIZE):
+                wx = fx + x * sx
+                wy = fy + x * sy
+                tx = wx * 3.0
+                ty = wy * 3.0
+                if tx % 1.0 < 0.08 or ty % 1.0 < 0.08:
+                    self.display.set_pixel(x, y, grout)
+                else:
+                    checker = (int(tx) + int(ty)) % 2
+                    self.display.set_pixel(x, y, ma if checker else mb)
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            self._cast_ray_bytes(col, ray_angle)
+
+
 # Legacy alias — keep old import working
 Gallery3D = GalleryArt
