@@ -589,17 +589,19 @@ class BloonsTD(Game):
                 self.display.draw_circle(cx, cy, t_range, (60, 60, 60))
 
     def _draw_bloons(self):
-        """Draw bloons as colored dots on path."""
+        """Draw bloons as 2x2 colored squares on path."""
         for bloon in self.bloons:
             if not bloon['alive']:
                 continue
             bx, by = pos_on_path(bloon['dist'])
             _, color, _, _, _ = BLOON_TYPES[bloon['type']]
+            if bloon['slow_timer'] > 0:
+                color = (100, 180, 255)
             ix, iy = int(bx), int(by)
             self.display.set_pixel(ix, iy, color)
-            # Slow indicator: slight blue tint
-            if bloon['slow_timer'] > 0:
-                self.display.set_pixel(ix, iy, (100, 180, 255))
+            self.display.set_pixel(ix + 1, iy, color)
+            self.display.set_pixel(ix, iy + 1, color)
+            self.display.set_pixel(ix + 1, iy + 1, color)
 
     def _draw_projectiles(self):
         """Draw projectiles."""
