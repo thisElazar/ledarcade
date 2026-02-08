@@ -188,7 +188,7 @@ _DOOR_LINKS = {
 # GLaDOS trigger zones: (cx, cy) -> (message_line1, message_line2, id)
 _GLADOS_ZONES = {
     (2, 2):   ("WELCOME TO",     "APERTURE",       "wake"),
-    (2, 4):   ("USE ARROWS",     "TO MOVE",         "move"),
+    (2, 4):   ("GO AHEAD",     "WALK AROUND",         "move"),
     (4, 8):   ("PORTALS ON",     "SPC:BLU Z:ORG",   "portals"),
     (5, 9):   ("WELL DONE",      "",                 "done1"),
     (4, 14):  ("THINK WITH",     "PORTALS",          "think"),
@@ -801,6 +801,7 @@ class Portal(Game):
         hit = False
         side = 0
         hit_cell = 0
+        cube_hit = None  # (perp_dist, wall_x, side) — rendered as overlay
         for _ in range(64):
             if side_dist_x < side_dist_y:
                 side_dist_x += delta_x
@@ -836,11 +837,17 @@ class Portal(Game):
                     step_edges.append((pd, lo, hi, side))
                 prev_floor_h = floor_h
 
-            # Companion cube renders as wall-like object
-            if map_x == self.cube_x and map_y == self.cube_y:
-                hit = True
-                hit_cell = CC
-                break
+            # Companion cube — save hit but continue ray to find background
+            if map_x == self.cube_x and map_y == self.cube_y and cube_hit is None:
+                if side == 0:
+                    cpd = (map_x - self.px + (1 - step_x) / 2) / cos_a
+                else:
+                    cpd = (map_y - self.py + (1 - step_y) / 2) / sin_a
+                if cpd > 0.01:
+                    cwx = self.py + cpd * sin_a if side == 0 else self.px + cpd * cos_a
+                    cwx -= int(cwx)
+                    cube_hit = (cpd, cwx, side)
+                continue
 
         if not hit:
             # No wall — fill column with ceiling + floor casting
@@ -875,8 +882,9 @@ class Portal(Game):
         if perp_dist < 0.01:
             perp_dist = 0.01
 
-        # Wall dimensions — vary by type
-        cell_floor = self._floor_height(map_x, map_y)
+        # Wall base matches player elevation — consistent across all columns
+        # (prevents staircase artifacts from stairs, overflow from gap cells)
+        cell_floor = max(0.0, self.elevation)
         wall_bottom = cell_floor
         if hit_cell == CC:
             wh = 0.4   # small pushable cube
@@ -972,6 +980,25 @@ class Portal(Game):
             for y in range(max(0, sy_top), min(GRID_SIZE, sy_bot + 1)):
                 self.display.set_pixel(col, y, (cr, cg, cb))
 
+        # ── Overlay companion cube (rendered on top of background) ──
+        if cube_hit:
+            cpd, cwx, cside = cube_hit
+            cube_floor_h = self._floor_height(self.cube_x, self.cube_y)
+            cube_top = cube_floor_h + 1.0
+            cscale = GRID_SIZE / cpd
+            c_screen_top = int(HALF - (cube_top - eye_h) * cscale)
+            c_screen_bot = int(HALF - (cube_floor_h - eye_h) * cscale)
+            c_draw_start = max(0, c_screen_top)
+            c_draw_end = min(GRID_SIZE - 1, c_screen_bot)
+            c_line_h = max(1, c_screen_bot - c_screen_top)
+            cfog = min(1.0, 2.5 / (cpd + 0.5))
+            if cside == 1:
+                cfog *= 0.75
+            for y in range(c_draw_start, c_draw_end + 1):
+                cv = (y - c_screen_top) / c_line_h if c_line_h > 0 else 0.5
+                r, g, b = self._wall_pixel(CC, cwx, cv, None, self.cube_x, self.cube_y)
+                self.display.set_pixel(col, y, (int(r * cfog), int(g * cfog), int(b * cfog)))
+
     def _wall_pixel(self, cell_type, u, v, portal_info, cx, cy):
         """Get wall pixel color based on type, with portal overlay.
         portal_info: None or (color_name, v_top, v_bot) for height-correct rendering."""
@@ -993,14 +1020,16 @@ class Portal(Game):
                     return base
 
         if cell_type == CC:
-            # Companion cube: gray body with prominent pink heart
+            # Companion cube: thin gray frame, big pink heart fills the face
+            edge = u < 0.12 or u > 0.88 or v < 0.12 or v > 0.88
+            if edge:
+                return (160, 155, 165)  # gray frame
+            # Heart fills interior — glow near frame edge
             hu = abs(u - 0.5)
             hv = abs(v - 0.5)
-            if hu < 0.25 and hv < 0.25:
-                return (220, 100, 140)  # pink heart (big so visible on small cube)
-            if hu < 0.35 and hv < 0.35:
+            if hu > 0.3 or hv > 0.3:
                 return (180, 130, 150)  # heart border/glow
-            return (160, 155, 165)  # gray body
+            return (220, 100, 140)  # pink heart center
 
         if cell_type in (P, PH):
             # White Aperture panels

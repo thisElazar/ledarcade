@@ -1238,6 +1238,10 @@ class GallerySMB3(_Gallery3DBase):
             side_idx += 1
             return sid
 
+        def _art():
+            """Fill cell with art (reused sprite) instead of gray wall."""
+            return _side()
+
         # --- Row 0: outer wall ---
         rows.append([1] * W)
 
@@ -1247,7 +1251,7 @@ class GallerySMB3(_Gallery3DBase):
             if placed < n_sprites:
                 row.append(cell_id); cell_id += 1; placed += 1
             else:
-                row.append(1)
+                row.append(_art())
         row += [_side(), _side(), 0, 0, _side()]  # east wall, shaft sep, shaft, shaft east
         rows.append(row)
 
@@ -1289,7 +1293,7 @@ class GallerySMB3(_Gallery3DBase):
                     if placed < n_sprites:
                         row.append(cell_id); cell_id += 1; placed += 1
                     else:
-                        row.append(1)
+                        row.append(_art())
                 row.append(0)  # opening
                 # Turn waypoints (transit, no pause)
                 waypoints.append((CW + 0.5, cy + 0.5, 0.0))
@@ -1301,7 +1305,7 @@ class GallerySMB3(_Gallery3DBase):
                     if placed < n_sprites:
                         row.append(cell_id); cell_id += 1; placed += 1
                     else:
-                        row.append(1)
+                        row.append(_art())
                 waypoints.append((1.5, cy + 0.5, 0.0))
                 waypoints.append((1.5, cy + 2.5, 0.0))
             row += [_side(), _side(), 0, 0, _side()]
@@ -1320,7 +1324,7 @@ class GallerySMB3(_Gallery3DBase):
         # --- Ensure last corridor walks east (for shaft connection) ---
         if corridor_num % 2 == 0:
             # Last walks west — add painting row with left opening + east corridor
-            row = [_side(), 0] + [1]*(CW - 1) + [_side(), _side(), 0, 0, _side()]
+            row = [_side(), 0] + [_art()]*(CW - 1) + [_side(), _side(), 0, 0, _side()]
             rows.append(row)
             # Turn waypoints through the opening at col 1
             waypoints.append((1.5, last_corridor_y + 0.5, 0.0))
@@ -1335,17 +1339,16 @@ class GallerySMB3(_Gallery3DBase):
             waypoints.append((float(CW - 1), cy + 0.5, 1.5))
             corridor_num += 1
 
-        # --- Last painting row (south wall) ---
-        row = [_side()] + [1]*CW + [_side(), _side(), 0, 0, _side()]
-        rows.append(row)
+        # --- Open the east wall of the last corridor into the shaft ---
+        # The last corridor already walks east; punch through its east
+        # wall + separator so it connects directly to the shaft.
+        rows[last_corridor_y][CW + 1] = 0   # east wall
+        rows[last_corridor_y][CW + 2] = 0   # shaft separator
 
-        # --- Final corridor (shaft connection at east end) ---
-        row = [_side()] + [0]*CW + [0, 0, 0, 0, _side()]  # fully open to shaft
+        # --- South wall (art-lined, closes off bottom) ---
+        row = [_side()] + [_art() for _ in range(CW)]
+        row += [_side(), _side(), 0, 0, _side()]
         rows.append(row)
-        final_cy = len(rows) - 1
-
-        # Waypoint: walk east to shaft entrance
-        waypoints.append((float(CW), final_cy + 0.5, 0.0))
 
         # --- Bottom wall ---
         rows.append([1] * W)
@@ -1355,9 +1358,9 @@ class GallerySMB3(_Gallery3DBase):
             rows[first_corridor_y][CW + 1] = 0  # open east wall
             rows[first_corridor_y][CW + 2] = 0  # open shaft separator
 
-        # --- Shaft return waypoints ---
+        # --- Shaft return waypoints (from last corridor east end) ---
         shaft_x = CW + 3.5  # center of shaft cols (CW+3, CW+4)
-        waypoints.append((shaft_x, final_cy + 0.5, 0.0))    # enter shaft
+        waypoints.append((shaft_x, last_corridor_y + 0.5, 0.0))  # into shaft
         waypoints.append((shaft_x, first_corridor_y + 0.5, 0.0))  # walk north
         waypoints.append((2.0, first_corridor_y + 0.5, 0.0))  # exit into first corridor
 
