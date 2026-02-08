@@ -122,4 +122,4 @@ class JakeMusic(Visual):
         frame = frames[self.frame_index]
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
-                self.display.set_pixel(x, y, frame[y * GRID_SIZE + x])
+                self.display.set_pixel(x, y, frame[y][x])

@@ -4622,22 +4622,36 @@ class WonderJake(Visual):
         """Load Jake dance GIF frames."""
         try:
             from PIL import Image
+            from .gifcache import cache_frames, extract_rgb
+
             project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             path = os.path.join(project_dir, "assets", self.GIF_FILE)
             if not os.path.exists(path):
                 return
-            
-            gif = Image.open(path)
-            for i in range(getattr(gif, 'n_frames', 1)):
-                gif.seek(i)
-                frame = gif.convert("RGB")
-                # Scale to fit in lower portion of screen
-                frame = frame.resize((64, 64), Image.Resampling.NEAREST)
-                pixels = []
-                for y in range(GRID_SIZE):
-                    for x in range(GRID_SIZE):
-                        pixels.append(frame.getpixel((x, y)))
-                self.frames.append(pixels)
+
+            def process():
+                gif = Image.open(path)
+                orig_w, orig_h = gif.size
+                # Center crop to square
+                sq = min(orig_w, orig_h)
+                x_off = (orig_w - sq) // 2
+                y_off = (orig_h - sq) // 2
+                canvas = None
+                frames = []
+                for i in range(getattr(gif, 'n_frames', 1)):
+                    gif.seek(i)
+                    frame = gif.convert("RGBA")
+                    if canvas is None:
+                        canvas = frame.copy()
+                    else:
+                        canvas.paste(frame, (0, 0), frame)
+                    cropped = canvas.copy().crop((x_off, y_off, x_off + sq, y_off + sq))
+                    scaled = cropped.resize((GRID_SIZE, GRID_SIZE),
+                                            Image.Resampling.NEAREST)
+                    frames.append(extract_rgb(scaled))
+                return frames
+
+            self.frames = cache_frames(path, process)
         except:
             pass
     
@@ -4661,7 +4675,7 @@ class WonderJake(Visual):
             frame = self.frames[self.frame_index]
             for y in range(GRID_SIZE):
                 for x in range(GRID_SIZE):
-                    d.set_pixel(x, y, frame[y * GRID_SIZE + x])
+                    d.set_pixel(x, y, frame[y][x])
         
         # Pop-up text effect for WONDER and CABINET
         # WONDER pops up first, then CABINET
