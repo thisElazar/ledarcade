@@ -978,6 +978,9 @@ class Portal(Game):
                 if p <= 0:
                     continue
                 row_dist = eye_h * GRID_SIZE / p
+                if row_dist <= 0:
+                    self.display.set_pixel(col, y, (5, 2, 2))
+                    continue
                 fx = self.px + cos_a * row_dist
                 fy = self.py + sin_a * row_dist
                 fcx, fcy = int(fx), int(fy)
@@ -1067,6 +1070,9 @@ class Portal(Game):
                 self.display.set_pixel(col, y, (13, 10, 8))
                 continue
             row_dist = eye_h * GRID_SIZE / p
+            if row_dist <= 0:
+                self.display.set_pixel(col, y, (5, 2, 2))
+                continue
             fx = self.px + cos_a * row_dist
             fy = self.py + sin_a * row_dist
             fcx, fcy = int(fx), int(fy)
