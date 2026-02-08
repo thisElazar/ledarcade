@@ -560,10 +560,15 @@ def main():
     hsm = get_high_score_manager()
     input_cooldown = 0
 
-    # Scroll acceleration state
+    # Scroll acceleration state (vertical - items)
     scroll_held_time = 0.0   # How long up/down has been held
     scroll_accum = 0.0       # Accumulator for auto-scroll timing
     scroll_dir = 0           # -1 = up, +1 = down, 0 = none
+
+    # Horizontal scroll state (categories)
+    cat_scroll_held_time = 0.0   # How long left/right has been held
+    cat_scroll_accum = 0.0       # Accumulator for auto-scroll timing
+    cat_scroll_dir = 0           # -1 = left, +1 = right, 0 = none
 
     FPS = 30
     last_time = time.time()
@@ -701,18 +706,40 @@ def main():
                     elif not konami_match:
                         category = categories[cat_index]
 
-                        if input_state.left_pressed and len(categories) > 1:
-                            cat_index = (cat_index - 1) % len(categories)
-                            item_index = 0
-                            scroll_held_time = 0.0
-                            scroll_accum = 0.0
-                            scroll_dir = 0
-                        elif input_state.right_pressed and len(categories) > 1:
-                            cat_index = (cat_index + 1) % len(categories)
-                            item_index = 0
-                            scroll_held_time = 0.0
-                            scroll_accum = 0.0
-                            scroll_dir = 0
+                        # Category navigation (left/right) with scroll acceleration
+                        if len(categories) > 1:
+                            if input_state.left_pressed:
+                                cat_index = (cat_index - 1) % len(categories)
+                                item_index = 0
+                                cat_scroll_dir = -1
+                                cat_scroll_held_time = 0.0
+                                cat_scroll_accum = 0.0
+                                scroll_held_time = 0.0
+                                scroll_accum = 0.0
+                                scroll_dir = 0
+                            elif input_state.right_pressed:
+                                cat_index = (cat_index + 1) % len(categories)
+                                item_index = 0
+                                cat_scroll_dir = 1
+                                cat_scroll_held_time = 0.0
+                                cat_scroll_accum = 0.0
+                                scroll_held_time = 0.0
+                                scroll_accum = 0.0
+                                scroll_dir = 0
+                            elif cat_scroll_dir != 0 and ((cat_scroll_dir == -1 and input_state.left) or (cat_scroll_dir == 1 and input_state.right)):
+                                cat_scroll_held_time += dt
+                                if cat_scroll_held_time >= 0.4:
+                                    t_accel = min(cat_scroll_held_time - 0.4, 1.5)
+                                    interval = 0.18 - (0.12 * t_accel / 1.5)
+                                    cat_scroll_accum += dt
+                                    while cat_scroll_accum >= interval:
+                                        cat_scroll_accum -= interval
+                                        cat_index = (cat_index + cat_scroll_dir) % len(categories)
+                                        item_index = 0
+                            else:
+                                cat_scroll_dir = 0
+                                cat_scroll_held_time = 0.0
+                                cat_scroll_accum = 0.0
 
                         if category.items:
                             n_items = len(category.items)
