@@ -96,6 +96,117 @@
   color: #4a4238;
   margin-top: 6px;
 }
+
+/* Touch controls — hidden on desktop, shown on touch devices */
+.touch-controls {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 420px;
+  margin: 12px auto 0;
+  padding: 0 8px;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.touch-device .touch-controls { display: flex; }
+.touch-device #emuKeys { display: none; }
+.touch-device .click-overlay span::after {
+  content: ' (TAP)';
+}
+
+/* Action buttons (one on each side of joystick) */
+.touch-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid rgba(200, 168, 110, 0.3);
+  background: rgba(30, 30, 34, 0.85);
+  color: #c8a86e;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.touch-btn:active, .touch-btn.pressed {
+  background: rgba(200, 168, 110, 0.25);
+  border-color: rgba(200, 168, 110, 0.6);
+  transform: scale(0.93);
+}
+
+/* Joystick */
+.touch-joystick {
+  touch-action: none;
+  flex-shrink: 0;
+}
+.joystick-base {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(30, 30, 34, 0.85);
+  border: 2px solid rgba(200, 168, 110, 0.25);
+  position: relative;
+  touch-action: none;
+}
+.joystick-knob {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, rgba(200, 168, 110, 0.5), rgba(200, 168, 110, 0.2));
+  border: 1px solid rgba(200, 168, 110, 0.4);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: none;
+  pointer-events: none;
+}
+.joystick-knob.idle {
+  transition: transform 0.15s ease-out;
+}
+
+/* Escape (back) button */
+.touch-esc {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 168, 110, 0.2);
+  background: rgba(0, 0, 0, 0.6);
+  color: #c8a86e;
+  font-size: 16px;
+  line-height: 32px;
+  text-align: center;
+  z-index: 11;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  cursor: pointer;
+}
+.touch-device .touch-esc { display: block; }
+.touch-esc:active {
+  background: rgba(200, 168, 110, 0.25);
+}
+
+@media (pointer: coarse) {
+  .touch-controls { display: flex; }
+  #emuKeys { display: none; }
+  .click-overlay span::after { content: ' (TAP)'; }
+  .touch-esc { display: block; }
+}
 </style>
 </head>
 <body>
@@ -127,7 +238,19 @@
       <canvas class="led" id="pyLedCanvas" width="640" height="640"></canvas>
       <div class="click-overlay" id="emuClickOverlay"><span>CLICK TO START</span></div>
     </div>
+    <button class="touch-esc" id="btnEsc">&#x2190;</button>
   </div>
+
+  <div class="touch-controls" id="touchControls">
+    <button class="touch-btn" id="btnL">GO</button>
+    <div class="touch-joystick" id="touchJoystick">
+      <div class="joystick-base" id="joystickBase">
+        <div class="joystick-knob idle" id="joystickKnob"></div>
+      </div>
+    </div>
+    <button class="touch-btn" id="btnR">GO</button>
+  </div>
+
   <div class="lab-fps" id="pyFps"></div>
   <div class="lab-keys" id="emuKeys">Arrows: navigate &middot; Space: select &middot; Z: alt button &middot; Esc: back to menu</div>
 </section>
@@ -169,6 +292,7 @@
     for (const k in prevKeys) prevKeys[k] = false;
   });
   emuOverlay.addEventListener('click', (e) => { e.stopPropagation(); emuFrame.focus(); });
+  emuOverlay.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); emuFrame.focus(); }, { passive: false });
 
   const keys = {};
   const prevKeys = {};
@@ -188,6 +312,139 @@
   document.addEventListener('keyup', (e) => {
     const k = e.key;
     keys[k.toLowerCase()] = false;
+  });
+
+  // --- Touch controls ---
+  const isTouchDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  if (isTouchDevice) {
+    document.body.classList.add('touch-device');
+  }
+
+  const joystickBase = document.getElementById('joystickBase');
+  const joystickKnob = document.getElementById('joystickKnob');
+  const btnL = document.getElementById('btnL');
+  const btnR = document.getElementById('btnR');
+  const btnEsc = document.getElementById('btnEsc');
+
+  let joystickTouchId = null;
+
+  function handleJoystickMove(touchX, touchY) {
+    const rect = joystickBase.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const maxR = rect.width / 2;
+
+    let dx = touchX - cx;
+    let dy = touchY - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Clamp knob to base radius
+    if (dist > maxR) {
+      dx = (dx / dist) * maxR;
+      dy = (dy / dist) * maxR;
+    }
+
+    joystickKnob.classList.remove('idle');
+    joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+    // Dead zone: inner 20%
+    const norm = dist / maxR;
+    if (norm < 0.2) {
+      keys['arrowup'] = false;
+      keys['arrowdown'] = false;
+      keys['arrowleft'] = false;
+      keys['arrowright'] = false;
+      return;
+    }
+
+    // Angle in degrees (0 = right, 90 = down, etc.)
+    const angle = ((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360;
+
+    // Cardinal + diagonal mapping with 90-degree zones
+    keys['arrowright'] = (angle < 60 || angle > 300);
+    keys['arrowdown']  = (angle > 30 && angle < 150);
+    keys['arrowleft']  = (angle > 120 && angle < 240);
+    keys['arrowup']    = (angle > 210 && angle < 330);
+  }
+
+  function resetJoystick() {
+    joystickTouchId = null;
+    joystickKnob.classList.add('idle');
+    joystickKnob.style.transform = 'translate(-50%, -50%)';
+    keys['arrowup'] = false;
+    keys['arrowdown'] = false;
+    keys['arrowleft'] = false;
+    keys['arrowright'] = false;
+  }
+
+  joystickBase.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    emuFrame.focus();
+    if (joystickTouchId === null) {
+      const t = e.changedTouches[0];
+      joystickTouchId = t.identifier;
+      handleJoystickMove(t.clientX, t.clientY);
+    }
+  }, { passive: false });
+
+  joystickBase.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) {
+        handleJoystickMove(t.clientX, t.clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  joystickBase.addEventListener('touchend', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) {
+        resetJoystick();
+        break;
+      }
+    }
+  });
+  joystickBase.addEventListener('touchcancel', (e) => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joystickTouchId) {
+        resetJoystick();
+        break;
+      }
+    }
+  });
+
+  // Both buttons = Space (action_l) — matching hardware layout
+  for (const btn of [btnL, btnR]) {
+    btn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      emuFrame.focus();
+      keys[' '] = true;
+      btn.classList.add('pressed');
+    }, { passive: false });
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      keys[' '] = false;
+      btn.classList.remove('pressed');
+    }, { passive: false });
+    btn.addEventListener('touchcancel', () => {
+      keys[' '] = false;
+      btn.classList.remove('pressed');
+    });
+  }
+
+  // Escape button
+  btnEsc.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    emuFrame.focus();
+    escapePressed = true;
+  }, { passive: false });
+  // Also handle click for non-touch pointer:coarse devices
+  btnEsc.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    emuFrame.focus();
+    escapePressed = true;
   });
 
   function pushInputToPython() {
@@ -510,6 +767,14 @@ class EmulatorMenu:
         self.categories = catalog['categories']
         self.cat_index = 0
         self.item_index = 0
+        # Auto-scroll state (vertical)
+        self.scroll_dir = 0
+        self.scroll_held = 0.0
+        self.scroll_accum = 0.0
+        # Auto-scroll state (horizontal)
+        self.cat_scroll_dir = 0
+        self.cat_scroll_held = 0.0
+        self.cat_scroll_accum = 0.0
 
     def handle_input(self, inp, dt):
         cats = self.categories
@@ -517,17 +782,69 @@ class EmulatorMenu:
             return None
         cat = cats[self.cat_index]
         items = cat.get('items', [])
-        if inp.left_pressed and len(cats) > 1:
-            self.cat_index = (self.cat_index - 1) % len(cats)
-            self.item_index = 0
-        elif inp.right_pressed and len(cats) > 1:
-            self.cat_index = (self.cat_index + 1) % len(cats)
-            self.item_index = 0
+
+        # Category navigation (left/right) with scroll acceleration
+        if len(cats) > 1:
+            if inp.left_pressed:
+                self.cat_index = (self.cat_index - 1) % len(cats)
+                self.item_index = 0
+                self.cat_scroll_dir = -1
+                self.cat_scroll_held = 0.0
+                self.cat_scroll_accum = 0.0
+                self.scroll_dir = 0
+                self.scroll_held = 0.0
+                self.scroll_accum = 0.0
+            elif inp.right_pressed:
+                self.cat_index = (self.cat_index + 1) % len(cats)
+                self.item_index = 0
+                self.cat_scroll_dir = 1
+                self.cat_scroll_held = 0.0
+                self.cat_scroll_accum = 0.0
+                self.scroll_dir = 0
+                self.scroll_held = 0.0
+                self.scroll_accum = 0.0
+            elif self.cat_scroll_dir != 0 and ((self.cat_scroll_dir == -1 and inp.left) or (self.cat_scroll_dir == 1 and inp.right)):
+                self.cat_scroll_held += dt
+                if self.cat_scroll_held >= 0.4:
+                    t_accel = min(self.cat_scroll_held - 0.4, 1.5)
+                    interval = 0.18 - (0.12 * t_accel / 1.5)
+                    self.cat_scroll_accum += dt
+                    while self.cat_scroll_accum >= interval:
+                        self.cat_scroll_accum -= interval
+                        self.cat_index = (self.cat_index + self.cat_scroll_dir) % len(cats)
+                        self.item_index = 0
+            else:
+                self.cat_scroll_dir = 0
+                self.cat_scroll_held = 0.0
+                self.cat_scroll_accum = 0.0
+
+        # Item navigation (up/down) with scroll acceleration
         if items:
+            n_items = len(items)
             if inp.up_pressed:
-                self.item_index = (self.item_index - 1) % len(items)
+                self.item_index = (self.item_index - 1) % n_items
+                self.scroll_dir = -1
+                self.scroll_held = 0.0
+                self.scroll_accum = 0.0
             elif inp.down_pressed:
-                self.item_index = (self.item_index + 1) % len(items)
+                self.item_index = (self.item_index + 1) % n_items
+                self.scroll_dir = 1
+                self.scroll_held = 0.0
+                self.scroll_accum = 0.0
+            elif self.scroll_dir != 0 and ((self.scroll_dir == -1 and inp.up) or (self.scroll_dir == 1 and inp.down)):
+                self.scroll_held += dt
+                if self.scroll_held >= 0.4:
+                    t_accel = min(self.scroll_held - 0.4, 1.5)
+                    interval = 0.18 - (0.12 * t_accel / 1.5)
+                    self.scroll_accum += dt
+                    while self.scroll_accum >= interval:
+                        self.scroll_accum -= interval
+                        self.item_index = (self.item_index + self.scroll_dir) % n_items
+            else:
+                self.scroll_dir = 0
+                self.scroll_held = 0.0
+                self.scroll_accum = 0.0
+
             if inp.action_l or inp.action_r:
                 return items[self.item_index]
         return None
@@ -595,8 +912,7 @@ class EmulatorMenu:
             display.draw_text_small(58, 14 + (visible - 1) * 8, "v", Colors.GRAY)
 
         display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-        display.draw_text_small(2, 58, "SPACE:GO", Colors.GRAY)
-        display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
+        display.draw_text_small(8, 58, "PRESS TO PLAY", Colors.GRAY)
 
 _menu = EmulatorMenu(_catalog)
   `);

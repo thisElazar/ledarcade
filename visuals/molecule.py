@@ -4737,12 +4737,11 @@ class Molecule(Visual):
                 _, _, sx, sy, r, color, elem = item
                 self._draw_atom(sx, sy, r, color)
 
-        # Bottom label: common name first 4s, then formula for 4s, repeat
+        # Bottom label: common name first 4s, then color-coded formula for 4s, repeat
         if int(self.label_timer / 4) % 2 == 0:
-            label = mol['name']
+            self.display.draw_text_small(2, 58, mol['name'], Colors.WHITE)
         else:
-            label = mol['formula']
-        self.display.draw_text_small(2, 58, label, Colors.WHITE)
+            self._draw_formula(mol['formula'], 2, 58)
 
         # Group name overlay at top (fades after switching groups)
         if self.overlay_timer > 0:
@@ -4751,6 +4750,35 @@ class Molecule(Visual):
             oc = (int(gcolor[0] * alpha), int(gcolor[1] * alpha),
                   int(gcolor[2] * alpha))
             self.display.draw_text_small(2, 2, gname, oc)
+
+    def _draw_formula(self, formula, x, y):
+        """Draw chemical formula with each element colored to match its atom."""
+        # Parse formula into (text, element) tokens
+        tokens = []  # [(string, element_symbol or None), ...]
+        i = 0
+        while i < len(formula):
+            if formula[i].isupper():
+                elem = formula[i]
+                i += 1
+                # Check for lowercase continuation (e.g., Na, Fe, Si, Cl)
+                if i < len(formula) and formula[i].islower():
+                    elem += formula[i]
+                    i += 1
+                # Collect trailing digits
+                num = ''
+                while i < len(formula) and formula[i].isdigit():
+                    num += formula[i]
+                    i += 1
+                tokens.append((elem + num, elem))
+            else:
+                tokens.append((formula[i], None))
+                i += 1
+        # Draw each token in its element color
+        cursor = x
+        for text, elem in tokens:
+            color = CPK_COLORS.get(elem, (200, 200, 200)) if elem else Colors.WHITE
+            self.display.draw_text_small(cursor, y, text, color)
+            cursor += len(text) * 4
 
     def _draw_atom(self, cx, cy, r, color):
         """Draw a filled circle for an atom with simple shading."""
