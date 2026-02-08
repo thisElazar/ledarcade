@@ -233,38 +233,29 @@ class Turntable(Visual):
 
         dx_total = stylus_x - ARM_PIVOT_X
         dy_total = stylus_y - ARM_PIVOT_Y
-        dist_to_stylus = math.sqrt(dx_total * dx_total + dy_total * dy_total)
 
-        # Use law of cosines to find elbow position
-        # This creates a smooth, realistic arm motion
-        total_length = ARM_LENGTH_1 + ARM_LENGTH_2
-        if dist_to_stylus <= total_length:
-            # Angle from pivot to stylus
-            angle_to_stylus = math.atan2(dy_total, dx_total)
+        # Elbow position: use ratio to place between pivot and stylus
+        # This creates smooth arm motion regardless of distance
+        elbow_ratio = 0.6  # 60% along the way from pivot to stylus
+        elbow_x = ARM_PIVOT_X + dx_total * elbow_ratio
+        elbow_y = ARM_PIVOT_Y + dy_total * elbow_ratio - 2  # Slight upward curve
 
-            # Using triangle formed by pivot-elbow-stylus:
-            # Place elbow using the ratio of arm segments
-            # Elbow angle slightly raised to look natural
-            elbow_ratio = ARM_LENGTH_1 / total_length
-            elbow_x = ARM_PIVOT_X + dx_total * elbow_ratio
-            elbow_y = ARM_PIVOT_Y + dy_total * elbow_ratio - 2  # Slight upward curve
+        # Draw upper arm segment (pivot to elbow)
+        d.draw_line(ARM_PIVOT_X, ARM_PIVOT_Y, int(elbow_x), int(elbow_y), ARM_COLOR)
 
-            # Draw upper arm segment (pivot to elbow)
-            d.draw_line(ARM_PIVOT_X, ARM_PIVOT_Y, int(elbow_x), int(elbow_y), ARM_COLOR)
+        # Draw lower arm segment (elbow to headshell)
+        headshell_x = int(stylus_x)
+        headshell_y = int(stylus_y) - 1
+        d.draw_line(int(elbow_x), int(elbow_y), headshell_x, headshell_y, ARM_COLOR)
 
-            # Draw lower arm segment (elbow to headshell)
-            headshell_x = int(stylus_x)
-            headshell_y = int(stylus_y) - 1
-            d.draw_line(int(elbow_x), int(elbow_y), headshell_x, headshell_y, ARM_COLOR)
+        # Headshell (small rectangle at end of arm)
+        d.set_pixel(headshell_x, headshell_y, HEADSHELL_COLOR)
+        d.set_pixel(headshell_x - 1, headshell_y, HEADSHELL_COLOR)
+        d.set_pixel(headshell_x, headshell_y + 1, HEADSHELL_COLOR)
+        d.set_pixel(headshell_x - 1, headshell_y + 1, HEADSHELL_COLOR)
 
-            # Headshell (small rectangle at end of arm)
-            d.set_pixel(headshell_x, headshell_y, HEADSHELL_COLOR)
-            d.set_pixel(headshell_x - 1, headshell_y, HEADSHELL_COLOR)
-            d.set_pixel(headshell_x, headshell_y + 1, HEADSHELL_COLOR)
-            d.set_pixel(headshell_x - 1, headshell_y + 1, HEADSHELL_COLOR)
-
-            # Stylus point (red dot)
-            d.set_pixel(headshell_x - 1, int(stylus_y) + 1, STYLUS_COLOR)
+        # Stylus point (red dot)
+        d.set_pixel(headshell_x - 1, int(stylus_y) + 1, STYLUS_COLOR)
 
         # Pivot point (metallic circle)
         for dy in range(-1, 2):

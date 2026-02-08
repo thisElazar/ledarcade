@@ -21,14 +21,14 @@ def _hue_to_rgb(h):
 
 def _center_x(text):
     """Calculate x position to center text (4px per char + 1px spacing).
-    Adds +2 offset to properly center on 64px screen."""
+    Adds +3 offset to properly center on 64px screen."""
     width = len(text) * 5 - 1
-    return max(0, (GRID_SIZE - width) // 2 + 2)
+    return max(0, (GRID_SIZE - width) // 2 + 3)
 
 
 # Precomputed centered x positions
-WONDER_X = _center_x("WONDER")   # 19 (visually centered)
-CABINET_X = _center_x("CABINET")  # 17 (visually centered)
+WONDER_X = _center_x("WONDER")   # 20 (visually centered)
+CABINET_X = _center_x("CABINET")  # 18 (visually centered)
 WONDER_W = len("WONDER") * 5 - 1   # 29
 CABINET_W = len("CABINET") * 5 - 1 # 34
 # Vertical center positions for the two-line layout

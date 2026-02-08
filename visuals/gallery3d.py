@@ -221,6 +221,14 @@ class _Gallery3DBase(Visual):
             if self.auto_walk and self.WAYPOINTS:
                 self._snap_to_nearest_waypoint()
                 self.wp_pause = 0.0
+
+        # When auto-walking, left/right adjust walk speed
+        if self.auto_walk:
+            if input_state.left:
+                self.move_speed = max(0.5, self.move_speed - 0.1)
+            if input_state.right:
+                self.move_speed = min(12.0, self.move_speed + 0.1)
+
         self._input = input_state
         return input_state.any_direction or input_state.action_l or input_state.action_r
 

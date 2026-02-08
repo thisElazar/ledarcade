@@ -703,6 +703,20 @@ class Optics(Visual):
         if self.show_notes:
             self.notes_scroll_offset += dt * 18
 
+        # Rotate prism for PRISM scenario
+        scenario = _SCENARIOS[self.scenario_idx]
+        if scenario == 'PRISM' and len(self.prisms) > 0:
+            angle = self.time * 0.15 + self.user_angle  # slow rotation
+            cx, cy = 32, 32
+            size = 12
+            # Rebuild prism vertices with rotation
+            v0 = (cx - size * 0.5 * math.cos(angle) + size * 0.58 * math.sin(angle),
+                  cy - size * 0.5 * math.sin(angle) - size * 0.58 * math.cos(angle))
+            v1 = (cx - size * 0.5 * math.cos(angle) - size * 0.58 * math.sin(angle),
+                  cy - size * 0.5 * math.sin(angle) + size * 0.58 * math.cos(angle))
+            v2 = (cx + size * 0.6 * math.cos(angle), cy + size * 0.6 * math.sin(angle))
+            self.prisms[0]['vertices'] = [v0, v1, v2]
+
     # ── draw ─────────────────────────────────────────────────────
 
     def draw(self):
@@ -729,7 +743,10 @@ class Optics(Visual):
         """Return beam angle based on user control and auto-animation."""
         if scenario == 'KALEIDOSCOPE':
             return self.time * self.kaleidoscope_speed
-        # Auto-animate beam angle for all other scenarios, plus user offset
+        elif scenario == 'PRISM':
+            # For PRISM, don't rotate beam - we rotate the prism itself
+            return self.user_angle
+        # Auto-animate beam angle for other scenarios, plus user offset
         auto_angle = self.time * 0.08  # slow automatic sweep
         return auto_angle + self.user_angle
 
