@@ -57,6 +57,8 @@ from .bopit import BopIt
 from .mastermind import Mastermind
 from .rushhour import RushHour
 from .portal import Portal
+from .bloons import Bloons
+from .bloonstd import BloonsTD
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -116,6 +118,8 @@ ALL_GAMES = [
     Mastermind,
     RushHour,
     Portal,
+    Bloons,
+    BloonsTD,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -183,6 +187,8 @@ __all__ = [
     'Mastermind',
     'RushHour',
     'Portal',
+    'Bloons',
+    'BloonsTD',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
