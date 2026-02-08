@@ -227,7 +227,7 @@ class _Gallery3DBase(Visual):
             if input_state.left:
                 self.move_speed = max(0.5, self.move_speed - 0.1)
             if input_state.right:
-                self.move_speed = min(12.0, self.move_speed + 0.1)
+                self.move_speed = min(9.6, self.move_speed + 0.1)
 
         self._input = input_state
         return input_state.any_direction or input_state.action_l or input_state.action_r
