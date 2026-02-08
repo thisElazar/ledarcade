@@ -58,15 +58,18 @@ BLOON_TYPES = [
 
 # Levels: list of (darts, [(type_index, x, y), ...])
 LEVELS = [
+    # L1-6: target = all bloons (clear them all)
+    # L7+: target < total, just need to pop enough
+
     # L1: Big red cluster, easy pickings
-    {'darts': 4, 'bloons': [
+    {'darts': 4, 'target': 16, 'bloons': [
         (0, 35, 28), (0, 39, 28), (0, 43, 28), (0, 47, 28), (0, 51, 28),
         (0, 37, 24), (0, 41, 24), (0, 45, 24), (0, 49, 24),
         (0, 39, 20), (0, 43, 20), (0, 47, 20),
         (0, 37, 32), (0, 41, 32), (0, 45, 32), (0, 49, 32),
     ]},
     # L2: Red pyramid right side
-    {'darts': 4, 'bloons': [
+    {'darts': 4, 'target': 14, 'bloons': [
         (0, 44, 38), (0, 48, 38), (0, 52, 38), (0, 56, 38),
         (0, 46, 34), (0, 50, 34), (0, 54, 34),
         (0, 48, 30), (0, 52, 30),
@@ -74,28 +77,28 @@ LEVELS = [
         (0, 44, 42), (0, 48, 42), (0, 52, 42), (0, 56, 42),
     ]},
     # L3: Reds everywhere
-    {'darts': 5, 'bloons': [
+    {'darts': 5, 'target': 19, 'bloons': [
         (0, 25, 15), (0, 30, 15), (0, 35, 15), (0, 40, 15),
         (0, 28, 25), (0, 33, 25), (0, 38, 25), (0, 43, 25), (0, 48, 25),
         (0, 30, 35), (0, 35, 35), (0, 40, 35), (0, 45, 35), (0, 50, 35),
         (0, 35, 45), (0, 40, 45), (0, 45, 45), (0, 50, 45), (0, 55, 45),
     ]},
     # L4: Blues introduced, dense cluster
-    {'darts': 4, 'bloons': [
+    {'darts': 4, 'target': 17, 'bloons': [
         (1, 38, 26), (1, 42, 26), (1, 46, 26), (1, 50, 26), (1, 54, 26),
         (1, 40, 22), (1, 44, 22), (1, 48, 22), (1, 52, 22),
         (0, 42, 18), (0, 46, 18), (0, 50, 18),
         (0, 38, 30), (0, 42, 30), (0, 46, 30), (0, 50, 30), (0, 54, 30),
     ]},
     # L5: Blue columns
-    {'darts': 5, 'bloons': [
+    {'darts': 5, 'target': 18, 'bloons': [
         (1, 35, 12), (1, 35, 18), (1, 35, 24), (1, 35, 30), (1, 35, 36),
         (1, 45, 12), (1, 45, 18), (1, 45, 24), (1, 45, 30), (1, 45, 36),
         (1, 55, 12), (1, 55, 18), (1, 55, 24), (1, 55, 30), (1, 55, 36),
         (0, 40, 42), (0, 50, 42), (0, 45, 46),
     ]},
     # L6: Blue diamond
-    {'darts': 5, 'bloons': [
+    {'darts': 5, 'target': 18, 'bloons': [
         (1, 44, 14),
         (1, 40, 18), (1, 48, 18),
         (1, 36, 22), (1, 44, 22), (1, 52, 22),
@@ -104,70 +107,70 @@ LEVELS = [
         (0, 36, 34), (0, 40, 34), (0, 44, 34), (0, 48, 34), (0, 52, 34),
         (0, 38, 38), (0, 42, 38), (0, 46, 38), (0, 50, 38),
     ]},
-    # L7: Greens with red/blue fillers
-    {'darts': 5, 'bloons': [
+    # L7: Greens with red/blue fillers — pop 14 of 19
+    {'darts': 5, 'target': 14, 'bloons': [
         (2, 40, 20), (2, 44, 20), (2, 48, 20), (2, 52, 20),
         (2, 42, 16), (2, 46, 16), (2, 50, 16),
         (1, 38, 24), (1, 42, 24), (1, 46, 24), (1, 50, 24), (1, 54, 24),
         (0, 40, 28), (0, 44, 28), (0, 48, 28), (0, 52, 28),
         (0, 42, 32), (0, 46, 32), (0, 50, 32),
     ]},
-    # L8: Green and blue mix, wide spread
-    {'darts': 5, 'bloons': [
+    # L8: Green and blue mix, wide spread — pop 12 of 18
+    {'darts': 5, 'target': 12, 'bloons': [
         (2, 30, 18), (2, 35, 18), (2, 40, 18), (2, 50, 18), (2, 55, 18),
         (1, 28, 28), (1, 33, 28), (1, 38, 28), (1, 43, 28), (1, 48, 28),
         (1, 53, 28), (1, 58, 28),
         (0, 30, 38), (0, 35, 38), (0, 40, 38), (0, 45, 38),
         (0, 50, 38), (0, 55, 38),
     ]},
-    # L9: Green wall, tight grid
-    {'darts': 5, 'bloons': [
+    # L9: Green wall, tight grid — pop 15 of 22
+    {'darts': 5, 'target': 15, 'bloons': [
         (2, 36, 14), (2, 40, 14), (2, 44, 14), (2, 48, 14), (2, 52, 14), (2, 56, 14),
         (2, 38, 18), (2, 42, 18), (2, 46, 18), (2, 50, 18), (2, 54, 18),
         (2, 36, 22), (2, 40, 22), (2, 44, 22), (2, 48, 22), (2, 52, 22), (2, 56, 22),
         (1, 38, 26), (1, 42, 26), (1, 46, 26), (1, 50, 26), (1, 54, 26),
     ]},
-    # L10: Yellows with supporting bloons
-    {'darts': 6, 'bloons': [
+    # L10: Yellows with supporting bloons — pop 12 of 19
+    {'darts': 6, 'target': 12, 'bloons': [
         (3, 50, 12), (3, 55, 12), (3, 50, 18), (3, 55, 18),
         (2, 40, 22), (2, 45, 22), (2, 50, 22), (2, 55, 22),
         (1, 35, 30), (1, 40, 30), (1, 45, 30), (1, 50, 30), (1, 55, 30),
         (0, 30, 38), (0, 35, 38), (0, 40, 38), (0, 45, 38),
         (0, 50, 38), (0, 55, 38),
     ]},
-    # L11: Yellow cluster with green base
-    {'darts': 5, 'bloons': [
+    # L11: Yellow cluster with green base — pop 13 of 19
+    {'darts': 5, 'target': 13, 'bloons': [
         (3, 40, 16), (3, 44, 16), (3, 48, 16), (3, 52, 16),
         (3, 42, 12), (3, 46, 12), (3, 50, 12),
         (2, 38, 20), (2, 42, 20), (2, 46, 20), (2, 50, 20), (2, 54, 20),
         (1, 40, 24), (1, 44, 24), (1, 48, 24), (1, 52, 24),
         (0, 42, 28), (0, 46, 28), (0, 50, 28),
     ]},
-    # L12: Spread yellows and greens
-    {'darts': 6, 'bloons': [
+    # L12: Spread yellows and greens — pop 12 of 18
+    {'darts': 6, 'target': 12, 'bloons': [
         (3, 28, 14), (3, 38, 14), (3, 48, 14), (3, 58, 14),
         (3, 33, 24), (3, 43, 24), (3, 53, 24),
         (2, 28, 34), (2, 38, 34), (2, 48, 34), (2, 58, 34),
         (1, 33, 44), (1, 43, 44), (1, 53, 44),
         (0, 28, 48), (0, 38, 48), (0, 48, 48), (0, 58, 48),
     ]},
-    # L13: Pinks introduced with big support
-    {'darts': 5, 'bloons': [
+    # L13: Pinks introduced with big support — pop 13 of 20
+    {'darts': 5, 'target': 13, 'bloons': [
         (4, 44, 16), (4, 48, 16), (4, 52, 16),
         (3, 40, 20), (3, 44, 20), (3, 48, 20), (3, 52, 20), (3, 56, 20),
         (2, 42, 24), (2, 46, 24), (2, 50, 24), (2, 54, 24),
         (1, 40, 30), (1, 44, 30), (1, 48, 30), (1, 52, 30),
         (0, 42, 36), (0, 46, 36), (0, 50, 36), (0, 54, 36),
     ]},
-    # L14: Pink cluster, lots of pops
-    {'darts': 5, 'bloons': [
+    # L14: Pink cluster, lots of pops — pop 12 of 18
+    {'darts': 5, 'target': 12, 'bloons': [
         (4, 38, 16), (4, 42, 16), (4, 46, 16), (4, 50, 16), (4, 54, 16),
         (4, 40, 20), (4, 44, 20), (4, 48, 20), (4, 52, 20),
         (3, 38, 24), (3, 42, 24), (3, 46, 24), (3, 50, 24), (3, 54, 24),
         (2, 40, 28), (2, 44, 28), (2, 48, 28), (2, 52, 28),
     ]},
-    # L15: Grand finale, packed field
-    {'darts': 6, 'bloons': [
+    # L15: Grand finale, packed field — pop 18 of 27
+    {'darts': 6, 'target': 18, 'bloons': [
         (4, 35, 12), (4, 40, 12), (4, 45, 12), (4, 50, 12), (4, 55, 12),
         (4, 37, 18), (4, 42, 18), (4, 47, 18), (4, 52, 18),
         (3, 35, 24), (3, 40, 24), (3, 45, 24), (3, 50, 24), (3, 55, 24),
@@ -197,6 +200,8 @@ class Bloons(Game):
         """Load current level data."""
         lvl = LEVELS[self.level]
         self.darts_left = lvl['darts']
+        self.target_pops = lvl['target']
+        self.level_pops = 0
         self.bloons = []
         for type_idx, bx, by in lvl['bloons']:
             self.bloons.append({
@@ -238,6 +243,7 @@ class Bloons(Game):
         _, _, child_idx, points = BLOON_TYPES[type_idx]
         self.score += points
         self.pops_this_throw += 1
+        self.level_pops += 1
 
         # Spawn child at same position
         if child_idx >= 0:
@@ -325,18 +331,17 @@ class Bloons(Game):
         """Dart finished flying."""
         self.darts_left -= 1
 
-        alive = self._alive_bloons()
-        if len(alive) == 0:
-            # Level complete!
+        # Check win: hit target pop count
+        if self.level_pops >= self.target_pops:
             self.phase = PHASE_LEVEL_WIN
             self.phase_timer = 2.0
             self.result_text = "LEVEL CLEAR!"
             return
 
         if self.darts_left <= 0:
-            # Out of darts
+            # Out of darts, didn't reach target
             self.phase = PHASE_LEVEL_FAIL
-            self.result_text = "OUT OF DARTS"
+            self.result_text = "NOT ENOUGH"
             return
 
         # Show result briefly
@@ -557,8 +562,9 @@ class Bloons(Game):
         # Level number
         self.display.draw_text_small(2, 1, f"L{self.level + 1}", Colors.WHITE)
 
-        # Score
-        self.display.draw_text_small(18, 1, f"{self.score}", Colors.YELLOW)
+        # Pop progress (pops/target)
+        pop_color = Colors.GREEN if self.level_pops >= self.target_pops else Colors.YELLOW
+        self.display.draw_text_small(18, 1, f"{self.level_pops}/{self.target_pops}", pop_color)
 
         # Dart icons remaining (right side)
         for i in range(self.darts_left):
