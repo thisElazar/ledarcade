@@ -91,6 +91,10 @@ class SandGame(Game):
         self.life = [[0] * W for _ in range(H)]
         self.color_var = [[0] * W for _ in range(H)]
 
+        # Wind grid: (wx, wy) force per cell, decays each frame
+        self.wind_x = [[0.0] * W for _ in range(H)]
+        self.wind_y = [[0.0] * W for _ in range(H)]
+
         # Cursor
         self.cx = W // 2
         self.cy = H // 2
@@ -150,10 +154,11 @@ class SandGame(Game):
         return 'none'
 
     def _explode(self, cx, cy, radius):
-        """Explosion at (cx,cy) destroying non-stone in radius, spawning fire."""
+        """Explosion at (cx,cy) destroying non-stone in radius, spawning fire + wind."""
         for dy in range(-radius, radius + 1):
             for dx in range(-radius, radius + 1):
-                if dx * dx + dy * dy <= radius * radius:
+                dist_sq = dx * dx + dy * dy
+                if dist_sq <= radius * radius:
                     nx, ny = cx + dx, cy + dy
                     if self._in_sim(nx, ny):
                         m = self.grid[ny][nx]
@@ -162,6 +167,11 @@ class SandGame(Game):
                                 self._set_cell(nx, ny, FIRE)
                             else:
                                 self._set_cell(nx, ny, EMPTY)
+                        # Outward wind from explosion
+                        dist = max(1.0, dist_sq ** 0.5)
+                        strength = 3.0 / dist
+                        self.wind_x[ny][nx] += dx / dist * strength
+                        self.wind_y[ny][nx] += dy / dist * strength
 
     def _update_powder(self, x, y):
         """Update a powder particle (sand, gunpowder)."""
@@ -239,6 +249,10 @@ class SandGame(Game):
         if self.life[y][x] <= 0:
             self._set_cell(x, y, EMPTY)
             return
+        # Fire generates upward wind
+        self.wind_y[y][x] -= 0.4
+        if self._in_sim(x, y - 1):
+            self.wind_y[y - 1][x] -= 0.2
         # Fire rises (try up, up-diagonal, or random drift)
         if random.random() < 0.6:
             if self._empty_at(x, y - 1):
@@ -271,26 +285,49 @@ class SandGame(Game):
                 self._swap(x, y, x + dx, y + dy)
 
     def _update_plant(self, x, y):
-        """Plant grows into adjacent empty cells if water neighbor exists."""
-        if random.random() > 0.02:
-            return
-        # Check for adjacent water
+        """Plant grows vine-like: upward bias, clings to surfaces, water accelerates."""
+        # Base growth chance: 1.5% dry, 8% if water nearby
+        has_water = False
         water_pos = None
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             if self._mat_at(x + dx, y + dy) == WATER:
+                has_water = True
                 water_pos = (x + dx, y + dy)
                 break
-        if not water_pos:
+
+        chance = 0.08 if has_water else 0.015
+        if random.random() > chance:
             return
-        # Find empty neighbor to grow into
-        grow_dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        # Has a solid/plant neighbor to cling to? (vine grows on surfaces)
+        has_support = False
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            nm = self._mat_at(x + dx, y + dy)
+            if nm in (STONE, WOOD, SAND, PLANT):
+                has_support = True
+                break
+        # Also count the cell below as support
+        if self._mat_at(x, y + 1) not in (EMPTY, -1):
+            has_support = True
+
+        # Growth directions: strong upward bias, slight sideways
+        grow_dirs = [(0, -1), (0, -1), (0, -1),   # up (3x weight)
+                     (-1, 0), (1, 0),              # sideways
+                     (-1, -1), (1, -1)]            # diagonal up
         random.shuffle(grow_dirs)
+
         for dx, dy in grow_dirs:
-            if self._empty_at(x + dx, y + dy):
-                self._set_cell(x + dx, y + dy, PLANT)
-                # Consume the water
+            nx, ny = x + dx, y + dy
+            if not self._empty_at(nx, ny):
+                continue
+            # For non-upward growth, require support nearby
+            if dy >= 0 and not has_support:
+                continue
+            self._set_cell(nx, ny, PLANT)
+            # Consume water if available
+            if water_pos:
                 self._set_cell(water_pos[0], water_pos[1], EMPTY)
-                return
+            return
 
     def _check_interactions(self, x, y):
         """Check and apply material interactions for cell at (x,y)."""
@@ -312,8 +349,8 @@ class SandGame(Game):
                     if random.random() < 0.08:
                         self._set_cell(nx, ny, FIRE)
                 elif nm == PLANT:
-                    # Plant catches fire readily
-                    if random.random() < 0.15:
+                    # Plant burns fast and clean (vine-like)
+                    if random.random() < 0.45:
                         self._set_cell(nx, ny, FIRE)
                 elif nm == OIL:
                     # Oil is highly flammable - catches almost instantly
@@ -364,7 +401,7 @@ class SandGame(Game):
                     if random.random() < 0.15:
                         self._set_cell(nx, ny, FIRE)
                 elif nm == PLANT:
-                    if random.random() < 0.2:
+                    if random.random() < 0.5:
                         self._set_cell(nx, ny, FIRE)
                 elif nm == ICE:
                     if random.random() < 0.15:
@@ -406,12 +443,51 @@ class SandGame(Game):
                     if random.random() < 0.04:
                         self._set_cell(nx, ny, ICE)
 
+    def _apply_wind(self):
+        """Apply wind forces to non-solid particles, then decay wind."""
+        for y in range(H - 1, SIM_TOP - 1, -1):
+            for x in range(W):
+                wx = self.wind_x[y][x]
+                wy = self.wind_y[y][x]
+                if abs(wx) < 0.3 and abs(wy) < 0.3:
+                    # Decay small wind to zero
+                    self.wind_x[y][x] = 0.0
+                    self.wind_y[y][x] = 0.0
+                    continue
+
+                mat = self.grid[y][x]
+                if mat == EMPTY:
+                    # Propagate wind to neighbors (diffuse)
+                    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        nx, ny = x + dx, y + dy
+                        if self._in_sim(nx, ny):
+                            self.wind_x[ny][nx] += wx * 0.1
+                            self.wind_y[ny][nx] += wy * 0.1
+                elif mat != EMPTY:
+                    behav = self._behavior(mat)
+                    # Wind moves non-solid, non-grow particles
+                    if behav in ('powder', 'liquid', 'gas'):
+                        # Convert wind force to displacement (probabilistic)
+                        dx = 1 if wx > 0.5 else (-1 if wx < -0.5 else 0)
+                        dy = 1 if wy > 0.5 else (-1 if wy < -0.5 else 0)
+                        if dx != 0 or dy != 0:
+                            nx, ny = x + dx, y + dy
+                            if self._empty_at(nx, ny):
+                                self._swap(x, y, nx, ny)
+
+                # Decay wind
+                self.wind_x[y][x] *= 0.7
+                self.wind_y[y][x] *= 0.7
+
     def _simulate(self):
         """Run one frame of physics simulation."""
         # Clear updated flags
         for y in range(H):
             for x in range(W):
                 self.updated[y][x] = False
+
+        # Apply wind forces before main sim
+        self._apply_wind()
 
         # Randomize horizontal scan direction
         x_range = list(range(W))
@@ -440,12 +516,10 @@ class SandGame(Game):
                     self._update_plant(x, y)
 
                 # Check interactions at current cell position
-                # (particle may have moved away, so check what's here now)
                 if self._in_sim(x, y) and self.grid[y][x] != EMPTY:
                     self._check_interactions(x, y)
 
         # Second pass: check interactions for particles that landed in new spots
-        # This catches the moved-to positions that the first pass missed
         for y in range(H - 1, SIM_TOP - 1, -1):
             for x in x_range:
                 mat = self.grid[y][x]
