@@ -5,10 +5,9 @@ Tower defense: bloons follow a serpentine path, place towers to pop them,
 survive 20 waves. Economy system with lives and money.
 
 Controls:
-  Arrows    - Move placement cursor (fine 2px grid)
-  Space     - Place tower / select existing tower
-  Z         - Cycle tower type / upgrade selected tower
-  Space+Z   - Start next wave
+  Arrows  - Move placement cursor (fine 2px grid)
+  Button  - Place tower / select tower / upgrade / cycle type
+  Waves auto-start every 15 seconds
 """
 
 import math
@@ -104,6 +103,7 @@ CELL_SIZE = 2
 # Economy
 START_MONEY = 500
 START_LIVES = 20
+WAVE_AUTO_START = 15.0  # seconds between waves
 
 # Waves: list of groups, each group = (type_index, count, interval)
 WAVES = [
@@ -199,6 +199,9 @@ class BloonsTD(Game):
         # Wave end timer
         self.wave_end_timer = 0.0
 
+        # Auto-start countdown
+        self.wave_countdown = WAVE_AUTO_START
+
     def _can_place(self, gx, gy):
         """Check if tower can be placed at grid cell."""
         if (gx, gy) in PATH_CELLS:
@@ -291,6 +294,13 @@ class BloonsTD(Game):
             self._update_wave_end(input_state, dt)
 
     def _update_place(self, inp, dt):
+        # Auto-start wave countdown during PLACE phase
+        if self.phase == PHASE_PLACE and self.wave_num < len(WAVES):
+            self.wave_countdown -= dt
+            if self.wave_countdown <= 0:
+                self._start_wave()
+                return
+
         # Cursor movement with repeat
         moved = False
         if inp.up_pressed or inp.down_pressed or inp.left_pressed or inp.right_pressed:
@@ -313,10 +323,18 @@ class BloonsTD(Game):
                 self.cursor_gx = min(30, self.cursor_gx + 1)
             self.selected_tower = None
 
-        # Space: place tower or select existing
-        if inp.action_l:
+        # Either button: place / select / upgrade / cycle
+        if inp.action_l or inp.action_r:
             existing = self._tower_at(self.cursor_gx, self.cursor_gy)
-            if existing is not None:
+            if existing is not None and self.selected_tower == existing:
+                # Already selected — upgrade it
+                t = self.towers[existing]
+                tdef = TOWER_DEFS[t['type']]
+                if not t['upgraded'] and self.money >= tdef['upgrade_cost']:
+                    self.money -= tdef['upgrade_cost']
+                    t['upgraded'] = True
+            elif existing is not None:
+                # Select this tower
                 self.selected_tower = existing
             elif self._can_place(self.cursor_gx, self.cursor_gy):
                 tdef = TOWER_DEFS[self.selected_tower_type]
@@ -330,27 +348,12 @@ class BloonsTD(Game):
                         'cooldown': 0.0,
                     })
                     self.selected_tower = len(self.towers) - 1
-
-        # Z: cycle tower type / upgrade selected tower
-        if inp.action_r:
-            if self.selected_tower is not None:
-                # Try upgrade
-                t = self.towers[self.selected_tower]
-                tdef = TOWER_DEFS[t['type']]
-                if not t['upgraded'] and self.money >= tdef['upgrade_cost']:
-                    self.money -= tdef['upgrade_cost']
-                    t['upgraded'] = True
+                else:
+                    # Can't afford — cycle tower type
+                    self.selected_tower_type = (self.selected_tower_type + 1) % len(TOWER_DEFS)
             else:
-                # Cycle tower type
+                # Invalid spot — cycle tower type
                 self.selected_tower_type = (self.selected_tower_type + 1) % len(TOWER_DEFS)
-
-        # Both buttons together during PLACE phase: start next wave
-        if inp.action_l and inp.action_r_held and self.phase == PHASE_PLACE:
-            if self.wave_num < len(WAVES):
-                self._start_wave()
-        elif inp.action_r and inp.action_l_held and self.phase == PHASE_PLACE:
-            if self.wave_num < len(WAVES):
-                self._start_wave()
 
     def _update_wave(self, dt):
         # Spawn bloons
@@ -527,6 +530,7 @@ class BloonsTD(Game):
         if self.wave_end_timer <= 0 or inp.action_l or inp.action_r:
             self.phase = PHASE_PLACE
             self.selected_tower = None
+            self.wave_countdown = WAVE_AUTO_START
 
     # ==== DRAW ====
 
@@ -683,9 +687,10 @@ class BloonsTD(Game):
         else:
             tdef = TOWER_DEFS[self.selected_tower_type]
             self.display.draw_text_small(20, 59, f"{tdef['name']}", tdef['color'])
-            # Show GO hint during place phase
+            # Show countdown during place phase
             if self.phase == PHASE_PLACE and self.wave_num < len(WAVES):
-                self.display.draw_text_small(48, 59, "GO", Colors.GREEN)
+                secs = max(0, int(self.wave_countdown) + 1)
+                self.display.draw_text_small(50, 59, f"{secs}S", Colors.GREEN)
 
     def _draw_wave_end(self):
         """Show wave completion message."""

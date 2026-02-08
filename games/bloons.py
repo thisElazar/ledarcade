@@ -5,9 +5,8 @@ Classic dart-throwing game. Aim a monkey's throw with angle + power,
 pop balloon clusters with limited darts, progress through 15 levels.
 
 Controls:
-  Up/Down      - Adjust aim angle
-  Space (hold) - Hold to charge power, release to fire
-  Z            - Cancel back to aiming (during power phase)
+  Up/Down          - Adjust aim angle
+  Button (hold)    - Hold to charge power, release to fire
 """
 
 import math
@@ -273,19 +272,14 @@ class Bloons(Game):
             self.angle = min(MAX_ANGLE, self.angle + AIM_SPEED * dt)
         if inp.down:
             self.angle = max(MIN_ANGLE, self.angle - AIM_SPEED * dt)
-        if inp.action_l:
+        if inp.action_l or inp.action_r:
             # Start charging power
             self.power = 0.0
             self.phase = PHASE_POWER
 
     def _update_power(self, inp, dt):
-        if inp.action_r:
-            # Cancel back to aim
-            self.phase = PHASE_AIM
-            return
-
-        if inp.action_l_held:
-            # Charge while holding
+        if inp.action_l_held or inp.action_r_held:
+            # Charge while holding either button
             self.power = min(1.0, self.power + POWER_CHARGE_SPEED * dt)
         else:
             # Released — fire with current power (minimum 0.15 so it always goes somewhere)
@@ -361,7 +355,7 @@ class Bloons(Game):
 
     def _update_level_win(self, inp, dt):
         self.phase_timer -= dt
-        if self.phase_timer <= 0 or inp.action_l:
+        if self.phase_timer <= 0 or inp.action_l or inp.action_r:
             self.level += 1
             if self.level >= len(LEVELS):
                 # Beat all levels!
