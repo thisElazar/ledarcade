@@ -1,0 +1,96 @@
+/* === shared.css === */
+/* Reset, body, header/footer, divider, responsive, nav bar */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #080808;
+  color: #d8d0c4;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* --- Site Nav --- */
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 24px;
+  flex-wrap: wrap;
+  padding: 14px 20px 0;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.site-nav .nav-brand {
+  color: #c8a86e;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  margin-right: 16px;
+}
+.site-nav .nav-brand:hover {
+  text-shadow: 0 0 12px rgba(200, 168, 110, 0.4);
+}
+.site-nav a {
+  color: #5a5448;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.site-nav a:hover {
+  color: #9a9284;
+}
+.site-nav a.active {
+  color: #c8a86e;
+}
+
+/* --- Header --- */
+header {
+  text-align: center;
+  padding: 40px 20px 10px;
+}
+header h1 {
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  color: #c8a86e;
+  text-shadow: 0 0 30px rgba(200, 168, 110, 0.3);
+  animation: titlePulse 5s ease-in-out infinite;
+}
+header .tagline {
+  font-size: 13px;
+  color: #6a6254;
+  letter-spacing: 0.15em;
+  margin-top: 6px;
+  font-weight: 300;
+}
+@keyframes titlePulse {
+  0%, 100% { text-shadow: 0 0 20px rgba(200, 168, 110, 0.2); }
+  50% { text-shadow: 0 0 35px rgba(200, 168, 110, 0.45); }
+}
+
+/* --- Divider --- */
+.divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(200, 168, 110, 0.2);
+  margin: 60px auto 50px;
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 0 20px 40px;
+  font-size: 11px;
+  color: #3a3428;
+  letter-spacing: 0.05em;
+}
+
+/* --- Responsive --- */
+@media (max-width: 500px) {
+  header { padding-top: 24px; }
+  .site-nav { gap: 4px 14px; font-size: 10px; }
+  .site-nav .nav-brand { margin-right: 8px; }
+}

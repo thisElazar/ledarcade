@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wonder Cabinet - Emulator</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.pyodide-lab {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+  text-align: center;
+}
+.pyodide-lab h2 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: #c8a86e;
+  margin-bottom: 6px;
+}
+.pyodide-lab .lab-subtitle {
+  font-size: 13px;
+  color: #6a6254;
+  margin-bottom: 24px;
+}
+.lab-status {
+  font-size: 11px;
+  color: #4a4238;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: block;
+}
+.lab-status.ready { color: #50c8a0; }
+.lab-status.loading { color: #c8a86e; }
+.lab-status.error { color: #ff6464; }
+.lab-display {
+  display: inline-block;
+  background: linear-gradient(145deg, #151517, #101012);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+  position: relative;
+  margin-bottom: 16px;
+  outline: none;
+}
+.lab-display .canvas-wrap {
+  position: relative;
+  width: min(400px, 60vw);
+  aspect-ratio: 1;
+}
+.lab-display .canvas-wrap canvas.led {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  display: block;
+  border-radius: 4px;
+}
+.lab-display .canvas-wrap canvas.glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  filter: blur(4px) brightness(1.4);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.lab-display .click-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+.lab-display .click-overlay span {
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  color: #c8a86e;
+  text-shadow: 0 0 10px rgba(200,168,110,0.4);
+}
+.lab-fps {
+  font-size: 11px;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  color: #4a4238;
+  margin-top: 8px;
+}
+.lab-keys {
+  font-size: 11px;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  color: #4a4238;
+  margin-top: 6px;
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="nav-brand" href="index.html">WONDER CABINET</a>
+  <a href="index.html">HOME</a>
+  <a href="emulator.html" class="active">EMULATOR</a>
+  <a href="timeline.html">TIMELINE</a>
+  <a href="guide.html">FIELD GUIDE</a>
+</nav>
+
+<header>
+  <h1>WONDER CABINET</h1>
+  <p class="tagline">A cabinet of electronic curiosities</p>
+</header>
+
+<section class="pyodide-lab" id="pyodideLab">
+  <h2>EMULATOR</h2>
+  <p class="lab-subtitle">
+    The full arcade running in your browser &mdash; Python source via Pyodide
+  </p>
+
+  <span class="lab-status loading" id="pyStatus">loading runtime...</span>
+
+  <div class="lab-display" id="emuFrame" tabindex="0">
+    <div class="canvas-wrap">
+      <canvas class="glow" id="pyGlowCanvas" width="64" height="64"></canvas>
+      <canvas class="led" id="pyLedCanvas" width="640" height="640"></canvas>
+      <div class="click-overlay" id="emuClickOverlay"><span>CLICK TO START</span></div>
+    </div>
+  </div>
+  <div class="lab-fps" id="pyFps"></div>
+  <div class="lab-keys" id="emuKeys">Arrows: navigate &middot; Space: select &middot; Z: alt button &middot; Esc: back to menu</div>
+</section>
+
+<footer>
+  Programmed with AI, Designed &amp; Curated by Hand
+</footer>
+
+<script src="shared.js"></script>
+<script>
+(async function emulator() {
+  const pyStatusEl = document.getElementById('pyStatus');
+  const pyFpsEl = document.getElementById('pyFps');
+  const pyLedCanvas = document.getElementById('pyLedCanvas');
+  const pyGlowCanvas = document.getElementById('pyGlowCanvas');
+  const emuFrame = document.getElementById('emuFrame');
+  const emuOverlay = document.getElementById('emuClickOverlay');
+
+  const GITHUB_RAW = 'https://raw.githubusercontent.com/thisElazar/ledarcade/main/';
+
+  const pyRenderer = new LEDRenderer(pyLedCanvas, pyGlowCanvas);
+  const pyDisplay = new Display();
+
+  let catalog = null;
+  let pyodide = null;
+  let emuState = 'init';
+  let hasFocus = false;
+  const loadedModules = new Set();
+
+  function setStatus(text, cls) {
+    pyStatusEl.textContent = text;
+    pyStatusEl.className = 'lab-status ' + cls;
+  }
+
+  emuFrame.addEventListener('focus', () => { hasFocus = true; emuOverlay.style.display = 'none'; });
+  emuFrame.addEventListener('blur', () => {
+    hasFocus = false;
+    for (const k in keys) keys[k] = false;
+    for (const k in prevKeys) prevKeys[k] = false;
+  });
+  emuOverlay.addEventListener('click', (e) => { e.stopPropagation(); emuFrame.focus(); });
+
+  const keys = {};
+  const prevKeys = {};
+  let escapePressed = false;
+  document.addEventListener('keydown', (e) => {
+    if (!hasFocus) return;
+    const k = e.key;
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','z','Z'].includes(k)) {
+      e.preventDefault();
+      keys[k.toLowerCase()] = true;
+    }
+    if (k === 'Escape') {
+      e.preventDefault();
+      escapePressed = true;
+    }
+  });
+  document.addEventListener('keyup', (e) => {
+    const k = e.key;
+    keys[k.toLowerCase()] = false;
+  });
+
+  function pushInputToPython() {
+    const up = !!keys['arrowup'];
+    const down = !!keys['arrowdown'];
+    const left = !!keys['arrowleft'];
+    const right = !!keys['arrowright'];
+    const space = !!keys[' '];
+    const z = !!keys['z'];
+    const up_p = up && !prevKeys['arrowup'];
+    const down_p = down && !prevKeys['arrowdown'];
+    const left_p = left && !prevKeys['arrowleft'];
+    const right_p = right && !prevKeys['arrowright'];
+    const action_l = space && !prevKeys[' '];
+    const action_r = z && !prevKeys['z'];
+    prevKeys['arrowup'] = up;
+    prevKeys['arrowdown'] = down;
+    prevKeys['arrowleft'] = left;
+    prevKeys['arrowright'] = right;
+    prevKeys[' '] = space;
+    prevKeys['z'] = z;
+    const b = (v) => v ? 'True' : 'False';
+    pyodide.runPython(
+      `_input.up=${b(up)};_input.down=${b(down)};_input.left=${b(left)};_input.right=${b(right)}\n` +
+      `_input.up_pressed=${b(up_p)};_input.down_pressed=${b(down_p)};_input.left_pressed=${b(left_p)};_input.right_pressed=${b(right_p)}\n` +
+      `_input.action_l=${b(action_l)};_input.action_r=${b(action_r)};_input.action_l_held=${b(space)};_input.action_r_held=${b(z)}`
+    );
+  }
+
+  function copyAndRender() {
+    try {
+      pyodide.runPython(`_frame = bytes(_display.buffer)`);
+      const proxy = pyodide.globals.get('_frame');
+      const arr = proxy.toJs();
+      proxy.destroy();
+      pyDisplay.buffer.set(arr);
+      pyRenderer.render(pyDisplay);
+    } catch (e) {
+      console.error('Buffer copy error:', e);
+    }
+  }
+
+  setStatus('loading Pyodide runtime...', 'loading');
+  try {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js';
+    document.head.appendChild(script);
+    await new Promise((resolve, reject) => {
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Failed to load Pyodide CDN'));
+    });
+    setStatus('initializing Python...', 'loading');
+    pyodide = await loadPyodide();
+  } catch (e) {
+    setStatus('failed to load: ' + e.message, 'error');
+    return;
+  }
+
+  setStatus('loading catalog...', 'loading');
+  try {
+    const resp = await fetch(GITHUB_RAW + 'site/catalog.json');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    catalog = await resp.json();
+  } catch (e) {
+    setStatus('catalog error: ' + e.message, 'error');
+    return;
+  }
+
+  setStatus('setting up arcade environment...', 'loading');
+  await pyodide.runPythonAsync(`
+import sys, math, random, types
+from collections import deque
+from enum import Enum, auto
+
+GRID_SIZE = 64
+
+class Colors:
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    YELLOW = (255, 255, 0)
+    CYAN = (0, 255, 255)
+    MAGENTA = (255, 0, 255)
+    ORANGE = (255, 128, 0)
+    PINK = (255, 128, 128)
+    LIME = (128, 255, 0)
+    PURPLE = (128, 0, 255)
+    GRAY = (128, 128, 128)
+    DARK_GRAY = (64, 64, 64)
+    SNAKE = GREEN
+    FOOD = RED
+    WALL = GRAY
+    PADDLE = WHITE
+    BALL = WHITE
+    BRICK = ORANGE
+    PLAYER = CYAN
+    ENEMY = RED
+    BULLET = YELLOW
+
+FONT_3X5 = {
+    'A':['010','101','111','101','101'],'B':['110','101','110','101','110'],
+    'C':['011','100','100','100','011'],'D':['110','101','101','101','110'],
+    'E':['111','100','110','100','111'],'F':['111','100','110','100','100'],
+    'G':['011','100','101','101','011'],'H':['101','101','111','101','101'],
+    'I':['111','010','010','010','111'],'J':['001','001','001','101','010'],
+    'K':['101','110','100','110','101'],'L':['100','100','100','100','111'],
+    'M':['101','111','111','101','101'],'N':['101','111','111','111','101'],
+    'O':['010','101','101','101','010'],'P':['110','101','110','100','100'],
+    'Q':['010','101','101','110','011'],'R':['110','101','110','101','101'],
+    'S':['011','100','010','001','110'],'T':['111','010','010','010','010'],
+    'U':['101','101','101','101','011'],'V':['101','101','101','010','010'],
+    'W':['101','101','111','111','101'],'X':['101','101','010','101','101'],
+    'Y':['101','101','010','010','010'],'Z':['111','001','010','100','111'],
+    '0':['111','101','101','101','111'],'1':['010','110','010','010','111'],
+    '2':['110','001','010','100','111'],'3':['110','001','010','001','110'],
+    '4':['101','101','111','001','001'],'5':['111','100','110','001','110'],
+    '6':['011','100','110','101','010'],'7':['111','001','010','010','010'],
+    '8':['010','101','010','101','010'],'9':['010','101','011','001','110'],
+    ' ':['000','000','000','000','000'],':':['000','010','000','010','000'],
+    '-':['000','000','111','000','000'],'.':['000','000','000','000','010'],
+    '!':['010','010','010','000','010'],'?':['110','001','010','000','010'],
+    '/':['001','001','010','100','100'],
+    "'":['010','010','000','000','000'],
+    '+':['000','010','111','010','000'],
+    '*':['101','010','111','010','101'],
+    '(':['010','100','100','100','010'],
+    ')':['010','001','001','001','010'],
+}
+
+class Display:
+    def __init__(self):
+        self.buffer = bytearray(GRID_SIZE * GRID_SIZE * 3)
+
+    def clear(self, color=None):
+        if color is None: color = (0, 0, 0)
+        r, g, b = int(color[0]), int(color[1]), int(color[2])
+        buf = self.buffer
+        for i in range(0, len(buf), 3):
+            buf[i] = r; buf[i+1] = g; buf[i+2] = b
+
+    def set_pixel(self, x, y, color):
+        x, y = int(x), int(y)
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            i = (y * GRID_SIZE + x) * 3
+            buf = self.buffer
+            buf[i] = max(0, min(255, int(color[0])))
+            buf[i+1] = max(0, min(255, int(color[1])))
+            buf[i+2] = max(0, min(255, int(color[2])))
+
+    def get_pixel(self, x, y):
+        x, y = int(x), int(y)
+        if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+            i = (y * GRID_SIZE + x) * 3
+            return (self.buffer[i], self.buffer[i+1], self.buffer[i+2])
+        return (0, 0, 0)
+
+    def draw_rect(self, x, y, w, h, color, filled=True):
+        x, y, w, h = int(x), int(y), int(w), int(h)
+        if filled:
+            for py in range(max(0, y), min(GRID_SIZE, y + h)):
+                for px in range(max(0, x), min(GRID_SIZE, x + w)):
+                    self.set_pixel(px, py, color)
+        else:
+            for px in range(x, x + w):
+                self.set_pixel(px, y, color); self.set_pixel(px, y + h - 1, color)
+            for py in range(y, y + h):
+                self.set_pixel(x, py, color); self.set_pixel(x + w - 1, py, color)
+
+    def draw_line(self, x0, y0, x1, y1, color):
+        x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
+        dx = abs(x1 - x0); dy = -abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1; sy = 1 if y0 < y1 else -1
+        err = dx + dy
+        while True:
+            self.set_pixel(x0, y0, color)
+            if x0 == x1 and y0 == y1: break
+            e2 = 2 * err
+            if e2 >= dy: err += dy; x0 += sx
+            if e2 <= dx: err += dx; y0 += sy
+
+    def draw_circle(self, cx, cy, r, color, filled=False):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                d2 = dx * dx + dy * dy
+                if filled:
+                    if d2 <= r * r: self.set_pixel(cx + dx, cy + dy, color)
+                else:
+                    if abs(d2 - r * r) < r * 2: self.set_pixel(cx + dx, cy + dy, color)
+
+    def draw_text_small(self, x, y, text, color):
+        cursor = int(x)
+        for char in text.upper():
+            glyph = FONT_3X5.get(char)
+            if glyph:
+                for r in range(5):
+                    for c in range(3):
+                        if glyph[r][c] == '1':
+                            self.set_pixel(cursor + c, int(y) + r, color)
+            cursor += 4
+
+    def set_gamma(self, gamma, toe): pass
+    def render(self): pass
+
+class GameState(Enum):
+    PLAYING = auto()
+    PAUSED = auto()
+    GAME_OVER = auto()
+    WIN = auto()
+
+class InputState:
+    def __init__(self):
+        self.reset()
+    def reset(self):
+        self.up = False
+        self.down = False
+        self.left = False
+        self.right = False
+        self.up_pressed = False
+        self.down_pressed = False
+        self.left_pressed = False
+        self.right_pressed = False
+        self.action_l = False
+        self.action_r = False
+        self.action_l_held = False
+        self.action_r_held = False
+    @property
+    def dx(self):
+        return (1 if self.right else 0) - (1 if self.left else 0)
+    @property
+    def dy(self):
+        return (1 if self.down else 0) - (1 if self.up else 0)
+    @property
+    def any_direction(self):
+        return self.up or self.down or self.left or self.right
+
+class Game:
+    name = "Unnamed Game"
+    description = ""
+    category = ""
+    def __init__(self, display):
+        self.display = display
+        self.state = GameState.PLAYING
+        self.score = 0
+        self.high_score = 0
+    def reset(self): pass
+    def update(self, input_state, dt): pass
+    def draw(self): pass
+    def draw_score(self, y=1):
+        self.display.draw_text_small(1, y, str(self.score), Colors.WHITE)
+    def draw_game_over(self, selection=0):
+        self.display.clear(Colors.BLACK)
+        self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
+        self.display.draw_text_small(12, 30, "SCORE:" + str(self.score), Colors.WHITE)
+        if selection == 0:
+            self.display.draw_text_small(4, 44, ">PLAY AGAIN", Colors.YELLOW)
+            self.display.draw_text_small(4, 54, " MENU", Colors.GRAY)
+        else:
+            self.display.draw_text_small(4, 44, " PLAY AGAIN", Colors.GRAY)
+            self.display.draw_text_small(4, 54, ">MENU", Colors.YELLOW)
+
+class Visual:
+    name = "Unnamed"
+    description = ""
+    category = ""
+    def __init__(self, display):
+        self.display = display
+        self.time = 0.0
+        self.wants_exit = False
+        self.reset()
+    def reset(self): pass
+    def update(self, dt): self.time += dt
+    def draw(self): pass
+    def handle_input(self, input_state): return False
+
+# --- sys.modules shimming ---
+_arcade_mod = types.ModuleType('arcade')
+for _n in ['Display', 'Colors', 'GRID_SIZE', 'Game', 'GameState', 'InputState',
+           'Visual', 'FONT_3X5']:
+    setattr(_arcade_mod, _n, eval(_n))
+sys.modules['arcade'] = _arcade_mod
+
+_visuals_mod = types.ModuleType('visuals')
+for _n in ['Visual', 'Display', 'Colors', 'GRID_SIZE']:
+    setattr(_visuals_mod, _n, eval(_n))
+sys.modules['visuals'] = _visuals_mod
+
+_games_mod = types.ModuleType('games')
+sys.modules['games'] = _games_mod
+
+for _stub_name in ['highscores', 'settings', 'transitions', 'catalog']:
+    _stub = types.ModuleType(_stub_name)
+    sys.modules[_stub_name] = _stub
+
+class _HighScoreManager:
+    def get_top_scores(self, *a, **kw): return []
+    def is_high_score(self, *a, **kw): return False
+    def add_score(self, *a, **kw): return -1
+    def log_play(self, *a, **kw): pass
+sys.modules['highscores'].HighScoreManager = _HighScoreManager
+sys.modules['highscores'].get_high_score_manager = lambda: _HighScoreManager()
+
+_display = Display()
+_input = InputState()
+_item = None
+_is_game = False
+_game_over_sel = 0
+_exit_hold = 0.0
+  `);
+
+  const catJson = JSON.stringify(catalog);
+  await pyodide.runPythonAsync(`
+import json as _json
+
+_catalog = _json.loads('''${catJson.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}''')
+
+class EmulatorMenu:
+    def __init__(self, catalog):
+        self.categories = catalog['categories']
+        self.cat_index = 0
+        self.item_index = 0
+
+    def handle_input(self, inp, dt):
+        cats = self.categories
+        if not cats:
+            return None
+        cat = cats[self.cat_index]
+        items = cat.get('items', [])
+        if inp.left_pressed and len(cats) > 1:
+            self.cat_index = (self.cat_index - 1) % len(cats)
+            self.item_index = 0
+        elif inp.right_pressed and len(cats) > 1:
+            self.cat_index = (self.cat_index + 1) % len(cats)
+            self.item_index = 0
+        if items:
+            if inp.up_pressed:
+                self.item_index = (self.item_index - 1) % len(items)
+            elif inp.down_pressed:
+                self.item_index = (self.item_index + 1) % len(items)
+            if inp.action_l or inp.action_r:
+                return items[self.item_index]
+        return None
+
+    def draw(self, display):
+        display.clear(Colors.BLACK)
+        cats = self.categories
+        if not cats:
+            display.draw_text_small(2, 30, "NO ITEMS", Colors.RED)
+            return
+        cat = cats[self.cat_index]
+        cat_color = tuple(cat['color'])
+        items = cat.get('items', [])
+
+        display.draw_text_small(4, 2, cat['name'], cat_color)
+
+        if len(cats) > 1:
+            display.set_pixel(1, 4, Colors.GRAY)
+            display.set_pixel(0, 5, Colors.GRAY)
+            display.set_pixel(1, 6, Colors.GRAY)
+            display.set_pixel(62, 4, Colors.GRAY)
+            display.set_pixel(63, 5, Colors.GRAY)
+            display.set_pixel(62, 6, Colors.GRAY)
+
+        n = len(cats)
+        vis_dots = min(n, 12)
+        spacing = 4
+        ws = max(0, min(self.cat_index - vis_dots // 2, n - vis_dots))
+        we = min(ws + vis_dots, n)
+        tw = (we - ws) * spacing
+        dx = 32 - tw // 2
+        if ws > 0:
+            display.set_pixel(2, 9, Colors.GRAY)
+            display.set_pixel(3, 8, Colors.GRAY)
+            display.set_pixel(3, 10, Colors.GRAY)
+        if we < n:
+            display.set_pixel(61, 9, Colors.GRAY)
+            display.set_pixel(60, 8, Colors.GRAY)
+            display.set_pixel(60, 10, Colors.GRAY)
+        for i in range(ws, we):
+            px = dx + (i - ws) * spacing
+            c = Colors.WHITE if i == self.cat_index else Colors.DARK_GRAY
+            display.set_pixel(px, 9, c)
+
+        display.draw_line(0, 11, 63, 11, Colors.DARK_GRAY)
+
+        if not items:
+            display.draw_text_small(8, 30, "EMPTY", Colors.GRAY)
+            return
+        visible = 5
+        si = max(0, self.item_index - visible // 2)
+        if si + visible > len(items):
+            si = max(0, len(items) - visible)
+        for i, item in enumerate(items[si:si + visible]):
+            ai = si + i
+            y = 14 + i * 8
+            if ai == self.item_index:
+                display.draw_rect(0, y - 1, 64, 7, Colors.DARK_GRAY)
+                display.draw_text_small(2, y, ">" + item['name'], cat_color)
+            else:
+                display.draw_text_small(2, y, " " + item['name'], Colors.WHITE)
+        if si > 0:
+            display.draw_text_small(58, 14, "^", Colors.GRAY)
+        if si + visible < len(items):
+            display.draw_text_small(58, 14 + (visible - 1) * 8, "v", Colors.GRAY)
+
+        display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
+        display.draw_text_small(2, 58, "SPACE:GO", Colors.GRAY)
+        display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
+
+_menu = EmulatorMenu(_catalog)
+  `);
+
+  async function loadPythonModule(modulePath) {
+    if (loadedModules.has(modulePath)) return true;
+    try {
+      const resp = await fetch(GITHUB_RAW + modulePath);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status + ' for ' + modulePath);
+      let source = await resp.text();
+
+      let pkgName, modName;
+      if (modulePath.startsWith('games/')) {
+        pkgName = 'games';
+        modName = modulePath.replace('games/', '').replace('.py', '');
+      } else if (modulePath.startsWith('visuals/')) {
+        pkgName = 'visuals';
+        modName = modulePath.replace('visuals/', '').replace('.py', '');
+      } else {
+        pkgName = '';
+        modName = modulePath.replace('.py', '');
+      }
+
+      source = source.replace(/^from \. import /gm, 'from ' + pkgName + ' import ');
+      source = source.replace(/^from \.(\w+) import /gm, 'from ' + pkgName + '.$1 import ');
+      source = source.replace(/^sys\.path\..*/gm, '');
+
+      pyodide.runPython(source);
+
+      if (pkgName && modName) {
+        const fullName = pkgName + '.' + modName;
+        pyodide.runPython(`
+import types as _t
+if '${fullName}' not in sys.modules:
+    _m = _t.ModuleType('${fullName}')
+    sys.modules['${fullName}'] = _m
+else:
+    _m = sys.modules['${fullName}']
+for _k, _v in dict(globals()).items():
+    if not _k.startswith('_'):
+        setattr(_m, _k, _v)
+        if hasattr(_v, '__class__') and isinstance(_v, type):
+            setattr(sys.modules['${pkgName}'], _k, _v)
+        `);
+      }
+
+      loadedModules.add(modulePath);
+      return true;
+    } catch (e) {
+      console.error('Module load error for ' + modulePath + ':', e);
+      return false;
+    }
+  }
+
+  async function launchItem(itemData) {
+    emuState = 'loading';
+    setStatus('loading ' + itemData.name + '...', 'loading');
+
+    pyodide.runPython(`
+_display.clear(Colors.BLACK)
+_display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
+    `);
+    copyAndRender();
+
+    const deps = itemData.deps || [];
+    for (const dep of deps) {
+      const ok = await loadPythonModule(dep);
+      if (!ok) {
+        showError('DEP FAIL: ' + dep);
+        return;
+      }
+    }
+
+    const ok = await loadPythonModule(itemData.module);
+    if (!ok) {
+      showError('LOAD FAIL');
+      return;
+    }
+
+    try {
+      const isGame = itemData.is_game;
+      pyodide.runPython(`
+_item = ${itemData.cls}(_display)
+_is_game = ${isGame ? 'True' : 'False'}
+_game_over_sel = 0
+_exit_hold = 0.0
+      `);
+      emuState = 'running';
+      setStatus('running: ' + itemData.name, 'ready');
+    } catch (e) {
+      console.error('Instantiate error:', e);
+      showError(e.message.split('\\n')[0].substring(0, 30));
+    }
+  }
+
+  function showError(msg) {
+    emuState = 'error';
+    const safeMsg = String(msg).replace(/[^A-Za-z0-9 .:_-]/g, '').substring(0, 15);
+    try {
+      pyodide.runPython(`
+_display.clear(Colors.BLACK)
+_display.draw_text_small(2, 24, "ERROR", Colors.RED)
+_display.draw_text_small(2, 36, "${safeMsg}", Colors.GRAY)
+      `);
+      copyAndRender();
+    } catch (e2) { /* ignore render errors during error display */ }
+    setStatus('error: ' + msg, 'error');
+    setTimeout(() => { returnToMenu(); }, 2000);
+  }
+
+  function returnToMenu() {
+    pyodide.runPython(`
+_item = None
+_exit_hold = 0.0
+_game_over_sel = 0
+    `);
+    emuState = 'menu';
+    setStatus('menu', 'ready');
+  }
+
+  setStatus('ready', 'ready');
+  emuState = 'menu';
+
+  let pyLastTime = performance.now();
+  let pyFrameCount = 0;
+  let pyFpsTimer = 0;
+  let pendingLaunch = null;
+
+  function pyLoop(timestamp) {
+    const dt = Math.min((timestamp - pyLastTime) / 1000, 0.05);
+    pyLastTime = timestamp;
+
+    if (hasFocus) {
+      pushInputToPython();
+    } else {
+      pyodide.runPython('_input.reset()');
+    }
+
+    try {
+      if (emuState === 'menu') {
+        escapePressed = false;
+        const result = pyodide.runPython(`
+_sel = _menu.handle_input(_input, ${dt})
+_menu.draw(_display)
+_sel
+        `);
+        if (result && result.toJs) {
+          const item = Object.fromEntries(result.toJs());
+          result.destroy();
+          pendingLaunch = item;
+        } else if (result !== null && result !== undefined && typeof result !== 'boolean') {
+          try { result.destroy && result.destroy(); } catch(e) {}
+        }
+        copyAndRender();
+
+        if (pendingLaunch) {
+          const item = pendingLaunch;
+          pendingLaunch = null;
+          launchItem(item);
+        }
+
+      } else if (emuState === 'running') {
+        if (escapePressed) {
+          escapePressed = false;
+          returnToMenu();
+        } else {
+          const stateStr = pyodide.runPython(`
+if _item:
+    if _is_game:
+        _item.update(_input, ${dt})
+        _item.draw()
+        if _input.action_l_held and _input.action_r_held:
+            _exit_hold += ${dt}
+        else:
+            _exit_hold = 0.0
+        if _exit_hold >= 2.0:
+            'exit'
+        elif hasattr(_item, 'state') and _item.state == GameState.GAME_OVER:
+            'gameover'
+        else:
+            'ok'
+    else:
+        _item.handle_input(_input)
+        _item.update(${dt})
+        _item.draw()
+        both = _input.action_l_held and _input.action_r_held
+        either = _input.action_l_held or _input.action_r_held
+        if both:
+            _exit_hold += ${dt} * 2.0
+        elif either:
+            _exit_hold += ${dt}
+        else:
+            _exit_hold = 0.0
+        if _exit_hold >= 1.0 or getattr(_item, 'wants_exit', False):
+            'exit'
+        else:
+            'ok'
+else:
+    'exit'
+          `);
+          copyAndRender();
+
+          if (stateStr === 'exit') {
+            returnToMenu();
+          } else if (stateStr === 'gameover') {
+            emuState = 'gameover';
+            pyodide.runPython(`_game_over_sel = 0`);
+          }
+        }
+
+      } else if (emuState === 'gameover') {
+        if (escapePressed) {
+          escapePressed = false;
+          returnToMenu();
+        } else {
+          const goResult = pyodide.runPython(`
+_r = 'show'
+if _input.up_pressed or _input.down_pressed:
+    _game_over_sel = 1 - _game_over_sel
+elif _input.action_l or _input.action_r:
+    if _game_over_sel == 0:
+        _r = 'again'
+    else:
+        _r = 'menu'
+if _input.action_l_held and _input.action_r_held:
+    _exit_hold += ${dt}
+else:
+    _exit_hold = 0.0
+if _exit_hold >= 2.0:
+    _r = 'menu'
+if _item:
+    _item.draw_game_over(_game_over_sel)
+_r
+          `);
+          copyAndRender();
+
+          if (goResult === 'again') {
+            pyodide.runPython(`
+_item.score = 0
+_item.state = GameState.PLAYING
+_item.reset()
+_exit_hold = 0.0
+            `);
+            emuState = 'running';
+            setStatus('running', 'ready');
+          } else if (goResult === 'menu') {
+            returnToMenu();
+          }
+        }
+      }
+      if (escapePressed && (emuState === 'loading' || emuState === 'error')) {
+        escapePressed = false;
+        returnToMenu();
+      }
+    } catch (e) {
+      console.error('Emulator frame error:', e);
+      showError(e.message ? e.message.split('\\n')[0].substring(0, 30) : 'runtime error');
+    }
+
+    pyFrameCount++;
+    pyFpsTimer += dt;
+    if (pyFpsTimer >= 1.0) {
+      pyFpsEl.textContent = pyFrameCount + ' fps \u00b7 Python via Pyodide';
+      pyFrameCount = 0;
+      pyFpsTimer = 0;
+    }
+
+    requestAnimationFrame(pyLoop);
+  }
+
+  requestAnimationFrame(pyLoop);
+})();
+</script>
+</body>
+</html>

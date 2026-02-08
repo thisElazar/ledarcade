@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wonder Cabinet - Timeline</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.timeline-section {
+  padding: 0 0 20px;
+}
+.timeline-section h2 {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: #c8a86e;
+  margin-bottom: 6px;
+}
+.timeline-section .tl-subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #6a6254;
+  margin-bottom: 20px;
+}
+.timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+  padding: 0 20px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: #6a6254;
+}
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.timeline-track {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+.timeline-track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.06);
+}
+.tl-era {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: #3a3428;
+  text-transform: uppercase;
+  padding: 20px 0;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1;
+}
+.tl-era::before,
+.tl-era::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.04);
+}
+.tl-item {
+  position: relative;
+  width: 50%;
+  padding: 10px 28px;
+  min-height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  z-index: 1;
+}
+.tl-item.left {
+  margin-right: auto;
+  text-align: right;
+  padding-right: 28px;
+}
+.tl-item.right {
+  margin-left: auto;
+  text-align: left;
+  padding-left: 28px;
+}
+.tl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--c) 60%, transparent);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tl-item.left .tl-dot {
+  right: -4px;
+}
+.tl-item.right .tl-dot {
+  left: -4px;
+}
+.tl-yr {
+  font-size: 10px;
+  color: #5a5448;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.tl-nm {
+  font-size: 12px;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  letter-spacing: 0.02em;
+  color: #9a9284;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+@media (max-width: 500px) {
+  .timeline-track::after {
+    left: 20px;
+  }
+  .tl-item {
+    width: 100%;
+    padding-left: 36px;
+    text-align: left;
+  }
+  .tl-item.left {
+    margin-right: 0;
+    text-align: left;
+    padding-right: 10px;
+    padding-left: 36px;
+  }
+  .tl-item.right {
+    margin-left: 0;
+    padding-left: 36px;
+  }
+  .tl-item.left .tl-dot,
+  .tl-item.right .tl-dot {
+    left: 16px;
+    right: auto;
+  }
+  .tl-era {
+    text-align: left;
+    padding-left: 36px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a class="nav-brand" href="index.html">WONDER CABINET</a>
+  <a href="index.html">HOME</a>
+  <a href="emulator.html">EMULATOR</a>
+  <a href="timeline.html" class="active">TIMELINE</a>
+  <a href="guide.html">FIELD GUIDE</a>
+</nav>
+
+<header>
+  <h1>WONDER CABINET</h1>
+  <p class="tagline">A cabinet of electronic curiosities</p>
+</header>
+
+<section class="timeline-section" id="timeline">
+  <h2>A HISTORY OF IDEAS</h2>
+  <p class="tl-subtitle">Every game, machine, algorithm, and discovery in the collection &mdash; placed in time</p>
+
+  <nav class="timeline-legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#b464ff"></span>MACHINES</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#6496ff"></span>PHYSICS</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#50c8a0"></span>BIOLOGY</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ff64ff"></span>AUTOMATA</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ffff00"></span>GAMES</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#64ffff"></span>DIGITAL</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ffb432"></span>MUSIC</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#e8c44a"></span>ART</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ff8080"></span>HOUSEHOLD</span>
+  </nav>
+
+  <div class="timeline-track">
+
+    <span class="tl-era">ANCIENT WORLD</span>
+
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">BOWLING</span><span class="tl-yr">~3200 BC</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">~3000 BC</span><span class="tl-nm">MANCALA</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">GO</span><span class="tl-yr">~500 BC</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">~250 BC</span><span class="tl-nm">ARCHIMEDES' SCREW</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">ASTROLABE</span><span class="tl-yr">~200 BC</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">~100 BC</span><span class="tl-nm">ANTIKYTHERA</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">CHESS</span><span class="tl-yr">~600</span><span class="tl-dot"></span>
+    </div>
+
+    <span class="tl-era">MEDIEVAL &amp; RENAISSANCE</span>
+
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">~1100</span><span class="tl-nm">HURDY GURDY</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">CHECKERS</span><span class="tl-yr">~1100</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1440</span><span class="tl-nm">GUTENBERG PRESS</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">SOLAR SYSTEM</span><span class="tl-yr">1543</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1657</span><span class="tl-nm">PENDULUM CLOCK</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">MICROSCOPE</span><span class="tl-yr">1670</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#64ffff">
+      <span class="tl-dot"></span><span class="tl-yr">1704</span><span class="tl-nm">TRUCHET TILES</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">ORRERY</span><span class="tl-yr">1713</span><span class="tl-dot"></span>
+    </div>
+
+    <span class="tl-era">AGE OF INDUSTRY</span>
+
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1769</span><span class="tl-nm">WATT ENGINE</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">COULOMB'S LAW</span><span class="tl-yr">1785</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#6496ff">
+      <span class="tl-dot"></span><span class="tl-yr">1787</span><span class="tl-nm">CHLADNI PLATES</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffb432">
+      <span class="tl-nm">MUSIC BOX</span><span class="tl-yr">~1796</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1804</span><span class="tl-nm">JACQUARD LOOM</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffb432">
+      <span class="tl-nm">METRONOME</span><span class="tl-yr">1815</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">~1829</span><span class="tl-nm">LOCOMOTIVE</span>
+    </div>
+    <div class="tl-item left" style="--c:#e8c44a">
+      <span class="tl-nm">GREAT WAVE</span><span class="tl-yr">1831</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1851</span><span class="tl-nm">SINGER</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">GYROSCOPE</span><span class="tl-yr">1852</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#6496ff">
+      <span class="tl-dot"></span><span class="tl-yr">1858</span><span class="tl-nm">M&Ouml;BIUS STRIP</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">SPECTROSCOPE</span><span class="tl-yr">1859</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#6496ff">
+      <span class="tl-dot"></span><span class="tl-yr">1865</span><span class="tl-nm">EM FIELD</span>
+    </div>
+    <div class="tl-item left" style="--c:#50c8a0">
+      <span class="tl-nm">PERIODIC TABLE</span><span class="tl-yr">1869</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1874</span><span class="tl-nm">FIFTEEN PUZZLE</span>
+    </div>
+
+    <span class="tl-era">TURN OF CENTURY</span>
+
+    <div class="tl-item left" style="--c:#ffb432">
+      <span class="tl-nm">GRAMOPHONE</span><span class="tl-yr">1887</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#e8c44a">
+      <span class="tl-dot"></span><span class="tl-yr">1889</span><span class="tl-nm">STARRY NIGHT</span>
+    </div>
+    <div class="tl-item left" style="--c:#e8c44a">
+      <span class="tl-nm">THE SCREAM</span><span class="tl-yr">1893</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">1896</span><span class="tl-nm">PIANO ROLL</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">RADIOACTIVITY</span><span class="tl-yr">1896</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1897</span><span class="tl-nm">OSCILLOSCOPE</span>
+    </div>
+    <div class="tl-item left" style="--c:#e8c44a">
+      <span class="tl-nm">WATER LILIES</span><span class="tl-yr">1906</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#b464ff">
+      <span class="tl-dot"></span><span class="tl-yr">1908</span><span class="tl-nm">MODEL T</span>
+    </div>
+    <div class="tl-item left" style="--c:#50c8a0">
+      <span class="tl-nm">BOHR ATOM</span><span class="tl-yr">1913</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">1920</span><span class="tl-nm">THEREMIN</span>
+    </div>
+
+    <span class="tl-era">MID-CENTURY</span>
+
+    <div class="tl-item left" style="--c:#e8c44a">
+      <span class="tl-nm">MONDRIAN</span><span class="tl-yr">1943</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1947</span><span class="tl-nm">PINBALL</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">CURTA</span><span class="tl-yr">1948</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ff8080">
+      <span class="tl-dot"></span><span class="tl-yr">1948</span><span class="tl-nm">POLAROID</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">TURING PATTERNS</span><span class="tl-yr">1952</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#50c8a0">
+      <span class="tl-dot"></span><span class="tl-yr">1953</span><span class="tl-nm">DNA STRUCTURE</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">LORENZ ATTRACTOR</span><span class="tl-yr">1963</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ff8080">
+      <span class="tl-dot"></span><span class="tl-yr">1963</span><span class="tl-nm">LAVA LAMP</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">QUARKS</span><span class="tl-yr">1964</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">1964</span><span class="tl-nm">MOOG SYNTH</span>
+    </div>
+    <div class="tl-item left" style="--c:#b464ff">
+      <span class="tl-nm">NEWTON'S CRADLE</span><span class="tl-yr">1967</span><span class="tl-dot"></span>
+    </div>
+
+    <span class="tl-era">THE COMPUTER AGE</span>
+
+    <div class="tl-item right" style="--c:#ff64ff">
+      <span class="tl-dot"></span><span class="tl-yr">1970</span><span class="tl-nm">GAME OF LIFE</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">MASTERMIND</span><span class="tl-yr">1970</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">1971</span><span class="tl-nm">EQUALIZER</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">OTHELLO</span><span class="tl-yr">1971</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1972</span><span class="tl-nm">PONG</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">CONNECT 4</span><span class="tl-yr">1974</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1974</span><span class="tl-nm">D&amp;D</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">FIREFLY SYNC</span><span class="tl-yr">1975</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1976</span><span class="tl-nm">BREAKOUT</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">SIMON</span><span class="tl-yr">1978</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1978</span><span class="tl-nm">SPACE INVADERS</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">LUNAR LANDER</span><span class="tl-yr">1979</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1979</span><span class="tl-nm">ASTEROIDS</span>
+    </div>
+
+    <span class="tl-era">GOLDEN AGE OF ARCADES</span>
+
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">PAC-MAN</span><span class="tl-yr">1980</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffb432">
+      <span class="tl-dot"></span><span class="tl-yr">1980</span><span class="tl-nm">TR-808</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">CENTIPEDE</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1981</span><span class="tl-nm">DONKEY KONG</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">GALAGA</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1981</span><span class="tl-nm">FROGGER</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">DEFENDER</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1982</span><span class="tl-nm">MS. PAC-MAN</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">DIG DUG</span><span class="tl-yr">1982</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1982</span><span class="tl-nm">Q*BERT</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">BURGERTIME</span><span class="tl-yr">1982</span><span class="tl-dot"></span>
+    </div>
+
+    <span class="tl-era">8-BIT &amp; BEYOND</span>
+
+    <div class="tl-item right" style="--c:#ff64ff">
+      <span class="tl-dot"></span><span class="tl-yr">1983</span><span class="tl-nm">WOLFRAM CA</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">LODE RUNNER</span><span class="tl-yr">1983</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1983</span><span class="tl-nm">BOMBERMAN</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">GRAY-SCOTT</span><span class="tl-yr">1984</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1985</span><span class="tl-nm">TETRIS</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">ARKANOID</span><span class="tl-yr">1986</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ff64ff">
+      <span class="tl-dot"></span><span class="tl-yr">1987</span><span class="tl-nm">BOIDS</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">SANDPILE</span><span class="tl-yr">1987</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#64ffff">
+      <span class="tl-dot"></span><span class="tl-yr">~1987</span><span class="tl-nm">AMIGA DEMOS</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">HODGEPODGE</span><span class="tl-yr">1988</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1989</span><span class="tl-nm">PIPE DREAM</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff8080">
+      <span class="tl-nm">SOLITAIRE</span><span class="tl-yr">1990</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1991</span><span class="tl-nm">SKIFREE</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">JEZZBALL</span><span class="tl-yr">1992</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1995</span><span class="tl-nm">LIGHTS OUT</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">BOP IT</span><span class="tl-yr">1996</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">1996</span><span class="tl-nm">RUSH HOUR</span>
+    </div>
+
+    <span class="tl-era">CONNECTED ERA</span>
+
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">SNAKE</span><span class="tl-yr">1997</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#64ffff">
+      <span class="tl-dot"></span><span class="tl-yr">1999</span><span class="tl-nm">MATRIX RAIN</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">STABLE FLUIDS</span><span class="tl-yr">1999</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ff8080">
+      <span class="tl-dot"></span><span class="tl-yr">~2000</span><span class="tl-nm">DVD LOGO</span>
+    </div>
+    <div class="tl-item left" style="--c:#6496ff">
+      <span class="tl-nm">SPIKING NEURONS</span><span class="tl-yr">2003</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">2007</span><span class="tl-nm">PORTAL</span>
+    </div>
+    <div class="tl-item left" style="--c:#ff64ff">
+      <span class="tl-nm">PARTICLE LIFE</span><span class="tl-yr">2007</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#64ffff">
+      <span class="tl-dot"></span><span class="tl-yr">2007</span><span class="tl-nm">CURL NOISE</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">BLOONS</span><span class="tl-yr">2007</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">2013</span><span class="tl-nm">GEOMETRY DASH</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">FLAPPY BIRD</span><span class="tl-yr">2013</span><span class="tl-dot"></span>
+    </div>
+    <div class="tl-item right" style="--c:#ffff00">
+      <span class="tl-dot"></span><span class="tl-yr">2014</span><span class="tl-nm">2048</span>
+    </div>
+    <div class="tl-item left" style="--c:#ffff00">
+      <span class="tl-nm">AGAR.IO</span><span class="tl-yr">2015</span><span class="tl-dot"></span>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Programmed with AI, Designed &amp; Curated by Hand
+</footer>
+
+</body>
+</html>
