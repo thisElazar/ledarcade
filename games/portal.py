@@ -44,7 +44,8 @@ G = 10  # gap / pit (elevation -1.0)
 PP = 11 # pressure plate (floor marker, not a wall)
 CC = 12 # companion cube start position (floor)
 EX = 13 # exit trigger
-PIT = 14 # pit/gap floor marker (blocks movement, renders as void)
+PIT = 14 # pit/gap floor marker (renders as void, player falls in)
+T = 15   # turret wall (solid, non-portalable)
 
 # Face directions: N=0, E=1, S=2, W=3
 FACE_DX = [0, 1, 0, -1]
@@ -58,7 +59,6 @@ FACE_DY = [-1, 0, 1, 0]
 # ═══════════════════════════════════════════════════════════════════
 
 MAP_W = 24
-MAP_H = 41  # updated by _M length
 
 # Cell types determine wall rendering and collision
 # 0 = open floor, other values = wall types above
@@ -74,8 +74,6 @@ _M = [
     [W,W,U,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 5
 
     # ── Chamber 01 — First Portal (rows 6-12) ──
-    # Open room with P walls on north/south edges (easily visible).
-    # Player enters from col 2 (kept open). Exit corridor south at col 2.
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 6
     [W,P,0,P,P,P,P,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 7
     [W,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 8
@@ -85,9 +83,6 @@ _M = [
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 12
 
     # ── Chamber 02 — Thinking with Portals (rows 13-19) ──
-    # Two rooms separated by W barrier at col 7. P walls on each face
-    # of barrier. Must portal through to reach exit on right side.
-    # Entry from north (col 2). Exit south-east (col 12→col 2).
     [W,W,0,0,0,0,P,W,P,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 13
     [W,W,0,0,0,0,P,W,P,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 14
     [W,W,0,0,0,0,P,W,P,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 15
@@ -97,9 +92,6 @@ _M = [
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 19
 
     # ── Chamber 03 — Mind the Gap (rows 20-27) ──
-    # Wide room with full-width pit across the middle.
-    # P walls on west (col 1) and east (col 12) walls on both sides.
-    # Player portals from near-side P to far-side P across the gap.
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 20
     [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 21
     [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 22
@@ -109,60 +101,107 @@ _M = [
     [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 26
     [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 27
 
-    # ── Chamber 04 — The Corridor (rows 28-35) ──
-    # L-shaped corridor from ch03 exit to ch05 entry.
-    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 28
-    [W,W,W,W,W,0,0,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W],  # 29
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 30
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 31
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 32
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 33
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 34
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 35
+    # ── Chamber 04 — The Bridge (rows 28-42) ──
+    # Three zones separated by 3-row PIT gaps with middle platform.
+    # P walls on cols 1 and 12 visible across gaps.
+    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 28 entry
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 29 near floor
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 30 near P walls
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 31 PIT
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 32 PIT
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 33 PIT
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 34 platform P
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 35 platform floor
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 36 platform P
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 37 PIT
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 38 PIT
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 39 PIT
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 40 far P walls
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 41 far floor
+    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 42 exit south
 
-    # ── Chamber 05 — Companion Cube (rows 36-40) ──
-    # Room with cube and pressure plate controlling exit door.
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 36
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 37
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,D,W,W,W],  # 38
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,0,W,W],  # 39
-    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 40
+    # ── Chamber 05 — Turret Alley (rows 43-50) ──
+    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 43 corridor
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 44 narrows
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 45 approach
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 46
+    [W,W,T,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 47 cross + turret
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 48
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 49
+    [W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 50
+
+    # ── Corridor to Cube Room (rows 51-54) ──
+    [W,W,W,W,W,0,0,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W],  # 51
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 52
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 53
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 54
+
+    # ── Chamber 06 — Companion Cube (rows 55-59) ──
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 55
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 56
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,D,W,W,W],  # 57
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,0,W,W],  # 58
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 59
 ]
 
-MAP_H = len(_M)  # 41
+MAP_H = len(_M)
 
 # Floor height map (elevation per cell, 0.0 = ground default)
 _HEIGHTS = {}
 
 # Floor markers (non-wall special cells)
 _FLOOR_MARKS = {}
-_FLOOR_MARKS[(18, 37)] = PP   # pressure plate in ch05
-_FLOOR_MARKS[(21, 39)] = EX   # exit trigger (through door east)
+_FLOOR_MARKS[(18, 56)] = PP   # pressure plate in cube room
+_FLOOR_MARKS[(21, 58)] = EX   # exit trigger (through door east)
 
 # Pit floor marks for ch03 gap (rows 23-24, cols 1-12)
 for _c in range(1, 13):
     _FLOOR_MARKS[(_c, 23)] = PIT
     _FLOOR_MARKS[(_c, 24)] = PIT
 
+# Pit floor marks for ch04 bridge gaps (rows 31-33, 37-39, cols 1-12)
+for _c in range(1, 13):
+    for _r in (31, 32, 33, 37, 38, 39):
+        _FLOOR_MARKS[(_c, _r)] = PIT
+
+# EX marks for scored level exits
+_FLOOR_MARKS[(7, 27)] = EX    # ch03 exit (Mind the Gap)
+_FLOOR_MARKS[(7, 42)] = EX    # ch04 exit (The Bridge)
+_FLOOR_MARKS[(5, 50)] = EX    # ch05 exit (Turret Alley)
+
 # Companion cube start position
-_CUBE_START = (17, 37)
+_CUBE_START = (17, 56)
 
 # Door links: door cell -> linked pressure plate cell
 _DOOR_LINKS = {
-    (20, 38): (18, 37),  # door D at (20,38), linked to plate at (18,37)
+    (20, 57): (18, 56),  # door D at (20,57), linked to plate at (18,56)
 }
+
+# Level definitions — scored chambers starting at ch03
+_LEVELS = [
+    {'name': 'MIND THE GAP',    'base': 200,  'time': 75},
+    {'name': 'THE BRIDGE',      'base': 400,  'time': 90},
+    {'name': 'TURRET ALLEY',    'base': 300,  'time': 60},
+    {'name': 'COMPANION CUBE',  'base': 500,  'time': 90},
+]
+
+# Turret definitions (instantiated when entering turret level)
+_TURRETS_DEF = [
+    {'x': 2, 'y': 47, 'dx': 1, 'dy': 0, 'rate': 3.0, 'warn': 0.8},
+]
 
 # GLaDOS trigger zones: (cx, cy) -> (message_line1, message_line2, id)
 _GLADOS_ZONES = {
     (2, 2):   ("WELCOME TO",     "APERTURE",       "wake"),
-    (2, 4):   ("GO AHEAD",     "WALK AROUND",         "move"),
-    (4, 8):   ("PORTALS ON",     "SPC:BLU Z:ORG",   "portals"),
-    (5, 9):   ("WELL DONE",      "",                 "done1"),
-    (4, 14):  ("THINK WITH",     "PORTALS",          "think"),
-    (2, 21):  ("MIND THE GAP",   "",                 "gap"),
-    (7, 29):  ("ALMOST THERE",   "",                 "corridor"),
-    (17, 37): ("CUBE CAN'T TALK","BUT IT CAN HELP",  "cube"),
-    (21, 39): ("THE CAKE IS",    "A LIE",            "cake"),
+    (2, 4):   ("GO AHEAD",       "WALK AROUND",    "move"),
+    (4, 8):   ("PORTALS ON",     "SPC:BLU Z:ORG",  "portals"),
+    (5, 9):   ("WELL DONE",      "",                "done1"),
+    (4, 14):  ("THINK WITH",     "PORTALS",         "think"),
+    (2, 21):  ("MIND THE GAP",   "",                "gap"),
+    (7, 29):  ("TWO JUMPS",      "USE THE PLATFORM","bridge"),
+    (5, 44):  ("TURRET AHEAD",   "TIME YOUR MOVE",  "turret"),
+    (17, 56): ("CUBE CAN'T TALK","BUT IT CAN HELP", "cube"),
+    (21, 58): ("THE CAKE IS",    "A LIE",           "cake"),
 }
 
 
@@ -207,9 +246,6 @@ class Portal(Game):
         self.orange_portal = None
         self.portal_cooldown = 0.0
 
-        # No pre-placed portals — chamber 01 teaches shooting
-        self.blue_portal = None
-
         # Companion cube
         self.cube_x, self.cube_y = _CUBE_START
         self.cube_push_cooldown = 0.0
@@ -232,6 +268,22 @@ class Portal(Game):
         # Shoot animation
         self.shoot_flash = 0.0
         self.shoot_color = None
+
+        # Death state
+        self.fall_timer = 0.0
+        self.dead_timer = 0.0
+        self.death_cause = None  # 'pit', 'turret', 'timeout'
+
+        # Level system
+        self.current_level = 0
+        self.level_score = 0
+        self.level_timer = 0.0
+        self.level_active = False
+        self.choice_selection = 0  # 0=NEXT, 1=STOP
+
+        # Turrets + bullets
+        self.turrets = []
+        self.bullets = []
 
     # ─────────────────────────────────────────────────────────────
     #  Map helpers
@@ -266,14 +318,12 @@ class Portal(Game):
         return self.heights.get((x, y), 0.0)
 
     def _solid(self, x, y):
-        """Collision check with margin."""
+        """Collision check with margin. Pits are NOT solid — player falls in."""
         for dx in (-MARGIN, MARGIN):
             for dy in (-MARGIN, MARGIN):
                 mx = int(x + dx)
                 my = int(y + dy)
                 if self._is_wall(mx, my):
-                    return True
-                if self.floor_marks.get((mx, my)) == PIT:
                     return True
                 # Cube blocks movement (unless pushing it)
                 if mx == self.cube_x and my == self.cube_y:
@@ -518,6 +568,25 @@ class Portal(Game):
                 self.state = GameState.GAME_OVER
             return
 
+        if self.phase == 'falling':
+            self.fall_timer -= dt
+            self.elevation -= 3.0 * dt
+            if self.fall_timer <= 0:
+                self.phase = 'dead'
+                self.dead_timer = 2.0
+            return
+
+        if self.phase == 'dead':
+            self.dead_timer -= dt
+            if self.dead_timer <= 0:
+                self.score = 0
+                self.state = GameState.GAME_OVER
+            return
+
+        if self.phase == 'level_clear':
+            self._update_level_clear(input_state)
+            return
+
         # Timers
         if self.portal_cooldown > 0:
             self.portal_cooldown -= dt
@@ -529,6 +598,16 @@ class Portal(Game):
             self.glados_timer -= dt
             if self.glados_timer <= 0:
                 self.glados_msg = None
+
+        # Level timer countdown
+        if self.level_active and self.level_timer > 0:
+            self.level_timer -= dt
+            if self.level_timer <= 0:
+                self.level_timer = 0
+                self.death_cause = 'timeout'
+                self.phase = 'falling'
+                self.fall_timer = 1.0
+                return
 
         # Auto door timer
         if not self.auto_door_opened:
@@ -562,16 +641,13 @@ class Portal(Game):
 
         # Check cube push
         if input_state.up:
-            # Determine facing cardinal direction
             face_dir = self._cardinal_dir()
             fdx, fdy = FACE_DX[face_dir], FACE_DY[face_dir]
-            # Check if cube is in the cell we're moving into
             target_cx = int(nx + fdx * 0.3)
             target_cy = int(ny + fdy * 0.3)
             if target_cx == self.cube_x and target_cy == self.cube_y:
                 pushed = self._try_push_cube(fdx, fdy)
                 if not pushed:
-                    # Can't push, block movement toward cube
                     pass
 
         # Apply movement with collision
@@ -580,11 +656,24 @@ class Portal(Game):
         if not self._solid(self.px, ny):
             self.py = ny
 
+        # Pit fall detection — after movement applied
+        pcx, pcy = int(self.px), int(self.py)
+        if self.floor_marks.get((pcx, pcy)) == PIT:
+            self.death_cause = 'pit'
+            self.phase = 'falling'
+            self.fall_timer = 1.0
+            return
+
         # Portal traversal
         self._try_portal_traverse(dt)
 
         # Pressure plates
         self._update_plates()
+
+        # Turret + bullet updates
+        if self.turrets:
+            self._update_turrets(dt)
+            self._update_bullets(dt)
 
         # GLaDOS trigger zones
         cell_key = (int(self.px), int(self.py))
@@ -595,11 +684,31 @@ class Portal(Game):
                 self.glados_msg = (line1, line2)
                 self.glados_timer = 3.0
 
-        # Exit check
-        if self.floor_marks.get((int(self.px), int(self.py))) == EX:
-            self.phase = 'won'
-            self.win_timer = 4.0
-            self.score = 1000
+        # Level activation — entering ch03 triggers scoring
+        if not self.level_active and cell_key == (2, 21):
+            self._start_level(0)
+
+        # EX check — level exit or final win
+        if self.floor_marks.get((pcx, pcy)) == EX:
+            # Remove mark so it won't re-trigger
+            del self.floor_marks[(pcx, pcy)]
+            if not self.level_active:
+                pass  # tutorial — no scoring
+            elif self.current_level >= len(_LEVELS) - 1:
+                # Final level complete
+                lvl = _LEVELS[self.current_level]
+                pts = lvl['base'] + int(self.level_timer * (self.current_level + 1) * 2)
+                self.level_score += pts
+                self.score = self.level_score
+                self.phase = 'won'
+                self.win_timer = 4.0
+            else:
+                # Level clear — show NEXT/STOP choice
+                lvl = _LEVELS[self.current_level]
+                self._level_pts = lvl['base'] + int(self.level_timer * (self.current_level + 1) * 2)
+                self.level_score += self._level_pts
+                self.phase = 'level_clear'
+                self.choice_selection = 0
 
     def _cardinal_dir(self):
         """Get cardinal direction from angle. 0=N, 1=E, 2=S, 3=W."""
@@ -617,6 +726,91 @@ class Portal(Game):
             return 0  # North
 
     # ─────────────────────────────────────────────────────────────
+    #  Level system
+    # ─────────────────────────────────────────────────────────────
+
+    def _start_level(self, level_idx):
+        """Activate a scored level."""
+        self.level_active = True
+        self.current_level = level_idx
+        lvl = _LEVELS[level_idx]
+        self.level_timer = float(lvl['time'])
+        # Clear portals for fresh start
+        self.blue_portal = None
+        self.orange_portal = None
+        # Activate turrets for turret level (index 2)
+        if level_idx == 2:
+            self.turrets = []
+            for td in _TURRETS_DEF:
+                self.turrets.append({
+                    'x': td['x'], 'y': td['y'],
+                    'dx': td['dx'], 'dy': td['dy'],
+                    'rate': td['rate'], 'warn': td['warn'],
+                    'timer': td['rate'],
+                })
+        else:
+            self.turrets = []
+            self.bullets = []
+
+    def _update_level_clear(self, input_state):
+        """Handle NEXT/STOP choice screen input."""
+        if input_state.up_pressed or input_state.down_pressed:
+            self.choice_selection = 1 - self.choice_selection
+        if input_state.action_l or input_state.action_r:
+            if self.choice_selection == 0:
+                # NEXT level
+                self._start_level(self.current_level + 1)
+                self.phase = 'playing'
+            else:
+                # STOP — bank score
+                self.score = self.level_score
+                self.phase = 'won'
+                self.win_timer = 4.0
+
+    # ─────────────────────────────────────────────────────────────
+    #  Turrets + Bullets
+    # ─────────────────────────────────────────────────────────────
+
+    def _update_turrets(self, dt):
+        """Countdown turret timers, spawn bullets."""
+        for t in self.turrets:
+            t['timer'] -= dt
+            if t['timer'] <= 0:
+                t['timer'] = t['rate']
+                self.bullets.append({
+                    'x': float(t['x']) + 0.5 + t['dx'] * 0.6,
+                    'y': float(t['y']) + 0.5 + t['dy'] * 0.6,
+                    'dx': t['dx'], 'dy': t['dy'],
+                    'speed': 6.0, 'life': 3.0,
+                })
+
+    def _update_bullets(self, dt):
+        """Move bullets, check collisions."""
+        alive = []
+        for b in self.bullets:
+            b['x'] += b['dx'] * b['speed'] * dt
+            b['y'] += b['dy'] * b['speed'] * dt
+            b['life'] -= dt
+            # Wall hit
+            bx, by = int(b['x']), int(b['y'])
+            if self._is_wall(bx, by):
+                continue
+            # Life expired
+            if b['life'] <= 0:
+                continue
+            # Player hit
+            dx = b['x'] - self.px
+            dy = b['y'] - self.py
+            if dx * dx + dy * dy < 0.3 * 0.3:
+                self.death_cause = 'turret'
+                self.phase = 'falling'
+                self.fall_timer = 1.0
+                self.bullets = []
+                return
+            alive.append(b)
+        self.bullets = alive
+
+    # ─────────────────────────────────────────────────────────────
     #  Raycaster + Drawing
     # ─────────────────────────────────────────────────────────────
 
@@ -631,11 +825,35 @@ class Portal(Game):
             self._draw_win()
             return
 
+        if self.phase == 'dead':
+            self._draw_dead()
+            return
+
+        if self.phase == 'level_clear':
+            self._draw_level_clear()
+            return
+
         # Column-by-column rendering (ceiling + wall + floor)
         eye_h = self.elevation + 0.5
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]
             self._cast_ray(col, ray_angle, eye_h)
+
+        # Bullet rendering
+        if self.bullets:
+            self._draw_bullets()
+
+        # Falling overlay — red tint intensifies
+        if self.phase == 'falling':
+            alpha = min(1.0, 1.0 - self.fall_timer)
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    pr, pg, pb = self.display.get_pixel(x, y)
+                    pr = min(255, int(pr + 120 * alpha))
+                    pg = int(pg * (1.0 - alpha * 0.7))
+                    pb = int(pb * (1.0 - alpha * 0.7))
+                    self.display.set_pixel(x, y, (pr, pg, pb))
+            return
 
         # Shoot flash overlay
         if self.shoot_flash > 0 and self.shoot_color:
@@ -665,6 +883,20 @@ class Portal(Game):
         self.display.set_pixel(32, 32, ch)
         self.display.set_pixel(31, 31, ch)
         self.display.set_pixel(32, 31, ch)
+
+        # Timer HUD (top-right area, below portal indicator)
+        if self.level_active and self.level_timer > 0:
+            secs = int(self.level_timer)
+            txt = str(secs)
+            if secs <= 5:
+                tc = Colors.RED
+            elif secs <= 15:
+                tc = Colors.ORANGE
+            else:
+                tc = Colors.WHITE
+            # Right-align: 4px per char
+            tx = 63 - len(txt) * 4
+            self.display.draw_text_small(tx, 5, txt, tc)
 
         # GLaDOS message overlay
         if self.glados_msg and self.glados_timer > 0:
@@ -929,6 +1161,18 @@ class Portal(Game):
             # Door (auto-open, shown as locked)
             return (60, 55, 65)
 
+        if cell_type == T:
+            # Turret — gray body with pulsing red eye
+            if 0.3 <= u <= 0.7 and 0.25 <= v <= 0.45:
+                # Eye region — pulse speed based on time
+                pulse = 0.5 + 0.5 * math.sin(self.time * 8.0)
+                r = int(180 + 75 * pulse)
+                return (r, 10, 10)
+            # Body — dark gray with subtle panel lines
+            if u < 0.05 or u > 0.95 or v < 0.05 or v > 0.95:
+                return (50, 50, 55)
+            return (80, 80, 90)
+
         # Concrete (default)
         r, g, b = 90, 90, 100
         # Subtle grid lines
@@ -1022,12 +1266,81 @@ class Portal(Game):
 
         self.display.draw_text_small(2, 34, "THE CAKE IS", Colors.WHITE)
         self.display.draw_text_small(14, 42, "A LIE", Colors.ORANGE)
-        self.display.draw_text_small(6, 54, "YOU ESCAPED!", Colors.GREEN)
+        if self.score > 0:
+            self.display.draw_text_small(2, 54, str(self.score), Colors.GREEN)
+        else:
+            self.display.draw_text_small(6, 54, "YOU ESCAPED!", Colors.GREEN)
+
+    def _draw_dead(self):
+        """Draw death screen."""
+        self.display.clear((40, 5, 5))
+        self.display.draw_text_small(2, 16, "SUBJECT LOST", Colors.RED)
+        if self.death_cause == 'pit':
+            self.display.draw_text_small(2, 28, "YOU FELL", Colors.WHITE)
+        elif self.death_cause == 'turret':
+            self.display.draw_text_small(2, 28, "SHOT DOWN", Colors.WHITE)
+        elif self.death_cause == 'timeout':
+            self.display.draw_text_small(2, 28, "TIME UP", Colors.WHITE)
+        self.display.draw_text_small(2, 40, "TESTING", (150, 150, 150))
+        self.display.draw_text_small(2, 48, "TERMINATED", (150, 150, 150))
+
+    def _draw_level_clear(self):
+        """Draw NEXT/STOP level clear screen."""
+        self.display.clear((10, 10, 15))
+        self.display.draw_text_small(2, 4, "CHAMBER CLEAR", Colors.GREEN)
+
+        lvl = _LEVELS[self.current_level]
+        # Score breakdown
+        self.display.draw_text_small(2, 14, lvl['name'], Colors.WHITE)
+        self.display.draw_text_small(2, 22, "+" + str(self._level_pts), Colors.YELLOW)
+        self.display.draw_text_small(2, 30, "TOTAL " + str(self.level_score), Colors.ORANGE)
+
+        # NEXT / STOP selector
+        if self.choice_selection == 0:
+            self.display.draw_text_small(2, 44, ">NEXT LEVEL", Colors.YELLOW)
+            self.display.draw_text_small(2, 52, " STOP:BANK", Colors.GRAY)
+        else:
+            self.display.draw_text_small(2, 44, " NEXT LEVEL", Colors.GRAY)
+            self.display.draw_text_small(2, 52, ">STOP:BANK", Colors.YELLOW)
+
+    def _draw_bullets(self):
+        """Draw bullets in screen space."""
+        cos_a = math.cos(self.pa)
+        sin_a = math.sin(self.pa)
+        for b in self.bullets:
+            # Transform to player-relative space
+            dx = b['x'] - self.px
+            dy = b['y'] - self.py
+            # Rotate into view space (forward = cos_a, sin_a)
+            vz = dx * cos_a + dy * sin_a   # depth (forward)
+            vx = -dx * sin_a + dy * cos_a   # lateral
+            if vz <= 0.1:
+                continue
+            # Project to screen
+            sx = int(HALF + vx * GRID_SIZE / vz)
+            sy = int(HALF)  # bullets at eye height
+            if 0 <= sx < GRID_SIZE - 1 and 0 <= sy < GRID_SIZE - 1:
+                self.display.set_pixel(sx, sy, (255, 60, 30))
+                self.display.set_pixel(sx + 1, sy, (255, 60, 30))
+                self.display.set_pixel(sx, sy + 1, (255, 60, 30))
+                self.display.set_pixel(sx + 1, sy + 1, (255, 60, 30))
 
     def draw_game_over(self, selection: int = 0):
         """Draw game over/win screen with menu options."""
-        self._draw_win()
-        # Overlay menu options
+        if self.death_cause:
+            # Death screen
+            self.display.clear((30, 5, 5))
+            self.display.draw_text_small(2, 10, "GAME OVER", Colors.RED)
+            if self.death_cause == 'pit':
+                self.display.draw_text_small(2, 22, "YOU FELL", Colors.WHITE)
+            elif self.death_cause == 'turret':
+                self.display.draw_text_small(2, 22, "SHOT DOWN", Colors.WHITE)
+            elif self.death_cause == 'timeout':
+                self.display.draw_text_small(2, 22, "TIME UP", Colors.WHITE)
+            self.display.draw_text_small(2, 34, "SCORE: 0", Colors.GRAY)
+        else:
+            self._draw_win()
+        # Menu options
         if selection == 0:
             self.display.draw_text_small(2, 54, ">RETRY", Colors.YELLOW)
             self.display.draw_text_small(34, 54, " MENU", Colors.GRAY)
