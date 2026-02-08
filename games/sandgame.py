@@ -7,8 +7,8 @@ gunpowder explodes, acid dissolves, lava melts ice.
 
 Controls:
   Joystick     - Move cursor
-  Space (hold) - Paint selected material
-  Both buttons - Toggle material select mode
+  Button (tap) - Toggle material select mode
+  Button (hold)- Paint selected material
 """
 
 import random
@@ -29,24 +29,34 @@ ICE       = 9
 STEAM     = 10
 WOOD      = 11
 PLANT     = 12
-ERASE     = 13
+GAS       = 13
+METAL     = 14
+NITRO     = 15
+FUSE      = 16
+VINE      = 17
+ERASE     = 18
 
 # Material properties: (name, color_rgb, behavior, density)
-# behavior: 'none','powder','liquid','gas','solid','grow','erase'
+# behavior: 'none','powder','liquid','gas_up','solid','grow','vine','fuse','erase'
 MATERIALS = [
     ("EMPTY",     (0, 0, 0),         'none',   0),
     ("SAND",      (194, 178, 128),    'powder', 90),
     ("WATER",     (40, 80, 200),      'liquid', 50),
     ("STONE",     (128, 128, 128),    'solid',  100),
-    ("FIRE",      (255, 140, 20),     'gas',    -5),
+    ("FIRE",      (255, 140, 20),     'gas_up', -5),
     ("OIL",       (80, 50, 20),       'liquid', 30),
     ("GUNPOWDER", (60, 60, 60),       'powder', 85),
     ("ACID",      (80, 255, 40),      'liquid', 55),
     ("LAVA",      (255, 80, 10),      'liquid', 95),
     ("ICE",       (160, 220, 255),    'solid',  45),
-    ("STEAM",     (200, 200, 210),    'gas',    -10),
+    ("STEAM",     (200, 200, 210),    'gas_up', -10),
     ("WOOD",      (120, 70, 30),      'solid',  100),
     ("PLANT",     (30, 160, 30),      'grow',   100),
+    ("GAS",       (220, 180, 200),    'gas_up', -8),
+    ("METAL",     (90, 95, 105),      'solid',  100),
+    ("NITRO",     (100, 200, 80),     'liquid', 60),
+    ("FUSE",      (140, 100, 60),     'fuse',   100),
+    ("VINE",      (20, 200, 20),      'vine',   100),
     ("ERASE",     (255, 255, 255),    'erase',  0),
 ]
 
@@ -57,6 +67,8 @@ SIM_TOP = 7  # rows 0-6 are HUD
 # Mode constants
 MODE_PLAY = 0
 MODE_SELECT = 1
+
+WIND_MAX = 3.0  # clamp wind values
 
 
 def clamp(v, lo, hi):
@@ -91,7 +103,7 @@ class SandGame(Game):
         self.life = [[0] * W for _ in range(H)]
         self.color_var = [[0] * W for _ in range(H)]
 
-        # Wind grid: (wx, wy) force per cell, decays each frame
+        # Wind grid: force per cell, decays rapidly each frame
         self.wind_x = [[0.0] * W for _ in range(H)]
         self.wind_y = [[0.0] * W for _ in range(H)]
 
@@ -106,18 +118,17 @@ class SandGame(Game):
 
         # Input timing
         self.move_timer = 0.0
-        self.btn_hold_time = 0.0   # how long button has been held
-        self.btn_was_held = False   # was button held last frame
-        self.painting = False       # are we in paint mode (held past threshold)
+        self.btn_hold_time = 0.0
+        self.btn_was_held = False
+        self.painting = False
 
     def _set_cell(self, x, y, mat_id):
         """Set a cell to a material with fresh properties."""
         self.grid[y][x] = mat_id
         if mat_id == FIRE:
-            # Fire is very short-lived: ~3-8 frames (like original Powder Game)
             self.life[y][x] = random.randint(3, 8)
-        elif mat_id == STEAM:
-            # Steam doesn't move, just fades: handled by per-frame % chance
+        elif mat_id == FUSE:
+            # Fuse burns slowly: life=0 means unlit, >0 means burning
             self.life[y][x] = 0
         else:
             self.life[y][x] = 0
@@ -153,6 +164,12 @@ class SandGame(Game):
             return MATERIALS[mat_id][2]
         return 'none'
 
+    def _add_wind(self, x, y, wx, wy):
+        """Add wind at position, clamped."""
+        if self._in_sim(x, y):
+            self.wind_x[y][x] = clamp(self.wind_x[y][x] + wx, -WIND_MAX, WIND_MAX)
+            self.wind_y[y][x] = clamp(self.wind_y[y][x] + wy, -WIND_MAX, WIND_MAX)
+
     def _explode(self, cx, cy, radius):
         """Explosion at (cx,cy) destroying non-stone in radius, spawning fire + wind."""
         for dy in range(-radius, radius + 1):
@@ -162,29 +179,26 @@ class SandGame(Game):
                     nx, ny = cx + dx, cy + dy
                     if self._in_sim(nx, ny):
                         m = self.grid[ny][nx]
-                        if m != STONE:
-                            if random.random() < 0.4:
-                                self._set_cell(nx, ny, FIRE)
-                            else:
-                                self._set_cell(nx, ny, EMPTY)
+                        if m == STONE or m == METAL:
+                            pass  # survives
+                        elif random.random() < 0.4:
+                            self._set_cell(nx, ny, FIRE)
+                        else:
+                            self._set_cell(nx, ny, EMPTY)
                         # Outward wind from explosion
                         dist = max(1.0, dist_sq ** 0.5)
-                        strength = 3.0 / dist
-                        self.wind_x[ny][nx] += dx / dist * strength
-                        self.wind_y[ny][nx] += dy / dist * strength
+                        strength = 2.0 / dist
+                        self._add_wind(nx, ny, dx / dist * strength, dy / dist * strength)
 
     def _update_powder(self, x, y):
         """Update a powder particle (sand, gunpowder)."""
-        # Try straight down
         if self._empty_at(x, y + 1):
             self._swap(x, y, x, y + 1)
             return
-        # Density swap: sink through lighter liquids
         below = self._mat_at(x, y + 1)
-        if below > 0 and self._behavior(below) in ('liquid', 'gas') and self._density(self.grid[y][x]) > self._density(below):
+        if below > 0 and self._behavior(below) in ('liquid', 'gas_up') and self._density(self.grid[y][x]) > self._density(below):
             self._swap(x, y, x, y + 1)
             return
-        # Try diagonals (randomized)
         dirs = [(-1, 1), (1, 1)]
         if random.random() < 0.5:
             dirs.reverse()
@@ -194,23 +208,21 @@ class SandGame(Game):
                 self._swap(x, y, nx, y + 1)
                 return
             nb = self._mat_at(nx, y + 1)
-            if nb > 0 and self._behavior(nb) in ('liquid', 'gas') and self._density(self.grid[y][x]) > self._density(nb):
+            if nb > 0 and self._behavior(nb) in ('liquid', 'gas_up') and self._density(self.grid[y][x]) > self._density(nb):
                 self._swap(x, y, nx, y + 1)
                 return
 
     def _update_liquid(self, x, y):
-        """Update a liquid particle (water, oil, acid, lava)."""
+        """Update a liquid particle (water, oil, acid, lava, nitro)."""
         mat = self.grid[y][x]
         dens = self._density(mat)
-        # Try straight down
         if self._empty_at(x, y + 1):
             self._swap(x, y, x, y + 1)
             return
         below = self._mat_at(x, y + 1)
-        if below > 0 and self._behavior(below) in ('liquid', 'gas') and dens > self._density(below):
+        if below > 0 and self._behavior(below) in ('liquid', 'gas_up') and dens > self._density(below):
             self._swap(x, y, x, y + 1)
             return
-        # Try diagonals down
         dirs = [(-1, 1), (1, 1)]
         if random.random() < 0.5:
             dirs.reverse()
@@ -220,10 +232,10 @@ class SandGame(Game):
                 self._swap(x, y, nx, y + 1)
                 return
             nb = self._mat_at(nx, y + 1)
-            if nb > 0 and self._behavior(nb) in ('liquid', 'gas') and dens > self._density(nb):
+            if nb > 0 and self._behavior(nb) in ('liquid', 'gas_up') and dens > self._density(nb):
                 self._swap(x, y, nx, y + 1)
                 return
-        # Spread horizontally (1-3 cells)
+        # Spread horizontally
         spread = random.randint(1, 3)
         d = 1 if random.random() < 0.5 else -1
         for i in range(1, spread + 1):
@@ -233,7 +245,6 @@ class SandGame(Game):
                 return
             elif not self._in_sim(nx, y) or self.grid[y][nx] != EMPTY:
                 break
-        # Try the other direction
         d = -d
         for i in range(1, spread + 1):
             nx = x + d * i
@@ -243,17 +254,34 @@ class SandGame(Game):
             elif not self._in_sim(nx, y) or self.grid[y][nx] != EMPTY:
                 break
 
+    def _update_gas_element(self, x, y):
+        """Update GAS: floats upward, repels self, extremely wind-sensitive."""
+        # Rise
+        if self._empty_at(x, y - 1):
+            self._swap(x, y, x, y - 1)
+            return
+        # Diagonal up
+        dirs = [(-1, -1), (1, -1)]
+        if random.random() < 0.5:
+            dirs.reverse()
+        for dx, dy in dirs:
+            if self._empty_at(x + dx, y + dy):
+                self._swap(x, y, x + dx, y + dy)
+                return
+        # Horizontal spread (gas repels itself)
+        d = 1 if random.random() < 0.5 else -1
+        if self._empty_at(x + d, y):
+            self._swap(x, y, x + d, y)
+
     def _update_fire(self, x, y):
-        """Update fire: very short-lived, rises slightly, spreads to neighbors."""
+        """Update fire: very short-lived, rises slightly."""
         self.life[y][x] -= 1
         if self.life[y][x] <= 0:
             self._set_cell(x, y, EMPTY)
             return
-        # Fire generates upward wind
-        self.wind_y[y][x] -= 0.4
-        if self._in_sim(x, y - 1):
-            self.wind_y[y - 1][x] -= 0.2
-        # Fire rises (try up, up-diagonal, or random drift)
+        # Fire generates gentle upward wind
+        self._add_wind(x, y, 0.0, -0.15)
+        # Fire rises
         if random.random() < 0.6:
             if self._empty_at(x, y - 1):
                 self._swap(x, y, x, y - 1)
@@ -265,28 +293,50 @@ class SandGame(Game):
             if random.random() < 0.3 and self._empty_at(x + dx, y + dy):
                 self._swap(x, y, x + dx, y + dy)
                 return
-        # Random horizontal drift
         if random.random() < 0.2:
             dx = 1 if random.random() < 0.5 else -1
             if self._empty_at(x + dx, y):
                 self._swap(x, y, x + dx, y)
 
     def _update_steam(self, x, y):
-        """Steam: stationary, ~10% chance to vanish each frame (like original)."""
+        """Steam: mostly stationary, ~10% chance to vanish each frame."""
         if random.random() < 0.10:
             self._set_cell(x, y, EMPTY)
             return
-        # Slight random drift (steam doesn't actively rise in original,
-        # but we give it very slight upward tendency for visual interest)
         if random.random() < 0.15:
             dx = random.choice([-1, 0, 0, 1])
             dy = random.choice([-1, -1, 0])
             if self._empty_at(x + dx, y + dy):
                 self._swap(x, y, x + dx, y + dy)
 
+    def _update_fuse(self, x, y):
+        """Fuse: when lit (life>0), burns slowly with sparks, ignites neighbors."""
+        if self.life[y][x] <= 0:
+            return  # unlit, do nothing
+        self.life[y][x] -= 1
+        if self.life[y][x] <= 0:
+            # Fuse consumed: spawn spark (fire)
+            self._set_cell(x, y, FIRE)
+            return
+        # Sparks fly off randomly
+        if random.random() < 0.3:
+            dx = random.choice([-1, 0, 1])
+            dy = random.choice([-1, 0, 1])
+            if self._empty_at(x + dx, y + dy):
+                self._set_cell(x + dx, y + dy, FIRE)
+        # Spread flame to adjacent fuse
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            nm = self._mat_at(x + dx, y + dy)
+            if nm == FUSE and self._in_sim(x + dx, y + dy) and self.life[y + dy][x + dx] == 0:
+                self.life[y + dy][x + dx] = random.randint(8, 15)  # slow burn
+                self.updated[y + dy][x + dx] = True
+            elif nm == GUNPOWDER:
+                self._explode(x + dx, y + dy, 5)
+            elif nm == NITRO:
+                self._explode(x + dx, y + dy, 7)
+
     def _update_plant(self, x, y):
         """Plant grows vine-like: upward bias, clings to surfaces, water accelerates."""
-        # Base growth chance: 1.5% dry, 8% if water nearby
         has_water = False
         water_pos = None
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -299,35 +349,55 @@ class SandGame(Game):
         if random.random() > chance:
             return
 
-        # Has a solid/plant neighbor to cling to? (vine grows on surfaces)
         has_support = False
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             nm = self._mat_at(x + dx, y + dy)
-            if nm in (STONE, WOOD, SAND, PLANT):
+            if nm in (STONE, WOOD, SAND, PLANT, METAL):
                 has_support = True
                 break
-        # Also count the cell below as support
         if self._mat_at(x, y + 1) not in (EMPTY, -1):
             has_support = True
 
-        # Growth directions: strong upward bias, slight sideways
-        grow_dirs = [(0, -1), (0, -1), (0, -1),   # up (3x weight)
-                     (-1, 0), (1, 0),              # sideways
-                     (-1, -1), (1, -1)]            # diagonal up
+        grow_dirs = [(0, -1), (0, -1), (0, -1),
+                     (-1, 0), (1, 0),
+                     (-1, -1), (1, -1)]
         random.shuffle(grow_dirs)
 
         for dx, dy in grow_dirs:
             nx, ny = x + dx, y + dy
             if not self._empty_at(nx, ny):
                 continue
-            # For non-upward growth, require support nearby
             if dy >= 0 and not has_support:
                 continue
             self._set_cell(nx, ny, PLANT)
-            # Consume water if available
             if water_pos:
                 self._set_cell(water_pos[0], water_pos[1], EMPTY)
             return
+
+    def _update_vine(self, x, y):
+        """Vine: grows on EVERYTHING (even fire/liquid), burns extremely fast."""
+        if random.random() > 0.06:
+            return
+        # Vine grows into any adjacent cell that isn't stone/metal/vine
+        grow_dirs = [(0, -1), (0, 1), (-1, 0), (1, 0),
+                     (-1, -1), (1, -1), (-1, 1), (1, 1)]
+        random.shuffle(grow_dirs)
+        for dx, dy in grow_dirs:
+            nx, ny = x + dx, y + dy
+            if not self._in_sim(nx, ny):
+                continue
+            nm = self.grid[ny][nx]
+            if nm == EMPTY:
+                self._set_cell(nx, ny, VINE)
+                return
+            # Vine can overgrow non-solid materials (except stone/metal/vine)
+            if nm not in (STONE, METAL, VINE, WOOD) and self._behavior(nm) != 'solid':
+                self._set_cell(nx, ny, VINE)
+                return
+
+    def _is_heat_source(self, mat):
+        """Check if a material is a heat source (for ignition checks)."""
+        return mat in (FIRE, LAVA)
 
     def _check_interactions(self, x, y):
         """Check and apply material interactions for cell at (x,y)."""
@@ -345,56 +415,66 @@ class SandGame(Game):
         if mat == FIRE:
             for nx, ny, nm in neighbors:
                 if nm == WOOD:
-                    # Wood burns slowly but steadily
                     if random.random() < 0.08:
                         self._set_cell(nx, ny, FIRE)
                 elif nm == PLANT:
-                    # Plant burns fast and clean (vine-like)
                     if random.random() < 0.45:
                         self._set_cell(nx, ny, FIRE)
+                elif nm == VINE:
+                    # Vine burns extremely fast
+                    if random.random() < 0.6:
+                        self._set_cell(nx, ny, FIRE)
                 elif nm == OIL:
-                    # Oil is highly flammable - catches almost instantly
                     if random.random() < 0.5:
                         self._set_cell(nx, ny, FIRE)
-                        # Oil fire produces extra fire in nearby empty cells
                         for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                             if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.3:
                                 self._set_cell(nx + ddx, ny + ddy, FIRE)
+                elif nm == GAS:
+                    # Gas is extremely flammable: 1 gas -> up to 4 fire
+                    self._set_cell(nx, ny, FIRE)
+                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.5:
+                            self._set_cell(nx + ddx, ny + ddy, FIRE)
+                    # Gas fire creates pressure burst
+                    self._add_wind(nx, ny, 0.0, -1.0)
                 elif nm == GUNPOWDER:
                     self._explode(nx, ny, 5)
                     return
+                elif nm == NITRO:
+                    self._explode(nx, ny, 7)
+                    return
+                elif nm == FUSE:
+                    if self._in_sim(nx, ny) and self.life[ny][nx] == 0:
+                        self.life[ny][nx] = random.randint(8, 15)
                 elif nm == ICE:
                     if random.random() < 0.12:
                         self._set_cell(nx, ny, WATER)
-                elif nm == SAND:
-                    # Fire can turn sand to glass-like (stone) at low rate
-                    pass
 
         elif mat == WATER:
             for nx, ny, nm in neighbors:
                 if nm == FIRE:
-                    # Water extinguishes fire
                     self._set_cell(nx, ny, STEAM)
                 elif nm == LAVA:
-                    # Water + lava = stone + steam
                     self._set_cell(nx, ny, STONE)
                     self._set_cell(x, y, STEAM)
                     return
                 elif nm == ICE:
-                    # Water freezes on contact with ice
                     if random.random() < 0.06:
                         self._set_cell(x, y, ICE)
                         return
+                elif nm == METAL:
+                    # Metal rusts in water -> sand
+                    if random.random() < 0.005:
+                        self._set_cell(nx, ny, SAND)
 
         elif mat == LAVA:
             for nx, ny, nm in neighbors:
                 if nm == WATER:
-                    # Lava + water = steam + stone
                     self._set_cell(nx, ny, STEAM)
                     self._set_cell(x, y, STONE)
                     return
                 elif nm == STONE:
-                    # Lava converts stone into more lava (key original mechanic)
                     if random.random() < 0.02:
                         self._set_cell(nx, ny, LAVA)
                 elif nm == WOOD:
@@ -403,90 +483,140 @@ class SandGame(Game):
                 elif nm == PLANT:
                     if random.random() < 0.5:
                         self._set_cell(nx, ny, FIRE)
+                elif nm == VINE:
+                    if random.random() < 0.6:
+                        self._set_cell(nx, ny, FIRE)
                 elif nm == ICE:
                     if random.random() < 0.15:
                         self._set_cell(nx, ny, WATER)
                 elif nm == OIL:
                     if random.random() < 0.4:
                         self._set_cell(nx, ny, FIRE)
+                elif nm == GAS:
+                    self._set_cell(nx, ny, FIRE)
+                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.5:
+                            self._set_cell(nx + ddx, ny + ddy, FIRE)
                 elif nm == GUNPOWDER:
                     self._explode(nx, ny, 5)
                     return
+                elif nm == NITRO:
+                    self._explode(nx, ny, 7)
+                    return
+                elif nm == FUSE:
+                    if self._in_sim(nx, ny) and self.life[ny][nx] == 0:
+                        self.life[ny][nx] = random.randint(8, 15)
+                elif nm == METAL:
+                    # Lava melts metal into more lava
+                    if random.random() < 0.03:
+                        self._set_cell(nx, ny, LAVA)
 
         elif mat == ACID:
-            # Acid dissolves almost everything (like original: eats through
-            # all materials except stone). Acid self-consumes in the process.
             for nx, ny, nm in neighbors:
-                if nm in (WOOD, SAND, ICE, PLANT, GUNPOWDER, OIL):
-                    # Easy to dissolve
+                if nm in (WOOD, SAND, ICE, PLANT, GUNPOWDER, OIL, FUSE, VINE, NITRO):
                     if random.random() < 0.15:
                         self._set_cell(nx, ny, EMPTY)
                         if random.random() < 0.3:
                             self._set_cell(x, y, EMPTY)
                             return
+                elif nm == METAL:
+                    # Acid dissolves metal slowly (1:10 in original)
+                    if random.random() < 0.03:
+                        self._set_cell(nx, ny, EMPTY)
+                        if random.random() < 0.5:
+                            self._set_cell(x, y, EMPTY)
+                            return
                 elif nm == WATER:
-                    # Acid destroys water (1:4 ratio in original)
                     if random.random() < 0.20:
                         self._set_cell(nx, ny, EMPTY)
                 elif nm == LAVA:
-                    # Acid and lava both consumed
                     if random.random() < 0.08:
                         self._set_cell(nx, ny, EMPTY)
                         self._set_cell(x, y, EMPTY)
                         return
-                # Stone resists acid (like glass in original)
 
         elif mat == ICE:
-            # Ice freezes adjacent water
             for nx, ny, nm in neighbors:
                 if nm == WATER:
                     if random.random() < 0.04:
                         self._set_cell(nx, ny, ICE)
 
+        elif mat == NITRO:
+            # Nitro explodes on contact with ANY heat source
+            for nx, ny, nm in neighbors:
+                if nm in (FIRE, LAVA):
+                    self._explode(x, y, 7)
+                    return
+
+        elif mat == GAS:
+            # Gas ignites from nearby heat
+            for nx, ny, nm in neighbors:
+                if nm in (FIRE, LAVA):
+                    # 1 gas -> fire + extra fire in neighbors
+                    self._set_cell(x, y, FIRE)
+                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        if self._empty_at(x + ddx, y + ddy) and random.random() < 0.5:
+                            self._set_cell(x + ddx, y + ddy, FIRE)
+                    self._add_wind(x, y, 0.0, -1.0)
+                    return
+
+        elif mat == VINE:
+            # Vine burns from fire/lava
+            for nx, ny, nm in neighbors:
+                if nm == FIRE:
+                    if random.random() < 0.6:
+                        self._set_cell(x, y, FIRE)
+                        return
+                elif nm == LAVA:
+                    if random.random() < 0.6:
+                        self._set_cell(x, y, FIRE)
+                        return
+
     def _apply_wind(self):
-        """Apply wind forces to non-solid particles, then decay wind."""
+        """Apply wind forces to movable particles, then decay. Solids block wind."""
         for y in range(H - 1, SIM_TOP - 1, -1):
             for x in range(W):
                 wx = self.wind_x[y][x]
                 wy = self.wind_y[y][x]
-                if abs(wx) < 0.3 and abs(wy) < 0.3:
-                    # Decay small wind to zero
+
+                # Kill small wind
+                if abs(wx) < 0.2 and abs(wy) < 0.2:
                     self.wind_x[y][x] = 0.0
                     self.wind_y[y][x] = 0.0
                     continue
 
                 mat = self.grid[y][x]
-                if mat == EMPTY:
-                    # Propagate wind to neighbors (diffuse)
-                    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        nx, ny = x + dx, y + dy
-                        if self._in_sim(nx, ny):
-                            self.wind_x[ny][nx] += wx * 0.1
-                            self.wind_y[ny][nx] += wy * 0.1
-                elif mat != EMPTY:
-                    behav = self._behavior(mat)
-                    # Wind moves non-solid, non-grow particles
-                    if behav in ('powder', 'liquid', 'gas'):
-                        # Convert wind force to displacement (probabilistic)
-                        dx = 1 if wx > 0.5 else (-1 if wx < -0.5 else 0)
-                        dy = 1 if wy > 0.5 else (-1 if wy < -0.5 else 0)
-                        if dx != 0 or dy != 0:
-                            nx, ny = x + dx, y + dy
-                            if self._empty_at(nx, ny):
-                                self._swap(x, y, nx, ny)
+                behav = self._behavior(mat) if mat != EMPTY else 'none'
 
-                # Decay wind
-                self.wind_x[y][x] *= 0.7
-                self.wind_y[y][x] *= 0.7
+                # Solids block wind: absorb it
+                if behav in ('solid', 'fuse'):
+                    self.wind_x[y][x] = 0.0
+                    self.wind_y[y][x] = 0.0
+                    continue
+
+                # Move particles that wind can push
+                if mat != EMPTY and behav in ('powder', 'liquid', 'gas_up', 'grow', 'vine'):
+                    # Probabilistic displacement based on wind strength
+                    if random.random() < min(abs(wx), 1.0) * 0.5:
+                        dx = 1 if wx > 0 else -1
+                        if self._empty_at(x + dx, y):
+                            self._swap(x, y, x + dx, y)
+                    if random.random() < min(abs(wy), 1.0) * 0.5:
+                        dy = 1 if wy > 0 else -1
+                        if self._empty_at(x, y + dy):
+                            self._swap(x, y, x, y + dy)
+
+                # Aggressive decay: wind dies fast
+                self.wind_x[y][x] *= 0.4
+                self.wind_y[y][x] *= 0.4
 
     def _simulate(self):
         """Run one frame of physics simulation."""
-        # Clear updated flags
         for y in range(H):
             for x in range(W):
                 self.updated[y][x] = False
 
-        # Apply wind forces before main sim
+        # Apply wind before main sim
         self._apply_wind()
 
         # Randomize horizontal scan direction
@@ -512,14 +642,20 @@ class SandGame(Game):
                     self._update_fire(x, y)
                 elif mat == STEAM:
                     self._update_steam(x, y)
+                elif mat == GAS:
+                    self._update_gas_element(x, y)
                 elif behav == 'grow':
                     self._update_plant(x, y)
+                elif behav == 'vine':
+                    self._update_vine(x, y)
+                elif behav == 'fuse':
+                    self._update_fuse(x, y)
 
-                # Check interactions at current cell position
+                # Check interactions
                 if self._in_sim(x, y) and self.grid[y][x] != EMPTY:
                     self._check_interactions(x, y)
 
-        # Second pass: check interactions for particles that landed in new spots
+        # Second pass: interactions for moved particles
         for y in range(H - 1, SIM_TOP - 1, -1):
             for x in x_range:
                 mat = self.grid[y][x]
@@ -545,20 +681,17 @@ class SandGame(Game):
                 self.painting = True
         else:
             if self.btn_was_held and self.btn_hold_time < 0.15:
-                # Quick tap: toggle mode
                 self.mode = MODE_SELECT if self.mode == MODE_PLAY else MODE_PLAY
             self.btn_hold_time = 0.0
             self.painting = False
         self.btn_was_held = btn_now
 
-        # Run simulation every frame regardless of mode
         self._simulate()
 
     def _update_play_mode(self, inp: InputState, dt: float):
         """Handle input in play mode."""
-        # Cursor movement (with repeat)
         self.move_timer += dt
-        rate = 0.08  # seconds between moves when held
+        rate = 0.08
         if inp.any_direction:
             if inp.up_pressed or inp.down_pressed or inp.left_pressed or inp.right_pressed:
                 self.move_timer = 0.0
@@ -569,7 +702,7 @@ class SandGame(Game):
                 self.cx = clamp(self.cx + inp.dx, 0, W - 1)
                 self.cy = clamp(self.cy + inp.dy, SIM_TOP, H - 1)
 
-        # Paint material with 2x2 brush while button held past tap threshold
+        # Paint material with 2x2 brush while button held
         if self.painting:
             for dy in range(2):
                 for dx in range(2):
@@ -602,7 +735,6 @@ class SandGame(Game):
 
     def _draw_play_screen(self):
         """Draw the simulation grid and HUD."""
-        # Draw HUD: material name in its color
         name = MATERIALS[self.selected][0]
         color = MATERIALS[self.selected][1]
         if self.selected == EMPTY:
@@ -619,7 +751,6 @@ class SandGame(Game):
                 mat = self.grid[y][x]
                 if mat != EMPTY:
                     c = mat_color(mat, self.color_var[y][x])
-                    # Fire flicker: cycle red-orange-yellow
                     if mat == FIRE:
                         flicker = random.randint(-40, 40)
                         c = (clamp(c[0] + flicker, 100, 255),
@@ -631,14 +762,28 @@ class SandGame(Game):
                              clamp(c[1] + flicker // 2, 0, 255),
                              clamp(c[2], 0, 255))
                     elif mat == ACID:
-                        # Acid glows
                         flicker = random.randint(-10, 20)
                         c = (clamp(c[0] + flicker, 0, 255),
                              clamp(c[1] + flicker, 0, 255),
                              clamp(c[2], 0, 255))
+                    elif mat == FUSE and self.life[y][x] > 0:
+                        # Lit fuse glows orange-red
+                        c = (255, clamp(80 + random.randint(-30, 30), 0, 255), 0)
+                    elif mat == GAS:
+                        # Gas shimmer
+                        flicker = random.randint(-10, 10)
+                        c = (clamp(c[0] + flicker, 0, 255),
+                             clamp(c[1] + flicker, 0, 255),
+                             clamp(c[2] + flicker, 0, 255))
+                    elif mat == NITRO:
+                        # Nitro pulses slightly
+                        flicker = random.randint(-8, 8)
+                        c = (clamp(c[0] + flicker, 0, 255),
+                             clamp(c[1] + flicker, 0, 255),
+                             clamp(c[2] + flicker, 0, 255))
                     self.display.set_pixel(x, y, c)
 
-        # Draw cursor (blink between white and material color)
+        # Draw cursor
         blink = int(self.blink_timer * 6) % 2 == 0
         if blink:
             cursor_color = (255, 255, 255)
@@ -650,20 +795,17 @@ class SandGame(Game):
 
     def _draw_select_screen(self):
         """Draw the full-screen material selection list."""
-        # Calculate scroll offset so selected item is visible
-        items_visible = 8  # how many fit on screen
-        total = len(MATERIALS) - 1  # skip EMPTY (index 0)
-        # Map selected (1-13) to list index (0-12)
+        items_visible = 8
+        total = len(MATERIALS) - 1  # skip EMPTY
         sel_idx = self.selected - 1
         scroll = max(0, min(sel_idx - items_visible // 2, total - items_visible))
 
         y = 2
         for i in range(scroll, min(scroll + items_visible, total)):
-            mat_id = i + 1  # skip EMPTY
+            mat_id = i + 1
             name = MATERIALS[mat_id][0]
             color = MATERIALS[mat_id][1]
             if mat_id == self.selected:
-                # Highlight: draw '>' prefix
                 self.display.draw_text_small(2, y, ">", (255, 255, 255))
                 self.display.draw_text_small(6, y, name, color)
             else:
