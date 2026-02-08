@@ -39,12 +39,12 @@ class Pong(Game):
         self.ai_y = GRID_SIZE // 2 - self.paddle_height // 2
 
         # AI difficulty scaling parameters (based on player score)
-        self.ai_base_speed = 20.0  # Starting AI speed (slow = easy)
-        self.ai_max_speed = 55.0   # Maximum AI speed at high player scores
-        self.ai_base_reaction_delay = 0.15  # Starting reaction delay in seconds
+        self.ai_base_speed = 38.0  # Starting AI speed (slow = easy)
+        self.ai_max_speed = 58.0   # Maximum AI speed at high player scores
+        self.ai_base_reaction_delay = 0.10  # Starting reaction delay in seconds
         self.ai_min_reaction_delay = 0.02   # Minimum delay at high player scores
-        self.ai_base_error = 6.0   # Starting tracking error (randomness)
-        self.ai_min_error = 1.0    # Minimum error at high player scores
+        self.ai_base_error = 3.0   # Starting tracking error (randomness)
+        self.ai_min_error = 0.5    # Minimum error at high player scores
         self.ai_reaction_timer = 0.0  # Timer for reaction delay
         self.ai_target_y = GRID_SIZE // 2  # Delayed target position
 
@@ -148,7 +148,7 @@ class Pong(Game):
             raw_target = self.ball_y - self.paddle_height / 2
             raw_target += random.uniform(-tracking_error, tracking_error)
             # Smooth toward new target to reduce jitter
-            self.ai_target_y += (raw_target - self.ai_target_y) * 0.3
+            self.ai_target_y += (raw_target - self.ai_target_y) * 0.7
 
         # AI moves toward its delayed target position
         if self.ai_y < self.ai_target_y - 1:
