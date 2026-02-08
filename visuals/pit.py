@@ -6,14 +6,15 @@ across the cloud-filled sky. 2-frame wing-flap animation from
 Kid Icarus NES sprites.
 
 Controls:
-  Left/Right  - Change direction
-  Up/Down     - Adjust speed
+  Left/Right  - Adjust speed
+  Up/Down     - Cycle sky (day / sunset / night / sunrise)
   Space       - Reset
   Escape      - Exit
 """
 
 import os
 import math
+import random
 from . import Visual, Display, Colors, GRID_SIZE
 
 try:
@@ -21,6 +22,35 @@ try:
     HAS_PIL = True
 except ImportError:
     HAS_PIL = False
+
+
+# Sky palettes: (sky_top, sky_bot, cloud, column_light, column_dark, column_cap, star_chance)
+_SKIES = {
+    'day': (
+        (100, 160, 255), (180, 220, 255), (240, 240, 248),
+        (200, 195, 210), (150, 145, 165), (220, 215, 230), 0.0,
+    ),
+    'sunset': (
+        (180, 80, 40), (255, 160, 60), (255, 200, 140),
+        (180, 140, 110), (130, 95, 75), (200, 165, 130), 0.0,
+    ),
+    'night': (
+        (10, 10, 40), (25, 20, 60), (60, 55, 80),
+        (70, 65, 90), (45, 40, 60), (90, 85, 110), 0.08,
+    ),
+    'sunrise': (
+        (60, 40, 120), (200, 140, 100), (220, 180, 160),
+        (170, 145, 155), (120, 100, 115), (195, 175, 180), 0.0,
+    ),
+}
+_SKY_ORDER = ['day', 'sunset', 'night', 'sunrise']
+
+# Cloud layout shared across all sky states
+_CLOUDS = [
+    (5, 8, 10, 4), (30, 4, 12, 5), (52, 12, 8, 3),
+    (15, 45, 9, 3), (40, 50, 11, 4), (58, 42, 6, 3),
+    (2, 28, 7, 3), (35, 30, 8, 3), (55, 25, 6, 2),
+]
 
 
 class Pit(Visual):
@@ -34,16 +64,9 @@ class Pit(Visual):
     WORLD_W = 80
     VIEW_OFFSET = 8
     BASE_SPEED = 25.0
-    FLAP_INTERVAL = 0.12     # Wing flap speed
-    DIR_CHANGE_TIME = 4.0    # Seconds between auto direction changes
-
-    # Skyworld palette
-    SKY_TOP = (100, 160, 255)
-    SKY_BOT = (180, 220, 255)
-    CLOUD_COLOR = (240, 240, 248)
-    COLUMN_LIGHT = (200, 195, 210)
-    COLUMN_DARK = (150, 145, 165)
-    COLUMN_CAP = (220, 215, 230)
+    FLAP_INTERVAL = 0.12
+    DIR_CHANGE_MIN = 3.0
+    DIR_CHANGE_MAX = 6.0
 
     def __init__(self, display):
         super().__init__(display)
@@ -62,8 +85,10 @@ class Pit(Visual):
         self.pit_frame = 0
         self.pit_timer = 0.0
         self.dir_timer = 0.0
+        self._next_dir_change = random.uniform(self.DIR_CHANGE_MIN, self.DIR_CHANGE_MAX)
 
-        self._build_background()
+        self.sky_idx = 0
+        self._build_all_backgrounds()
 
     def _load_gif_native(self, filename):
         if not HAS_PIL:
@@ -93,68 +118,71 @@ class Pit(Visual):
         self.pit_r = self._load_gif_native(self.PIT_R_GIF)
         self.pit_l = self._load_gif_native(self.PIT_L_GIF)
 
-    def _build_background(self):
-        """Pre-render Skyworld background with gradient sky, clouds, columns."""
-        self.bg_buf = [[(0, 0, 0)] * GRID_SIZE for _ in range(GRID_SIZE)]
+    def _build_all_backgrounds(self):
+        """Pre-render a background buffer for each sky state."""
+        self._backgrounds = {}
+        rng = random.Random(42)
+        for key in _SKY_ORDER:
+            sky_top, sky_bot, cloud_c, col_lt, col_dk, col_cap, star_chance = _SKIES[key]
+            buf = [[(0, 0, 0)] * GRID_SIZE for _ in range(GRID_SIZE)]
 
-        # Sky gradient
-        for y in range(GRID_SIZE):
-            t = y / GRID_SIZE
-            r = int(self.SKY_TOP[0] + (self.SKY_BOT[0] - self.SKY_TOP[0]) * t)
-            g = int(self.SKY_TOP[1] + (self.SKY_BOT[1] - self.SKY_TOP[1]) * t)
-            b = int(self.SKY_TOP[2] + (self.SKY_BOT[2] - self.SKY_TOP[2]) * t)
-            for x in range(GRID_SIZE):
-                self.bg_buf[y][x] = (r, g, b)
+            # Sky gradient
+            for y in range(GRID_SIZE):
+                t = y / GRID_SIZE
+                r = int(sky_top[0] + (sky_bot[0] - sky_top[0]) * t)
+                g = int(sky_top[1] + (sky_bot[1] - sky_top[1]) * t)
+                b = int(sky_top[2] + (sky_bot[2] - sky_top[2]) * t)
+                for x in range(GRID_SIZE):
+                    buf[y][x] = (r, g, b)
 
-        # Cloud clusters
-        clouds = [
-            (5, 8, 10, 4), (30, 4, 12, 5), (52, 12, 8, 3),
-            (15, 45, 9, 3), (40, 50, 11, 4), (58, 42, 6, 3),
-            (2, 28, 7, 3), (35, 30, 8, 3), (55, 25, 6, 2),
-        ]
-        cc = self.CLOUD_COLOR
-        for cx, cy, cw, ch in clouds:
-            for dy in range(ch):
-                for dx in range(cw):
-                    # Round corners
-                    if (dy == 0 or dy == ch - 1) and (dx == 0 or dx == cw - 1):
-                        continue
-                    px, py = cx + dx, cy + dy
-                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
-                        self.bg_buf[py][px] = cc
+            # Stars (night sky)
+            if star_chance > 0:
+                star_rng = random.Random(99)
+                for y in range(GRID_SIZE):
+                    for x in range(GRID_SIZE):
+                        if star_rng.random() < star_chance:
+                            v = star_rng.randint(140, 255)
+                            buf[y][x] = (v, v, int(v * 0.85))
 
-        # Greek columns at edges (decorative)
-        for col_x in [2, 60]:
-            col_w = 3
-            # Capital (top piece)
-            for dx in range(-1, col_w + 1):
-                px = col_x + dx
-                if 0 <= px < GRID_SIZE:
-                    self.bg_buf[52][px] = self.COLUMN_CAP
-                    self.bg_buf[53][px] = self.COLUMN_CAP
-            # Shaft
-            for y in range(54, GRID_SIZE):
-                for dx in range(col_w):
+            # Clouds
+            for cx, cy, cw, ch in _CLOUDS:
+                for dy in range(ch):
+                    for dx in range(cw):
+                        if (dy == 0 or dy == ch - 1) and (dx == 0 or dx == cw - 1):
+                            continue
+                        px, py = cx + dx, cy + dy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            buf[py][px] = cloud_c
+
+            # Greek columns at edges
+            for col_x in [2, 60]:
+                col_w = 3
+                for dx in range(-1, col_w + 1):
                     px = col_x + dx
                     if 0 <= px < GRID_SIZE:
-                        c = self.COLUMN_LIGHT if dx == 1 else self.COLUMN_DARK
-                        self.bg_buf[y][px] = c
+                        buf[52][px] = col_cap
+                        buf[53][px] = col_cap
+                for y in range(54, GRID_SIZE):
+                    for dx in range(col_w):
+                        px = col_x + dx
+                        if 0 <= px < GRID_SIZE:
+                            buf[y][px] = col_lt if dx == 1 else col_dk
+
+            self._backgrounds[key] = buf
 
     def handle_input(self, input_state):
         consumed = False
         if input_state.left:
-            self.pit_dir = -1
-            self.dir_timer = 0.0
+            self.speed_mult = max(0.3, self.speed_mult - 0.15)
             consumed = True
         if input_state.right:
-            self.pit_dir = 1
-            self.dir_timer = 0.0
-            consumed = True
-        if input_state.up:
             self.speed_mult = min(3.0, self.speed_mult + 0.15)
             consumed = True
+        if input_state.up:
+            self.sky_idx = (self.sky_idx - 1) % len(_SKY_ORDER)
+            consumed = True
         if input_state.down:
-            self.speed_mult = max(0.3, self.speed_mult - 0.15)
+            self.sky_idx = (self.sky_idx + 1) % len(_SKY_ORDER)
             consumed = True
         if input_state.action_l or input_state.action_r:
             self.speed_mult = 1.0
@@ -163,6 +191,7 @@ class Pit(Visual):
             self.pit_y = 28.0
             self.pit_frame = 0
             self.dir_timer = 0.0
+            self.sky_idx = 0
             consumed = True
         return consumed
 
@@ -171,11 +200,12 @@ class Pit(Visual):
         ws = self.WORLD_W
         spd = self.BASE_SPEED * self.speed_mult
 
-        # Auto direction change
+        # Random direction change
         self.dir_timer += dt
-        if self.dir_timer >= self.DIR_CHANGE_TIME:
+        if self.dir_timer >= self._next_dir_change:
             self.dir_timer = 0.0
             self.pit_dir = -self.pit_dir
+            self._next_dir_change = random.uniform(self.DIR_CHANGE_MIN, self.DIR_CHANGE_MAX)
 
         # Horizontal movement (wrapping)
         self.pit_x = (self.pit_x + self.pit_dir * spd * dt) % ws
@@ -208,9 +238,11 @@ class Pit(Visual):
         display = self.display
         sp = display.set_pixel
 
-        # 1. Background
+        # 1. Background for current sky state
+        sky_key = _SKY_ORDER[self.sky_idx]
+        bg = self._backgrounds[sky_key]
         for y in range(GRID_SIZE):
-            row = self.bg_buf[y]
+            row = bg[y]
             for x in range(GRID_SIZE):
                 sp(x, y, row[x])
 
