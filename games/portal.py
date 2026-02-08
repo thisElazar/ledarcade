@@ -2,8 +2,8 @@
 PORTAL — First-Person Puzzle Game
 ===================================
 Portal-inspired first-person raycaster for the 64x64 LED arcade.
-DDA raycaster with elevation system, wall portals with momentum,
-companion cube, pressure plates, and GLaDOS messages.
+DDA raycaster with wall portals, companion cube, pressure plates,
+and GLaDOS messages.
 
 Controls:
   Left/Right  - Rotate view
@@ -44,6 +44,7 @@ G = 10  # gap / pit (elevation -1.0)
 PP = 11 # pressure plate (floor marker, not a wall)
 CC = 12 # companion cube start position (floor)
 EX = 13 # exit trigger
+PIT = 14 # pit/gap floor marker (blocks movement, renders as void)
 
 # Face directions: N=0, E=1, S=2, W=3
 FACE_DX = [0, 1, 0, -1]
@@ -53,11 +54,11 @@ FACE_DY = [-1, 0, 1, 0]
 # Player exits heading outward from the face
 
 # ═══════════════════════════════════════════════════════════════════
-#  Level Map — 24 wide x 40 tall
+#  Level Map — 24 wide x 41 tall
 # ═══════════════════════════════════════════════════════════════════
 
 MAP_W = 24
-MAP_H = 44  # updated by _M length
+MAP_H = 41  # updated by _M length
 
 # Cell types determine wall rendering and collision
 # 0 = open floor, other values = wall types above
@@ -95,32 +96,31 @@ _M = [
     [W,W,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 18
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 19
 
-    # ── Chamber 03 — Vertical Thinking (rows 20-28) ──
-    # Ground level left, stairs going right, upper platform right.
-    # P walls at ground and upper for cross-elevation portaling.
-    # Entry from north (col 2). Exit east on upper level.
-    [W,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 20
-    [W,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 21
-    [W,0,0,0,0,P,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 22
-    [W,W,W,W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 23
-    [W,W,W,W,W,W,W,W,0,0,P,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 24
-    [W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 25
-    [W,W,W,W,W,W,W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 26
-    [W,W,W,W,W,W,W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 27
-    [W,W,W,W,W,W,W,W,W,W,W,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 28
+    # ── Chamber 03 — Mind the Gap (rows 20-27) ──
+    # Wide room with full-width pit across the middle.
+    # P walls on west (col 1) and east (col 12) walls on both sides.
+    # Player portals from near-side P to far-side P across the gap.
+    [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 20
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 21
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 22
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 23 PIT
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 24 PIT
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 25
+    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 26
+    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 27
 
-    # ── Chamber 04 — Fling (rows 29-35) ──
-    # Long room with descending stairs left, portal wall at bottom,
-    # gap in middle, landing + portal wall on right side.
-    # Entry from north (col 11-12). Exit south to ch05 (col 18).
-    [W,W,0,0,0,0,0,0,0,0,P,0,0,W,W,P,0,0,0,0,0,W,W,W],  # 29
-    [W,W,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W],  # 30
-    [W,W,0,0,0,0,0,0,0,0,P,0,0,W,W,P,0,0,0,0,0,W,W,W],  # 31
+    # ── Chamber 04 — The Corridor (rows 28-35) ──
+    # L-shaped corridor from ch03 exit to ch05 entry.
+    [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 28
+    [W,W,W,W,W,0,0,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W],  # 29
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 30
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 31
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 32
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 33
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 34
+    [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,W,W,W,W,W],  # 35
 
-    # ── Chamber 05 — Companion Cube (rows 36-41) ──
+    # ── Chamber 05 — Companion Cube (rows 36-40) ──
     # Room with cube and pressure plate controlling exit door.
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 36
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,0,0,0,0,0,W,W,W],  # 37
@@ -129,60 +129,27 @@ _M = [
     [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 40
 ]
 
-MAP_H = len(_M)  # 44
+MAP_H = len(_M)  # 41
 
 # Floor height map (elevation per cell, 0.0 = ground default)
 _HEIGHTS = {}
 
-# Chamber 03: stairs ascending east through row 21
-_HEIGHTS[(6, 21)] = 0.25
-_HEIGHTS[(7, 21)] = 0.5
-_HEIGHTS[(8, 21)] = 0.75
-_HEIGHTS[(9, 21)] = 1.0
-# Upper platform at elevation 1.0 (rows 22-27)
-for c in [8, 9]:
-    _HEIGHTS[(c, 22)] = 1.0
-    _HEIGHTS[(c, 23)] = 1.0
-    _HEIGHTS[(c, 24)] = 1.0
-for c in [8, 9, 10, 11, 12]:
-    _HEIGHTS[(c, 25)] = 1.0
-_HEIGHTS[(11, 26)] = 1.0
-_HEIGHTS[(12, 26)] = 1.0
-_HEIGHTS[(11, 27)] = 1.0
-_HEIGHTS[(12, 27)] = 1.0
-_HEIGHTS[(11, 28)] = 1.0
-_HEIGHTS[(12, 28)] = 1.0
-_HEIGHTS[(11, 29)] = 1.0
-_HEIGHTS[(12, 29)] = 1.0
-
-# Chamber 04: descending staircase west from entry (rows 29-31)
-# Entry at (11,28)/(12,28) at elev 1.0 coming from ch03
-# P walls at col 10 — stairs are cols 9->2 on rows 29-31
-_HEIGHTS[(10, 30)] = 1.0  # smooth transition from upper platform to stairs
-_HEIGHTS[(9, 29)] = 0.75
-_HEIGHTS[(8, 29)] = 0.5
-_HEIGHTS[(7, 29)] = 0.25
-_HEIGHTS[(9, 30)] = 0.75
-_HEIGHTS[(8, 30)] = 0.5
-_HEIGHTS[(7, 30)] = 0.25
-_HEIGHTS[(9, 31)] = 0.75
-_HEIGHTS[(8, 31)] = 0.5
-_HEIGHTS[(7, 31)] = 0.25
-# Gap cells in chamber 04 (between the two portal-wall barriers)
-for c in [12, 13]:
-    _HEIGHTS[(c, 30)] = -1.0
-
 # Floor markers (non-wall special cells)
 _FLOOR_MARKS = {}
-_FLOOR_MARKS[(18, 36)] = PP   # pressure plate in ch05
-_FLOOR_MARKS[(21, 38)] = EX   # exit trigger (through door east)
+_FLOOR_MARKS[(18, 37)] = PP   # pressure plate in ch05
+_FLOOR_MARKS[(21, 39)] = EX   # exit trigger (through door east)
+
+# Pit floor marks for ch03 gap (rows 23-24, cols 1-12)
+for _c in range(1, 13):
+    _FLOOR_MARKS[(_c, 23)] = PIT
+    _FLOOR_MARKS[(_c, 24)] = PIT
 
 # Companion cube start position
-_CUBE_START = (17, 36)
+_CUBE_START = (17, 37)
 
 # Door links: door cell -> linked pressure plate cell
 _DOOR_LINKS = {
-    (20, 37): (18, 36),  # door D at (20,37), linked to plate at (18,36)
+    (20, 38): (18, 37),  # door D at (20,38), linked to plate at (18,37)
 }
 
 # GLaDOS trigger zones: (cx, cy) -> (message_line1, message_line2, id)
@@ -192,10 +159,10 @@ _GLADOS_ZONES = {
     (4, 8):   ("PORTALS ON",     "SPC:BLU Z:ORG",   "portals"),
     (5, 9):   ("WELL DONE",      "",                 "done1"),
     (4, 14):  ("THINK WITH",     "PORTALS",          "think"),
-    (3, 21):  ("VERTICAL",       "THINKING",         "vert"),
-    (5, 30):  ("SPEEDY IN",      "SPEEDY OUT",       "fling"),
-    (17, 36): ("CUBE CAN'T TALK","BUT IT CAN HELP",  "cube"),
-    (21, 38): ("THE CAKE IS",    "A LIE",            "cake"),
+    (2, 21):  ("MIND THE GAP",   "",                 "gap"),
+    (7, 29):  ("ALMOST THERE",   "",                 "corridor"),
+    (17, 37): ("CUBE CAN'T TALK","BUT IT CAN HELP",  "cube"),
+    (21, 39): ("THE CAKE IS",    "A LIE",            "cake"),
 }
 
 
@@ -224,28 +191,11 @@ class Portal(Game):
         self.heights = dict(_HEIGHTS)
         self.floor_marks = dict(_FLOOR_MARKS)
 
-        # Propagate floor heights to adjacent wall cells so elevated
-        # walls render at the correct base height (multi-story support)
-        for y in range(MAP_H):
-            for x in range(MAP_W):
-                if self.map[y][x] != 0 and (x, y) not in self.heights:
-                    max_h = 0.0
-                    for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < MAP_W and 0 <= ny < MAP_H:
-                            if self.map[ny][nx] == 0:
-                                h = self.heights.get((nx, ny), 0.0)
-                                if h > max_h:
-                                    max_h = h
-                    if max_h > 0:
-                        self.heights[(x, y)] = max_h
-
         # Player
         self.px = 2.5
         self.py = 2.5
         self.pa = 0.0  # facing east
         self.elevation = 0.0
-        self.velocity = 0.0
 
         # Ray offsets
         self.ray_offsets = []
@@ -274,9 +224,6 @@ class Portal(Game):
         self.glados_seen = set()
         self.glados_msg = None  # (line1, line2)
         self.glados_timer = 0.0
-
-        # Checkpoint for gap falls
-        self.checkpoint = (self.px, self.py, self.pa, self.elevation)
 
         # Win state
         self.won = False
@@ -326,12 +273,10 @@ class Portal(Game):
                 my = int(y + dy)
                 if self._is_wall(mx, my):
                     return True
+                if self.floor_marks.get((mx, my)) == PIT:
+                    return True
                 # Cube blocks movement (unless pushing it)
                 if mx == self.cube_x and my == self.cube_y:
-                    return True
-                # Gap: block if velocity too low
-                h = self._floor_height(mx, my)
-                if h <= -0.5 and self.velocity < 3.0:
                     return True
         return False
 
@@ -497,7 +442,6 @@ class Portal(Game):
         # Set elevation to exit portal's floor level
         self.elevation = e_height
 
-        # Preserve velocity magnitude
         self.portal_cooldown = 0.4
 
     # ─────────────────────────────────────────────────────────────
@@ -510,7 +454,7 @@ class Portal(Game):
             return False
         nx = self.cube_x + dx
         ny = self.cube_y + dy
-        if not self._is_wall(nx, ny) and self._floor_height(nx, ny) >= 0:
+        if not self._is_wall(nx, ny) and self.floor_marks.get((nx, ny)) != PIT and self._floor_height(nx, ny) >= 0:
             # Check cube doesn't go into another cube (only one cube)
             self.cube_x = nx
             self.cube_y = ny
@@ -601,24 +545,15 @@ class Portal(Game):
         # Movement
         cos_a = math.cos(self.pa)
         sin_a = math.sin(self.pa)
-        move_spd = max(MOVE_SPEED, self.velocity)
-        speed = move_spd * dt
-        moving = False
-
-        # Determine current cell height and adjust speed for slopes
-        cur_cell_x = int(self.px)
-        cur_cell_y = int(self.py)
-        cur_h = self._floor_height(cur_cell_x, cur_cell_y)
+        speed = MOVE_SPEED * dt
 
         nx, ny = self.px, self.py
         if input_state.up:
             nx += cos_a * speed
             ny += sin_a * speed
-            moving = True
         if input_state.down:
             nx -= cos_a * speed * 0.6
             ny -= sin_a * speed * 0.6
-            moving = True
 
         if input_state.left:
             self.pa -= ROT_SPEED * dt
@@ -626,7 +561,7 @@ class Portal(Game):
             self.pa += ROT_SPEED * dt
 
         # Check cube push
-        if moving and input_state.up:
+        if input_state.up:
             # Determine facing cardinal direction
             face_dir = self._cardinal_dir()
             fdx, fdy = FACE_DX[face_dir], FACE_DY[face_dir]
@@ -644,36 +579,6 @@ class Portal(Game):
             self.px = nx
         if not self._solid(self.px, ny):
             self.py = ny
-
-        # Update velocity tracking — gradual decay preserves momentum
-        if moving:
-            new_h = self._floor_height(int(self.px), int(self.py))
-            slope = self.elevation - new_h  # positive when going downhill
-            if slope > 0.05:
-                target_v = min(5.0, MOVE_SPEED * (1.0 + slope * 2.5))
-                self.velocity = max(self.velocity, target_v)
-            else:
-                # Gradual decay toward base speed
-                self.velocity = max(MOVE_SPEED, self.velocity - dt * 2.0)
-        else:
-            self.velocity = max(0, self.velocity - dt * 4.0)  # faster decay when stopped
-
-        # Smooth elevation interpolation
-        target_h = self._floor_height(int(self.px), int(self.py))
-        if target_h >= -0.5:  # not a gap
-            diff = target_h - self.elevation
-            self.elevation += diff * min(1.0, 8.0 * dt)
-
-        # Check for gap fall
-        cell_h = self._floor_height(int(self.px), int(self.py))
-        if cell_h <= -0.5 and self.velocity < 3.5:
-            # Fall! Reset to checkpoint
-            self.px, self.py, self.pa, self.elevation = self.checkpoint
-            self.velocity = 0.0
-
-        # Update checkpoint when on solid ground
-        if cell_h >= 0:
-            self.checkpoint = (self.px, self.py, self.pa, self.elevation)
 
         # Portal traversal
         self._try_portal_traverse(dt)
@@ -726,7 +631,7 @@ class Portal(Game):
             self._draw_win()
             return
 
-        # Column-by-column rendering (ceiling + wall + steps + floor)
+        # Column-by-column rendering (ceiling + wall + floor)
         eye_h = self.elevation + 0.5
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]
@@ -766,8 +671,8 @@ class Portal(Game):
             self._draw_glados()
 
     def _cast_ray(self, col, angle, eye_h):
-        """DDA raycaster with elevation, step edges, and portal rendering.
-        Renders the full column: ceiling, wall, stair steps, floor."""
+        """DDA raycaster with portal rendering.
+        Renders the full column: ceiling, wall, floor."""
         cos_a = math.cos(angle)
         sin_a = math.sin(angle)
         if abs(cos_a) < 1e-8:
@@ -793,10 +698,6 @@ class Portal(Game):
         else:
             step_y = 1
             side_dist_y = (map_y + 1.0 - self.py) * delta_y
-
-        # Track floor height transitions for stair step rendering
-        prev_floor_h = self._floor_height(int(self.px), int(self.py))
-        step_edges = []
 
         hit = False
         side = 0
@@ -824,19 +725,6 @@ class Portal(Game):
                 hit_cell = cell
                 break
 
-            # Open floor cell — check for height transition (stair edge)
-            floor_h = self._floor_height(map_x, map_y)
-            if abs(floor_h - prev_floor_h) > 0.05:
-                if side == 0:
-                    pd = (map_x - self.px + (1 - step_x) / 2) / cos_a
-                else:
-                    pd = (map_y - self.py + (1 - step_y) / 2) / sin_a
-                if pd > 0.1:
-                    lo = min(prev_floor_h, floor_h)
-                    hi = max(prev_floor_h, floor_h)
-                    step_edges.append((pd, lo, hi, side))
-                prev_floor_h = floor_h
-
             # Companion cube — save hit but continue ray to find background
             if map_x == self.cube_x and map_y == self.cube_y and cube_hit is None:
                 if side == 0:
@@ -863,7 +751,9 @@ class Portal(Game):
                 fcx, fcy = int(fx), int(fy)
                 mark = self.floor_marks.get((fcx, fcy))
                 fog_f = min(1.0, 2.0 / (row_dist + 0.5))
-                if mark == PP:
+                if mark == PIT:
+                    r, g, b = int(15 * fog_f), int(5 * fog_f), int(5 * fog_f)
+                elif mark == PP:
                     r, g, b = int(180 * fog_f), int(150 * fog_f), int(30 * fog_f)
                 elif mark == EX:
                     r, g, b = int(30 * fog_f), int(180 * fog_f), int(30 * fog_f)
@@ -882,13 +772,9 @@ class Portal(Game):
         if perp_dist < 0.01:
             perp_dist = 0.01
 
-        # Wall base matches player elevation — consistent across all columns
-        # (prevents staircase artifacts from stairs, overflow from gap cells)
-        cell_floor = max(0.0, self.elevation)
+        cell_floor = 0.0
         wall_bottom = cell_floor
-        if hit_cell == CC:
-            wh = 0.4   # small pushable cube
-        elif hit_cell == D:
+        if hit_cell == D:
             wh = 1.2   # door: shorter than walls (looks like a doorway)
         else:
             wh = WALL_HEIGHT
@@ -954,7 +840,9 @@ class Portal(Game):
             fcx, fcy = int(fx), int(fy)
             mark = self.floor_marks.get((fcx, fcy))
             fog_f = min(1.0, 2.0 / (row_dist + 0.5))
-            if mark == PP:
+            if mark == PIT:
+                r, g, b = int(15 * fog_f), int(5 * fog_f), int(5 * fog_f)
+            elif mark == PP:
                 r, g, b = int(180 * fog_f), int(150 * fog_f), int(30 * fog_f)
             elif mark == EX:
                 r, g, b = int(30 * fog_f), int(180 * fog_f), int(30 * fog_f)
@@ -963,22 +851,6 @@ class Portal(Game):
                 base = 45 if checker == 0 else 35
                 r, g, b = int((base+5)*fog_f), int((base+2)*fog_f), int(base*fog_f)
             self.display.set_pixel(col, y, (r, g, b))
-
-        # ── Render stair step edges (small risers only) ──
-        for pd, lo, hi, s in step_edges:
-            if pd >= perp_dist:
-                continue  # step is behind the wall
-            if hi - lo > 0.4:
-                continue  # skip large transitions (platform edges)
-            sc = GRID_SIZE / pd
-            sy_top = int(HALF - (hi - eye_h) * sc)
-            sy_bot = int(HALF - (lo - eye_h) * sc)
-            sf = min(1.0, 2.0 / (pd + 0.5))
-            if s == 1:
-                sf *= 0.8
-            cr, cg, cb = int(95 * sf), int(90 * sf), int(100 * sf)
-            for y in range(max(0, sy_top), min(GRID_SIZE, sy_bot + 1)):
-                self.display.set_pixel(col, y, (cr, cg, cb))
 
         # ── Overlay companion cube (rendered on top of background) ──
         if cube_hit:
