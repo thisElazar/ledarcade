@@ -225,7 +225,7 @@
           "is_game": true
         },
         {
-          "name": "3D MAZE",
+          "name": "3D MONSTR MAZE",
           "cls": "MonsterMaze",
           "module": "games/monstermaze.py",
           "is_game": true

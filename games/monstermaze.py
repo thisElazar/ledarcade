@@ -190,7 +190,7 @@ def manhattan(x1, y1, x2, y2):
 # =============================================================================
 
 class MonsterMaze(Game):
-    name = "3D MAZE"
+    name = "3D MONSTR MAZE"
     description = "Escape the T-Rex!"
     category = "retro"
 
