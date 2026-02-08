@@ -1252,13 +1252,16 @@ class GallerySMB3(_Gallery3DBase):
             if is_first:
                 first_corridor_y = cy
 
-            # Waypoints: stop at far end only (pause=1.5), start end no pause
+            # Waypoints: entry → center → far end (pause)
+            mid = float(CW // 2)
             if corridor_num % 2 == 0:
-                waypoints.append((2.0, cy + 0.5, 0.0))
-                waypoints.append((float(CW), cy + 0.5, 1.5))
+                waypoints.append((4.0, cy + 0.5, 0.0))
+                waypoints.append((mid, cy + 0.5, 0.0))
+                waypoints.append((float(CW - 1), cy + 0.5, 1.5))
             else:
-                waypoints.append((float(CW), cy + 0.5, 0.0))
-                waypoints.append((2.0, cy + 0.5, 1.5))
+                waypoints.append((float(CW - 2), cy + 0.5, 0.0))
+                waypoints.append((mid, cy + 0.5, 0.0))
+                waypoints.append((3.0, cy + 0.5, 1.5))
             corridor_num += 1
 
             if placed >= n_sprites:
@@ -1302,8 +1305,10 @@ class GallerySMB3(_Gallery3DBase):
             rows.append(row)
             cy = len(rows) - 1
             last_corridor_y = cy
-            waypoints.append((2.0, cy + 0.5, 0.0))
-            waypoints.append((float(CW), cy + 0.5, 1.5))
+            mid = float(CW // 2)
+            waypoints.append((4.0, cy + 0.5, 0.0))
+            waypoints.append((mid, cy + 0.5, 0.0))
+            waypoints.append((float(CW - 1), cy + 0.5, 1.5))
             corridor_num += 1
 
         # --- Last painting row (south wall) ---
@@ -1336,7 +1341,7 @@ class GallerySMB3(_Gallery3DBase):
         self.MAP_W = W
         self.MAP_H = len(rows)
         self.WAYPOINTS = waypoints
-        self.START_POS = (float(CW // 2), first_corridor_y + 0.5)
+        self.START_POS = (2.0, first_corridor_y + 0.5)
 
     # ------------------------------------------------------------------
     # Auto-walk override — supports (x, y, pause) waypoint tuples
@@ -1354,7 +1359,7 @@ class GallerySMB3(_Gallery3DBase):
         dx = tx - self.px
         dy = ty - self.py
         dist = math.sqrt(dx * dx + dy * dy)
-        if dist < 0.3:
+        if dist < 0.2:
             self.wp_pause = pause
             self.wp_idx = (self.wp_idx + 1) % len(self.WAYPOINTS)
             return
@@ -1364,7 +1369,7 @@ class GallerySMB3(_Gallery3DBase):
             diff -= 2 * math.pi
         while diff < -math.pi:
             diff += 2 * math.pi
-        self.pa += diff * min(1.0, 4.0 * dt)
+        self.pa += diff * min(1.0, 8.0 * dt)
         speed = self.move_speed * dt
         cos_a = math.cos(self.pa)
         sin_a = math.sin(self.pa)
@@ -1375,6 +1380,12 @@ class GallerySMB3(_Gallery3DBase):
             self.px = nx
         if not self._solid(self.px, ny, margin):
             self.py = ny
+        # Lane-keeping: only during horizontal corridor walks
+        if abs(dy) < 0.5 and abs(dx) > 2.0:
+            center_y = int(self.py) + 0.5
+            corr_y = self.py + (center_y - self.py) * min(1.0, 12.0 * dt)
+            if not self._solid(self.px, corr_y, margin):
+                self.py = corr_y
 
     # ------------------------------------------------------------------
     # Rendering override — Mario sky ceiling + brick floor + bytes tex
