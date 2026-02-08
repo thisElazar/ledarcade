@@ -102,8 +102,9 @@ class SandGame(Game):
 
         # Input timing
         self.move_timer = 0.0
-        self.both_tap_timer = 0.0
-        self.prev_both = False
+        self.btn_hold_time = 0.0   # how long button has been held
+        self.btn_was_held = False   # was button held last frame
+        self.painting = False       # are we in paint mode (held past threshold)
 
     def _set_cell(self, x, y, mat_id):
         """Set a cell to a material with fresh properties."""
@@ -462,16 +463,19 @@ class SandGame(Game):
         else:
             self._update_play_mode(input_state, dt)
 
-        # Check for mode toggle: both buttons tapped
-        both_now = input_state.action_l_held and input_state.action_r_held
-        if both_now and not self.prev_both:
-            self.both_tap_timer = 0.0
-        if both_now:
-            self.both_tap_timer += dt
-        if not both_now and self.prev_both and self.both_tap_timer < 0.4:
-            # Short tap of both buttons = toggle mode
-            self.mode = MODE_SELECT if self.mode == MODE_PLAY else MODE_PLAY
-        self.prev_both = both_now
+        # Unified button handling: either button counts the same
+        btn_now = input_state.action_l_held or input_state.action_r_held
+        if btn_now:
+            self.btn_hold_time += dt
+            if self.btn_hold_time >= 0.15:
+                self.painting = True
+        else:
+            if self.btn_was_held and self.btn_hold_time < 0.15:
+                # Quick tap: toggle mode
+                self.mode = MODE_SELECT if self.mode == MODE_PLAY else MODE_PLAY
+            self.btn_hold_time = 0.0
+            self.painting = False
+        self.btn_was_held = btn_now
 
         # Run simulation every frame regardless of mode
         self._simulate()
@@ -491,8 +495,8 @@ class SandGame(Game):
                 self.cx = clamp(self.cx + inp.dx, 0, W - 1)
                 self.cy = clamp(self.cy + inp.dy, SIM_TOP, H - 1)
 
-        # Paint material while space held (2x2 brush, but not when both held for mode switch)
-        if inp.action_l_held and not inp.action_r_held:
+        # Paint material with 2x2 brush while button held past tap threshold
+        if self.painting:
             for dy in range(2):
                 for dx in range(2):
                     bx, by = self.cx + dx, self.cy + dy
