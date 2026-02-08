@@ -1198,7 +1198,8 @@ class GallerySMB3(_Gallery3DBase):
                                 visited[ny, nx] = True
                                 queue.append((ny, nx))
                     cw, ch = mxx-mnx+1, mxy-mny+1
-                    if (min(cw, ch) >= 14 and max(cw, ch) <= 120
+                    max_dim = getattr(self, '_MAX_SPRITE_DIM', 120)
+                    if (min(cw, ch) >= 14 and max(cw, ch) <= max_dim
                             and 0.2 <= cw/ch <= 5.0 and area / (cw*ch) > 0.08):
                         components.append((mnx, mny, cw, ch, area))
 
@@ -1834,6 +1835,135 @@ class GalleryKidIcarus(GallerySMB3):
                 else:
                     checker = (int(tx) + int(ty)) % 2
                     self.display.set_pixel(x, y, ma if checker else mb)
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            self._cast_ray_bytes(col, ray_angle)
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Gallery 12: ADVENTURE TIME MUSEUM — Explore the Dungeon sprites
+#  Extends SMB3 Museum base with Land of Ooo sky and dungeon floor.
+# ══════════════════════════════════════════════════════════════════
+
+class GalleryAdventureTime(GallerySMB3):
+    name = "ADVENTURE TIME"
+    description = "Land of Ooo sprites"
+
+    _MAX_SPRITE_DIM = 350  # PC game sprites are larger than NES
+
+    _SHEETS = [
+        # Playable characters (11)
+        "at_finn.png", "at_jake.png", "at_marceline.png",
+        "at_iceking.png", "at_flameprincess.png", "at_gunter.png",
+        "at_cinnamonbun.png", "at_lemongrab.png", "at_lsp.png",
+        "at_kingofmars.png", "at_pepbutler.png",
+        # NPCs (11)
+        "at_bubblegum.png", "at_bananaguard.png",
+        "at_ladyrainicorn.gif", "at_neptr.gif",
+        "at_choosegoose.png", "at_mrpig.png", "at_mrcupcake.png",
+        "at_starchy.png", "at_susanstrong.png", "at_treetrunks.png",
+        "at_princessmuscles.png",
+        # Enemies (4)
+        "at_babypig.png", "at_deer.png", "at_keyper.png",
+        "at_lakeknight.png",
+        # Bosses (10)
+        "at_demoncat.png", "at_cake.png", "at_fionna.png",
+        "at_goliad.png", "at_goop.png", "at_gunterboss.png",
+        "at_gunterkitten.png", "at_hyoomanf.png", "at_hyoomanm.png",
+        "at_stormo.png",
+        # Effects (1)
+        "at_marcelinefx.png",
+    ]
+
+    _SHEET_LABELS = [
+        # Playable
+        "FINN", "JAKE", "MARCELINE", "ICE KING", "FLAME PRINCESS",
+        "GUNTER", "CINNAMON BUN", "LEMONGRAB", "LSP",
+        "KING OF MARS", "PEP BUTLER",
+        # NPCs
+        "BUBBLEGUM", "BANANA GUARD", "LADY RAINICORN", "NEPTR",
+        "CHOOSE GOOSE", "MR. PIG", "MR. CUPCAKE", "STARCHY",
+        "SUSAN STRONG", "TREE TRUNKS", "PRINCESS MUSCLES",
+        # Enemies
+        "BABY PIG", "DEER", "KEYPER", "LAKE KNIGHT",
+        # Bosses
+        "DEMON CAT", "CAKE", "FIONNA", "GOLIAD", "GOOP",
+        "GUNTER BOSS", "KITTEN", "HYOOMAN F", "HYOOMAN M", "STORMO",
+        # Effects
+        "MARCELINE FX",
+    ]
+
+    # Candy-colored sparkle positions for Ooo sky (x, y)
+    _SPARKLES = [
+        (4, 2), (13, 5), (23, 1), (36, 4), (48, 2), (59, 6),
+        (9, 10), (19, 13), (31, 8), (43, 11), (54, 9), (63, 3),
+        (6, 17), (16, 20), (27, 15), (39, 19), (51, 16), (61, 14),
+        (11, 24), (22, 22), (34, 26), (45, 23), (57, 27), (3, 28),
+    ]
+
+    # Candy colors for sparkles (pink, cyan, yellow, lime, lavender)
+    _CANDY_COLORS = [
+        (255, 130, 180), (100, 220, 255), (255, 230, 80),
+        (130, 255, 130), (200, 160, 255),
+    ]
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        # --- Land of Ooo sky: warm gradient from deep blue to sunset orange ---
+        for y in range(half):
+            t = y / half
+            r = int(30 + 140 * t)
+            g = int(20 + 80 * t)
+            b = int(100 - 50 * t)
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, (r, g, b))
+        # Candy-colored twinkling sparkles
+        phase = self.time * 2.5
+        for i, (sx, sy) in enumerate(self._SPARKLES):
+            if 0 <= sx < GRID_SIZE and 0 <= sy < half:
+                bright = 0.4 + 0.6 * math.sin(phase + i * 1.3)
+                cc = self._CANDY_COLORS[i % len(self._CANDY_COLORS)]
+                v = int(128 + 127 * bright)
+                r = min(255, int(cc[0] * v / 255))
+                g = min(255, int(cc[1] * v / 255))
+                b = min(255, int(cc[2] * v / 255))
+                self.display.set_pixel(sx, sy, (r, g, b))
+
+        # --- Dungeon floor: dark stone tiles with green mortar ---
+        stone_a = (70, 65, 80)
+        stone_b = (50, 45, 60)
+        cos_l = math.cos(self.pa - self.fov * 0.5)
+        sin_l = math.sin(self.pa - self.fov * 0.5)
+        step_cx = (math.cos(self.pa + self.fov * 0.5) - cos_l) / GRID_SIZE
+        step_cy = (math.sin(self.pa + self.fov * 0.5) - sin_l) / GRID_SIZE
+        for y in range(half, GRID_SIZE):
+            p = y - half
+            if p == 0:
+                for x in range(GRID_SIZE):
+                    self.display.set_pixel(x, y, (0, 0, 0))
+                continue
+            row_dist = float(half) / p
+            fx = self.px + row_dist * cos_l
+            fy = self.py + row_dist * sin_l
+            sx = row_dist * step_cx
+            sy = row_dist * step_cy
+            fog = min(1.0, 1.5 / (row_dist + 0.5))
+            sa = (int(stone_a[0] * fog), int(stone_a[1] * fog),
+                  int(stone_a[2] * fog))
+            sb = (int(stone_b[0] * fog), int(stone_b[1] * fog),
+                  int(stone_b[2] * fog))
+            mortar = (int(20 * fog), int(40 * fog), int(25 * fog))
+            for x in range(GRID_SIZE):
+                wx = fx + x * sx
+                wy = fy + x * sy
+                tx = wx * 3.0
+                ty = wy * 3.0
+                if tx % 1.0 < 0.1 or ty % 1.0 < 0.1:
+                    self.display.set_pixel(x, y, mortar)
+                else:
+                    checker = (int(tx) + int(ty)) % 2
+                    self.display.set_pixel(x, y, sa if checker else sb)
 
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]

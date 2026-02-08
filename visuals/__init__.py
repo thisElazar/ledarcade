@@ -123,6 +123,7 @@ from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GalleryScience, GalleryDigital, GalleryEffects,
                         GallerySalon, GallerySMB3, GalleryKirby,
                         GalleryZelda, GalleryKidIcarus,
+                        GalleryAdventureTime,
                         GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
@@ -325,6 +326,7 @@ ALL_VISUALS = [
     GalleryKirby,
     GalleryZelda,
     GalleryKidIcarus,
+    GalleryAdventureTime,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -587,6 +589,7 @@ __all__ = [
     'GalleryKirby',
     'GalleryZelda',
     'GalleryKidIcarus',
+    'GalleryAdventureTime',
     'Gallery3D',
     'Win95Maze',
     'DemonSpirals',
