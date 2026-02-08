@@ -1293,6 +1293,16 @@ class GallerySMB3(_Gallery3DBase):
             row += [_side(), _side(), 0, 0, _side()]
             rows.append(row)
 
+        # --- Remove stale turn waypoints from loop's last painting row ---
+        # (they point into rows the fixup or final section will repurpose)
+        if (len(waypoints) >= 2
+                and waypoints[-1][2] == 0.0
+                and waypoints[-2][2] == 0.0
+                and waypoints[-1][0] == waypoints[-2][0]
+                and waypoints[-1][0] in (1.5, CW + 0.5)):
+            waypoints.pop()
+            waypoints.pop()
+
         # --- Ensure last corridor walks east (for shaft connection) ---
         if corridor_num % 2 == 0:
             # Last walks west — add painting row with left opening + east corridor
@@ -1560,6 +1570,81 @@ class GallerySMB3(_Gallery3DBase):
             g = int(g * fog)
             b = int(b * fog)
             self.display.set_pixel(col, y, (r, g, b))
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Gallery 9: KIRBY MUSEUM — Kirby's Adventure NES sprite sheets
+#  Extends SMB3 Museum base with Dreamland-themed sky and floor.
+# ══════════════════════════════════════════════════════════════════
+
+class GalleryKirby(GallerySMB3):
+    name = "KIRBY MUSEUM"
+    description = "Kirby's Adventure sprites"
+
+    _SHEETS = ["kirby_heroes.png", "kirby_enemies.png",
+               "kirby_bosses.png", "kirby_soldiers.png"]
+    _SHEET_LABELS = ["KIRBY", "ENEMIES", "KING DEDEDE", "SOLDIERS"]
+
+    # Star positions for Dreamland sky (x, y)
+    _STARS = [
+        (3, 2), (12, 5), (22, 1), (35, 4), (47, 2), (58, 6),
+        (8, 10), (18, 13), (30, 8), (42, 11), (53, 9), (62, 3),
+        (5, 17), (15, 20), (26, 15), (38, 19), (50, 16), (60, 14),
+        (10, 24), (21, 22), (33, 26), (44, 23), (56, 27), (2, 28),
+    ]
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        # --- Dreamland sky: purple gradient with stars ---
+        for y in range(half):
+            t = y / half
+            # Gradient from deep purple (top) to pink-purple (horizon)
+            r = int(60 + 80 * t)
+            g = int(20 + 40 * t)
+            b = int(120 - 20 * t)
+            sky_color = (r, g, b)
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, sky_color)
+        # Twinkling stars
+        phase = self.time * 2.0
+        for i, (sx, sy) in enumerate(self._STARS):
+            if 0 <= sx < GRID_SIZE and 0 <= sy < half:
+                bright = 0.5 + 0.5 * math.sin(phase + i * 1.7)
+                v = int(180 + 75 * bright)
+                self.display.set_pixel(sx, sy, (v, v, int(v * 0.8)))
+
+        # --- Green Greens floor with perspective checker ---
+        grass_a = (50, 180, 50)
+        grass_b = (30, 140, 30)
+        cos_l = math.cos(self.pa - self.fov * 0.5)
+        sin_l = math.sin(self.pa - self.fov * 0.5)
+        step_cx = (math.cos(self.pa + self.fov * 0.5) - cos_l) / GRID_SIZE
+        step_cy = (math.sin(self.pa + self.fov * 0.5) - sin_l) / GRID_SIZE
+        for y in range(half, GRID_SIZE):
+            p = y - half
+            if p == 0:
+                for x in range(GRID_SIZE):
+                    self.display.set_pixel(x, y, (0, 0, 0))
+                continue
+            row_dist = float(half) / p
+            fx = self.px + row_dist * cos_l
+            fy = self.py + row_dist * sin_l
+            sx = row_dist * step_cx
+            sy = row_dist * step_cy
+            fog = min(1.0, 1.5 / (row_dist + 0.5))
+            ga = (int(grass_a[0] * fog), int(grass_a[1] * fog),
+                  int(grass_a[2] * fog))
+            gb = (int(grass_b[0] * fog), int(grass_b[1] * fog),
+                  int(grass_b[2] * fog))
+            for x in range(GRID_SIZE):
+                wx = fx + x * sx
+                wy = fy + x * sy
+                checker = (int(wx * 2) + int(wy * 2)) % 2
+                self.display.set_pixel(x, y, ga if checker else gb)
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            self._cast_ray_bytes(col, ray_angle)
 
 
 # Legacy alias — keep old import working
