@@ -93,12 +93,12 @@ _M = [
 
     # ── Chamber 03 — Mind the Gap (rows 20-27) ──
     [W,W,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 20
-    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 21
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 21
     [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 22
-    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 23 PIT
-    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 24 PIT
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 23 PIT
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 24 PIT
     [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 25
-    [W,0,0,0,0,0,0,0,0,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W],  # 26
+    [W,P,0,0,0,0,0,0,0,0,0,0,P,W,W,W,W,W,W,W,W,W,W,W],  # 26
     [W,W,W,W,W,0,0,0,0,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],  # 27
 
     # ── Chamber 04 — The Bridge (rows 28-42) ──
