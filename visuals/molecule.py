@@ -4597,10 +4597,8 @@ class Molecule(Visual):
             r = math.sqrt(dx * dx + dy * dy + dz * dz)
             max_r = max(max_r, r)
 
-        # Fixed scale: ~6 pixels per Ångström, capped to fit display
-        pixels_per_angstrom = 6.0
-        max_radius = 26.0  # Max pixel radius before clipping
-        self.scale = min(pixels_per_angstrom, max_radius / max_r if max_r > 0 else 10.0)
+        # Fixed scale: ~6 pixels per Ångström, no cap - big molecules extend off screen
+        self.scale = 6.0
         self.large = False
         self.label_timer = 0.0
 
