@@ -4595,3 +4595,102 @@ class WonderCassette(Visual):
             c = _hue_to_rgb(hue)
             c = (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade))
             self.display.draw_text_small(CABINET_X, 46, "CABINET", c)
+
+
+# =========================================================================
+# WonderJake - Dancing Jake with popping text
+# =========================================================================
+
+class WonderJake(Visual):
+    name = "WONDER JAKE"
+    description = "Jake dance title"
+    category = "titles"
+
+    GIF_FILE = "jake_dance.gif"
+    
+    def __init__(self, display: Display):
+        super().__init__(display)
+        
+    def reset(self):
+        self.time = 0.0
+        self.frame_timer = 0.0
+        self.frame_index = 0
+        self.frames = []
+        self._load_gif()
+        
+    def _load_gif(self):
+        """Load Jake dance GIF frames."""
+        try:
+            from PIL import Image
+            project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            path = os.path.join(project_dir, "assets", self.GIF_FILE)
+            if not os.path.exists(path):
+                return
+            
+            gif = Image.open(path)
+            for i in range(getattr(gif, 'n_frames', 1)):
+                gif.seek(i)
+                frame = gif.convert("RGB")
+                # Scale to fit in lower portion of screen
+                frame = frame.resize((64, 64), Image.Resampling.NEAREST)
+                pixels = []
+                for y in range(GRID_SIZE):
+                    for x in range(GRID_SIZE):
+                        pixels.append(frame.getpixel((x, y)))
+                self.frames.append(pixels)
+        except:
+            pass
+    
+    def update(self, dt: float):
+        self.time += dt
+        
+        # Animate Jake
+        if self.frames:
+            self.frame_timer += dt
+            if self.frame_timer >= 0.08:  # ~12 fps
+                self.frame_timer = 0.0
+                self.frame_index = (self.frame_index + 1) % len(self.frames)
+        
+    def draw(self):
+        d = self.display
+        d.clear(Colors.BLACK)
+        t = self.time
+        
+        # Draw Jake dancing GIF
+        if self.frames and len(self.frames) > 0:
+            frame = self.frames[self.frame_index]
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    d.set_pixel(x, y, frame[y * GRID_SIZE + x])
+        
+        # Pop-up text effect for WONDER and CABINET
+        # WONDER pops up first, then CABINET
+        if t > 1.0:
+            # WONDER pop
+            wonder_t = min(1.0, (t - 1.0) / 0.5)
+            # Bounce effect
+            if wonder_t < 1.0:
+                bounce = abs(math.sin(wonder_t * math.pi * 2)) * 3
+                y_off = int((1.0 - wonder_t) * 10 - bounce)
+            else:
+                y_off = 0
+            
+            # Scale and fade in
+            alpha = wonder_t
+            c = (int(255 * alpha), int(220 * alpha), int(100 * alpha))
+            d.draw_text_small(WONDER_X, max(2, 8 - y_off), "WONDER", c)
+        
+        if t > 1.8:
+            # CABINET pop
+            cabinet_t = min(1.0, (t - 1.8) / 0.5)
+            # Bounce effect
+            if cabinet_t < 1.0:
+                bounce = abs(math.sin(cabinet_t * math.pi * 2)) * 3
+                y_off = int((1.0 - cabinet_t) * 10 - bounce)
+            else:
+                y_off = 0
+            
+            # Scale and fade in
+            alpha = cabinet_t
+            c = (int(100 * alpha), int(220 * alpha), int(255 * alpha))
+            d.draw_text_small(CABINET_X, max(2, 16 - y_off), "CABINET", c)

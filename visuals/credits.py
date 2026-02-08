@@ -282,6 +282,12 @@ class Credits(Visual):
             ("RICK BRUNS", W),
             ("NESMAPS.COM", G),
             ("", G),
+            ("ADVENTURE TIME", G),
+            ("V GOMINHO", W),
+            ("JAKE DANCE", G),
+            ("NANDOO.PX", W),
+            ("JAKE MUSIC", G),
+            ("", G),
             # --- Art ---
             ("- ART -", M),
             ("", G),

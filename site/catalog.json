@@ -1852,6 +1852,12 @@
           "cls": "Spidey",
           "module": "visuals/spidey.py",
           "is_game": false
+        },
+        {
+          "name": "JAKE MUSIC",
+          "cls": "JakeMusic",
+          "module": "visuals/jakemusic.py",
+          "is_game": false
         }
       ]
     },
@@ -2173,6 +2179,12 @@
         {
           "name": "WONDER ZOOM",
           "cls": "WonderZoom",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false
+        },
+        {
+          "name": "WONDER JAKE",
+          "cls": "WonderJake",
           "module": "visuals/wondercabinet.py",
           "is_game": false
         }
