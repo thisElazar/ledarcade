@@ -1054,6 +1054,7 @@ class GallerySMB3(_Gallery3DBase):
     def _load_textures(self):
         if not HAS_PIL:
             return
+        import gc
         project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         assets = os.path.join(project_dir, "assets")
         cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -1072,16 +1073,23 @@ class GallerySMB3(_Gallery3DBase):
                     try:
                         with open(cache_path, 'rb') as f:
                             sheet_tex = pickle.load(f)
+                        # Ensure cached textures are bytes format
+                        if sheet_tex and not isinstance(sheet_tex[0], bytes):
+                            sheet_tex = None  # re-extract in compact format
                     except Exception:
-                        pass
+                        sheet_tex = None
             if sheet_tex is None:
-                sheet_tex = self._extract_all(sheet_path)
+                try:
+                    sheet_tex = self._extract_all(sheet_path)
+                except Exception:
+                    continue
                 try:
                     with open(cache_path, 'wb') as f:
                         pickle.dump(sheet_tex, f, protocol=pickle.HIGHEST_PROTOCOL)
                 except Exception:
                     pass
             all_textures.extend(sheet_tex)
+            gc.collect()
 
         if not all_textures:
             return
@@ -1242,10 +1250,10 @@ class GallerySMB3(_Gallery3DBase):
 
         # --- Ensure last corridor walks east (for shaft connection) ---
         if corridor_num % 2 == 0:
-            # Last walks west — add one more painting row + east-walking corridor
-            row = [_side()] + [1]*CW + [_side(), _side(), 0, 0, _side()]
+            # Last walks west — add painting row with left opening + east corridor
+            row = [_side(), 0] + [1]*(CW - 1) + [_side(), _side(), 0, 0, _side()]
             rows.append(row)
-            # Turn to get there
+            # Turn waypoints through the opening at col 1
             waypoints.append((1.5, last_corridor_y + 0.5, 0.0))
             waypoints.append((1.5, last_corridor_y + 2.5, 0.0))
             row = [_side()] + [0]*CW + [_side(), _side(), 0, 0, _side()]
@@ -1327,33 +1335,47 @@ class GallerySMB3(_Gallery3DBase):
             self.py = ny
 
     # ------------------------------------------------------------------
-    # Rendering override — ceiling light strip + bytes texture support
+    # Rendering override — Mario sky ceiling + brick floor + bytes tex
     # ------------------------------------------------------------------
 
+    # Cloud shapes: (x, y, w, h) — white rectangles with rounded corners
+    _CLOUDS = [
+        (6, 1, 8, 4), (30, 2, 10, 4), (52, 3, 7, 3),
+        (18, 9, 6, 3), (44, 11, 5, 3), (8, 16, 5, 2),
+        (36, 18, 4, 2), (58, 15, 4, 2),
+    ]
+
     def _render_frame(self):
-        ceil_color = (25, 25, 40)
-        floor_color = (45, 35, 30)
-        light_bright = (90, 85, 60)
-        light_dim = (55, 52, 42)
         half = GRID_SIZE // 2
-        cx = GRID_SIZE // 2
+        sky = (92, 148, 252)
+        cloud = (252, 252, 252)
+        brick = (200, 76, 12)
+        mortar = (0, 0, 0)
 
-        # Ceiling with warm light strip (perspective: narrows toward horizon)
+        # --- Mario sky ---
         for y in range(half):
-            t = y / half
-            hw = max(1, int(5 * (1.0 - t * 0.7)))
             for x in range(GRID_SIZE):
-                dx = abs(x - cx)
-                if dx <= 1:
-                    self.display.set_pixel(x, y, light_bright)
-                elif dx <= hw:
-                    self.display.set_pixel(x, y, light_dim)
-                else:
-                    self.display.set_pixel(x, y, ceil_color)
+                self.display.set_pixel(x, y, sky)
+        for cx, cy, cw, ch in self._CLOUDS:
+            for dy in range(ch):
+                for dx in range(cw):
+                    if (dy == 0 or dy == ch - 1) and (dx == 0 or dx == cw - 1):
+                        continue
+                    px, py = cx + dx, cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < half:
+                        self.display.set_pixel(px, py, cloud)
 
+        # --- Mario brick floor ---
         for y in range(half, GRID_SIZE):
+            fy = y - half
+            offset = 4 if (fy // 4) % 2 else 0
             for x in range(GRID_SIZE):
-                self.display.set_pixel(x, y, floor_color)
+                bx = (x + offset) % 8
+                by = fy % 4
+                if bx == 0 or by == 0:
+                    self.display.set_pixel(x, y, mortar)
+                else:
+                    self.display.set_pixel(x, y, brick)
 
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]
