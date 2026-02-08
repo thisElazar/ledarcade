@@ -278,6 +278,12 @@
           "is_game": true
         },
         {
+          "name": "SANDGAME",
+          "cls": "SandGame",
+          "module": "games/sandgame.py",
+          "is_game": true
+        },
+        {
           "name": "STACK",
           "cls": "Stack",
           "module": "games/stack.py",
@@ -1135,6 +1141,12 @@
       "key": "household",
       "items": [
         {
+          "name": "AQUARIUM",
+          "cls": "Aquarium",
+          "module": "visuals/aquarium.py",
+          "is_game": false
+        },
+        {
           "name": "CAT",
           "cls": "Cat",
           "module": "visuals/cat.py",
@@ -1384,6 +1396,12 @@
       "key": "nature",
       "items": [
         {
+          "name": "ADVENTURE TIME",
+          "cls": "GalleryAdventureTime",
+          "module": "visuals/gallery3d.py",
+          "is_game": false
+        },
+        {
           "name": "ALL VISUALS",
           "cls": "AllVisuals",
           "module": "visuals/slideshow.py",
@@ -1432,15 +1450,15 @@
           "is_game": false
         },
         {
-          "name": "JELLYFISH",
-          "cls": "ParticleLife",
-          "module": "visuals/particlelife.py",
-          "is_game": false
-        },
-        {
           "name": "ICARUS MUSEUM",
           "cls": "GalleryKidIcarus",
           "module": "visuals/gallery3d.py",
+          "is_game": false
+        },
+        {
+          "name": "JELLYFISH",
+          "cls": "ParticleLife",
+          "module": "visuals/particlelife.py",
           "is_game": false
         },
         {
@@ -1848,15 +1866,15 @@
           "is_game": false
         },
         {
-          "name": "SPIDEY",
-          "cls": "Spidey",
-          "module": "visuals/spidey.py",
-          "is_game": false
-        },
-        {
           "name": "JAKE MUSIC",
           "cls": "JakeMusic",
           "module": "visuals/jakemusic.py",
+          "is_game": false
+        },
+        {
+          "name": "SPIDEY",
+          "cls": "Spidey",
+          "module": "visuals/spidey.py",
           "is_game": false
         }
       ]
@@ -2021,6 +2039,12 @@
           "is_game": false
         },
         {
+          "name": "WONDER JAKE",
+          "cls": "WonderJake",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false
+        },
+        {
           "name": "WONDER LIFE",
           "cls": "WonderLife",
           "module": "visuals/wondercabinet.py",
@@ -2179,12 +2203,6 @@
         {
           "name": "WONDER ZOOM",
           "cls": "WonderZoom",
-          "module": "visuals/wondercabinet.py",
-          "is_game": false
-        },
-        {
-          "name": "WONDER JAKE",
-          "cls": "WonderJake",
           "module": "visuals/wondercabinet.py",
           "is_game": false
         }

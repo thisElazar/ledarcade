@@ -109,6 +109,7 @@ from .boids import Boids
 from .attractors import Attractors
 from .flux import Flux
 from .cat import Cat
+from .aquarium import Aquarium
 from .xorpattern import XORPattern
 from .twister import Twister
 from .rotozoom import Rotozoom
@@ -305,6 +306,7 @@ ALL_VISUALS = [
     Attractors,
     Flux,
     Cat,
+    Aquarium,
     XORPattern,
     Twister,
     Rotozoom,
@@ -568,6 +570,7 @@ __all__ = [
     'Attractors',
     'Flux',
     'Cat',
+    'Aquarium',
     'XORPattern',
     'Twister',
     'Rotozoom',

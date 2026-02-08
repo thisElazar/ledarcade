@@ -59,6 +59,7 @@ from .rushhour import RushHour
 from .portal import Portal
 from .bloons import Bloons
 from .bloonstd import BloonsTD
+from .sandgame import SandGame
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -120,6 +121,7 @@ ALL_GAMES = [
     Portal,
     Bloons,
     BloonsTD,
+    SandGame,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -189,6 +191,7 @@ __all__ = [
     'Portal',
     'Bloons',
     'BloonsTD',
+    'SandGame',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',

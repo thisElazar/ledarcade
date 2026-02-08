@@ -152,6 +152,9 @@ class Credits(Visual):
             ("M VALADARES", C),
             ("AGAR.IO", W),
             ("", G),
+            ("HA55II/DAN-BALL", C),
+            ("SAND GAME", W),
+            ("", G),
             ("", G),
             # --- Visuals ---
             ("- VISUALS -", M),
