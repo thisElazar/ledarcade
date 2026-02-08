@@ -1407,17 +1407,38 @@ class GallerySMB3(_Gallery3DBase):
                     if 0 <= px < GRID_SIZE and 0 <= py < half:
                         self.display.set_pixel(px, py, cloud)
 
-        # --- Mario brick floor ---
+        # --- Mario brick floor with perspective ---
+        cos_l = math.cos(self.pa - self.fov * 0.5)
+        sin_l = math.sin(self.pa - self.fov * 0.5)
+        step_cx = (math.cos(self.pa + self.fov * 0.5) - cos_l) / GRID_SIZE
+        step_cy = (math.sin(self.pa + self.fov * 0.5) - sin_l) / GRID_SIZE
         for y in range(half, GRID_SIZE):
-            fy = y - half
-            offset = 4 if (fy // 4) % 2 else 0
+            p = y - half
+            if p == 0:
+                for x in range(GRID_SIZE):
+                    self.display.set_pixel(x, y, mortar)
+                continue
+            row_dist = float(half) / p
+            fx = self.px + row_dist * cos_l
+            fy = self.py + row_dist * sin_l
+            sx = row_dist * step_cx
+            sy = row_dist * step_cy
+            fog = min(1.0, 1.5 / (row_dist + 0.5))
+            br = int(brick[0] * fog)
+            bg = int(brick[1] * fog)
+            bb = int(brick[2] * fog)
+            brick_fog = (br, bg, bb)
             for x in range(GRID_SIZE):
-                bx = (x + offset) % 8
-                by = fy % 4
-                if bx == 0 or by == 0:
+                wx = fx + x * sx
+                wy = fy + x * sy
+                bx = wx * 4.0
+                by = wy * 2.0
+                if int(by) % 2:
+                    bx += 0.5
+                if bx % 1.0 < 0.12 or by % 1.0 < 0.15:
                     self.display.set_pixel(x, y, mortar)
                 else:
-                    self.display.set_pixel(x, y, brick)
+                    self.display.set_pixel(x, y, brick_fog)
 
         for col in range(GRID_SIZE):
             ray_angle = self.pa + self.ray_offsets[col]
