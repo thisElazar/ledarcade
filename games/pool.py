@@ -280,6 +280,9 @@ class Pool(Game):
         self.scratch = False
         self.points_earned = 0
         self.pocketed_this_shot = []
+        # Deduct shot immediately when cue ball is struck (1P only)
+        if not self.two_player:
+            self.shots_left -= 1
 
     def _replace_cue_ball(self):
         """Put cue ball back at break position."""
@@ -417,8 +420,7 @@ class Pool(Game):
             self.phase_timer = 0.5
             self.current_player = 1 - self.current_player
         else:
-            # 1P: just aim again (no penalty for miss)
-            self.shots_left -= 1
+            # 1P: just aim again (shot already deducted in _fire_shot)
             if self.shots_left <= 0:
                 self.state = GameState.GAME_OVER
             else:
@@ -463,8 +465,8 @@ class Pool(Game):
                 self.phase_timer = 0.5
                 self.current_player = 1 - self.current_player
             else:
-                # 1P scratch: costs a shot
-                self.shots_left -= 2  # normal -1 plus penalty -1
+                # 1P scratch: additional penalty (shot already deducted in _fire_shot)
+                self.shots_left -= 1  # penalty only
                 if self.shots_left <= 0:
                     self.shots_left = 0
                     self.state = GameState.GAME_OVER
