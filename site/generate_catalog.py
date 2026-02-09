@@ -2,8 +2,8 @@
 """Generate catalog.json for the web emulator by scanning game/visual source files.
 
 Matches the arcade machine's catalog.py registration logic:
+  - Only includes classes imported in each package's __init__.py
   - Resolves category inheritance (subclasses inherit parent's category)
-  - Skips abstract base classes (GamePlaylist, Slideshow)
   - Skips dev_only classes (hidden on production arcade)
 """
 
@@ -44,8 +44,54 @@ VISUAL_CATEGORIES = [
     {"name": "UTILITY", "color": [255, 255, 255], "key": "utility"},
 ]
 
-# Base classes that aren't actual menu items (not in ALL_GAMES / ALL_VISUALS)
-SKIP_CLASSES = {'GamePlaylist', 'Slideshow'}
+def scan_exported_classes(pkg):
+    """Parse __init__.py to find which classes are in ALL_GAMES / ALL_VISUALS.
+
+    Returns a dict mapping module basename -> set of class names, e.g.
+    {'turing': {'TuringPatterns'}, 'emfield': {'Coulomb'}, ...}
+    Only classes registered in the ALL_* list will appear in the catalog,
+    exactly matching the device's runtime registration.
+    """
+    init_path = os.path.join(ROOT, pkg, '__init__.py')
+    try:
+        with open(init_path, 'r') as f:
+            tree = ast.parse(f.read())
+    except (SyntaxError, FileNotFoundError):
+        return None  # Fall back to including all classes
+
+    # Step 1: build name -> module mapping from relative imports
+    #   from .turing import TuringPatterns  =>  TuringPatterns -> turing
+    name_to_module = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.level >= 1 and node.module:
+            mod = node.module.split('.')[0]
+            for alias in node.names:
+                imported_name = alias.asname or alias.name
+                name_to_module[imported_name] = mod
+
+    # Step 2: find ALL_GAMES or ALL_VISUALS list and extract names
+    list_name = 'ALL_GAMES' if pkg == 'games' else 'ALL_VISUALS'
+    registered_names = set()
+    for node in ast.iter_child_nodes(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name) and target.id == list_name:
+                if isinstance(node.value, ast.List):
+                    for elt in node.value.elts:
+                        if isinstance(elt, ast.Name):
+                            registered_names.add(elt.id)
+
+    if not registered_names:
+        return None  # Fall back if list not found
+
+    # Step 3: build module -> set of registered class names
+    exported = {}
+    for cls_name in registered_names:
+        mod = name_to_module.get(cls_name)
+        if mod:
+            exported.setdefault(mod, set()).add(cls_name)
+    return exported
 
 
 def extract_string(node):
@@ -62,9 +108,10 @@ def extract_bool(node):
     return None
 
 
-def scan_file(filepath, pkg):
+def scan_file(filepath, pkg, exported_classes=None):
     """Scan a Python file for Game/Visual classes and cross-package deps.
 
+    If exported_classes is provided, only classes in that set are included.
     Resolves category inheritance: if a class doesn't set its own category,
     it inherits from its base class (matching runtime getattr behavior).
     """
@@ -170,10 +217,10 @@ def scan_file(filepath, pkg):
         if info['category'] is None:
             info['category'] = resolve_category(cls_name)
 
-    # Build result list, skipping base classes and dev_only items
+    # Build result list, filtering to exported classes and skipping dev_only
     classes = []
     for cls_name, info in class_info.items():
-        if cls_name in SKIP_CLASSES:
+        if exported_classes is not None and cls_name not in exported_classes:
             continue
         if info['dev_only']:
             continue
@@ -222,6 +269,7 @@ def main():
 
         is_game = pkg == 'games'
         default_cat = 'arcade' if is_game else 'nature'
+        pkg_exports = scan_exported_classes(pkg)
 
         for fname in sorted(os.listdir(pkg_dir)):
             if not fname.endswith('.py') or fname.startswith('_'):
@@ -229,7 +277,9 @@ def main():
 
             filepath = os.path.join(pkg_dir, fname)
             module_path = f"{pkg}/{fname}"
-            classes, deps, needs_numpy = scan_file(filepath, pkg)
+            mod_name = fname.replace('.py', '')
+            exported = pkg_exports.get(mod_name) if pkg_exports else None
+            classes, deps, needs_numpy = scan_file(filepath, pkg, exported)
             if deps:
                 file_deps[module_path] = deps
             if needs_numpy:

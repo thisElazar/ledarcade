@@ -1726,24 +1726,6 @@
           ]
         },
         {
-          "name": "EM CIRCUIT",
-          "cls": "EMCircuit",
-          "module": "visuals/emfield.py",
-          "is_game": false
-        },
-        {
-          "name": "EM FIELD",
-          "cls": "EMFreeAir",
-          "module": "visuals/emfield.py",
-          "is_game": false
-        },
-        {
-          "name": "EM MOTOR",
-          "cls": "EMMotor",
-          "module": "visuals/emfield.py",
-          "is_game": false
-        },
-        {
           "name": "GRAY-SCOTT",
           "cls": "TuringPatterns",
           "module": "visuals/turing.py",
@@ -1825,34 +1807,6 @@
           "cls": "Spectroscope",
           "module": "visuals/spectroscope.py",
           "is_game": false
-        },
-        {
-          "name": "TURING CORAL",
-          "cls": "TuringCoral",
-          "module": "visuals/turing.py",
-          "is_game": false,
-          "needs_numpy": true
-        },
-        {
-          "name": "TURING LINES",
-          "cls": "TuringStripes",
-          "module": "visuals/turing.py",
-          "is_game": false,
-          "needs_numpy": true
-        },
-        {
-          "name": "TURING SPOTS",
-          "cls": "TuringSpots",
-          "module": "visuals/turing.py",
-          "is_game": false,
-          "needs_numpy": true
-        },
-        {
-          "name": "TURING WORMS",
-          "cls": "TuringWorms",
-          "module": "visuals/turing.py",
-          "is_game": false,
-          "needs_numpy": true
         },
         {
           "name": "WAVE TANK",
