@@ -1,12 +1,14 @@
 """
-Jake Music - Adventure Time
-============================
+Jake the Dog - Adventure Time
+==============================
 Jake listens to music with his headphones on.
-Button press toggles between day and night scenes.
+Left/Right adjusts animation speed. Button toggles day/night.
 
 Pixel art by Nandoo.px
 
 Controls:
+  Left    - Slow down
+  Right   - Speed up
   Button  - Toggle day/night
 """
 
@@ -21,13 +23,16 @@ except ImportError:
 
 
 class JakeMusic(Visual):
-    name = "JAKE MUSIC"
+    name = "JAKE THE DOG"
     description = "Jake with headphones"
     category = "superheroes"
 
     GIF_DAY = "jake_music_day.gif"
     GIF_NIGHT = "jake_music_night.gif"
     BASE_INTERVAL = 0.08  # Frame timing
+    MIN_INTERVAL = 0.02
+    MAX_INTERVAL = 0.25
+    SPEED_STEP = 0.01
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -37,6 +42,7 @@ class JakeMusic(Visual):
         self.frame_timer = 0.0
         self.frame_index = 0
         self.is_night = False  # Start with day
+        self.interval = self.BASE_INTERVAL
 
         self.day_frames = []
         self.night_frames = []
@@ -89,12 +95,20 @@ class JakeMusic(Visual):
         return cache_frames(path, process)
 
     def handle_input(self, input_state) -> bool:
+        handled = False
+        # Left/Right adjust animation speed
+        if input_state.left:
+            self.interval = min(self.MAX_INTERVAL, self.interval + self.SPEED_STEP)
+            handled = True
+        elif input_state.right:
+            self.interval = max(self.MIN_INTERVAL, self.interval - self.SPEED_STEP)
+            handled = True
         # Toggle day/night on button press
         if input_state.action_l or input_state.action_r:
             self.is_night = not self.is_night
-            self.frame_index = 0  # Reset to first frame when toggling
-            return True
-        return False
+            self.frame_index = 0
+            handled = True
+        return handled
 
     def update(self, dt: float):
         self.time += dt
@@ -105,8 +119,8 @@ class JakeMusic(Visual):
             return
 
         self.frame_timer += dt
-        if self.frame_timer >= self.BASE_INTERVAL:
-            self.frame_timer -= self.BASE_INTERVAL
+        if self.frame_timer >= self.interval:
+            self.frame_timer -= self.interval
             self.frame_index = (self.frame_index + 1) % len(frames)
 
     def draw(self):

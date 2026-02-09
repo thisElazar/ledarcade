@@ -1967,7 +1967,7 @@
           ]
         },
         {
-          "name": "JAKE MUSIC",
+          "name": "JAKE THE DOG",
           "cls": "JakeMusic",
           "module": "visuals/jakemusic.py",
           "is_game": false,

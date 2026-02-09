@@ -302,7 +302,7 @@ class Credits(Visual):
             ("V GOMINHO", W),
             ("JAKE DANCE", G),
             ("NANDOO.PX", W),
-            ("JAKE MUSIC", G),
+            ("JAKE THE DOG", G),
             ("", G),
             # --- Art ---
             ("- ART -", M),

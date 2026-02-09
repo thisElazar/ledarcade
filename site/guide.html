@@ -1119,8 +1119,8 @@
       <span class="entry-text"><span class="entry-year">1962, Stan Lee &amp; Steve Ditko</span> &mdash; Web-slinging across the LED grid. Red and blue suit, web patterns, and the dynamic poses of your friendly neighborhood Spider-Man.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,0,0,0.25)">
-      <span class="entry-name" style="color:#ff0000">JAKE MUSIC</span>
-      <span class="entry-text"><span class="entry-year">2010, Pendleton Ward</span> &mdash; Jake the Dog from Adventure Time, lounging with headphones. Button press toggles between day and night scenes. Pixel art by <strong>Nandoo.px</strong>.</span>
+      <span class="entry-name" style="color:#ff0000">JAKE THE DOG</span>
+      <span class="entry-text"><span class="entry-year">2010, Pendleton Ward</span> &mdash; Jake the Dog from Adventure Time, lounging with headphones. Left/Right adjusts animation speed; button toggles day/night. Pixel art by <strong>Nandoo.px</strong>.</span>
     </div>
   </div>
 
@@ -1335,7 +1335,7 @@
     <div class="guide-subheader" style="color:#80ff00">Sprite Art &amp; Character IP</div>
     <div class="guide-entry" style="border-color: rgba(128,255,0,0.15)">
       <span class="entry-name" style="color:#80ff00">PIXEL ART</span>
-      <span class="entry-text"><strong>Olivier Huard</strong> (huardolivier.myportfolio.com) &mdash; original pixel art for the Spider-Man web swing animation. French pixel artist, professional work since the MO5 era. <strong>Nandoo.px</strong> &mdash; pixel art for the Jake Music day/night animation. <strong>V Gominho</strong> &mdash; Jake dance animation used in the Wonder Jake title screen.</span>
+      <span class="entry-text"><strong>Olivier Huard</strong> (huardolivier.myportfolio.com) &mdash; original pixel art for the Spider-Man web swing animation. French pixel artist, professional work since the MO5 era. <strong>Nandoo.px</strong> &mdash; pixel art for the Jake the Dog day/night animation. <strong>V Gominho</strong> &mdash; Jake dance animation used in the Wonder Jake title screen.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(128,255,0,0.15)">
       <span class="entry-name" style="color:#80ff00">SPRITE RIPS</span>
@@ -1374,7 +1374,7 @@
     <div class="guide-subheader" style="color:#c8a86e">Built By</div>
     <div class="guide-entry" style="border-color: rgba(200,168,110,0.15)">
       <span class="entry-name" style="color:#c8a86e">WONDER CABINET</span>
-      <span class="entry-text">Designed by <strong>Thiselazar</strong>. Programmed by <strong>Claude Code</strong>. Built with Python, rpi-rgb-led-matrix, and a Raspberry Pi 3.</span>
+      <span class="entry-text">Designed and Curated by <strong>thisElazar</strong>. Programmed by <strong>Claude Code</strong>. Built with Python, rpi-rgb-led-matrix, and a Raspberry Pi 3.</span>
     </div>
   </div>
 
@@ -1382,8 +1382,7 @@
   <div class="guide-section" id="g-hardware">
     <h3 style="color:#c8a86e">HOW IT WORKS</h3>
     <p class="guide-intro">
-      A physical machine. No screen, no monitor &mdash; just raw LEDs and a single-board
-      computer.
+     64x64 LED Array + Raspberry Pi + Joystick + 2 Buttons + Power Supply
     </p>
     <div class="guide-section-hw">
       <div class="guide-spec">
@@ -1406,9 +1405,8 @@
     <div class="guide-callout" style="margin-top:32px">
       <strong>No GPU. No shaders.</strong>
       Every pixel is computed in Python on a 1.2 GHz ARM chip. Fluid dynamics,
-      ray tracing, reaction-diffusion, N-body gravity &mdash; all running at 30fps
-      on hardware that costs $35. The constraint forces algorithmic creativity:
-      when you can't brute-force it, you have to be clever.
+      ray tracing, classic arcade games, reaction-diffusion, N-body gravity &mdash; all running at 30fps
+      on tiny, concise physical hardware.
     </div>
   </div>
 
@@ -1466,7 +1464,7 @@
     'PLASMA':        'dpad-only',
     'LAVA LAMP':     'dpad-only',
     'WEATHER':       'action-only',
-    'JAKE MUSIC':    'action-only',
+    'JAKE THE DOG':  'dpad+action',
   };
   document.querySelectorAll('.guide-section').forEach(function(section) {
     var def = DEFAULTS[section.id];
