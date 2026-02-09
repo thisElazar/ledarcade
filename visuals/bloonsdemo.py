@@ -106,16 +106,18 @@ class BloonsDemo(Visual):
         return best_bloon
 
     def _simulate_trajectory(self, angle, power, target_x, target_y):
-        """Simulate dart flight and return minimum distance to target."""
+        """Simulate dart flight and return minimum distance to target.
+        Uses small dt matching game's 3-substep physics for accuracy."""
         dart_x = float(MONKEY_X + 3)
         dart_y = float(MONKEY_Y - 2)
         vx = math.cos(angle) * power * MAX_SPEED
         vy = -math.sin(angle) * BASE_VY
 
-        sim_dt = 0.02
+        # Match game's substep size (~0.016/3 ≈ 0.005) for accurate trajectory
+        sim_dt = 0.005
         best_dist = float('inf')
 
-        for _ in range(200):
+        for _ in range(800):
             vy += GRAVITY * sim_dt
             dart_x += vx * sim_dt
             dart_y += vy * sim_dt
@@ -139,8 +141,8 @@ class BloonsDemo(Visual):
             return
 
         target = self._find_best_target(alive)
-        tx = target['x'] + 2  # aim at center of 4px bloon
-        ty = target['y'] + 2
+        tx = target['x']  # collision checks distance to top-left corner
+        ty = target['y']
 
         # Coarse sweep: 14 angles × 7 power levels
         best_dist = float('inf')
