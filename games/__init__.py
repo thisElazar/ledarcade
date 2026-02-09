@@ -60,6 +60,7 @@ from .portal import Portal
 from .bloons import Bloons
 from .bloonstd import BloonsTD
 from .sandgame import SandGame
+from .drift import Drift
 from .lasermirrors import LaserMirrors
 from .windowwasher import WindowWasher
 from .shuffle import (
@@ -124,6 +125,7 @@ ALL_GAMES = [
     Bloons,
     BloonsTD,
     SandGame,
+    Drift,
     LaserMirrors,
     WindowWasher,
     AllGames,
@@ -196,6 +198,7 @@ __all__ = [
     'Bloons',
     'BloonsTD',
     'SandGame',
+    'Drift',
     'LaserMirrors',
     'WindowWasher',
     'ALL_GAMES',

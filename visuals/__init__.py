@@ -208,6 +208,7 @@ from .hurdygurdy import HurdyGurdy
 from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
+from .drift import DriftVisual
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderSlide, WonderDrop, WonderSpin,
                             WonderPacMan, WonderInvaders, WonderTetris,
@@ -421,6 +422,7 @@ ALL_VISUALS = [
     Antikythera,
     Astrolabe,
     Archimedes,
+    DriftVisual,
     WonderGlow,
     WonderMarquee,
     WonderCrawl,
@@ -688,6 +690,7 @@ __all__ = [
     'Antikythera',
     'Astrolabe',
     'Archimedes',
+    'DriftVisual',
     'BML',
     'Highway',
     'Intersection',
