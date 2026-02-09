@@ -23,7 +23,7 @@ PHASE_LEVEL_FAIL = 5
 
 # Physics
 MAX_SPEED = 120.0      # max horizontal px/s at full power
-BASE_VY = 50.0         # vertical launch speed (angle-dependent, power-independent)
+BASE_VY = 70.0         # vertical launch speed (scales with angle and power)
 GRAVITY = 60.0         # px/s^2
 DART_RADIUS = 3.5      # collision radius
 TRAIL_LEN = 3
@@ -233,7 +233,7 @@ class Bloons(Game):
         self.dart_x = float(MONKEY_X + 3)
         self.dart_y = float(MONKEY_Y - 2)
         self.dart_vx = math.cos(self.angle) * self.power * MAX_SPEED
-        self.dart_vy = -math.sin(self.angle) * BASE_VY
+        self.dart_vy = -math.sin(self.angle) * self.power * BASE_VY
         self.trail = []
         self.pops_this_throw = 0
         self.phase = PHASE_FLIGHT
@@ -518,7 +518,7 @@ class Bloons(Game):
         preview_power = self.power if self.phase == PHASE_POWER else 0.5
         preview_power = max(0.15, preview_power)
         vx = math.cos(self.angle) * preview_power * MAX_SPEED
-        vy = -math.sin(self.angle) * BASE_VY
+        vy = -math.sin(self.angle) * preview_power * BASE_VY
         px = float(MONKEY_X + 3)
         py = float(MONKEY_Y - 2)
         dt = 0.05

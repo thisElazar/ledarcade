@@ -2,14 +2,14 @@
 Bloons Demo - AI Attract Mode
 ==============================
 Bloons plays itself using AI for idle screen demos.
-The AI uses trajectory simulation to find the optimal
-angle and power to hit the densest bloon cluster.
+The AI simulates trajectories and picks the angle/power
+that pops the most bloons per dart (including child chains).
 
 AI Strategy:
-- Pick target bloon from densest cluster (most neighbors within 8px)
-- Sweep angles × power levels, simulate projectile trajectory
-- Pick angle/power with smallest distance to target bloon
-- Refine with binary search around best angle
+- Sweep angles × power levels, simulate full dart flight
+- Score each trajectory by total pops (dart passes through bloons)
+- Child bloons from multi-layer pops are included in the count
+- Refine around best with fine grid search
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -21,7 +21,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.bloons import (
     Bloons, PHASE_AIM, PHASE_POWER, PHASE_FLIGHT, PHASE_RESULT,
     PHASE_LEVEL_WIN, PHASE_LEVEL_FAIL, MIN_ANGLE, MAX_ANGLE,
-    MONKEY_X, MONKEY_Y, MAX_SPEED, BASE_VY, GRAVITY, GROUND_Y
+    MONKEY_X, MONKEY_Y, MAX_SPEED, BASE_VY, GRAVITY, GROUND_Y,
+    DART_RADIUS, BLOON_TYPES,
 )
 
 
@@ -85,105 +86,86 @@ class BloonsDemo(Visual):
         if int(self.time * 2) % 2 == 0:
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
-    def _find_best_target(self, alive):
-        """Pick the bloon in the densest cluster (most neighbors within 8px)."""
-        if len(alive) == 1:
-            return alive[0]
-
-        best_bloon = alive[0]
-        best_count = 0
-        for b in alive:
-            count = 0
-            for other in alive:
-                if other is b:
-                    continue
-                d = math.hypot(b['x'] - other['x'], b['y'] - other['y'])
-                if d < 8.0:
-                    count += 1
-            if count > best_count:
-                best_count = count
-                best_bloon = b
-        return best_bloon
-
-    def _simulate_trajectory(self, angle, power, target_x, target_y):
-        """Simulate dart flight and return minimum distance to target.
-        Uses small dt matching game's 3-substep physics for accuracy."""
+    def _simulate_pops(self, angle, power, alive_bloons):
+        """Simulate dart flight and count total pops including child chains."""
         dart_x = float(MONKEY_X + 3)
         dart_y = float(MONKEY_Y - 2)
         vx = math.cos(angle) * power * MAX_SPEED
-        vy = -math.sin(angle) * BASE_VY
+        vy = -math.sin(angle) * power * BASE_VY
 
-        # Match game's substep size (~0.016/3 ≈ 0.005) for accurate trajectory
         sim_dt = 0.005
-        best_dist = float('inf')
+        radius_sq = DART_RADIUS * DART_RADIUS
 
-        for _ in range(800):
+        # [x, y, type_idx, alive] — children appended during sim
+        bloons = [[b['x'], b['y'], b['type'], True] for b in alive_bloons]
+        total_pops = 0
+        best_dist_sq = float('inf')
+
+        for _ in range(600):
             vy += GRAVITY * sim_dt
             dart_x += vx * sim_dt
             dart_y += vy * sim_dt
 
-            d = math.hypot(dart_x - target_x, dart_y - target_y)
-            if d < best_dist:
-                best_dist = d
+            i = 0
+            while i < len(bloons):
+                b = bloons[i]
+                if b[3]:
+                    dx = dart_x - b[0]
+                    dy = dart_y - b[1]
+                    dsq = dx * dx + dy * dy
+                    if dsq < radius_sq:
+                        b[3] = False
+                        total_pops += 1
+                        child_idx = BLOON_TYPES[b[2]][2]
+                        if child_idx >= 0:
+                            bloons.append([b[0], b[1], child_idx, True])
+                    elif dsq < best_dist_sq:
+                        best_dist_sq = dsq
+                i += 1
 
-            # Out of bounds
             if dart_x > 66 or dart_x < -5 or dart_y > GROUND_Y + 2 or dart_y < -20:
                 break
 
-        return best_dist
+        # Score: pops first, then closeness as tiebreaker
+        return (total_pops, -best_dist_sq)
 
     def _compute_aim(self):
-        """Calculate target angle and power using trajectory simulation."""
+        """Sweep angle × power grid, pick trajectory that pops the most."""
         alive = [b for b in self.game.bloons if b['alive']]
         if not alive:
             self.target_angle = 0.7
             self.target_power = 0.5
             return
 
-        target = self._find_best_target(alive)
-        tx = target['x']  # collision checks distance to top-left corner
-        ty = target['y']
-
-        # Coarse sweep: 14 angles × 7 power levels
-        best_dist = float('inf')
+        best_score = (-1, float('-inf'))
         best_angle = 0.7
         best_power = 0.5
 
-        for ai in range(14):
-            angle = MIN_ANGLE + (MAX_ANGLE - MIN_ANGLE) * ai / 13.0
-            for pi in range(7):
-                power = 0.2 + 0.7 * pi / 6.0
-                d = self._simulate_trajectory(angle, power, tx, ty)
-                if d < best_dist:
-                    best_dist = d
+        # Coarse sweep: 12 angles × 6 power levels
+        for ai in range(12):
+            angle = MIN_ANGLE + (MAX_ANGLE - MIN_ANGLE) * ai / 11.0
+            for pi in range(6):
+                power = 0.15 + 0.8 * pi / 5.0
+                score = self._simulate_pops(angle, power, alive)
+                if score > best_score:
+                    best_score = score
                     best_angle = angle
                     best_power = power
 
-        # Refine angle with binary search (±0.1 around best)
-        lo = max(MIN_ANGLE, best_angle - 0.1)
-        hi = min(MAX_ANGLE, best_angle + 0.1)
-        for _ in range(8):
-            mid = (lo + hi) / 2.0
-            d_lo = self._simulate_trajectory(lo, best_power, tx, ty)
-            d_hi = self._simulate_trajectory(hi, best_power, tx, ty)
-            if d_lo < d_hi:
-                hi = mid
-            else:
-                lo = mid
-        refined_angle = (lo + hi) / 2.0
+        # Refine: fine grid around best
+        for da in [-0.05, -0.025, 0.025, 0.05]:
+            for dp in [-0.06, -0.03, 0.0, 0.03, 0.06]:
+                a = best_angle + da
+                p = best_power + dp
+                if a < MIN_ANGLE or a > MAX_ANGLE or p < 0.15 or p > 0.95:
+                    continue
+                score = self._simulate_pops(a, p, alive)
+                if score > best_score:
+                    best_score = score
+                    best_angle = a
+                    best_power = p
 
-        # Also refine power
-        d_refined = self._simulate_trajectory(refined_angle, best_power, tx, ty)
-        for dp in [-0.05, 0.05, -0.1, 0.1]:
-            p = best_power + dp
-            if p < 0.15 or p > 0.95:
-                continue
-            d = self._simulate_trajectory(refined_angle, p, tx, ty)
-            if d < d_refined:
-                d_refined = d
-                best_power = p
-
-        self.target_angle = max(MIN_ANGLE, min(MAX_ANGLE, refined_angle))
+        self.target_angle = max(MIN_ANGLE, min(MAX_ANGLE, best_angle))
         self.target_power = max(0.15, min(0.95, best_power))
 
     def _ai_aim(self, ai_input, dt):
