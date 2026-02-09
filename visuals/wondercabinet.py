@@ -4707,5 +4707,5 @@ class WonderJake(Visual):
             
             # Scale and fade in
             alpha = cabinet_t
-            c = (int(100 * alpha), int(220 * alpha), int(255 * alpha))
+            c = (int(40 * alpha), int(140 * alpha), int(200 * alpha))
             d.draw_text_small(CABINET_X, max(2, 16 - y_off), "CABINET", c)

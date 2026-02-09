@@ -826,16 +826,16 @@ class LaserMirrors(Game):
             dist = du * du + dv * dv
             if charge >= 1.0:
                 # Fully charged — bright pulsing green
-                tp = 0.8 + 0.2 * math.sin(self.time * 4.0)
+                tp = 0.85 + 0.15 * math.sin(self.time * 4.0)
                 if dist < 0.1:
-                    return (int(80 * tp), int(255 * tp), int(120 * tp))
-                return (int(40 * tp), int(200 * tp), int(80 * tp))
+                    return (int(140 * tp), int(255 * tp), int(180 * tp))
+                return (int(100 * tp), int(245 * tp), int(140 * tp))
             elif charge > 0.01:
-                # Charging — interpolate from dim to bright based on charge
+                # Charging — interpolate from dim to nearly full brightness
                 c = charge
                 if dist < 0.1:
-                    return (int(60 + 40 * c), int(90 + 165 * c), int(60 + 60 * c))
-                return (int(40 + 30 * c), int(70 + 130 * c), int(50 + 30 * c))
+                    return (int(60 + 80 * c), int(90 + 165 * c), int(60 + 120 * c))
+                return (int(40 + 60 * c), int(70 + 175 * c), int(50 + 90 * c))
             else:
                 # Uncharged — dim green ring
                 if dist < 0.06:
