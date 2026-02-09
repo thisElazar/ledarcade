@@ -236,7 +236,7 @@ class LunarLander(Game):
             self.angle += self.ROTATION_SPEED * dt
 
         # Main thrust (pushes in direction lander is pointing)
-        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held and self.fuel > 0:
+        if (input_state.action_l_held or input_state.action_r_held) and self.fuel > 0:
             # Thrust direction: angle=0 means pointing up, so thrust is up
             # angle>0 means tilted right, thrust pushes up-right
             self.vx += math.sin(self.angle) * self.BASE_THRUST * dt

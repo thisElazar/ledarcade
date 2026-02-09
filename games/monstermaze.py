@@ -344,7 +344,7 @@ class MonsterMaze(Game):
                 self.steps += 1
                 self.step_cooldown = self.STEP_COOLDOWN
                 self.player_moved = True
-        elif input_state.action_l and self.step_cooldown <= 0:
+        elif (input_state.action_l or input_state.action_r) and self.step_cooldown <= 0:
             # Sprint: move forward 2 cells if both open
             dx, dy = DX[self.facing], DY[self.facing]
             nx1, ny1 = self.px + dx, self.py + dy

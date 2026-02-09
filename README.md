@@ -249,8 +249,8 @@ class MyGame(Game):
         self.score = 0
 
     def update(self, input_state, dt):
-        if input_state.action_l:
-            # Handle space bar
+        if input_state.action_l or input_state.action_r:
+            # Handle button press (either button)
             pass
 
     def draw(self):

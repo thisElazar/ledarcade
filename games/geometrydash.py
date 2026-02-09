@@ -232,7 +232,7 @@ class GeometryDash(Game):
         if self.state != GameState.PLAYING:
             return
 
-        if (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
+        if input_state.action_l_held or input_state.action_r_held:
             if self.on_ground and self.can_jump_again:
                 self.velocity_y = self.JUMP_VELOCITY
                 self.on_ground = False

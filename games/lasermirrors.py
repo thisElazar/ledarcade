@@ -524,7 +524,7 @@ class LaserMirrors(Game):
                 self._trace_all_lasers()
 
         # Rotate mirror with Space (blocked during animation)
-        if input_state.action_l and not self.mirror_anims:
+        if (input_state.action_l or input_state.action_r) and not self.mirror_anims:
             fx, fy = self._facing_cell()
             if 0 <= fx < self.map_w and 0 <= fy < self.map_h:
                 c = self.map[fy][fx]

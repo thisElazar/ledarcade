@@ -459,7 +459,7 @@ class WindowWasher(Game):
         self.rope_sway = math.sin(self.time * 1.5) * 1.5
 
         # Cleaning
-        if input_state.action_l_held:
+        if input_state.action_l_held or input_state.action_r_held:
             w = self._window_at_player()
             if w and w['clean'] < 1.0:
                 w['clean'] = min(1.0, w['clean'] + self.clean_speed * dt)

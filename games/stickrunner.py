@@ -212,7 +212,7 @@ class StickRunner(Game):
             self.on_ground = False
             self.can_jump = False
 
-        if not (input_state.action_l_held or input_state.action_r_held) or input_state.action_r_held:
+        if not (input_state.action_l_held or input_state.action_r_held):
             self.can_jump = True
 
         self.velocity_y += self.GRAVITY * dt
