@@ -13,6 +13,7 @@ Controls:
 import os
 import sys
 import subprocess
+import threading
 from . import Visual, Display, Colors, GRID_SIZE
 
 
@@ -78,12 +79,13 @@ class Refresh(Visual):
         self.version_hash = _short_hash("HEAD")
         self.current_date = _commit_date("HEAD")
 
-        # Fetch remote to check for updates
-        self.remote_hash = "?"
+        # Fetch remote in background to avoid blocking the UI
+        self.remote_hash = "..."
         self.is_latest = False
-        _git("fetch", "origin", BRANCH, timeout=10)
-        self.remote_hash = _short_hash("origin/" + BRANCH)
-        self.is_latest = (self.version_hash == self.remote_hash)
+        self._fetch_done = False
+        self._fetch_thread = threading.Thread(target=self._fetch_remote,
+                                              daemon=True)
+        self._fetch_thread.start()
 
         # Rollback info
         self.rollback_hash = ""
@@ -101,6 +103,13 @@ class Refresh(Visual):
                         self.has_rollback = True
             except Exception:
                 pass
+
+    def _fetch_remote(self):
+        """Background thread: fetch remote and resolve remote hash."""
+        _git("fetch", "origin", BRANCH, timeout=10)
+        self.remote_hash = _short_hash("origin/" + BRANCH)
+        self.is_latest = (self.version_hash == self.remote_hash)
+        self._fetch_done = True
 
     def handle_input(self, input_state) -> bool:
         if self.confirmed:
@@ -223,7 +232,9 @@ class Refresh(Visual):
         branch_color = Colors.YELLOW if BRANCH == "main" else Colors.GREEN
         self.display.draw_text_small(2, 12, BRANCH, branch_color)
         self.display.draw_text_small(2, 20, "NOW:" + self.version_hash, Colors.GRAY)
-        if self.is_latest:
+        if not self._fetch_done:
+            self.display.draw_text_small(2, 28, "CHECKING...", Colors.GRAY)
+        elif self.is_latest:
             self.display.draw_text_small(2, 28, "=LATEST", Colors.GREEN)
         else:
             self.display.draw_text_small(2, 28, "NEW:" + self.remote_hash, Colors.WHITE)
