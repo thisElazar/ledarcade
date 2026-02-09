@@ -29,8 +29,9 @@ user_settings.json
 # Claude Code
 CLAUDE.md
 
-# Update rollback state
+# Update system
 .rollback_ref
+.dev
 
 # Environment
 .env

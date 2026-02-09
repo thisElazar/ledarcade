@@ -18,7 +18,8 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLLBACK_FILE = os.path.join(REPO_DIR, ".rollback_ref")
-BRANCH = "stable"
+DEV_FLAG = os.path.join(REPO_DIR, ".dev")
+BRANCH = "main" if os.path.exists(DEV_FLAG) else "stable"
 
 
 def _git(*args, timeout=15):
@@ -148,7 +149,8 @@ class Refresh(Visual):
 
         # Version info
         self.display.draw_text_small(2, 12, "V:" + self.version_hash, Colors.GRAY)
-        self.display.draw_text_small(2, 20, self.version_date, Colors.GRAY)
+        branch_color = Colors.YELLOW if BRANCH == "main" else Colors.GREEN
+        self.display.draw_text_small(2, 20, BRANCH + " " + self.version_date, branch_color)
 
         # Description
         self.display.draw_text_small(2, 30, "PULL + ", Colors.WHITE)
