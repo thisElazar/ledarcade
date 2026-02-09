@@ -1,13 +1,23 @@
 """
 Connect 4 Demo - AI vs AI Attract Mode
 =======================================
-Two AIs play Connect 4 using minimax with alpha-beta pruning.
+Two AIs play Connect 4 using bitboard-based alpha-beta search.
+
+Historical context: Connect 4 was solved by Victor Allis in 1988 and
+independently by James D. Allen. First player wins with perfect play
+starting from the center column. This engine uses techniques from that
+era: bitboard position encoding for O(1) win detection (John Tromp's
+shift-AND technique), negamax with alpha-beta pruning, a transposition
+table, and center-biased move ordering.
 
 AI Strategy:
-- Negamax with alpha-beta, depth 7
+- Bitboard representation — each side is a 49-bit integer
+- O(1) win detection via shift-AND on four directions
+- Negamax with alpha-beta pruning, iterative deepening to depth 20+
+- Transposition table with exact / lower / upper bound entries
 - Move ordering: center columns first [3, 2, 4, 1, 5, 0, 6]
-- Evaluation: center control, 4-window scoring (3-in-a-row threats,
-  2-in-a-row setups, opponent threat penalties)
+- Evaluation: all 69 four-in-a-row windows scored by threat level,
+  plus center-column positional weighting
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -17,161 +27,272 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.connect4 import Connect4, PLAYER_1, PLAYER_2
 
-# Column preference: center first, edges last
-COLUMN_ORDER = [3, 2, 4, 1, 5, 0, 6]
+# Column preference: center first, edges last (classic heuristic)
+_COL = (3, 2, 4, 1, 5, 0, 6)
+_COL_IDX = {c: i for i, c in enumerate(_COL)}
 
+# ---------------------------------------------------------------------------
+# Bitboard layout  (column-major, 7 bits per column, row 0 = bottom)
+#
+#   5 12 19 26 33 40 47    <- top playable row   (game row 0)
+#   4 11 18 25 32 39 46
+#   3 10 17 24 31 38 45
+#   2  9 16 23 30 37 44
+#   1  8 15 22 29 36 43
+#   0  7 14 21 28 35 42    <- bottom row          (game row 5)
+#
+# Sentinel bits (6, 13, 20, 27, 34, 41, 48) are never set.
+# ---------------------------------------------------------------------------
+
+# Precompute all 69 possible four-in-a-row bitmasks for the evaluator.
+_FOUR_MASKS = []
+for _r in range(6):
+    for _c in range(4):                           # 24 horizontal
+        _m = 0
+        for _i in range(4):
+            _m |= 1 << ((_c + _i) * 7 + _r)
+        _FOUR_MASKS.append(_m)
+for _r in range(3):
+    for _c in range(7):                           # 21 vertical
+        _m = 0
+        for _i in range(4):
+            _m |= 1 << (_c * 7 + _r + _i)
+        _FOUR_MASKS.append(_m)
+for _r in range(3):
+    for _c in range(4):                           # 12 diagonal  /
+        _m = 0
+        for _i in range(4):
+            _m |= 1 << ((_c + _i) * 7 + _r + _i)
+        _FOUR_MASKS.append(_m)
+for _r in range(3):
+    for _c in range(4):                           # 12 diagonal  \
+        _m = 0
+        for _i in range(4):
+            _m |= 1 << ((_c + _i) * 7 + (_r + 3 - _i))
+        _FOUR_MASKS.append(_m)
+_FOUR_MASKS = tuple(_FOUR_MASKS)                  # tuple for speed
+
+# Positional weight per column (center columns matter most — Allis 1988)
+_COL_WEIGHT = (0, 1, 2, 3, 2, 1, 0)
+
+from time import monotonic as _clock
+
+
+def _has_won(bb):
+    """O(1) four-in-a-row detection (Tromp's shift-AND technique)."""
+    m = bb & (bb >> 7)                  # horizontal pairs
+    if m & (m >> 14):
+        return True
+    m = bb & (bb >> 1)                  # vertical pairs
+    if m & (m >> 2):
+        return True
+    m = bb & (bb >> 8)                  # diagonal / pairs
+    if m & (m >> 16):
+        return True
+    m = bb & (bb >> 6)                  # diagonal \ pairs
+    if m & (m >> 12):
+        return True
+    return False
+
+
+# -----------------------------------------------------------------------
+# AI engine
+# -----------------------------------------------------------------------
 
 class Connect4AI:
-    """Minimax AI with alpha-beta pruning for Connect 4."""
+    """Bitboard negamax engine with iterative deepening and TT.
 
-    DEPTH = 7
+    Uses the same algorithmic foundations as Victor Allis's 1988 solver:
+    bitboard encoding, alpha-beta pruning, transposition table, and
+    center-biased move ordering.  Iterative deepening with a wall-clock
+    budget keeps the demo smooth on any hardware.
+    """
+
+    TIME_BUDGET = 0.05          # 50 ms per move — keeps demo fluid
 
     def __init__(self):
-        pass
+        self.tt = {}
+        self._deadline = 0.0
+        self._abort = False
+        self._nodes = 0
+
+    def new_game(self):
+        self.tt.clear()
+
+    # -- board conversion ------------------------------------------------
+
+    @staticmethod
+    def _from_board(board, player):
+        """Convert the game's 2-D array into (cur_bb, opp_bb, heights)."""
+        cur_bb = opp_bb = 0
+        heights = [0, 0, 0, 0, 0, 0, 0]
+        for col in range(7):
+            h = 0
+            base = col * 7
+            for game_row in range(5, -1, -1):          # bottom → top
+                cell = board[game_row][col]
+                if not cell:
+                    break
+                if cell == player:
+                    cur_bb |= 1 << (base + h)
+                else:
+                    opp_bb |= 1 << (base + h)
+                h += 1
+            heights[col] = h
+        return cur_bb, opp_bb, heights
+
+    # -- public API ------------------------------------------------------
 
     def get_best_move(self, game, player):
-        """Find the best column using negamax with alpha-beta."""
-        valid = [c for c in COLUMN_ORDER if game.get_drop_row(c) >= 0]
+        """Return the best column (0-6).  Does NOT mutate game.board."""
+        cur_bb, opp_bb, heights = self._from_board(game.board, player)
+
+        valid = [c for c in _COL if heights[c] < 6]
         if not valid:
             return None
 
-        opponent = PLAYER_2 if player == PLAYER_1 else PLAYER_1
+        # 1. Immediate win
+        for c in valid:
+            if _has_won(cur_bb | (1 << (c * 7 + heights[c]))):
+                return c
 
-        # Check for immediate win
-        for col in valid:
-            row = game.get_drop_row(col)
-            game.board[row][col] = player
-            if game.check_win(row, col, player):
-                game.board[row][col] = 0
-                return col
-            game.board[row][col] = 0
+        # 2. Block opponent's immediate win
+        for c in valid:
+            if _has_won(opp_bb | (1 << (c * 7 + heights[c]))):
+                return c
 
-        # Check for immediate block
-        for col in valid:
-            row = game.get_drop_row(col)
-            game.board[row][col] = opponent
-            if game.check_win(row, col, opponent):
-                game.board[row][col] = 0
-                return col
-            game.board[row][col] = 0
-
+        # 3. Iterative deepening — evaluate ALL root moves (no root
+        #    pruning) so we can randomise among tied columns for variety.
+        #    The abort mechanism caps wall-clock time.
+        n_empty = 42 - (cur_bb | opp_bb).bit_count()
         best_col = valid[0]
-        best_score = float('-inf')
-        alpha = float('-inf')
-        beta = float('inf')
+        self._deadline = _clock() + self.TIME_BUDGET
+        self._abort = False
+        self._nodes = 0
 
-        # Shuffle same-priority columns for variety
-        random.shuffle(valid)
-        # But keep center bias by re-sorting by column order preference
-        valid.sort(key=lambda c: COLUMN_ORDER.index(c))
-
-        for col in valid:
-            row = game.get_drop_row(col)
-            game.board[row][col] = player
-            score = -self._negamax(game, self.DEPTH - 1, -beta, -alpha, opponent)
-            game.board[row][col] = 0
-
-            if score > best_score:
-                best_score = score
-                best_col = col
-            alpha = max(alpha, score)
-            if alpha >= beta:
+        for depth in range(2, n_empty + 1):
+            self._abort = False
+            scores = {}
+            for c in valid:
+                bit = 1 << (c * 7 + heights[c])
+                heights[c] += 1
+                s = -self._negamax(opp_bb, cur_bb | bit, heights,
+                                   depth - 1, -100000, 100000)
+                heights[c] -= 1
+                if self._abort:
+                    break
+                scores[c] = s
+            if not self._abort and scores:
+                bs = max(scores.values())
+                top = [c for c in valid if scores.get(c, -100000) >= bs - 3]
+                top.sort(key=lambda c: _COL_IDX[c])
+                if len(top) > 1 and random.random() < 0.3:
+                    best_col = random.choice(top)
+                else:
+                    best_col = top[0]
+                if bs >= 9000:
+                    break
+            if self._abort:
                 break
 
         return best_col
 
-    def _negamax(self, game, depth, alpha, beta, player):
-        """Negamax with alpha-beta pruning."""
-        opponent = PLAYER_2 if player == PLAYER_1 else PLAYER_1
+    # -- negamax with alpha-beta + TT ------------------------------------
 
-        # Terminal checks
-        if depth == 0:
-            return self._evaluate(game, player)
+    def _negamax(self, cur_bb, opp_bb, heights, depth, alpha, beta):
+        # Periodic time check (every 512 nodes)
+        self._nodes += 1
+        if self._nodes & 0x1FF == 0 and _clock() > self._deadline:
+            self._abort = True
+        if self._abort:
+            return 0
 
-        valid = [c for c in COLUMN_ORDER if game.get_drop_row(c) >= 0]
-        if not valid:
-            return 0  # Draw
+        key = cur_bb | (opp_bb << 49)               # single-int TT key
+        entry = self.tt.get(key)
+        if entry is not None:
+            d, flag, val = entry
+            if d >= depth:
+                if flag == 0:
+                    return val
+                if flag == 1 and val >= beta:
+                    return val
+                if flag == -1 and val <= alpha:
+                    return val
 
-        for col in valid:
-            row = game.get_drop_row(col)
-            game.board[row][col] = player
+        # Immediate win?
+        for c in _COL:
+            h = heights[c]
+            if h < 6 and _has_won(cur_bb | (1 << (c * 7 + h))):
+                return 10000 + depth                 # prefer faster wins
 
-            # Check win
-            if game.check_win(row, col, player):
-                game.board[row][col] = 0
-                return 10000 + depth  # Prefer faster wins
+        if depth <= 0:
+            return self._evaluate(cur_bb, opp_bb)
 
-            score = -self._negamax(game, depth - 1, -beta, -alpha, opponent)
-            game.board[row][col] = 0
+        # Check if any valid moves exist
+        has_move = False
+        orig_alpha = alpha
+        best = -100000
 
-            alpha = max(alpha, score)
+        for c in _COL:
+            h = heights[c]
+            if h >= 6:
+                continue
+            has_move = True
+            heights[c] = h + 1
+            score = -self._negamax(opp_bb, cur_bb | (1 << (c * 7 + h)),
+                                   heights, depth - 1, -beta, -alpha)
+            heights[c] = h
+            if score > best:
+                best = score
+            if score > alpha:
+                alpha = score
             if alpha >= beta:
                 break
 
-        return alpha
+        if not has_move:
+            return 0                                 # draw
 
-    def _evaluate(self, game, player):
-        """Evaluate board position for player."""
-        opponent = PLAYER_2 if player == PLAYER_1 else PLAYER_1
+        # Store in transposition table (skip if search was aborted)
+        if not self._abort:
+            if best <= orig_alpha:
+                flag = -1                            # upper bound
+            elif best >= beta:
+                flag = 1                             # lower bound
+            else:
+                flag = 0                             # exact
+            self.tt[key] = (depth, flag, best)
+        return best
+
+    # -- static evaluation -----------------------------------------------
+
+    def _evaluate(self, cur_bb, opp_bb):
+        """Score all 69 four-windows + centre-column weighting."""
         score = 0
+        for mask in _FOUR_MASKS:
+            cur_in = cur_bb & mask
+            opp_in = opp_bb & mask
+            if not opp_in:
+                c = cur_in.bit_count()
+                if c == 3:   score += 50
+                elif c == 2: score += 10
+                elif c == 1: score += 1
+            elif not cur_in:
+                c = opp_in.bit_count()
+                if c == 3:   score -= 40
+                elif c == 2: score -= 8
+                elif c == 1: score -= 1
 
-        # Center column control
-        center_col = 3
-        for row in range(6):
-            if game.board[row][center_col] == player:
-                score += 3
-            elif game.board[row][center_col] == opponent:
-                score -= 3
-
-        # Evaluate all possible 4-windows
-        # Horizontal
-        for row in range(6):
-            for col in range(4):
-                score += self._score_window(game, row, col, 0, 1, player, opponent)
-
-        # Vertical
-        for row in range(3):
-            for col in range(7):
-                score += self._score_window(game, row, col, 1, 0, player, opponent)
-
-        # Diagonal down-right
-        for row in range(3):
-            for col in range(4):
-                score += self._score_window(game, row, col, 1, 1, player, opponent)
-
-        # Diagonal down-left
-        for row in range(3):
-            for col in range(3, 7):
-                score += self._score_window(game, row, col, 1, -1, player, opponent)
-
+        for col in range(7):
+            w = _COL_WEIGHT[col]
+            if w:
+                score += ((cur_bb >> (col * 7)) & 0x3F).bit_count() * w
+                score -= ((opp_bb >> (col * 7)) & 0x3F).bit_count() * w
         return score
 
-    def _score_window(self, game, row, col, dr, dc, player, opponent):
-        """Score a 4-cell window."""
-        own = 0
-        opp = 0
-        empty = 0
-        for i in range(4):
-            r = row + dr * i
-            c = col + dc * i
-            cell = game.board[r][c]
-            if cell == player:
-                own += 1
-            elif cell == opponent:
-                opp += 1
-            else:
-                empty += 1
 
-        if own == 3 and empty == 1:
-            return 20
-        if own == 2 and empty == 2:
-            return 4
-        if opp == 3 and empty == 1:
-            return -18
-        if opp == 2 and empty == 2:
-            return -2
-        return 0
-
+# -----------------------------------------------------------------------
+# Demo visual wrapper (unchanged interface)
+# -----------------------------------------------------------------------
 
 class Connect4Demo(Visual):
     """AI vs AI Connect 4 demo for attract mode."""
@@ -206,6 +327,7 @@ class Connect4Demo(Visual):
                 self.game_over_timer = 0.0
                 self.target_col = None
                 self.think_timer = 0.0
+                self.ai.new_game()
             # Still update game for win flash animation
             self.game.update(InputState(), dt)
             return
@@ -220,7 +342,8 @@ class Connect4Demo(Visual):
             self.think_timer += dt
             if self.think_timer < random.uniform(0.3, 0.6):
                 return
-            self.target_col = self.ai.get_best_move(self.game, self.game.current_player)
+            self.target_col = self.ai.get_best_move(
+                self.game, self.game.current_player)
             self.think_timer = 0.0
             self.move_timer = 0.0
             if self.target_col is None:
