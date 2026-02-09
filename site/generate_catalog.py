@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Generate catalog.json for the web emulator by scanning game/visual source files."""
+"""Generate catalog.json for the web emulator by scanning game/visual source files.
+
+Matches the arcade machine's catalog.py registration logic:
+  - Resolves category inheritance (subclasses inherit parent's category)
+  - Skips abstract base classes (GamePlaylist, Slideshow)
+  - Skips dev_only classes (hidden on production arcade)
+"""
 
 import ast
 import json
@@ -7,7 +13,7 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Category definitions matching catalog.py
+# Category definitions matching catalog.py exactly
 GAME_CATEGORIES = [
     {"name": "ARCADE GAMES", "color": [255, 255, 0], "key": "arcade"},
     {"name": "RETRO GAMES", "color": [0, 255, 0], "key": "retro"},
@@ -15,6 +21,7 @@ GAME_CATEGORIES = [
     {"name": "TOYS", "color": [255, 128, 128], "key": "toys"},
     {"name": "2 PLAYER GAMES", "color": [255, 0, 255], "key": "2_player"},
     {"name": "BAR GAMES", "color": [200, 150, 50], "key": "bar"},
+    {"name": "UNIQUE GAMES", "color": [100, 255, 180], "key": "unique"},
     {"name": "GAME MIX", "color": [255, 128, 0], "key": "game_mix"},
 ]
 
@@ -37,6 +44,9 @@ VISUAL_CATEGORIES = [
     {"name": "UTILITY", "color": [255, 255, 255], "key": "utility"},
 ]
 
+# Base classes that aren't actual menu items (not in ALL_GAMES / ALL_VISUALS)
+SKIP_CLASSES = {'GamePlaylist', 'Slideshow'}
+
 
 def extract_string(node):
     """Extract string value from an AST Constant node."""
@@ -45,8 +55,19 @@ def extract_string(node):
     return None
 
 
+def extract_bool(node):
+    """Extract boolean value from an AST Constant node."""
+    if isinstance(node, ast.Constant) and isinstance(node.value, bool):
+        return node.value
+    return None
+
+
 def scan_file(filepath, pkg):
-    """Scan a Python file for Game/Visual classes and cross-package deps."""
+    """Scan a Python file for Game/Visual classes and cross-package deps.
+
+    Resolves category inheritance: if a class doesn't set its own category,
+    it inherits from its base class (matching runtime getattr behavior).
+    """
     try:
         with open(filepath, 'r') as f:
             source = f.read()
@@ -54,7 +75,6 @@ def scan_file(filepath, pkg):
     except (SyntaxError, UnicodeDecodeError):
         return [], []
 
-    classes = []
     deps = []
 
     # Detect cross-package imports (e.g. demos importing from games)
@@ -66,15 +86,23 @@ def scan_file(filepath, pkg):
                 if dep_path not in deps:
                     deps.append(dep_path)
 
-    # Find classes with a name = "..." attribute
+    # First pass: collect all classes with their attributes and bases
+    class_info = {}
     for node in ast.iter_child_nodes(tree):
         if not isinstance(node, ast.ClassDef):
             continue
         if node.name.startswith('_'):
             continue
 
+        # Get base class names (for same-file inheritance resolution)
+        bases = []
+        for base in node.bases:
+            if isinstance(base, ast.Name):
+                bases.append(base.id)
+
         name_val = None
         cat_val = None
+        dev_only = False
 
         for item in node.body:
             if isinstance(item, ast.Assign):
@@ -84,13 +112,52 @@ def scan_file(filepath, pkg):
                             name_val = extract_string(item.value)
                         elif target.id == 'category':
                             cat_val = extract_string(item.value)
+                        elif target.id == 'dev_only':
+                            dev_only = extract_bool(item.value) or False
 
         if name_val:
-            classes.append({
+            class_info[node.name] = {
                 'cls': node.name,
                 'name': name_val,
                 'category': cat_val,
-            })
+                'bases': bases,
+                'dev_only': dev_only,
+            }
+
+    # Second pass: resolve category inheritance (walk up base chain)
+    def resolve_category(cls_name, visited=None):
+        if visited is None:
+            visited = set()
+        if cls_name in visited:
+            return None
+        visited.add(cls_name)
+        info = class_info.get(cls_name)
+        if not info:
+            return None
+        if info['category']:
+            return info['category']
+        for base_name in info['bases']:
+            cat = resolve_category(base_name, visited)
+            if cat:
+                return cat
+        return None
+
+    for cls_name, info in class_info.items():
+        if info['category'] is None:
+            info['category'] = resolve_category(cls_name)
+
+    # Build result list, skipping base classes and dev_only items
+    classes = []
+    for cls_name, info in class_info.items():
+        if cls_name in SKIP_CLASSES:
+            continue
+        if info['dev_only']:
+            continue
+        classes.append({
+            'cls': info['cls'],
+            'name': info['name'],
+            'category': info['category'],
+        })
 
     return classes, deps
 
