@@ -10,9 +10,12 @@ Navigation:
   Escape     - Back to menu / Exit
 """
 
+import os
 from dataclasses import dataclass, field
 from typing import List, Tuple, Dict, Any
 from arcade import Colors
+
+DEV_MODE = os.environ.get('LED_DEV', '') == '1'
 
 
 @dataclass
@@ -89,6 +92,8 @@ def register_visuals(visual_classes):
         cat.items = []
 
     for visual_class in visual_classes:
+        if not DEV_MODE and getattr(visual_class, 'dev_only', False):
+            continue
         category_key = getattr(visual_class, 'category', 'nature')
         if category_key in VISUAL_CATEGORY_MAP:
             VISUAL_CATEGORY_MAP[category_key].add(visual_class)

@@ -484,6 +484,7 @@ class GalleryArt(_Gallery3DBase):
     name = "ART GALLERY"
     description = "Classic paintings museum"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 16
@@ -551,6 +552,7 @@ class GallerySprites(_Gallery3DBase):
     name = "SPRITE MUSEUM"
     description = "Classic game characters"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 16
@@ -619,6 +621,7 @@ class GalleryAutomata(_Gallery3DBase):
     name = "AUTOMATA WING"
     description = "Living pattern rooms"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 20
@@ -702,6 +705,7 @@ class GalleryScience(_Gallery3DBase):
     name = "SCIENCE WING"
     description = "Science visualization rooms"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 20
@@ -785,6 +789,7 @@ class GalleryDigital(_Gallery3DBase):
     name = "DIGITAL WING"
     description = "Digital art installations"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 20
@@ -868,6 +873,7 @@ class GalleryEffects(_Gallery3DBase):
     name = "EFFECTS LAB"
     description = "Starfield and Matrix rooms"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 23
@@ -944,6 +950,7 @@ class GallerySalon(_Gallery3DBase):
     name = "SALON"
     description = "Wall-to-wall paintings"
     category = "gallery"
+    dev_only = True
 
     MAP_W = 16
     MAP_H = 10
