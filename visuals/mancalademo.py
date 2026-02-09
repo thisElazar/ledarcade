@@ -1,8 +1,8 @@
 """
 Mancala Demo - AI vs AI Attract Mode
 =====================================
-Two AIs play Mancala using simple heuristics: prefer free turns,
-then captures, then the pit with the most seeds.
+Two AIs play Mancala using minimax with alpha-beta pruning at depth 8.
+Handles free turns, captures, and store difference evaluation.
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -11,6 +11,143 @@ import random
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.mancala import Mancala, PLAYER_1, PLAYER_2
+
+
+class MancalaAI:
+    """Minimax AI with alpha-beta pruning for Mancala."""
+
+    DEPTH = 8
+
+    def _save_state(self, game):
+        """Save game state as a tuple for restore after search."""
+        return (
+            list(game.pits),
+            game.store1,
+            game.store2,
+            game.current_player,
+            game.state,
+            game.winner,
+            game.selected_pit,
+        )
+
+    def _restore_state(self, game, state):
+        """Restore game state from saved tuple."""
+        game.pits = list(state[0])
+        game.store1 = state[1]
+        game.store2 = state[2]
+        game.current_player = state[3]
+        game.state = state[4]
+        game.winner = state[5]
+        game.selected_pit = state[6]
+
+    def get_best_move(self, game, player):
+        """Find the best pit (0-5) using minimax."""
+        offset = 0 if player == PLAYER_1 else 6
+        valid = [i for i in range(6) if game.pits[offset + i] > 0]
+        if not valid:
+            return 0
+
+        best_pit = valid[0]
+        best_score = float('-inf')
+
+        for pit in valid:
+            saved = self._save_state(game)
+            pit_index = pit if player == PLAYER_1 else pit + 6
+            game.sow_seeds(pit_index)
+
+            # After sow_seeds, current_player may have changed (or not, if free turn)
+            score = self._minimax(game, self.DEPTH - 1, float('-inf'), float('inf'),
+                                  game.current_player == player, player)
+
+            self._restore_state(game, saved)
+
+            if score > best_score:
+                best_score = score
+                best_pit = pit
+
+        return best_pit
+
+    def _minimax(self, game, depth, alpha, beta, maximizing, root_player):
+        """Minimax with alpha-beta. root_player is the AI we're optimizing for."""
+        from arcade import GameState as GS
+        if game.state == GS.GAME_OVER or depth == 0:
+            return self._evaluate(game, root_player)
+
+        current = game.current_player
+        offset = 0 if current == PLAYER_1 else 6
+        valid = [i for i in range(6) if game.pits[offset + i] > 0]
+        if not valid:
+            return self._evaluate(game, root_player)
+
+        if maximizing:
+            value = float('-inf')
+            for pit in valid:
+                saved = self._save_state(game)
+                pit_index = pit if current == PLAYER_1 else pit + 6
+                game.sow_seeds(pit_index)
+
+                # If same player goes again (free turn), still maximizing
+                is_max = game.current_player == root_player
+                score = self._minimax(game, depth - 1, alpha, beta, is_max, root_player)
+
+                self._restore_state(game, saved)
+                value = max(value, score)
+                alpha = max(alpha, value)
+                if alpha >= beta:
+                    break
+            return value
+        else:
+            value = float('inf')
+            for pit in valid:
+                saved = self._save_state(game)
+                pit_index = pit if current == PLAYER_1 else pit + 6
+                game.sow_seeds(pit_index)
+
+                is_max = game.current_player == root_player
+                score = self._minimax(game, depth - 1, alpha, beta, is_max, root_player)
+
+                self._restore_state(game, saved)
+                value = min(value, score)
+                beta = min(beta, value)
+                if alpha >= beta:
+                    break
+            return value
+
+    def _evaluate(self, game, player):
+        """Evaluate position for player."""
+        opponent = PLAYER_2 if player == PLAYER_1 else PLAYER_1
+
+        if player == PLAYER_1:
+            own_store = game.store1
+            opp_store = game.store2
+            own_pits = game.pits[0:6]
+            opp_pits = game.pits[6:12]
+        else:
+            own_store = game.store2
+            opp_store = game.store1
+            own_pits = game.pits[6:12]
+            opp_pits = game.pits[0:6]
+
+        score = 0.0
+
+        # Store difference (most important)
+        score += (own_store - opp_store) * 10.0
+
+        # Seeds on own side (potential)
+        score += sum(own_pits) * 2.0
+        score -= sum(opp_pits) * 1.0
+
+        # Free turn setups: pits where seeds == distance to store
+        for i in range(6):
+            if own_pits[i] == 6 - i:
+                score += 5.0
+
+        # Capture setups: empty own pits with seeds in opposite
+        for i in range(6):
+            if own_pits[i] == 0 and opp_pits[5 - i] > 0:
+                score += 2.0
+
+        return score
 
 
 class MancalaDemo(Visual):
@@ -25,6 +162,7 @@ class MancalaDemo(Visual):
         self.time = 0.0
         self.game = Mancala(self.display)
         self.game.reset()
+        self.ai = MancalaAI()
         self.think_timer = 0.0
         self.think_delay = 0.0
         self.target_pit = None
@@ -34,52 +172,6 @@ class MancalaDemo(Visual):
 
     def handle_input(self, input_state):
         return False
-
-    def _lands_in_store(self, pit_local):
-        """Check if sowing from pit_local (0-5) lands in own store."""
-        player = self.game.current_player
-        offset = 0 if player == PLAYER_1 else 6
-        seeds = self.game.pits[offset + pit_local]
-        if seeds == 0:
-            return False
-        # Both players: store is 6 positions past pit 0, 5 past pit 1, etc.
-        return seeds == 6 - pit_local
-
-    def _choose_pit(self):
-        """Choose best pit index (0-5) using simple heuristics."""
-        player = self.game.current_player
-        offset = 0 if player == PLAYER_1 else 6
-        valid = [i for i in range(6) if self.game.pits[offset + i] > 0]
-        if not valid:
-            return 0
-
-        # Priority 1: free turn (lands in own store)
-        for i in valid:
-            if self._lands_in_store(i):
-                return i
-
-        # Priority 2: capture (land in empty own pit, opposite has seeds)
-        for i in valid:
-            pit_index = offset + i
-            seeds = self.game.pits[pit_index]
-            pos = i if player == PLAYER_1 else pit_index + 1
-            remaining = seeds
-            while remaining > 0:
-                pos = (pos + 1) % 14
-                skip = 13 if player == PLAYER_1 else 6
-                if pos == skip:
-                    continue
-                remaining -= 1
-            if player == PLAYER_1 and 0 <= pos <= 5:
-                if self.game.pits[pos] == 0 and self.game.pits[11 - pos] > 0:
-                    return i
-            elif player == PLAYER_2 and 7 <= pos <= 12:
-                arr = pos - 1
-                if self.game.pits[arr] == 0 and self.game.pits[11 - arr] > 0:
-                    return i
-
-        # Priority 3: pit with the most seeds
-        return max(valid, key=lambda i: self.game.pits[offset + i])
 
     def update(self, dt):
         self.time += dt
@@ -99,7 +191,7 @@ class MancalaDemo(Visual):
         if self.ai_state == "thinking":
             self.think_timer += dt
             if self.think_timer >= self.think_delay:
-                self.target_pit = self._choose_pit()
+                self.target_pit = self.ai.get_best_move(self.game, self.game.current_player)
                 self.ai_state = "navigating"
                 self.nav_timer = 0.0
 
