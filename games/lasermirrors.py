@@ -22,18 +22,20 @@ HALF = GRID_SIZE // 2
 MOVE_SPEED = 2.5
 ROT_SPEED = 2.5
 MARGIN = 0.2
-MIRROR_ANIM_DUR = 0.5  # seconds for mirror rotation animation
+MIRROR_ANIM_DUR = 1.0  # seconds for mirror rotation animation
 
 # Cell types
 EMPTY = 0
 WALL = 1
-MIRROR_BK = 2   # backslash mirror: \  reflects (1,0)->(0,1), (0,-1)->(-1,0)
-MIRROR_FW = 3   # forward slash mirror: /  reflects (1,0)->(0,-1), (0,-1)->(1,0)
+MIRROR_BK = 2   # backslash mirror: \   (θ=45°)
+MIRROR_FW = 3   # forward slash mirror: /  (θ=135°)
 EMITTER_N = 4   # fires north (beam goes -y)
 EMITTER_S = 5   # fires south (beam goes +y)
 EMITTER_E = 6   # fires east  (beam goes +x)
 EMITTER_W = 7   # fires west  (beam goes -x)
 TARGET = 8
+MIRROR_V = 9    # vertical mirror: |   (θ=90°)
+MIRROR_H = 10   # horizontal mirror: —  (θ=0°/180°)
 
 EMITTER_DIRS = {
     EMITTER_N: (0, -1),
@@ -41,6 +43,30 @@ EMITTER_DIRS = {
     EMITTER_E: (1, 0),
     EMITTER_W: (-1, 0),
 }
+
+# Mirror system — 4 orientations, 45° apart, each press rotates CCW
+MIRROR_TYPES = {MIRROR_BK, MIRROR_FW, MIRROR_V, MIRROR_H}
+MIRROR_ANGLES = {
+    MIRROR_BK: math.pi / 4,       # 45°  (\)
+    MIRROR_V:  math.pi / 2,       # 90°  (|)
+    MIRROR_FW: 3 * math.pi / 4,   # 135° (/)
+    MIRROR_H:  math.pi,           # 180° (—)
+}
+MIRROR_NEXT = {  # CCW rotation cycle
+    MIRROR_BK: MIRROR_V,
+    MIRROR_V:  MIRROR_FW,
+    MIRROR_FW: MIRROR_H,
+    MIRROR_H:  MIRROR_BK,
+}
+# Precompute cardinal-direction reflections for grid-based tracing
+MIRROR_REFLECT = {}
+for _mt, _theta in MIRROR_ANGLES.items():
+    _a2 = 2 * _theta
+    _c2, _s2 = round(math.cos(_a2)), round(math.sin(_a2))
+    MIRROR_REFLECT[_mt] = {}
+    for _d in [(0, -1), (0, 1), (1, 0), (-1, 0)]:
+        MIRROR_REFLECT[_mt][_d] = (int(_d[0]*_c2 + _d[1]*_s2),
+                                   int(_d[0]*_s2 - _d[1]*_c2))
 
 # Colors
 STONE_COLOR = (40, 45, 70)
@@ -247,11 +273,12 @@ class LaserMirrors(Game):
                 if c in EMITTER_DIRS:
                     self.emitters.append((x, y, c))
                 elif c == TARGET:
-                    self.targets.append([x, y, False])
+                    self.targets.append([x, y, 0.0])  # charge: 0.0 to 1.0
 
         # Trace laser beams
         self.beam_segments = []
         self.beam_cells = set()
+        self.target_hit = set()  # which targets beam touches this frame
         self._trace_all_lasers()
 
         # Level clear state
@@ -294,8 +321,7 @@ class LaserMirrors(Game):
     def _trace_all_lasers(self):
         self.beam_segments = []
         self.beam_cells = set()
-        for t in self.targets:
-            t[2] = False
+        self.target_hit = set()
         for ex, ey, etype in self.emitters:
             dx, dy = EMITTER_DIRS[etype]
             self._trace_beam(ex, ey, dx, dy)
@@ -318,22 +344,13 @@ class LaserMirrors(Game):
             if cell == TARGET:
                 self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
                 self.beam_cells.add((nx, ny))
-                for t in self.targets:
-                    if t[0] == nx and t[1] == ny:
-                        t[2] = True
+                self.target_hit.add((nx, ny))
                 break
 
-            if cell == MIRROR_BK:
+            if cell in MIRROR_REFLECT:
                 self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
                 self.beam_cells.add((nx, ny))
-                dx, dy = dy, dx
-                cx, cy = nx, ny
-                continue
-
-            if cell == MIRROR_FW:
-                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
-                self.beam_cells.add((nx, ny))
-                dx, dy = -dy, -dx
+                dx, dy = MIRROR_REFLECT[cell][(dx, dy)]
                 cx, cy = nx, ny
                 continue
 
@@ -350,8 +367,7 @@ class LaserMirrors(Game):
         """Retrace all lasers with continuous-angle reflection for animating mirrors."""
         self.beam_segments = []
         self.beam_cells = set()
-        for t in self.targets:
-            t[2] = False
+        self.target_hit = set()
         for ex, ey, etype in self.emitters:
             dx, dy = EMITTER_DIRS[etype]
             self._trace_beam_animated(ex, ey, dx, dy)
@@ -371,11 +387,9 @@ class LaserMirrors(Game):
             if cell == TARGET:
                 self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
                 self.beam_cells.add((nx, ny))
-                for t in self.targets:
-                    if t[0] == nx and t[1] == ny:
-                        t[2] = True
+                self.target_hit.add((nx, ny))
                 break
-            if cell in (MIRROR_BK, MIRROR_FW):
+            if cell in MIRROR_REFLECT:
                 self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
                 self.beam_cells.add((nx, ny))
                 if (nx, ny) in self.mirror_anims:
@@ -389,11 +403,8 @@ class LaserMirrors(Game):
                     ref_dy = dx * sin2 - dy * cos2
                     self._trace_continuous(nx + 0.5, ny + 0.5, ref_dx, ref_dy)
                     return
-                # Static mirror: normal grid reflection
-                if cell == MIRROR_BK:
-                    dx, dy = dy, dx
-                else:
-                    dx, dy = -dy, -dx
+                # Static mirror: use precomputed lookup
+                dx, dy = MIRROR_REFLECT[cell][(dx, dy)]
                 cx, cy = nx, ny
                 continue
             # Empty cell
@@ -425,15 +436,13 @@ class LaserMirrors(Game):
                 if cell == TARGET:
                     self.beam_segments.append((ox, oy, gx + 0.5, gy + 0.5))
                     self.beam_cells.add((gx, gy))
-                    for t in self.targets:
-                        if t[0] == gx and t[1] == gy:
-                            t[2] = True
+                    self.target_hit.add((gx, gy))
                     return
-                if cell in (MIRROR_BK, MIRROR_FW):
+                if cell in MIRROR_TYPES:
                     self.beam_segments.append((ox, oy, gx + 0.5, gy + 0.5))
                     self.beam_cells.add((gx, gy))
                     # Reflect off static mirror using continuous formula
-                    a2 = math.pi / 2 if cell == MIRROR_BK else -math.pi / 2
+                    a2 = 2 * MIRROR_ANGLES[cell]
                     cos2, sin2 = math.cos(a2), math.sin(a2)
                     new_dx = dx * cos2 + dy * sin2
                     new_dy = dx * sin2 - dy * cos2
@@ -519,25 +528,27 @@ class LaserMirrors(Game):
             fx, fy = self._facing_cell()
             if 0 <= fx < self.map_w and 0 <= fy < self.map_h:
                 c = self.map[fy][fx]
-                if c == MIRROR_BK:
+                if c in MIRROR_TYPES:
+                    from_theta = MIRROR_ANGLES[c]
                     self.mirror_anims[(fx, fy)] = {
-                        'from_theta': math.pi / 4,
-                        'to_theta': -math.pi / 4,
+                        'from_theta': from_theta,
+                        'to_theta': from_theta + math.pi / 4,
                         'progress': 0.0,
-                        'from_type': MIRROR_BK,
-                        'to_type': MIRROR_FW,
-                    }
-                elif c == MIRROR_FW:
-                    self.mirror_anims[(fx, fy)] = {
-                        'from_theta': -math.pi / 4,
-                        'to_theta': math.pi / 4,
-                        'progress': 0.0,
-                        'from_type': MIRROR_FW,
-                        'to_type': MIRROR_BK,
+                        'from_type': c,
+                        'to_type': MIRROR_NEXT[c],
                     }
 
+        # Advance target charge (3 seconds to fully charge)
+        for t in self.targets:
+            if (t[0], t[1]) in self.target_hit:
+                if t[2] < 1.0:
+                    t[2] = min(1.0, t[2] + dt / 3.0)
+            else:
+                if t[2] < 1.0:  # completed targets stay locked
+                    t[2] = max(0.0, t[2] - dt / 1.5)
+
         # Check win condition
-        if self.targets and all(t[2] for t in self.targets):
+        if self.targets and all(t[2] >= 1.0 for t in self.targets):
             if not self.level_clear:
                 self.level_clear = True
                 lvl = LEVELS[self.level]
@@ -592,7 +603,7 @@ class LaserMirrors(Game):
                 break
 
             cell = self._cell(map_x, map_y)
-            if cell != EMPTY:
+            if cell != EMPTY and cell not in MIRROR_TYPES:
                 if side == 0:
                     perp = (map_x - self.px + (1 - step_x) / 2) / cos_a
                 else:
@@ -657,6 +668,11 @@ class LaserMirrors(Game):
                     r = int(base[0] * fog_f)
                     g = int(base[1] * fog_f)
                     b = int(base[2] * fog_f)
+                    # Rotating floor panel under mirrors
+                    if self._cell(fcx, fcy) in MIRROR_TYPES:
+                        r = int(r * 0.35)
+                        g = int(g * 0.35)
+                        b = int(b * 0.45)
                     # Beam floor glow
                     if (fcx, fcy) in self.beam_cells:
                         r = min(255, r + int(60 * fog_f))
@@ -706,13 +722,16 @@ class LaserMirrors(Game):
                         intensity = (3 - dist) / 3.0
                         glow_r += int(40 * intensity)
                         glow_g += int(15 * intensity)
-                # Target glow
+                # Target glow (scales with charge)
                 for t in self.targets:
-                    if t[2]:
+                    if t[2] > 0.01:
                         dist = abs(fcx - t[0]) + abs(fcy - t[1])
                         if dist <= 2:
-                            intensity = (3 - dist) / 3.0
+                            intensity = (3 - dist) / 3.0 * t[2]
                             glow_g += int(50 * intensity)
+                # Rotating floor panel under mirrors
+                if self._cell(fcx, fcy) in MIRROR_TYPES:
+                    base = (int(base[0] * 0.35), int(base[1] * 0.35), int(base[2] * 0.45))
                 # Beam floor glow
                 if (fcx, fcy) in self.beam_cells:
                     glow_r += int(60 * fog_f)
@@ -724,6 +743,9 @@ class LaserMirrors(Game):
 
         # Render laser beams in screen space
         self._draw_laser_beams()
+
+        # Render mirror sprites (prism on log)
+        self._draw_mirror_sprites()
 
         # Crosshair
         ch = (100, 100, 120)
@@ -764,7 +786,7 @@ class LaserMirrors(Game):
                 return STONE_DARK
             return STONE_COLOR
 
-        if cell in (MIRROR_BK, MIRROR_FW):
+        if cell in MIRROR_TYPES:
             mp = 0.8 + 0.2 * math.sin(self.time * 2.0)
             # Check if this mirror is animating
             anim = self.mirror_anims.get((cx, cy))
@@ -773,7 +795,7 @@ class LaserMirrors(Game):
                 diag = anim['from_theta'] + t * (anim['to_theta'] - anim['from_theta'])
                 mp = 1.0  # bright during animation
             else:
-                diag = math.pi / 4 if cell == MIRROR_BK else -math.pi / 4
+                diag = MIRROR_ANGLES[cell]
             # Distance from (u,v) to diagonal line through center
             dist = abs((u - 0.5) * math.sin(diag) - (v - 0.5) * math.cos(diag))
             if dist < 0.11:
@@ -794,21 +816,28 @@ class LaserMirrors(Game):
             return (60, 30, 20)
 
         if cell == TARGET:
-            lit = False
+            charge = 0.0
             for t in self.targets:
                 if t[0] == cx and t[1] == cy:
-                    lit = t[2]
+                    charge = t[2]
                     break
             du = abs(u - 0.5)
             dv = abs(v - 0.5)
             dist = du * du + dv * dv
-            if lit:
+            if charge >= 1.0:
+                # Fully charged — bright pulsing green
                 tp = 0.8 + 0.2 * math.sin(self.time * 4.0)
                 if dist < 0.1:
                     return (int(80 * tp), int(255 * tp), int(120 * tp))
                 return (int(40 * tp), int(200 * tp), int(80 * tp))
+            elif charge > 0.01:
+                # Charging — interpolate from dim to bright based on charge
+                c = charge
+                if dist < 0.1:
+                    return (int(60 + 40 * c), int(90 + 165 * c), int(60 + 60 * c))
+                return (int(40 + 30 * c), int(70 + 130 * c), int(50 + 30 * c))
             else:
-                # Unlit target — distinct green ring
+                # Uncharged — dim green ring
                 if dist < 0.06:
                     return (100, 130, 100)
                 if dist < 0.15:
@@ -816,6 +845,71 @@ class LaserMirrors(Game):
                 return TARGET_UNLIT
 
         return STONE_COLOR
+
+    def _draw_mirror_sprites(self):
+        """Draw mirrors as small prism-on-log columns."""
+        cos_pa = math.cos(self.pa)
+        sin_pa = math.sin(self.pa)
+
+        # Collect visible mirrors with depth
+        sprites = []
+        for y in range(self.map_h):
+            for x in range(self.map_w):
+                cell = self.map[y][x]
+                if cell not in MIRROR_TYPES:
+                    continue
+                dx = x + 0.5 - self.px
+                dy = y + 0.5 - self.py
+                vz = dx * cos_pa + dy * sin_pa
+                if vz <= 0.1:
+                    continue
+                vx = -dx * sin_pa + dy * cos_pa
+                sprites.append((vz, vx, x, y, cell))
+
+        # Sort back to front
+        sprites.sort(key=lambda s: -s[0])
+
+        for vz, vx, mx, my, cell in sprites:
+            sx_center = int(HALF + vx * GRID_SIZE / vz)
+
+            # Sprite size — prism top reaches laser height (eye level)
+            sprite_w = max(2, int(0.15 * GRID_SIZE / vz))
+            sprite_h = max(4, int(0.55 * GRID_SIZE / vz))
+
+            # Anchored to floor
+            sy_floor = int(HALF + 0.5 * GRID_SIZE / vz)
+            sy_top = sy_floor - sprite_h
+            sx_start = sx_center - sprite_w // 2
+
+            fog = min(1.0, 2.5 / (vz + 0.5))
+
+            # Animation state
+            anim = self.mirror_anims.get((mx, my))
+            if anim:
+                glow = 1.0
+            else:
+                glow = 0.8 + 0.2 * math.sin(self.time * 2.0)
+
+            log_start = sy_top + max(1, int(sprite_h * 0.55))
+
+            for sx in range(sx_start, sx_start + sprite_w):
+                if sx < 0 or sx >= GRID_SIZE:
+                    continue
+                if vz > self.zbuf[sx]:
+                    continue
+
+                for sy in range(max(0, sy_top), min(GRID_SIZE, sy_floor)):
+                    if sy >= log_start:
+                        # Log base (dark wood)
+                        r = int(65 * fog)
+                        g = int(40 * fog)
+                        b = int(18 * fog)
+                    else:
+                        # Glass prism
+                        r = int(170 * glow * fog)
+                        g = int(195 * glow * fog)
+                        b = min(255, int(235 * glow * fog))
+                    self.display.set_pixel(sx, sy, (r, g, b))
 
     def _draw_laser_beams(self):
         cos_pa = math.cos(self.pa)
@@ -854,22 +948,17 @@ class LaserMirrors(Game):
                 if sy < 0 or sy >= GRID_SIZE:
                     continue
 
-                # 2px tall core
+                # 1px core
                 self.display.set_pixel(sx, sy, LASER_CORE)
-                if 0 <= sy - 1 < GRID_SIZE:
-                    self.display.set_pixel(sx, sy - 1, LASER_CORE)
 
-                # Glow above and below
-                for gy in range(-3, 4):
-                    if -1 <= gy <= 0:
-                        continue  # skip core pixels
+                # Subtle glow ±1
+                for gy in (-1, 1):
                     gsy = sy + gy
                     if 0 <= gsy < GRID_SIZE:
                         pr, pg, pb = self.display.get_pixel(sx, gsy)
-                        intensity = max(0, 4 - abs(gy))
-                        nr = min(255, pr + LASER_GLOW[0] * intensity)
-                        ng = min(255, pg + LASER_GLOW[1] * intensity)
-                        nb = min(255, pb + LASER_GLOW[2] * intensity)
+                        nr = min(255, pr + LASER_GLOW[0] * 2)
+                        ng = min(255, pg + LASER_GLOW[1] * 2)
+                        nb = min(255, pb + LASER_GLOW[2] * 2)
                         self.display.set_pixel(sx, gsy, (nr, ng, nb))
 
     def _draw_hints(self):
@@ -895,7 +984,7 @@ class LaserMirrors(Game):
         else:
             self.display.draw_text_small(2, 24, f"LEVEL {self.level + 1}", c)
             n_targets = len(self.targets)
-            n_mirrors = sum(1 for row in self.map for c in row if c in (MIRROR_BK, MIRROR_FW))
+            n_mirrors = sum(1 for row in self.map for c in row if c in MIRROR_TYPES)
             self.display.draw_text_small(2, 32, f"{n_mirrors}M {n_targets}T", h)
             self.display.draw_text_small(2, 38, "SPC:ROTATE", h)
 
