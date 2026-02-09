@@ -107,24 +107,11 @@ class CentipedeDemo(Visual):
             else:
                 move['left'] = True
 
-        # Check if we have a clear shot (no mushrooms blocking)
-        has_clear_shot = self._has_clear_shot(player_x, player_y, target_x, target_y)
-
-        if not has_clear_shot:
-            # Move up/down to find clear shot
-            # Try moving up if we can
-            if player_y > game.PLAYER_AREA_TOP:
-                move['up'] = True
-            elif player_y < 61:
-                move['down'] = True
-        else:
-            # We have a clear shot, try to align horizontally
-            if abs(dx) <= 3:
-                # Aligned enough to shoot
-                move['shoot'] = True
-                # Stop horizontal movement when shooting
-                move['left'] = False
-                move['right'] = False
+        # Shoot when roughly aligned — bullets clear mushrooms on the way
+        if abs(dx) <= 4:
+            move['shoot'] = True
+            move['left'] = False
+            move['right'] = False
 
         # Avoid spider - move away if too close
         if game.spider:
@@ -213,17 +200,3 @@ class CentipedeDemo(Visual):
 
         return None
 
-    def _has_clear_shot(self, player_x, player_y, target_x, target_y):
-        """Check if there's a clear vertical path to the target."""
-        game = self.game
-
-        # Check if any mushroom is blocking the shot
-        # We shoot straight up, so check mushrooms in our column
-        for (mx, my), _ in game.mushrooms.items():
-            # Mushroom is in our column (within 3 pixels)
-            if abs(mx - player_x) < 4:
-                # Mushroom is between us and the target
-                if my < player_y and my > target_y:
-                    return False
-
-        return True
