@@ -80,7 +80,7 @@ class Bomberman(Game):
         self.player_y = 1
         self.player_speed = 1  # Tiles per move
         self.move_timer = 0.0
-        self.move_delay = 0.12
+        self.move_delay = 0.18
 
         # Bomb stats
         self.max_bombs = 1

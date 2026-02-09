@@ -132,7 +132,7 @@ class Invaders(Game):
                 self.ufo = None
 
         # Player movement (adjusted for smaller ship)
-        player_speed = 50
+        player_speed = 34
         if input_state.left:
             self.player_x = max(2, self.player_x - player_speed * dt)
         if input_state.right:
@@ -148,11 +148,11 @@ class Invaders(Game):
                 'x': int(self.player_x) + 1,  # Center of smaller ship
                 'y': self.player_y - 1,
             })
-            self.fire_cooldown = 0.25  # Cooldown between shots
+            self.fire_cooldown = 0.30  # Cooldown between shots
 
         # Update player bullets
         for bullet in self.bullets[:]:
-            bullet['y'] -= 80 * dt
+            bullet['y'] -= 58 * dt
             if bullet['y'] < 8:
                 self.bullets.remove(bullet)
         
@@ -176,7 +176,7 @@ class Invaders(Game):
         
         # Update enemy bullets
         for bullet in self.enemy_bullets[:]:
-            bullet['y'] += 40 * dt
+            bullet['y'] += 28 * dt
             
             # Hit player (adjusted for smaller ship - 3 wide, 2 tall)
             if (abs(bullet['x'] - self.player_x - 1) < 2 and

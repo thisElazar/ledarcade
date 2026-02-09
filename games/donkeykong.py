@@ -32,11 +32,11 @@ class DonkeyKong(Game):
     OIL_COLOR = (50, 50, 200)          # Blue flame
 
     # Physics constants
-    GRAVITY = 150.0
-    MAX_FALL_SPEED = 120.0
-    MOVE_SPEED = 35.0
-    CLIMB_SPEED = 25.0
-    BARREL_SPEED = 30.0
+    GRAVITY = 100.0
+    MAX_FALL_SPEED = 80.0
+    MOVE_SPEED = 24.0
+    CLIMB_SPEED = 16.0
+    BARREL_SPEED = 20.0
 
     # Explicit jump arc (parabolic, not physics-based)
     JUMP_DURATION = 0.5   # Total airtime in seconds

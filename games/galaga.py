@@ -20,7 +20,7 @@ class Galaga(Game):
 
     # Player constants
     PLAYER_Y = 58
-    PLAYER_SPEED = 50.0
+    PLAYER_SPEED = 34.0
     FIRE_COOLDOWN = 0.25
     MAX_BULLETS = 3
 
@@ -143,11 +143,11 @@ class Galaga(Game):
 
         # Update bullets
         for bullet in self.bullets:
-            bullet['y'] -= 120 * dt
+            bullet['y'] -= 80 * dt
         self.bullets = [b for b in self.bullets if b['y'] > 0]
 
         # Update enemy bullets (speed scales with level, capped for playability)
-        enemy_bullet_speed = min(120, 60 + self.level * 8)  # Faster bullets, capped at 120
+        enemy_bullet_speed = min(80, 40 + self.level * 6)  # Faster bullets, capped at 80
         for bullet in self.enemy_bullets:
             bullet['y'] += enemy_bullet_speed * dt
         self.enemy_bullets = [b for b in self.enemy_bullets if b['y'] < GRID_SIZE]
@@ -230,7 +230,7 @@ class Galaga(Game):
 
             # Create dive path toward player then loop back
             # Diver speed scales with level, capped for playability
-            diver_speed = min(110, 45 + self.level * 8)  # Faster dive speed, capped at 110
+            diver_speed = min(75, 30 + self.level * 6)  # Faster dive speed, capped at 75
             self.divers.append({
                 'x': ex,
                 'y': ey,

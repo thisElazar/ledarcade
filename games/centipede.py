@@ -19,11 +19,11 @@ class Centipede(Game):
 
     # Player constants
     PLAYER_AREA_TOP = 48  # Player can only move in bottom area
-    PLAYER_SPEED = 45.0
-    FIRE_COOLDOWN = 0.15
+    PLAYER_SPEED = 32.0
+    FIRE_COOLDOWN = 0.18
 
     # Centipede constants
-    SEGMENT_SPEED = 25.0
+    SEGMENT_SPEED = 16.0
     SEGMENT_SIZE = 3
 
     def __init__(self, display: Display):
@@ -132,7 +132,7 @@ class Centipede(Game):
 
         # Update bullet
         if self.bullet:
-            self.bullet['y'] -= 150 * dt
+            self.bullet['y'] -= 65 * dt
             if self.bullet['y'] < 0:
                 self.bullet = None
 
@@ -233,7 +233,7 @@ class Centipede(Game):
 
     def update_centipede(self, dt: float):
         """Update centipede movement."""
-        speed = self.SEGMENT_SPEED + self.level * 3
+        speed = self.SEGMENT_SPEED + self.level * 2
 
         for i, seg in enumerate(self.segments):
             # Move horizontally
@@ -275,8 +275,8 @@ class Centipede(Game):
                 self.spider = {
                     'x': 0 if random.random() < 0.5 else 63,
                     'y': random.randint(self.PLAYER_AREA_TOP, 58),
-                    'vx': random.choice([-30, 30]),
-                    'vy': random.choice([-20, 20]),
+                    'vx': random.choice([-20, 20]),
+                    'vy': random.choice([-14, 14]),
                     'lifetime': 0.0,
                     'exiting': False,
                 }
@@ -287,9 +287,9 @@ class Centipede(Game):
             if self.spider.get('exiting', False):
                 # Move toward nearest edge to exit
                 if self.spider['x'] < 32:
-                    self.spider['vx'] = -40
+                    self.spider['vx'] = -28
                 else:
-                    self.spider['vx'] = 40
+                    self.spider['vx'] = 28
                 self.spider['vy'] = 0
 
                 self.spider['x'] += self.spider['vx'] * dt
@@ -313,11 +313,11 @@ class Centipede(Game):
                 if random.random() < 0.02:
                     if random.random() < 0.6:
                         # Bias toward player
-                        self.spider['vx'] = 30 if self.player_x > self.spider['x'] else -30
-                        self.spider['vy'] = 20 if self.player_y > self.spider['y'] else -20
+                        self.spider['vx'] = 20 if self.player_x > self.spider['x'] else -20
+                        self.spider['vy'] = 14 if self.player_y > self.spider['y'] else -14
                     else:
-                        self.spider['vx'] = random.choice([-30, 30])
-                        self.spider['vy'] = random.choice([-20, 20])
+                        self.spider['vx'] = random.choice([-20, 20])
+                        self.spider['vy'] = random.choice([-14, 14])
 
             # Spider eats mushrooms
             for (mx, my) in list(self.mushrooms.keys()):
@@ -346,7 +346,7 @@ class Centipede(Game):
                     'hits': 2
                 }
         else:
-            self.flea['y'] += 50 * dt
+            self.flea['y'] += 30 * dt
 
             # Drop mushrooms
             if random.random() < 0.1:
@@ -373,7 +373,7 @@ class Centipede(Game):
                     'dir': side
                 }
         else:
-            self.scorpion['x'] += self.scorpion['dir'] * 25 * dt
+            self.scorpion['x'] += self.scorpion['dir'] * 16 * dt
 
             # Exit screen
             if self.scorpion['x'] < -5 or self.scorpion['x'] > 68:

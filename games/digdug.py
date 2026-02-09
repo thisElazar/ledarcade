@@ -73,7 +73,7 @@ class DigDug(Game):
         self.invincible = 0
 
         self.move_timer = 0
-        self.move_delay = 0.08
+        self.move_delay = 0.15
 
     def spawn_enemies(self):
         """Spawn enemies for current level."""
@@ -252,9 +252,9 @@ class DigDug(Game):
 
         if ghost_mode:
             # Ghosts are faster, and scale with level too
-            return 0.20 * speed_multiplier
+            return 0.28 * speed_multiplier
         else:
-            return 0.15 * speed_multiplier
+            return 0.22 * speed_multiplier
 
     def update_enemies(self, dt: float):
         """Update enemy movement and behavior."""

@@ -72,7 +72,7 @@ class LodeRunner(Game):
         self.exit_open = False
 
         self.move_timer = 0
-        self.move_delay = 0.08
+        self.move_delay = 0.13
         self.dig_cooldown = 0
         self.enemy_start_delay = 1.5  # Guards pause before chasing
 
@@ -365,7 +365,7 @@ class LodeRunner(Game):
                     continue
 
             # Chase player — guards get faster at higher levels
-            enemy_speed = max(0.12, 0.22 - self.level * 0.01)
+            enemy_speed = max(0.18, 0.28 - self.level * 0.01)
             if enemy['move_timer'] >= enemy_speed:
                 enemy['move_timer'] = 0
 

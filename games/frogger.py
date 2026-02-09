@@ -48,7 +48,7 @@ class Frogger(Game):
 
         # Movement input cooldown
         self.move_cooldown = 0
-        self.move_delay = 0.12
+        self.move_delay = 0.18
 
         # Home slots (5 slots to fill)
         self.homes = [False, False, False, False, False]
@@ -97,7 +97,7 @@ class Frogger(Game):
                     'row': row,
                     'x': float(x * self.cell_size),
                     'length': length,
-                    'speed': speed * direction * (1 + self.level * 0.1),
+                    'speed': speed * direction * (1 + self.level * 0.06),
                     'color': random.choice([Colors.RED, Colors.YELLOW, Colors.MAGENTA, Colors.CYAN])
                 })
 
@@ -126,7 +126,7 @@ class Frogger(Game):
                     'row': row,
                     'x': float(x * self.cell_size),
                     'length': length,
-                    'speed': speed * direction * (1 + self.level * 0.1),
+                    'speed': speed * direction * (1 + self.level * 0.06),
                 }
 
                 if obj_type == 'turtle':

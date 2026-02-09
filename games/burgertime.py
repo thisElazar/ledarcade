@@ -204,11 +204,11 @@ class BurgerTime(Game):
     PEPPER_COLOR = Colors.YELLOW
 
     # Game constants
-    MOVE_SPEED = 30.0
-    CLIMB_SPEED = 25.0
-    ENEMY_SPEED = 12.0
-    ENEMY_CLIMB_SPEED = 8.0
-    INGREDIENT_FALL_SPEED = 45.0
+    MOVE_SPEED = 14.0
+    CLIMB_SPEED = 12.0
+    ENEMY_SPEED = 7.0
+    ENEMY_CLIMB_SPEED = 4.5
+    INGREDIENT_FALL_SPEED = 25.0
     CASCADE_DELAY = 0.12  # Stagger between cascade steps
 
     def __init__(self, display: Display):
@@ -698,8 +698,8 @@ class BurgerTime(Game):
             dx = self.chef_x - enemy['x']
             dy = self.chef_y - enemy['y']
 
-            h_speed = self.ENEMY_SPEED * (1 + self.level * 0.05)
-            v_speed = self.ENEMY_CLIMB_SPEED * (1 + self.level * 0.05)
+            h_speed = self.ENEMY_SPEED * (1 + self.level * 0.08)
+            v_speed = self.ENEMY_CLIMB_SPEED * (1 + self.level * 0.08)
 
             if enemy['on_ladder']:
                 ladder = self.get_ladder_at(enemy['x'], enemy['y'])
