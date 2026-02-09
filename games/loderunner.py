@@ -74,109 +74,135 @@ class LodeRunner(Game):
         self.move_timer = 0
         self.move_delay = 0.08
         self.dig_cooldown = 0
+        self.enemy_start_delay = 1.5  # Guards pause before chasing
 
         self.generate_level()
 
     def generate_level(self):
-        """Generate a random level."""
+        """Generate a structured level with connected floors."""
         # Clear
         self.tiles = [[self.EMPTY] * self.LEVEL_WIDTH for _ in range(self.LEVEL_HEIGHT)]
         self.enemies = []
         self.holes = {}
 
-        # Floor
-        for x in range(self.LEVEL_WIDTH):
-            self.tiles[self.LEVEL_HEIGHT - 1][x] = self.SOLID
+        # --- Define floor rows ---
+        # Bottom floor is SOLID, upper floors are BRICK
+        floor_spacing = 5
+        floor_rows = []
+        y = self.LEVEL_HEIGHT - 1
+        while y >= 3:
+            floor_rows.append(y)
+            y -= floor_spacing
+        # floor_rows[0] = ground, rest going upward
 
-        # Generate platforms
-        num_platforms = 6 + self.level
-        for _ in range(num_platforms):
-            px = random.randint(0, self.LEVEL_WIDTH - 8)
-            py = random.randint(4, self.LEVEL_HEIGHT - 4)
-            pw = random.randint(4, 10)
+        # --- Place platforms on each floor ---
+        gap_chance = min(0.12 + self.level * 0.02, 0.25)
+        for fi, fy in enumerate(floor_rows):
+            tile = self.SOLID if fi == 0 else self.BRICK
+            for x in range(self.LEVEL_WIDTH):
+                # Leave gaps on non-ground floors for falling through
+                if fi > 0 and random.random() < gap_chance:
+                    continue
+                self.tiles[fy][x] = tile
 
-            for x in range(px, min(px + pw, self.LEVEL_WIDTH)):
-                if self.tiles[py][x] == self.EMPTY:
-                    self.tiles[py][x] = self.BRICK
+        # --- Connect adjacent floors with ladders ---
+        # Ensure at least 2 ladders between each pair; more at lower levels
+        min_ladders = max(2, 4 - self.level // 3)
+        max_ladders = min_ladders + 2
+        for fi in range(len(floor_rows) - 1):
+            lower_y = floor_rows[fi]
+            upper_y = floor_rows[fi + 1]
+            num_ladders = random.randint(min_ladders, max_ladders)
 
-        # Generate ladders connecting platforms
-        num_ladders = 4 + self.level // 2
-        for _ in range(num_ladders):
-            lx = random.randint(1, self.LEVEL_WIDTH - 2)
-            ly1 = random.randint(4, self.LEVEL_HEIGHT - 6)
-            ly2 = ly1 + random.randint(3, 8)
+            # Spread ladders across the width
+            segment_w = self.LEVEL_WIDTH // num_ladders
+            for li in range(num_ladders):
+                seg_start = li * segment_w + 1
+                seg_end = min((li + 1) * segment_w - 1, self.LEVEL_WIDTH - 2)
+                lx = random.randint(seg_start, max(seg_start, seg_end))
 
-            for y in range(ly1, min(ly2, self.LEVEL_HEIGHT)):
-                if self.tiles[y][lx] == self.EMPTY or self.tiles[y][lx] == self.BRICK:
-                    self.tiles[y][lx] = self.LADDER
+                # Ladder spans from just above the lower floor to the upper floor
+                for ly in range(upper_y, lower_y):
+                    self.tiles[ly][lx] = self.LADDER
+                # Ensure the floor tile under the ladder is solid (not a gap)
+                if self.tiles[lower_y][lx] == self.EMPTY:
+                    self.tiles[lower_y][lx] = self.BRICK if fi > 0 else self.SOLID
 
-        # Generate ropes
-        num_ropes = 2 + self.level // 3
+        # --- Place ropes between floors for horizontal traversal ---
+        num_ropes = 2 + self.level // 2
         for _ in range(num_ropes):
-            rx = random.randint(2, self.LEVEL_WIDTH - 6)
-            ry = random.randint(4, self.LEVEL_HEIGHT - 8)
-            rw = random.randint(4, 8)
-
-            for x in range(rx, min(rx + rw, self.LEVEL_WIDTH)):
+            # Pick a gap between two floors
+            fi = random.randint(0, len(floor_rows) - 2)
+            lower_y = floor_rows[fi]
+            upper_y = floor_rows[fi + 1]
+            # Rope sits 2 rows above the upper floor (midway in the gap)
+            ry = upper_y + (lower_y - upper_y) // 2
+            rx = random.randint(2, self.LEVEL_WIDTH - 8)
+            rw = random.randint(5, 10)
+            for x in range(rx, min(rx + rw, self.LEVEL_WIDTH - 1)):
                 if self.tiles[ry][x] == self.EMPTY:
                     self.tiles[ry][x] = self.ROPE
 
-        # Place gold
-        self.gold_remaining = 5 + self.level * 2
+        # --- Place gold on reachable surfaces ---
+        self.gold_remaining = 4 + self.level
+        # Collect valid spots: empty tile with solid/brick/ladder below
+        valid_spots = []
+        for fy in floor_rows:
+            surface_y = fy - 1  # one tile above the floor
+            if surface_y < 1:
+                continue
+            for x in range(1, self.LEVEL_WIDTH - 1):
+                if self.tiles[surface_y][x] == self.EMPTY:
+                    below = self.tiles[surface_y + 1][x]
+                    if below in (self.BRICK, self.SOLID, self.LADDER):
+                        valid_spots.append((x, surface_y))
+
+        random.shuffle(valid_spots)
         placed = 0
-        attempts = 0
-        while placed < self.gold_remaining and attempts < 200:
-            gx = random.randint(1, self.LEVEL_WIDTH - 2)
-            gy = random.randint(2, self.LEVEL_HEIGHT - 3)
-
-            # Gold should be on a surface
-            if self.tiles[gy][gx] == self.EMPTY and self.tiles[gy + 1][gx] in [self.BRICK, self.SOLID, self.LADDER]:
-                self.tiles[gy][gx] = self.GOLD
-                placed += 1
-            attempts += 1
-
+        for gx, gy in valid_spots:
+            if placed >= self.gold_remaining:
+                break
+            self.tiles[gy][gx] = self.GOLD
+            placed += 1
         self.gold_remaining = placed
 
-        # Place player
+        # --- Place player on ground floor ---
         self.player_x = 2
         self.player_y = self.LEVEL_HEIGHT - 2
-        # Ensure player start is clear
+        # Ensure player start area is clear
         self.tiles[self.player_y][self.player_x] = self.EMPTY
+        # Ensure ground under player
+        self.tiles[self.LEVEL_HEIGHT - 1][self.player_x] = self.SOLID
 
-        # Add starting ladder near player so they can climb up
-        start_ladder_x = 4
-        for y in range(self.LEVEL_HEIGHT - 8, self.LEVEL_HEIGHT - 1):
-            self.tiles[y][start_ladder_x] = self.LADDER
-        # Add a platform at the top of starting ladder
-        for x in range(start_ladder_x - 2, start_ladder_x + 4):
-            if 0 <= x < self.LEVEL_WIDTH and self.tiles[self.LEVEL_HEIGHT - 8][x] == self.EMPTY:
-                self.tiles[self.LEVEL_HEIGHT - 8][x] = self.BRICK
-
-        # Place enemies
-        num_enemies = 2 + self.level
-        for _ in range(num_enemies):
-            attempts = 0
-            while attempts < 50:
-                ex = random.randint(5, self.LEVEL_WIDTH - 2)
-                ey = random.randint(2, self.LEVEL_HEIGHT - 3)
-
-                # Enemy should be on surface and away from player
-                if self.tiles[ey][ex] == self.EMPTY:
-                    if self.tiles[ey + 1][ex] in [self.BRICK, self.SOLID, self.LADDER]:
-                        dist = abs(ex - self.player_x) + abs(ey - self.player_y)
+        # --- Place enemies on reachable surfaces, far from player ---
+        # Original: 1 guard on level 1, slow ramp to ~5
+        num_enemies = min(1 + (self.level - 1) // 2, 5)
+        enemy_spots = []
+        for fy in floor_rows:
+            surface_y = fy - 1
+            if surface_y < 1:
+                continue
+            for x in range(1, self.LEVEL_WIDTH - 1):
+                if self.tiles[surface_y][x] in (self.EMPTY, self.LADDER):
+                    below = self.tiles[surface_y + 1][x]
+                    if below in (self.BRICK, self.SOLID, self.LADDER):
+                        dist = abs(x - self.player_x) + abs(surface_y - self.player_y)
                         if dist > 10:
-                            self.enemies.append({
-                                'x': ex,
-                                'y': ey,
-                                'falling': False,
-                                'trapped': False,
-                                'trap_timer': 0,
-                                'move_timer': 0,
-                            })
-                            break
-                attempts += 1
+                            enemy_spots.append((x, surface_y))
 
-        # Exit ladder at top
+        random.shuffle(enemy_spots)
+        for i in range(min(num_enemies, len(enemy_spots))):
+            ex, ey = enemy_spots[i]
+            # Don't place on gold
+            if self.tiles[ey][ex] == self.GOLD:
+                continue
+            self.enemies.append({
+                'x': ex, 'y': ey,
+                'falling': False, 'trapped': False,
+                'trap_timer': 0, 'move_timer': 0,
+            })
+
+        # --- Exit ladder at top ---
         self.exit_x = self.LEVEL_WIDTH // 2
         self.exit_open = False
 
@@ -211,7 +237,7 @@ class LodeRunner(Game):
         """Dig a hole in a brick. Returns True if successful."""
         if 0 <= x < self.LEVEL_WIDTH and 0 <= y < self.LEVEL_HEIGHT:
             if self.tiles[y][x] == self.BRICK:
-                self.holes[(x, y)] = 3.0  # Hole lasts 3 seconds
+                self.holes[(x, y)] = 10.0  # ~10s like original
                 return True
         return False
 
@@ -226,10 +252,12 @@ class LodeRunner(Game):
             self.holes[pos] -= dt
             if self.holes[pos] <= 0:
                 del self.holes[pos]
-                # Check if enemy was in hole
+                # Crush any enemy still in the hole — respawn at top
                 for enemy in self.enemies:
                     if (enemy['x'], enemy['y']) == pos:
                         enemy['trapped'] = False
+                        enemy['y'] = 0
+                        enemy['x'] = random.randint(1, self.LEVEL_WIDTH - 2)
 
         # Player movement
         if self.move_timer >= self.move_delay:
@@ -299,8 +327,11 @@ class LodeRunner(Game):
         if self.exit_open and self.player_y <= 1:
             self.next_level()
 
-        # Update enemies
-        self.update_enemies(dt)
+        # Guards pause briefly at level start before chasing
+        if self.enemy_start_delay > 0:
+            self.enemy_start_delay -= dt
+        else:
+            self.update_enemies(dt)
 
         # Check enemy collision
         for enemy in self.enemies:
@@ -317,7 +348,7 @@ class LodeRunner(Game):
             # Check if in hole
             if (enemy['x'], enemy['y']) in self.holes:
                 enemy['trapped'] = True
-                enemy['trap_timer'] = 2.5
+                enemy['trap_timer'] = 5.0  # ~5s like original
 
             if enemy['trapped']:
                 enemy['trap_timer'] -= dt
@@ -333,8 +364,9 @@ class LodeRunner(Game):
                     enemy['y'] += 1
                     continue
 
-            # Chase player
-            if enemy['move_timer'] >= 0.15:
+            # Chase player — guards get faster at higher levels
+            enemy_speed = max(0.12, 0.22 - self.level * 0.01)
+            if enemy['move_timer'] >= enemy_speed:
                 enemy['move_timer'] = 0
 
                 dx = 0
@@ -369,6 +401,7 @@ class LodeRunner(Game):
         else:
             self.player_x = 2
             self.player_y = self.LEVEL_HEIGHT - 2
+            self.enemy_start_delay = 1.5  # Brief reprieve on respawn
             # Reset enemies
             for enemy in self.enemies:
                 enemy['trapped'] = False
@@ -377,6 +410,7 @@ class LodeRunner(Game):
         """Advance to next level."""
         self.level += 1
         self.score += 500
+        self.enemy_start_delay = 1.5
         self.generate_level()
 
     def draw(self):
