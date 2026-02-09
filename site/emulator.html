@@ -985,6 +985,11 @@ _menu = EmulatorMenu(_catalog)
       source = source.replace(/^from \.(\w+) import /gm, 'from ' + pkgName + '.$1 import ');
       source = source.replace(/^sys\.path\..*/gm, '');
 
+      // Load numpy on demand if the source imports it
+      if (/^import numpy|^from numpy /m.test(source)) {
+        await pyodide.loadPackage('numpy');
+      }
+
       pyodide.runPython(source);
 
       if (pkgName && modName) {
@@ -1021,11 +1026,6 @@ _display.clear(Colors.BLACK)
 _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
     `);
     copyAndRender();
-
-    if (itemData.needs_numpy) {
-      setStatus('loading numpy...', 'loading');
-      await pyodide.loadPackage('numpy');
-    }
 
     const deps = itemData.deps || [];
     for (const dep of deps) {
