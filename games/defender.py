@@ -236,7 +236,8 @@ class Defender(Game):
 
         # Firing
         self.fire_cooldown -= dt
-        if input_state.action_l_held and self.fire_cooldown <= 0 and len(self.bullets) < MAX_BULLETS:
+        firing = input_state.action_l_held or input_state.action_r_held
+        if firing and self.fire_cooldown <= 0 and len(self.bullets) < MAX_BULLETS:
             self.bullets.append({
                 'wx': self.px + self.facing * 3,
                 'wy': self.py,
@@ -244,8 +245,8 @@ class Defender(Game):
             })
             self.fire_cooldown = FIRE_COOLDOWN
 
-        # Smart bomb
-        if input_state.action_r and self.smart_bombs > 0:
+        # Smart bomb (both buttons)
+        if input_state.action_l_held and input_state.action_r_held and self.smart_bombs > 0:
             self.smart_bombs -= 1
             self._smart_bomb()
 

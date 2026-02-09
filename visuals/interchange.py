@@ -345,5 +345,5 @@ class Interchange(Visual):
                 self.display.set_pixel(ix, iy, v['color'])
 
         # Type label
-        label = self.TYPES[self.type_index].upper()[:8]
+        label = self.TYPES[self.type_index].upper()
         self.display.draw_text_small(2, 1, label, (160, 160, 160))
