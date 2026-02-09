@@ -158,7 +158,6 @@ from .controls import Controls
 from .inputtest import InputTest
 from .shutdown import Shutdown
 from .refresh import Refresh
-from .rollback import Rollback
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
@@ -243,7 +242,6 @@ from .connect4demo import Connect4Demo
 from .dartsdemo import DartsDemo
 from .defenderdemo import DefenderDemo
 from .digdugdemo import DigDugDemo
-from .dnddemo import DnDDemo
 from .donkeykongdemo import DonkeyKongDemo
 from .flappydemo import FlappyDemo
 from .froggerdemo import FroggerDemo
@@ -369,7 +367,6 @@ ALL_VISUALS = [
     InputTest,
     Shutdown,
     Refresh,
-    Rollback,
     NewtonCradle,
     DblPendulum,
     OrbitsSolar,
@@ -513,7 +510,6 @@ ALL_VISUALS = [
     DartsDemo,
     DefenderDemo,
     DigDugDemo,
-    DnDDemo,
     DonkeyKongDemo,
     FlappyDemo,
     FroggerDemo,
@@ -640,7 +636,6 @@ __all__ = [
     'InputTest',
     'Shutdown',
     'Refresh',
-    'Rollback',
     'NewtonCradle',
     'DblPendulum',
     'OrbitsSolar',
