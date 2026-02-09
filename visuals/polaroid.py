@@ -53,6 +53,9 @@ class Polaroid(Visual):
         self.viewfinder_color = (40, 40, 45)
         self.button_color = (200, 50, 50)
 
+        # Auto-capture timer (counts only idle time, not photo display)
+        self.auto_timer = 0.0
+
         # Input timing
         self.rotate_held = 0.0
 
@@ -123,6 +126,7 @@ class Polaroid(Visual):
     def take_picture(self):
         """Trigger the flash and eject a photo."""
         self.flash_intensity = 1.0
+        self.auto_timer = 0.0
 
         # Start photo ejection
         self.photo_active = True
@@ -281,6 +285,13 @@ class Polaroid(Visual):
 
     def update(self, dt: float):
         self.time += dt
+
+        # Auto-capture: count idle time (no photo active) and snap every 5s
+        if not self.photo_active:
+            self.auto_timer += dt
+            if self.auto_timer >= 5.0:
+                self.auto_timer = 0.0
+                self.take_picture()
 
         # Smooth rotation
         angle_diff = self.target_angle - self.angle

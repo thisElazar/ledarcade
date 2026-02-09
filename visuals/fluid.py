@@ -305,7 +305,7 @@ class FluidTunnel(Visual):
     def reset(self):
         self.time = 0.0
         self.viz_mode = 0
-        self.viscosity = 0.001
+        self.viscosity = 0.0008
         self.diffusion = 0.0001
         self.shape_idx = 0
         self.overlay_text = ""
@@ -332,8 +332,8 @@ class FluidTunnel(Visual):
 
     # Re = U * L / viscosity.  U = 3.0 (inflow), L = 8/N (circle diameter).
     _RE_UL = 3.0 * 8.0 / N
-    _VISC_MIN = 0.0002
-    _VISC_MAX = 0.006
+    _VISC_MIN = 0.0003
+    _VISC_MAX = 0.002
 
     def _re_label(self):
         re = self._RE_UL / self.viscosity
