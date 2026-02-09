@@ -2,13 +2,11 @@
 Indy 500 Demo - AI Attract Mode
 ================================
 AI races around the oval track for idle screen demos.
-The AI follows the racing line, accelerating on straights and steering through turns.
 
 AI Strategy:
-- Calculate ideal angle to follow the track centerline
-- Steer to match the ideal racing angle
+- Steer toward a lookahead point on the track centerline
+- Lookahead distance increases when car drifts off-center (self-correcting)
 - Always accelerate (hold gas pedal)
-- Adjust steering based on upcoming track curvature
 """
 
 import math
@@ -71,52 +69,51 @@ class Indy500Demo(Visual):
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
     def _decide_steering(self):
-        """AI decision-making for steering."""
+        """AI decision-making: steer toward a lookahead point on the centerline."""
         game = self.game
 
-        # Current car position and angle
         car_x = game.x
         car_y = game.y
         car_angle = game.angle
 
-        # Calculate the ideal angle to follow the track centerline
-        # The track is an oval centered at (TRACK_CENTER_X, TRACK_CENTER_Y)
-        # We want to drive tangent to the ellipse, moving counterclockwise
-
-        # Vector from track center to car
+        # Find car's parametric angle on the ellipse
         dx = car_x - game.TRACK_CENTER_X
         dy = car_y - game.TRACK_CENTER_Y
+        track_angle = math.atan2(dy / game.TRACK_RADIUS_Y,
+                                 dx / game.TRACK_RADIUS_X)
 
-        # Calculate the angle from center to car (in ellipse space)
-        # Account for ellipse aspect ratio
-        track_angle = math.atan2(dy / game.TRACK_RADIUS_Y, dx / game.TRACK_RADIUS_X)
+        # Centerline point at car's current angle
+        center_x = game.TRACK_CENTER_X + game.TRACK_RADIUS_X * math.cos(track_angle)
+        center_y = game.TRACK_CENTER_Y + game.TRACK_RADIUS_Y * math.sin(track_angle)
 
-        # The tangent direction for counterclockwise motion on an ellipse
-        # Derivative of ellipse parameterization: (-a*sin(t), b*cos(t))
-        # Normalized to get direction
-        tangent_x = -game.TRACK_RADIUS_X * math.sin(track_angle)
-        tangent_y = game.TRACK_RADIUS_Y * math.cos(track_angle)
+        # Distance from centerline — look further ahead when drifting off-center
+        off_x = car_x - center_x
+        off_y = car_y - center_y
+        offset_dist = math.sqrt(off_x * off_x + off_y * off_y)
+        half_width = game.TRACK_WIDTH / 2
 
-        # Target angle is the tangent direction (counterclockwise around track)
-        target_angle = math.atan2(tangent_y, tangent_x)
+        base_lookahead = 0.25
+        correction = min(offset_dist / half_width, 1.0) * 0.2
+        lookahead = base_lookahead + correction
 
-        # Calculate angle difference (normalized to -pi to pi)
-        angle_diff = target_angle - car_angle
+        # Target point on centerline ahead of car (track_angle increases in
+        # the driving direction — counterclockwise on screen)
+        ahead_angle = track_angle + lookahead
+        target_x = game.TRACK_CENTER_X + game.TRACK_RADIUS_X * math.cos(ahead_angle)
+        target_y = game.TRACK_CENTER_Y + game.TRACK_RADIUS_Y * math.sin(ahead_angle)
+
+        # Desired heading toward the lookahead point
+        desired_angle = math.atan2(target_y - car_y, target_x - car_x)
+
+        # Angle difference (normalized to -pi..pi)
+        angle_diff = desired_angle - car_angle
         while angle_diff > math.pi:
             angle_diff -= 2 * math.pi
         while angle_diff < -math.pi:
             angle_diff += 2 * math.pi
 
-        # Steering threshold (dead zone to prevent oscillation)
-        threshold = 0.15
-
-        # Steer to match target angle
-        steer_left = False
-        steer_right = False
-
-        if angle_diff < -threshold:
-            steer_left = True
-        elif angle_diff > threshold:
-            steer_right = True
+        threshold = 0.08
+        steer_left = angle_diff < -threshold
+        steer_right = angle_diff > threshold
 
         return steer_left, steer_right

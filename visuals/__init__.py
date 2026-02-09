@@ -229,6 +229,8 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderVinyl, WonderCassette, WonderJake)
 from .agariodemo import AgarioDemo
 from .arkanoid_demo import ArkanoidDemo
+from .bloonsdemo import BloonsDemo
+from .bloonstddemo import BloonsTDDemo
 from .asteroidsdemo import AsteroidsDemo
 from .bombermandemo import BombermanDemo
 from .bowlingdemo import BowlingDemo
@@ -237,9 +239,11 @@ from .burgertimedemo import BurgerTimeDemo
 from .centipededemo import CentipedeDemo
 from .checkersdemo import CheckersDemo
 from .chessdemo import ChessDemo
+from .connect4demo import Connect4Demo
 from .dartsdemo import DartsDemo
 from .defenderdemo import DefenderDemo
 from .digdugdemo import DigDugDemo
+from .dnddemo import DnDDemo
 from .donkeykongdemo import DonkeyKongDemo
 from .flappydemo import FlappyDemo
 from .froggerdemo import FroggerDemo
@@ -252,6 +256,7 @@ from .jezzballdemo import JezzBallDemo
 from .lightsoutdemo import LightsOutDemo
 from .loderunnerdemo import LodeRunnerDemo
 from .lunarlanderdemo import LunarLanderDemo
+from .mancalademo import MancalaDemo
 from .monstermazedemo import MonsterMazeDemo
 from .mspacmandemo import MsPacManDemo
 from .nightdriverdemo import NightDriverDemo
@@ -259,8 +264,10 @@ from .othellodemo import OthelloDemo
 from .pacmandemo import PacManDemo
 from .pinballdemo import PinballDemo
 from .pipedreamdemo import PipeDreamDemo
+from .pooldemo import PoolDemo
 from .pongdemo import PongDemo
 from .qbertdemo import QBertDemo
+from .shuffleboarddemo import ShuffleboardDemo
 from .skifreedemo import SkiFreeDemo
 from .snakedemo import SnakeDemo
 from .spacecruisedemo import SpaceCruiseDemo
@@ -493,6 +500,8 @@ ALL_VISUALS = [
     AgarioDemo,
     ArkanoidDemo,
     AsteroidsDemo,
+    BloonsDemo,
+    BloonsTDDemo,
     BombermanDemo,
     BowlingDemo,
     BreakoutDemo,
@@ -500,9 +509,11 @@ ALL_VISUALS = [
     CentipedeDemo,
     CheckersDemo,
     ChessDemo,
+    Connect4Demo,
     DartsDemo,
     DefenderDemo,
     DigDugDemo,
+    DnDDemo,
     DonkeyKongDemo,
     FlappyDemo,
     FroggerDemo,
@@ -515,6 +526,7 @@ ALL_VISUALS = [
     LightsOutDemo,
     LodeRunnerDemo,
     LunarLanderDemo,
+    MancalaDemo,
     MonsterMazeDemo,
     MsPacManDemo,
     NightDriverDemo,
@@ -522,8 +534,10 @@ ALL_VISUALS = [
     PacManDemo,
     PinballDemo,
     PipeDreamDemo,
+    PoolDemo,
     PongDemo,
     QBertDemo,
+    ShuffleboardDemo,
     SkiFreeDemo,
     SnakeDemo,
     SpaceCruiseDemo,
