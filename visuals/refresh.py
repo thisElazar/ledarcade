@@ -37,14 +37,10 @@ def _git(*args, timeout=15):
         return False, ""
 
 
-def _short_hash():
-    ok, out = _git("rev-parse", "--short", "HEAD")
+def _short_hash(ref="HEAD"):
+    ok, out = _git("rev-parse", "--short", ref)
     return out if ok else "?"
 
-
-def _commit_date():
-    ok, out = _git("log", "-1", "--format=%Y-%m-%d", "HEAD")
-    return out if ok else "?"
 
 
 class Refresh(Visual):
@@ -65,8 +61,14 @@ class Refresh(Visual):
         self.restart_timer = 0.0
 
         # Current version info
-        self.version_hash = _short_hash()
-        self.version_date = _commit_date()
+        self.version_hash = _short_hash("HEAD")
+
+        # Fetch remote to check for updates
+        self.remote_hash = "?"
+        self.is_latest = False
+        _git("fetch", "origin", BRANCH, timeout=10)
+        self.remote_hash = _short_hash("origin/" + BRANCH)
+        self.is_latest = (self.version_hash == self.remote_hash)
 
     def handle_input(self, input_state) -> bool:
         if self.confirmed:
@@ -148,12 +150,15 @@ class Refresh(Visual):
         self.display.draw_line(2, 9, 61, 9, Colors.GRAY)
 
         # Version info
-        self.display.draw_text_small(2, 12, "V:" + self.version_hash, Colors.GRAY)
         branch_color = Colors.YELLOW if BRANCH == "main" else Colors.GREEN
-        self.display.draw_text_small(2, 20, BRANCH + " " + self.version_date, branch_color)
+        self.display.draw_text_small(2, 12, BRANCH, branch_color)
+        self.display.draw_text_small(2, 20, "NOW:" + self.version_hash, Colors.GRAY)
+        if self.is_latest:
+            self.display.draw_text_small(2, 28, "=LATEST", Colors.GREEN)
+        else:
+            self.display.draw_text_small(2, 28, "NEW:" + self.remote_hash, Colors.WHITE)
 
         # Description
-        self.display.draw_text_small(2, 30, "PULL + ", Colors.WHITE)
         self.display.draw_text_small(2, 38, "RESTART?", Colors.WHITE)
 
         # YES / NO options
