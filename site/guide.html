@@ -150,6 +150,18 @@
 @media (max-width: 500px) {
   .guide-section-hw { grid-template-columns: 1fr; }
 }
+.entry-ctrl {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  vertical-align: middle;
+  white-space: nowrap;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+}
 </style>
 </head>
 
@@ -157,10 +169,11 @@
 
 <nav class="site-nav">
   <a class="nav-brand" href="index.html">WONDER CABINET</a>
-  <a href="index.html">HOME</a>
   <a href="emulator.html">EMULATOR</a>
-  <a href="timeline.html">TIMELINE</a>
   <a href="guide.html" class="active">FIELD GUIDE</a>
+  <a href="history.html">HISTORY</a>
+
+  <a href="order.html">ORDER</a>
 </nav>
 
 <header>
@@ -206,7 +219,7 @@
       and visualization was designed from scratch to be beautiful at this resolution.
     </p>
     <p class="guide-intro">
-      Inside are 54 playable games, 119 visual experiences, and 44 AI-controlled game demos,
+      Inside are 54 playable games, 119 visual experiences, and 41 AI-controlled game demos,
       all running on a Raspberry Pi. The name comes from the Renaissance tradition of
       <em>Wunderkammern</em> &mdash; cabinets of curiosities that gathered natural specimens,
       scientific instruments, and works of art into a single room of wonder.
@@ -218,565 +231,566 @@
       minimum pixels needed to recognize a double helix? To see a flock emerge? To feel
       fire rising?
     </div>
+    <div class="guide-callout" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06);">
+      <strong style="color:#9a9284">Controls.</strong> Each entry is tagged with its input scheme:
+      <span class="entry-ctrl" style="color:#5a7a50">D-PAD + ACTION</span> joystick + either button &nbsp;
+      <span class="entry-ctrl" style="color:#7a6a50">ACTION ONLY</span> buttons only &nbsp;
+      <span class="entry-ctrl" style="color:#50607a">D-PAD ONLY</span> joystick only &nbsp;
+      <span class="entry-ctrl" style="color:#7a507a">D-PAD + L / R</span> buttons do different things &nbsp;
+      <span class="entry-ctrl" style="color:#6a6a50">L / R BROWSE</span> left/right to cycle
+    </div>
   </div>
 
   <!-- ---- THE ARCADE ---- -->
   <div class="guide-section" id="g-arcade">
-    <h3 style="color:#ffff00">THE ARCADE</h3>
+    <h3 style="color:#ffff00">ARCADE</h3>
     <p class="guide-intro">
-      54 playable games spanning the full history of the medium &mdash; from Pong (1972)
-      to Agar.io (2015). Every game reimagined for 4,096 pixels with authentic mechanics.
-      The golden age of arcades, shrunk to a grid you can hold in your hands.
+      54 playable games from Pong (1972) to Agar.io (2015), each rebuilt for 64&times;64 pixels
+      with authentic mechanics.
     </p>
 
     <h4 class="guide-subheader" style="color:#ffff00">ARCADE CLASSICS</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">ASTEROIDS</span>
-      <span class="entry-text"><span class="entry-year">1979, Atari</span> &mdash; Vector graphics in a wrap-around arena. Shoot rocks, they split into smaller rocks. Elegant physics: thrust, inertia, rotation. Ed Logg's masterpiece of minimalism.</span>
+      <span class="entry-text"><span class="entry-year">1979, Atari</span> &mdash; Rotate and thrust your ship, shoot asteroids that split into smaller pieces. Screen wraps. Survive and score. Designed by Ed Logg; one of the first games with vector graphics.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">BOMBERMAN</span>
-      <span class="entry-text"><span class="entry-year">1983, Hudson Soft</span> &mdash; Lay bombs on a grid, destroy walls, collect power-ups. Bombs chain-react. Timing and positioning are everything. The original one-more-game loop.</span>
+      <span class="entry-text"><span class="entry-year">1983, Hudson Soft</span> &mdash; Place bombs on a grid to destroy walls and enemies. Collect power-ups for range, speed, and extra bombs. Bombs chain-react. Clear all enemies to advance.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">BREAKOUT</span>
-      <span class="entry-text"><span class="entry-year">1976, Atari</span> &mdash; Steve Wozniak built the prototype; Steve Jobs sold it. Eight rows of colored bricks, authentic speed-up mechanics, paddle shrinks when the ball hits the ceiling.</span>
+      <span class="entry-text"><span class="entry-year">1976, Atari</span> &mdash; Move a paddle to bounce a ball into rows of bricks. Clear all bricks to win. Ball speeds up; paddle shrinks after hitting the ceiling. Steve Wozniak built the prototype.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">BURGERTIME</span>
-      <span class="entry-text"><span class="entry-year">1982, Data East</span> &mdash; Chef Peter Pepper walks across burger ingredients to assemble them while dodging Mr. Hot Dog, Mr. Pickle, and Mr. Egg. One of the strangest premises in arcade history.</span>
+      <span class="entry-text"><span class="entry-year">1982, Data East</span> &mdash; Walk across burger ingredients to drop them down platforms. Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Assemble all burgers to clear the level.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">CENTIPEDE</span>
-      <span class="entry-text"><span class="entry-year">1981, Atari</span> &mdash; Dona Bailey, one of the first women in game development, co-designed this trackball shooter. A centipede weaves down through a mushroom field; hit a segment and it splits in two.</span>
+      <span class="entry-text"><span class="entry-year">1981, Atari</span> &mdash; Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Clear the centipede to advance. Co-designed by Dona Bailey and Ed Logg.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">DEFENDER</span>
-      <span class="entry-text"><span class="entry-year">1981, Williams</span> &mdash; Eugene Jarvis's side-scrolling shooter with a scrolling radar display. Protect humanoids from alien abduction. Famously difficult, famously rewarding. The game that popularized the horizontal scrolling shooter.</span>
+      <span class="entry-text"><span class="entry-year">1981, Williams</span> &mdash; Side-scrolling shooter by Eugene Jarvis. Fly left or right, shoot aliens, rescue humanoids from abduction. Radar shows the full map. Hold both buttons for a smart bomb. Popularized the horizontal scrolling shooter.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">DIG DUG</span>
-      <span class="entry-text"><span class="entry-year">1982, Namco</span> &mdash; Dig tunnels through the earth and inflate underground monsters until they pop. Or drop rocks on them. A uniquely satisfying mechanic that has never been replicated.</span>
+      <span class="entry-text"><span class="entry-year">1982, Namco</span> &mdash; Dig tunnels underground and inflate enemies with your pump until they pop, or lure them under falling rocks. Clear all enemies to advance.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">DONKEY KONG</span>
-      <span class="entry-text"><span class="entry-year">1981, Nintendo</span> &mdash; Mario's debut (he was called &ldquo;Jumpman&rdquo;). Shigeru Miyamoto's first game. The cabinet where a plumber, a gorilla, and a damsel created the platformer genre.</span>
+      <span class="entry-text"><span class="entry-year">1981, Nintendo</span> &mdash; Climb platforms, jump over barrels, and reach the top to rescue Pauline. Mario&rsquo;s debut (originally &ldquo;Jumpman&rdquo;). Shigeru Miyamoto&rsquo;s first game and the origin of the platformer genre.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">FROGGER</span>
-      <span class="entry-text"><span class="entry-year">1981, Konami</span> &mdash; Cross five lanes of traffic, then hop across logs and turtles to reach home. Simple rules, infinite tension. One of the best-selling arcade games of all time.</span>
+      <span class="entry-text"><span class="entry-year">1981, Konami</span> &mdash; Cross five lanes of traffic, then hop across logs and turtles to reach home. Guide all five frogs home to clear the level. Don&rsquo;t get hit or fall in the water.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">GALAGA</span>
-      <span class="entry-text"><span class="entry-year">1981, Namco</span> &mdash; The risk-reward dual-ship capture mechanic: let the aliens kidnap your fighter, then rescue it for double firepower. Formation attacks and diving runs. The pinnacle of fixed shooters.</span>
+      <span class="entry-text"><span class="entry-year">1981, Namco</span> &mdash; Fixed-position shooter. Move left/right and fire at alien formations. Let a boss alien capture your ship, then rescue it for double firepower. Survive waves of diving attacks.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SPACE INVADERS</span>
-      <span class="entry-text"><span class="entry-year">1978, Taito</span> &mdash; Tomohiro Nishikado's game caused a 100-yen coin shortage in Japan. The aliens speed up as you destroy them &mdash; an accidental feature that became the defining mechanic.</span>
+      <span class="entry-text"><span class="entry-year">1978, Taito</span> &mdash; Shoot rows of aliens before they reach the bottom. They speed up as you destroy them &mdash; an accidental hardware feature that became the core mechanic. Designed by Tomohiro Nishikado.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">LODE RUNNER</span>
-      <span class="entry-text"><span class="entry-year">1983, Br&oslash;derbund</span> &mdash; Dig holes in platforms to trap guards, collect all the gold, escape to the top. One of the first games with a level editor. 150 levels of pure puzzle-platforming.</span>
+      <span class="entry-text"><span class="entry-year">1983, Broderbund</span> &mdash; Collect all gold on each level, then escape to the top. Dig holes to trap guards. 150 levels. One of the first games with a built-in level editor.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">LUNAR LANDER</span>
-      <span class="entry-text"><span class="entry-year">1979, Atari</span> &mdash; Manage thrust and rotation to soft-land on a craggy lunar surface. Physics-based gameplay before the term existed. Gentle on the throttle or you crater.</span>
+      <span class="entry-text"><span class="entry-year">1979, Atari</span> &mdash; Manage thrust and rotation to soft-land on a lunar surface. Land gently on a flat pad to score. Too much speed and you crash.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">MS. PAC-MAN</span>
-      <span class="entry-text"><span class="entry-year">1982, Midway</span> &mdash; The sequel that many consider superior. Faster, with more mazes and semi-random ghost behavior. The best-selling American arcade game of all time.</span>
+      <span class="entry-text"><span class="entry-year">1982, Midway</span> &mdash; Eat all dots while avoiding ghosts. Faster than Pac-Man with multiple mazes and semi-random ghost AI. The best-selling American arcade game.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">NIGHT DRIVER</span>
-      <span class="entry-text"><span class="entry-year">1976, Atari</span> &mdash; One of the earliest first-person driving games. White posts fly past against a black void. No road texture, no horizon &mdash; just speed and reflexes in the dark.</span>
+      <span class="entry-text"><span class="entry-year">1976, Atari</span> &mdash; One of the earliest first-person driving games. Steer between roadside posts against a black background. Stay on the road at increasing speeds.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">PAC-MAN</span>
-      <span class="entry-text"><span class="entry-year">1980, Namco</span> &mdash; Toru Iwatani wanted to attract women to arcades. He designed a game about eating. Each ghost has a unique personality: Blinky chases, Pinky ambushes, Inky flanks, Clyde wanders. The first game character.</span>
+      <span class="entry-text"><span class="entry-year">1980, Namco</span> &mdash; Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Each ghost has unique AI: Blinky chases, Pinky ambushes, Inky flanks, Clyde wanders. Designed by Toru Iwatani.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">PONG</span>
-      <span class="entry-text"><span class="entry-year">1972, Atari</span> &mdash; Where it all began. Allan Alcorn built it as a training exercise. Nolan Bushnell put it in a bar. The coin box overflowed. An industry was born.</span>
+      <span class="entry-text"><span class="entry-year">1972, Atari</span> &mdash; Two paddles, one ball. First to 11 wins. Allan Alcorn built it as a training exercise; Nolan Bushnell put it in a bar. The first commercially successful video game.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">Q*BERT</span>
-      <span class="entry-text"><span class="entry-year">1982, Gottlieb</span> &mdash; An isometric pyramid of cubes. Hop on each one to change its color while avoiding Coily the snake. The speech balloon of swear symbols when you fall off is iconic.</span>
+      <span class="entry-text"><span class="entry-year">1982, Gottlieb</span> &mdash; Hop on cubes in an isometric pyramid to change their colors. Change every cube to advance. Avoid Coily the snake and other enemies. Don&rsquo;t fall off the edges.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SNAKE</span>
-      <span class="entry-text"><span class="entry-year">1976 / 1997</span> &mdash; The snake genre began as Blockade, a 1976 coin-op by Gremlin Industries &mdash; two players walling each other off in real time. Nokia's Taneli Armanto reimagined it as a solo game for the Nokia 6110 in 1997: eat food, grow longer, don't hit yourself. Pre-installed on 400 million phones, it became the most-played game before smartphones.</span>
+      <span class="entry-text"><span class="entry-year">1976 / 1997</span> &mdash; Eat food, grow longer, don&rsquo;t hit yourself or the walls. Started as Blockade (1976, Gremlin Industries). Nokia&rsquo;s 1997 version shipped on 400 million phones.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">TETRIS</span>
-      <span class="entry-text"><span class="entry-year">1984, Alexey Pajitnov</span> &mdash; Created on an Elektronika 60 in Moscow. Stack tetrominoes, clear lines, chase the long piece. The subject of a Cold War licensing battle. Sold 520 million copies.</span>
+      <span class="entry-text"><span class="entry-year">1984, Alexey Pajitnov</span> &mdash; Stack falling tetrominoes, clear complete lines. Game ends when pieces reach the top. Created on an Elektronika 60 in Moscow. 520 million copies sold.</span>
     </div>
 
     <h4 class="guide-subheader" style="color:#ffff00">RETRO</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">ARKANOID</span>
-      <span class="entry-text"><span class="entry-year">1986, Taito</span> &mdash; Breakout reborn with power-ups, enemies, and a storyline. Laser paddle, catch ball, multi-ball, warp gates. The game that proved the brick-breaking genre had room to grow.</span>
+      <span class="entry-text"><span class="entry-year">1986, Taito</span> &mdash; Breakout with power-ups: laser paddle, catch ball, multi-ball, warp gates. Clear all bricks per level. An expanded take on brick-breaking with enemies and a storyline.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">DND</span>
-      <span class="entry-text"><span class="entry-year">1982, Mattel</span> &mdash; Inspired by Advanced Dungeons &amp; Dragons: Cloudy Mountain on Intellivision. Explore rooms, fight monsters, collect treasure. Turn-based combat on a grid &mdash; console dungeon-crawling distilled to 64&times;64 pixels.</span>
+      <span class="entry-text"><span class="entry-year">1982, Mattel</span> &mdash; Explore rooms, fight monsters, collect treasure. Turn-based grid combat inspired by Advanced Dungeons &amp; Dragons: Cloudy Mountain on Intellivision.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">INDY 500</span>
-      <span class="entry-text"><span class="entry-year">1977, Atari</span> &mdash; Top-down racing on an oval track. Simple controls, tight cornering, pure speed. One of the original Atari 2600 launch titles.</span>
+      <span class="entry-text"><span class="entry-year">1977, Atari</span> &mdash; Top-down racing on an oval track. Steer and accelerate to complete laps. One of the original Atari 2600 launch titles.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">JEZZBALL</span>
-      <span class="entry-text"><span class="entry-year">1992, Microsoft</span> &mdash; Trap bouncing balls by building walls. Claim 75% of the area to advance. Shipped with Windows Entertainment Pack. A puzzle game that rewards patience and spatial thinking.</span>
+      <span class="entry-text"><span class="entry-year">1992, Microsoft</span> &mdash; Trap bouncing balls by building walls. Claim 75% of the area to advance. Don&rsquo;t let a ball hit a wall while it&rsquo;s forming. Shipped with the Windows Entertainment Pack.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">PIPE DREAM</span>
-      <span class="entry-text"><span class="entry-year">1989, The Assembly Line</span> &mdash; Place pipe segments before the water arrives. A frantic real-time puzzle where you&rsquo;re always building just ahead of disaster. Originally released as Pipe Mania; renamed Pipe Dream for the US market by Lucasfilm Games.</span>
+      <span class="entry-text"><span class="entry-year">1989, The Assembly Line</span> &mdash; Place pipe segments before the water arrives. Build a path long enough to pass the level. Originally released as Pipe Mania; renamed Pipe Dream for the US market by Lucasfilm Games.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SKIFREE</span>
-      <span class="entry-text"><span class="entry-year">1991, Microsoft</span> &mdash; Chris Pirih's beloved Windows ski game. Dodge trees, rocks, and dogs. Then the Abominable Snowman appears and eats you. Everyone remembers the snowman.</span>
+      <span class="entry-text"><span class="entry-year">1991, Microsoft</span> &mdash; Ski downhill, dodging trees, rocks, and dogs. The Abominable Snowman chases you eventually. By Chris Pirih for Windows.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SPACE CRUISE</span>
-      <span class="entry-text">A side-scrolling starship odyssey inspired by Davidson's Math Blaster. Navigate asteroid fields, manage shields, fire lasers &mdash; the number-crunching stripped away, the arcade action kept.</span>
+      <span class="entry-text">Side-scrolling starship game inspired by Davidson&rsquo;s Math Blaster. Navigate asteroid fields, manage shields, fire lasers. Survive as long as possible.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">TRASHBLASTER</span>
-      <span class="entry-text">Shoot upward to blast falling garbage before it stacks too high. Based on the Trash Zapper mini-game from Davidson's Math Blaster, distilled to pure arcade reflex.</span>
+      <span class="entry-text">Shoot upward to blast falling garbage before it stacks to the top. Based on the Trash Zapper mini-game from Davidson&rsquo;s Math Blaster.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">3D MONSTER MAZE</span>
-      <span class="entry-text"><span class="entry-year">1981, Malcolm Evans</span> &mdash; Widely considered the first survival horror game. Escape a T-Rex stalking you through a 3D maze, originally on the ZX81 using character-block 3D rendering. Recreated in first-person on 64&times;64 pixels.</span>
+      <span class="entry-text"><span class="entry-year">1981, Malcolm Evans</span> &mdash; Escape a T-Rex stalking you through a first-person 3D maze. Widely considered the first survival horror game, originally on the ZX81.</span>
     </div>
 
     <h4 class="guide-subheader" style="color:#ffff00">MODERN</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">AGAR.IO</span>
-      <span class="entry-text"><span class="entry-year">2015, Matheus Valadares</span> &mdash; Absorb smaller cells, avoid bigger ones. The browser game that launched the .io genre. Exponential growth, split mechanics, and the perpetual fear of something larger.</span>
+      <span class="entry-text"><span class="entry-year">2015, Matheus Valadares</span> &mdash; Absorb smaller cells, avoid bigger ones. L button boosts speed, R button ejects mass. The browser game that launched the .io genre.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">FLAPPY BIRD</span>
-      <span class="entry-text"><span class="entry-year">2013, Dong Nguyen</span> &mdash; Tap to flap, thread through pipes. So maddeningly addictive that the creator pulled it from the App Store. Proof that the simplest mechanic can be the most compelling.</span>
+      <span class="entry-text"><span class="entry-year">2013, Dong Nguyen</span> &mdash; Press a button to flap, thread through pipes. One hit and you&rsquo;re done. So addictive the creator pulled it from the App Store.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">GEOMETRY DASH</span>
-      <span class="entry-text"><span class="entry-year">2013, RobTop</span> &mdash; One-button rhythm platformer. Tap to jump in sync with the geometry. The obstacle course scrolls at a fixed speed &mdash; memorize, react, repeat.</span>
+      <span class="entry-text"><span class="entry-year">2013, RobTop</span> &mdash; One-button platformer. Hold the button to jump; the level scrolls at a fixed speed. Hit any obstacle and you restart.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">PORTAL</span>
-      <span class="entry-text"><span class="entry-year">2007, Valve (inspired by)</span> &mdash; Place orange and blue portals to navigate puzzle rooms. Walk into one, emerge from the other. Spatial thinking with the logic turned inside out.</span>
+      <span class="entry-text"><span class="entry-year">2007, Valve (inspired by)</span> &mdash; Navigate puzzle rooms using portals. L button places a blue portal, R button places an orange one. Walk into one, emerge from the other. Reach the exit to clear each room.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SAND GAME</span>
-      <span class="entry-text"><span class="entry-year">2006, ha55ii / dan-ball.jp (inspired by)</span> &mdash; Falling sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes, acid dissolves, lava converts stone, ice freezes water. A creative toy with no score and no goal &mdash; just physics.</span>
+      <span class="entry-text"><span class="entry-year">2006, ha55ii / dan-ball.jp (inspired by)</span> &mdash; Falling-sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal &mdash; a creative toy.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">STACK</span>
-      <span class="entry-text">Time your drops to stack blocks perfectly. Each misalignment shrinks the next platform. Simple, meditative, and relentlessly punishing as the tower grows.</span>
+      <span class="entry-text">Press the button to drop a sliding block onto the stack. Misalignment shrinks the next platform. Game ends when the block gets too small. Score by stacking as high as possible.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">STICK RUNNER</span>
-      <span class="entry-text">An endless runner with a stick figure protagonist. Jump, duck, and dodge obstacles in a procedurally generated world. How far can you go?</span>
+      <span class="entry-text">Endless runner with a stick figure. Press the button to jump over obstacles. Hold longer to jump higher. Score by distance. Procedurally generated levels.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">2048</span>
-      <span class="entry-text"><span class="entry-year">2014, Gabriele Cirulli</span> &mdash; Slide numbered tiles on a grid. Matching tiles merge and double. Chase the 2048 tile. A weekend project that went viral and spawned a thousand clones.</span>
+      <span class="entry-text"><span class="entry-year">2014, Gabriele Cirulli</span> &mdash; Slide numbered tiles on a 4&times;4 grid. Matching tiles merge and double. Reach the 2048 tile to win. Game ends when the board fills with no moves left.</span>
     </div>
 
     <h4 class="guide-subheader" style="color:#ffff00">TOYS &amp; PUZZLES</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">BOP IT</span>
-      <span class="entry-text"><span class="entry-year">1996, Hasbro</span> &mdash; Bop it! Twist it! Pull it! A reflex game that barks commands faster and faster. The cabinet version uses button presses and directional inputs.</span>
+      <span class="entry-text"><span class="entry-year">1996, Hasbro</span> &mdash; Follow commands (bop, twist, pull) using button presses and directional inputs. Commands get faster each round. Miss one and you&rsquo;re out.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">LIGHTS OUT</span>
-      <span class="entry-text"><span class="entry-year">1995, Tiger Electronics</span> &mdash; Press a light and its neighbors toggle. Turn them all off. A puzzle with an elegant mathematical solution involving linear algebra over GF(2). Simple to play, deep to solve.</span>
+      <span class="entry-text"><span class="entry-year">1995, Tiger Electronics</span> &mdash; Press a light and its neighbors toggle. Turn all lights off to win. Solvable with linear algebra over GF(2), but trial and error works too.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">MASTERMIND</span>
-      <span class="entry-text"><span class="entry-year">1971, Mordecai Meirowitz</span> &mdash; Guess a hidden color code in limited tries. Each guess gets feedback: right color right place, right color wrong place. Information theory as a game.</span>
+      <span class="entry-text"><span class="entry-year">1971, Mordecai Meirowitz</span> &mdash; Guess a hidden color code in limited tries. Each guess gets feedback: right color in right place, or right color in wrong place. Deduce the code before your guesses run out.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">RUSH HOUR</span>
-      <span class="entry-text"><span class="entry-year">1996, ThinkFun</span> &mdash; Slide cars and trucks on a grid to free the red car. A spatial logic puzzle with solutions ranging from trivial to fiendish. Pure constraint satisfaction.</span>
+      <span class="entry-text"><span class="entry-year">1996, ThinkFun</span> &mdash; Slide cars and trucks on a grid to free the red car through the exit. Vehicles only move along their length. Puzzles range from easy to very hard.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SIMON</span>
-      <span class="entry-text"><span class="entry-year">1978, Ralph Baer</span> &mdash; Four colored quadrants flash in sequence. Repeat the pattern. Each round adds one more. A test of short-term memory that never gets easier.</span>
+      <span class="entry-text"><span class="entry-year">1978, Ralph Baer</span> &mdash; Four colored quadrants flash in sequence. Repeat the pattern. Each round adds one step. Game ends when you get the sequence wrong.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">15 PUZZLE</span>
-      <span class="entry-text"><span class="entry-year">1874, Noyes Chapman</span> &mdash; Slide 15 numbered tiles to put them in order. Sam Loyd offered $1,000 for solving the &ldquo;14-15&rdquo; variant &mdash; which is mathematically impossible. Group theory in a toy.</span>
+      <span class="entry-text"><span class="entry-year">1874, Noyes Chapman</span> &mdash; Slide 15 numbered tiles into order using the single empty space. Sam Loyd offered $1,000 for solving the &ldquo;14-15&rdquo; variant &mdash; which is mathematically impossible.</span>
     </div>
 
     <h4 class="guide-subheader" style="color:#ffff00">2 PLAYER</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">CHECKERS</span>
-      <span class="entry-text"><span class="entry-year">~1100 AD</span> &mdash; Jump and capture on a diagonal grid. Solved by computer in 2007 &mdash; perfect play from both sides always ends in a draw. Demo mode emulates Arthur Samuel&rsquo;s 1959 IBM program &mdash; a pioneer of machine learning through self-play.</span>
+      <span class="entry-text"><span class="entry-year">~1100 AD</span> &mdash; Jump and capture diagonally. Reach the far side to king a piece. Capture all opponent pieces or block all their moves to win. Solved in 2007 &mdash; perfect play always draws.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">CHESS</span>
-      <span class="entry-text"><span class="entry-year">~600 AD</span> &mdash; The royal game. 64 squares, 32 pieces, and more possible positions than atoms in the observable universe. The cabinet renders each piece as a recognizable sprite on the LED grid. Demo mode emulates Alex Bernstein&rsquo;s 1957 IBM program &mdash; one of the first complete chess programs.</span>
+      <span class="entry-text"><span class="entry-year">~600 AD</span> &mdash; 64 squares, 32 pieces. Checkmate the opponent&rsquo;s king to win. Each piece type rendered as a recognizable sprite on the LED grid.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">CONNECT 4</span>
-      <span class="entry-text"><span class="entry-year">1974, Milton Bradley</span> &mdash; Drop colored discs into columns, connect four in a row. Solved in 1988 &mdash; first player always wins with perfect play. Simple enough for children, deep enough for study.</span>
+      <span class="entry-text"><span class="entry-year">1974, Milton Bradley</span> &mdash; Drop colored discs into columns. Connect four in a row (horizontal, vertical, or diagonal) to win. Solved in 1988 &mdash; first player wins with perfect play.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">GO</span>
-      <span class="entry-text"><span class="entry-year">~500 BC</span> &mdash; The oldest board game still played in its original form. Place stones to surround territory. Simple rules, bottomless strategy. It took until 2016 for a computer (AlphaGo) to beat the world champion.</span>
+      <span class="entry-text"><span class="entry-year">~500 BC</span> &mdash; Place black or white stones to surround territory. The player controlling more territory wins. Simple rules, deep strategy. It took until 2016 for a computer (AlphaGo) to beat a top professional player.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">MANCALA</span>
-      <span class="entry-text"><span class="entry-year">~3000 BC</span> &mdash; The oldest known game. Sow seeds around pits, capture your opponent's. Found carved into stone in ancient Egypt, played across every continent. Mathematics of distribution and timing.</span>
+      <span class="entry-text"><span class="entry-year">~3000 BC</span> &mdash; Sow seeds around pits, capture your opponent&rsquo;s. The player with the most seeds wins. One of the oldest known games, found carved into stone across ancient Africa and the Middle East.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">OTHELLO</span>
-      <span class="entry-text"><span class="entry-year">1973, Goro Hasegawa</span> &mdash; Place discs to outflank your opponent&rsquo;s and flip them to your color. &ldquo;A minute to learn, a lifetime to master.&rdquo; Corner control is everything. Demo mode plays with positional strategy and alpha-beta search.</span>
+      <span class="entry-text"><span class="entry-year">1973, Goro Hasegawa</span> &mdash; Place discs to outflank your opponent&rsquo;s and flip them to your color. The player with the most discs when the board is full wins. Corner control is key.</span>
     </div>
 
     <h4 class="guide-subheader" style="color:#ffff00">BAR GAMES</h4>
 
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">BOWLING</span>
-      <span class="entry-text">Ten-pin bowling with realistic pin physics. Time your release, aim your angle. Strikes, spares, and splits on a 64-pixel lane.</span>
+      <span class="entry-text">Ten-pin bowling. Time your release and aim your angle. Standard scoring &mdash; strikes, spares, and splits over 10 frames.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">DARTS</span>
-      <span class="entry-text">501-style darts. A moving cursor and timing-based throws. Hit the bullseye, chase the doubles, finish on a double-out. Pub precision in pixel form.</span>
+      <span class="entry-text">501-style darts with a timing-based throw mechanic. Count down from 501; finish on a double-out. Aim with the joystick, throw with the button.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">PINBALL</span>
-      <span class="entry-text">A miniature pinball table with flippers, bumpers, ramps, and a plunger. Real ball physics at 64&times;64 resolution. Hit the targets, rack up the score, don't drain.</span>
+      <span class="entry-text">Pinball with flippers, bumpers, ramps, and a plunger. L button controls the left flipper, R button the right. Hit targets to score; don&rsquo;t let the ball drain.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">POOL</span>
-      <span class="entry-text">Billiards with real 2D physics. Aim, set power, break. Ball collisions with proper momentum transfer on a pocket-sized felt table.</span>
+      <span class="entry-text">8-ball billiards. Aim with the joystick, set power, and shoot. Pocket all your balls (stripes or solids) then sink the 8-ball to win.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SHUFFLEBOARD</span>
-      <span class="entry-text">Slide pucks down a long board to score in the highest-value zone. Power and aim. The bar game of kings, miniaturized.</span>
+      <span class="entry-text">Slide pucks down a board to land in the highest-scoring zone. Set angle and power. Knock opponents off if you can.</span>
     </div>
   </div>
 
   <!-- ---- FAMOUS PAINTINGS ---- -->
   <div class="guide-section" id="g-art">
-    <h3 style="color:#ffff00">FAMOUS PAINTINGS</h3>
+    <h3 style="color:#ffff00">ART</h3>
     <p class="guide-intro">
-      Five of the world's most recognizable paintings, re-imagined as animated LED interpretations.
-      Not reproductions &mdash; living, breathing pixel versions that capture the essence of each work.
+      Five well-known paintings as animated LED interpretations. Each captures the composition
+      and palette of the original with movement added &mdash; swirling skies, drifting lilies, churning waves.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">GREAT WAVE</span>
-      <span class="entry-text"><span class="entry-year">Hokusai, c. 1831</span> &mdash; &ldquo;The Great Wave off Kanagawa.&rdquo; The cresting wave with Mount Fuji behind it, animated with churning foam and spray. Japan's most famous artwork on 4,096 LEDs.</span>
+      <span class="entry-text"><span class="entry-year">Hokusai, c. 1831</span> &mdash; &ldquo;The Great Wave off Kanagawa.&rdquo; The cresting wave with Mount Fuji behind it, animated with churning foam and spray. Up/down adjusts animation speed.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">MONDRIAN</span>
-      <span class="entry-text"><span class="entry-year">Piet Mondrian, 1930s&ndash;40s</span> &mdash; Primary colors in a black grid. Neoplasticism rendered at the resolution it was almost designed for. The grid shifts and recomposes itself.</span>
+      <span class="entry-text"><span class="entry-year">Piet Mondrian, 1930s&ndash;40s</span> &mdash; Primary-color rectangles in a black grid, in the style of Mondrian&rsquo;s neoplastic compositions. The grid shifts and recomposes itself. Button generates a new layout.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">SCREAM</span>
-      <span class="entry-text"><span class="entry-year">Edvard Munch, 1893</span> &mdash; The swirling sky, the bridge, the figure with hands on face. Expressionist anguish distilled to pixel art. The sky ripples with animated anxiety.</span>
+      <span class="entry-text"><span class="entry-year">Edvard Munch, 1893</span> &mdash; The figure on the bridge with swirling sky. Animated with rippling colors. Up/down adjusts animation speed.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">STARRY NIGHT</span>
-      <span class="entry-text"><span class="entry-year">Vincent van Gogh, 1889</span> &mdash; The swirling night sky over Saint-R&eacute;my. Animated brushstrokes spiral across the panel, the village glows below, and the cypress tree reaches upward.</span>
+      <span class="entry-text"><span class="entry-year">Vincent van Gogh, 1889</span> &mdash; The swirling night sky over Saint-R&eacute;my. Animated brushstrokes spiral across the panel. Button spawns a shooting star.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,255,0,0.2)">
       <span class="entry-name" style="color:#ffff00">WATER LILIES</span>
-      <span class="entry-text"><span class="entry-year">Claude Monet, 1906</span> &mdash; Monet's Giverny pond with floating lilies and reflected sky. Impressionist color mixing rendered as gently drifting pixels. Peaceful and meditative.</span>
+      <span class="entry-text"><span class="entry-year">Claude Monet, 1906</span> &mdash; Monet&rsquo;s Giverny pond with floating lilies and reflected sky. Lilies drift slowly. Button adds a ripple.</span>
     </div>
   </div>
 
   <!-- ---- THE RULES OF LIFE ---- -->
   <div class="guide-section" id="g-automata">
-    <h3 style="color:#ff64ff">THE RULES OF LIFE</h3>
+    <h3 style="color:#ff64ff">AUTOMATA</h3>
     <p class="guide-intro">
-      Drop a few simple rules into a grid. Press play. Watch complexity emerge from nothing.
-      These simulations explore one of the deepest questions in science: how does order arise
-      from chaos? Each starts from randomness and organizes itself &mdash; spirals, flocks,
-      spots, waves &mdash; with no central control.
+      Cellular automata and agent simulations. Simple local rules produce complex global behavior &mdash;
+      spirals, flocks, spots, waves &mdash; all emerging from randomness with no central control.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">AURORA</span>
-      <span class="entry-text">Curtains of light undulating across the grid, inspired by the Northern Lights. Particles stream along magnetic field lines, producing shimmering green, violet, and cyan bands.</span>
+      <span class="entry-text">Particles streaming along magnetic field lines, producing shimmering bands of green, violet, and cyan. Inspired by the Northern Lights.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">BOIDS</span>
-      <span class="entry-text"><span class="entry-year">Craig Reynolds, 1987</span> &mdash; Three rules: stay close, match heading, don't collide. From these alone, flocking emerges. The same algorithm is now used in film VFX, robotics, and crowd simulation. No bird knows the plan. The flock has no leader.</span>
+      <span class="entry-text"><span class="entry-year">Craig Reynolds, 1987</span> &mdash; Three rules per agent: stay close, match heading, don&rsquo;t collide. Flocking behavior emerges with no central control. The same algorithm is used in film VFX, robotics, and crowd simulation.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">CYCLIC</span>
-      <span class="entry-text">A cyclic cellular automaton where each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures. Also known as Demon Spirals.</span>
+      <span class="entry-text">Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures. Also known as Demon Spirals.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">FADERS</span>
-      <span class="entry-text">Cells glow, fade, and reactivate based on their neighbors' brightness. Produces cascading pulses and traveling waves of light that sweep across the grid in organic patterns.</span>
+      <span class="entry-text">Cells glow, fade, and reactivate based on their neighbors' brightness. Produces cascading pulses and traveling waves of light.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">GYRE</span>
-      <span class="entry-text">Rotating vortex patterns driven by simple agent rules. Particles orbit local centers of rotation, forming hypnotic spiral structures that merge and split.</span>
+      <span class="entry-text">Rotating vortex patterns driven by simple agent rules. Particles orbit local centers of rotation, forming spirals that merge and split.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">HODGEPODGE</span>
-      <span class="entry-text"><span class="entry-year">Gerhardt &amp; Schuster</span> &mdash; A cellular automaton that models the Belousov-Zhabotinsky chemical reaction &mdash; a real chemical oscillator that produces spiral waves in a petri dish. The same self-organizing spirals appear here, emerging from random initial conditions.</span>
+      <span class="entry-text"><span class="entry-year">Gerhardt &amp; Schuster</span> &mdash; Models the Belousov-Zhabotinsky chemical reaction, a real oscillator that produces spiral waves in a petri dish. Self-organizing spirals emerge from random initial conditions.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">GAME OF LIFE</span>
-      <span class="entry-text"><span class="entry-year">John Conway, 1970</span> &mdash; The most famous cellular automaton. Four rules about birth, survival, and death produce an endless menagerie of gliders, oscillators, and self-replicating structures. Proven Turing-complete.</span>
+      <span class="entry-text"><span class="entry-year">John Conway, 1970</span> &mdash; Four rules about birth, survival, and death produce gliders, oscillators, and self-replicating structures. Proven Turing-complete. The most famous cellular automaton.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">MITOSIS</span>
-      <span class="entry-text">A simulation of cell division. Cells grow, duplicate their contents, pinch in half, and separate. The fundamental process of all life, animated on the grid.</span>
+      <span class="entry-text">A simulation of cell division. Cells grow, duplicate their contents, pinch in half, and separate.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">QUARKS</span>
-      <span class="entry-text">Particles with charge-like properties that attract and repel, forming fleeting bonds and structures. Inspired by particle physics but governed by simple local interaction rules.</span>
+      <span class="entry-text">Particles with charge-like properties that attract and repel, forming fleeting bonds and structures. Simple local rules produce behavior reminiscent of particle physics.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">RUG</span>
-      <span class="entry-text">An averaging cellular automaton that produces Persian-rug-like symmetric patterns. Each cell becomes the average of its neighbors, then saturates, creating kaleidoscopic woven textures.</span>
+      <span class="entry-text">An averaging cellular automaton. Each cell becomes the average of its neighbors, then saturates, producing symmetric patterns that look like woven rugs.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">SANDPILE</span>
-      <span class="entry-text"><span class="entry-year">Bak, Tang &amp; Wiesenfeld, 1987</span> &mdash; The Abelian Sandpile Model. Drop grains one at a time. Watch chain-reaction avalanches form fractal patterns. This is self-organized criticality &mdash; the mechanism behind power laws in earthquakes and markets.</span>
+      <span class="entry-text"><span class="entry-year">Bak, Tang &amp; Wiesenfeld, 1987</span> &mdash; The Abelian Sandpile Model. Drop grains one at a time; chain-reaction avalanches form fractal patterns. Demonstrates self-organized criticality &mdash; the mechanism behind power laws in earthquakes and markets.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">SLIME</span>
-      <span class="entry-text"><span class="entry-year">Jeff Jones, 2010</span> &mdash; Agents that deposit and follow chemical trails, mimicking slime mold (Physarum polycephalum). From simple deposit-sense-turn rules, networks form that are eerily similar to the Tokyo rail system.</span>
+      <span class="entry-text"><span class="entry-year">Jeff Jones, 2010</span> &mdash; Agents deposit and follow chemical trails, mimicking slime mold (Physarum polycephalum). Simple deposit-sense-turn rules produce networks similar to real transport systems.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">STAR WARS CA</span>
-      <span class="entry-text">A totalistic cellular automaton with birth/survival rules inspired by the Star Wars universe. Produces complex, long-lived patterns of oscillating structures and traveling sparks.</span>
+      <span class="entry-text">A totalistic cellular automaton with birth/survival rules. Produces long-lived oscillating structures and traveling sparks.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,100,255,0.25)">
       <span class="entry-name" style="color:#ff64ff">WOLFRAM</span>
-      <span class="entry-text"><span class="entry-year">Stephen Wolfram, 1983</span> &mdash; 256 elementary cellular automata, each defined by a single number. Rule 30 is used as a random number generator. Rule 110 is Turing-complete &mdash; a 1D grid that can compute anything.</span>
+      <span class="entry-text"><span class="entry-year">Stephen Wolfram, 1983</span> &mdash; 256 elementary 1D cellular automata, each defined by a single number. Rule 30 generates randomness; Rule 110 is Turing-complete.</span>
     </div>
   </div>
 
   <!-- ---- DIGITAL DREAMS ---- -->
   <div class="guide-section" id="g-digital">
-    <h3 style="color:#64ffff">DIGITAL DREAMS</h3>
+    <h3 style="color:#64ffff">DIGITAL</h3>
     <p class="guide-intro">
-      The demoscene is an underground computer art movement born in the 1980s &mdash;
-      programmers competing to create the most beautiful real-time effects in the
-      smallest possible code. Many of these techniques come directly from that tradition.
+      Demoscene effects and procedural graphics. Many of these techniques come from the 1980s
+      tradition of programmers competing to create real-time visual effects in minimal code.
     </p>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">AMIGA BARS</span>
-      <span class="entry-text">Metallic horizontal gradient bars bouncing on sine waves. A tribute to the Amiga copper chip &mdash; a coprocessor that could change colors mid-scanline. The signature effect of late-80s demos.</span>
+      <span class="entry-text">Metallic gradient bars bouncing on sine waves. Uses the Amiga copper chip technique &mdash; changing colors mid-scanline. A signature effect of late-80s demos.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">FLUX</span>
-      <span class="entry-text">Flowing particle streams guided by time-varying vector fields. Particles trace smooth curves through space, creating ribbons of color that ebb and surge.</span>
+      <span class="entry-text">Particle streams guided by time-varying vector fields. Particles trace smooth curves, creating ribbons of color.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">LARSON SCAN</span>
-      <span class="entry-text">The sweeping red eye of a Cylon from Battlestar Galactica (and Kit from Knight Rider). A single bright dot bounces back and forth with a fading trail. Also called a Larson Scanner after Glen A. Larson.</span>
+      <span class="entry-text">A bright dot sweeping back and forth with a fading trail &mdash; the Cylon eye from Battlestar Galactica (and Kit from Knight Rider). Named after producer Glen A. Larson.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">MATRIX RAIN</span>
-      <span class="entry-text">Falling green characters with trail fading, inspired by the film's &ldquo;digital rain&rdquo; effect. Designed by Simon Whiteley, who scanned his wife's Japanese cookbook for the characters.</span>
+      <span class="entry-text">Falling green characters with trail fading, from the film&rsquo;s &ldquo;digital rain&rdquo; effect. Designed by Simon Whiteley using characters scanned from a Japanese cookbook.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">MAZE</span>
-      <span class="entry-text">A 3D maze screensaver in the style of Windows 95. First-person perspective as the camera navigates through corridors, making turns at intersections. Pure nostalgia.</span>
+      <span class="entry-text">First-person maze navigation in the style of the Windows 95 screensaver. The camera auto-navigates through corridors and intersections.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">MOBIUS</span>
-      <span class="entry-text">A rotating M&ouml;bius strip &mdash; the surface with only one side. 3D projection of the twisted band, rendered as a wireframe or shaded surface spinning in space.</span>
+      <span class="entry-text">A rotating M&ouml;bius strip &mdash; the one-sided surface discovered in 1858. 3D wireframe or shaded projection spinning in space.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">MOIRE</span>
-      <span class="entry-text">Overlapping line patterns create shimmering moir&eacute; interference fringes. Two grids, slightly offset and rotating, produce organic flowing shapes from pure geometry.</span>
+      <span class="entry-text">Two overlapping grids, slightly offset and rotating, produce shimmering moir&eacute; interference patterns.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">RAINBOW</span>
-      <span class="entry-text">Sweeping HSV color gradients across the entire panel. Simple and hypnotic &mdash; a cycling rainbow that fills the grid with smoothly shifting hues.</span>
+      <span class="entry-text">Cycling HSV color gradients sweeping across the panel.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">ROTOZOOM</span>
-      <span class="entry-text">Simultaneous rotation and zoom of a procedural texture using rotation matrix math. A staple of Amiga and Atari ST demos. The texture wraps infinitely.</span>
+      <span class="entry-text">Simultaneous rotation and zoom of a procedural texture using rotation matrix math. A staple of Amiga and Atari ST demos.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">SINE SCROLLER</span>
-      <span class="entry-text">Text scrolling along a sine wave. The classic demoscene intro effect &mdash; a message undulates across the screen, each character bobbing independently on a sinusoidal path.</span>
+      <span class="entry-text">Text scrolling along a sine wave &mdash; the classic demoscene intro effect. Each character bobs independently on a sinusoidal path.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">TRANCE</span>
-      <span class="entry-text">Pulsing concentric shapes and strobing color patterns. A hypnotic tunnel of expanding and contracting geometric forms synced to an internal rhythm.</span>
+      <span class="entry-text">Pulsing concentric shapes and strobing color patterns forming an expanding/contracting tunnel effect.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">TRUCHET TILES</span>
-      <span class="entry-text"><span class="entry-year">S&eacute;bastien Truchet, 1704</span> &mdash; Quarter-circle tiles placed randomly create flowing organic curves. A Dominican priest's mathematical observation, over 300 years old and still mesmerizing.</span>
+      <span class="entry-text"><span class="entry-year">S&eacute;bastien Truchet, 1704</span> &mdash; Quarter-circle tiles placed randomly create flowing organic curves. Discovered by a Dominican priest over 300 years ago.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">TWISTER</span>
-      <span class="entry-text">A rotating 3D column effect. Vertical bars twist and warp as if wrapped around a spinning cylinder. Another demoscene staple, creating the illusion of depth from 2D math.</span>
+      <span class="entry-text">Vertical bars twist as if wrapped around a spinning cylinder. A demoscene staple creating depth from 2D math.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(100,255,255,0.2)">
       <span class="entry-name" style="color:#64ffff">XOR PATTERN</span>
-      <span class="entry-text">XOR the x and y coordinates of each pixel and map the result to color. A single bitwise operation produces intricate recursive patterns reminiscent of Sierpinski triangles.</span>
+      <span class="entry-text">XOR the x and y coordinates of each pixel, map the result to color. A single bitwise operation produces Sierpinski-like recursive patterns.</span>
     </div>
   </div>
 
   <!-- ---- THE GALLERY ---- -->
   <div class="guide-section" id="g-gallery">
-    <h3 style="color:#b4a032">THE GALLERY</h3>
+    <h3 style="color:#b4a032">GALLERY</h3>
     <p class="guide-intro">
-      3D virtual museums you can walk through. Each gallery is a raycasted first-person space
-      with paintings on the walls &mdash; framed visuals and sprites from the collection, hung in
-      themed wings. Use the joystick to explore.
+      Walkable 3D museums built with raycasting. Each gallery has framed visuals and sprites
+      from the collection hung on the walls. Use the joystick to walk through.
     </p>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">ART GALLERY</span>
-      <span class="entry-text">A gallery wing housing the famous paintings collection &mdash; Starry Night, Water Lilies, Great Wave, Mondrian, and Scream on the walls of a 3D space.</span>
+      <span class="entry-text">3D gallery with the famous paintings collection on the walls &mdash; Starry Night, Water Lilies, Great Wave, Mondrian, and Scream.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">AUTOMATA WING</span>
-      <span class="entry-text">Walk through a wing dedicated to cellular automata. Framed snapshots of Life, Hodgepodge, Wolfram, and more &mdash; complexity frozen on gallery walls.</span>
+      <span class="entry-text">3D gallery with framed snapshots of cellular automata &mdash; Life, Hodgepodge, Wolfram, and more.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">DIGITAL WING</span>
-      <span class="entry-text">The demoscene effects on display. Plasma, rotozoom, copper bars, and matrix rain captured as gallery pieces in a virtual corridor.</span>
+      <span class="entry-text">3D gallery with demoscene effects on the walls &mdash; plasma, rotozoom, copper bars, and matrix rain.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">EFFECTS LAB</span>
-      <span class="entry-text">An experimental gallery showcasing visual effects and particle systems. Walk past shimmering frames of fire, fluid, and light.</span>
+      <span class="entry-text">3D gallery with visual effects and particle systems &mdash; fire, fluid, and light simulations framed on the walls.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">SALON</span>
-      <span class="entry-text">A curated salon-style gallery with a mix of highlights from across all categories. The greatest hits of the collection in a single walkable space.</span>
+      <span class="entry-text">A salon-style gallery with highlights from across all categories in a single walkable space.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">SCIENCE WING</span>
-      <span class="entry-text">Scientific visualizations on the walls &mdash; fluid dynamics, orbits, neurons, DNA. A museum of computation and natural law.</span>
+      <span class="entry-text">3D gallery with scientific visualizations on the walls &mdash; fluid dynamics, orbits, neurons, DNA.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">SMB3 MUSEUM</span>
-      <span class="entry-text">A gallery dedicated to Super Mario Bros. 3 sprite art. Walk past framed scenes and characters from one of the greatest NES games ever made.</span>
+      <span class="entry-text">3D gallery with Super Mario Bros. 3 sprite art. Framed scenes and characters from the NES classic.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">SPRITE MUSEUM</span>
-      <span class="entry-text">A museum of classic video game sprite art. Characters from across gaming history displayed as framed pixel art in a 3D walkable gallery.</span>
+      <span class="entry-text">3D gallery with classic video game sprite art. Characters from across gaming history framed on the walls.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">ADVENTURE TIME</span>
-      <span class="entry-text">The Land of Ooo as a walkable sprite museum. 37 character sheets from the Adventure Time video games &mdash; Finn, Jake, Marceline, Ice King, Princess Bubblegum, Flame Princess, Lemongrab, LSP, and dozens more &mdash; framed in gold on dungeon walls. Sprites ripped by <strong>Ploaj</strong>, <strong>Dazz</strong>, and <strong>Frario</strong> on The Spriters Resource (spriters-resource.com).</span>
+      <span class="entry-text">3D gallery with 37 Adventure Time character sheets &mdash; Finn, Jake, Marceline, Ice King, Princess Bubblegum, and more. Sprites ripped by <strong>Ploaj</strong>, <strong>Dazz</strong>, and <strong>Frario</strong> (The Spriters Resource).</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,160,50,0.25)">
       <span class="entry-name" style="color:#b4a032">KIRBY MUSEUM</span>
-      <span class="entry-text">A gallery dedicated to Kirby&rsquo;s Adventure sprite art. The pink puffball and friends from Dream Land, framed and displayed in a walkable 3D museum.</span>
+      <span class="entry-text">3D gallery with Kirby&rsquo;s Adventure sprite art. The pink puffball and friends from Dream Land framed on the walls.</span>
     </div>
   </div>
 
   <!-- ---- DOMESTIC NOSTALGIA ---- -->
   <div class="guide-section" id="g-household">
-    <h3 style="color:#ff8000">DOMESTIC NOSTALGIA</h3>
+    <h3 style="color:#ff8000">HOUSEHOLD</h3>
     <p class="guide-intro">
-      The visual detritus of everyday life, elevated. Screensavers you grew up with, toys you forgot
-      you loved, the ambient background of domestic existence &mdash; given a second life in pixels.
+      Familiar domestic objects and screensavers. Lava lamps, bouncing logos, aquariums,
+      and other things you might find in a living room.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">CAT</span>
-      <span class="entry-text">A pixel cat doing pixel cat things. Walking, sitting, sleeping, chasing a laser dot. The internet's favorite animal, rendered at its most essential resolution.</span>
+      <span class="entry-text">A pixel cat walking, sitting, sleeping, and chasing a laser dot.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">CLOCK</span>
-      <span class="entry-text">A working digital clock. Hours, minutes, and seconds displayed on the LED matrix. Functional, beautiful, and a reminder that this is, at its heart, a computer.</span>
+      <span class="entry-text">A working digital clock. Hours, minutes, and seconds on the LED matrix.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">DVD</span>
-      <span class="entry-text"><span class="entry-year">c. 2000</span> &mdash; The iconic bouncing DVD logo screensaver. Color changes on every wall hit. The whole screen flashes when it hits the corner. You know you've been waiting for it.</span>
+      <span class="entry-text"><span class="entry-year">c. 2000</span> &mdash; The bouncing DVD logo screensaver. Changes color on every wall hit. The screen flashes when it hits the corner.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">LAVA LAMP</span>
-      <span class="entry-text"><span class="entry-year">Edward Craven Walker, 1963</span> &mdash; Wax blobs rise and fall through heated liquid. Metaballs simulate the organic splitting and merging. The definitive ambient decoration of the 1960s and '70s.</span>
+      <span class="entry-text"><span class="entry-year">Edward Craven Walker, 1963</span> &mdash; Wax blobs rise and fall through heated liquid. Metaballs simulate the organic splitting and merging.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">NEWTON'S CRADLE</span>
-      <span class="entry-text">Five suspended steel balls transferring momentum. Pull one back, release, and watch the energy pass through. Conservation of momentum and energy, made kinetic and meditative.</span>
+      <span class="entry-text">Five suspended steel balls transferring momentum. Pull one back, release, and watch the energy pass through.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">POLAROID</span>
-      <span class="entry-text">An instant camera that &ldquo;photographs&rdquo; other visuals in the collection. The image develops slowly in the classic Polaroid white frame. Nostalgia inside nostalgia.</span>
+      <span class="entry-text">An instant camera that &ldquo;photographs&rdquo; other visuals in the collection. The image develops slowly in the classic Polaroid white frame.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">AQUARIUM</span>
-      <span class="entry-text">A tropical fish tank rendered in pixels. Eight species school loosely through swaying plants, bubbles rise from the substrate, and caustic light patterns shimmer on the gravel. Three color schemes &mdash; Tropical, Moonlight, and Sunset &mdash; turn the display into a living window.</span>
+      <span class="entry-text">A tropical fish tank. Eight species school through swaying plants with rising bubbles. Three color schemes: Tropical, Moonlight, and Sunset.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,128,0,0.25)">
       <span class="entry-name" style="color:#ff8000">SOLITAIRE</span>
-      <span class="entry-text"><span class="entry-year">1990, Wes Cherry</span> &mdash; The famous Windows Solitaire victory cascade. Cards tumble and bounce across the screen in arcing trails. The reward animation that launched a thousand procrastinations.</span>
+      <span class="entry-text"><span class="entry-year">1990, Wes Cherry</span> &mdash; The Windows Solitaire victory cascade. Cards tumble and bounce across the screen in arcing trails.</span>
     </div>
   </div>
 
   <!-- ---- MACHINES THAT CHANGED THE WORLD ---- -->
   <div class="guide-section" id="g-mechanics">
-    <h3 style="color:#b464ff">MACHINES THAT CHANGED THE WORLD</h3>
+    <h3 style="color:#b464ff">MECHANICS</h3>
     <p class="guide-intro">
-      Working models of machines that bent the arc of civilization &mdash; from ancient
-      astronomical computers to the engines that powered the Industrial Revolution.
-      Each one animates the actual mechanical principles: gears mesh, pistons fire,
-      shuttles fly.
+      Animated mechanical models from ancient astronomical instruments to Industrial Revolution
+      engines. Each shows the actual working mechanism &mdash; gears meshing, pistons firing, shuttles flying.
     </p>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">ANTIKYTHERA MECHANISM</span>
-      <span class="entry-text"><span class="entry-year">c. 100 BC</span> &mdash; The first analog computer. An ancient Greek hand-powered orrery with interlocking bronze gears that predicted astronomical positions and eclipses. Nothing comparable was built for another 1,500 years.</span>
+      <span class="entry-text"><span class="entry-year">c. 100 BC</span> &mdash; Ancient Greek analog computer with interlocking bronze gears that predicted astronomical positions and eclipses. Nothing comparable was built for 1,500 years.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">ARCHIMEDES' SCREW</span>
-      <span class="entry-text"><span class="entry-year">c. 250 BC</span> &mdash; A helical surface inside a cylinder, turned by hand to raise water. Still used today for irrigation and wastewater. 2,300 years of continuous service for one simple idea.</span>
+      <span class="entry-text"><span class="entry-year">c. 250 BC</span> &mdash; A helical surface inside a cylinder, turned by hand to raise water. Still used today for irrigation and wastewater.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">ASTROLABE</span>
-      <span class="entry-text"><span class="entry-year">c. 200 BC &ndash; 1600s</span> &mdash; The &ldquo;medieval smartphone.&rdquo; A brass instrument that could tell time, find latitude, predict sunrise and sunset, and locate stars. Carried by astronomers and navigators for over a thousand years.</span>
+      <span class="entry-text"><span class="entry-year">c. 200 BC &ndash; 1600s</span> &mdash; A brass instrument for telling time, finding latitude, predicting sunrise/sunset, and locating stars. Used by astronomers and navigators for over a thousand years.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">BEAM ENGINE</span>
-      <span class="entry-text"><span class="entry-year">1769</span> &mdash; James Watt's separate condenser steam engine powered the Industrial Revolution. The iconic rocking beam links a piston and cylinder to a flywheel. The full four-stroke cycle, animated.</span>
+      <span class="entry-text"><span class="entry-year">1769</span> &mdash; Watt&rsquo;s separate condenser transformed Newcomen&rsquo;s earlier engine into the workhorse of the Industrial Revolution. The rocking beam links piston to flywheel.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">CAMSHAFT</span>
-      <span class="entry-text">A rotating camshaft with eccentric lobes operating valve followers. The heartbeat of every internal combustion engine &mdash; converting rotation into precisely timed reciprocating motion.</span>
+      <span class="entry-text">A rotating camshaft with eccentric lobes operating valve followers. Converts rotation into precisely timed reciprocating motion &mdash; the basis of internal combustion valve timing.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">CURTA CALCULATOR</span>
-      <span class="entry-text"><span class="entry-year">1948</span> &mdash; Curt Herzstark's legendary handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing. Computation before electricity.</span>
+      <span class="entry-text"><span class="entry-year">1948</span> &mdash; Curt Herzstark's handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">GRANDFATHER CLOCK</span>
-      <span class="entry-text"><span class="entry-year">1656</span> &mdash; A longcase pendulum clock with escapement mechanism. The pendulum swings, the escape wheel ticks, the hands turn. Christiaan Huygens' invention that made accurate timekeeping possible.</span>
+      <span class="entry-text"><span class="entry-year">Christiaan Huygens, 1656</span> &mdash; Longcase pendulum clock with escapement mechanism. The pendulum swings, the escape wheel ticks, the hands turn.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">GUTENBERG PRESS</span>
-      <span class="entry-text"><span class="entry-year">c. 1440</span> &mdash; The movable type printing press that democratized knowledge. The full mechanical cycle: inking, bed slide, press down, impression, release. Before Gutenberg, a book cost as much as a house.</span>
+      <span class="entry-text"><span class="entry-year">c. 1440</span> &mdash; Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">GYROSCOPE</span>
-      <span class="entry-text">A spinning rotor that resists changes to its orientation. Precession, nutation, and angular momentum made visible. The physics that keeps satellites pointed and bicycles upright.</span>
+      <span class="entry-text">A spinning rotor that resists changes to its orientation. Demonstrates precession, nutation, and conservation of angular momentum.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">JACQUARD LOOM</span>
-      <span class="entry-text"><span class="entry-year">1804</span> &mdash; Punch cards controlling a weaving loom &mdash; the direct ancestor of computer programming. Ada Lovelace saw this machine and made the connection to general-purpose computation. A textile machine that led to software.</span>
+      <span class="entry-text"><span class="entry-year">1804</span> &mdash; Punch cards controlling a weaving loom &mdash; the direct ancestor of computer programming. Babbage modeled his Analytical Engine on its logic; Lovelace saw the deeper computational implications.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">LOCOMOTIVE</span>
-      <span class="entry-text">Side-view cutaway with driving wheels, coupling rods, and crankshaft. The crank-slider mechanism converts the piston's linear motion into rotary motion &mdash; the mechanical linkage that moved the world.</span>
+      <span class="entry-text">Side-view cutaway with driving wheels, coupling rods, and crankshaft. The crank-slider mechanism converts the piston's linear motion into rotary motion.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">LOOM</span>
-      <span class="entry-text">A working weaving loom. The shuttle passes through the warp threads, the heddles lift, the beater presses. Cloth forms row by row. Textile production at its most fundamental.</span>
+      <span class="entry-text">A working weaving loom. The shuttle passes through the warp threads, the heddles lift, the beater presses. Cloth forms row by row.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">MODEL T</span>
-      <span class="entry-text"><span class="entry-year">1908, Henry Ford</span> &mdash; The car that put America on wheels. Animated cross-section showing the engine, transmission, and drive train. Mass production made visible in 64&times;64 pixels.</span>
+      <span class="entry-text"><span class="entry-year">1908, Henry Ford</span> &mdash; Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">ORRERY</span>
@@ -784,15 +798,15 @@
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">PROJECTOR</span>
-      <span class="entry-text">A film projector with spinning reels, film threading through the gate, and a flickering beam of light. The mechanical poetry of cinema &mdash; 24 still images per second becoming motion.</span>
+      <span class="entry-text">A film projector with spinning reels, film threading through the gate, and a beam of light. 24 still images per second creating the illusion of motion.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">SINGER</span>
-      <span class="entry-text">A sewing machine with needle, bobbin, and feed dog. The needle plunges, the thread loops, the fabric advances. Isaac Singer's machine that changed the garment industry forever.</span>
+      <span class="entry-text">A sewing machine with needle, bobbin, and feed dog. The needle plunges, the thread loops, the fabric advances.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">TYPEWRITER</span>
-      <span class="entry-text">A mechanical typewriter with type bars striking an inked ribbon against paper. The carriage advances, the bell rings at the margin, the return lever sweeps back. QWERTY at its origin.</span>
+      <span class="entry-text">A mechanical typewriter with type bars striking an inked ribbon against paper. The carriage advances, the bell rings at the margin, the return lever sweeps back.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(180,100,255,0.25)">
       <span class="entry-name" style="color:#b464ff">SWISS WATCH</span>
@@ -802,46 +816,45 @@
 
   <!-- ---- MUSIC & SOUND ---- -->
   <div class="guide-section" id="g-music">
-    <h3 style="color:#ffb432">MUSIC &amp; SOUND</h3>
+    <h3 style="color:#ffb432">MUSIC</h3>
     <p class="guide-intro">
-      Instruments, audio visualizations, and the physics of sound &mdash; from waveforms
-      on a virtual oscilloscope to the electromagnetic arcs of a theremin.
+      Musical instruments and audio visualizations, from gramophones to synthesizers.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">DRUM MACHINE</span>
-      <span class="entry-text">A Roland TR-808-style step sequencer. 16 steps, multiple tracks for kick, snare, hi-hat, and more. The beat patterns scroll and animate. The machine that defined hip-hop, house, and electronic music.</span>
+      <span class="entry-text">A Roland TR-808-style step sequencer. 16 steps, multiple tracks for kick, snare, hi-hat, and more. Beat patterns scroll and animate.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">EQUALIZER</span>
-      <span class="entry-text">Stereo spectrum analyzer with 16 bouncing bars and peak-hold dots. Layered sine waves simulate kick, snare, and hi-hat. The LED bars that adorned every 1980s hi-fi system.</span>
+      <span class="entry-text">Stereo spectrum analyzer with 16 bouncing bars and peak-hold dots. Layered sine waves simulate kick, snare, and hi-hat.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">GRAMOPHONE</span>
-      <span class="entry-text"><span class="entry-year">1887, Emile Berliner</span> &mdash; A spinning disc, a tonearm, and a brass horn. The machine that made recorded music a mass medium. The platter turns, the arm traces the groove.</span>
+      <span class="entry-text"><span class="entry-year">1887, Emile Berliner</span> &mdash; A spinning disc, a tonearm, and a brass horn. The platter turns, the arm traces the groove.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">HURDY GURDY</span>
-      <span class="entry-text">A medieval string instrument where a rosined wheel acts as a continuous bow. Keys press tangents against the strings. Drone notes sustain while the melody dances above. One of the oldest mechanical instruments.</span>
+      <span class="entry-text">Medieval string instrument where a rosined wheel acts as a continuous bow. Keys press tangents against the strings. Drone notes sustain while the melody plays above.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">JUKEBOX</span>
-      <span class="entry-text">A classic coin-operated jukebox with visible record mechanism. The arm selects a disc, places it on the platter, and drops the needle. Neon lights and chrome &mdash; the American diner in miniature.</span>
+      <span class="entry-text">A coin-operated jukebox with visible record mechanism. The arm selects a disc, places it on the platter, and drops the needle.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">METRONOME</span>
-      <span class="entry-text">A mechanical metronome with swinging pendulum and sliding weight. Tick-tock, tick-tock. The musician's timekeeper, setting the tempo for practice and performance.</span>
+      <span class="entry-text">A mechanical metronome with swinging pendulum and sliding weight. Sets the tempo for practice and performance.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">MUSIC BOX</span>
-      <span class="entry-text">A rotating cylinder with pins plucking a metal comb. Each pin triggers a note as the barrel turns. The original mechanical music player, producing delicate melodies from pure clockwork.</span>
+      <span class="entry-text">A rotating cylinder with pins plucking a metal comb. Each pin triggers a note as the barrel turns. The original mechanical music player.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">PIANO ROLL</span>
-      <span class="entry-text">A scrolling piano roll showing notes in time. Colored bars descend onto a keyboard, playing a melody. The visual language of MIDI and digital music production, dating back to player pianos of the 1900s.</span>
+      <span class="entry-text">A scrolling piano roll showing notes in time. Colored bars descend onto a keyboard. The format dates back to player pianos of the 1900s and is still used in MIDI editors.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">SYNTHESIZER</span>
-      <span class="entry-text">A modular synthesizer with oscillators, filters, and patch cables. Waveforms morph on screen as parameters change. The instrument that created every electronic sound you've ever heard.</span>
+      <span class="entry-text">A modular synthesizer with oscillators, filters, and patch cables. Waveforms morph on screen as parameters change.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">THEREMIN</span>
@@ -849,25 +862,23 @@
     </div>
     <div class="guide-entry" style="border-color: rgba(255,180,50,0.25)">
       <span class="entry-name" style="color:#ffb432">TURNTABLE</span>
-      <span class="entry-text">A vinyl record spinning with a tonearm tracking the groove. The platter rotates at 33 RPM, the stylus rides the spiral. The warm analog sound of vinyl, visualized.</span>
+      <span class="entry-text">A vinyl record spinning with a tonearm tracking the groove. The platter rotates at 33 RPM, the stylus rides the spiral.</span>
     </div>
   </div>
 
   <!-- ---- THE NATURAL WORLD ---- -->
   <div class="guide-section" id="g-outdoors">
-    <h3 style="color:#00ff00">THE NATURAL WORLD</h3>
+    <h3 style="color:#00ff00">OUTDOORS</h3>
     <p class="guide-intro">
-      Natural phenomena simulated from first principles. Fire rises, rain falls, stars recede,
-      plasma swirls. Each effect is computed, not pre-rendered &mdash; the same physics that
-      governs the real world, running on a grid of LEDs.
+      Natural phenomena computed from first principles &mdash; fire, water, weather, and starlight.
     </p>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">FIRE</span>
-      <span class="entry-text">Classic fire simulation with a heat source at the bottom, upward propagation, and cooling. The algorithm dates back to the demoscene of the early 1990s. Simple math, primal result.</span>
+      <span class="entry-text">Classic fire simulation with a heat source at the bottom, upward propagation, and cooling. The algorithm dates back to the demoscene of the early 1990s.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">FIREFLIES</span>
-      <span class="entry-text">Kuramoto model of coupled oscillators. Each firefly has its own internal clock, but when they can see their neighbors, they synchronize &mdash; just like real fireflies in Southeast Asia that flash in perfect unison.</span>
+      <span class="entry-text">Kuramoto model of coupled oscillators. Each firefly has its own internal clock but synchronizes with visible neighbors &mdash; the same behavior seen in real firefly swarms.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">PARTICLE LIFE</span>
@@ -875,15 +886,15 @@
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">JELLYFISH</span>
-      <span class="entry-text">A Particle Life variant tuned for drifting, pulsing jellyfish motion. Species interact with asymmetric forces that produce translucent bell shapes trailing luminous tentacles through dark water.</span>
+      <span class="entry-text">A Particle Life variant tuned for drifting, pulsing jellyfish motion. Asymmetric species forces produce bell shapes trailing tentacles.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">LAKE</span>
-      <span class="entry-text">A serene lake surface with ripples, reflections, and gentle wave motion. Pixels shimmer as if catching light on water. Digital tranquility.</span>
+      <span class="entry-text">A lake surface with ripples, reflections, and gentle wave motion. Pixels shimmer as if catching light on water.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">PLASMA</span>
-      <span class="entry-text">Four overlapping sine functions create smoothly animated color fields &mdash; one of the quintessential demoscene effects. The math is trivial. The result is hypnotic.</span>
+      <span class="entry-text">Four overlapping sine functions create smoothly animated color fields. One of the quintessential demoscene effects.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">RIPPLES</span>
@@ -891,22 +902,19 @@
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">STARFIELD</span>
-      <span class="entry-text">3D stars rushing toward you with perspective projection. The classic warp-speed effect: dots start small in the center and streak outward as they approach. Infinite depth from 2D math.</span>
+      <span class="entry-text">3D stars rushing toward you with perspective projection. Dots start small in the center and streak outward as they approach.</span>
     </div>
     <div class="guide-entry" style="border-color: rgba(0,255,0,0.2)">
       <span class="entry-name" style="color:#00ff00">WEATHER</span>
-      <span class="entry-text">Animated weather scenes: rain, snow, thunderstorms, sunshine. Particles fall with realistic physics, lightning flashes illuminate the grid. A miniature sky.</span>
+      <span class="entry-text">Animated weather scenes: rain, snow, thunderstorms, sunshine. Particles fall with realistic physics, lightning flashes illuminate the grid.</span>
     </div>
   </div>
 
   <!-- ---- ROAD & RAIL ---- -->
   <div class="guide-section" id="g-road">
-    <h3 style="color:#ffa000">ROAD &amp; RAIL</h3>
+    <h3 style="color:#ffa000">ROAD + RAIL</h3>
     <p class="guide-intro">
-      Traffic simulations and transportation networks. Cars flow through intersections,
-      merge onto highways, and navigate roundabouts. Each simulation models real traffic
-      dynamics &mdash; congestion waves, signal timing, and the emergent behavior of
-      vehicles following simple rules.
+      Traffic simulations modeling real dynamics &mdash; congestion waves, signal timing, merge behavior.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,160,0,0.25)">
       <span class="entry-name" style="color:#ffa000">CLOVERLEAF</span>
@@ -946,9 +954,8 @@
   <div class="guide-section" id="g-science">
     <h3 style="color:#6496ff">SCIENCE</h3>
     <p class="guide-intro">
-      Physics, chemistry, and biology on 4,096 pixels. These simulations solve real equations
-      in real time: Navier-Stokes for fluids, Coulomb's law for electric fields, the wave
-      equation for diffraction. Nothing is faked &mdash; every dot on screen comes from the math.
+      Physics, chemistry, and biology simulations solving real equations in real time &mdash;
+      Navier-Stokes for fluids, Coulomb&rsquo;s law for fields, the wave equation for diffraction.
     </p>
     <div class="guide-entry" style="border-color: rgba(100,150,255,0.25)">
       <span class="entry-name" style="color:#6496ff">STRANGE ATTRACTORS</span>
@@ -1054,11 +1061,10 @@
 
   <!-- ---- SPRITE ANIMATIONS ---- -->
   <div class="guide-section" id="g-sprites">
-    <h3 style="color:#80ff00">SPRITE ANIMATIONS</h3>
+    <h3 style="color:#80ff00">SPRITES</h3>
     <p class="guide-intro">
-      Classic video game characters brought to life on the LED grid. Each sprite is
-      hand-crafted pixel art, animated with authentic walk cycles, idle poses, and
-      signature moves from their original games.
+      Classic video game characters animated with walk cycles, idle poses, and signature moves
+      from their original games.
     </p>
     <div class="guide-entry" style="border-color: rgba(128,255,0,0.25)">
       <span class="entry-name" style="color:#80ff00">KIRBY</span>
@@ -1098,8 +1104,7 @@
   <div class="guide-section" id="g-superheroes">
     <h3 style="color:#ff0000">SUPERHEROES</h3>
     <p class="guide-intro">
-      Comic book icons rendered as animated LED pixel art. Each hero gets a signature
-      scene with characteristic colors, poses, and effects.
+      Comic and cartoon characters as animated pixel art with signature scenes and colors.
     </p>
     <div class="guide-entry" style="border-color: rgba(255,0,0,0.25)">
       <span class="entry-name" style="color:#ff0000">BATMAN</span>
@@ -1121,11 +1126,9 @@
 
   <!-- ---- AI DEMOS ---- -->
   <div class="guide-section" id="g-demos">
-    <h3 style="color:#ff6464">AI DEMOS</h3>
+    <h3 style="color:#ff6464">DEMOS</h3>
     <p class="guide-intro">
-      Every playable game in the cabinet also has an AI-controlled demo mode. The computer
-      plays itself &mdash; sometimes optimally, sometimes entertainingly. 42 demos that let
-      you watch games play out hands-free, like an attract-mode loop in a real arcade.
+      Each playable game has an AI demo mode. 41 attract-mode loops where the computer plays itself.
     </p>
     <div class="compact-list" style="color:#ff6464">
       <span>AGAR.IO</span>
@@ -1174,11 +1177,10 @@
 
   <!-- ---- TITLE SCREENS ---- -->
   <div class="guide-section" id="g-titles">
-    <h3 style="color:#c8b4ff">TITLE SCREENS</h3>
+    <h3 style="color:#c8b4ff">TITLES</h3>
     <p class="guide-intro">
-      52 branded boot screens and title cards, each a miniature tribute to a platform,
-      game, or era in computing history. From the Commodore 64 startup to the PlayStation
-      logo, from the NES loading screen to the Windows XP hills &mdash; nostalgia as an art form.
+      53 branded boot screens and title cards referencing platforms, games, and computing eras &mdash;
+      C64 startup, PlayStation logo, NES loading screen, Windows XP hills, and more.
     </p>
     <div class="compact-list" style="color:#c8b4ff">
       <span>WONDER ASTEROIDS</span>
@@ -1416,5 +1418,70 @@
   Programmed with AI, Designed &amp; Curated by Hand
 </footer>
 
+<script>
+(function() {
+  var LABELS = {
+    'dpad-action': 'D-PAD + ACTION',
+    'action-only': 'ACTION ONLY',
+    'dpad-only':   'D-PAD ONLY',
+    'dpad-lr':     'D-PAD + L / R',
+    'lr-browse':   'L / R BROWSE',
+  };
+  var COLORS = {
+    'dpad-action': '#5a7a50',
+    'action-only': '#7a6a50',
+    'dpad-only':   '#50607a',
+    'dpad-lr':     '#7a507a',
+    'lr-browse':   '#6a6a50',
+  };
+  // Section defaults
+  var DEFAULTS = {
+    'g-arcade':      'dpad-action',
+    'g-art':         'dpad-action',
+    'g-automata':    'dpad-action',
+    'g-digital':     'dpad-action',
+    'g-gallery':     'dpad-only',
+    'g-household':   'dpad-action',
+    'g-mechanics':   'lr-browse',
+    'g-music':       'lr-browse',
+    'g-outdoors':    'dpad-action',
+    'g-road':        'dpad-action',
+    'g-science':     'dpad-action',
+    'g-sprites':     'lr-browse',
+    'g-superheroes': 'lr-browse',
+  };
+  // Per-entry overrides
+  var OVERRIDES = {
+    'SNAKE':         'dpad-only',
+    'FROGGER':       'dpad-only',
+    'FLAPPY BIRD':   'action-only',
+    'GEOMETRY DASH': 'action-only',
+    'STACK':         'action-only',
+    'STICK RUNNER':  'action-only',
+    'PORTAL':        'dpad-lr',
+    'PINBALL':       'dpad-lr',
+    'AGAR.IO':       'dpad-lr',
+    'GREAT WAVE':    'dpad-only',
+    'SCREAM':        'dpad-only',
+    'PLASMA':        'dpad-only',
+    'LAVA LAMP':     'dpad-only',
+    'WEATHER':       'action-only',
+    'JAKE MUSIC':    'action-only',
+  };
+  document.querySelectorAll('.guide-section').forEach(function(section) {
+    var def = DEFAULTS[section.id];
+    if (!def) return;
+    section.querySelectorAll('.entry-name').forEach(function(el) {
+      var name = el.textContent.trim();
+      var ctrl = OVERRIDES[name] || def;
+      var badge = document.createElement('span');
+      badge.className = 'entry-ctrl';
+      badge.textContent = LABELS[ctrl];
+      badge.style.color = COLORS[ctrl];
+      el.appendChild(badge);
+    });
+  });
+})();
+</script>
 </body>
 </html>

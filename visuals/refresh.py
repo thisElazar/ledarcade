@@ -1,9 +1,9 @@
 """
 Refresh - Restart the arcade with latest code
 ===============================================
-Attempts a git pull, then restarts the arcade process
-regardless of pull outcome. The restart is the point —
-new code may already be on disk from a prior deploy.
+Saves the current commit as a rollback point, pulls from the
+stable branch, then restarts the arcade process regardless of
+pull outcome.
 
 Controls:
   Up/Down    - Select YES/NO
@@ -14,6 +14,36 @@ import os
 import sys
 import subprocess
 from . import Visual, Display, Colors, GRID_SIZE
+
+
+REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROLLBACK_FILE = os.path.join(REPO_DIR, ".rollback_ref")
+BRANCH = "stable"
+
+
+def _git(*args, timeout=15):
+    """Run a git command in the repo directory."""
+    try:
+        result = subprocess.run(
+            ["git", "-c", "safe.directory=*"] + list(args),
+            cwd=REPO_DIR,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        return result.returncode == 0, result.stdout.strip()
+    except Exception:
+        return False, ""
+
+
+def _short_hash():
+    ok, out = _git("rev-parse", "--short", "HEAD")
+    return out if ok else "?"
+
+
+def _commit_date():
+    ok, out = _git("log", "-1", "--format=%Y-%m-%d", "HEAD")
+    return out if ok else "?"
 
 
 class Refresh(Visual):
@@ -32,6 +62,10 @@ class Refresh(Visual):
         self.pull_done = False
         self.pull_msg = ""
         self.restart_timer = 0.0
+
+        # Current version info
+        self.version_hash = _short_hash()
+        self.version_date = _commit_date()
 
     def handle_input(self, input_state) -> bool:
         if self.confirmed:
@@ -63,26 +97,26 @@ class Refresh(Visual):
         # Attempt git pull once (best-effort)
         if not self.pull_started:
             self.pull_started = True
-            repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            try:
-                # safe.directory=* avoids "dubious ownership" when running as root
-                result = subprocess.run(
-                    ["git", "-c", "safe.directory=*", "pull"],
-                    cwd=repo_dir,
-                    capture_output=True,
-                    text=True,
-                    timeout=15,
-                )
-                if result.returncode == 0:
-                    output = result.stdout.strip()
-                    if "Already up to date" in output:
-                        self.pull_msg = "UP TO DATE"
-                    else:
-                        self.pull_msg = "PULLED"
+
+            # Save current HEAD as rollback point before pulling
+            ok, current_ref = _git("rev-parse", "HEAD")
+            if ok and current_ref:
+                try:
+                    with open(ROLLBACK_FILE, "w") as f:
+                        f.write(current_ref)
+                except Exception:
+                    pass
+
+            # Pull from stable branch explicitly
+            ok, output = _git("pull", "origin", BRANCH)
+            if ok:
+                if "Already up to date" in output:
+                    self.pull_msg = "UP TO DATE"
                 else:
-                    self.pull_msg = "PULL FAILED"
-            except Exception:
-                self.pull_msg = "PULL SKIPPED"
+                    self.pull_msg = "PULLED"
+            else:
+                self.pull_msg = "PULL FAILED"
+
             self.pull_done = True
             self.restart_timer = 0.0
 
@@ -108,27 +142,26 @@ class Refresh(Visual):
                 self.display.draw_text_small(2, 42, "." * dots, Colors.GRAY)
             return
 
-        # Title
-        self.display.draw_text_small(2, 2, "REFRESH", Colors.CYAN)
-
-        # Separator
+        # Title + version
+        self.display.draw_text_small(2, 2, "UPDATE", Colors.CYAN)
         self.display.draw_line(2, 9, 61, 9, Colors.GRAY)
 
+        # Version info
+        self.display.draw_text_small(2, 12, "V:" + self.version_hash, Colors.GRAY)
+        self.display.draw_text_small(2, 20, self.version_date, Colors.GRAY)
+
         # Description
-        self.display.draw_text_small(2, 14, "PULL + ", Colors.WHITE)
-        self.display.draw_text_small(2, 22, "RESTART?", Colors.WHITE)
+        self.display.draw_text_small(2, 30, "PULL + ", Colors.WHITE)
+        self.display.draw_text_small(2, 38, "RESTART?", Colors.WHITE)
 
         # YES / NO options
         yes_color = Colors.YELLOW if self.selection == 0 else Colors.GRAY
         no_color = Colors.YELLOW if self.selection == 1 else Colors.GRAY
 
         if self.selection == 0:
-            self.display.draw_text_small(2, 34, ">", Colors.YELLOW)
+            self.display.draw_text_small(2, 48, ">", Colors.YELLOW)
         else:
-            self.display.draw_text_small(2, 44, ">", Colors.YELLOW)
+            self.display.draw_text_small(2, 56, ">", Colors.YELLOW)
 
-        self.display.draw_text_small(9, 34, "YES", yes_color)
-        self.display.draw_text_small(9, 44, "NO", no_color)
-
-        # Hint
-        self.display.draw_text_small(2, 54, "BTN:CONFIRM", Colors.GRAY)
+        self.display.draw_text_small(9, 48, "YES", yes_color)
+        self.display.draw_text_small(9, 56, "NO", no_color)

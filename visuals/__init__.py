@@ -158,6 +158,7 @@ from .controls import Controls
 from .inputtest import InputTest
 from .shutdown import Shutdown
 from .refresh import Refresh
+from .rollback import Rollback
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt

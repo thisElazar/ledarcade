@@ -2307,6 +2307,12 @@
           "is_game": false
         },
         {
+          "name": "ROLLBACK",
+          "cls": "Rollback",
+          "module": "visuals/rollback.py",
+          "is_game": false
+        },
+        {
           "name": "SHUTDOWN",
           "cls": "Shutdown",
           "module": "visuals/shutdown.py",

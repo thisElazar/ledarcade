@@ -213,10 +213,11 @@
 
 <nav class="site-nav">
   <a class="nav-brand" href="index.html">WONDER CABINET</a>
-  <a href="index.html">HOME</a>
   <a href="emulator.html" class="active">EMULATOR</a>
-  <a href="timeline.html">TIMELINE</a>
   <a href="guide.html">FIELD GUIDE</a>
+  <a href="history.html">HISTORY</a>
+
+  <a href="order.html">ORDER</a>
 </nav>
 
 <header>
@@ -491,6 +492,8 @@
   try {
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js';
+    script.integrity = 'sha384-tSKqtqt5i9t+BKiXGOGifQBi2UQGv0DKKTl7grFv4cS4c8bc/Zc+PI+1O2Bj+xtC';
+    script.crossOrigin = 'anonymous';
     document.head.appendChild(script);
     await new Promise((resolve, reject) => {
       script.onload = resolve;
@@ -698,7 +701,10 @@ class Game:
         self.display.draw_text_small(1, y, str(self.score), Colors.WHITE)
     def draw_game_over(self, selection=0):
         self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
+        if hasattr(self, 'state') and self.state == GameState.WIN:
+            self.display.draw_text_small(8, 20, "YOU WIN!", Colors.YELLOW)
+        else:
+            self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(12, 30, "SCORE:" + str(self.score), Colors.WHITE)
         if selection == 0:
             self.display.draw_text_small(4, 44, ">PLAY AGAIN", Colors.YELLOW)
@@ -1082,15 +1088,18 @@ _sel
           const stateStr = pyodide.runPython(`
 if _item:
     if _is_game:
-        _item.update(_input, ${dt})
-        _item.draw()
+        try:
+            _item.update(_input, ${dt})
+            _item.draw()
+        except Exception as _e:
+            _item.state = GameState.GAME_OVER
         if _input.action_l_held and _input.action_r_held:
             _exit_hold += ${dt}
         else:
             _exit_hold = 0.0
         if _exit_hold >= 2.0:
             'exit'
-        elif hasattr(_item, 'state') and _item.state == GameState.GAME_OVER:
+        elif hasattr(_item, 'state') and _item.state in (GameState.GAME_OVER, GameState.WIN):
             'gameover'
         else:
             'ok'

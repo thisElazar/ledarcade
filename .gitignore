@@ -26,6 +26,12 @@ build/
 # User settings (persistent across restarts)
 user_settings.json
 
+# Claude Code
+CLAUDE.md
+
+# Update rollback state
+.rollback_ref
+
 # Environment
 .env
 .venv/
