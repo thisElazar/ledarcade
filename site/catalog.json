@@ -144,7 +144,10 @@
           "name": "ARKANOID",
           "cls": "Arkanoid",
           "module": "games/arkanoid.py",
-          "is_game": true
+          "is_game": true,
+          "deps": [
+            "games/arkanoid_levels.py"
+          ]
         },
         {
           "name": "DND",
@@ -630,7 +633,90 @@
           "name": "ALL",
           "cls": "Demos",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "ARKANOID",
@@ -638,7 +724,8 @@
           "module": "visuals/arkanoid_demo.py",
           "is_game": false,
           "deps": [
-            "games/arkanoid.py"
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py"
           ]
         },
         {
@@ -1627,7 +1714,10 @@
           "name": "EARTH",
           "cls": "Earth",
           "module": "visuals/earth.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "EM CIRCUIT",
@@ -1663,7 +1753,10 @@
           "name": "LATTICES",
           "cls": "Lattice",
           "module": "visuals/lattice.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/molecule.py"
+          ]
         },
         {
           "name": "MICROSCOPE",
@@ -1782,13 +1875,19 @@
           "name": "KIRBY",
           "cls": "Kirby",
           "module": "visuals/kirby.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "LINK",
           "cls": "Link",
           "module": "visuals/link.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "MARIO",
@@ -1800,19 +1899,28 @@
           "name": "MEGA MAN",
           "cls": "MegaMan",
           "module": "visuals/megaman.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "PIT",
           "cls": "Pit",
           "module": "visuals/pit.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "SAMUS",
           "cls": "MetroidChase",
           "module": "visuals/metroid.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "SONIC",
@@ -1824,7 +1932,10 @@
           "name": "YOSHI",
           "cls": "Yoshi",
           "module": "visuals/yoshi.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         }
       ]
     },
@@ -1841,25 +1952,37 @@
           "name": "BATMAN",
           "cls": "Batman",
           "module": "visuals/batman.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "GREEN LANTERN",
           "cls": "GreenLantern",
           "module": "visuals/greenlantern.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "JAKE MUSIC",
           "cls": "JakeMusic",
           "module": "visuals/jakemusic.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "SPIDEY",
           "cls": "Spidey",
           "module": "visuals/spidey.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         }
       ]
     },
@@ -1876,319 +1999,478 @@
           "name": "WONDER ASTRDS",
           "cls": "WonderAsteroids",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER ATARI",
           "cls": "WonderAtari",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER BARS",
           "cls": "WonderColorBars",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER BOING",
           "cls": "WonderBoing",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER BRAIN",
           "cls": "WonderBrain",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER BREAK",
           "cls": "WonderBreakout",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER BSOD",
           "cls": "WonderBSOD",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER C64",
           "cls": "WonderC64",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER COIN",
           "cls": "WonderInsertCoin",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER CRAWL",
           "cls": "WonderCrawl",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER CREEP",
           "cls": "WonderCreeper",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER DK",
           "cls": "WonderDK",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER DOOM",
           "cls": "WonderDoom",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER DOS",
           "cls": "WonderDOS",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER DROP",
           "cls": "WonderDrop",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER FILM",
           "cls": "WonderFilm",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER FLOCK",
           "cls": "WonderBoids",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER FLOW",
           "cls": "WonderFlow",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER FROG",
           "cls": "WonderFrogger",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER GBOY",
           "cls": "WonderGameBoy",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER GLITCH",
           "cls": "WonderGlitch",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER GLOW",
           "cls": "WonderGlow",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER HEAT",
           "cls": "WonderDiffusion",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER HODGE",
           "cls": "WonderHodge",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER INVADE",
           "cls": "WonderInvaders",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER JAKE",
           "cls": "WonderJake",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER LIFE",
           "cls": "WonderLife",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER LOAD",
           "cls": "WonderLoading",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER MARQUEE",
           "cls": "WonderMarquee",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER MATRIX",
           "cls": "WonderMatrix",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER N64",
           "cls": "WonderN64",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER NEON",
           "cls": "WonderNeon",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER NES",
           "cls": "WonderNES",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER NYAN",
           "cls": "WonderNyanCat",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER PAC",
           "cls": "WonderPacMan",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER PIPE",
           "cls": "WonderPipe",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER PONG",
           "cls": "WonderPong",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER PS1",
           "cls": "WonderPS1",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SAND",
           "cls": "WonderSand",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SEGA",
           "cls": "WonderSega",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SLIDE",
           "cls": "WonderSlide",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SLIME",
           "cls": "WonderSlime",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SNAKE",
           "cls": "WonderSnake",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER SPIN",
           "cls": "WonderSpin",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER TAPE",
           "cls": "WonderCassette",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER TETRIS",
           "cls": "WonderTetris",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER TV",
           "cls": "WonderRetroTV",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER TYPE",
           "cls": "WonderTypewriter",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER VHS",
           "cls": "WonderVHS",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER VINYL",
           "cls": "WonderVinyl",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER WARS",
           "cls": "WonderStarWars",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER XP",
           "cls": "WonderWinXP",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         },
         {
           "name": "WONDER ZOOM",
           "cls": "WonderZoom",
           "module": "visuals/wondercabinet.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
         }
       ]
     },
@@ -2205,67 +2487,980 @@
           "name": "ALL VISUALS",
           "cls": "AllVisuals",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "ART GALLERY",
           "cls": "ArtGallery",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "CHILL",
           "cls": "Chill",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "COMPLEXITY",
           "cls": "Complexity",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "DEMOSCENE",
           "cls": "Demoscene",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "ENERGY",
           "cls": "Energy",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "MUSIC MIX",
           "cls": "MusicMix",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "SCIENCE LAB",
           "cls": "ScienceLab",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "SPRITE GALLERY",
           "cls": "SpriteGallery",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "SUPERHEROES",
           "cls": "SuperheroGallery",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         },
         {
           "name": "TITLE",
           "cls": "Title",
           "module": "visuals/slideshow.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ]
         }
       ]
     },
@@ -2336,12 +3531,6 @@
           "name": "PIXEL TEST",
           "cls": "TestPattern",
           "module": "visuals/testpattern.py",
-          "is_game": false
-        },
-        {
-          "name": "ROLLBACK",
-          "cls": "Rollback",
-          "module": "visuals/rollback.py",
           "is_game": false
         },
         {

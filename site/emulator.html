@@ -96,6 +96,26 @@
   color: #4a4238;
   margin-top: 6px;
 }
+.lab-notes {
+  font-size: 11px;
+  color: #4a4238;
+  margin-top: 16px;
+  text-align: left;
+  max-width: 420px;
+  display: inline-block;
+  line-height: 1.6;
+}
+.lab-notes summary {
+  cursor: pointer;
+  color: #6a6254;
+  letter-spacing: 0.05em;
+}
+.lab-notes ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.lab-notes li { margin-bottom: 2px; }
+.lab-notes .cat { color: #6a6254; }
 
 /* Touch controls — hidden on desktop, shown on touch devices */
 .touch-controls {
@@ -254,6 +274,24 @@
 
   <div class="lab-fps" id="pyFps"></div>
   <div class="lab-keys" id="emuKeys">Arrows: navigate &middot; Space: select &middot; Z: alt button &middot; Esc: back to menu</div>
+
+  <div class="lab-notes">
+    <details>
+      <summary>Arcade-only items</summary>
+      <p>These categories need GIF/image assets or dynamic module loading
+      that isn't available in the browser. They work on the physical arcade.</p>
+      <ul>
+        <li><span class="cat">SPRITES</span> &mdash; GIF sprite animations (PIL)</li>
+        <li><span class="cat">SUPERHEROES</span> &mdash; GIF sprite animations (PIL)</li>
+        <li><span class="cat">TITLES</span> &mdash; Wonder Cabinet GIF assets (PIL)</li>
+        <li><span class="cat">GALLERY</span> &mdash; 3D galleries with cached assets</li>
+        <li><span class="cat">GAME MIX</span> &mdash; shuffle playlists (dynamic loading)</li>
+        <li><span class="cat">VISUAL MIX</span> &mdash; slideshow playlists (dynamic loading)</li>
+        <li><span class="cat">ART</span>: Great Wave, Scream &mdash; PNG image files</li>
+        <li><span class="cat">SCIENCE</span>: Earth &mdash; globe texture (PIL)</li>
+      </ul>
+    </details>
+  </div>
 </section>
 
 <footer>

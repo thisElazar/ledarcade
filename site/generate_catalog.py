@@ -76,15 +76,30 @@ def scan_file(filepath, pkg):
         return [], []
 
     deps = []
+    module_name = os.path.splitext(os.path.basename(filepath))[0]
 
-    # Detect cross-package imports (e.g. demos importing from games)
+    # Detect import dependencies (cross-package AND intra-package)
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module:
             other = 'games' if pkg == 'visuals' else 'visuals'
+            # Cross-package: visuals importing from games (or vice versa)
             if node.module.startswith(other + '.'):
                 dep_path = node.module.replace('.', '/') + '.py'
                 if dep_path not in deps:
                     deps.append(dep_path)
+            # Intra-package: importing a sibling module (e.g. games.arkanoid_levels)
+            elif node.module.startswith(pkg + '.'):
+                sub = node.module[len(pkg) + 1:]
+                if sub != module_name:  # skip self-imports
+                    dep_path = pkg + '/' + sub + '.py'
+                    if dep_path not in deps:
+                        deps.append(dep_path)
+        # Relative sibling import: from .foo import ... (level >= 1, module set)
+        if (isinstance(node, ast.ImportFrom) and node.level >= 1
+                and node.module and node.module != module_name):
+            dep_path = pkg + '/' + node.module + '.py'
+            if dep_path not in deps:
+                deps.append(dep_path)
 
     # First pass: collect all classes with their attributes and bases
     class_info = {}
@@ -162,8 +177,33 @@ def scan_file(filepath, pkg):
     return classes, deps
 
 
+def resolve_transitive_deps(file_deps):
+    """Expand deps transitively: if A needs B and B needs C, A needs [B, C]."""
+    resolved = {}
+    def _resolve(path, visiting=None):
+        if path in resolved:
+            return resolved[path]
+        if visiting is None:
+            visiting = set()
+        if path in visiting:
+            return []
+        visiting.add(path)
+        direct = file_deps.get(path, [])
+        full = list(direct)
+        for dep in direct:
+            for sub in _resolve(dep, visiting):
+                if sub not in full:
+                    full.append(sub)
+        resolved[path] = full
+        return full
+    for path in file_deps:
+        _resolve(path)
+    return resolved
+
+
 def main():
     items_by_cat = {}
+    file_deps = {}  # module_path -> direct deps from scan_file
 
     for pkg in ['games', 'visuals']:
         pkg_dir = os.path.join(ROOT, pkg)
@@ -180,6 +220,8 @@ def main():
             filepath = os.path.join(pkg_dir, fname)
             module_path = f"{pkg}/{fname}"
             classes, deps = scan_file(filepath, pkg)
+            if deps:
+                file_deps[module_path] = deps
 
             for cls_info in classes:
                 cat_key = cls_info['category'] or default_cat
@@ -189,10 +231,15 @@ def main():
                     'module': module_path,
                     'is_game': is_game,
                 }
-                if deps:
-                    entry['deps'] = deps
-
                 items_by_cat.setdefault(cat_key, []).append(entry)
+
+    # Resolve transitive deps and attach to items
+    all_deps = resolve_transitive_deps(file_deps)
+    for items in items_by_cat.values():
+        for entry in items:
+            deps = all_deps.get(entry['module'], [])
+            if deps:
+                entry['deps'] = deps
 
     # Sort items within each category (numbers after letters, matching catalog.py)
     for items in items_by_cat.values():
