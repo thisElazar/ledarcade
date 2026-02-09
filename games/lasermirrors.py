@@ -1,0 +1,948 @@
+"""
+LASER MIRRORS — First-Person Puzzle Game
+==========================================
+Wolfenstein-style raycaster puzzle game. Walk around moody rooms,
+rotate mirrors to redirect laser beams onto targets.
+
+Controls:
+  Left/Right  - Rotate view
+  Up/Down     - Move forward/backward
+  Space       - Rotate mirror you're facing
+"""
+
+import math
+from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
+
+# ═══════════════════════════════════════════════════════════════════
+#  Constants
+# ═══════════════════════════════════════════════════════════════════
+
+FOV = math.pi / 3  # 60 degree FOV
+HALF = GRID_SIZE // 2
+MOVE_SPEED = 2.5
+ROT_SPEED = 2.5
+MARGIN = 0.2
+MIRROR_ANIM_DUR = 0.5  # seconds for mirror rotation animation
+
+# Cell types
+EMPTY = 0
+WALL = 1
+MIRROR_BK = 2   # backslash mirror: \  reflects (1,0)->(0,1), (0,-1)->(-1,0)
+MIRROR_FW = 3   # forward slash mirror: /  reflects (1,0)->(0,-1), (0,-1)->(1,0)
+EMITTER_N = 4   # fires north (beam goes -y)
+EMITTER_S = 5   # fires south (beam goes +y)
+EMITTER_E = 6   # fires east  (beam goes +x)
+EMITTER_W = 7   # fires west  (beam goes -x)
+TARGET = 8
+
+EMITTER_DIRS = {
+    EMITTER_N: (0, -1),
+    EMITTER_S: (0, 1),
+    EMITTER_E: (1, 0),
+    EMITTER_W: (-1, 0),
+}
+
+# Colors
+STONE_COLOR = (40, 45, 70)
+STONE_DARK = (30, 34, 55)
+MIRROR_COLOR = (140, 180, 220)
+TARGET_UNLIT = (60, 80, 60)
+TARGET_LIT = (40, 255, 80)
+LASER_CORE = (255, 80, 20)
+LASER_GLOW = (80, 30, 10)
+CEIL_COLOR = (15, 18, 30)
+FLOOR_LIGHT = (35, 38, 55)
+FLOOR_DARK = (28, 30, 45)
+
+# ═══════════════════════════════════════════════════════════════════
+#  Levels — 6 puzzles (all emitters on south wall, fire north)
+# ═══════════════════════════════════════════════════════════════════
+
+W = WALL
+B = MIRROR_BK   # backslash \
+F = MIRROR_FW   # forward slash /
+EN = EMITTER_N  # fires north (into room)
+T = TARGET
+_ = EMPTY
+
+LEVELS = [
+    # Level 1: One mirror, one target. Rotate mirror once.
+    # Beam: E(5,7)↑ → M(5,5)  /→east→wall (wrong)  \→west→T(1,5) (correct)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, T, _, _, _, F, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, W, W, W, W,EN, W, W],
+        ],
+        'start': (2.5, 2.5, math.pi / 2),
+        'par': 25,
+    },
+    # Level 2: Two mirrors, one target. Rotate both.
+    # Beam: E(2,8)↑ → M1(2,5)  \→west (wrong)  /→east→ M2(5,5)  \→south (wrong)  /→north→T(5,2)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, T, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, B, _, _, B, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, W,EN, W, W, W, W, W],
+        ],
+        'start': (4.5, 1.5, math.pi * 0.75),
+        'par': 30,
+    },
+    # Level 3: Three mirrors, one target. Rotate M1 and M3.
+    # Beam: E(5,9)↑ → M1(5,7) /→east(wrong), need \→west →
+    #   M2(2,7) already \→north → M3(2,4) /→east(wrong), need \→west → T(1,4)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, T, F, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, _, B, _, _, F, _, W],
+            [W, _, _, _, _, _, _, W],
+            [W, W, W, W, W,EN, W, W],
+        ],
+        'start': (3.5, 1.5, math.pi / 2),
+        'par': 35,
+    },
+    # Level 4: Two emitters, two mirrors, two targets.
+    # E1(3,9)↑→M1(3,7) /→east→wall(5,7), need \→west→T1(1,7)
+    # E2(7,9)↑→M2(7,7) \→west→wall(5,7), need /→east→T2(9,7)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, T, _, F, _, W, _, B, _, T, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, W, W,EN, W, W, W,EN, W, W, W],
+        ],
+        'start': (5.5, 2.5, math.pi / 2),
+        'par': 35,
+    },
+    # Level 5: Maze with walls blocking. 3 mirrors, 1 target.
+    # E(3,9)↑→M1(3,7) B(\)→west(wrong), need F(/)→east →
+    #   M2(7,7) B(\) correct→north → M3(7,3) F(/)→east(wrong), need B(\)→west → T(1,3)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, W],
+            [W, T, _, _, _, _, _, F, _, W],
+            [W, _, _, _, _, W, _, _, _, W],
+            [W, _, _, _, _, W, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, W],
+            [W, _, _, B, _, _, _, B, _, W],
+            [W, _, _, _, _, _, _, _, _, W],
+            [W, W, W,EN, W, W, W, W, W, W],
+        ],
+        'start': (1.5, 1.5, math.pi / 2),
+        'par': 40,
+    },
+    # Level 6: Two emitters, three mirrors, two targets.
+    # E1(2,9)↑→M1(2,6) B(\)→west(wrong), need F(/)→east→ M2(5,6) B(\)→south(wrong), need F(/)→north→T1(5,2)
+    # E2(9,9)↑→M3(9,6) F(/)→east(wrong), need B(\)→west→T2(7,6)
+    {
+        'map': [
+            [W, W, W, W, W, W, W, W, W, W, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, T, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, B, _, _, B, _, T, _, F, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, _, _, _, _, _, _, _, _, _, W],
+            [W, W,EN, W, W, W, W, W, W,EN, W],
+        ],
+        'start': (5.5, 1.5, math.pi / 2),
+        'par': 45,
+    },
+]
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  Game Class
+# ═══════════════════════════════════════════════════════════════════
+
+class LaserMirrors(Game):
+    name = "LASER MIRRORS"
+    description = "Redirect the beam"
+    category = "unique"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        self.reset()
+
+    def reset(self):
+        self.state = GameState.PLAYING
+        self.score = 0
+        self.level = 0
+        self.time = 0.0
+        self.phase = 'title'
+        self.phase_timer = 2.5
+        self.level_elapsed = 0.0
+
+        # Ray offsets for rendering
+        self.ray_offsets = []
+        for col in range(GRID_SIZE):
+            self.ray_offsets.append((col / GRID_SIZE - 0.5) * FOV)
+
+        # Z-buffer for laser rendering
+        self.zbuf = [0.0] * GRID_SIZE
+
+        # Beam cells for floor glow
+        self.beam_cells = set()
+
+        # Hint overlay timer
+        self.hint_timer = 0.0
+
+        self._load_level(0)
+
+    def _load_level(self, idx):
+        """Load a level map."""
+        if idx >= len(LEVELS):
+            self.phase = 'won'
+            self.phase_timer = 4.0
+            return
+
+        lvl = LEVELS[idx]
+        self.level = idx
+        self.level_elapsed = 0.0
+
+        # Deep copy map
+        self.map = [row[:] for row in lvl['map']]
+        self.map_h = len(self.map)
+        self.map_w = len(self.map[0])
+
+        # Player start
+        sx, sy, sa = lvl['start']
+        self.px = sx
+        self.py = sy
+        self.pa = sa
+
+        # Find emitters and targets
+        self.emitters = []
+        self.targets = []
+        for y in range(self.map_h):
+            for x in range(self.map_w):
+                c = self.map[y][x]
+                if c in EMITTER_DIRS:
+                    self.emitters.append((x, y, c))
+                elif c == TARGET:
+                    self.targets.append([x, y, False])
+
+        # Trace laser beams
+        self.beam_segments = []
+        self.beam_cells = set()
+        self._trace_all_lasers()
+
+        # Level clear state
+        self.level_clear = False
+        self.clear_timer = 0.0
+        self.mirror_anims = {}  # {(mx,my): {from_theta, to_theta, progress, from_type, to_type}}
+
+        # Show hints
+        self.hint_timer = 4.0
+
+        self.phase = 'playing'
+
+    def _cell(self, x, y):
+        if x < 0 or x >= self.map_w or y < 0 or y >= self.map_h:
+            return WALL
+        return self.map[y][x]
+
+    def _is_solid(self, x, y):
+        c = self._cell(x, y)
+        return c != EMPTY
+
+    def _collision(self, x, y):
+        for dx in (-MARGIN, MARGIN):
+            for dy in (-MARGIN, MARGIN):
+                if self._is_solid(int(x + dx), int(y + dy)):
+                    return True
+        return False
+
+    def _facing_cell(self):
+        cos_a = math.cos(self.pa)
+        sin_a = math.sin(self.pa)
+        check_x = int(self.px + cos_a * 1.2)
+        check_y = int(self.py + sin_a * 1.2)
+        return check_x, check_y
+
+    # ─────────────────────────────────────────────────────────────
+    #  Laser tracing
+    # ─────────────────────────────────────────────────────────────
+
+    def _trace_all_lasers(self):
+        self.beam_segments = []
+        self.beam_cells = set()
+        for t in self.targets:
+            t[2] = False
+        for ex, ey, etype in self.emitters:
+            dx, dy = EMITTER_DIRS[etype]
+            self._trace_beam(ex, ey, dx, dy)
+
+    def _trace_beam(self, start_x, start_y, dx, dy):
+        cx, cy = start_x, start_y
+        for _ in range(30):
+            nx, ny = cx + dx, cy + dy
+
+            if nx < 0 or nx >= self.map_w or ny < 0 or ny >= self.map_h:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                break
+
+            cell = self.map[ny][nx]
+
+            if cell == WALL or cell in EMITTER_DIRS:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                break
+
+            if cell == TARGET:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                self.beam_cells.add((nx, ny))
+                for t in self.targets:
+                    if t[0] == nx and t[1] == ny:
+                        t[2] = True
+                break
+
+            if cell == MIRROR_BK:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                self.beam_cells.add((nx, ny))
+                dx, dy = dy, dx
+                cx, cy = nx, ny
+                continue
+
+            if cell == MIRROR_FW:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                self.beam_cells.add((nx, ny))
+                dx, dy = -dy, -dx
+                cx, cy = nx, ny
+                continue
+
+            # Empty cell
+            self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+            self.beam_cells.add((nx, ny))
+            cx, cy = nx, ny
+
+    # ─────────────────────────────────────────────────────────────
+    #  Animated laser tracing (during mirror rotation)
+    # ─────────────────────────────────────────────────────────────
+
+    def _trace_all_lasers_animated(self):
+        """Retrace all lasers with continuous-angle reflection for animating mirrors."""
+        self.beam_segments = []
+        self.beam_cells = set()
+        for t in self.targets:
+            t[2] = False
+        for ex, ey, etype in self.emitters:
+            dx, dy = EMITTER_DIRS[etype]
+            self._trace_beam_animated(ex, ey, dx, dy)
+
+    def _trace_beam_animated(self, start_x, start_y, dx, dy):
+        """Grid-based trace that uses continuous angles at rotating mirrors."""
+        cx, cy = start_x, start_y
+        for _ in range(30):
+            nx, ny = cx + dx, cy + dy
+            if nx < 0 or nx >= self.map_w or ny < 0 or ny >= self.map_h:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                break
+            cell = self.map[ny][nx]
+            if cell == WALL or cell in EMITTER_DIRS:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                break
+            if cell == TARGET:
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                self.beam_cells.add((nx, ny))
+                for t in self.targets:
+                    if t[0] == nx and t[1] == ny:
+                        t[2] = True
+                break
+            if cell in (MIRROR_BK, MIRROR_FW):
+                self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+                self.beam_cells.add((nx, ny))
+                if (nx, ny) in self.mirror_anims:
+                    # Rotating mirror: compute interpolated reflection angle
+                    anim = self.mirror_anims[(nx, ny)]
+                    t = min(1.0, anim['progress'])
+                    theta = anim['from_theta'] + t * (anim['to_theta'] - anim['from_theta'])
+                    a2 = 2 * theta
+                    cos2, sin2 = math.cos(a2), math.sin(a2)
+                    ref_dx = dx * cos2 + dy * sin2
+                    ref_dy = dx * sin2 - dy * cos2
+                    self._trace_continuous(nx + 0.5, ny + 0.5, ref_dx, ref_dy)
+                    return
+                # Static mirror: normal grid reflection
+                if cell == MIRROR_BK:
+                    dx, dy = dy, dx
+                else:
+                    dx, dy = -dy, -dx
+                cx, cy = nx, ny
+                continue
+            # Empty cell
+            self.beam_segments.append((cx + 0.5, cy + 0.5, nx + 0.5, ny + 0.5))
+            self.beam_cells.add((nx, ny))
+            cx, cy = nx, ny
+
+    def _trace_continuous(self, ox, oy, dx, dy, depth=0):
+        """Float-step trace for beams at arbitrary angles after a rotating mirror."""
+        if depth > 10:
+            return
+        step_sz = 0.05
+        cx, cy = ox, oy
+        start_cell = (int(ox), int(oy))
+        entered = set()
+        for _ in range(600):
+            cx += dx * step_sz
+            cy += dy * step_sz
+            gx, gy = int(cx), int(cy)
+            if gx < 0 or gx >= self.map_w or gy < 0 or gy >= self.map_h:
+                self.beam_segments.append((ox, oy, cx, cy))
+                return
+            if (gx, gy) != start_cell and (gx, gy) not in entered:
+                entered.add((gx, gy))
+                cell = self.map[gy][gx]
+                if cell == WALL or cell in EMITTER_DIRS:
+                    self.beam_segments.append((ox, oy, gx + 0.5, gy + 0.5))
+                    return
+                if cell == TARGET:
+                    self.beam_segments.append((ox, oy, gx + 0.5, gy + 0.5))
+                    self.beam_cells.add((gx, gy))
+                    for t in self.targets:
+                        if t[0] == gx and t[1] == gy:
+                            t[2] = True
+                    return
+                if cell in (MIRROR_BK, MIRROR_FW):
+                    self.beam_segments.append((ox, oy, gx + 0.5, gy + 0.5))
+                    self.beam_cells.add((gx, gy))
+                    # Reflect off static mirror using continuous formula
+                    a2 = math.pi / 2 if cell == MIRROR_BK else -math.pi / 2
+                    cos2, sin2 = math.cos(a2), math.sin(a2)
+                    new_dx = dx * cos2 + dy * sin2
+                    new_dy = dx * sin2 - dy * cos2
+                    self._trace_continuous(gx + 0.5, gy + 0.5, new_dx, new_dy, depth + 1)
+                    return
+                self.beam_cells.add((gx, gy))
+        self.beam_segments.append((ox, oy, cx, cy))
+
+    # ─────────────────────────────────────────────────────────────
+    #  Update
+    # ─────────────────────────────────────────────────────────────
+
+    def update(self, input_state: InputState, dt: float):
+        if self.state != GameState.PLAYING:
+            return
+
+        self.time += dt
+
+        if self.phase == 'title':
+            self.phase_timer -= dt
+            if self.phase_timer <= 0:
+                self.phase = 'playing'
+            return
+
+        if self.phase == 'won':
+            self.phase_timer -= dt
+            if self.phase_timer <= 0:
+                self.state = GameState.GAME_OVER
+            return
+
+        if self.phase == 'level_clear':
+            self.clear_timer -= dt
+            if self.clear_timer <= 0:
+                self._load_level(self.level + 1)
+            return
+
+        # Playing
+        self.level_elapsed += dt
+        if self.hint_timer > 0:
+            self.hint_timer -= dt
+
+        # Rotation
+        if input_state.left:
+            self.pa -= ROT_SPEED * dt
+        if input_state.right:
+            self.pa += ROT_SPEED * dt
+
+        # Movement
+        cos_a = math.cos(self.pa)
+        sin_a = math.sin(self.pa)
+        speed = MOVE_SPEED * dt
+
+        nx, ny = self.px, self.py
+        if input_state.up:
+            nx += cos_a * speed
+            ny += sin_a * speed
+        if input_state.down:
+            nx -= cos_a * speed * 0.6
+            ny -= sin_a * speed * 0.6
+
+        if not self._collision(nx, self.py):
+            self.px = nx
+        if not self._collision(self.px, ny):
+            self.py = ny
+
+        # Advance mirror rotation animations
+        if self.mirror_anims:
+            done = []
+            for pos, anim in self.mirror_anims.items():
+                anim['progress'] += dt / MIRROR_ANIM_DUR
+                if anim['progress'] >= 1.0:
+                    mx, my = pos
+                    self.map[my][mx] = anim['to_type']
+                    done.append(pos)
+            for pos in done:
+                del self.mirror_anims[pos]
+            self._trace_all_lasers_animated()
+            if not self.mirror_anims:
+                self._trace_all_lasers()
+
+        # Rotate mirror with Space (blocked during animation)
+        if input_state.action_l and not self.mirror_anims:
+            fx, fy = self._facing_cell()
+            if 0 <= fx < self.map_w and 0 <= fy < self.map_h:
+                c = self.map[fy][fx]
+                if c == MIRROR_BK:
+                    self.mirror_anims[(fx, fy)] = {
+                        'from_theta': math.pi / 4,
+                        'to_theta': -math.pi / 4,
+                        'progress': 0.0,
+                        'from_type': MIRROR_BK,
+                        'to_type': MIRROR_FW,
+                    }
+                elif c == MIRROR_FW:
+                    self.mirror_anims[(fx, fy)] = {
+                        'from_theta': -math.pi / 4,
+                        'to_theta': math.pi / 4,
+                        'progress': 0.0,
+                        'from_type': MIRROR_FW,
+                        'to_type': MIRROR_BK,
+                    }
+
+        # Check win condition
+        if self.targets and all(t[2] for t in self.targets):
+            if not self.level_clear:
+                self.level_clear = True
+                lvl = LEVELS[self.level]
+                time_bonus = max(0, lvl['par'] - self.level_elapsed) * 10
+                self.score += 100 + int(time_bonus)
+                self.phase = 'level_clear'
+                self.clear_timer = 2.0
+
+    # ─────────────────────────────────────────────────────────────
+    #  Raycaster
+    # ─────────────────────────────────────────────────────────────
+
+    def _cast_column(self, col, angle):
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        if abs(cos_a) < 1e-8:
+            cos_a = 1e-8
+        if abs(sin_a) < 1e-8:
+            sin_a = 1e-8
+
+        map_x = int(self.px)
+        map_y = int(self.py)
+        delta_x = abs(1.0 / cos_a)
+        delta_y = abs(1.0 / sin_a)
+
+        if cos_a < 0:
+            step_x = -1
+            side_dist_x = (self.px - map_x) * delta_x
+        else:
+            step_x = 1
+            side_dist_x = (map_x + 1.0 - self.px) * delta_x
+
+        if sin_a < 0:
+            step_y = -1
+            side_dist_y = (self.py - map_y) * delta_y
+        else:
+            step_y = 1
+            side_dist_y = (map_y + 1.0 - self.py) * delta_y
+
+        side = 0
+        for _ in range(64):
+            if side_dist_x < side_dist_y:
+                side_dist_x += delta_x
+                map_x += step_x
+                side = 0
+            else:
+                side_dist_y += delta_y
+                map_y += step_y
+                side = 1
+
+            if map_x < 0 or map_x >= self.map_w or map_y < 0 or map_y >= self.map_h:
+                break
+
+            cell = self._cell(map_x, map_y)
+            if cell != EMPTY:
+                if side == 0:
+                    perp = (map_x - self.px + (1 - step_x) / 2) / cos_a
+                else:
+                    perp = (map_y - self.py + (1 - step_y) / 2) / sin_a
+                if perp < 0.01:
+                    perp = 0.01
+
+                if side == 0:
+                    wall_x = self.py + perp * sin_a
+                else:
+                    wall_x = self.px + perp * cos_a
+                wall_x -= int(wall_x)
+
+                return (perp, cell, wall_x, side, map_x, map_y)
+
+        return None
+
+    # ─────────────────────────────────────────────────────────────
+    #  Drawing
+    # ─────────────────────────────────────────────────────────────
+
+    def draw(self):
+        self.display.clear(Colors.BLACK)
+
+        if self.phase == 'title':
+            self._draw_title()
+            return
+
+        if self.phase == 'won':
+            self._draw_win()
+            return
+
+        if self.phase == 'level_clear':
+            self._draw_level_clear()
+            return
+
+        pulse = 0.9 + 0.1 * math.sin(self.time * 0.5)
+        eye_h = 0.5
+
+        for col in range(GRID_SIZE):
+            ray_angle = self.pa + self.ray_offsets[col]
+            hit = self._cast_column(col, ray_angle)
+
+            cos_r = math.cos(ray_angle)
+            sin_r = math.sin(ray_angle)
+
+            if not hit:
+                self.zbuf[col] = 999.0
+                for y in range(HALF):
+                    self.display.set_pixel(col, y, CEIL_COLOR)
+                for y in range(HALF, GRID_SIZE):
+                    p = y - HALF
+                    if p <= 0:
+                        continue
+                    row_dist = eye_h * GRID_SIZE / p
+                    fx = self.px + cos_r * row_dist
+                    fy = self.py + sin_r * row_dist
+                    fcx, fcy = int(fx), int(fy)
+                    checker = (fcx + fcy) % 2
+                    fog_f = min(1.0, 2.0 / (row_dist + 0.5)) * pulse
+                    base = FLOOR_LIGHT if checker == 0 else FLOOR_DARK
+                    r = int(base[0] * fog_f)
+                    g = int(base[1] * fog_f)
+                    b = int(base[2] * fog_f)
+                    # Beam floor glow
+                    if (fcx, fcy) in self.beam_cells:
+                        r = min(255, r + int(60 * fog_f))
+                        g = min(255, g + int(20 * fog_f))
+                    self.display.set_pixel(col, y, (r, g, b))
+                continue
+
+            perp, cell, wall_x, side, mx, my = hit
+            self.zbuf[col] = perp
+
+            line_height = int(GRID_SIZE / perp) if perp > 0 else GRID_SIZE
+            draw_start = max(0, HALF - line_height // 2)
+            draw_end = min(GRID_SIZE - 1, HALF + line_height // 2)
+
+            fog = min(1.0, 2.5 / (perp + 0.5)) * pulse
+            if side == 1:
+                fog *= 0.75
+
+            for y in range(0, draw_start):
+                self.display.set_pixel(col, y, CEIL_COLOR)
+
+            for y in range(draw_start, draw_end + 1):
+                v = (y - (HALF - line_height // 2)) / max(1, line_height)
+                r, g, b = self._wall_color(cell, wall_x, v, mx, my)
+                r = min(255, int(r * fog))
+                g = min(255, int(g * fog))
+                b = min(255, int(b * fog))
+                self.display.set_pixel(col, y, (r, g, b))
+
+            for y in range(draw_end + 1, GRID_SIZE):
+                p = y - HALF
+                if p <= 0:
+                    self.display.set_pixel(col, y, CEIL_COLOR)
+                    continue
+                row_dist = eye_h * GRID_SIZE / p
+                fx = self.px + cos_r * row_dist
+                fy = self.py + sin_r * row_dist
+                fcx, fcy = int(fx), int(fy)
+                checker = (fcx + fcy) % 2
+                fog_f = min(1.0, 2.0 / (row_dist + 0.5)) * pulse
+                base = FLOOR_LIGHT if checker == 0 else FLOOR_DARK
+                glow_r, glow_g = 0, 0
+                # Emitter glow
+                for ex, ey, etype in self.emitters:
+                    dist = abs(fcx - ex) + abs(fcy - ey)
+                    if dist <= 2:
+                        intensity = (3 - dist) / 3.0
+                        glow_r += int(40 * intensity)
+                        glow_g += int(15 * intensity)
+                # Target glow
+                for t in self.targets:
+                    if t[2]:
+                        dist = abs(fcx - t[0]) + abs(fcy - t[1])
+                        if dist <= 2:
+                            intensity = (3 - dist) / 3.0
+                            glow_g += int(50 * intensity)
+                # Beam floor glow
+                if (fcx, fcy) in self.beam_cells:
+                    glow_r += int(60 * fog_f)
+                    glow_g += int(20 * fog_f)
+                r = min(255, int(base[0] * fog_f) + glow_r)
+                g = min(255, int(base[1] * fog_f) + glow_g)
+                b = int(base[2] * fog_f)
+                self.display.set_pixel(col, y, (r, g, b))
+
+        # Render laser beams in screen space
+        self._draw_laser_beams()
+
+        # Crosshair
+        ch = (100, 100, 120)
+        self.display.set_pixel(31, 32, ch)
+        self.display.set_pixel(32, 32, ch)
+        self.display.set_pixel(31, 31, ch)
+        self.display.set_pixel(32, 31, ch)
+
+        # HUD
+        self.display.draw_text_small(2, 1, f"L{self.level + 1}", (150, 200, 150))
+        score_txt = str(self.score)
+        stx = 63 - len(score_txt) * 4
+        self.display.draw_text_small(stx, 1, score_txt, Colors.WHITE)
+
+        # Par timer
+        secs = int(self.level_elapsed)
+        lvl = LEVELS[self.level]
+        remaining = max(0, lvl['par'] - secs)
+        timer_color = Colors.GREEN if remaining > 10 else (Colors.ORANGE if remaining > 5 else Colors.RED)
+        timer_txt = str(remaining)
+        tx = 63 - len(timer_txt) * 4
+        self.display.draw_text_small(tx, 58, timer_txt, timer_color)
+
+        # Instruction overlay
+        if self.hint_timer > 0:
+            self._draw_hints()
+
+    def _wall_color(self, cell, u, v, cx, cy):
+        if cell == WALL:
+            bu = int(u * 4)
+            bv = int(v * 4)
+            fu = u * 4 - bu
+            fv = v * 4 - bv
+            if bv % 2 == 1:
+                fu = (u * 4 + 0.5)
+                fu = fu - int(fu)
+            if fu < 0.06 or fv < 0.06:
+                return STONE_DARK
+            return STONE_COLOR
+
+        if cell in (MIRROR_BK, MIRROR_FW):
+            mp = 0.8 + 0.2 * math.sin(self.time * 2.0)
+            # Check if this mirror is animating
+            anim = self.mirror_anims.get((cx, cy))
+            if anim:
+                t = min(1.0, anim['progress'])
+                diag = anim['from_theta'] + t * (anim['to_theta'] - anim['from_theta'])
+                mp = 1.0  # bright during animation
+            else:
+                diag = math.pi / 4 if cell == MIRROR_BK else -math.pi / 4
+            # Distance from (u,v) to diagonal line through center
+            dist = abs((u - 0.5) * math.sin(diag) - (v - 0.5) * math.cos(diag))
+            if dist < 0.11:
+                return (int(220 * mp), int(240 * mp), 255)
+            if u < 0.08 or u > 0.92 or v < 0.08 or v > 0.92:
+                return (80, 90, 110)
+            return (int(MIRROR_COLOR[0] * mp), int(MIRROR_COLOR[1] * mp), int(MIRROR_COLOR[2] * mp))
+
+        if cell in EMITTER_DIRS:
+            du = abs(u - 0.5)
+            dv = abs(v - 0.5)
+            dist = du * du + dv * dv
+            ep = 0.7 + 0.3 * math.sin(self.time * 3.0)
+            if dist < 0.08:
+                return (min(255, int(255 * ep)), int(100 * ep), 20)
+            if dist < 0.15:
+                return (int(180 * ep), int(60 * ep), 20)
+            return (60, 30, 20)
+
+        if cell == TARGET:
+            lit = False
+            for t in self.targets:
+                if t[0] == cx and t[1] == cy:
+                    lit = t[2]
+                    break
+            du = abs(u - 0.5)
+            dv = abs(v - 0.5)
+            dist = du * du + dv * dv
+            if lit:
+                tp = 0.8 + 0.2 * math.sin(self.time * 4.0)
+                if dist < 0.1:
+                    return (int(80 * tp), int(255 * tp), int(120 * tp))
+                return (int(40 * tp), int(200 * tp), int(80 * tp))
+            else:
+                # Unlit target — distinct green ring
+                if dist < 0.06:
+                    return (100, 130, 100)
+                if dist < 0.15:
+                    return (70, 100, 70)
+                return TARGET_UNLIT
+
+        return STONE_COLOR
+
+    def _draw_laser_beams(self):
+        cos_pa = math.cos(self.pa)
+        sin_pa = math.sin(self.pa)
+
+        for x1, y1, x2, y2 in self.beam_segments:
+            pts = []
+            for bx, by in [(x1, y1), (x2, y2)]:
+                dx = bx - self.px
+                dy = by - self.py
+                vz = dx * cos_pa + dy * sin_pa
+                vx = -dx * sin_pa + dy * cos_pa
+                pts.append((vx, vz))
+
+            if pts[0][1] <= 0.05 and pts[1][1] <= 0.05:
+                continue
+
+            # More steps for longer segments
+            seg_len = max(abs(x2 - x1), abs(y2 - y1))
+            steps = max(16, int(seg_len * 20))
+            for i in range(steps + 1):
+                t = i / steps
+                vx = pts[0][0] * (1 - t) + pts[1][0] * t
+                vz = pts[0][1] * (1 - t) + pts[1][1] * t
+                if vz <= 0.05:
+                    continue
+
+                sx = int(HALF + vx * GRID_SIZE / vz)
+                # Beam at wall midpoint (eye height)
+                sy = HALF
+
+                if sx < 0 or sx >= GRID_SIZE:
+                    continue
+                if vz > self.zbuf[sx]:
+                    continue
+                if sy < 0 or sy >= GRID_SIZE:
+                    continue
+
+                # 2px tall core
+                self.display.set_pixel(sx, sy, LASER_CORE)
+                if 0 <= sy - 1 < GRID_SIZE:
+                    self.display.set_pixel(sx, sy - 1, LASER_CORE)
+
+                # Glow above and below
+                for gy in range(-3, 4):
+                    if -1 <= gy <= 0:
+                        continue  # skip core pixels
+                    gsy = sy + gy
+                    if 0 <= gsy < GRID_SIZE:
+                        pr, pg, pb = self.display.get_pixel(sx, gsy)
+                        intensity = max(0, 4 - abs(gy))
+                        nr = min(255, pr + LASER_GLOW[0] * intensity)
+                        ng = min(255, pg + LASER_GLOW[1] * intensity)
+                        nb = min(255, pb + LASER_GLOW[2] * intensity)
+                        self.display.set_pixel(sx, gsy, (nr, ng, nb))
+
+    def _draw_hints(self):
+        alpha = min(1.0, self.hint_timer / 0.8)
+        # Dark band
+        y0, y1 = 18, 48
+        if self.level > 0:
+            y0, y1 = 22, 42
+        for y in range(y0, y1):
+            for x in range(GRID_SIZE):
+                pr, pg, pb = self.display.get_pixel(x, y)
+                f = 1.0 - 0.7 * alpha
+                self.display.set_pixel(x, y, (int(pr * f), int(pg * f), int(pb * f)))
+
+        c = (int(220 * alpha), int(220 * alpha), int(240 * alpha))
+        h = (int(160 * alpha), int(180 * alpha), int(160 * alpha))
+
+        if self.level == 0:
+            self.display.draw_text_small(2, 20, "ARROWS:MOVE", c)
+            self.display.draw_text_small(2, 28, "SPC:ROTATE", c)
+            self.display.draw_text_small(2, 36, "LIGHT TARGETS", h)
+            self.display.draw_text_small(2, 44, "WITH THE BEAM", h)
+        else:
+            self.display.draw_text_small(2, 24, f"LEVEL {self.level + 1}", c)
+            n_targets = len(self.targets)
+            n_mirrors = sum(1 for row in self.map for c in row if c in (MIRROR_BK, MIRROR_FW))
+            self.display.draw_text_small(2, 32, f"{n_mirrors}M {n_targets}T", h)
+            self.display.draw_text_small(2, 38, "SPC:ROTATE", h)
+
+    def _draw_title(self):
+        self.display.clear((10, 12, 25))
+        beam_y = 28
+        beam_x = int((self.time * 40) % 80) - 10
+        for x in range(max(0, beam_x - 30), min(64, beam_x)):
+            fade = max(0.2, 1.0 - (beam_x - x) / 30.0)
+            r = int(255 * fade)
+            g = int(80 * fade)
+            self.display.set_pixel(x, beam_y, (r, g, 20))
+
+        self.display.draw_text_small(10, 14, "LASER", LASER_CORE)
+        self.display.draw_text_small(6, 22, "MIRRORS", MIRROR_COLOR)
+        self.display.draw_text_small(2, 38, "ROTATE MIRRORS", (100, 120, 140))
+        self.display.draw_text_small(2, 46, "REDIRECT BEAM", (100, 120, 140))
+        if int(self.time * 3) % 2 == 0:
+            self.display.draw_text_small(6, 57, "PRESS START", Colors.ORANGE)
+
+    def _draw_win(self):
+        self.display.clear((10, 15, 10))
+        self.display.draw_text_small(6, 14, "ALL CLEAR", TARGET_LIT)
+        self.display.draw_text_small(2, 26, "WELL DONE!", Colors.WHITE)
+        self.display.draw_text_small(2, 38, f"SCORE:{self.score}", Colors.YELLOW)
+
+    def _draw_level_clear(self):
+        self.display.clear((10, 15, 10))
+        self.display.draw_text_small(2, 10, f"LEVEL {self.level + 1}", Colors.GREEN)
+        self.display.draw_text_small(2, 20, "CLEAR!", TARGET_LIT)
+        lvl = LEVELS[self.level]
+        time_bonus = max(0, lvl['par'] - self.level_elapsed) * 10
+        self.display.draw_text_small(2, 32, "BASE:100", Colors.WHITE)
+        self.display.draw_text_small(2, 40, f"TIME:+{int(time_bonus)}", Colors.YELLOW)
+        self.display.draw_text_small(2, 52, f"TOTAL:{self.score}", Colors.ORANGE)
+
+    def draw_game_over(self, selection: int = 0):
+        if self.phase == 'won':
+            self._draw_win()
+        else:
+            self.display.clear(Colors.BLACK)
+            self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
+            self.display.draw_text_small(2, 32, f"SCORE:{self.score}", Colors.WHITE)
+
+        if selection == 0:
+            self.display.draw_text_small(2, 54, ">RETRY", Colors.YELLOW)
+            self.display.draw_text_small(34, 54, " MENU", Colors.GRAY)
+        else:
+            self.display.draw_text_small(2, 54, " RETRY", Colors.GRAY)
+            self.display.draw_text_small(34, 54, ">MENU", Colors.YELLOW)

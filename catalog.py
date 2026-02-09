@@ -41,6 +41,7 @@ GAME_CATEGORIES = [
     Category("TOYS", Colors.PINK, "toys"),
     Category("2 PLAYER GAMES", Colors.MAGENTA, "2_player"),
     Category("BAR GAMES", (200, 150, 50), "bar"),
+    Category("UNIQUE GAMES", (100, 255, 180), "unique"),
     Category("GAME MIX", Colors.ORANGE, "game_mix"),
 ]
 
