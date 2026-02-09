@@ -76,11 +76,20 @@ def scan_file(filepath, pkg):
         return [], []
 
     deps = []
+    needs_numpy = False
     module_name = os.path.splitext(os.path.basename(filepath))[0]
 
     # Detect import dependencies (cross-package AND intra-package)
     for node in ast.walk(tree):
+        # Detect numpy imports: import numpy / import numpy as np
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == 'numpy' or alias.name.startswith('numpy.'):
+                    needs_numpy = True
+        # Detect numpy imports: from numpy import ...
         if isinstance(node, ast.ImportFrom) and node.module:
+            if node.module == 'numpy' or node.module.startswith('numpy.'):
+                needs_numpy = True
             other = 'games' if pkg == 'visuals' else 'visuals'
             # Cross-package: visuals importing from games (or vice versa)
             if node.module.startswith(other + '.'):
@@ -174,7 +183,7 @@ def scan_file(filepath, pkg):
             'category': info['category'],
         })
 
-    return classes, deps
+    return classes, deps, needs_numpy
 
 
 def resolve_transitive_deps(file_deps):
@@ -204,6 +213,7 @@ def resolve_transitive_deps(file_deps):
 def main():
     items_by_cat = {}
     file_deps = {}  # module_path -> direct deps from scan_file
+    file_numpy = {}  # module_path -> True if file directly imports numpy
 
     for pkg in ['games', 'visuals']:
         pkg_dir = os.path.join(ROOT, pkg)
@@ -219,9 +229,11 @@ def main():
 
             filepath = os.path.join(pkg_dir, fname)
             module_path = f"{pkg}/{fname}"
-            classes, deps = scan_file(filepath, pkg)
+            classes, deps, needs_numpy = scan_file(filepath, pkg)
             if deps:
                 file_deps[module_path] = deps
+            if needs_numpy:
+                file_numpy[module_path] = True
 
             for cls_info in classes:
                 cat_key = cls_info['category'] or default_cat
@@ -237,9 +249,13 @@ def main():
     all_deps = resolve_transitive_deps(file_deps)
     for items in items_by_cat.values():
         for entry in items:
-            deps = all_deps.get(entry['module'], [])
+            mod = entry['module']
+            deps = all_deps.get(mod, [])
             if deps:
                 entry['deps'] = deps
+            # needs_numpy if the module or any transitive dep imports numpy
+            if file_numpy.get(mod) or any(file_numpy.get(d) for d in deps):
+                entry['needs_numpy'] = True
 
     # Sort items within each category (numbers after letters, matching catalog.py)
     for items in items_by_cat.values():

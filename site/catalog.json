@@ -1252,31 +1252,36 @@
           "name": "ADVENTURE TIME",
           "cls": "GalleryAdventureTime",
           "module": "visuals/gallery3d.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "ICARUS MUSEUM",
           "cls": "GalleryKidIcarus",
           "module": "visuals/gallery3d.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "KIRBY MUSEUM",
           "cls": "GalleryKirby",
           "module": "visuals/gallery3d.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "SMB3 MUSEUM",
           "cls": "GallerySMB3",
           "module": "visuals/gallery3d.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "ZELDA MUSEUM",
           "cls": "GalleryZelda",
           "module": "visuals/gallery3d.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         }
       ]
     },
@@ -1690,7 +1695,8 @@
           "name": "COLOR MIX",
           "cls": "FluidMixing",
           "module": "visuals/fluid.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "COULOMB",
@@ -1741,13 +1747,15 @@
           "name": "GRAY-SCOTT",
           "cls": "TuringPatterns",
           "module": "visuals/turing.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "INK DROPS",
           "cls": "FluidInk",
           "module": "visuals/fluid.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "LATTICES",
@@ -1822,37 +1830,43 @@
           "name": "TURING CORAL",
           "cls": "TuringCoral",
           "module": "visuals/turing.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "TURING LINES",
           "cls": "TuringStripes",
           "module": "visuals/turing.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "TURING SPOTS",
           "cls": "TuringSpots",
           "module": "visuals/turing.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "TURING WORMS",
           "cls": "TuringWorms",
           "module": "visuals/turing.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "WAVE TANK",
           "cls": "WaveTank",
           "module": "visuals/wavetank.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "WIND TUNNEL",
           "cls": "FluidTunnel",
           "module": "visuals/fluid.py",
-          "is_game": false
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "3 BODY PROBLEM",

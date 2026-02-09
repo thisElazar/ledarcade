@@ -289,7 +289,6 @@
         <li><span class="cat">VISUAL MIX</span> &mdash; slideshow playlists (dynamic loading)</li>
         <li><span class="cat">ART</span>: Great Wave, Scream &mdash; PNG image files (PIL)</li>
         <li><span class="cat">SCIENCE</span>: Earth &mdash; globe texture (PIL)</li>
-        <li><span class="cat">SCIENCE</span>: Fluids, Turing, Wave Tank &mdash; numpy</li>
         <li><span class="cat">UTILITY</span>: Info, Update &mdash; system access</li>
       </ul>
     </details>
@@ -1022,6 +1021,11 @@ _display.clear(Colors.BLACK)
 _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
     `);
     copyAndRender();
+
+    if (itemData.needs_numpy) {
+      setStatus('loading numpy...', 'loading');
+      await pyodide.loadPackage('numpy');
+    }
 
     const deps = itemData.deps || [];
     for (const dep of deps) {
