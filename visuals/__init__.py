@@ -541,8 +541,6 @@ ALL_VISUALS = [
     StickRunnerDemo,
     TetrisDemo,
     TrashBlasterDemo,
-    # Demo slideshow (plays all demos)
-    Demos,
 ]
 
 __all__ = [
