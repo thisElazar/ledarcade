@@ -208,10 +208,17 @@ class MancalaDemo(Visual):
                     if self.nav_timer >= 0.1:
                         self.nav_timer = 0.0
                         diff = (self.target_pit - self.game.selected_pit) % 6
-                        if diff <= 3:
-                            ai_input.right = True
+                        # Game inverts L/R for P2, so AI must counter-invert
+                        if self.game.current_player == PLAYER_2:
+                            if diff <= 3:
+                                ai_input.left = True
+                            else:
+                                ai_input.right = True
                         else:
-                            ai_input.left = True
+                            if diff <= 3:
+                                ai_input.right = True
+                            else:
+                                ai_input.left = True
 
         self.game.update(ai_input, dt)
 
