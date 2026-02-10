@@ -27,7 +27,7 @@ $body .= "Joystick Color:  $joystick\n";
 $body .= "Button Color:    $buttons\n";
 $body .= "Notes:           $notes\n";
 
-$headers  = "From: noreply@wondercabinet.com\r\n";
+$headers  = "From: noreply@thiselazar.com\r\n";
 $headers .= "Reply-To: $email\r\n";
 
 $sent = mail($to, $subject, $body, $headers);
