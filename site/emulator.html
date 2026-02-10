@@ -238,6 +238,88 @@
   .click-overlay span::after { content: ' (TAP)'; }
   .touch-esc { display: block; }
 }
+
+/* Notes form */
+.notes-section {
+  max-width: 480px;
+  margin: 48px auto 0;
+  padding: 0 24px 60px;
+}
+.notes-section h2 {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: #c8a86e;
+  margin-bottom: 6px;
+}
+.notes-subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #6a6254;
+  margin-bottom: 24px;
+}
+.notes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.notes-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.notes-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.notes-group label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #9a9284;
+  text-transform: uppercase;
+}
+.notes-group input[type="text"],
+.notes-group input[type="email"],
+.notes-group textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  color: #d8d0c4;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.notes-group input:focus,
+.notes-group textarea:focus {
+  border-color: rgba(200, 168, 110, 0.5);
+}
+.notes-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.notes-btn {
+  background: rgba(200, 168, 110, 0.15);
+  border: 1px solid rgba(200, 168, 110, 0.3);
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: #c8a86e;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.notes-btn:hover {
+  background: rgba(200, 168, 110, 0.25);
+  border-color: rgba(200, 168, 110, 0.5);
+}
+@media (max-width: 500px) {
+  .notes-row { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -302,6 +384,29 @@
       </ul>
     </details>
   </div>
+</section>
+
+<section class="notes-section">
+  <h2>LEAVE A NOTE</h2>
+  <p class="notes-subtitle">Bug reports, game requests, or just say hi</p>
+  <form class="notes-form" action="submit-notes.php" method="POST">
+    <input type="hidden" name="page" value="Emulator">
+    <div class="notes-row">
+      <div class="notes-group">
+        <label for="note-name">Name</label>
+        <input type="text" id="note-name" name="name" required>
+      </div>
+      <div class="notes-group">
+        <label for="note-email">Email</label>
+        <input type="email" id="note-email" name="email" required>
+      </div>
+    </div>
+    <div class="notes-group">
+      <label for="note-text">Note</label>
+      <textarea id="note-text" name="note" required placeholder="What's on your mind..."></textarea>
+    </div>
+    <button type="submit" class="notes-btn">SEND NOTE</button>
+  </form>
 </section>
 
 <footer>
