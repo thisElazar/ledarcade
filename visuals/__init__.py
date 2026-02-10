@@ -105,6 +105,7 @@ from .rug import Rug
 from .trance import Trance
 from .wolfram import Wolfram
 from .mitosis import Mitosis
+from .balloons import Balloons
 from .boids import Boids
 from .attractors import Attractors
 from .flux import Flux
@@ -309,6 +310,7 @@ ALL_VISUALS = [
     Trance,
     Wolfram,
     Mitosis,
+    Balloons,
     Boids,
     Attractors,
     Flux,
@@ -578,6 +580,7 @@ __all__ = [
     'Trance',
     'Wolfram',
     'Mitosis',
+    'Balloons',
     'Boids',
     'Attractors',
     'Flux',
