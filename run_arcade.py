@@ -528,8 +528,7 @@ def main():
     is_game = False
     is_two_player = False  # 2-player games skip high scores
     exit_hold = 0.0         # Timer for hold-to-exit (menu and gameplay)
-    visual_exit_hold = 0.0  # Timer for hold-to-exit visuals (either button)
-    visual_exit_hold_both = 0.0  # Timer for both-buttons hold-to-exit visuals
+    visual_exit_hold = 0.0  # Timer for hold-to-exit visuals (both buttons)
 
     # Idle screen state
     idle_timer = 0.0
@@ -967,23 +966,18 @@ def main():
                         current_item.update(input_state, dt)
                         current_item.draw()
                 else:
-                    # Visual — hold both buttons 0.5s or either button 1s to return to menu
+                    # Visual — hold both buttons 2s to return to menu
                     # Skip for visuals that handle their own exit (e.g. InputTest)
                     if not getattr(current_item, 'custom_exit', False):
                         if input_state.action_l_held and input_state.action_r_held:
-                            visual_exit_hold_both += dt
-                        else:
-                            visual_exit_hold_both = 0.0
-                        if input_state.action_l_held or input_state.action_r_held:
                             visual_exit_hold += dt
+                            if visual_exit_hold >= 2.0:
+                                in_menu = True
+                                current_item = None
+                                visual_exit_hold = 0.0
+                                idle_timer = 0.0
                         else:
                             visual_exit_hold = 0.0
-                        if visual_exit_hold_both >= 0.5 or visual_exit_hold >= 1.0:
-                            in_menu = True
-                            current_item = None
-                            visual_exit_hold = 0.0
-                            visual_exit_hold_both = 0.0
-                            idle_timer = 0.0
 
                     if current_item:
                         current_item.handle_input(input_state)
