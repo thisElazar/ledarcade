@@ -59,6 +59,29 @@
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.guide-section h3::before {
+  content: '\25be';
+  font-size: 10px;
+  color: #6a6254;
+  transition: transform 0.2s;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.guide-section.collapsed h3 {
+  margin-bottom: 0;
+  border-bottom-color: transparent;
+}
+.guide-section.collapsed h3::before {
+  transform: rotate(-90deg);
+}
+.guide-section.collapsed > *:not(h3) {
+  display: none;
 }
 .guide-section .guide-intro {
   font-size: 14px;
@@ -1491,6 +1514,23 @@
 
 <script>
 (function() {
+  // Collapsible sections
+  document.querySelectorAll('.guide-section').forEach(function(section) {
+    if (section.id !== 'g-what') {
+      section.classList.add('collapsed');
+    }
+    section.querySelector('h3').addEventListener('click', function() {
+      section.classList.toggle('collapsed');
+    });
+  });
+  document.querySelectorAll('.guide-toc a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      var id = this.getAttribute('href').substring(1);
+      var target = document.getElementById(id);
+      if (target) target.classList.remove('collapsed');
+    });
+  });
+
   var LABELS = {
     'dpad-action': 'D-PAD + ACTION',
     'action-only': 'ACTION ONLY',
