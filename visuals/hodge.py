@@ -28,17 +28,18 @@ class Hodge(Visual):
         super().__init__(display)
 
     def reset(self):
+        import settings as _s
         self.time = 0.0
         self.update_timer = 0.0
         self.speed = 1.0
         self.base_interval = 0.1   # Base CA rate, tuned for Pi
         self.min_interval = 0.05   # Fastest allowed (prevents lag)
 
-        # Hodgepodge parameters
-        self.n = 63  # Max state (ill state)
+        # Hodgepodge parameters (read committed LAB defaults)
+        self.n = _s.get('hodge_lab_n', 63)
         self.k1 = 2  # Infection divisor for infected neighbors
         self.k2 = 3  # Infection divisor for ill neighbors
-        self.g = 5.0   # Infection growth constant (float for fine tuning)
+        self.g = _s.get('hodge_lab_g', 5.0)
 
         # Color palettes - smooth gradients first, then banded options
         self.palettes = [

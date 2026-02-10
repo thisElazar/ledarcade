@@ -31,11 +31,16 @@ class Rug(Visual):
         super().__init__(display)
 
     def reset(self):
+        import settings as _s
         self.time = 0.0
         self.speed = 1.0
         self.update_timer = 0.0
         self.base_interval = 0.08  # Base CA rate, tuned for Pi
         self.min_interval = 0.05   # Fastest allowed (prevents lag)
+
+        # Rug parameters (read committed LAB defaults)
+        self.increment = _s.get('rug_lab_inc', 1)
+        self.num_states = _s.get('rug_lab_states', 256)
 
         # Color palettes
         self.palettes = [
@@ -134,7 +139,8 @@ class Rug(Visual):
                 self.grid[y][x] = 0
 
         # Seed the edges with values
-        self.edge_val = random.randint(100, 200)
+        ns = getattr(self, 'num_states', 256)
+        self.edge_val = random.randint(ns // 3, ns * 2 // 3)
         for i in range(GRID_SIZE):
             self.grid[0][i] = self.edge_val  # Top
             self.grid[GRID_SIZE-1][i] = self.edge_val  # Bottom
@@ -207,14 +213,20 @@ class Rug(Visual):
                 total += self.get_cell(x, y + 1)
                 total += self.get_cell(x + 1, y + 1)
 
-                # Rug rule: average of neighbors + 1
-                self.next_grid[y][x] = (total // 8 + 1) % 256
+                # Rug rule: average of neighbors + increment
+                self.next_grid[y][x] = (total // 8 + self.increment) % self.num_states
 
         self.grid, self.next_grid = self.next_grid, self.grid
 
         # Slowly drift the edge value to create evolving patterns
         if random.random() < 0.02:
-            self.edge_val = (self.edge_val + random.choice([-1, 1])) % 256
+            self.edge_val = (self.edge_val + random.choice([-1, 1])) % self.num_states
+
+    def _state_to_color_idx(self, state):
+        """Map state (0..num_states-1) to palette index (0..255)."""
+        if self.num_states >= 256:
+            return min(state, 255)
+        return state * 255 // max(1, self.num_states - 1)
 
     def draw(self):
         for y in range(GRID_SIZE):
@@ -223,8 +235,8 @@ class Rug(Visual):
                 curr_state = self.grid[y][x]
 
                 # Interpolate between previous and current color
-                prev_color = self.colors[prev_state]
-                curr_color = self.colors[curr_state]
+                prev_color = self.colors[self._state_to_color_idx(prev_state)]
+                curr_color = self.colors[self._state_to_color_idx(curr_state)]
                 t = self.blend
 
                 color = (

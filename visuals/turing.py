@@ -17,6 +17,7 @@ Controls:
 import random
 import numpy as np
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 # Diffusion rates
 DU = 0.16
@@ -294,7 +295,7 @@ class _TuringBase(Visual):
 class TuringSpots(_TuringBase):
     name = "TURING SPOTS"
     description = "Reaction-diffusion spots"
-    category = "science"
+    category = "automata"
     _f_center = 0.035
     _k_center = 0.065
     _f_min = 0.030
@@ -318,7 +319,7 @@ class TuringSpots(_TuringBase):
 class TuringStripes(_TuringBase):
     name = "TURING LINES"
     description = "Reaction-diffusion stripes"
-    category = "science"
+    category = "automata"
     _f_center = 0.025
     _k_center = 0.056
     _f_min = 0.020
@@ -340,7 +341,7 @@ class TuringStripes(_TuringBase):
 class TuringCoral(_TuringBase):
     name = "TURING CORAL"
     description = "Reaction-diffusion coral"
-    category = "science"
+    category = "automata"
     _f_center = 0.029
     _k_center = 0.057
     _f_min = 0.024
@@ -362,7 +363,7 @@ class TuringCoral(_TuringBase):
 class TuringWorms(_TuringBase):
     name = "TURING WORMS"
     description = "Reaction-diffusion worms"
-    category = "science"
+    category = "automata"
     _f_center = 0.078
     _k_center = 0.061
     _f_min = 0.070
@@ -382,15 +383,24 @@ class TuringWorms(_TuringBase):
 
 
 class TuringPatterns(_TuringBase):
-    name = "GRAY-SCOTT"
+    name = "GRAY-SCOTT LAB"
     description = "Explore the full Gray-Scott parameter space"
-    category = "science"
+    category = "automata"
     _f_center = 0.035
     _k_center = 0.065
     _f_min = 0.010
     _f_max = 0.100
     _k_min = 0.040
     _k_max = 0.075
+
+    def reset(self):
+        super().reset()
+        self.f = settings.get('gs_lab_f', self._f_center)
+        self.k = settings.get('gs_lab_k', self._k_center)
+        self.palette_idx = settings.get('gs_lab_palette', 0) % len(PALETTES)
+        self.saved_timer = 0.0
+        self.confirm_timer = 0.0
+        self._both_held_prev = False
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -410,23 +420,50 @@ class TuringPatterns(_TuringBase):
             self.k = max(self._k_min, round(self.k - 0.001, 3))
             self.param_overlay_timer = 2.0
             consumed = True
-        # Both buttons simultaneously toggles notes
-        both = input_state.action_l and input_state.action_r
-        if both and not self._both_pressed_prev:
-            self.show_notes = not self.show_notes
-            self.notes_scroll_offset = 0.0
-            if self.show_notes:
-                self._build_notes_segments()
+        # Both buttons: release shows SAVE? prompt; R confirms, L cancels
+        both_held = input_state.action_l_held and input_state.action_r_held
+        both_released = self._both_held_prev and not both_held
+        if both_released:
+            self.confirm_timer = 3.0
             consumed = True
-        elif input_state.action_l or input_state.action_r:
-            if not both:
+        elif self.confirm_timer > 0 and not both_held:
+            if input_state.action_r:
+                settings.set('gs_lab_f', round(self.f, 3))
+                settings.set('gs_lab_k', round(self.k, 3))
+                settings.set('gs_lab_palette', self.palette_idx)
+                self.saved_timer = 1.5
+                self.confirm_timer = 0.0
+                consumed = True
+            elif input_state.action_l:
+                self.confirm_timer = 0.0
+                consumed = True
+        elif not both_held:
+            if input_state.action_l or input_state.action_r:
                 self.u, self.v = _init_grid()
                 self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
-                if self.show_notes:
-                    self._build_notes_segments()
                 consumed = True
-        self._both_pressed_prev = both
+        self._both_held_prev = both_held
         return consumed
+
+    def update(self, dt):
+        super().update(dt)
+        if self.saved_timer > 0:
+            self.saved_timer = max(0.0, self.saved_timer - dt)
+        if self.confirm_timer > 0:
+            self.confirm_timer = max(0.0, self.confirm_timer - dt)
+
+    def draw(self):
+        _draw_turing(self.display, self.v, self.palette_idx)
+        if self.param_overlay_timer > 0:
+            self._draw_param_overlay()
+        if self.confirm_timer > 0 and self.saved_timer <= 0:
+            alpha = min(1.0, self.confirm_timer / 0.5)
+            c = (int(255 * alpha), int(220 * alpha), int(80 * alpha))
+            self.display.draw_text_small(2, 14, "SAVE?", c)
+        if self.saved_timer > 0:
+            alpha = min(1.0, self.saved_timer / 0.5)
+            c = (int(80 * alpha), int(255 * alpha), int(80 * alpha))
+            self.display.draw_text_small(2, 14, "SAVED", c)
 
     def _draw_param_overlay(self):
         alpha = min(1.0, self.param_overlay_timer / 0.5)
@@ -437,16 +474,3 @@ class TuringPatterns(_TuringBase):
             self.display.draw_text_small(2, 8, "F=%.3f K=%.3f" % (self.f, self.k), c)
         else:
             self.display.draw_text_small(2, 2, "F=%.3f K=%.3f" % (self.f, self.k), c)
-
-    def _get_notes(self):
-        mid = PALETTES[self.palette_idx][3]
-        return [
-            ("GRAY-SCOTT MODEL", (255, 255, 255)),
-            ("REACTION-DIFFUSION SYSTEM", mid),
-            ("PEARSON 1993 CLASSIFICATION", mid),
-            ("F = FEED RATE (REPLENISH U)", (255, 255, 255)),
-            ("K = KILL RATE (REMOVE V)", (255, 255, 255)),
-            ("JOYSTICK EXPLORES PARAMETER SPACE", mid),
-            ("BUTTON RESEEDS THE GRID", mid),
-            ("ALAN TURING 1952", (255, 255, 255)),
-        ]

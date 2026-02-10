@@ -167,6 +167,11 @@ from .wavetank import WaveTank
 from .optics import Optics
 from .radioactive import Radioactive
 from .turing import TuringPatterns
+from .grayscott import GrayScott
+from .hodgelab import HodgeLab
+from .ruglab import RugLab
+from .cycliclab import CyclicLab
+from .lenia import Lenia, LeniaLab
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
 from .earth import Earth
@@ -381,6 +386,12 @@ ALL_VISUALS = [
     Optics,
     Radioactive,
     TuringPatterns,
+    GrayScott,
+    HodgeLab,
+    RugLab,
+    CyclicLab,
+    Lenia,
+    LeniaLab,
     Neurons,
     FluidTunnel,
     FluidInk,
@@ -651,6 +662,12 @@ __all__ = [
     'Optics',
     'Radioactive',
     'TuringPatterns',
+    'GrayScott',
+    'HodgeLab',
+    'RugLab',
+    'CyclicLab',
+    'Lenia',
+    'LeniaLab',
     'Neurons',
     'FluidTunnel',
     'FluidInk',

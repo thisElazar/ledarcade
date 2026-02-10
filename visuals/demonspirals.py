@@ -41,9 +41,10 @@ class DemonSpirals(Visual):
         self.base_interval = 0.08
         self.min_interval = 0.05
 
-        # Number of cyclic states
-        self.num_states = 12
-        self.threshold = 1  # Classic demon spiral threshold
+        # Number of cyclic states (read committed LAB defaults)
+        import settings as _s
+        self.num_states = _s.get('cyclic_lab_states', 12)
+        self.threshold = _s.get('cyclic_lab_threshold', 1)
 
         # Color palette
         self.palette_index = 0
@@ -215,15 +216,16 @@ class DemonSpirals(Visual):
                 successor = (state + 1) % n
 
                 # Check Moore neighborhood for the successor state
-                found = False
+                count = 0
                 for dx, dy in self.NEIGHBORS:
                     nx = (x + dx) % GRID_SIZE
                     ny = (y + dy) % GRID_SIZE
                     if self.grid[ny][nx] == successor:
-                        found = True
-                        break
+                        count += 1
+                        if count >= self.threshold:
+                            break
 
-                if found:
+                if count >= self.threshold:
                     self.next_grid[y][x] = successor
                 else:
                     self.next_grid[y][x] = state
