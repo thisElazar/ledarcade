@@ -70,8 +70,8 @@ class Centipede(Game):
     def spawn_mushrooms(self):
         """Spawn random mushrooms in the field."""
         self.mushrooms = {}
-        # Spawn mushrooms in upper play area
-        for _ in range(25 + self.level * 3):
+        # Spawn mushrooms in upper play area (fewer to keep field open)
+        for _ in range(12 + self.level * 2):
             x = random.randint(1, 62)
             y = random.randint(8, self.PLAYER_AREA_TOP - 2)
             # Align to grid
@@ -232,37 +232,62 @@ class Centipede(Game):
         self.segments.remove(segment)
 
     def update_centipede(self, dt: float):
-        """Update centipede movement."""
+        """Update centipede movement — grid-row dropping, one row at a time."""
         speed = self.SEGMENT_SPEED + self.level * 2
+        step = speed * dt
 
-        for i, seg in enumerate(self.segments):
-            # Move horizontally
-            new_x = seg['x'] + seg['dir_x'] * speed * dt
+        for seg in self.segments:
+            # --- vertical drop phase (animate one row down) ---
+            if seg.get('dropping'):
+                seg['drop_progress'] += step
+                if seg['drop_progress'] >= 4.0:
+                    # Landed on target row
+                    seg['y'] = seg['drop_target']
+                    del seg['dropping']
+                    del seg['drop_progress']
+                    del seg['drop_target']
+                    del seg['drop_start']
+                    # Must travel one grid cell horizontally before
+                    # mushroom collisions re-enable (prevents cascade)
+                    seg['h_since_drop'] = 0.0
+                else:
+                    seg['y'] = seg['drop_start'] + seg['drop_progress']
+                continue  # no horizontal movement while dropping
 
-            # Check for wall or mushroom collision
-            hit_obstacle = False
+            # --- horizontal phase ---
+            new_x = seg['x'] + seg['dir_x'] * step
+            h_moved = seg.get('h_since_drop', 99.0) + abs(new_x - seg['x'])
 
-            # Wall collision
-            if new_x < 2 or new_x > 61:
-                hit_obstacle = True
+            hit = False
 
-            # Mushroom collision
-            for (mx, my), _ in self.mushrooms.items():
-                if abs(new_x - mx) < 4 and abs(seg['y'] - my) < 4:
-                    hit_obstacle = True
-                    break
+            # Wall collision (always checked, boundaries match grid edges)
+            if new_x < 2 or new_x > 62:
+                hit = True
 
-            if hit_obstacle:
-                # Reverse direction and move down
+            # Mushroom collision — same row only, requires one grid cell
+            # of horizontal travel after a drop to prevent cascade
+            if not hit and h_moved >= 4.0:
+                row_y = round((seg['y'] - 2) / 4) * 4 + 2
+                for (mx, my) in self.mushrooms:
+                    if abs(my - row_y) < 1 and abs(new_x - mx) < 3:
+                        hit = True
+                        break
+
+            if hit:
                 seg['dir_x'] *= -1
-                seg['y'] += 4
-
-                # If at bottom, move back up
-                if seg['y'] > 60:
-                    seg['y'] = 60
-                    seg['dir_x'] *= -1
+                seg['x'] = round((seg['x'] - 2) / 4) * 4 + 2  # snap to grid
+                drop_target = seg['y'] + 4.0
+                if drop_target > 60:
+                    # At bottom — just reverse, don't drop further
+                    seg['y'] = min(seg['y'], 60.0)
+                else:
+                    seg['dropping'] = True
+                    seg['drop_start'] = seg['y']
+                    seg['drop_target'] = drop_target
+                    seg['drop_progress'] = 0.0
             else:
                 seg['x'] = new_x
+                seg['h_since_drop'] = h_moved
 
     def update_spider(self, dt: float):
         """Update spider enemy."""
