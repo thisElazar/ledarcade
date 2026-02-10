@@ -52,8 +52,31 @@ SKY_TOP = (30, 50, 100)
 SKY_BOT = (60, 90, 140)
 RAIL_COLOR = (120, 120, 130)
 
+# Room background palettes: (wall_color, floor_color)
+ROOM_PALETTES = [
+    ((190, 180, 160), (130, 105, 75)),   # Cream / wood
+    ((175, 180, 190), (115, 115, 120)),   # Cool gray / slate
+    ((185, 175, 155), (125, 95, 65)),     # Warm beige / dark wood
+    ((180, 170, 180), (125, 110, 110)),   # Lavender / stone
+    ((170, 185, 165), (105, 120, 90)),    # Sage / olive
+    ((195, 185, 170), (140, 115, 85)),    # Linen / oak
+    ((185, 178, 170), (120, 100, 80)),    # Taupe / walnut
+    ((185, 190, 195), (105, 110, 115)),   # Ice blue / charcoal
+]
+
+
+def _fill_room(buf, wall, floor):
+    """Fill 6x6 with wall (rows 0-3) and floor (rows 4-5) for room perspective."""
+    for y in range(4):
+        for x in range(6):
+            buf[y][x] = wall
+    for y in range(4, 6):
+        for x in range(6):
+            buf[y][x] = floor
+
+
 # ═══════════════════════════════════════════════════════════════════
-#  Window scene definitions (6x6 pixel vignettes)
+#  Window scene definitions (6x6 pixel vignettes drawn on room bg)
 # ═══════════════════════════════════════════════════════════════════
 
 def _scene_cat(buf):
@@ -265,11 +288,8 @@ def _scene_boxing(buf):
     buf[2][2] = buf[2][3] = (200, 0, 0)
 
 def _scene_empty(buf):
-    """Empty room — just light coming in."""
-    for y in range(6):
-        for x in range(6):
-            shade = 160 + (x * 10)
-            buf[y][x] = (shade, shade - 10, shade - 20)
+    """Empty room — room background shows through."""
+    pass
 
 def _scene_disco(buf):
     """Disco ball."""
@@ -301,18 +321,238 @@ def _scene_weights(buf):
     # Body
     buf[1][3] = buf[2][3] = (255, 60, 60)
     # Arms up holding bar
-    buf[0][1] = buf[0][2] = buf[0][4] = buf[0][5] = (80, 80, 90)
+    buf[0][1] = buf[0][2] = buf[0][4] = buf[0][5] = (100, 100, 110)
     buf[1][1] = buf[1][5] = SKIN
     # Legs
     buf[3][2] = buf[3][4] = (40, 40, 120)
 
-# Scene pool
+def _scene_christmas(buf):
+    """Christmas tree with ornaments."""
+    buf[0][3] = (255, 220, 0)  # star
+    buf[1][2] = buf[1][3] = (30, 140, 30)
+    buf[2][1] = buf[2][2] = buf[2][3] = buf[2][4] = (25, 120, 25)
+    buf[2][2] = (255, 50, 50)   # red ornament
+    buf[2][4] = (50, 100, 255)  # blue ornament
+    buf[3][0] = buf[3][1] = buf[3][2] = buf[3][3] = buf[3][4] = buf[3][5] = (20, 110, 20)
+    buf[3][1] = (255, 200, 0)   # gold ornament
+    buf[3][4] = (255, 50, 50)   # red ornament
+    buf[4][2] = buf[4][3] = (110, 70, 35)  # trunk
+
+def _scene_bookshelf(buf):
+    """Wall of colorful book spines."""
+    spines = [
+        (180, 40, 40), (40, 100, 170), (200, 160, 40),
+        (40, 140, 60), (160, 60, 140), (200, 100, 40),
+    ]
+    for y in range(6):
+        for x in range(6):
+            buf[y][x] = spines[(x + y * 3) % len(spines)]
+    # Shelf boards
+    for x in range(6):
+        buf[2][x] = (110, 75, 45)
+        buf[5][x] = (110, 75, 45)
+
+def _scene_candles(buf):
+    """Three candles with flames."""
+    for col in [1, 3, 5]:
+        buf[4][col] = buf[3][col] = (235, 225, 200)  # wax
+        buf[2][col] = (255, 200, 50)   # flame
+        buf[1][col] = (255, 120, 30)   # flame tip
+
+def _scene_party(buf):
+    """Balloons and confetti."""
+    buf[0][1] = buf[1][1] = (255, 50, 50)   # red balloon
+    buf[0][3] = buf[1][3] = (50, 120, 255)  # blue balloon
+    buf[0][5] = buf[1][5] = (50, 200, 50)   # green balloon
+    buf[2][1] = buf[2][3] = buf[2][5] = (180, 180, 180)  # strings
+    buf[4][0] = (255, 255, 50)    # confetti
+    buf[3][2] = (255, 120, 200)   # confetti
+    buf[4][4] = (50, 255, 255)    # confetti
+
+def _scene_sleeping(buf):
+    """Person sleeping in bed."""
+    buf[2][0] = buf[2][1] = (240, 235, 245)  # pillow
+    buf[2][2] = SKIN  # head
+    for x in range(6):
+        buf[3][x] = buf[4][x] = (90, 90, 180)  # blanket
+    for x in range(6):
+        buf[5][x] = (110, 70, 40)  # bed frame
+    buf[0][4] = (180, 180, 240)  # z
+    buf[1][5] = (180, 180, 240)  # z
+
+def _scene_guitar(buf):
+    """Person playing guitar."""
+    buf[0][2] = SKIN  # head
+    buf[1][2] = buf[2][2] = (120, 70, 170)  # shirt
+    buf[1][3] = SKIN  # strumming arm
+    buf[2][3] = buf[2][4] = (180, 120, 50)  # guitar body
+    buf[3][3] = buf[3][4] = (180, 120, 50)
+    buf[1][4] = buf[0][5] = (140, 90, 40)   # guitar neck
+
+def _scene_telescope(buf):
+    """Telescope on tripod."""
+    buf[0][0] = (140, 170, 220)  # lens
+    buf[1][1] = buf[2][2] = buf[3][3] = (130, 130, 140)  # tube
+    buf[4][2] = buf[4][4] = (130, 125, 115)  # tripod legs
+    buf[5][1] = buf[5][5] = (130, 125, 115)
+    buf[4][3] = (130, 130, 140)  # tripod center
+
+def _scene_chess_game(buf):
+    """Chess board with pieces."""
+    for y in range(2, 6):
+        for x in range(6):
+            if (x + y) % 2 == 0:
+                buf[y][x] = (210, 190, 160)  # light square
+            else:
+                buf[y][x] = (140, 100, 65)   # dark square
+    buf[2][1] = buf[2][3] = (40, 35, 30)     # black pieces
+    buf[5][0] = buf[5][2] = (240, 240, 245)  # white pieces
+
+def _scene_lavalamp(buf):
+    """Lava lamp."""
+    buf[0][2] = buf[0][3] = (150, 140, 100)  # cap
+    for y in range(1, 5):
+        buf[y][2] = buf[y][3] = (30, 20, 50)  # dark glass
+    buf[5][2] = buf[5][3] = (150, 140, 100)  # base
+    # Lava blobs
+    buf[1][2] = (255, 50, 80)
+    buf[2][3] = (255, 80, 50)
+    buf[3][2] = buf[3][3] = (255, 60, 60)
+    buf[4][2] = (255, 100, 50)
+
+def _scene_drums(buf):
+    """Drum kit."""
+    buf[0][0] = buf[0][1] = (200, 180, 80)   # hi-hat cymbal
+    buf[2][0] = buf[2][1] = buf[2][2] = (200, 195, 180)  # snare top
+    buf[3][0] = buf[3][1] = buf[3][2] = (180, 50, 50)    # snare shell
+    buf[2][3] = buf[2][4] = buf[2][5] = (180, 170, 160)  # bass drum
+    buf[3][3] = buf[3][4] = buf[3][5] = (180, 170, 160)
+    buf[4][3] = buf[4][4] = buf[4][5] = (50, 50, 180)    # bass front
+
+def _scene_aquarium(buf):
+    """Jellyfish aquarium."""
+    for y in range(6):
+        for x in range(6):
+            buf[y][x] = (10, 25, 100)  # deep water
+    buf[0][3] = (220, 140, 255)  # bell top
+    buf[1][2] = buf[1][3] = buf[1][4] = (220, 140, 255)  # bell
+    buf[2][2] = buf[2][4] = (200, 120, 240)  # tentacles
+    buf[3][2] = buf[3][3] = buf[3][4] = (180, 100, 220)
+    buf[0][0] = (80, 120, 180)  # bubble
+
+def _scene_cactus(buf):
+    """Cactus in pot."""
+    buf[1][3] = buf[2][3] = buf[3][3] = (40, 140, 50)  # main stem
+    buf[1][2] = buf[0][2] = (40, 140, 50)  # left arm
+    buf[2][4] = buf[1][4] = (40, 140, 50)  # right arm
+    buf[0][3] = (255, 80, 120)  # flower
+    buf[4][2] = buf[4][3] = buf[4][4] = (190, 110, 60)  # pot
+    buf[5][2] = buf[5][3] = buf[5][4] = (170, 90, 45)   # pot base
+
+def _scene_wizard(buf):
+    """Wizard with staff."""
+    buf[0][3] = (120, 60, 180)  # hat tip
+    buf[1][2] = buf[1][3] = buf[1][4] = (120, 60, 180)  # hat brim
+    buf[2][3] = SKIN  # face
+    buf[3][2] = buf[3][3] = buf[3][4] = (200, 200, 220)  # beard
+    buf[1][5] = buf[2][5] = buf[3][5] = (140, 100, 50)  # staff
+    buf[0][5] = (255, 255, 100)  # staff gem
+
+def _scene_sushi(buf):
+    """Sushi plate."""
+    for x in range(6):
+        buf[4][x] = (230, 230, 235)  # plate
+    buf[2][1] = buf[2][2] = (240, 240, 240)  # rice
+    buf[3][1] = buf[3][2] = (250, 130, 80)   # salmon
+    buf[2][4] = (255, 80, 50)   # maki filling
+    buf[3][4] = (30, 35, 30)    # nori wrap
+    buf[1][0] = buf[2][0] = (200, 170, 100)  # chopsticks
+
+def _scene_laundry(buf):
+    """Washing machine."""
+    for y in range(1, 5):
+        for x in range(1, 5):
+            buf[y][x] = (210, 210, 215)  # machine body
+    buf[2][2] = buf[2][3] = (130, 180, 230)  # water through door
+    buf[3][2] = buf[3][3] = (130, 180, 230)
+    buf[1][2] = (200, 50, 50)   # button
+    buf[1][4] = (50, 200, 50)   # button
+
+def _scene_birdcage(buf):
+    """Bird in cage."""
+    for y in range(5):
+        buf[y][0] = buf[y][5] = (180, 170, 100)  # side bars
+    buf[0][1] = buf[0][2] = buf[0][3] = buf[0][4] = (180, 170, 100)  # top
+    buf[4][1] = buf[4][2] = buf[4][3] = buf[4][4] = (180, 170, 100)  # bottom
+    buf[2][2] = buf[2][3] = (50, 150, 255)  # bird body
+    buf[1][2] = (255, 200, 50)  # beak
+    buf[3][1] = buf[3][2] = buf[3][3] = buf[3][4] = (140, 100, 50)  # perch
+
+def _scene_painter(buf):
+    """Artist at easel."""
+    buf[0][1] = SKIN  # head
+    buf[1][1] = buf[2][1] = (200, 60, 60)  # smock
+    buf[1][2] = SKIN  # painting arm
+    buf[0][3] = buf[0][4] = buf[1][3] = buf[1][4] = (240, 235, 220)  # canvas
+    buf[1][4] = (50, 120, 200)   # blue stroke
+    buf[0][4] = (255, 200, 50)   # yellow stroke
+    buf[2][3] = buf[3][4] = (140, 100, 50)  # easel legs
+
+def _scene_baby(buf):
+    """Baby in crib."""
+    buf[1][0] = buf[2][0] = buf[3][0] = (200, 180, 140)  # left rail
+    buf[1][5] = buf[2][5] = buf[3][5] = (200, 180, 140)  # right rail
+    for x in range(6):
+        buf[4][x] = (200, 180, 140)  # base
+    buf[3][1] = buf[3][2] = buf[3][3] = buf[3][4] = (180, 200, 240)  # blanket
+    buf[2][1] = (255, 210, 180)  # baby head
+    buf[0][3] = (255, 100, 100)  # mobile
+    buf[0][4] = (100, 100, 255)  # mobile
+
+def _scene_trophies(buf):
+    """Trophy shelf."""
+    for x in range(6):
+        buf[3][x] = (120, 80, 50)  # shelf
+    buf[1][1] = buf[2][1] = (220, 190, 50)   # gold trophy
+    buf[0][1] = (220, 190, 50)
+    buf[1][3] = buf[2][3] = (180, 180, 190)  # silver trophy
+    buf[0][3] = (180, 180, 190)
+    buf[1][5] = buf[2][5] = (180, 120, 50)   # bronze trophy
+
+def _scene_snowglobe(buf):
+    """Snow globe."""
+    buf[0][2] = buf[0][3] = (200, 220, 240)  # dome top
+    buf[1][1] = buf[1][2] = buf[1][3] = buf[1][4] = (200, 220, 240)  # dome
+    buf[2][1] = buf[2][2] = buf[2][3] = buf[2][4] = (200, 220, 240)
+    buf[2][2] = buf[2][3] = (30, 120, 40)   # tree inside
+    buf[1][3] = (30, 120, 40)
+    buf[0][2] = buf[1][1] = buf[1][4] = (255, 255, 255)  # snow
+    buf[3][1] = buf[3][2] = buf[3][3] = buf[3][4] = (140, 100, 50)  # base
+    buf[4][1] = buf[4][2] = buf[4][3] = buf[4][4] = (140, 100, 50)
+
+def _scene_arcade(buf):
+    """Tiny arcade cabinet."""
+    buf[0][1] = buf[0][2] = buf[0][3] = buf[0][4] = (40, 40, 130)  # top
+    for y in range(1, 5):
+        buf[y][1] = buf[y][4] = (40, 40, 130)  # sides
+    buf[1][2] = buf[1][3] = buf[2][2] = buf[2][3] = (50, 200, 50)  # screen
+    buf[3][2] = (255, 50, 50)    # joystick
+    buf[3][3] = (255, 255, 50)   # button
+    buf[4][1] = buf[4][2] = buf[4][3] = buf[4][4] = (30, 30, 110)  # base
+
+# Scene pool (41 scenes — covers levels 1-3 with no duplicates)
 SCENES = [
     _scene_cat, _scene_phone, _scene_dance, _scene_skeleton,
     _scene_alien, _scene_fishtank, _scene_plants, _scene_piano,
     _scene_tv, _scene_cooking, _scene_reading, _scene_yoga,
     _scene_dog, _scene_ghost, _scene_robot, _scene_boxing,
     _scene_empty, _scene_disco, _scene_bath, _scene_weights,
+    _scene_christmas, _scene_bookshelf, _scene_candles, _scene_party,
+    _scene_sleeping, _scene_guitar, _scene_telescope, _scene_chess_game,
+    _scene_lavalamp, _scene_drums, _scene_aquarium, _scene_cactus,
+    _scene_wizard, _scene_sushi, _scene_laundry, _scene_birdcage,
+    _scene_painter, _scene_baby, _scene_trophies, _scene_snowglobe,
+    _scene_arcade,
 ]
 
 
@@ -366,15 +606,41 @@ class WindowWasher(Game):
         self.camera_x = 0.0
 
         # Windows: list of dicts
+        # Shuffle scenes — all unique when pool is large enough
         self.windows = []
-        scene_pool = list(SCENES)
+        num_windows = self.num_cols * WINDOW_ROWS
+        if num_windows <= len(SCENES):
+            scene_order = random.sample(SCENES, num_windows)
+        else:
+            # More windows than scenes: shuffle full deck, repeat as needed
+            scene_order = []
+            while len(scene_order) < num_windows:
+                batch = list(SCENES)
+                random.shuffle(batch)
+                scene_order.extend(batch)
+            scene_order = scene_order[:num_windows]
+
+        idx = 0
+        palette_grid = []
         for row in range(WINDOW_ROWS):
+            palette_row = []
             for col in range(self.num_cols):
                 wx = 4 + col * (WINDOW_W + WINDOW_GAP_X)
                 wy = BUILDING_TOP + WINDOW_TOP_Y + row * (WINDOW_H + WINDOW_GAP_Y)
-                scene_fn = random.choice(scene_pool)
-                # Pre-render scene into 6x6 buffer
+                scene_fn = scene_order[idx]
+                idx += 1
+                # Pick palette avoiding left/above neighbor
+                excl = set()
+                if col > 0:
+                    excl.add(palette_row[col - 1])
+                if row > 0:
+                    excl.add(palette_grid[row - 1][col])
+                pal_choices = [p for p in ROOM_PALETTES if p not in excl]
+                wall, floor = random.choice(pal_choices)
+                palette_row.append((wall, floor))
+                # Pre-render scene with room background
                 scene_buf = [[(0, 0, 0)] * 6 for _ in range(6)]
+                _fill_room(scene_buf, wall, floor)
                 scene_fn(scene_buf)
                 self.windows.append({
                     'x': wx,
@@ -382,6 +648,7 @@ class WindowWasher(Game):
                     'clean': 0.0,  # 0=dirty, 1=clean
                     'scene': scene_buf,
                 })
+            palette_grid.append(palette_row)
 
         # Rope sway
         self.rope_sway = 0.0
@@ -616,11 +883,7 @@ class WindowWasher(Game):
                 bayer_val = BAYER_4X4[py % 4][px % 4]
                 if bayer_val < threshold:
                     # Clean — show scene
-                    r, g, b = w['scene'][py][px]
-                    if r == 0 and g == 0 and b == 0:
-                        # Default interior warm light
-                        r, g, b = 180, 160, 120
-                    self.display.set_pixel(scx, scy, (r, g, b))
+                    self.display.set_pixel(scx, scy, w['scene'][py][px])
                 else:
                     # Dirty
                     self.display.set_pixel(scx, scy, DIRTY_WINDOW)
