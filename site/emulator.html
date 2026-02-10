@@ -1075,16 +1075,6 @@ class EmulatorMenu:
 _menu = EmulatorMenu(_catalog)
   `);
 
-  // Build idle pool: no-dep, non-game, non-utility visuals for screensaver
-  for (const cat of catalog.categories) {
-    if (cat.key === 'utility' || cat.key === 'visual_mix' || cat.key === 'game_mix') continue;
-    for (const item of cat.items) {
-      if (!item.is_game && !item.deps && !item.needs_numpy && !item.playlist) {
-        idlePool.push(item);
-      }
-    }
-  }
-
   async function loadPythonModule(modulePath) {
     if (loadedModules.has(modulePath)) return true;
     try {
@@ -1289,6 +1279,16 @@ _exit_hold = 0.0
   let idleCycleTimer = 0;
   let idlePool = [];
   let lastActionPressed = false;
+
+  // Build idle pool: no-dep, non-game, non-utility visuals for screensaver
+  for (const cat of catalog.categories) {
+    if (cat.key === 'utility' || cat.key === 'visual_mix' || cat.key === 'game_mix') continue;
+    for (const item of cat.items) {
+      if (!item.is_game && !item.deps && !item.needs_numpy && !item.playlist) {
+        idlePool.push(item);
+      }
+    }
+  }
 
   function pyLoop(timestamp) {
     const dt = Math.min((timestamp - pyLastTime) / 1000, 0.05);
