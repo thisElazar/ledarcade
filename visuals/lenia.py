@@ -5,6 +5,8 @@ Lenia is a continuous generalization of Conway's Game of Life.
 Cells have continuous values 0.0-1.0, with a smooth bell-shaped
 kernel and growth function.
 
+Simulated at 128x128 with R=13 kernel, downsampled to 64x64 for display.
+
 Controls (LENIA):
   Up/Down  - Cycle color palette
   Button   - Re-seed grid
@@ -16,14 +18,14 @@ Controls (LENIA LAB):
   Both       - Commit params to settings
 """
 
-import random
 import numpy as np
 from . import Visual, Display, GRID_SIZE
 from .turing import PALETTES, _PAL_ARRAYS
 import settings
 
-N = GRID_SIZE
-R = 6  # Kernel radius (scaled for 64x64 grid)
+N = GRID_SIZE       # Display resolution (64)
+SIM = 128           # Internal simulation resolution
+R = 13              # Kernel radius (proper scale for 128x128)
 
 
 def _bell(x, mu, sigma):
@@ -42,27 +44,16 @@ def _make_kernel(R):
 
 
 def _init_lenia_grid():
-    """Initialize grid with random circular blobs."""
-    grid = np.zeros((N, N), dtype=np.float64)
-    n_seeds = random.randint(8, 14)
-    for _ in range(n_seeds):
-        cx = random.randint(3, N - 4)
-        cy = random.randint(3, N - 4)
-        r = random.randint(2, 5)
-        for dy in range(-r, r + 1):
-            for dx in range(-r, r + 1):
-                d = (dx * dx + dy * dy) ** 0.5
-                if d <= r:
-                    xi = (cx + dx) % N
-                    yi = (cy + dy) % N
-                    grid[yi, xi] = max(grid[yi, xi],
-                                        (1.0 - d / r) * random.uniform(0.5, 1.0))
+    """Initialize 128x128 grid with 35% random soup."""
+    grid = np.zeros((SIM, SIM), dtype=np.float64)
+    mask = np.random.random((SIM, SIM)) < 0.35
+    grid[mask] = np.random.random(mask.sum())
     return grid
 
 
-# Precompute kernel and its FFT (fixed R)
+# Precompute kernel and its FFT at SIM resolution
 _KERNEL = _make_kernel(R)
-_KERNEL_PAD = np.zeros((N, N), dtype=np.float64)
+_KERNEL_PAD = np.zeros((SIM, SIM), dtype=np.float64)
 _kh, _kw = _KERNEL.shape
 _KERNEL_PAD[:_kh, :_kw] = _KERNEL
 _KERNEL_PAD = np.roll(np.roll(_KERNEL_PAD, -(_kh // 2), axis=0),
@@ -71,21 +62,27 @@ _KERNEL_FFT = np.fft.rfft2(_KERNEL_PAD)
 
 
 def _step_lenia(grid, mu, sigma, dt, steps):
-    """Run steps iterations of Lenia using FFT convolution."""
+    """Run steps iterations of Lenia using FFT convolution at 128x128."""
     kfft = _KERNEL_FFT
     for _ in range(steps):
         gfft = np.fft.rfft2(grid)
-        potential = np.fft.irfft2(gfft * kfft, s=(N, N))
+        potential = np.fft.irfft2(gfft * kfft, s=(SIM, SIM))
         growth = 2.0 * np.exp(-((potential - mu) ** 2) / (2.0 * sigma ** 2)) - 1.0
         grid = np.clip(grid + dt * growth, 0.0, 1.0)
     return grid
 
 
+def _downsample(grid):
+    """2x2 average downsample from SIM (128) to N (64)."""
+    return grid.reshape(N, SIM // N, N, SIM // N).mean(axis=(1, 3))
+
+
 def _draw_lenia(display, grid, palette_idx):
-    """Draw grid through a color palette (vectorized)."""
+    """Downsample and draw through a color palette (vectorized)."""
+    small = _downsample(grid)
     pal_arr = _PAL_ARRAYS[palette_idx]
     n_colors = len(pal_arr)
-    t = np.clip(grid, 0.0, 1.0)
+    t = np.clip(small, 0.0, 1.0)
     idx_f = t * (n_colors - 1)
     lo = idx_f.astype(np.intp)
     hi = np.minimum(lo + 1, n_colors - 1)
@@ -99,13 +96,14 @@ def _draw_lenia(display, grid, palette_idx):
             display.set_pixel(x, y, (int(p[0]), int(p[1]), int(p[2])))
 
 
-# Named regions in mu x sigma space (tuned for R=6 on 64x64)
+# Named regions in mu x sigma space (tuned for R=13 on 128x128)
 _REGIONS = [
-    ('SPARSE BLOBS',  0.10, 0.18, 0.03, 0.05),
-    ('DENSE BLOBS',   0.10, 0.18, 0.06, 0.10),
-    ('CRAWLERS',      0.18, 0.26, 0.03, 0.05),
-    ('TURBULENCE',    0.24, 0.35, 0.05, 0.08),
-    ('CHAOTIC',       0.18, 0.26, 0.06, 0.10),
+    ('SPARSE LIFE',   0.10, 0.14, 0.012, 0.022),
+    ('SMOOTH FLOW',   0.14, 0.18, 0.014, 0.028),
+    ('DENSE BLOBS',   0.10, 0.16, 0.030, 0.060),
+    ('CRAWLERS',      0.18, 0.24, 0.025, 0.050),
+    ('CHAOTIC',       0.16, 0.22, 0.040, 0.070),
+    ('TURBULENCE',    0.22, 0.28, 0.050, 0.080),
 ]
 
 
@@ -113,7 +111,7 @@ def _nearest_region(mu, sigma):
     for name, mu_lo, mu_hi, s_lo, s_hi in _REGIONS:
         if mu_lo <= mu <= mu_hi and s_lo <= sigma <= s_hi:
             return name
-    if mu > 0.40 or sigma < 0.02:
+    if mu > 0.40 or sigma < 0.008:
         return 'VOID'
     return ''
 
@@ -129,10 +127,10 @@ class Lenia(Visual):
     def reset(self):
         self.time = 0.0
         self.mu = settings.get('lenia_lab_mu', 0.15)
-        self.sigma = settings.get('lenia_lab_sigma', 0.04)
+        self.sigma = settings.get('lenia_lab_sigma', 0.022)
         self.palette_idx = settings.get('lenia_lab_palette', 0) % len(PALETTES)
-        self.dt = 0.05
-        self.steps_per_frame = 5
+        self.dt = 0.1
+        self.steps_per_frame = 2
         self.grid = _init_lenia_grid()
         self._both_pressed_prev = False
         self._dead_frames = 0
@@ -158,9 +156,9 @@ class Lenia(Visual):
         self.time += dt
         self.grid = _step_lenia(self.grid, self.mu, self.sigma,
                                  self.dt, self.steps_per_frame)
-        if self.grid.sum() < 1.0:
+        if self.grid.sum() < 2.0:
             self._dead_frames += 1
-            if self._dead_frames > 5:
+            if self._dead_frames > 3:
                 self.grid = _init_lenia_grid()
                 self._dead_frames = 0
         else:
@@ -181,10 +179,10 @@ class LeniaLab(Visual):
     def reset(self):
         self.time = 0.0
         self.mu = settings.get('lenia_lab_mu', 0.15)
-        self.sigma = settings.get('lenia_lab_sigma', 0.04)
+        self.sigma = settings.get('lenia_lab_sigma', 0.022)
         self.palette_idx = settings.get('lenia_lab_palette', 0) % len(PALETTES)
-        self.dt = 0.05
-        self.steps_per_frame = 5
+        self.dt = 0.1
+        self.steps_per_frame = 2
         self.grid = _init_lenia_grid()
         self._dead_frames = 0
         self.param_overlay_timer = 2.0
@@ -207,7 +205,7 @@ class LeniaLab(Visual):
             self.param_overlay_timer = 2.0
             consumed = True
         if input_state.down_pressed:
-            self.sigma = max(0.01, round(self.sigma - 0.002, 3))
+            self.sigma = max(0.008, round(self.sigma - 0.002, 3))
             self.param_overlay_timer = 2.0
             consumed = True
         both_held = input_state.action_l_held and input_state.action_r_held
@@ -238,9 +236,9 @@ class LeniaLab(Visual):
         self.time += dt
         self.grid = _step_lenia(self.grid, self.mu, self.sigma,
                                  self.dt, self.steps_per_frame)
-        if self.grid.sum() < 1.0:
+        if self.grid.sum() < 2.0:
             self._dead_frames += 1
-            if self._dead_frames > 5:
+            if self._dead_frames > 3:
                 self.grid = _init_lenia_grid()
                 self._dead_frames = 0
         else:
