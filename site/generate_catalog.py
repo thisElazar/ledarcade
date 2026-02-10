@@ -257,6 +257,118 @@ def resolve_transitive_deps(file_deps):
     return resolved
 
 
+def scan_playlists(items_by_cat):
+    """Extract playlist membership from shuffle.py and slideshow.py ASTs.
+
+    Attaches a 'playlist' list to each playlist item in items_by_cat.
+    """
+    # Build class-name -> item lookup
+    cls_lookup = {}
+    for items in items_by_cat.values():
+        for item in items:
+            if item['cls'] not in cls_lookup:
+                cls_lookup[item['cls']] = item
+
+    def extract_method_imports(class_node, method_name):
+        """Extract imported class names from a method body."""
+        for item in class_node.body:
+            if isinstance(item, ast.FunctionDef) and item.name == method_name:
+                names = []
+                for stmt in ast.walk(item):
+                    if isinstance(stmt, ast.ImportFrom):
+                        for alias in stmt.names:
+                            names.append(alias.asname or alias.name)
+                return names
+        return None
+
+    def resolve_items(class_names):
+        """Map class names to mini catalog entries."""
+        result = []
+        seen = set()
+        for cn in class_names:
+            if cn in cls_lookup and cn not in seen:
+                seen.add(cn)
+                src = cls_lookup[cn]
+                e = {'name': src['name'], 'cls': src['cls'],
+                     'module': src['module']}
+                if src.get('deps'):
+                    e['deps'] = src['deps']
+                if src.get('needs_numpy'):
+                    e['needs_numpy'] = True
+                result.append(e)
+        return result
+
+    def attach(cls_name, members):
+        if cls_name in cls_lookup and members:
+            cls_lookup[cls_name]['playlist'] = members
+
+    # --- Game playlists (shuffle.py) ---
+    shuffle_path = os.path.join(ROOT, 'games', 'shuffle.py')
+    try:
+        with open(shuffle_path) as f:
+            shuffle_tree = ast.parse(f.read())
+    except (SyntaxError, FileNotFoundError):
+        shuffle_tree = None
+
+    if shuffle_tree:
+        for node in ast.iter_child_nodes(shuffle_tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            if not any(isinstance(b, ast.Name) and b.id == 'GamePlaylist'
+                       for b in node.bases):
+                continue
+            if node.name == 'AllGames':
+                # All single-player, non-playlist games
+                members = []
+                for cat_key, cat_items in items_by_cat.items():
+                    if cat_key in ('2_player', 'game_mix'):
+                        continue
+                    for it in cat_items:
+                        if it['is_game']:
+                            members.append(it)
+                attach('AllGames', resolve_items([m['cls'] for m in members]))
+            else:
+                imports = extract_method_imports(node, '_init_games')
+                if imports:
+                    attach(node.name, resolve_items(imports))
+
+    # --- Visual playlists (slideshow.py) ---
+    slideshow_path = os.path.join(ROOT, 'visuals', 'slideshow.py')
+    try:
+        with open(slideshow_path) as f:
+            slideshow_tree = ast.parse(f.read())
+    except (SyntaxError, FileNotFoundError):
+        slideshow_tree = None
+
+    if slideshow_tree:
+        for node in ast.iter_child_nodes(slideshow_tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            if not any(isinstance(b, ast.Name) and b.id == 'Slideshow'
+                       for b in node.bases):
+                continue
+            if node.name == 'AllVisuals':
+                members = []
+                for cat_key, cat_items in items_by_cat.items():
+                    if cat_key in ('utility', 'visual_mix'):
+                        continue
+                    for it in cat_items:
+                        if not it['is_game']:
+                            members.append(it)
+                attach('AllVisuals', resolve_items([m['cls'] for m in members]))
+            elif node.name == 'Title':
+                members = items_by_cat.get('titles', [])
+                attach('Title', resolve_items([m['cls'] for m in members]))
+            elif node.name == 'Demos':
+                members = [m for m in items_by_cat.get('demos', [])
+                           if m['cls'] != 'Demos']
+                attach('Demos', resolve_items([m['cls'] for m in members]))
+            else:
+                imports = extract_method_imports(node, '_get_visual_classes')
+                if imports:
+                    attach(node.name, resolve_items(imports))
+
+
 def main():
     items_by_cat = {}
     file_deps = {}  # module_path -> direct deps from scan_file
@@ -306,6 +418,9 @@ def main():
             # needs_numpy if the module or any transitive dep imports numpy
             if file_numpy.get(mod) or any(file_numpy.get(d) for d in deps):
                 entry['needs_numpy'] = True
+
+    # Extract playlist membership and attach to playlist items
+    scan_playlists(items_by_cat)
 
     # Sort items within each category (numbers after letters, matching catalog.py)
     for items in items_by_cat.values():

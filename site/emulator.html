@@ -376,9 +376,7 @@
         <li><span class="cat">SPRITES</span> &mdash; GIF/PNG sprite animations</li>
         <li><span class="cat">SUPERHEROES</span> &mdash; GIF sprite animations</li>
         <li><span class="cat">GALLERY</span> &mdash; 3D galleries with image assets</li>
-        <li><span class="cat">GAME MIX</span> &mdash; shuffle playlists</li>
-        <li><span class="cat">VISUAL MIX</span> &mdash; slideshow playlists</li>
-        <li><span class="cat">ART</span>: Great Wave, Scream &mdash; PNG images</li>
+<li><span class="cat">ART</span>: Great Wave, Scream &mdash; PNG images</li>
         <li><span class="cat">SCIENCE</span>: Earth &mdash; globe texture</li>
         <li><span class="cat">UTILITY</span>: Info, Update &mdash; system access</li>
       </ul>
@@ -614,6 +612,7 @@
     const right_p = right && !prevKeys['arrowright'];
     const action_l = space && !prevKeys[' '];
     const action_r = z && !prevKeys['z'];
+    lastActionPressed = action_l || action_r;
     prevKeys['arrowup'] = up;
     prevKeys['arrowdown'] = down;
     prevKeys['arrowleft'] = left;
@@ -1076,6 +1075,16 @@ class EmulatorMenu:
 _menu = EmulatorMenu(_catalog)
   `);
 
+  // Build idle pool: no-dep, non-game, non-utility visuals for screensaver
+  for (const cat of catalog.categories) {
+    if (cat.key === 'utility' || cat.key === 'visual_mix' || cat.key === 'game_mix') continue;
+    for (const item of cat.items) {
+      if (!item.is_game && !item.deps && !item.needs_numpy && !item.playlist) {
+        idlePool.push(item);
+      }
+    }
+  }
+
   async function loadPythonModule(modulePath) {
     if (loadedModules.has(modulePath)) return true;
     try {
@@ -1141,6 +1150,14 @@ _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
     `);
     copyAndRender();
 
+    // Handle playlists: redirect to a random member
+    if (itemData.playlist) {
+      playlistItems = itemData.playlist;
+      playlistIsGame = !!itemData.is_game;
+      playlistCycleTimer = 0;
+      itemData = playlistItems[Math.floor(Math.random() * playlistItems.length)];
+    }
+
     const deps = itemData.deps || [];
     for (const dep of deps) {
       const ok = await loadPythonModule(dep);
@@ -1157,7 +1174,7 @@ _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
     }
 
     try {
-      const isGame = itemData.is_game;
+      const isGame = playlistItems ? playlistIsGame : !!itemData.is_game;
       pyodide.runPython(`
 _item = ${itemData.cls}(_display)
 _is_game = ${isGame ? 'True' : 'False'}
@@ -1193,8 +1210,68 @@ _item = None
 _exit_hold = 0.0
 _game_over_sel = 0
     `);
+    playlistItems = null;
+    playlistIsGame = false;
+    playlistCycleTimer = 0;
+    isIdle = false;
+    idleTimer = 0;
+    idleCycleTimer = 0;
     emuState = 'menu';
     setStatus('menu', 'ready');
+  }
+
+  async function swapPlaylistVisual() {
+    if (!playlistItems || playlistIsGame) return;
+    const item = playlistItems[Math.floor(Math.random() * playlistItems.length)];
+    for (const dep of (item.deps || [])) {
+      await loadPythonModule(dep);
+    }
+    await loadPythonModule(item.module);
+    if (emuState !== 'running' || !playlistItems) return;
+    try {
+      pyodide.runPython(`_item = ${item.cls}(_display)\n_exit_hold = 0.0`);
+      playlistCycleTimer = 0;
+      setStatus('running: ' + item.name, 'ready');
+    } catch(e) { console.error('Visual swap error:', e); }
+  }
+
+  async function loadNextPlaylistGame() {
+    if (!playlistItems || !playlistIsGame) return;
+    const item = playlistItems[Math.floor(Math.random() * playlistItems.length)];
+    emuState = 'loading';
+    setStatus('loading ' + item.name + '...', 'loading');
+    pyodide.runPython(`
+_display.clear(Colors.BLACK)
+_display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
+    `);
+    copyAndRender();
+    for (const dep of (item.deps || [])) {
+      if (!await loadPythonModule(dep)) { showError('DEP FAIL'); return; }
+    }
+    if (!await loadPythonModule(item.module)) { showError('LOAD FAIL'); return; }
+    try {
+      pyodide.runPython(`
+_item = ${item.cls}(_display)
+_is_game = True
+_game_over_sel = 0
+_exit_hold = 0.0
+      `);
+      emuState = 'running';
+      setStatus('running: ' + item.name, 'ready');
+    } catch(e) {
+      showError(e.message.split('\\n')[0].substring(0, 30));
+    }
+  }
+
+  async function launchIdleVisual() {
+    if (!isIdle || idlePool.length === 0) return;
+    const item = idlePool[Math.floor(Math.random() * idlePool.length)];
+    const ok = await loadPythonModule(item.module);
+    if (!ok || !isIdle) return;
+    try {
+      pyodide.runPython(`_item = ${item.cls}(_display)`);
+      idleCycleTimer = 0;
+    } catch(e) { console.error('Idle visual error:', e); }
   }
 
   setStatus('ready', 'ready');
@@ -1204,6 +1281,14 @@ _game_over_sel = 0
   let pyFrameCount = 0;
   let pyFpsTimer = 0;
   let pendingLaunch = null;
+  let playlistItems = null;
+  let playlistIsGame = false;
+  let playlistCycleTimer = 0;
+  let idleTimer = 0;
+  let isIdle = false;
+  let idleCycleTimer = 0;
+  let idlePool = [];
+  let lastActionPressed = false;
 
   function pyLoop(timestamp) {
     const dt = Math.min((timestamp - pyLastTime) / 1000, 0.05);
@@ -1218,24 +1303,63 @@ _game_over_sel = 0
     try {
       if (emuState === 'menu') {
         escapePressed = false;
-        const result = pyodide.runPython(`
+
+        if (isIdle) {
+          // Idle screensaver mode
+          const hasInput = keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright'] || keys[' '] || keys['z'];
+          if (hasInput) {
+            isIdle = false;
+            idleTimer = 0;
+            idleCycleTimer = 0;
+            pyodide.runPython('_item = None');
+          } else {
+            idleCycleTimer += dt;
+            if (idleCycleTimer >= 30) {
+              launchIdleVisual();
+            }
+            pyodide.runPython(`
+if _item:
+    _item.update(${dt})
+    _item.draw()
+else:
+    _display.clear()
+            `);
+          }
+          copyAndRender();
+        } else {
+          const result = pyodide.runPython(`
 _sel = _menu.handle_input(_input, ${dt})
 _menu.draw(_display)
 _sel
-        `);
-        if (result && result.toJs) {
-          const item = Object.fromEntries(result.toJs());
-          result.destroy();
-          pendingLaunch = item;
-        } else if (result !== null && result !== undefined && typeof result !== 'boolean') {
-          try { result.destroy && result.destroy(); } catch(e) {}
-        }
-        copyAndRender();
+          `);
+          if (result && result.toJs) {
+            const item = Object.fromEntries(result.toJs());
+            result.destroy();
+            pendingLaunch = item;
+          } else if (result !== null && result !== undefined && typeof result !== 'boolean') {
+            try { result.destroy && result.destroy(); } catch(e) {}
+          }
+          copyAndRender();
 
-        if (pendingLaunch) {
-          const item = pendingLaunch;
-          pendingLaunch = null;
-          launchItem(item);
+          // Idle timer
+          const hasInput = keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright'] || keys[' '] || keys['z'];
+          if (hasInput) {
+            idleTimer = 0;
+          } else {
+            idleTimer += dt;
+            if (idleTimer >= 60 && idlePool.length > 0) {
+              isIdle = true;
+              idleCycleTimer = 0;
+              launchIdleVisual();
+            }
+          }
+
+          if (pendingLaunch) {
+            const item = pendingLaunch;
+            pendingLaunch = null;
+            idleTimer = 0;
+            launchItem(item);
+          }
         }
 
       } else if (emuState === 'running') {
@@ -1288,6 +1412,14 @@ else:
             emuState = 'gameover';
             pyodide.runPython(`_game_over_sel = 0`);
           }
+
+          // Visual playlist: auto-cycle and button skip
+          if (emuState === 'running' && playlistItems && !playlistIsGame) {
+            playlistCycleTimer += dt;
+            if (playlistCycleTimer >= 30 || lastActionPressed) {
+              swapPlaylistVisual();
+            }
+          }
         }
 
       } else if (emuState === 'gameover') {
@@ -1314,17 +1446,33 @@ if _item:
     _item.draw_game_over(_game_over_sel)
 _r
           `);
+
+          // Overdraw "PLAY AGAIN" with "NEXT GAME" for game playlists
+          if (playlistItems && playlistIsGame) {
+            pyodide.runPython(`
+_display.draw_rect(4, 43, 56, 7, Colors.BLACK)
+if _game_over_sel == 0:
+    _display.draw_text_small(4, 44, ">NEXT GAME", Colors.YELLOW)
+else:
+    _display.draw_text_small(4, 44, " NEXT GAME", Colors.GRAY)
+            `);
+          }
+
           copyAndRender();
 
           if (goResult === 'again') {
-            pyodide.runPython(`
+            if (playlistItems && playlistIsGame) {
+              loadNextPlaylistGame();
+            } else {
+              pyodide.runPython(`
 _item.score = 0
 _item.state = GameState.PLAYING
 _item.reset()
 _exit_hold = 0.0
-            `);
-            emuState = 'running';
-            setStatus('running', 'ready');
+              `);
+              emuState = 'running';
+              setStatus('running', 'ready');
+            }
           } else if (goResult === 'menu') {
             returnToMenu();
           }

@@ -83,4 +83,7 @@ def _init_all_playlists():
     for cls in [ArcadeMix, QuickPlay, Shooters, Puzzle, Classics]:
         cls._init_games()
 
-_init_all_playlists()
+try:
+    _init_all_playlists()
+except ImportError:
+    pass  # Web emulator handles playlists in JS

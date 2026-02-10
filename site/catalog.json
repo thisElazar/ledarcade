@@ -415,6 +415,15 @@
       "key": "unique",
       "items": [
         {
+          "name": "DRIFT",
+          "cls": "Drift",
+          "module": "games/drift.py",
+          "is_game": true,
+          "deps": [
+            "games/drift_sim.py"
+          ]
+        },
+        {
           "name": "LASER MIRRORS",
           "cls": "LaserMirrors",
           "module": "games/lasermirrors.py",
@@ -441,37 +450,515 @@
           "name": "ALL GAMES",
           "cls": "AllGames",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "AGAR.IO",
+              "cls": "Agario",
+              "module": "games/agario.py"
+            },
+            {
+              "name": "BLOONS",
+              "cls": "Bloons",
+              "module": "games/bloons.py"
+            },
+            {
+              "name": "BLOONS TD",
+              "cls": "BloonsTD",
+              "module": "games/bloonstd.py"
+            },
+            {
+              "name": "FLAPPY BIRD",
+              "cls": "Flappy",
+              "module": "games/flappy.py"
+            },
+            {
+              "name": "2048",
+              "cls": "Game2048",
+              "module": "games/game2048.py"
+            },
+            {
+              "name": "GEODASH",
+              "cls": "GeometryDash",
+              "module": "games/geometrydash.py"
+            },
+            {
+              "name": "PORTAL",
+              "cls": "Portal",
+              "module": "games/portal.py"
+            },
+            {
+              "name": "SANDGAME",
+              "cls": "SandGame",
+              "module": "games/sandgame.py"
+            },
+            {
+              "name": "STACK",
+              "cls": "Stack",
+              "module": "games/stack.py"
+            },
+            {
+              "name": "STICK RUN",
+              "cls": "StickRunner",
+              "module": "games/stickrunner.py"
+            },
+            {
+              "name": "ARKANOID",
+              "cls": "Arkanoid",
+              "module": "games/arkanoid.py",
+              "deps": [
+                "games/arkanoid_levels.py"
+              ]
+            },
+            {
+              "name": "DND",
+              "cls": "DnD",
+              "module": "games/dnd.py"
+            },
+            {
+              "name": "INDY 500",
+              "cls": "Indy500",
+              "module": "games/indy500.py"
+            },
+            {
+              "name": "JEZZBALL",
+              "cls": "JezzBall",
+              "module": "games/jezzball.py"
+            },
+            {
+              "name": "3D MONSTR MAZE",
+              "cls": "MonsterMaze",
+              "module": "games/monstermaze.py"
+            },
+            {
+              "name": "PIPE DREAM",
+              "cls": "PipeDream",
+              "module": "games/pipedream.py"
+            },
+            {
+              "name": "SKIFREE",
+              "cls": "SkiFree",
+              "module": "games/skifree.py"
+            },
+            {
+              "name": "SPACE CRUISE",
+              "cls": "SpaceCruise",
+              "module": "games/spacecruise.py"
+            },
+            {
+              "name": "TRASHBLASTER",
+              "cls": "TrashBlaster",
+              "module": "games/trashblaster.py"
+            },
+            {
+              "name": "ASTEROIDS",
+              "cls": "Asteroids",
+              "module": "games/asteroids.py"
+            },
+            {
+              "name": "BOMBERMAN",
+              "cls": "Bomberman",
+              "module": "games/bomberman.py"
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "Breakout",
+              "module": "games/breakout.py"
+            },
+            {
+              "name": "BURGERTIME",
+              "cls": "BurgerTime",
+              "module": "games/burgertime.py"
+            },
+            {
+              "name": "CENTIPEDE",
+              "cls": "Centipede",
+              "module": "games/centipede.py"
+            },
+            {
+              "name": "DEFENDER",
+              "cls": "Defender",
+              "module": "games/defender.py"
+            },
+            {
+              "name": "DIGDUG",
+              "cls": "DigDug",
+              "module": "games/digdug.py"
+            },
+            {
+              "name": "DONKEY KONG",
+              "cls": "DonkeyKong",
+              "module": "games/donkeykong.py"
+            },
+            {
+              "name": "FROGGER",
+              "cls": "Frogger",
+              "module": "games/frogger.py"
+            },
+            {
+              "name": "GALAGA",
+              "cls": "Galaga",
+              "module": "games/galaga.py"
+            },
+            {
+              "name": "INVADERS",
+              "cls": "Invaders",
+              "module": "games/invaders.py"
+            },
+            {
+              "name": "LODERUN",
+              "cls": "LodeRunner",
+              "module": "games/loderunner.py"
+            },
+            {
+              "name": "LUNAR LANDER",
+              "cls": "LunarLander",
+              "module": "games/lunarlander.py"
+            },
+            {
+              "name": "MS. PAC-MAN",
+              "cls": "MsPacMan",
+              "module": "games/mspacman.py"
+            },
+            {
+              "name": "NIGHT DRIVER",
+              "cls": "NightDriver",
+              "module": "games/nightdriver.py"
+            },
+            {
+              "name": "PAC-MAN",
+              "cls": "PacMan",
+              "module": "games/pacman.py"
+            },
+            {
+              "name": "PONG",
+              "cls": "Pong",
+              "module": "games/pong.py"
+            },
+            {
+              "name": "Q*BERT",
+              "cls": "QBert",
+              "module": "games/qbert.py"
+            },
+            {
+              "name": "SNAKE",
+              "cls": "Snake",
+              "module": "games/snake.py"
+            },
+            {
+              "name": "TETRIS",
+              "cls": "Tetris",
+              "module": "games/tetris.py"
+            },
+            {
+              "name": "BOP IT",
+              "cls": "BopIt",
+              "module": "games/bopit.py"
+            },
+            {
+              "name": "15 PUZZLE",
+              "cls": "FifteenPuzzle",
+              "module": "games/fifteenpuzzle.py"
+            },
+            {
+              "name": "LIGHTS OUT",
+              "cls": "LightsOut",
+              "module": "games/lightsout.py"
+            },
+            {
+              "name": "MASTERMIND",
+              "cls": "Mastermind",
+              "module": "games/mastermind.py"
+            },
+            {
+              "name": "RUSH HOUR",
+              "cls": "RushHour",
+              "module": "games/rushhour.py"
+            },
+            {
+              "name": "SIMON",
+              "cls": "Simon",
+              "module": "games/simon.py"
+            },
+            {
+              "name": "BOWLING",
+              "cls": "Bowling",
+              "module": "games/bowling.py"
+            },
+            {
+              "name": "DARTS",
+              "cls": "Darts",
+              "module": "games/darts.py"
+            },
+            {
+              "name": "PINBALL",
+              "cls": "Pinball",
+              "module": "games/pinball.py"
+            },
+            {
+              "name": "POOL",
+              "cls": "Pool",
+              "module": "games/pool.py"
+            },
+            {
+              "name": "SHUFFLEBOARD",
+              "cls": "Shuffleboard",
+              "module": "games/shuffleboard.py"
+            },
+            {
+              "name": "DRIFT",
+              "cls": "Drift",
+              "module": "games/drift.py",
+              "deps": [
+                "games/drift_sim.py"
+              ]
+            },
+            {
+              "name": "LASER MIRRORS",
+              "cls": "LaserMirrors",
+              "module": "games/lasermirrors.py"
+            },
+            {
+              "name": "WINDOW WASHER",
+              "cls": "WindowWasher",
+              "module": "games/windowwasher.py"
+            }
+          ]
         },
         {
           "name": "ARCADE MIX",
           "cls": "ArcadeMix",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "SNAKE",
+              "cls": "Snake",
+              "module": "games/snake.py"
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "Breakout",
+              "module": "games/breakout.py"
+            },
+            {
+              "name": "INVADERS",
+              "cls": "Invaders",
+              "module": "games/invaders.py"
+            },
+            {
+              "name": "TETRIS",
+              "cls": "Tetris",
+              "module": "games/tetris.py"
+            },
+            {
+              "name": "ASTEROIDS",
+              "cls": "Asteroids",
+              "module": "games/asteroids.py"
+            },
+            {
+              "name": "FROGGER",
+              "cls": "Frogger",
+              "module": "games/frogger.py"
+            },
+            {
+              "name": "PAC-MAN",
+              "cls": "PacMan",
+              "module": "games/pacman.py"
+            },
+            {
+              "name": "MS. PAC-MAN",
+              "cls": "MsPacMan",
+              "module": "games/mspacman.py"
+            },
+            {
+              "name": "NIGHT DRIVER",
+              "cls": "NightDriver",
+              "module": "games/nightdriver.py"
+            },
+            {
+              "name": "PONG",
+              "cls": "Pong",
+              "module": "games/pong.py"
+            },
+            {
+              "name": "GALAGA",
+              "cls": "Galaga",
+              "module": "games/galaga.py"
+            },
+            {
+              "name": "CENTIPEDE",
+              "cls": "Centipede",
+              "module": "games/centipede.py"
+            },
+            {
+              "name": "DIGDUG",
+              "cls": "DigDug",
+              "module": "games/digdug.py"
+            },
+            {
+              "name": "LODERUN",
+              "cls": "LodeRunner",
+              "module": "games/loderunner.py"
+            },
+            {
+              "name": "DONKEY KONG",
+              "cls": "DonkeyKong",
+              "module": "games/donkeykong.py"
+            },
+            {
+              "name": "Q*BERT",
+              "cls": "QBert",
+              "module": "games/qbert.py"
+            },
+            {
+              "name": "BOMBERMAN",
+              "cls": "Bomberman",
+              "module": "games/bomberman.py"
+            },
+            {
+              "name": "LUNAR LANDER",
+              "cls": "LunarLander",
+              "module": "games/lunarlander.py"
+            }
+          ]
         },
         {
           "name": "CLASSICS",
           "cls": "Classics",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "PAC-MAN",
+              "cls": "PacMan",
+              "module": "games/pacman.py"
+            },
+            {
+              "name": "MS. PAC-MAN",
+              "cls": "MsPacMan",
+              "module": "games/mspacman.py"
+            },
+            {
+              "name": "SNAKE",
+              "cls": "Snake",
+              "module": "games/snake.py"
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "Breakout",
+              "module": "games/breakout.py"
+            },
+            {
+              "name": "FROGGER",
+              "cls": "Frogger",
+              "module": "games/frogger.py"
+            },
+            {
+              "name": "PONG",
+              "cls": "Pong",
+              "module": "games/pong.py"
+            }
+          ]
         },
         {
           "name": "PUZZLE",
           "cls": "Puzzle",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "TETRIS",
+              "cls": "Tetris",
+              "module": "games/tetris.py"
+            },
+            {
+              "name": "2048",
+              "cls": "Game2048",
+              "module": "games/game2048.py"
+            },
+            {
+              "name": "PIPE DREAM",
+              "cls": "PipeDream",
+              "module": "games/pipedream.py"
+            },
+            {
+              "name": "LIGHTS OUT",
+              "cls": "LightsOut",
+              "module": "games/lightsout.py"
+            }
+          ]
         },
         {
           "name": "QUICK PLAY",
           "cls": "QuickPlay",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "SNAKE",
+              "cls": "Snake",
+              "module": "games/snake.py"
+            },
+            {
+              "name": "FLAPPY BIRD",
+              "cls": "Flappy",
+              "module": "games/flappy.py"
+            },
+            {
+              "name": "STACK",
+              "cls": "Stack",
+              "module": "games/stack.py"
+            },
+            {
+              "name": "GEODASH",
+              "cls": "GeometryDash",
+              "module": "games/geometrydash.py"
+            },
+            {
+              "name": "STICK RUN",
+              "cls": "StickRunner",
+              "module": "games/stickrunner.py"
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "Breakout",
+              "module": "games/breakout.py"
+            }
+          ]
         },
         {
           "name": "SHOOTERS",
           "cls": "Shooters",
           "module": "games/shuffle.py",
-          "is_game": true
+          "is_game": true,
+          "playlist": [
+            {
+              "name": "INVADERS",
+              "cls": "Invaders",
+              "module": "games/invaders.py"
+            },
+            {
+              "name": "GALAGA",
+              "cls": "Galaga",
+              "module": "games/galaga.py"
+            },
+            {
+              "name": "CENTIPEDE",
+              "cls": "Centipede",
+              "module": "games/centipede.py"
+            },
+            {
+              "name": "ASTEROIDS",
+              "cls": "Asteroids",
+              "module": "games/asteroids.py"
+            },
+            {
+              "name": "SPACE CRUISE",
+              "cls": "SpaceCruise",
+              "module": "games/spacecruise.py"
+            }
+          ]
         }
       ]
     },
@@ -544,10 +1031,33 @@
           "is_game": false
         },
         {
+          "name": "CYCLIC LAB",
+          "cls": "CyclicLab",
+          "module": "visuals/cycliclab.py",
+          "is_game": false
+        },
+        {
           "name": "FADERS",
           "cls": "Faders",
           "module": "visuals/faders.py",
           "is_game": false
+        },
+        {
+          "name": "GRAY-SCOTT",
+          "cls": "GrayScott",
+          "module": "visuals/grayscott.py",
+          "is_game": false,
+          "deps": [
+            "visuals/turing.py"
+          ],
+          "needs_numpy": true
+        },
+        {
+          "name": "GRAY-SCOTT LAB",
+          "cls": "TuringPatterns",
+          "module": "visuals/turing.py",
+          "is_game": false,
+          "needs_numpy": true
         },
         {
           "name": "GYRE",
@@ -560,6 +1070,32 @@
           "cls": "Hodge",
           "module": "visuals/hodge.py",
           "is_game": false
+        },
+        {
+          "name": "HODGE LAB",
+          "cls": "HodgeLab",
+          "module": "visuals/hodgelab.py",
+          "is_game": false
+        },
+        {
+          "name": "LENIA",
+          "cls": "Lenia",
+          "module": "visuals/lenia.py",
+          "is_game": false,
+          "deps": [
+            "visuals/turing.py"
+          ],
+          "needs_numpy": true
+        },
+        {
+          "name": "LENIA LAB",
+          "cls": "LeniaLab",
+          "module": "visuals/lenia.py",
+          "is_game": false,
+          "deps": [
+            "visuals/turing.py"
+          ],
+          "needs_numpy": true
         },
         {
           "name": "LIFE",
@@ -583,6 +1119,12 @@
           "name": "RUG",
           "cls": "Rug",
           "module": "visuals/rug.py",
+          "is_game": false
+        },
+        {
+          "name": "RUG LAB",
+          "cls": "RugLab",
+          "module": "visuals/ruglab.py",
           "is_game": false
         },
         {
@@ -716,6 +1258,393 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "AGAR.IO",
+              "cls": "AgarioDemo",
+              "module": "visuals/agariodemo.py",
+              "deps": [
+                "games/agario.py"
+              ]
+            },
+            {
+              "name": "ARKANOID",
+              "cls": "ArkanoidDemo",
+              "module": "visuals/arkanoid_demo.py",
+              "deps": [
+                "games/arkanoid.py",
+                "games/arkanoid_levels.py"
+              ]
+            },
+            {
+              "name": "ASTEROIDS",
+              "cls": "AsteroidsDemo",
+              "module": "visuals/asteroidsdemo.py",
+              "deps": [
+                "games/asteroids.py"
+              ]
+            },
+            {
+              "name": "BLOONS",
+              "cls": "BloonsDemo",
+              "module": "visuals/bloonsdemo.py",
+              "deps": [
+                "games/bloons.py"
+              ]
+            },
+            {
+              "name": "BLOONS TD",
+              "cls": "BloonsTDDemo",
+              "module": "visuals/bloonstddemo.py",
+              "deps": [
+                "games/bloonstd.py"
+              ]
+            },
+            {
+              "name": "BOMBERMAN",
+              "cls": "BombermanDemo",
+              "module": "visuals/bombermandemo.py",
+              "deps": [
+                "games/bomberman.py"
+              ]
+            },
+            {
+              "name": "BOWLING",
+              "cls": "BowlingDemo",
+              "module": "visuals/bowlingdemo.py",
+              "deps": [
+                "games/bowling.py"
+              ]
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "BreakoutDemo",
+              "module": "visuals/breakoutdemo.py",
+              "deps": [
+                "games/breakout.py"
+              ]
+            },
+            {
+              "name": "BURGERTIME",
+              "cls": "BurgerTimeDemo",
+              "module": "visuals/burgertimedemo.py",
+              "deps": [
+                "games/burgertime.py"
+              ]
+            },
+            {
+              "name": "CENTIPEDE",
+              "cls": "CentipedeDemo",
+              "module": "visuals/centipededemo.py",
+              "deps": [
+                "games/centipede.py"
+              ]
+            },
+            {
+              "name": "CHECKERS",
+              "cls": "CheckersDemo",
+              "module": "visuals/checkersdemo.py",
+              "deps": [
+                "games/checkers.py"
+              ]
+            },
+            {
+              "name": "CHESS",
+              "cls": "ChessDemo",
+              "module": "visuals/chessdemo.py",
+              "deps": [
+                "games/chess.py"
+              ]
+            },
+            {
+              "name": "CONNECT 4",
+              "cls": "Connect4Demo",
+              "module": "visuals/connect4demo.py",
+              "deps": [
+                "games/connect4.py"
+              ]
+            },
+            {
+              "name": "DARTS",
+              "cls": "DartsDemo",
+              "module": "visuals/dartsdemo.py",
+              "deps": [
+                "games/darts.py"
+              ]
+            },
+            {
+              "name": "DEFENDER",
+              "cls": "DefenderDemo",
+              "module": "visuals/defenderdemo.py",
+              "deps": [
+                "games/defender.py"
+              ]
+            },
+            {
+              "name": "DIGDUG",
+              "cls": "DigDugDemo",
+              "module": "visuals/digdugdemo.py",
+              "deps": [
+                "games/digdug.py"
+              ]
+            },
+            {
+              "name": "DND",
+              "cls": "DnDDemo",
+              "module": "visuals/dnddemo.py",
+              "deps": [
+                "games/dnd.py"
+              ]
+            },
+            {
+              "name": "DK",
+              "cls": "DonkeyKongDemo",
+              "module": "visuals/donkeykongdemo.py",
+              "deps": [
+                "games/donkeykong.py"
+              ]
+            },
+            {
+              "name": "FLAPPY",
+              "cls": "FlappyDemo",
+              "module": "visuals/flappydemo.py",
+              "deps": [
+                "games/flappy.py"
+              ]
+            },
+            {
+              "name": "FROGGER",
+              "cls": "FroggerDemo",
+              "module": "visuals/froggerdemo.py",
+              "deps": [
+                "games/frogger.py"
+              ]
+            },
+            {
+              "name": "GALAGA",
+              "cls": "GalagaDemo",
+              "module": "visuals/galagademo.py",
+              "deps": [
+                "games/galaga.py"
+              ]
+            },
+            {
+              "name": "2048",
+              "cls": "Game2048Demo",
+              "module": "visuals/game2048demo.py",
+              "deps": [
+                "games/game2048.py"
+              ]
+            },
+            {
+              "name": "GEOMETRY",
+              "cls": "GeometryDemo",
+              "module": "visuals/geometrydemo.py",
+              "deps": [
+                "games/geometrydash.py"
+              ]
+            },
+            {
+              "name": "INDY 500",
+              "cls": "Indy500Demo",
+              "module": "visuals/indy500demo.py",
+              "deps": [
+                "games/indy500.py"
+              ]
+            },
+            {
+              "name": "INVADERS",
+              "cls": "InvadersDemo",
+              "module": "visuals/invadersdemo.py",
+              "deps": [
+                "games/invaders.py"
+              ]
+            },
+            {
+              "name": "JEZZBALL",
+              "cls": "JezzBallDemo",
+              "module": "visuals/jezzballdemo.py",
+              "deps": [
+                "games/jezzball.py"
+              ]
+            },
+            {
+              "name": "LIGHTS OUT",
+              "cls": "LightsOutDemo",
+              "module": "visuals/lightsoutdemo.py",
+              "deps": [
+                "games/lightsout.py"
+              ]
+            },
+            {
+              "name": "LODE RUNNER",
+              "cls": "LodeRunnerDemo",
+              "module": "visuals/loderunnerdemo.py",
+              "deps": [
+                "games/loderunner.py"
+              ]
+            },
+            {
+              "name": "LUNAR LANDER",
+              "cls": "LunarLanderDemo",
+              "module": "visuals/lunarlanderdemo.py",
+              "deps": [
+                "games/lunarlander.py"
+              ]
+            },
+            {
+              "name": "MANCALA",
+              "cls": "MancalaDemo",
+              "module": "visuals/mancalademo.py",
+              "deps": [
+                "games/mancala.py"
+              ]
+            },
+            {
+              "name": "3D MAZE",
+              "cls": "MonsterMazeDemo",
+              "module": "visuals/monstermazedemo.py",
+              "deps": [
+                "games/monstermaze.py"
+              ]
+            },
+            {
+              "name": "MS.PAC-MAN",
+              "cls": "MsPacManDemo",
+              "module": "visuals/mspacmandemo.py",
+              "deps": [
+                "games/mspacman.py"
+              ]
+            },
+            {
+              "name": "NIGHT DRIVER",
+              "cls": "NightDriverDemo",
+              "module": "visuals/nightdriverdemo.py",
+              "deps": [
+                "games/nightdriver.py"
+              ]
+            },
+            {
+              "name": "OTHELLO",
+              "cls": "OthelloDemo",
+              "module": "visuals/othellodemo.py",
+              "deps": [
+                "games/othello.py"
+              ]
+            },
+            {
+              "name": "PAC-MAN",
+              "cls": "PacManDemo",
+              "module": "visuals/pacmandemo.py",
+              "deps": [
+                "games/pacman.py"
+              ]
+            },
+            {
+              "name": "PINBALL",
+              "cls": "PinballDemo",
+              "module": "visuals/pinballdemo.py",
+              "deps": [
+                "games/pinball.py"
+              ]
+            },
+            {
+              "name": "PIPE DREAM",
+              "cls": "PipeDreamDemo",
+              "module": "visuals/pipedreamdemo.py",
+              "deps": [
+                "games/pipedream.py"
+              ]
+            },
+            {
+              "name": "PONG",
+              "cls": "PongDemo",
+              "module": "visuals/pongdemo.py",
+              "deps": [
+                "games/pong.py"
+              ]
+            },
+            {
+              "name": "POOL",
+              "cls": "PoolDemo",
+              "module": "visuals/pooldemo.py",
+              "deps": [
+                "games/pool.py"
+              ]
+            },
+            {
+              "name": "Q*BERT",
+              "cls": "QBertDemo",
+              "module": "visuals/qbertdemo.py",
+              "deps": [
+                "games/qbert.py"
+              ]
+            },
+            {
+              "name": "SHUFFLEBOARD",
+              "cls": "ShuffleboardDemo",
+              "module": "visuals/shuffleboarddemo.py",
+              "deps": [
+                "games/shuffleboard.py"
+              ]
+            },
+            {
+              "name": "SKIFREE",
+              "cls": "SkiFreeDemo",
+              "module": "visuals/skifreedemo.py",
+              "deps": [
+                "games/skifree.py"
+              ]
+            },
+            {
+              "name": "SNAKE",
+              "cls": "SnakeDemo",
+              "module": "visuals/snakedemo.py",
+              "deps": [
+                "games/snake.py"
+              ]
+            },
+            {
+              "name": "SPACE CRUISE",
+              "cls": "SpaceCruiseDemo",
+              "module": "visuals/spacecruisedemo.py",
+              "deps": [
+                "games/spacecruise.py"
+              ]
+            },
+            {
+              "name": "STACK",
+              "cls": "StackDemo",
+              "module": "visuals/stackdemo.py",
+              "deps": [
+                "games/stack.py"
+              ]
+            },
+            {
+              "name": "STICK RUNNER",
+              "cls": "StickRunnerDemo",
+              "module": "visuals/stickrunnerdemo.py",
+              "deps": [
+                "games/stickrunner.py"
+              ]
+            },
+            {
+              "name": "TETRIS",
+              "cls": "TetrisDemo",
+              "module": "visuals/tetrisdemo.py",
+              "deps": [
+                "games/tetris.py"
+              ]
+            },
+            {
+              "name": "TRASH BLASTER",
+              "cls": "TrashBlasterDemo",
+              "module": "visuals/trashblasterdemo.py",
+              "deps": [
+                "games/trashblaster.py"
+              ]
+            }
           ]
         },
         {
@@ -1301,6 +2230,12 @@
           "is_game": false
         },
         {
+          "name": "BALLOONS",
+          "cls": "Balloons",
+          "module": "visuals/balloons.py",
+          "is_game": false
+        },
+        {
           "name": "CAT",
           "cls": "Cat",
           "module": "visuals/cat.py",
@@ -1550,6 +2485,24 @@
       "key": "nature",
       "items": [
         {
+          "name": "DRIFT",
+          "cls": "DriftVisual",
+          "module": "visuals/drift.py",
+          "is_game": false,
+          "deps": [
+            "games/drift_sim.py"
+          ]
+        },
+        {
+          "name": "DRIFT 3D",
+          "cls": "Drift3D",
+          "module": "visuals/drift3d.py",
+          "is_game": false,
+          "deps": [
+            "games/drift_sim.py"
+          ]
+        },
+        {
           "name": "FIRE",
           "cls": "Fire",
           "module": "visuals/fire.py",
@@ -1724,13 +2677,6 @@
           "deps": [
             "visuals/gifcache.py"
           ]
-        },
-        {
-          "name": "GRAY-SCOTT",
-          "cls": "TuringPatterns",
-          "module": "visuals/turing.py",
-          "is_game": false,
-          "needs_numpy": true
         },
         {
           "name": "INK DROPS",
@@ -1964,6 +2910,15 @@
       "key": "titles",
       "items": [
         {
+          "name": "WONDER ALIEN",
+          "cls": "WonderAlien",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER ASTRDS",
           "cls": "WonderAsteroids",
           "module": "visuals/wondercabinet.py",
@@ -1984,6 +2939,15 @@
         {
           "name": "WONDER BARS",
           "cls": "WonderColorBars",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER BLADE RUNNER",
+          "cls": "WonderBladeRunner",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2029,6 +2993,15 @@
         {
           "name": "WONDER C64",
           "cls": "WonderC64",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER CLOSE ENCOUNTERS",
+          "cls": "WonderCloseEncounters",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2099,6 +3072,24 @@
           ]
         },
         {
+          "name": "WONDER ET",
+          "cls": "WonderET",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER EXORCIST",
+          "cls": "WonderExorcist",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER FILM",
           "cls": "WonderFilm",
           "module": "visuals/wondercabinet.py",
@@ -2144,6 +3135,15 @@
           ]
         },
         {
+          "name": "WONDER GHOSTBUSTERS",
+          "cls": "WonderGhostbusters",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER GLITCH",
           "cls": "WonderGlitch",
           "module": "visuals/wondercabinet.py",
@@ -2155,6 +3155,15 @@
         {
           "name": "WONDER GLOW",
           "cls": "WonderGlow",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER GODZILLA",
+          "cls": "WonderGodzilla",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2180,6 +3189,15 @@
           ]
         },
         {
+          "name": "WONDER INDIANA",
+          "cls": "WonderIndiana",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER INVADE",
           "cls": "WonderInvaders",
           "module": "visuals/wondercabinet.py",
@@ -2191,6 +3209,33 @@
         {
           "name": "WONDER JAKE",
           "cls": "WonderJake",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER JAWS",
+          "cls": "WonderJaws",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER JURASSIC PARK",
+          "cls": "WonderJurassicPark",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER KING KONG",
+          "cls": "WonderKingKong",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2234,6 +3279,15 @@
           ]
         },
         {
+          "name": "WONDER METROPOLIS",
+          "cls": "WonderMetropolis",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER N64",
           "cls": "WonderN64",
           "module": "visuals/wondercabinet.py",
@@ -2254,6 +3308,15 @@
         {
           "name": "WONDER NES",
           "cls": "WonderNES",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER NOSFERATU",
+          "cls": "WonderNosferatu",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2306,6 +3369,15 @@
           ]
         },
         {
+          "name": "WONDER PSYCHO",
+          "cls": "WonderPsycho",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER SAND",
           "cls": "WonderSand",
           "module": "visuals/wondercabinet.py",
@@ -2326,6 +3398,15 @@
         {
           "name": "WONDER SEGA",
           "cls": "WonderSega",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER SHINING",
+          "cls": "WonderShining",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2369,6 +3450,15 @@
           ]
         },
         {
+          "name": "WONDER STARGATE",
+          "cls": "WonderStargate",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER TAPE",
           "cls": "WonderCassette",
           "module": "visuals/wondercabinet.py",
@@ -2378,8 +3468,26 @@
           ]
         },
         {
+          "name": "WONDER TERMINATOR",
+          "cls": "WonderTerminator",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER TETRIS",
           "cls": "WonderTetris",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER TRON",
+          "cls": "WonderTron",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2398,6 +3506,15 @@
         {
           "name": "WONDER TYPE",
           "cls": "WonderTypewriter",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER VERTIGO",
+          "cls": "WonderVertigo",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2425,6 +3542,15 @@
         {
           "name": "WONDER WARS",
           "cls": "WonderStarWars",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
+          "name": "WONDER WIZARD OF OZ",
+          "cls": "WonderWizardOz",
           "module": "visuals/wondercabinet.py",
           "is_game": false,
           "deps": [
@@ -2547,6 +3673,1822 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "AGAR.IO",
+              "cls": "AgarioDemo",
+              "module": "visuals/agariodemo.py",
+              "deps": [
+                "games/agario.py"
+              ]
+            },
+            {
+              "name": "ARKANOID",
+              "cls": "ArkanoidDemo",
+              "module": "visuals/arkanoid_demo.py",
+              "deps": [
+                "games/arkanoid.py",
+                "games/arkanoid_levels.py"
+              ]
+            },
+            {
+              "name": "ASTEROIDS",
+              "cls": "AsteroidsDemo",
+              "module": "visuals/asteroidsdemo.py",
+              "deps": [
+                "games/asteroids.py"
+              ]
+            },
+            {
+              "name": "BLOONS",
+              "cls": "BloonsDemo",
+              "module": "visuals/bloonsdemo.py",
+              "deps": [
+                "games/bloons.py"
+              ]
+            },
+            {
+              "name": "BLOONS TD",
+              "cls": "BloonsTDDemo",
+              "module": "visuals/bloonstddemo.py",
+              "deps": [
+                "games/bloonstd.py"
+              ]
+            },
+            {
+              "name": "BOMBERMAN",
+              "cls": "BombermanDemo",
+              "module": "visuals/bombermandemo.py",
+              "deps": [
+                "games/bomberman.py"
+              ]
+            },
+            {
+              "name": "BOWLING",
+              "cls": "BowlingDemo",
+              "module": "visuals/bowlingdemo.py",
+              "deps": [
+                "games/bowling.py"
+              ]
+            },
+            {
+              "name": "BREAKOUT",
+              "cls": "BreakoutDemo",
+              "module": "visuals/breakoutdemo.py",
+              "deps": [
+                "games/breakout.py"
+              ]
+            },
+            {
+              "name": "BURGERTIME",
+              "cls": "BurgerTimeDemo",
+              "module": "visuals/burgertimedemo.py",
+              "deps": [
+                "games/burgertime.py"
+              ]
+            },
+            {
+              "name": "CENTIPEDE",
+              "cls": "CentipedeDemo",
+              "module": "visuals/centipededemo.py",
+              "deps": [
+                "games/centipede.py"
+              ]
+            },
+            {
+              "name": "CHECKERS",
+              "cls": "CheckersDemo",
+              "module": "visuals/checkersdemo.py",
+              "deps": [
+                "games/checkers.py"
+              ]
+            },
+            {
+              "name": "CHESS",
+              "cls": "ChessDemo",
+              "module": "visuals/chessdemo.py",
+              "deps": [
+                "games/chess.py"
+              ]
+            },
+            {
+              "name": "CONNECT 4",
+              "cls": "Connect4Demo",
+              "module": "visuals/connect4demo.py",
+              "deps": [
+                "games/connect4.py"
+              ]
+            },
+            {
+              "name": "DARTS",
+              "cls": "DartsDemo",
+              "module": "visuals/dartsdemo.py",
+              "deps": [
+                "games/darts.py"
+              ]
+            },
+            {
+              "name": "DEFENDER",
+              "cls": "DefenderDemo",
+              "module": "visuals/defenderdemo.py",
+              "deps": [
+                "games/defender.py"
+              ]
+            },
+            {
+              "name": "DIGDUG",
+              "cls": "DigDugDemo",
+              "module": "visuals/digdugdemo.py",
+              "deps": [
+                "games/digdug.py"
+              ]
+            },
+            {
+              "name": "DND",
+              "cls": "DnDDemo",
+              "module": "visuals/dnddemo.py",
+              "deps": [
+                "games/dnd.py"
+              ]
+            },
+            {
+              "name": "DK",
+              "cls": "DonkeyKongDemo",
+              "module": "visuals/donkeykongdemo.py",
+              "deps": [
+                "games/donkeykong.py"
+              ]
+            },
+            {
+              "name": "FLAPPY",
+              "cls": "FlappyDemo",
+              "module": "visuals/flappydemo.py",
+              "deps": [
+                "games/flappy.py"
+              ]
+            },
+            {
+              "name": "FROGGER",
+              "cls": "FroggerDemo",
+              "module": "visuals/froggerdemo.py",
+              "deps": [
+                "games/frogger.py"
+              ]
+            },
+            {
+              "name": "GALAGA",
+              "cls": "GalagaDemo",
+              "module": "visuals/galagademo.py",
+              "deps": [
+                "games/galaga.py"
+              ]
+            },
+            {
+              "name": "2048",
+              "cls": "Game2048Demo",
+              "module": "visuals/game2048demo.py",
+              "deps": [
+                "games/game2048.py"
+              ]
+            },
+            {
+              "name": "GEOMETRY",
+              "cls": "GeometryDemo",
+              "module": "visuals/geometrydemo.py",
+              "deps": [
+                "games/geometrydash.py"
+              ]
+            },
+            {
+              "name": "INDY 500",
+              "cls": "Indy500Demo",
+              "module": "visuals/indy500demo.py",
+              "deps": [
+                "games/indy500.py"
+              ]
+            },
+            {
+              "name": "INVADERS",
+              "cls": "InvadersDemo",
+              "module": "visuals/invadersdemo.py",
+              "deps": [
+                "games/invaders.py"
+              ]
+            },
+            {
+              "name": "JEZZBALL",
+              "cls": "JezzBallDemo",
+              "module": "visuals/jezzballdemo.py",
+              "deps": [
+                "games/jezzball.py"
+              ]
+            },
+            {
+              "name": "LIGHTS OUT",
+              "cls": "LightsOutDemo",
+              "module": "visuals/lightsoutdemo.py",
+              "deps": [
+                "games/lightsout.py"
+              ]
+            },
+            {
+              "name": "LODE RUNNER",
+              "cls": "LodeRunnerDemo",
+              "module": "visuals/loderunnerdemo.py",
+              "deps": [
+                "games/loderunner.py"
+              ]
+            },
+            {
+              "name": "LUNAR LANDER",
+              "cls": "LunarLanderDemo",
+              "module": "visuals/lunarlanderdemo.py",
+              "deps": [
+                "games/lunarlander.py"
+              ]
+            },
+            {
+              "name": "MANCALA",
+              "cls": "MancalaDemo",
+              "module": "visuals/mancalademo.py",
+              "deps": [
+                "games/mancala.py"
+              ]
+            },
+            {
+              "name": "3D MAZE",
+              "cls": "MonsterMazeDemo",
+              "module": "visuals/monstermazedemo.py",
+              "deps": [
+                "games/monstermaze.py"
+              ]
+            },
+            {
+              "name": "MS.PAC-MAN",
+              "cls": "MsPacManDemo",
+              "module": "visuals/mspacmandemo.py",
+              "deps": [
+                "games/mspacman.py"
+              ]
+            },
+            {
+              "name": "NIGHT DRIVER",
+              "cls": "NightDriverDemo",
+              "module": "visuals/nightdriverdemo.py",
+              "deps": [
+                "games/nightdriver.py"
+              ]
+            },
+            {
+              "name": "OTHELLO",
+              "cls": "OthelloDemo",
+              "module": "visuals/othellodemo.py",
+              "deps": [
+                "games/othello.py"
+              ]
+            },
+            {
+              "name": "PAC-MAN",
+              "cls": "PacManDemo",
+              "module": "visuals/pacmandemo.py",
+              "deps": [
+                "games/pacman.py"
+              ]
+            },
+            {
+              "name": "PINBALL",
+              "cls": "PinballDemo",
+              "module": "visuals/pinballdemo.py",
+              "deps": [
+                "games/pinball.py"
+              ]
+            },
+            {
+              "name": "PIPE DREAM",
+              "cls": "PipeDreamDemo",
+              "module": "visuals/pipedreamdemo.py",
+              "deps": [
+                "games/pipedream.py"
+              ]
+            },
+            {
+              "name": "PONG",
+              "cls": "PongDemo",
+              "module": "visuals/pongdemo.py",
+              "deps": [
+                "games/pong.py"
+              ]
+            },
+            {
+              "name": "POOL",
+              "cls": "PoolDemo",
+              "module": "visuals/pooldemo.py",
+              "deps": [
+                "games/pool.py"
+              ]
+            },
+            {
+              "name": "Q*BERT",
+              "cls": "QBertDemo",
+              "module": "visuals/qbertdemo.py",
+              "deps": [
+                "games/qbert.py"
+              ]
+            },
+            {
+              "name": "SHUFFLEBOARD",
+              "cls": "ShuffleboardDemo",
+              "module": "visuals/shuffleboarddemo.py",
+              "deps": [
+                "games/shuffleboard.py"
+              ]
+            },
+            {
+              "name": "SKIFREE",
+              "cls": "SkiFreeDemo",
+              "module": "visuals/skifreedemo.py",
+              "deps": [
+                "games/skifree.py"
+              ]
+            },
+            {
+              "name": "ALL",
+              "cls": "Demos",
+              "module": "visuals/slideshow.py",
+              "deps": [
+                "visuals/pacmandemo.py",
+                "visuals/tetrisdemo.py",
+                "visuals/snakedemo.py",
+                "visuals/invadersdemo.py",
+                "visuals/froggerdemo.py",
+                "visuals/breakoutdemo.py",
+                "visuals/galagademo.py",
+                "visuals/defenderdemo.py",
+                "visuals/centipededemo.py",
+                "visuals/donkeykongdemo.py",
+                "visuals/qbertdemo.py",
+                "visuals/asteroidsdemo.py",
+                "visuals/flappydemo.py",
+                "visuals/pongdemo.py",
+                "visuals/mspacmandemo.py",
+                "visuals/digdugdemo.py",
+                "visuals/bombermandemo.py",
+                "visuals/arkanoid_demo.py",
+                "visuals/game2048demo.py",
+                "visuals/geometrydemo.py",
+                "visuals/lunarlanderdemo.py",
+                "visuals/skifreedemo.py",
+                "visuals/burgertimedemo.py",
+                "visuals/loderunnerdemo.py",
+                "visuals/nightdriverdemo.py",
+                "visuals/pinballdemo.py",
+                "visuals/stackdemo.py",
+                "visuals/jezzballdemo.py",
+                "visuals/indy500demo.py",
+                "visuals/spacecruisedemo.py",
+                "visuals/trashblasterdemo.py",
+                "visuals/stickrunnerdemo.py",
+                "visuals/pipedreamdemo.py",
+                "visuals/lightsoutdemo.py",
+                "visuals/bowlingdemo.py",
+                "visuals/dartsdemo.py",
+                "visuals/chessdemo.py",
+                "visuals/checkersdemo.py",
+                "visuals/othellodemo.py",
+                "visuals/agariodemo.py",
+                "games/pacman.py",
+                "games/tetris.py",
+                "games/snake.py",
+                "games/invaders.py",
+                "games/frogger.py",
+                "games/breakout.py",
+                "games/galaga.py",
+                "games/defender.py",
+                "games/centipede.py",
+                "games/donkeykong.py",
+                "games/qbert.py",
+                "games/asteroids.py",
+                "games/flappy.py",
+                "games/pong.py",
+                "games/mspacman.py",
+                "games/digdug.py",
+                "games/bomberman.py",
+                "games/arkanoid.py",
+                "games/arkanoid_levels.py",
+                "games/game2048.py",
+                "games/geometrydash.py",
+                "games/lunarlander.py",
+                "games/skifree.py",
+                "games/burgertime.py",
+                "games/loderunner.py",
+                "games/nightdriver.py",
+                "games/pinball.py",
+                "games/stack.py",
+                "games/jezzball.py",
+                "games/indy500.py",
+                "games/spacecruise.py",
+                "games/trashblaster.py",
+                "games/stickrunner.py",
+                "games/pipedream.py",
+                "games/lightsout.py",
+                "games/bowling.py",
+                "games/darts.py",
+                "games/chess.py",
+                "games/checkers.py",
+                "games/othello.py",
+                "games/agario.py"
+              ]
+            },
+            {
+              "name": "SNAKE",
+              "cls": "SnakeDemo",
+              "module": "visuals/snakedemo.py",
+              "deps": [
+                "games/snake.py"
+              ]
+            },
+            {
+              "name": "SPACE CRUISE",
+              "cls": "SpaceCruiseDemo",
+              "module": "visuals/spacecruisedemo.py",
+              "deps": [
+                "games/spacecruise.py"
+              ]
+            },
+            {
+              "name": "STACK",
+              "cls": "StackDemo",
+              "module": "visuals/stackdemo.py",
+              "deps": [
+                "games/stack.py"
+              ]
+            },
+            {
+              "name": "STICK RUNNER",
+              "cls": "StickRunnerDemo",
+              "module": "visuals/stickrunnerdemo.py",
+              "deps": [
+                "games/stickrunner.py"
+              ]
+            },
+            {
+              "name": "TETRIS",
+              "cls": "TetrisDemo",
+              "module": "visuals/tetrisdemo.py",
+              "deps": [
+                "games/tetris.py"
+              ]
+            },
+            {
+              "name": "TRASH BLASTER",
+              "cls": "TrashBlasterDemo",
+              "module": "visuals/trashblasterdemo.py",
+              "deps": [
+                "games/trashblaster.py"
+              ]
+            },
+            {
+              "name": "ANTIKYTHERA",
+              "cls": "Antikythera",
+              "module": "visuals/antikythera.py"
+            },
+            {
+              "name": "ARCHIMEDES",
+              "cls": "Archimedes",
+              "module": "visuals/archimedes.py"
+            },
+            {
+              "name": "ASTROLABE",
+              "cls": "Astrolabe",
+              "module": "visuals/astrolabe.py"
+            },
+            {
+              "name": "BEAM ENGINE",
+              "cls": "BeamEngine",
+              "module": "visuals/beamengine.py"
+            },
+            {
+              "name": "CAMSHAFT",
+              "cls": "Camshaft",
+              "module": "visuals/camshaft.py"
+            },
+            {
+              "name": "CURTA",
+              "cls": "Curta",
+              "module": "visuals/curta.py"
+            },
+            {
+              "name": "GRANDFATHER",
+              "cls": "GrandfatherClock",
+              "module": "visuals/grandfather.py"
+            },
+            {
+              "name": "GUTENBERG",
+              "cls": "GutenbergPress",
+              "module": "visuals/gutenberg.py"
+            },
+            {
+              "name": "GYROSCOPE",
+              "cls": "Gyroscope",
+              "module": "visuals/gyroscope.py"
+            },
+            {
+              "name": "JACQUARD",
+              "cls": "Jacquard",
+              "module": "visuals/jacquard.py"
+            },
+            {
+              "name": "LOCOMOTIVE",
+              "cls": "Locomotive",
+              "module": "visuals/locomotive.py"
+            },
+            {
+              "name": "LOOM",
+              "cls": "Loom",
+              "module": "visuals/loom.py"
+            },
+            {
+              "name": "MODEL T",
+              "cls": "ModelT",
+              "module": "visuals/modelt.py"
+            },
+            {
+              "name": "ORRERY",
+              "cls": "Orrery",
+              "module": "visuals/orrery.py"
+            },
+            {
+              "name": "PROJECTOR",
+              "cls": "Projector",
+              "module": "visuals/projector.py"
+            },
+            {
+              "name": "SINGER",
+              "cls": "Singer",
+              "module": "visuals/singer.py"
+            },
+            {
+              "name": "TYPEWRITER",
+              "cls": "Typewriter",
+              "module": "visuals/typewriter.py"
+            },
+            {
+              "name": "WATCH",
+              "cls": "WatchGears",
+              "module": "visuals/watchgears.py"
+            },
+            {
+              "name": "AQUARIUM",
+              "cls": "Aquarium",
+              "module": "visuals/aquarium.py"
+            },
+            {
+              "name": "BALLOONS",
+              "cls": "Balloons",
+              "module": "visuals/balloons.py"
+            },
+            {
+              "name": "CAT",
+              "cls": "Cat",
+              "module": "visuals/cat.py"
+            },
+            {
+              "name": "CLOCK",
+              "cls": "Clock",
+              "module": "visuals/clock.py"
+            },
+            {
+              "name": "DVD",
+              "cls": "DVD",
+              "module": "visuals/dvd.py"
+            },
+            {
+              "name": "LAVALAMP",
+              "cls": "Lava",
+              "module": "visuals/lava.py"
+            },
+            {
+              "name": "NEWTON",
+              "cls": "NewtonCradle",
+              "module": "visuals/newtoncradle.py"
+            },
+            {
+              "name": "POLAROID",
+              "cls": "Polaroid",
+              "module": "visuals/polaroid.py"
+            },
+            {
+              "name": "SOLITAIRE",
+              "cls": "Solitaire",
+              "module": "visuals/solitaire.py"
+            },
+            {
+              "name": "ATTRACTORS",
+              "cls": "Attractors",
+              "module": "visuals/attractors.py"
+            },
+            {
+              "name": "CELL",
+              "cls": "Cell",
+              "module": "visuals/cell.py"
+            },
+            {
+              "name": "CHLADNI",
+              "cls": "Chladni",
+              "module": "visuals/chladni.py"
+            },
+            {
+              "name": "DBL PENDULUM",
+              "cls": "DblPendulum",
+              "module": "visuals/dblpendulum.py"
+            },
+            {
+              "name": "DNA",
+              "cls": "DNA",
+              "module": "visuals/dna.py"
+            },
+            {
+              "name": "EARTH",
+              "cls": "Earth",
+              "module": "visuals/earth.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "COULOMB",
+              "cls": "Coulomb",
+              "module": "visuals/emfield.py"
+            },
+            {
+              "name": "WIND TUNNEL",
+              "cls": "FluidTunnel",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "INK DROPS",
+              "cls": "FluidInk",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "COLOR MIX",
+              "cls": "FluidMixing",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "LATTICES",
+              "cls": "Lattice",
+              "module": "visuals/lattice.py",
+              "deps": [
+                "visuals/molecule.py"
+              ]
+            },
+            {
+              "name": "MICROSCOPE",
+              "cls": "Microscope",
+              "module": "visuals/microscope.py"
+            },
+            {
+              "name": "MOLECULES",
+              "cls": "Molecule",
+              "module": "visuals/molecule.py"
+            },
+            {
+              "name": "BRAIN",
+              "cls": "Neurons",
+              "module": "visuals/neurons.py"
+            },
+            {
+              "name": "OPTICS",
+              "cls": "Optics",
+              "module": "visuals/optics.py"
+            },
+            {
+              "name": "SOLAR SYSTEM",
+              "cls": "OrbitsSolar",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "3 BODY PROBLEM",
+              "cls": "OrbitsMulti",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "SPACE DUST",
+              "cls": "OrbitsBelt",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "OSCILLOSCOPE",
+              "cls": "Oscilloscope",
+              "module": "visuals/oscilloscope.py"
+            },
+            {
+              "name": "PERIODIC",
+              "cls": "Periodic",
+              "module": "visuals/periodic.py"
+            },
+            {
+              "name": "PROTEINS",
+              "cls": "Proteins",
+              "module": "visuals/proteins.py"
+            },
+            {
+              "name": "RADIOACTIVE",
+              "cls": "Radioactive",
+              "module": "visuals/radioactive.py"
+            },
+            {
+              "name": "SPECTROSCOPE",
+              "cls": "Spectroscope",
+              "module": "visuals/spectroscope.py"
+            },
+            {
+              "name": "WAVE TANK",
+              "cls": "WaveTank",
+              "module": "visuals/wavetank.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "AURORA",
+              "cls": "Aurora",
+              "module": "visuals/aurora.py"
+            },
+            {
+              "name": "BOIDS",
+              "cls": "Boids",
+              "module": "visuals/boids.py"
+            },
+            {
+              "name": "CYCLIC LAB",
+              "cls": "CyclicLab",
+              "module": "visuals/cycliclab.py"
+            },
+            {
+              "name": "CYCLIC",
+              "cls": "DemonSpirals",
+              "module": "visuals/demonspirals.py"
+            },
+            {
+              "name": "FADERS",
+              "cls": "Faders",
+              "module": "visuals/faders.py"
+            },
+            {
+              "name": "GRAY-SCOTT",
+              "cls": "GrayScott",
+              "module": "visuals/grayscott.py",
+              "deps": [
+                "visuals/turing.py"
+              ],
+              "needs_numpy": true
+            },
+            {
+              "name": "GYRE",
+              "cls": "Gyre",
+              "module": "visuals/gyre.py"
+            },
+            {
+              "name": "HODGE",
+              "cls": "Hodge",
+              "module": "visuals/hodge.py"
+            },
+            {
+              "name": "HODGE LAB",
+              "cls": "HodgeLab",
+              "module": "visuals/hodgelab.py"
+            },
+            {
+              "name": "LENIA",
+              "cls": "Lenia",
+              "module": "visuals/lenia.py",
+              "deps": [
+                "visuals/turing.py"
+              ],
+              "needs_numpy": true
+            },
+            {
+              "name": "LENIA LAB",
+              "cls": "LeniaLab",
+              "module": "visuals/lenia.py",
+              "deps": [
+                "visuals/turing.py"
+              ],
+              "needs_numpy": true
+            },
+            {
+              "name": "LIFE",
+              "cls": "Life",
+              "module": "visuals/life.py"
+            },
+            {
+              "name": "MITOSIS",
+              "cls": "Mitosis",
+              "module": "visuals/mitosis.py"
+            },
+            {
+              "name": "QUARKS",
+              "cls": "Quarks",
+              "module": "visuals/quarks.py"
+            },
+            {
+              "name": "RUG",
+              "cls": "Rug",
+              "module": "visuals/rug.py"
+            },
+            {
+              "name": "RUG LAB",
+              "cls": "RugLab",
+              "module": "visuals/ruglab.py"
+            },
+            {
+              "name": "SANDPILE",
+              "cls": "Sandpile",
+              "module": "visuals/sandpile.py"
+            },
+            {
+              "name": "SLIME",
+              "cls": "Slime",
+              "module": "visuals/slime.py"
+            },
+            {
+              "name": "STARWARS",
+              "cls": "StarWarsCA",
+              "module": "visuals/starwarsca.py"
+            },
+            {
+              "name": "GRAY-SCOTT LAB",
+              "cls": "TuringPatterns",
+              "module": "visuals/turing.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "WOLFRAM",
+              "cls": "Wolfram",
+              "module": "visuals/wolfram.py"
+            },
+            {
+              "name": "BATMAN",
+              "cls": "Batman",
+              "module": "visuals/batman.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "GREEN LANTERN",
+              "cls": "GreenLantern",
+              "module": "visuals/greenlantern.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "JAKE THE DOG",
+              "cls": "JakeMusic",
+              "module": "visuals/jakemusic.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "SPIDEY",
+              "cls": "Spidey",
+              "module": "visuals/spidey.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "GRIDLOCK",
+              "cls": "BML",
+              "module": "visuals/bml.py"
+            },
+            {
+              "name": "GREENWAVE",
+              "cls": "GreenWave",
+              "module": "visuals/greenwave.py"
+            },
+            {
+              "name": "HIGHWAY",
+              "cls": "Highway",
+              "module": "visuals/highway.py"
+            },
+            {
+              "name": "CLOVERLEAF",
+              "cls": "Interchange",
+              "module": "visuals/interchange.py"
+            },
+            {
+              "name": "SIGNALS",
+              "cls": "Intersection",
+              "module": "visuals/intersection.py"
+            },
+            {
+              "name": "ONRAMP",
+              "cls": "Merge",
+              "module": "visuals/merge.py"
+            },
+            {
+              "name": "ROAD",
+              "cls": "Road",
+              "module": "visuals/road.py"
+            },
+            {
+              "name": "ROTARY",
+              "cls": "Roundabout",
+              "module": "visuals/roundabout.py"
+            },
+            {
+              "name": "AMIGA BARS",
+              "cls": "CopperBars",
+              "module": "visuals/copperbars.py"
+            },
+            {
+              "name": "LARSON SCAN",
+              "cls": "Cylon",
+              "module": "visuals/cylon.py"
+            },
+            {
+              "name": "FLUX",
+              "cls": "Flux",
+              "module": "visuals/flux.py"
+            },
+            {
+              "name": "MATRIX",
+              "cls": "Matrix",
+              "module": "visuals/matrix.py"
+            },
+            {
+              "name": "MOBIUS",
+              "cls": "Mobius",
+              "module": "visuals/mobius.py"
+            },
+            {
+              "name": "MOIRE",
+              "cls": "Moire",
+              "module": "visuals/moire.py"
+            },
+            {
+              "name": "RAINBOW",
+              "cls": "Rainbow",
+              "module": "visuals/rainbow.py"
+            },
+            {
+              "name": "ROTOZOOM",
+              "cls": "Rotozoom",
+              "module": "visuals/rotozoom.py"
+            },
+            {
+              "name": "SINESCROLL",
+              "cls": "SineScroller",
+              "module": "visuals/sinescroller.py"
+            },
+            {
+              "name": "TRANCE",
+              "cls": "Trance",
+              "module": "visuals/trance.py"
+            },
+            {
+              "name": "TRUCHET",
+              "cls": "Truchet",
+              "module": "visuals/truchet.py"
+            },
+            {
+              "name": "TWISTER",
+              "cls": "Twister",
+              "module": "visuals/twister.py"
+            },
+            {
+              "name": "MAZE",
+              "cls": "Win95Maze",
+              "module": "visuals/win95maze.py"
+            },
+            {
+              "name": "XOR",
+              "cls": "XORPattern",
+              "module": "visuals/xorpattern.py"
+            },
+            {
+              "name": "DRIFT",
+              "cls": "DriftVisual",
+              "module": "visuals/drift.py",
+              "deps": [
+                "games/drift_sim.py"
+              ]
+            },
+            {
+              "name": "DRIFT 3D",
+              "cls": "Drift3D",
+              "module": "visuals/drift3d.py",
+              "deps": [
+                "games/drift_sim.py"
+              ]
+            },
+            {
+              "name": "FIRE",
+              "cls": "Fire",
+              "module": "visuals/fire.py"
+            },
+            {
+              "name": "FIREFLIES",
+              "cls": "Fireflies",
+              "module": "visuals/fireflies.py"
+            },
+            {
+              "name": "LAKE",
+              "cls": "Lake",
+              "module": "visuals/lake.py"
+            },
+            {
+              "name": "JELLYFISH",
+              "cls": "ParticleLife",
+              "module": "visuals/particlelife.py"
+            },
+            {
+              "name": "PLASMA",
+              "cls": "Plasma",
+              "module": "visuals/plasma.py"
+            },
+            {
+              "name": "RIPPLES",
+              "cls": "Ripples",
+              "module": "visuals/ripples.py"
+            },
+            {
+              "name": "STARFIELD",
+              "cls": "Starfield",
+              "module": "visuals/starfield.py"
+            },
+            {
+              "name": "WEATHER",
+              "cls": "Weather",
+              "module": "visuals/weather.py"
+            },
+            {
+              "name": "DRUM MACHINE",
+              "cls": "DrumMachine",
+              "module": "visuals/drummachine.py"
+            },
+            {
+              "name": "EQUALIZER",
+              "cls": "Equalizer",
+              "module": "visuals/equalizer.py"
+            },
+            {
+              "name": "GRAMOPHONE",
+              "cls": "Gramophone",
+              "module": "visuals/gramophone.py"
+            },
+            {
+              "name": "HURDY GURDY",
+              "cls": "HurdyGurdy",
+              "module": "visuals/hurdygurdy.py"
+            },
+            {
+              "name": "JUKEBOX",
+              "cls": "Jukebox",
+              "module": "visuals/jukebox.py"
+            },
+            {
+              "name": "METRONOME",
+              "cls": "Metronome",
+              "module": "visuals/metronome.py"
+            },
+            {
+              "name": "MUSIC BOX",
+              "cls": "MusicBox",
+              "module": "visuals/musicbox.py"
+            },
+            {
+              "name": "PIANO ROLL",
+              "cls": "PianoRoll",
+              "module": "visuals/pianoroll.py"
+            },
+            {
+              "name": "SYNTHESIZER",
+              "cls": "Synthesizer",
+              "module": "visuals/synthesizer.py"
+            },
+            {
+              "name": "THEREMIN",
+              "cls": "Theremin",
+              "module": "visuals/theremin.py"
+            },
+            {
+              "name": "TURNTABLE",
+              "cls": "Turntable",
+              "module": "visuals/turntable.py"
+            },
+            {
+              "name": "SMB3 MUSEUM",
+              "cls": "GallerySMB3",
+              "module": "visuals/gallery3d.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "KIRBY MUSEUM",
+              "cls": "GalleryKirby",
+              "module": "visuals/gallery3d.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "ZELDA MUSEUM",
+              "cls": "GalleryZelda",
+              "module": "visuals/gallery3d.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "ICARUS MUSEUM",
+              "cls": "GalleryKidIcarus",
+              "module": "visuals/gallery3d.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "ADVENTURE TIME",
+              "cls": "GalleryAdventureTime",
+              "module": "visuals/gallery3d.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "GREATWAVE",
+              "cls": "GreatWave",
+              "module": "visuals/greatwave.py"
+            },
+            {
+              "name": "MONDRIAN",
+              "cls": "Mondrian",
+              "module": "visuals/mondrian.py"
+            },
+            {
+              "name": "SCREAM",
+              "cls": "Scream",
+              "module": "visuals/scream.py"
+            },
+            {
+              "name": "STARRYNIGHT",
+              "cls": "StarryNight",
+              "module": "visuals/starrynight.py"
+            },
+            {
+              "name": "WATERLILIES",
+              "cls": "WaterLilies",
+              "module": "visuals/waterlilies.py"
+            },
+            {
+              "name": "KIRBY",
+              "cls": "Kirby",
+              "module": "visuals/kirby.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "LINK",
+              "cls": "Link",
+              "module": "visuals/link.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "MARIO",
+              "cls": "Mario",
+              "module": "visuals/mario.py"
+            },
+            {
+              "name": "MEGA MAN",
+              "cls": "MegaMan",
+              "module": "visuals/megaman.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "SAMUS",
+              "cls": "MetroidChase",
+              "module": "visuals/metroid.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "PIT",
+              "cls": "Pit",
+              "module": "visuals/pit.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "SONIC",
+              "cls": "Sonic",
+              "module": "visuals/sonic.py"
+            },
+            {
+              "name": "YOSHI",
+              "cls": "Yoshi",
+              "module": "visuals/yoshi.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GLOW",
+              "cls": "WonderGlow",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER MARQUEE",
+              "cls": "WonderMarquee",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CRAWL",
+              "cls": "WonderCrawl",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SLIDE",
+              "cls": "WonderSlide",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DROP",
+              "cls": "WonderDrop",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SPIN",
+              "cls": "WonderSpin",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PAC",
+              "cls": "WonderPacMan",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER INVADE",
+              "cls": "WonderInvaders",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TETRIS",
+              "cls": "WonderTetris",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER MATRIX",
+              "cls": "WonderMatrix",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NEON",
+              "cls": "WonderNeon",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FILM",
+              "cls": "WonderFilm",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TV",
+              "cls": "WonderRetroTV",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DK",
+              "cls": "WonderDK",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FROG",
+              "cls": "WonderFrogger",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER LIFE",
+              "cls": "WonderLife",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER HODGE",
+              "cls": "WonderHodge",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER WARS",
+              "cls": "WonderStarWars",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FLOCK",
+              "cls": "WonderBoids",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SLIME",
+              "cls": "WonderSlime",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER HEAT",
+              "cls": "WonderDiffusion",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BRAIN",
+              "cls": "WonderBrain",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FLOW",
+              "cls": "WonderFlow",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SAND",
+              "cls": "WonderSand",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PONG",
+              "cls": "WonderPong",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SEGA",
+              "cls": "WonderSega",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PS1",
+              "cls": "WonderPS1",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER COIN",
+              "cls": "WonderInsertCoin",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CREEP",
+              "cls": "WonderCreeper",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NYAN",
+              "cls": "WonderNyanCat",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER C64",
+              "cls": "WonderC64",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GBOY",
+              "cls": "WonderGameBoy",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DOS",
+              "cls": "WonderDOS",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BSOD",
+              "cls": "WonderBSOD",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER LOAD",
+              "cls": "WonderLoading",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BARS",
+              "cls": "WonderColorBars",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VHS",
+              "cls": "WonderVHS",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BOING",
+              "cls": "WonderBoing",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NES",
+              "cls": "WonderNES",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER N64",
+              "cls": "WonderN64",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ATARI",
+              "cls": "WonderAtari",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BREAK",
+              "cls": "WonderBreakout",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SNAKE",
+              "cls": "WonderSnake",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ASTRDS",
+              "cls": "WonderAsteroids",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DOOM",
+              "cls": "WonderDoom",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PIPE",
+              "cls": "WonderPipe",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER XP",
+              "cls": "WonderWinXP",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GLITCH",
+              "cls": "WonderGlitch",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TYPE",
+              "cls": "WonderTypewriter",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ZOOM",
+              "cls": "WonderZoom",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VINYL",
+              "cls": "WonderVinyl",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TAPE",
+              "cls": "WonderCassette",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JAKE",
+              "cls": "WonderJake",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SAURON",
+              "cls": "WonderSauron",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VERTIGO",
+              "cls": "WonderVertigo",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER STARGATE",
+              "cls": "WonderStargate",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PSYCHO",
+              "cls": "WonderPsycho",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NOSFERATU",
+              "cls": "WonderNosferatu",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JAWS",
+              "cls": "WonderJaws",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SHINING",
+              "cls": "WonderShining",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ET",
+              "cls": "WonderET",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ALIEN",
+              "cls": "WonderAlien",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER EXORCIST",
+              "cls": "WonderExorcist",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TERMINATOR",
+              "cls": "WonderTerminator",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GODZILLA",
+              "cls": "WonderGodzilla",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BLADE RUNNER",
+              "cls": "WonderBladeRunner",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CLOSE ENCOUNTERS",
+              "cls": "WonderCloseEncounters",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TRON",
+              "cls": "WonderTron",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JURASSIC PARK",
+              "cls": "WonderJurassicPark",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER INDIANA",
+              "cls": "WonderIndiana",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER METROPOLIS",
+              "cls": "WonderMetropolis",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER KING KONG",
+              "cls": "WonderKingKong",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER WIZARD OF OZ",
+              "cls": "WonderWizardOz",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GHOSTBUSTERS",
+              "cls": "WonderGhostbusters",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            }
           ]
         },
         {
@@ -2636,6 +5578,33 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "GREATWAVE",
+              "cls": "GreatWave",
+              "module": "visuals/greatwave.py"
+            },
+            {
+              "name": "MONDRIAN",
+              "cls": "Mondrian",
+              "module": "visuals/mondrian.py"
+            },
+            {
+              "name": "SCREAM",
+              "cls": "Scream",
+              "module": "visuals/scream.py"
+            },
+            {
+              "name": "STARRYNIGHT",
+              "cls": "StarryNight",
+              "module": "visuals/starrynight.py"
+            },
+            {
+              "name": "WATERLILIES",
+              "cls": "WaterLilies",
+              "module": "visuals/waterlilies.py"
+            }
           ]
         },
         {
@@ -2725,6 +5694,58 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "LAKE",
+              "cls": "Lake",
+              "module": "visuals/lake.py"
+            },
+            {
+              "name": "AURORA",
+              "cls": "Aurora",
+              "module": "visuals/aurora.py"
+            },
+            {
+              "name": "STARFIELD",
+              "cls": "Starfield",
+              "module": "visuals/starfield.py"
+            },
+            {
+              "name": "FIREFLIES",
+              "cls": "Fireflies",
+              "module": "visuals/fireflies.py"
+            },
+            {
+              "name": "RIPPLES",
+              "cls": "Ripples",
+              "module": "visuals/ripples.py"
+            },
+            {
+              "name": "FLUX",
+              "cls": "Flux",
+              "module": "visuals/flux.py"
+            },
+            {
+              "name": "WEATHER",
+              "cls": "Weather",
+              "module": "visuals/weather.py"
+            },
+            {
+              "name": "BOIDS",
+              "cls": "Boids",
+              "module": "visuals/boids.py"
+            },
+            {
+              "name": "WATERLILIES",
+              "cls": "WaterLilies",
+              "module": "visuals/waterlilies.py"
+            },
+            {
+              "name": "STARRYNIGHT",
+              "cls": "StarryNight",
+              "module": "visuals/starrynight.py"
+            }
           ]
         },
         {
@@ -2814,6 +5835,78 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "RUG",
+              "cls": "Rug",
+              "module": "visuals/rug.py"
+            },
+            {
+              "name": "QUARKS",
+              "cls": "Quarks",
+              "module": "visuals/quarks.py"
+            },
+            {
+              "name": "HODGE",
+              "cls": "Hodge",
+              "module": "visuals/hodge.py"
+            },
+            {
+              "name": "RIPPLES",
+              "cls": "Ripples",
+              "module": "visuals/ripples.py"
+            },
+            {
+              "name": "FLUX",
+              "cls": "Flux",
+              "module": "visuals/flux.py"
+            },
+            {
+              "name": "SLIME",
+              "cls": "Slime",
+              "module": "visuals/slime.py"
+            },
+            {
+              "name": "CYCLIC",
+              "cls": "DemonSpirals",
+              "module": "visuals/demonspirals.py"
+            },
+            {
+              "name": "LIFE",
+              "cls": "Life",
+              "module": "visuals/life.py"
+            },
+            {
+              "name": "JELLYFISH",
+              "cls": "ParticleLife",
+              "module": "visuals/particlelife.py"
+            },
+            {
+              "name": "AURORA",
+              "cls": "Aurora",
+              "module": "visuals/aurora.py"
+            },
+            {
+              "name": "GYRE",
+              "cls": "Gyre",
+              "module": "visuals/gyre.py"
+            },
+            {
+              "name": "BOIDS",
+              "cls": "Boids",
+              "module": "visuals/boids.py"
+            },
+            {
+              "name": "SANDPILE",
+              "cls": "Sandpile",
+              "module": "visuals/sandpile.py"
+            },
+            {
+              "name": "FIREFLIES",
+              "cls": "Fireflies",
+              "module": "visuals/fireflies.py"
+            }
           ]
         },
         {
@@ -2903,6 +5996,58 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "FIRE",
+              "cls": "Fire",
+              "module": "visuals/fire.py"
+            },
+            {
+              "name": "PLASMA",
+              "cls": "Plasma",
+              "module": "visuals/plasma.py"
+            },
+            {
+              "name": "ROTOZOOM",
+              "cls": "Rotozoom",
+              "module": "visuals/rotozoom.py"
+            },
+            {
+              "name": "SINESCROLL",
+              "cls": "SineScroller",
+              "module": "visuals/sinescroller.py"
+            },
+            {
+              "name": "TWISTER",
+              "cls": "Twister",
+              "module": "visuals/twister.py"
+            },
+            {
+              "name": "AMIGA BARS",
+              "cls": "CopperBars",
+              "module": "visuals/copperbars.py"
+            },
+            {
+              "name": "LARSON SCAN",
+              "cls": "Cylon",
+              "module": "visuals/cylon.py"
+            },
+            {
+              "name": "TRANCE",
+              "cls": "Trance",
+              "module": "visuals/trance.py"
+            },
+            {
+              "name": "MOIRE",
+              "cls": "Moire",
+              "module": "visuals/moire.py"
+            },
+            {
+              "name": "XOR",
+              "cls": "XORPattern",
+              "module": "visuals/xorpattern.py"
+            }
           ]
         },
         {
@@ -2992,6 +6137,58 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "FIRE",
+              "cls": "Fire",
+              "module": "visuals/fire.py"
+            },
+            {
+              "name": "PLASMA",
+              "cls": "Plasma",
+              "module": "visuals/plasma.py"
+            },
+            {
+              "name": "TRANCE",
+              "cls": "Trance",
+              "module": "visuals/trance.py"
+            },
+            {
+              "name": "ROTOZOOM",
+              "cls": "Rotozoom",
+              "module": "visuals/rotozoom.py"
+            },
+            {
+              "name": "MATRIX",
+              "cls": "Matrix",
+              "module": "visuals/matrix.py"
+            },
+            {
+              "name": "TWISTER",
+              "cls": "Twister",
+              "module": "visuals/twister.py"
+            },
+            {
+              "name": "AMIGA BARS",
+              "cls": "CopperBars",
+              "module": "visuals/copperbars.py"
+            },
+            {
+              "name": "RAINBOW",
+              "cls": "Rainbow",
+              "module": "visuals/rainbow.py"
+            },
+            {
+              "name": "LARSON SCAN",
+              "cls": "Cylon",
+              "module": "visuals/cylon.py"
+            },
+            {
+              "name": "SINESCROLL",
+              "cls": "SineScroller",
+              "module": "visuals/sinescroller.py"
+            }
           ]
         },
         {
@@ -3081,6 +6278,63 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "MUSIC BOX",
+              "cls": "MusicBox",
+              "module": "visuals/musicbox.py"
+            },
+            {
+              "name": "METRONOME",
+              "cls": "Metronome",
+              "module": "visuals/metronome.py"
+            },
+            {
+              "name": "HURDY GURDY",
+              "cls": "HurdyGurdy",
+              "module": "visuals/hurdygurdy.py"
+            },
+            {
+              "name": "EQUALIZER",
+              "cls": "Equalizer",
+              "module": "visuals/equalizer.py"
+            },
+            {
+              "name": "TURNTABLE",
+              "cls": "Turntable",
+              "module": "visuals/turntable.py"
+            },
+            {
+              "name": "PIANO ROLL",
+              "cls": "PianoRoll",
+              "module": "visuals/pianoroll.py"
+            },
+            {
+              "name": "DRUM MACHINE",
+              "cls": "DrumMachine",
+              "module": "visuals/drummachine.py"
+            },
+            {
+              "name": "JUKEBOX",
+              "cls": "Jukebox",
+              "module": "visuals/jukebox.py"
+            },
+            {
+              "name": "THEREMIN",
+              "cls": "Theremin",
+              "module": "visuals/theremin.py"
+            },
+            {
+              "name": "GRAMOPHONE",
+              "cls": "Gramophone",
+              "module": "visuals/gramophone.py"
+            },
+            {
+              "name": "SYNTHESIZER",
+              "cls": "Synthesizer",
+              "module": "visuals/synthesizer.py"
+            }
           ]
         },
         {
@@ -3170,6 +6424,121 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "ATTRACTORS",
+              "cls": "Attractors",
+              "module": "visuals/attractors.py"
+            },
+            {
+              "name": "DBL PENDULUM",
+              "cls": "DblPendulum",
+              "module": "visuals/dblpendulum.py"
+            },
+            {
+              "name": "BRAIN",
+              "cls": "Neurons",
+              "module": "visuals/neurons.py"
+            },
+            {
+              "name": "SOLAR SYSTEM",
+              "cls": "OrbitsSolar",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "3 BODY PROBLEM",
+              "cls": "OrbitsMulti",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "SPACE DUST",
+              "cls": "OrbitsBelt",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "COULOMB",
+              "cls": "Coulomb",
+              "module": "visuals/emfield.py"
+            },
+            {
+              "name": "WAVE TANK",
+              "cls": "WaveTank",
+              "module": "visuals/wavetank.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "OPTICS",
+              "cls": "Optics",
+              "module": "visuals/optics.py"
+            },
+            {
+              "name": "RADIOACTIVE",
+              "cls": "Radioactive",
+              "module": "visuals/radioactive.py"
+            },
+            {
+              "name": "WIND TUNNEL",
+              "cls": "FluidTunnel",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "INK DROPS",
+              "cls": "FluidInk",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "COLOR MIX",
+              "cls": "FluidMixing",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "GRAY-SCOTT LAB",
+              "cls": "TuringPatterns",
+              "module": "visuals/turing.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "MITOSIS",
+              "cls": "Mitosis",
+              "module": "visuals/mitosis.py"
+            },
+            {
+              "name": "EARTH",
+              "cls": "Earth",
+              "module": "visuals/earth.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "MOLECULES",
+              "cls": "Molecule",
+              "module": "visuals/molecule.py"
+            },
+            {
+              "name": "DNA",
+              "cls": "DNA",
+              "module": "visuals/dna.py"
+            },
+            {
+              "name": "SPECTROSCOPE",
+              "cls": "Spectroscope",
+              "module": "visuals/spectroscope.py"
+            },
+            {
+              "name": "OSCILLOSCOPE",
+              "cls": "Oscilloscope",
+              "module": "visuals/oscilloscope.py"
+            },
+            {
+              "name": "CHLADNI",
+              "cls": "Chladni",
+              "module": "visuals/chladni.py"
+            }
           ]
         },
         {
@@ -3259,6 +6628,58 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "MARIO",
+              "cls": "Mario",
+              "module": "visuals/mario.py"
+            },
+            {
+              "name": "SONIC",
+              "cls": "Sonic",
+              "module": "visuals/sonic.py"
+            },
+            {
+              "name": "LINK",
+              "cls": "Link",
+              "module": "visuals/link.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "SAMUS",
+              "cls": "MetroidChase",
+              "module": "visuals/metroid.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "YOSHI",
+              "cls": "Yoshi",
+              "module": "visuals/yoshi.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "KIRBY",
+              "cls": "Kirby",
+              "module": "visuals/kirby.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "MEGA MAN",
+              "cls": "MegaMan",
+              "module": "visuals/megaman.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            }
           ]
         },
         {
@@ -3348,6 +6769,32 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "SPIDEY",
+              "cls": "Spidey",
+              "module": "visuals/spidey.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "BATMAN",
+              "cls": "Batman",
+              "module": "visuals/batman.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "GREEN LANTERN",
+              "cls": "GreenLantern",
+              "module": "visuals/greenlantern.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            }
           ]
         },
         {
@@ -3437,6 +6884,600 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "WONDER GLOW",
+              "cls": "WonderGlow",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER MARQUEE",
+              "cls": "WonderMarquee",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CRAWL",
+              "cls": "WonderCrawl",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SLIDE",
+              "cls": "WonderSlide",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DROP",
+              "cls": "WonderDrop",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SPIN",
+              "cls": "WonderSpin",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PAC",
+              "cls": "WonderPacMan",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER INVADE",
+              "cls": "WonderInvaders",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TETRIS",
+              "cls": "WonderTetris",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER MATRIX",
+              "cls": "WonderMatrix",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NEON",
+              "cls": "WonderNeon",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FILM",
+              "cls": "WonderFilm",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TV",
+              "cls": "WonderRetroTV",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DK",
+              "cls": "WonderDK",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FROG",
+              "cls": "WonderFrogger",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER LIFE",
+              "cls": "WonderLife",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER HODGE",
+              "cls": "WonderHodge",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER WARS",
+              "cls": "WonderStarWars",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FLOCK",
+              "cls": "WonderBoids",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SLIME",
+              "cls": "WonderSlime",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER HEAT",
+              "cls": "WonderDiffusion",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BRAIN",
+              "cls": "WonderBrain",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER FLOW",
+              "cls": "WonderFlow",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SAND",
+              "cls": "WonderSand",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PONG",
+              "cls": "WonderPong",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SEGA",
+              "cls": "WonderSega",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PS1",
+              "cls": "WonderPS1",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER COIN",
+              "cls": "WonderInsertCoin",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CREEP",
+              "cls": "WonderCreeper",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NYAN",
+              "cls": "WonderNyanCat",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER C64",
+              "cls": "WonderC64",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GBOY",
+              "cls": "WonderGameBoy",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DOS",
+              "cls": "WonderDOS",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BSOD",
+              "cls": "WonderBSOD",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER LOAD",
+              "cls": "WonderLoading",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BARS",
+              "cls": "WonderColorBars",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VHS",
+              "cls": "WonderVHS",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BOING",
+              "cls": "WonderBoing",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NES",
+              "cls": "WonderNES",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER N64",
+              "cls": "WonderN64",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ATARI",
+              "cls": "WonderAtari",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BREAK",
+              "cls": "WonderBreakout",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SNAKE",
+              "cls": "WonderSnake",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ASTRDS",
+              "cls": "WonderAsteroids",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER DOOM",
+              "cls": "WonderDoom",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PIPE",
+              "cls": "WonderPipe",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER XP",
+              "cls": "WonderWinXP",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GLITCH",
+              "cls": "WonderGlitch",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TYPE",
+              "cls": "WonderTypewriter",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ZOOM",
+              "cls": "WonderZoom",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VINYL",
+              "cls": "WonderVinyl",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TAPE",
+              "cls": "WonderCassette",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JAKE",
+              "cls": "WonderJake",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SAURON",
+              "cls": "WonderSauron",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER VERTIGO",
+              "cls": "WonderVertigo",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER STARGATE",
+              "cls": "WonderStargate",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER PSYCHO",
+              "cls": "WonderPsycho",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER NOSFERATU",
+              "cls": "WonderNosferatu",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JAWS",
+              "cls": "WonderJaws",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER SHINING",
+              "cls": "WonderShining",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ET",
+              "cls": "WonderET",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER ALIEN",
+              "cls": "WonderAlien",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER EXORCIST",
+              "cls": "WonderExorcist",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TERMINATOR",
+              "cls": "WonderTerminator",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GODZILLA",
+              "cls": "WonderGodzilla",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER BLADE RUNNER",
+              "cls": "WonderBladeRunner",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER CLOSE ENCOUNTERS",
+              "cls": "WonderCloseEncounters",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER TRON",
+              "cls": "WonderTron",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER JURASSIC PARK",
+              "cls": "WonderJurassicPark",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER INDIANA",
+              "cls": "WonderIndiana",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER METROPOLIS",
+              "cls": "WonderMetropolis",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER KING KONG",
+              "cls": "WonderKingKong",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER WIZARD OF OZ",
+              "cls": "WonderWizardOz",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            },
+            {
+              "name": "WONDER GHOSTBUSTERS",
+              "cls": "WonderGhostbusters",
+              "module": "visuals/wondercabinet.py",
+              "deps": [
+                "visuals/gifcache.py"
+              ]
+            }
           ]
         }
       ]
