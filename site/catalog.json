@@ -2315,6 +2315,15 @@
           ]
         },
         {
+          "name": "WONDER SAURON",
+          "cls": "WonderSauron",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false,
+          "deps": [
+            "visuals/gifcache.py"
+          ]
+        },
+        {
           "name": "WONDER SEGA",
           "cls": "WonderSega",
           "module": "visuals/wondercabinet.py",

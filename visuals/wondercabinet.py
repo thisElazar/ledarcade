@@ -4709,3 +4709,135 @@ class WonderJake(Visual):
             alpha = cabinet_t
             c = (int(40 * alpha), int(140 * alpha), int(200 * alpha))
             d.draw_text_small(CABINET_X, max(2, 16 - y_off), "CABINET", c)
+
+
+# =========================================================================
+# WonderSauron - Eye of Sauron title
+# =========================================================================
+
+class WonderSauron(Visual):
+    name = "WONDER SAURON"
+    description = "The Eye of Sauron"
+    category = "titles"
+
+    _CX = 32
+    _CY = 22
+    _EW = 24   # eye half-width
+    _EH = 10   # eye half-height
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        # Precompute parabolic eye half-heights per column
+        self._col_hh = {}
+        for px in range(self._CX - self._EW, self._CX + self._EW + 1):
+            nx = abs(px - self._CX) / self._EW
+            self._col_hh[px] = self._EH * (1.0 - nx * nx)
+
+    def reset(self):
+        self.time = 0.0
+        self.sparks = [self._spark() for _ in range(30)]
+
+    def _spark(self):
+        a = random.uniform(0, math.pi * 2)
+        life = random.uniform(0.3, 1.2)
+        return {
+            'x': self._CX + self._EW * math.cos(a) * random.uniform(0.6, 1.0),
+            'y': self._CY + self._EH * math.sin(a) * random.uniform(0.6, 1.0),
+            'vx': random.uniform(-1.5, 1.5),
+            'vy': random.uniform(-18, -6),
+            'life': life, 'ml': life,
+        }
+
+    def update(self, dt: float):
+        self.time += dt
+        for s in self.sparks:
+            s['x'] += s['vx'] * dt
+            s['y'] += s['vy'] * dt
+            s['life'] -= dt
+            if s['life'] <= 0:
+                s.update(self._spark())
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx, cy = self._CX, self._CY
+        ew, eh = self._EW, self._EH
+        pulse = 0.8 + 0.2 * math.sin(t * 2.3)
+
+        # Pupil drift (slowly looks left/right)
+        pcx = cx + 2.5 * math.sin(t * 0.6)
+        slit_hw = 1.0 + 0.5 * math.sin(t * 1.5)
+
+        # Ambient glow behind eye
+        glow_w, glow_h = ew + 3, eh + 5
+        for py in range(max(0, cy - glow_h), min(GRID_SIZE, cy + glow_h + 1)):
+            for px in range(max(0, cx - glow_w), min(GRID_SIZE, cx + glow_w + 1)):
+                dx = (px - cx) / glow_w
+                dy = (py - cy) / glow_h
+                d2 = dx * dx + dy * dy
+                if d2 < 1.0:
+                    g = (1.0 - d2) * 0.2 * pulse
+                    r = int(100 * g)
+                    if r > 1:
+                        d.set_pixel(px, py, (r, int(15 * g), 0))
+
+        # Eye body
+        for px, hh in self._col_hh.items():
+            y_lo = max(0, int(cy - hh))
+            y_hi = min(GRID_SIZE - 1, int(cy + hh))
+            nx = abs(px - cx) / ew
+            for py in range(y_lo, y_hi + 1):
+                dy = py - cy
+                if abs(dy) > hh:
+                    continue
+                rim = abs(dy) / hh if hh > 0 else 1.0
+
+                # Slit pupil
+                pdist = abs(px - pcx)
+                if pdist <= slit_hw and rim < 0.8:
+                    d.set_pixel(px, py, (int(20 * pulse), int(5 * pulse), 0))
+                    continue
+
+                # Fire intensity
+                intensity = (1.0 - rim * 0.6) * (1.0 - nx * 0.3) * pulse
+                # Bright iris glow near slit edge
+                nd = pdist / ew
+                if nd < 0.25:
+                    intensity *= 1.0 + 0.5 * (1.0 - nd / 0.25)
+                if intensity > 1.0:
+                    intensity = 1.0
+                # Flicker
+                intensity *= 0.88 + 0.12 * math.sin(px * 3.7 + py * 2.3 + t * 8.5)
+
+                # Fire color ramp
+                if intensity > 0.7:
+                    r = int(255 * intensity)
+                    g = int(200 * (intensity - 0.2))
+                    b = int(30 * max(0, intensity - 0.6))
+                elif intensity > 0.4:
+                    r = int(255 * intensity)
+                    g = int(90 * intensity)
+                    b = 0
+                else:
+                    v = max(0.0, intensity * 1.8)
+                    r = int(160 * v)
+                    g = int(25 * v)
+                    b = 0
+                if r > 1:
+                    d.set_pixel(px, py, (min(255, r), min(255, g), min(255, b)))
+
+        # Rising embers
+        for s in self.sparks:
+            frac = max(0.0, s['life'] / s['ml'])
+            sx, sy = int(s['x']), int(s['y'])
+            if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE and frac > 0:
+                d.set_pixel(sx, sy, (int(255 * frac), int(90 * frac * frac), 0))
+
+        # Title text in fire colors
+        tp = 0.6 + 0.4 * math.sin(t * 1.2)
+        d.draw_text_small(WONDER_X, 44, "WONDER",
+                          (int(210 * tp), int(100 * tp), 0))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.2 + 0.5)
+        d.draw_text_small(CABINET_X, 52, "CABINET",
+                          (int(180 * tp2), int(80 * tp2), 0))
