@@ -32,7 +32,7 @@ TOOL_COLORS = [
 class Drift(Game):
     name = "DRIFT"
     description = "Terrain sandbox"
-    category = "modern"
+    category = "unique"
 
     def __init__(self, display: Display):
         super().__init__(display)

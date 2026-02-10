@@ -210,6 +210,7 @@ from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
 from .drift import DriftVisual
+from .drift3d import Drift3D
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderSlide, WonderDrop, WonderSpin,
                             WonderPacMan, WonderInvaders, WonderTetris,
@@ -425,6 +426,7 @@ ALL_VISUALS = [
     Astrolabe,
     Archimedes,
     DriftVisual,
+    Drift3D,
     WonderGlow,
     WonderMarquee,
     WonderCrawl,
@@ -694,6 +696,7 @@ __all__ = [
     'Astrolabe',
     'Archimedes',
     'DriftVisual',
+    'Drift3D',
     'BML',
     'Highway',
     'Intersection',
