@@ -21,17 +21,16 @@ def _hue_to_rgb(h):
 
 
 def _center_x(text):
-    """Calculate x position to center text (4px per char + 1px spacing).
-    Adds +3 offset to properly center on 64px screen."""
-    width = len(text) * 5 - 1
-    return max(0, (GRID_SIZE - width) // 2 + 3)
+    """Calculate x position to center text (3px char + 1px space = 4px stride)."""
+    width = len(text) * 4 - 1  # 3px per char + 1px gap, minus trailing gap
+    return max(0, (GRID_SIZE - width) // 2)
 
 
 # Precomputed centered x positions
-WONDER_X = _center_x("WONDER")   # 20 (visually centered)
-CABINET_X = _center_x("CABINET")  # 18 (visually centered)
-WONDER_W = len("WONDER") * 5 - 1   # 29
-CABINET_W = len("CABINET") * 5 - 1 # 34
+WONDER_X = _center_x("WONDER")   # 20
+CABINET_X = _center_x("CABINET")  # 18
+WONDER_W = len("WONDER") * 4 - 1   # 23
+CABINET_W = len("CABINET") * 4 - 1 # 27
 # Vertical center positions for the two-line layout
 WONDER_Y = 24
 CABINET_Y = 34
@@ -4841,3 +4840,2696 @@ class WonderSauron(Visual):
         tp2 = 0.6 + 0.4 * math.sin(t * 1.2 + 0.5)
         d.draw_text_small(CABINET_X, 52, "CABINET",
                           (int(180 * tp2), int(80 * tp2), 0))
+
+
+# =========================================================================
+# WonderVertigo - Hitchcock / Saul Bass spiral
+# =========================================================================
+
+class WonderVertigo(Visual):
+    name = "WONDER VERTIGO"
+    description = "Saul Bass spiral"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        # Pre-compute polar coords
+        cx, cy = GRID_SIZE / 2, GRID_SIZE / 2
+        self._angle = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self._radius = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = x - cx + 0.5
+                dy = y - cy + 0.5
+                self._angle[y][x] = math.atan2(dy, dx)
+                self._radius[y][x] = math.sqrt(dx * dx + dy * dy)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Green Saul Bass palette
+        pal = [(0, 0, 0), (0, 60, 25), (0, 140, 55), (0, 200, 80)]
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                angle = self._angle[y][x]
+                radius = self._radius[y][x]
+
+                # Dual spirals rotating opposite directions
+                spiral = angle * 3.0 + radius * 0.35 - t * 2.0
+                spiral2 = angle * 5.0 - radius * 0.25 + t * 1.3
+                pulse = math.sin(t * 0.7) * 0.15
+                v1 = math.sin(spiral + pulse) * 0.5 + 0.5
+                v2 = math.sin(spiral2) * 0.5 + 0.5
+                v = v1 * 0.65 + v2 * 0.35
+
+                # Sharp threshold bands for woodcut look
+                if v < 0.25:
+                    color = pal[0]
+                elif v < 0.45:
+                    color = pal[1]
+                elif v < 0.7:
+                    color = pal[2]
+                else:
+                    color = pal[3]
+
+                # Fade edges to black
+                edge = max(0.0, 1.0 - radius / 38.0)
+                if edge < 1.0:
+                    color = (int(color[0] * edge), int(color[1] * edge),
+                             int(color[2] * edge))
+
+                d.set_pixel(x, y, color)
+
+        # Title text - green on black, pulsing
+        tp = 0.6 + 0.4 * math.sin(t * 1.5)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(80 * tp), int(220 * tp), int(90 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.5 + 0.4)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(60 * tp2), int(180 * tp2), int(70 * tp2)))
+
+
+# =========================================================================
+# WonderStargate - 2001: A Space Odyssey slit-scan tunnel
+# =========================================================================
+
+class WonderStargate(Visual):
+    name = "WONDER STARGATE"
+    description = "2001 slit-scan tunnel"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        cx, cy = GRID_SIZE / 2, GRID_SIZE / 2
+        self._dist = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self._angle = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = abs(x - cx + 0.5)
+                dy = abs(y - cy + 0.5)
+                self._dist[y][x] = max(dx, dy)  # Chebyshev = rectangular tunnel
+                self._angle[y][x] = math.atan2(y - cy + 0.5, x - cx + 0.5)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Kubrick blue/orange palette
+        pal = [
+            (0, 0, 40), (0, 60, 180), (200, 100, 0), (255, 180, 50),
+            (0, 30, 120), (255, 130, 20),
+        ]
+        n_colors = len(pal)
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dist = self._dist[y][x]
+                angle = self._angle[y][x]
+
+                if dist < 0.5:
+                    continue
+
+                # Tunnel depth via inverse distance
+                depth = 30.0 / dist
+                band = depth * 3.0 - t * 4.0 + (angle / math.pi) * 0.5
+
+                band_val = band % n_colors
+                idx = int(band_val) % n_colors
+                frac = band_val - int(band_val)
+                c1 = pal[idx]
+                c2 = pal[(idx + 1) % n_colors]
+                r = int(c1[0] + (c2[0] - c1[0]) * frac)
+                g = int(c1[1] + (c2[1] - c1[1]) * frac)
+                b = int(c1[2] + (c2[2] - c1[2]) * frac)
+
+                # Brightness falloff + shimmer
+                brightness = min(1.0, dist / 8.0)
+                brightness *= 0.85 + 0.15 * math.sin(depth * 6.0 + t * 3.0)
+                d.set_pixel(x, y, (int(r * brightness), int(g * brightness),
+                                   int(b * brightness)))
+
+        # Title text - electric blue/white
+        tp = 0.7 + 0.3 * math.sin(t * 2.0)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(150 * tp), int(200 * tp), int(255 * tp)))
+        tp2 = 0.7 + 0.3 * math.sin(t * 2.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(120 * tp2), int(170 * tp2), int(255 * tp2)))
+
+
+# =========================================================================
+# WonderPsycho - Hitchcock's shower drain spiral
+# =========================================================================
+
+class WonderPsycho(Visual):
+    name = "WONDER PSYCHO"
+    description = "Shower drain spiral"
+    category = "titles"
+
+    _DRAIN_CX = GRID_SIZE // 2
+    _DRAIN_CY = GRID_SIZE // 2 + 2
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        cx, cy = self._DRAIN_CX, self._DRAIN_CY
+        self._angle = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        self._radius = [[0.0] * GRID_SIZE for _ in range(GRID_SIZE)]
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = x - cx + 0.5
+                dy = y - cy + 0.5
+                self._angle[y][x] = math.atan2(dy, dx)
+                self._radius[y][x] = math.sqrt(dx * dx + dy * dy)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx, cy = self._DRAIN_CX, self._DRAIN_CY
+
+        # Slowly oscillating convergence
+        progress = math.sin(t * 0.25) * 0.5 + 0.5  # 0→1→0
+
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                angle = self._angle[y][x]
+                radius = self._radius[y][x]
+
+                # Spiral arms converging on drain
+                spiral = angle * 2.0 + radius * 0.4 - t * 3.0
+
+                converge = max(0.0, radius - (1.0 - progress) * 35)
+                in_flow = converge < 15.0
+                v = math.sin(spiral) * 0.5 + 0.5
+
+                if in_flow and radius < 35:
+                    # BW noir: mix gray water and dark streaks
+                    blood_mix = progress * 0.5 + v * 0.3
+                    # Grayscale noir palette
+                    water_l = int(130 - blood_mix * 80)
+                    streak = abs(math.sin(spiral * 2.0))
+                    water_l = max(10, int(water_l + streak * 30))
+
+                    # Subtle warm tint at high convergence
+                    warm = progress * 0.4
+                    color = (min(255, int(water_l * (1.0 + warm * 0.4))),
+                             int(water_l * (1.0 - warm * 0.1)),
+                             int(water_l * (1.0 - warm * 0.3)))
+
+                    # Darken toward center (drain hole)
+                    center_dark = max(0.0, 1.0 - radius / 6.0)
+                    if center_dark > 0:
+                        color = (int(color[0] * (1 - center_dark)),
+                                 int(color[1] * (1 - center_dark)),
+                                 int(color[2] * (1 - center_dark)))
+                else:
+                    # White porcelain
+                    base = max(60, 200 - int(radius * 1.5))
+                    color = (base, base - 3, base - 6)
+
+                d.set_pixel(x, y, color)
+
+        # Drain hole
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                if dx * dx + dy * dy <= 4:
+                    px, py = cx + dx, cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (8, 8, 10))
+
+        # Title text - cold white, slightly flickering
+        flick = 0.8 + 0.2 * math.sin(t * 6.0 + math.sin(t * 2.3) * 3)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(220 * flick), int(220 * flick), int(230 * flick)))
+        flick2 = 0.8 + 0.2 * math.sin(t * 6.0 + 1.0 + math.sin(t * 2.3) * 3)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(200 * flick2), int(200 * flick2), int(210 * flick2)))
+
+
+# =========================================================================
+# WonderNosferatu - Murnau's shadow on stairs
+# =========================================================================
+
+class WonderNosferatu(Visual):
+    name = "WONDER NOSFERATU"
+    description = "Shadow on the stairs"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Candlelight flicker
+        flicker = (0.82 + 0.18 * math.sin(t * 11.0)
+                   * (0.9 + 0.1 * math.sin(t * 7.3)))
+
+        # Staircase wall background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                stair_y = (y + x // 2) % 12
+                if stair_y < 1:
+                    base = (120, 90, 40)
+                elif stair_y < 6:
+                    base = (90, 65, 30)
+                else:
+                    base = (150, 115, 55)
+                # Darker at top (light from below)
+                vert = 0.55 + 0.45 * (y / GRID_SIZE)
+                c = (int(base[0] * vert * flicker),
+                     int(base[1] * vert * flicker),
+                     int(base[2] * vert * flicker))
+                d.set_pixel(x, y, c)
+
+        # Shadow silhouette - cycles through phases
+        cycle = 12.0
+        phase_t = t % cycle
+        if phase_t < 5.0:
+            # Climb: shadow rises from bottom
+            progress = phase_t / 5.0
+            y_off = int(55 - progress * 40)
+            hand_ext = 0.0
+            scale = 0.6 + progress * 0.4
+        elif phase_t < 9.0:
+            # Loom: hand extends
+            progress = (phase_t - 5.0) / 4.0
+            y_off = 15
+            hand_ext = progress
+            scale = 1.0 + progress * 0.3
+        else:
+            # Retreat
+            progress = (phase_t - 9.0) / 3.0
+            y_off = int(15 + progress * 45)
+            hand_ext = max(0.0, 1.0 - progress * 2)
+            scale = 1.3 - progress * 0.7
+
+        shadow = (12, 8, 4)
+        sx = 38
+
+        # Head (bald oval)
+        head_cy = y_off + int(8 * scale)
+        head_rx = int(5 * scale)
+        head_ry = int(7 * scale)
+        for dy in range(-head_ry, head_ry + 1):
+            row = head_cy + dy
+            if 0 <= row < GRID_SIZE:
+                tv = dy / head_ry if head_ry > 0 else 0
+                w = int(head_rx * math.sqrt(max(0, 1 - tv * tv)))
+                for dx in range(-w, w + 1):
+                    col = sx + dx
+                    if 0 <= col < GRID_SIZE:
+                        d.set_pixel(col, row, shadow)
+
+        # Pointed ears
+        for i in range(int(3 * scale)):
+            ear_y = head_cy - head_ry + i
+            for side in [-1, 1]:
+                ear_x = sx + side * (head_rx + i)
+                if 0 <= ear_x < GRID_SIZE and 0 <= ear_y < GRID_SIZE:
+                    d.set_pixel(ear_x, ear_y, shadow)
+
+        # Body
+        body_top = head_cy + head_ry
+        for i in range(int(20 * scale)):
+            row = body_top + i
+            if row >= GRID_SIZE:
+                break
+            w = max(2, int((6 - i * 0.1) * scale))
+            for dx in range(-w, w + 1):
+                col = sx + dx
+                if 0 <= col < GRID_SIZE:
+                    d.set_pixel(col, row, shadow)
+
+        # Claw hand
+        arm_y = body_top + int(5 * scale)
+        arm_x = sx - int(6 * scale)
+        finger_len = int(6 * scale * (0.3 + hand_ext * 0.7))
+        for f in range(5):
+            angle = -0.8 + f * 0.3
+            for seg in range(finger_len):
+                fx = arm_x - seg
+                fy = arm_y + int(seg * math.tan(angle))
+                if 0 <= fx < GRID_SIZE and 0 <= fy < GRID_SIZE:
+                    d.set_pixel(fx, fy, shadow)
+                    if fy + 1 < GRID_SIZE and seg < finger_len - 2:
+                        d.set_pixel(fx, fy + 1, shadow)
+        # Arm to body
+        for seg in range(int(6 * scale)):
+            ax = sx - seg
+            ay = arm_y + seg // 3
+            if 0 <= ax < GRID_SIZE and 0 <= ay < GRID_SIZE:
+                d.set_pixel(ax, ay, shadow)
+                if ay + 1 < GRID_SIZE:
+                    d.set_pixel(ax, ay + 1, shadow)
+
+        # Title text - warm amber, candle-tinted
+        tp = 0.6 + 0.4 * math.sin(t * 1.0) * flicker
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(220 * tp), int(160 * tp), int(50 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.0 + 0.6) * flicker
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(200 * tp2), int(140 * tp2), int(40 * tp2)))
+
+
+# =========================================================================
+# WonderJaws - Spielberg's iconic poster
+# =========================================================================
+
+class WonderJaws(Visual):
+    name = "WONDER JAWS"
+    description = "Shark from below"
+    category = "titles"
+
+    _SURFACE_Y = 14
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._bubbles = [self._new_bubble() for _ in range(12)]
+
+    def _new_bubble(self):
+        return {
+            'x': random.uniform(4, GRID_SIZE - 4),
+            'y': random.uniform(self._SURFACE_Y + 5, GRID_SIZE),
+            'speed': random.uniform(6, 14),
+        }
+
+    def update(self, dt: float):
+        self.time += dt
+        for b in self._bubbles:
+            b['y'] -= b['speed'] * dt
+            if b['y'] < self._SURFACE_Y:
+                b.update(self._new_bubble())
+                b['y'] = GRID_SIZE
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+        sy = self._SURFACE_Y
+
+        # Night sky
+        for y in range(sy):
+            grad = y / sy
+            c = (int(8 + 10 * grad), int(8 + 12 * grad), int(25 + 20 * grad))
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, c)
+
+        # Moon
+        for dy in range(-3, 4):
+            for dx in range(-3, 4):
+                if dx * dx + dy * dy <= 9:
+                    px, py = 50 + dx, 4 + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (190, 190, 170))
+
+        # Underwater
+        for y in range(sy, GRID_SIZE):
+            depth = (y - sy) / (GRID_SIZE - sy)
+            base_r = int(15 * (1 - depth))
+            base_g = int(50 + 10 * (1 - depth))
+            base_b = int(100 + 30 * (1 - depth))
+            for x in range(GRID_SIZE):
+                # Caustic rays
+                ray = math.sin((x - cx) * 0.3 + t * 0.5 + y * 0.1)
+                ray += math.sin((x - cx) * 0.15 - t * 0.3 + y * 0.15)
+                ri = max(0.0, ray * 0.5) * (1.0 - depth) * 0.25
+                d.set_pixel(x, y, (min(255, int(base_r + ri * 60)),
+                                   min(255, int(base_g + ri * 100)),
+                                   min(255, int(base_b + ri * 50))))
+
+        # Surface wave
+        for x in range(GRID_SIZE):
+            wy = sy + int(math.sin(x * 0.3 + t * 2.0) * 1.2)
+            if 0 <= wy < GRID_SIZE:
+                d.set_pixel(x, wy, (50, 90, 150))
+
+        # Swimmer silhouette
+        swim_x = cx + int(math.sin(t * 0.5) * 3)
+        for dx in range(-4, 5):
+            px = swim_x + dx
+            if 0 <= px < GRID_SIZE and 0 <= sy - 1 < GRID_SIZE:
+                d.set_pixel(px, sy - 1, (160, 130, 100))
+        # Kicking legs
+        kick = int(math.sin(t * 4.0) * 2)
+        for i in range(2):
+            lx = swim_x - 4 - i
+            ly = sy + abs(kick)
+            if 0 <= lx < GRID_SIZE and 0 <= ly < GRID_SIZE:
+                d.set_pixel(lx, ly, (140, 110, 80))
+
+        # Shark - oscillates up/down, viewed from below (poster angle)
+        # Pixel-art silhouette: each row is (y_offset, x_min, x_max) from snout
+        # Nose-up, open jaws, pectoral fins out, forked tail
+        SHARK_DARK = (15, 18, 28)      # body silhouette
+        SHARK_BELLY = (45, 50, 60)     # lighter underbelly
+        SHARK_MOUTH = (90, 20, 15)     # red mouth interior
+        SHARK_TEETH = (220, 225, 230)  # teeth
+        SHARK_EYE = (10, 10, 10)       # beady black eye
+
+        # Silhouette rows: list of (half-width,) from snout tip downward
+        # Row 0 = snout tip, progressing to tail
+        #   snout → jaw → head → pectoral fins → body → caudal peduncle → tail
+        body_profile = [
+            1,           # 0  snout tip
+            2,           # 1  snout
+            3,           # 2  upper jaw
+            4,           # 3  jaw hinge
+            5,           # 4  head widens
+            6,           # 5  head
+            7,           # 6  gills / widest head
+            7,           # 7  pectoral fin root
+            6,           # 8  behind pectorals
+            5,           # 9  torso
+            5,           # 10 torso
+            4,           # 11 abdomen
+            4,           # 12 abdomen
+            3,           # 13 taper
+            3,           # 14 taper
+            2,           # 15 caudal peduncle
+            2,           # 16 peduncle
+            1,           # 17 peduncle narrow
+        ]
+        body_len = len(body_profile)
+
+        shark_cycle = 10.0
+        st = t % shark_cycle
+        if st < 6.0:
+            progress = st / 6.0
+            shark_y = int(GRID_SIZE - 2 - progress * 30)
+        else:
+            progress = (st - 6.0) / 4.0
+            shark_y = int(GRID_SIZE - 32 + progress * 30)
+
+        # Draw body silhouette
+        for i, hw in enumerate(body_profile):
+            row = shark_y + i
+            if row < sy or row >= GRID_SIZE:
+                continue
+            # Belly is lighter in the center, darker at edges
+            for dx in range(-hw, hw + 1):
+                col = cx + dx
+                if 0 <= col < GRID_SIZE:
+                    edge = abs(dx) / max(1, hw)
+                    if edge > 0.7:
+                        d.set_pixel(col, row, SHARK_DARK)
+                    else:
+                        d.set_pixel(col, row, SHARK_BELLY)
+
+        # Open mouth (V-shaped gape, rows 0-3)
+        for i in range(4):
+            row = shark_y + i
+            if row < sy or row >= GRID_SIZE:
+                continue
+            # Mouth interior is narrower than head, creating jaw edges
+            mouth_hw = max(0, i)  # widens downward
+            for dx in range(-mouth_hw, mouth_hw + 1):
+                col = cx + dx
+                if 0 <= col < GRID_SIZE:
+                    d.set_pixel(col, row, SHARK_MOUTH)
+
+        # Teeth along upper jaw edge (row 0-1) and lower jaw (row 3)
+        for row_off in [0, 1]:
+            row = shark_y + row_off
+            if row < sy or row >= GRID_SIZE:
+                continue
+            jaw_hw = body_profile[row_off]
+            # Teeth at the outer edges of the jaw
+            for dx in range(-jaw_hw, jaw_hw + 1):
+                col = cx + dx
+                if 0 <= col < GRID_SIZE:
+                    # Alternating teeth pattern
+                    if (dx + row_off) % 2 == 0:
+                        d.set_pixel(col, row, SHARK_TEETH)
+        # Lower teeth row
+        row = shark_y + 3
+        if sy <= row < GRID_SIZE:
+            for dx in range(-3, 4):
+                col = cx + dx
+                if 0 <= col < GRID_SIZE and dx % 2 == 0:
+                    d.set_pixel(col, row, SHARK_TEETH)
+
+        # Eyes (row 5, set into the head sides)
+        eye_row = shark_y + 5
+        if sy <= eye_row < GRID_SIZE:
+            for side in [-1, 1]:
+                ex = cx + side * 5
+                if 0 <= ex < GRID_SIZE:
+                    d.set_pixel(ex, eye_row, SHARK_EYE)
+
+        # Pectoral fins (extend out from rows 7-10)
+        for i in range(4):
+            row = shark_y + 7 + i
+            if row < sy or row >= GRID_SIZE:
+                continue
+            # Fins extend outward, wider near root, tapering
+            fin_start = body_profile[7 + i] + 1
+            fin_len = max(0, 5 - i)
+            for side in [-1, 1]:
+                for f in range(fin_len):
+                    col = cx + side * (fin_start + f)
+                    if 0 <= col < GRID_SIZE:
+                        d.set_pixel(col, row, SHARK_DARK)
+
+        # Tail fin (forked caudal fin, two lobes angling outward)
+        tail_start = shark_y + body_len
+        for i in range(5):
+            row = tail_start + i
+            if row < sy or row >= GRID_SIZE:
+                continue
+            # Two lobes spread outward
+            spread = 2 + i
+            for side in [-1, 1]:
+                for w in range(2):
+                    col = cx + side * (spread - w)
+                    if 0 <= col < GRID_SIZE:
+                        d.set_pixel(col, row, SHARK_DARK)
+            # Thin connector in middle for first couple rows
+            if i < 2:
+                d.set_pixel(cx, row, SHARK_DARK)
+
+        # Bubbles
+        for b in self._bubbles:
+            bx, by = int(b['x']), int(b['y'])
+            if 0 <= bx < GRID_SIZE and sy <= by < GRID_SIZE:
+                d.set_pixel(bx, by, (90, 150, 210))
+
+        # Title text - ocean blue/white
+        tp = 0.65 + 0.35 * math.sin(t * 1.3)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(180 * tp), int(210 * tp), int(255 * tp)))
+        tp2 = 0.65 + 0.35 * math.sin(t * 1.3 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(150 * tp2), int(190 * tp2), int(255 * tp2)))
+
+
+# =========================================================================
+# WonderShining - Kubrick's Overlook corridor
+# =========================================================================
+
+class WonderShining(Visual):
+    name = "WONDER SHINING"
+    description = "The Overlook corridor"
+    category = "titles"
+
+    _VP_Y = 20  # Vanishing point Y
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._flash_timer = 0.0
+
+    def handle_input(self, input_state) -> bool:
+        if input_state.up:
+            self._flash_timer = 0.5
+            return True
+        return False
+
+    def update(self, dt: float):
+        self.time += dt
+        if self._flash_timer > 0:
+            self._flash_timer -= dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+        vpy = self._VP_Y
+
+        # Light flicker
+        flicker = 0.86 + 0.14 * math.sin(t * 8.0 + math.sin(t * 3.0) * 2.0)
+
+        # Easter egg: REDRUM flash (joystick up)
+        if self._flash_timer > 0:
+            alpha = min(1.0, self._flash_timer / 0.15)
+            for y in range(GRID_SIZE):
+                for x in range(GRID_SIZE):
+                    d.set_pixel(x, y, (int(15 * alpha), int(20 * alpha),
+                                       int(45 * alpha)))
+            rc = (int(220 * alpha), int(20 * alpha), int(20 * alpha))
+            d.draw_text_small(_center_x("REDRUM"), 18, "REDRUM", rc)
+            mc = (int(140 * alpha), int(10 * alpha), int(10 * alpha))
+            d.draw_text_small(_center_x("MURDER"), 28, "MURDER", mc)
+            d.draw_text_small(WONDER_X, 44, "WONDER",
+                              (int(180 * alpha), int(60 * alpha), int(60 * alpha)))
+            d.draw_text_small(CABINET_X, 52, "CABINET",
+                              (int(150 * alpha), int(50 * alpha), int(50 * alpha)))
+            return
+
+        # One-point perspective corridor
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = abs(x - cx)
+                wall_hw = 8 + abs(y - vpy) * 0.8
+
+                if y < vpy:
+                    # Ceiling
+                    if dx < wall_hw:
+                        depth = max(1, vpy - y)
+                        df = min(1.0, depth / 30.0)
+                        base = (int((160 + 20 * df) * flicker),
+                                int((150 + 20 * df) * flicker),
+                                int((130 + 20 * df) * flicker))
+                        # Panel pattern
+                        panel = ((x + int(t * 2)) // 8) % 2
+                        if panel:
+                            base = (max(0, base[0] - 12), max(0, base[1] - 12),
+                                    max(0, base[2] - 12))
+                        d.set_pixel(x, y, base)
+                    else:
+                        # Upper wall
+                        df = min(1.0, (vpy - y) / 30.0)
+                        c = (int((100 + 50 * df) * flicker),
+                             int((60 + 40 * df) * flicker),
+                             int((30 + 20 * df) * flicker))
+                        d.set_pixel(x, y, c)
+
+                elif y == vpy:
+                    # Back wall / door
+                    if dx < 5:
+                        d.set_pixel(x, y, (int(55 * flicker), int(90 * flicker),
+                                           int(130 * flicker)))
+                    else:
+                        d.set_pixel(x, y, (int(90 * flicker), int(55 * flicker),
+                                           int(28 * flicker)))
+                else:
+                    # Floor
+                    if dx < wall_hw:
+                        df = min(1.0, (y - vpy) / 30.0)
+                        # Hicks hexagonal carpet
+                        fx = x + t * 3
+                        fy = (y - vpy) * 2.0 / max(1, df * 4 + 1)
+                        hx = int(fx * 0.4) % 3
+                        hy = int(fy * 0.4 + (int(fx * 0.4) % 2) * 0.5) % 3
+                        if (hx + hy) % 2 == 0:
+                            c = (160, 50, 20)  # Red
+                        else:
+                            c = (200, 120, 40)  # Orange
+                        dark = 1.0 - df * 0.6
+                        c = (int(c[0] * dark * flicker), int(c[1] * dark * flicker),
+                             int(c[2] * dark * flicker))
+                        d.set_pixel(x, y, c)
+                    else:
+                        # Lower wall
+                        df = min(1.0, (y - vpy) / 30.0)
+                        c = (int((100 + 50 * df) * flicker),
+                             int((60 + 40 * df) * flicker),
+                             int((30 + 20 * df) * flicker))
+                        d.set_pixel(x, y, c)
+
+        # Twin silhouettes at vanishing point
+        for twin_off in [-4, 4]:
+            tx = cx + twin_off
+            for dy in range(10):
+                row = vpy - 5 + dy
+                if 0 <= row < GRID_SIZE:
+                    rel = dy / 10.0
+                    w = 1 if rel < 0.25 else (0 if rel < 0.3 else 1 + int(rel * 2))
+                    for ddx in range(-w, w + 1):
+                        col = tx + ddx
+                        if 0 <= col < GRID_SIZE:
+                            c = (35, 50, 110) if rel > 0.3 else (28, 22, 18)
+                            d.set_pixel(col, row, c)
+
+        # Ceiling lights with glow
+        for lx in [cx - 10, cx, cx + 10]:
+            ly = vpy - 14
+            if 0 <= ly < GRID_SIZE and 0 <= lx < GRID_SIZE:
+                bv = int(210 * flicker)
+                d.set_pixel(lx, ly, (bv, bv, min(255, bv + 20)))
+                for cdy in range(1, 3):
+                    for cdx in range(-cdy, cdy + 1):
+                        px, py = lx + cdx, ly + cdy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            iv = max(0, bv - cdy * 60 - abs(cdx) * 40)
+                            if iv > 0:
+                                ex = d.get_pixel(px, py)
+                                d.set_pixel(px, py, (min(255, ex[0] + iv // 3),
+                                                     min(255, ex[1] + iv // 3),
+                                                     min(255, ex[2] + iv // 4)))
+
+        # Title text - eerie warm white
+        tp = 0.65 + 0.35 * math.sin(t * 1.0) * flicker
+        d.draw_text_small(WONDER_X, WONDER_Y + 20, "WONDER",
+                          (int(240 * tp), int(200 * tp), int(140 * tp)))
+        tp2 = 0.65 + 0.35 * math.sin(t * 1.0 + 0.5) * flicker
+        d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
+                          (int(220 * tp2), int(180 * tp2), int(120 * tp2)))
+
+
+# =========================================================================
+# WonderET - E.T. moon bicycle silhouette
+# =========================================================================
+
+class WonderET(Visual):
+    name = "WONDER ET"
+    description = "Moon bicycle flight"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # A few twinkling stars
+        self._stars = [(random.randint(0, GRID_SIZE - 1),
+                        random.randint(0, GRID_SIZE - 1),
+                        random.uniform(0, math.pi * 2),
+                        random.uniform(0.8, 2.0))
+                       for _ in range(25)]
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Dark blue night sky
+        for y in range(GRID_SIZE):
+            grad = y / GRID_SIZE
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (int(5 + 8 * grad), int(5 + 10 * grad),
+                                   int(20 + 25 * grad)))
+
+        # Stars
+        for sx, sy, phase, spd in self._stars:
+            bri = int(80 + 60 * math.sin(t * spd + phase))
+            d.set_pixel(sx, sy, (bri, bri, bri + 20))
+
+        # Large moon
+        moon_cx, moon_cy, moon_r = 40, 18, 14
+        for dy in range(-moon_r, moon_r + 1):
+            for dx in range(-moon_r, moon_r + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= moon_r:
+                    # Moon surface with craters
+                    edge = dist / moon_r
+                    base = int(220 - edge * 40)
+                    # Crater shadows
+                    crater1 = math.sqrt((dx + 3) ** 2 + (dy - 2) ** 2)
+                    crater2 = math.sqrt((dx - 5) ** 2 + (dy + 4) ** 2)
+                    crater3 = math.sqrt((dx + 1) ** 2 + (dy + 6) ** 2)
+                    if crater1 < 3:
+                        base -= 25
+                    if crater2 < 4:
+                        base -= 20
+                    if crater3 < 2.5:
+                        base -= 30
+                    base = max(100, base)
+                    px, py = moon_cx + dx, moon_cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (base, base - 10, base - 30))
+
+        # Bicycle + E.T. silhouette flying across the moon
+        cycle = 14.0
+        ct = t % cycle
+        # Arc path across the moon
+        bike_x = int(-10 + ct / cycle * 80)
+        bike_y = int(moon_cy - 4 + 12 * math.sin(ct / cycle * math.pi))
+        bike_y = min(bike_y, moon_cy + 2)
+
+        # Bicycle frame (tiny pixel art)
+        sil = (5, 5, 12)
+        # Wheels (2px circles)
+        for wx_off in [-3, 3]:
+            wx = bike_x + wx_off
+            wy = bike_y + 3
+            for ddy in [-1, 0, 1]:
+                for ddx in [-1, 0, 1]:
+                    if abs(ddx) + abs(ddy) <= 1:
+                        px, py = wx + ddx, wy + ddy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            d.set_pixel(px, py, sil)
+        # Frame connecting wheels
+        for fx in range(bike_x - 2, bike_x + 3):
+            if 0 <= fx < GRID_SIZE and 0 <= bike_y + 2 < GRID_SIZE:
+                d.set_pixel(fx, bike_y + 2, sil)
+        # Rider body
+        for ry in range(bike_y - 1, bike_y + 2):
+            if 0 <= bike_x < GRID_SIZE and 0 <= ry < GRID_SIZE:
+                d.set_pixel(bike_x, ry, sil)
+        # E.T. in basket (front, bigger head)
+        et_x = bike_x + 3
+        for ey in range(bike_y - 2, bike_y + 1):
+            if 0 <= et_x < GRID_SIZE and 0 <= ey < GRID_SIZE:
+                d.set_pixel(et_x, ey, sil)
+        # E.T. head (larger)
+        for ddx in [-1, 0, 1]:
+            px = et_x + ddx
+            if 0 <= px < GRID_SIZE and 0 <= bike_y - 3 < GRID_SIZE:
+                d.set_pixel(px, bike_y - 3, sil)
+        # E.T. finger pointing (glowing!)
+        finger_x = et_x + 2
+        finger_y = bike_y - 1
+        if 0 <= finger_x < GRID_SIZE and 0 <= finger_y < GRID_SIZE:
+            glow = 0.6 + 0.4 * math.sin(t * 3.0)
+            d.set_pixel(finger_x, finger_y,
+                        (int(200 * glow), int(180 * glow), int(255 * glow)))
+
+        # Title text - warm moonlit
+        tp = 0.6 + 0.4 * math.sin(t * 1.2)
+        d.draw_text_small(WONDER_X, WONDER_Y + 20, "WONDER",
+                          (int(200 * tp), int(190 * tp), int(255 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.2 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
+                          (int(170 * tp2), int(160 * tp2), int(230 * tp2)))
+
+
+# =========================================================================
+# WonderAlien - Alien egg with green glow
+# =========================================================================
+
+class WonderAlien(Visual):
+    name = "WONDER ALIEN"
+    description = "In space no one can hear"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._mist = [(random.uniform(0, GRID_SIZE), random.uniform(50, 63),
+                        random.uniform(0.5, 2.0), random.uniform(0.3, 1.0))
+                       for _ in range(20)]
+
+    def update(self, dt: float):
+        self.time += dt
+        for i, (mx, my, ms, ml) in enumerate(self._mist):
+            my -= ms * dt * 0.3
+            mx += math.sin(self.time + i) * dt * 0.5
+            if my < 40:
+                my = random.uniform(55, 63)
+                mx = random.uniform(0, GRID_SIZE)
+            self._mist[i] = (mx, my, ms, ml)
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Pure black space
+        cx = GRID_SIZE // 2
+        egg_cx, egg_cy = cx, 34
+        egg_w, egg_h = 8, 14
+
+        # Green underglow (from the crack)
+        crack_open = (math.sin(t * 0.3) * 0.5 + 0.5)  # 0-1 pulse
+        glow_intensity = 0.3 + crack_open * 0.7
+
+        # Floor glow
+        for y in range(45, GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = abs(x - egg_cx)
+                dist = dx + (y - 45) * 0.5
+                g = max(0, int(40 * glow_intensity * max(0, 1.0 - dist / 25.0)))
+                if g > 0:
+                    d.set_pixel(x, y, (0, g, g // 4))
+
+        # Egg shape (ovoid)
+        for y in range(egg_cy - egg_h, egg_cy + egg_h + 1):
+            ny = (y - egg_cy) / egg_h
+            # Egg is wider at bottom, narrower at top
+            width_factor = 1.0 - ny * 0.3  # narrower at top
+            w = egg_w * math.sqrt(max(0, 1.0 - ny * ny)) * width_factor
+            w = int(w)
+            for dx in range(-w, w + 1):
+                px = egg_cx + dx
+                if 0 <= px < GRID_SIZE and 0 <= y < GRID_SIZE:
+                    edge = abs(dx) / max(1, w)
+                    # Leathery texture
+                    tex = math.sin(y * 1.5 + dx * 0.8) * 0.1
+                    base = 0.35 + tex - edge * 0.15
+                    r = int(90 * base)
+                    g = int(80 * base)
+                    b = int(60 * base)
+                    d.set_pixel(px, y, (r, g, b))
+
+        # Crack at top of egg (opening petals)
+        petal_open = crack_open * 6
+        for i in range(4):
+            angle = i * math.pi / 2 + t * 0.1
+            for seg in range(int(petal_open)):
+                px = int(egg_cx + math.cos(angle) * (seg + 1) * 0.8)
+                py = int(egg_cy - egg_h + seg)
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (70, 65, 45))
+
+        # Green glow from crack
+        for dy in range(-3, 1):
+            for dx in range(-3, 4):
+                px = egg_cx + dx
+                py = egg_cy - egg_h + dy
+                dist = math.sqrt(dx * dx + dy * dy)
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE and dist < 4:
+                    gi = max(0, int(120 * glow_intensity * (1.0 - dist / 4.0)))
+                    ex = d.get_pixel(px, py)
+                    d.set_pixel(px, py, (ex[0], min(255, ex[1] + gi),
+                                         ex[2] + gi // 3))
+
+        # Mist particles
+        for mx, my, ms, ml in self._mist:
+            ix, iy = int(mx), int(my)
+            if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                g = int(25 * glow_intensity * ml)
+                d.set_pixel(ix, iy, (0, g, g // 3))
+
+        # Horizontal line (the iconic crack of light)
+        line_y = egg_cy - egg_h - 2
+        if 0 <= line_y < GRID_SIZE:
+            hw = int(12 * glow_intensity)
+            for dx in range(-hw, hw + 1):
+                px = egg_cx + dx
+                if 0 <= px < GRID_SIZE:
+                    fall = abs(dx) / max(1, hw)
+                    gi = int(100 * glow_intensity * (1.0 - fall))
+                    d.set_pixel(px, line_y, (0, gi, gi // 3))
+
+        # Title text - acid green
+        tp = 0.5 + 0.5 * glow_intensity
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (0, int(200 * tp), int(60 * tp)))
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (0, int(170 * tp), int(50 * tp)))
+
+
+# =========================================================================
+# WonderExorcist - The iconic window silhouette
+# =========================================================================
+
+class WonderExorcist(Visual):
+    name = "WONDER EXORCIST"
+    description = "The power of light"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Dark foggy night
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                fog = int(8 + 4 * math.sin(x * 0.1 + y * 0.15 + t * 0.3))
+                d.set_pixel(x, y, (fog, fog, fog + 3))
+
+        # House silhouette (dark block)
+        house_x, house_y = 18, 12
+        house_w, house_h = 28, 40
+        for y in range(house_y, min(GRID_SIZE, house_y + house_h)):
+            for x in range(house_x, house_x + house_w):
+                if 0 <= x < GRID_SIZE:
+                    d.set_pixel(x, y, (3, 3, 5))
+
+        # Roof peak
+        peak_cx = house_x + house_w // 2
+        for row in range(8):
+            y = house_y - row
+            hw = house_w // 2 - row * 2
+            if hw < 1:
+                break
+            for dx in range(-hw, hw + 1):
+                px = peak_cx + dx
+                if 0 <= px < GRID_SIZE and 0 <= y < GRID_SIZE:
+                    d.set_pixel(px, y, (3, 3, 5))
+
+        # Window (the iconic glowing rectangle, upper right of house)
+        win_x, win_y = 34, 16
+        win_w, win_h = 8, 12
+
+        # Light beam from window (cone of light into fog)
+        beam_intensity = 0.7 + 0.3 * math.sin(t * 0.5)
+        for y in range(0, win_y + win_h):
+            for x in range(win_x - 2, win_x + win_w + 2):
+                # Distance from window
+                dy = win_y - y
+                if dy < 0:
+                    continue
+                dx = x - (win_x + win_w // 2)
+                # Beam spreads upward
+                spread = max(1, dy * 0.4)
+                if abs(dx) < spread + win_w // 2:
+                    fall = abs(dx) / (spread + win_w // 2)
+                    fog_light = int(60 * beam_intensity * (1.0 - fall)
+                                    * min(1.0, dy / 3.0))
+                    if fog_light > 0 and 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+                        ex = d.get_pixel(x, y)
+                        d.set_pixel(x, y, (min(255, ex[0] + fog_light),
+                                           min(255, ex[1] + fog_light),
+                                           min(255, ex[2] + fog_light // 2)))
+
+        # Window glow
+        for y in range(win_y, win_y + win_h):
+            for x in range(win_x, win_x + win_w):
+                if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE:
+                    # Warm yellow light
+                    d.set_pixel(x, y, (int(220 * beam_intensity),
+                                       int(190 * beam_intensity),
+                                       int(80 * beam_intensity)))
+
+        # Window frame (cross)
+        mid_x = win_x + win_w // 2
+        mid_y = win_y + win_h // 2
+        for y in range(win_y, win_y + win_h):
+            if 0 <= mid_x < GRID_SIZE and 0 <= y < GRID_SIZE:
+                d.set_pixel(mid_x, y, (3, 3, 5))
+        for x in range(win_x, win_x + win_w):
+            if 0 <= x < GRID_SIZE and 0 <= mid_y < GRID_SIZE:
+                d.set_pixel(x, mid_y, (3, 3, 5))
+
+        # Figure silhouette in front of house (hat, briefcase)
+        fig_x = house_x + 4
+        fig_top = 30
+        # Hat brim
+        for dx in range(-3, 4):
+            px = fig_x + dx
+            if 0 <= px < GRID_SIZE and 0 <= fig_top < GRID_SIZE:
+                d.set_pixel(px, fig_top, (2, 2, 3))
+        # Hat crown
+        for dy in range(-3, 0):
+            for dx in range(-2, 3):
+                px, py = fig_x + dx, fig_top + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (2, 2, 3))
+        # Body
+        for dy in range(1, 16):
+            row = fig_top + dy
+            if row >= GRID_SIZE:
+                break
+            w = 2 if dy < 8 else 3
+            for dx in range(-w, w + 1):
+                px = fig_x + dx
+                if 0 <= px < GRID_SIZE:
+                    d.set_pixel(px, row, (2, 2, 3))
+        # Briefcase
+        for dy in range(8, 12):
+            for dx in range(3, 6):
+                px, py = fig_x + dx, fig_top + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (2, 2, 3))
+
+        # Lamppost
+        lamp_x = house_x - 3
+        for y in range(8, 48):
+            if 0 <= lamp_x < GRID_SIZE and 0 <= y < GRID_SIZE:
+                d.set_pixel(lamp_x, y, (3, 3, 5))
+        # Lamp head
+        for dx in range(-1, 2):
+            px = lamp_x + dx
+            if 0 <= px < GRID_SIZE:
+                d.set_pixel(px, 8, (3, 3, 5))
+        # Lamp glow
+        glow = int(120 * beam_intensity)
+        if 0 <= lamp_x < GRID_SIZE:
+            d.set_pixel(lamp_x, 9, (glow, glow, glow // 2))
+            for ddx in [-1, 0, 1]:
+                for ddy in [9, 10]:
+                    px = lamp_x + ddx
+                    if 0 <= px < GRID_SIZE and 0 <= ddy < GRID_SIZE:
+                        g = glow // 3
+                        ex = d.get_pixel(px, ddy)
+                        d.set_pixel(px, ddy, (min(255, ex[0] + g),
+                                              min(255, ex[1] + g),
+                                              min(255, ex[2] + g // 2)))
+
+        # Title text
+        tp = 0.5 + 0.5 * beam_intensity
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(220 * tp), int(190 * tp), int(80 * tp)))
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(200 * tp), int(170 * tp), int(60 * tp)))
+
+
+# =========================================================================
+# WonderTerminator - Chrome skull with scanning red eye
+# =========================================================================
+
+class WonderTerminator(Visual):
+    name = "WONDER TERMINATOR"
+    description = "I'll be back"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx, cy = GRID_SIZE // 2, 24
+
+        # Dark background with subtle red ambient
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (3, 0, 0))
+
+        # Chrome skull (metallic grays)
+        # Cranium (top dome)
+        for dy in range(-12, 13):
+            for dx in range(-10, 11):
+                # Skull shape: wider at temples, narrow at chin
+                ny = dy / 12.0
+                if ny < 0:
+                    # Upper cranium - dome
+                    max_w = 10 * math.sqrt(max(0, 1 - ny * ny))
+                elif ny < 0.5:
+                    # Cheekbones - widest
+                    max_w = 10 - ny * 4
+                else:
+                    # Jaw narrows
+                    max_w = 10 - ny * 12
+                    max_w = max(2, max_w)
+
+                if abs(dx) > max_w:
+                    continue
+
+                px, py = cx + dx, cy + dy
+                if not (0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE):
+                    continue
+
+                edge = abs(dx) / max(1, max_w)
+                # Chrome: bright highlights, dark edges
+                highlight = math.sin(dx * 0.5 + dy * 0.3 + t * 0.5) * 0.15
+                base = 0.5 + highlight - edge * 0.3
+                # Specular highlight on forehead
+                spec_dist = math.sqrt((dx - 2) ** 2 + (dy + 6) ** 2)
+                spec = max(0, 1.0 - spec_dist / 5.0) * 0.4
+                base += spec
+                base = max(0.15, min(1.0, base))
+
+                r = int(160 * base)
+                g = int(165 * base)
+                b = int(175 * base)
+                d.set_pixel(px, py, (r, g, b))
+
+        # Eye sockets (dark recesses)
+        for side in [-1, 1]:
+            eye_cx = cx + side * 4
+            eye_cy = cy - 2
+            for dy in range(-2, 3):
+                for dx in range(-2, 3):
+                    dist = math.sqrt(dx * dx + dy * dy)
+                    if dist <= 2.5:
+                        px, py = eye_cx + dx, eye_cy + dy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            d.set_pixel(px, py, (10, 0, 0))
+
+        # Red eye (left socket has the iconic red glow)
+        eye_x = cx - 4
+        eye_y = cy - 2
+        # Scanning: eye pulses and occasionally sweeps
+        pulse = 0.6 + 0.4 * math.sin(t * 2.0)
+        scan_x = int(math.sin(t * 0.7) * 1.5)
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= 1.5:
+                    px, py = eye_x + scan_x + dx, eye_y + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        intensity = (1.0 - dist / 1.5) * pulse
+                        d.set_pixel(px, py, (int(255 * intensity),
+                                             int(20 * intensity), 0))
+
+        # Eye glow bleed
+        for dy in range(-3, 4):
+            for dx in range(-3, 4):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if 1.5 < dist < 4:
+                    px, py = eye_x + scan_x + dx, eye_y + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        gi = int(30 * pulse * (1.0 - dist / 4.0))
+                        if gi > 0:
+                            ex = d.get_pixel(px, py)
+                            d.set_pixel(px, py, (min(255, ex[0] + gi),
+                                                 ex[1], ex[2]))
+
+        # Nose cavity
+        for dy in range(0, 4):
+            for dx in range(-1, 2):
+                px, py = cx + dx, cy + 2 + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    if abs(dx) <= 1 - dy // 3:
+                        d.set_pixel(px, py, (15, 5, 5))
+
+        # Teeth
+        teeth_y = cy + 7
+        for row in range(3):
+            ry = teeth_y + row
+            if ry >= GRID_SIZE:
+                break
+            jaw_w = 6 - row
+            for dx in range(-jaw_w, jaw_w + 1):
+                px = cx + dx
+                if 0 <= px < GRID_SIZE and 0 <= ry < GRID_SIZE:
+                    if dx % 2 == 0:
+                        d.set_pixel(px, ry, (180, 185, 190))
+                    else:
+                        d.set_pixel(px, ry, (20, 10, 10))
+
+        # Horizontal scan line sweeping across
+        scan_y = int(cy - 12 + ((t * 8) % 28))
+        if 0 <= scan_y < GRID_SIZE:
+            for x in range(GRID_SIZE):
+                ex = d.get_pixel(x, scan_y)
+                d.set_pixel(x, scan_y, (min(255, ex[0] + 15),
+                                         min(255, ex[1] + 5), ex[2]))
+
+        # Title text - chrome/red
+        tp = 0.6 + 0.4 * pulse
+        d.draw_text_small(WONDER_X, WONDER_Y + 20, "WONDER",
+                          (int(220 * tp), int(50 * tp), int(30 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 2.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
+                          (int(200 * tp2), int(40 * tp2), int(20 * tp2)))
+
+
+# =========================================================================
+# WonderGodzilla - City skyline with atomic breath
+# =========================================================================
+
+class WonderGodzilla(Visual):
+    name = "WONDER GODZILLA"
+    description = "King of the monsters"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        # Random city skyline heights
+        rng = random.Random(99)
+        self._buildings = []
+        x = 0
+        while x < GRID_SIZE:
+            w = rng.randint(3, 7)
+            h = rng.randint(12, 30)
+            self._buildings.append((x, w, h))
+            x += w + rng.randint(0, 1)
+
+    def reset(self):
+        self.time = 0.0
+        self._breath_particles = []
+
+    def update(self, dt: float):
+        self.time += dt
+        # Update breath particles
+        for p in self._breath_particles:
+            p['x'] += p['vx'] * dt
+            p['y'] += p['vy'] * dt
+            p['life'] -= dt
+        self._breath_particles = [p for p in self._breath_particles if p['life'] > 0]
+
+        # Spawn breath particles during breath phase
+        # Jaw tip is at gz_x(44) - 6 = 38, jaw_y = head_top(14) + 5 = 19
+        cycle = 8.0
+        ct = self.time % cycle
+        if 3.0 < ct < 6.0:
+            mouth_x, mouth_y = 38, 19
+            for _ in range(3):
+                angle = math.pi + random.uniform(-0.4, 0.4)  # shoot left
+                speed = random.uniform(15, 30)
+                self._breath_particles.append({
+                    'x': float(mouth_x),
+                    'y': float(mouth_y),
+                    'vx': math.cos(angle) * speed,
+                    'vy': math.sin(angle) * speed,
+                    'life': random.uniform(0.3, 0.8),
+                })
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Dark stormy sky
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                cloud = math.sin(x * 0.15 + t * 0.3) * math.sin(y * 0.2 + t * 0.2)
+                base = int(12 + cloud * 6)
+                d.set_pixel(x, y, (base, base, base + 5))
+
+        # City skyline
+        for bx, bw, bh in self._buildings:
+            top = GRID_SIZE - bh
+            for y in range(top, GRID_SIZE):
+                for x in range(bx, min(GRID_SIZE, bx + bw)):
+                    # Windows
+                    is_window = (x - bx) % 2 == 1 and (y - top) % 3 == 1
+                    if is_window and y < GRID_SIZE - 2:
+                        win_on = ((x * 7 + y * 13) % 5) > 1
+                        if win_on:
+                            d.set_pixel(x, y, (180, 160, 60))
+                        else:
+                            d.set_pixel(x, y, (25, 25, 35))
+                    else:
+                        d.set_pixel(x, y, (20, 20, 30))
+
+        # Godzilla silhouette (right side, towering over buildings)
+        gz_x = 44  # Center x
+        gz_base = GRID_SIZE  # Feet at bottom
+
+        # Body profile (from top of head down)
+        sil = (8, 8, 12)
+        # Head (dorsal ridge)
+        head_top = gz_base - 50
+        for dy in range(6):
+            row = head_top + dy
+            if 0 <= row < GRID_SIZE:
+                hw = 2 + dy // 2
+                for dx in range(-hw, hw + 1):
+                    px = gz_x + dx
+                    if 0 <= px < GRID_SIZE:
+                        d.set_pixel(px, row, sil)
+        # Jaw / snout extends forward
+        jaw_y = head_top + 4
+        for dx in range(-5, -1):
+            px = gz_x + dx
+            if 0 <= px < GRID_SIZE and 0 <= jaw_y < GRID_SIZE:
+                d.set_pixel(px, jaw_y, sil)
+            if 0 <= px < GRID_SIZE and 0 <= jaw_y + 1 < GRID_SIZE:
+                d.set_pixel(px, jaw_y + 1, sil)
+
+        # Neck and body
+        for dy in range(6, 35):
+            row = head_top + dy
+            if row >= GRID_SIZE:
+                break
+            # Body widens from neck to torso
+            if dy < 12:
+                hw = 3 + dy // 2
+            elif dy < 25:
+                hw = 9
+            else:
+                hw = 9 - (dy - 25) // 3
+            hw = max(2, hw)
+            for dx in range(-hw, hw + 1):
+                px = gz_x + dx
+                if 0 <= px < GRID_SIZE:
+                    d.set_pixel(px, row, sil)
+
+        # Dorsal spines along back
+        for i in range(5):
+            spine_y = head_top + 2 + i * 5
+            spine_x = gz_x + 4 + (2 - abs(i - 2))
+            for sy in range(-2, 1):
+                px, py = spine_x, spine_y + sy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, sil)
+
+        # Arms (small T-Rex-like)
+        arm_y = head_top + 14
+        for i in range(3):
+            px = gz_x - 7 - i
+            py = arm_y + i
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                d.set_pixel(px, py, sil)
+
+        # Tail (extending right and down)
+        for i in range(12):
+            tx = gz_x + 8 + i
+            ty = head_top + 28 + i // 2
+            if 0 <= tx < GRID_SIZE and 0 <= ty < GRID_SIZE:
+                d.set_pixel(tx, ty, sil)
+                if ty + 1 < GRID_SIZE:
+                    d.set_pixel(tx, ty + 1, sil)
+
+        # Eye
+        eye_x, eye_y = gz_x - 2, head_top + 3
+        if 0 <= eye_x < GRID_SIZE and 0 <= eye_y < GRID_SIZE:
+            glow = 0.5 + 0.5 * math.sin(t * 2.0)
+            d.set_pixel(eye_x, eye_y, (int(255 * glow), int(100 * glow), 0))
+
+        # Atomic breath particles
+        for p in self._breath_particles:
+            px, py = int(p['x']), int(p['y'])
+            frac = max(0, p['life'] / 0.8)
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                # Blue-white beam
+                r = int(100 * frac)
+                g = int(150 * frac)
+                b = int(255 * frac)
+                d.set_pixel(px, py, (r, g, b))
+                # Glow neighbors
+                for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = px + ddx, py + ddy
+                    if 0 <= nx < GRID_SIZE and 0 <= ny < GRID_SIZE:
+                        ex = d.get_pixel(nx, ny)
+                        d.set_pixel(nx, ny, (min(255, ex[0] + r // 4),
+                                             min(255, ex[1] + g // 4),
+                                             min(255, ex[2] + b // 4)))
+
+        # Title text - radioactive blue
+        tp = 0.6 + 0.4 * math.sin(t * 1.5)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(100 * tp), int(160 * tp), int(255 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.5 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(80 * tp2), int(140 * tp2), int(230 * tp2)))
+
+
+# =========================================================================
+# WonderBladeRunner - Neon rain cityscape
+# =========================================================================
+
+class WonderBladeRunner(Visual):
+    name = "WONDER BLADE RUNNER"
+    description = "Tears in rain"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        # Skyline
+        rng = random.Random(2019)
+        self._buildings = []
+        x = 0
+        while x < GRID_SIZE:
+            w = rng.randint(2, 5)
+            h = rng.randint(15, 45)
+            self._buildings.append((x, w, h))
+            x += w + rng.randint(0, 1)
+
+    def reset(self):
+        self.time = 0.0
+        self._rain = [{'x': random.randint(0, GRID_SIZE - 1),
+                        'y': random.uniform(-GRID_SIZE, GRID_SIZE),
+                        'speed': random.uniform(40, 70),
+                        'len': random.randint(2, 4)}
+                       for _ in range(50)]
+        self._neon_signs = [
+            (random.randint(3, 58), random.randint(20, 50),
+             random.choice([(255, 0, 80), (0, 200, 255), (255, 100, 0),
+                            (200, 0, 255), (0, 255, 150)]),
+             random.uniform(0, math.pi * 2))
+            for _ in range(8)]
+
+    def update(self, dt: float):
+        self.time += dt
+        for r in self._rain:
+            r['y'] += r['speed'] * dt
+            if r['y'] > GRID_SIZE + 5:
+                r['y'] = random.uniform(-10, -1)
+                r['x'] = random.randint(0, GRID_SIZE - 1)
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Dark sky with smog
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                smog = math.sin(x * 0.08 + t * 0.2) * math.sin(y * 0.1 - t * 0.1)
+                base = int(8 + smog * 4)
+                d.set_pixel(x, y, (base + 2, base, base + 5))
+
+        # Buildings
+        for bx, bw, bh in self._buildings:
+            top = GRID_SIZE - bh
+            for y in range(max(0, top), GRID_SIZE):
+                for x in range(bx, min(GRID_SIZE, bx + bw)):
+                    d.set_pixel(x, y, (12, 12, 18))
+
+        # Neon signs on buildings
+        for sx, sy, color, phase in self._neon_signs:
+            flick = math.sin(t * 4 + phase)
+            if flick > -0.3:  # Occasionally off
+                brightness = 0.5 + 0.5 * flick
+                c = (int(color[0] * brightness),
+                     int(color[1] * brightness),
+                     int(color[2] * brightness))
+                if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                    d.set_pixel(sx, sy, c)
+                    if sx + 1 < GRID_SIZE:
+                        d.set_pixel(sx + 1, sy, c)
+                # Glow on nearby building wall
+                for ddy in [-1, 0, 1]:
+                    for ddx in [-1, 0, 1]:
+                        px, py = sx + ddx, sy + ddy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            ex = d.get_pixel(px, py)
+                            g = brightness * 0.2
+                            d.set_pixel(px, py, (min(255, int(ex[0] + color[0] * g)),
+                                                 min(255, int(ex[1] + color[1] * g)),
+                                                 min(255, int(ex[2] + color[2] * g))))
+
+        # Rain
+        for r in self._rain:
+            rx = r['x']
+            for i in range(r['len']):
+                ry = int(r['y']) - i
+                if 0 <= rx < GRID_SIZE and 0 <= ry < GRID_SIZE:
+                    bri = 60 - i * 15
+                    ex = d.get_pixel(rx, ry)
+                    d.set_pixel(rx, ry, (min(255, ex[0] + bri // 2),
+                                         min(255, ex[1] + bri // 2),
+                                         min(255, ex[2] + bri)))
+
+        # Spinner lights (flying car) crossing occasionally
+        spinner_cycle = 12.0
+        sp_t = t % spinner_cycle
+        if sp_t < 4.0:
+            sp_x = int(sp_t / 4.0 * (GRID_SIZE + 20)) - 10
+            sp_y = 8 + int(math.sin(sp_t * 2.0) * 3)
+            for dx in range(-1, 2):
+                px = sp_x + dx
+                if 0 <= px < GRID_SIZE and 0 <= sp_y < GRID_SIZE:
+                    d.set_pixel(px, sp_y, (200, 100, 30))
+            # Tail lights
+            if 0 <= sp_x - 2 < GRID_SIZE and 0 <= sp_y < GRID_SIZE:
+                d.set_pixel(sp_x - 2, sp_y, (200, 30, 10))
+
+        # Title text - neon pink/cyan
+        tp = 0.6 + 0.4 * math.sin(t * 1.5)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(255 * tp), int(50 * tp), int(120 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.5 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(50 * tp2), int(200 * tp2), int(255 * tp2)))
+
+
+# =========================================================================
+# WonderCloseEncounters - Devil's Tower with UFO lights
+# =========================================================================
+
+class WonderCloseEncounters(Visual):
+    name = "WONDER CLOSE ENCOUNTERS"
+    description = "Devil's Tower lights"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+        # Devil's Tower profile (flat-topped butte)
+        rng = random.Random(1977)
+        self._tower_profile = []
+        for x in range(GRID_SIZE):
+            dx = abs(x - GRID_SIZE // 2)
+            if dx < 12:
+                # Flat top
+                h = 30 + rng.randint(-1, 1)
+            elif dx < 18:
+                # Steep sides with columnar texture
+                h = 30 - (dx - 12) * 3 + rng.randint(-1, 1)
+            else:
+                # Ground level
+                h = max(5, 8 - (dx - 18) + rng.randint(-1, 1))
+            self._tower_profile.append(max(3, h))
+
+    def reset(self):
+        self.time = 0.0
+        self._ufo_lights = [random.uniform(0, math.pi * 2) for _ in range(12)]
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+
+        # Night sky with stars
+        rng = random.Random(42)
+        for _ in range(30):
+            sx = rng.randint(0, GRID_SIZE - 1)
+            sy = rng.randint(0, 25)
+            bri = int(50 + 40 * math.sin(t * rng.uniform(0.5, 2.0) + rng.random() * 6))
+            d.set_pixel(sx, sy, (bri, bri, bri + 10))
+
+        # Devil's Tower
+        for x in range(GRID_SIZE):
+            h = self._tower_profile[x]
+            top = GRID_SIZE - h
+            for y in range(max(0, top), GRID_SIZE):
+                # Columnar basalt texture
+                col_stripe = (x + (y // 4) % 2) % 3
+                if y < top + 2:
+                    # Top edge highlight
+                    c = (70, 60, 45)
+                elif col_stripe == 0:
+                    c = (40, 35, 25)
+                else:
+                    c = (50, 45, 32)
+                # Moonlight from right
+                if x > cx:
+                    c = (int(c[0] * 1.2), int(c[1] * 1.2), int(c[2] * 1.2))
+                d.set_pixel(x, y, (min(255, c[0]), min(255, c[1]), min(255, c[2])))
+
+        # UFO mothership (hovering above tower)
+        ufo_y = 12 + int(math.sin(t * 0.5) * 2)
+        # Ship body (elliptical)
+        for dx in range(-14, 15):
+            for dy in range(-2, 3):
+                dist = math.sqrt((dx / 14.0) ** 2 + (dy / 2.0) ** 2)
+                if dist <= 1.0:
+                    px, py = cx + dx, ufo_y + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        edge = dist
+                        bri = int(80 * (1.0 - edge * 0.5))
+                        d.set_pixel(px, py, (bri, bri, bri + 10))
+
+        # Ring of colored lights around UFO
+        for i, phase in enumerate(self._ufo_lights):
+            angle = i / len(self._ufo_lights) * math.pi * 2 + t * 0.8
+            lx = int(cx + 13 * math.cos(angle))
+            ly = int(ufo_y + 2 * math.sin(angle))
+            if 0 <= lx < GRID_SIZE and 0 <= ly < GRID_SIZE:
+                pulse = 0.5 + 0.5 * math.sin(t * 3 + phase)
+                hue = (i / len(self._ufo_lights) + t * 0.1) % 1.0
+                color = _hue_to_rgb(hue)
+                d.set_pixel(lx, ly, (int(color[0] * pulse),
+                                     int(color[1] * pulse),
+                                     int(color[2] * pulse)))
+
+        # Light beams descending from UFO to tower
+        beam_phase = math.sin(t * 0.4) * 0.5 + 0.5
+        beam_count = int(3 + beam_phase * 4)
+        for i in range(beam_count):
+            bx = cx + int((i - beam_count / 2) * 3)
+            for by in range(ufo_y + 3, GRID_SIZE - self._tower_profile[max(0, min(63, bx))]):
+                if 0 <= bx < GRID_SIZE and 0 <= by < GRID_SIZE:
+                    depth = (by - ufo_y) / 40.0
+                    intensity = int(40 * beam_phase * (1.0 - depth * 0.5))
+                    shimmer = math.sin(by * 0.5 + t * 5 + i) * 0.3 + 0.7
+                    intensity = int(intensity * shimmer)
+                    if intensity > 0:
+                        ex = d.get_pixel(bx, by)
+                        d.set_pixel(bx, by, (min(255, ex[0] + intensity),
+                                             min(255, ex[1] + intensity),
+                                             min(255, ex[2] + intensity // 2)))
+
+        # Musical tone lights (the five-note sequence)
+        note_cycle = 6.0
+        nt = t % note_cycle
+        notes = [(255, 50, 50), (255, 200, 50), (50, 255, 50),
+                 (50, 150, 255), (255, 100, 255)]
+        note_idx = min(4, int(nt / 1.2))
+        if nt < 5.0:
+            nc = notes[note_idx]
+            tp = 0.3 + 0.7 * math.sin((nt - note_idx * 1.2) / 1.2 * math.pi)
+            # Flash the bottom edge
+            for x in range(GRID_SIZE):
+                ex = d.get_pixel(x, GRID_SIZE - 1)
+                d.set_pixel(x, GRID_SIZE - 1,
+                            (min(255, int(ex[0] + nc[0] * tp * 0.15)),
+                             min(255, int(ex[1] + nc[1] * tp * 0.15)),
+                             min(255, int(ex[2] + nc[2] * tp * 0.15))))
+
+        # Title text - warm white
+        tp = 0.6 + 0.4 * math.sin(t * 1.0)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(240 * tp), int(220 * tp), int(180 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(220 * tp2), int(200 * tp2), int(160 * tp2)))
+
+
+# =========================================================================
+# WonderTron - Light cycle trails on perspective grid
+# =========================================================================
+
+class WonderTron(Visual):
+    name = "WONDER TRON"
+    description = "Light cycle grid"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        # Light cycles: each has position, direction, color, trail
+        self._cycles = [
+            {'x': 10.0, 'y': 40.0, 'dx': 1, 'dy': 0,
+             'color': (0, 200, 255), 'trail': [], 'turn_timer': 0},
+            {'x': 54.0, 'y': 50.0, 'dx': -1, 'dy': 0,
+             'color': (255, 100, 0), 'trail': [], 'turn_timer': 0},
+        ]
+
+    def update(self, dt: float):
+        self.time += dt
+        speed = 20.0
+        for c in self._cycles:
+            c['trail'].append((int(c['x']), int(c['y'])))
+            if len(c['trail']) > 80:
+                c['trail'].pop(0)
+            c['x'] += c['dx'] * speed * dt
+            c['y'] += c['dy'] * speed * dt
+            c['turn_timer'] -= dt
+            # Random turns or boundary avoidance
+            if (c['turn_timer'] <= 0 or
+                    c['x'] < 2 or c['x'] > 61 or c['y'] < 20 or c['y'] > 61):
+                c['turn_timer'] = random.uniform(0.5, 2.0)
+                if c['dx'] != 0:
+                    c['dx'] = 0
+                    c['dy'] = random.choice([-1, 1])
+                    if c['y'] < 25:
+                        c['dy'] = 1
+                    elif c['y'] > 58:
+                        c['dy'] = -1
+                else:
+                    c['dy'] = 0
+                    c['dx'] = random.choice([-1, 1])
+                    if c['x'] < 5:
+                        c['dx'] = 1
+                    elif c['x'] > 58:
+                        c['dx'] = -1
+            # Wrap
+            c['x'] = max(1, min(62, c['x']))
+            c['y'] = max(18, min(62, c['y']))
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+
+        # Dark background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (0, 2, 8))
+
+        # Grid lines (scrolling for motion feel)
+        grid_off = (t * 5) % 8
+        # Horizontal grid
+        for gy in range(GRID_SIZE):
+            if (gy + int(grid_off)) % 8 == 0 and gy > 16:
+                for x in range(GRID_SIZE):
+                    d.set_pixel(x, gy, (0, 20, 40))
+        # Vertical grid
+        for gx in range(GRID_SIZE):
+            if gx % 8 == 0:
+                for y in range(17, GRID_SIZE):
+                    ex = d.get_pixel(gx, y)
+                    d.set_pixel(gx, y, (max(ex[0], 0), max(ex[1], 20),
+                                        max(ex[2], 40)))
+
+        # Light cycle trails
+        for c in self._cycles:
+            color = c['color']
+            trail = c['trail']
+            for i, (tx, ty) in enumerate(trail):
+                frac = i / max(1, len(trail))
+                fade = frac * 0.8
+                tc = (int(color[0] * fade), int(color[1] * fade),
+                      int(color[2] * fade))
+                if 0 <= tx < GRID_SIZE and 0 <= ty < GRID_SIZE:
+                    d.set_pixel(tx, ty, tc)
+
+            # Cycle head (bright)
+            hx, hy = int(c['x']), int(c['y'])
+            if 0 <= hx < GRID_SIZE and 0 <= hy < GRID_SIZE:
+                d.set_pixel(hx, hy, (min(255, color[0] + 55),
+                                     min(255, color[1] + 55),
+                                     min(255, color[2] + 55)))
+                # Glow
+                for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    px, py = hx + ddx, hy + ddy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (color[0] // 2, color[1] // 2,
+                                             color[2] // 2))
+
+        # Title text - cyan neon
+        tp = 0.6 + 0.4 * math.sin(t * 2.0)
+        d.draw_text_small(WONDER_X, WONDER_Y - 2, "WONDER",
+                          (int(100 * tp), int(220 * tp), int(255 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 2.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y - 2, "CABINET",
+                          (int(80 * tp2), int(200 * tp2), int(255 * tp2)))
+
+
+# =========================================================================
+# WonderJurassicPark - Water ripple in the cup
+# =========================================================================
+
+class WonderJurassicPark(Visual):
+    name = "WONDER JURASSIC PARK"
+    description = "Water ripple impact"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx, cy = GRID_SIZE // 2, GRID_SIZE // 2
+
+        # Dark interior (dashboard of the car)
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (12, 10, 8))
+
+        # Cup of water (viewed from above - circular)
+        cup_cx, cup_cy = cx, cy - 2
+        cup_r = 16
+
+        for dy in range(-cup_r - 1, cup_r + 2):
+            for dx in range(-cup_r - 1, cup_r + 2):
+                dist = math.sqrt(dx * dx + dy * dy)
+                px, py = cup_cx + dx, cup_cy + dy
+
+                if not (0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE):
+                    continue
+
+                if cup_r - 1 < dist <= cup_r + 1:
+                    # Cup rim (glass edge)
+                    rim_highlight = 0.6 + 0.4 * math.cos(math.atan2(dy, dx) - 0.5)
+                    d.set_pixel(px, py, (int(180 * rim_highlight),
+                                         int(190 * rim_highlight),
+                                         int(200 * rim_highlight)))
+                elif dist < cup_r - 1:
+                    # Water surface
+                    # Concentric ripples from T-Rex footsteps
+                    # Footstep rhythm: thud every ~2.5 seconds
+                    thud_period = 2.5
+                    time_since_thud = t % thud_period
+                    ripple_speed = 12.0
+
+                    # Multiple ripple rings expanding from center
+                    ripple_dist = time_since_thud * ripple_speed
+                    ripple1 = math.sin((dist - ripple_dist) * 1.5) * \
+                              max(0, 1.0 - time_since_thud / thud_period)
+                    # Previous thud's ripple (still fading)
+                    prev_dist = (time_since_thud + thud_period) * ripple_speed
+                    ripple2 = math.sin((dist - prev_dist) * 1.5) * \
+                              max(0, -time_since_thud / thud_period + 0.3)
+
+                    ripple = (ripple1 + ripple2) * 0.5
+
+                    # Water color
+                    base_r = 60
+                    base_g = 80
+                    base_b = 120
+                    # Ripple creates light/dark bands
+                    shift = int(ripple * 35)
+                    # Highlight on crests
+                    highlight = max(0, ripple) * 25
+                    d.set_pixel(px, py, (min(255, base_r + shift + int(highlight)),
+                                         min(255, base_g + shift + int(highlight)),
+                                         min(255, base_b + shift)))
+
+        # Dashboard elements around the cup
+        # Rearview mirror at top
+        for x in range(cx - 8, cx + 9):
+            for y in range(3, 7):
+                if 0 <= x < GRID_SIZE:
+                    d.set_pixel(x, y, (25, 22, 18))
+        # Mirror reflection (green jungle)
+        for x in range(cx - 6, cx + 7):
+            for y in range(4, 6):
+                if 0 <= x < GRID_SIZE:
+                    jitter = int(math.sin(x * 0.5 + t) * 10)
+                    d.set_pixel(x, y, (15 + jitter, 40 + jitter, 10))
+
+        # Title text - amber/jungle
+        tp = 0.6 + 0.4 * math.sin(t * 1.0)
+        d.draw_text_small(WONDER_X, WONDER_Y + 22, "WONDER",
+                          (int(220 * tp), int(180 * tp), int(50 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y + 22, "CABINET",
+                          (int(200 * tp2), int(160 * tp2), int(40 * tp2)))
+
+
+# =========================================================================
+# WonderIndiana - Rolling boulder in tunnel
+# =========================================================================
+
+class WonderIndiana(Visual):
+    name = "WONDER INDIANA"
+    description = "Rolling boulder chase"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._dust = []
+
+    def update(self, dt: float):
+        self.time += dt
+        # Update dust
+        for p in self._dust:
+            p['x'] += p['vx'] * dt
+            p['y'] += p['vy'] * dt
+            p['life'] -= dt
+        self._dust = [p for p in self._dust if p['life'] > 0]
+        # Spawn dust from boulder
+        if random.random() < 0.4:
+            boulder_x = 45 + int(math.sin(self.time * 0.3) * 3)
+            self._dust.append({
+                'x': float(boulder_x + random.randint(-8, 8)),
+                'y': float(random.randint(25, 55)),
+                'vx': random.uniform(-10, -3),
+                'vy': random.uniform(-5, 5),
+                'life': random.uniform(0.3, 0.8),
+            })
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+
+        # Tunnel walls (one-point perspective, like the corridor)
+        vp_y = 35  # Vanishing point
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                dx = abs(x - cx)
+                wall_hw = 6 + abs(y - vp_y) * 0.7
+
+                if dx < wall_hw:
+                    # Floor/ceiling - stone texture
+                    stone = ((x * 3 + y * 7) % 11) / 11.0
+                    if y < vp_y:
+                        # Ceiling
+                        base = int(50 + stone * 20)
+                        d.set_pixel(x, y, (base, max(0, base - 5), max(0, base - 10)))
+                    else:
+                        # Floor
+                        base = int(60 + stone * 15)
+                        d.set_pixel(x, y, (base, max(0, base - 5), max(0, base - 15)))
+                else:
+                    # Walls
+                    depth = abs(y - vp_y) / 32.0
+                    stone = ((x * 5 + y * 3) % 7) / 7.0
+                    base = int(40 + stone * 15 + depth * 20)
+                    d.set_pixel(x, y, (base, max(0, base - 8), max(0, base - 15)))
+
+        # Running figure silhouette (Indy)
+        fig_x = 20 + int(math.sin(t * 3.0) * 2)  # Bob while running
+        fig_y_base = 50
+        sil = (5, 5, 3)
+
+        # Hat
+        hat_y = fig_y_base - 14
+        for dx in range(-3, 4):
+            if 0 <= fig_x + dx < GRID_SIZE and 0 <= hat_y < GRID_SIZE:
+                d.set_pixel(fig_x + dx, hat_y, sil)
+        for dx in range(-2, 3):
+            if 0 <= fig_x + dx < GRID_SIZE and 0 <= hat_y - 1 < GRID_SIZE:
+                d.set_pixel(fig_x + dx, hat_y - 1, sil)
+            if 0 <= fig_x + dx < GRID_SIZE and 0 <= hat_y - 2 < GRID_SIZE:
+                d.set_pixel(fig_x + dx, hat_y - 2, sil)
+
+        # Head
+        for dy in range(1, 4):
+            for dx in range(-1, 2):
+                px, py = fig_x + dx, hat_y + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, sil)
+
+        # Body
+        for dy in range(4, 12):
+            row = hat_y + dy
+            if row >= GRID_SIZE:
+                break
+            w = 2 if dy < 8 else 1
+            for dx in range(-w, w + 1):
+                px = fig_x + dx
+                if 0 <= px < GRID_SIZE and 0 <= row < GRID_SIZE:
+                    d.set_pixel(px, row, sil)
+
+        # Running legs (animated)
+        leg_phase = math.sin(t * 8.0)
+        for leg_side in [-1, 1]:
+            leg_dx = int(leg_phase * leg_side * 2)
+            for i in range(3):
+                px = fig_x + leg_dx + (i if leg_side > 0 else -i)
+                py = fig_y_base - 2 + i
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, sil)
+
+        # Boulder (large circle, right side, rolling)
+        boulder_cx = 48 + int(math.sin(t * 0.3) * 3)
+        boulder_cy = 38
+        boulder_r = 10
+        roll_angle = t * 3.0
+
+        for dy in range(-boulder_r, boulder_r + 1):
+            for dx in range(-boulder_r, boulder_r + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= boulder_r:
+                    px, py = boulder_cx + dx, boulder_cy + dy
+                    if not (0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE):
+                        continue
+                    # Rocky texture that rotates
+                    angle = math.atan2(dy, dx) + roll_angle
+                    tex = math.sin(angle * 3) * math.sin(dist * 0.8) * 0.3
+                    edge = dist / boulder_r
+                    base = 0.6 + tex - edge * 0.3
+                    base = max(0.2, min(1.0, base))
+                    r = int(140 * base)
+                    g = int(120 * base)
+                    b = int(80 * base)
+                    d.set_pixel(px, py, (r, g, b))
+
+        # Dust particles
+        for p in self._dust:
+            px, py = int(p['x']), int(p['y'])
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                frac = max(0, p['life'] / 0.8)
+                bri = int(80 * frac)
+                d.set_pixel(px, py, (bri, max(0, bri - 10), max(0, bri - 20)))
+
+        # Title text - adventure gold
+        tp = 0.6 + 0.4 * math.sin(t * 1.2)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(240 * tp), int(190 * tp), int(60 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.2 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(220 * tp2), int(170 * tp2), int(50 * tp2)))
+
+
+# =========================================================================
+# WonderMetropolis - Maria the robot with electric arcs
+# =========================================================================
+
+class WonderMetropolis(Visual):
+    name = "WONDER METROPOLIS"
+    description = "Maria the machine"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._arcs = []
+
+    def update(self, dt: float):
+        self.time += dt
+        # Update arcs
+        for a in self._arcs:
+            a['life'] -= dt
+        self._arcs = [a for a in self._arcs if a['life'] > 0]
+        # Spawn new arcs
+        if random.random() < 0.3:
+            cx = GRID_SIZE // 2
+            side = random.choice([-1, 1])
+            self._arcs.append({
+                'x': cx + side * random.randint(8, 20),
+                'y': random.randint(10, 45),
+                'segments': [(random.uniform(-3, 3), random.uniform(-3, 3))
+                             for _ in range(random.randint(3, 6))],
+                'life': random.uniform(0.05, 0.15),
+            })
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+
+        # Dark art deco background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                # Radiating lines from center (deco pattern)
+                angle = math.atan2(y - 25, x - cx)
+                ray = int(abs(math.sin(angle * 8)) * 6)
+                d.set_pixel(x, y, (ray + 3, ray + 2, ray + 5))
+
+        # Maria robot silhouette (chrome art deco humanoid)
+        # Head (circular with art deco crown)
+        head_cy = 14
+        for dy in range(-4, 5):
+            for dx in range(-3, 4):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= 4:
+                    px, py = cx + dx, head_cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        edge = dist / 4.0
+                        # Chrome metallic
+                        bri = 0.6 + 0.3 * math.cos(dx * 0.8 + t * 0.5) - edge * 0.2
+                        bri = max(0.2, min(1.0, bri))
+                        d.set_pixel(px, py, (int(160 * bri), int(170 * bri),
+                                             int(180 * bri)))
+        # Crown spikes
+        for i in range(5):
+            spike_x = cx - 4 + i * 2
+            for sy in range(head_cy - 6, head_cy - 3):
+                if 0 <= spike_x < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                    d.set_pixel(spike_x, sy, (140, 150, 160))
+
+        # Eyes (glowing)
+        eye_glow = 0.5 + 0.5 * math.sin(t * 2.0)
+        for side in [-1, 1]:
+            ex = cx + side * 2
+            ey = head_cy - 1
+            if 0 <= ex < GRID_SIZE and 0 <= ey < GRID_SIZE:
+                d.set_pixel(ex, ey, (int(200 * eye_glow), int(200 * eye_glow),
+                                     int(100 * eye_glow)))
+
+        # Neck
+        for dy in range(5, 8):
+            for dx in range(-1, 2):
+                px, py = cx + dx, head_cy + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (100, 110, 120))
+
+        # Torso (art deco angular)
+        torso_top = head_cy + 8
+        for dy in range(14):
+            row = torso_top + dy
+            if row >= GRID_SIZE:
+                break
+            # Shoulders wide, waist narrow, hips moderate
+            if dy < 3:
+                hw = 6 + dy
+            elif dy < 8:
+                hw = 9 - dy // 2
+            else:
+                hw = 5 + (dy - 8) // 2
+            hw = min(hw, 10)
+            for dx in range(-hw, hw + 1):
+                px = cx + dx
+                if 0 <= px < GRID_SIZE:
+                    edge = abs(dx) / max(1, hw)
+                    bri = 0.4 + 0.2 * (1 - edge)
+                    # Segmented armor plates
+                    if dy % 4 == 0:
+                        bri += 0.15
+                    d.set_pixel(px, row, (int(130 * bri), int(140 * bri),
+                                          int(155 * bri)))
+
+        # Art deco rings around the figure
+        ring_r = 18 + int(math.sin(t * 0.8) * 2)
+        ring_cy = 28
+        for i in range(64):
+            angle = i / 64.0 * math.pi * 2
+            rx = int(cx + ring_r * math.cos(angle))
+            ry = int(ring_cy + ring_r * 0.5 * math.sin(angle))
+            if 0 <= rx < GRID_SIZE and 0 <= ry < GRID_SIZE:
+                pulse = 0.3 + 0.7 * abs(math.sin(angle * 3 + t * 2))
+                d.set_pixel(rx, ry, (int(100 * pulse), int(110 * pulse),
+                                     int(130 * pulse)))
+
+        # Electric arcs
+        for a in self._arcs:
+            frac = a['life'] / 0.15
+            ax, ay = a['x'], a['y']
+            for sdx, sdy in a['segments']:
+                ax += sdx
+                ay += sdy
+                px, py = int(ax), int(ay)
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (int(200 * frac), int(220 * frac),
+                                         int(255 * frac)))
+
+        # Title text - silver art deco
+        tp = 0.6 + 0.4 * math.sin(t * 1.0)
+        d.draw_text_small(WONDER_X, WONDER_Y + 20, "WONDER",
+                          (int(180 * tp), int(190 * tp), int(210 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
+                          (int(160 * tp2), int(170 * tp2), int(190 * tp2)))
+
+
+# =========================================================================
+# WonderKingKong - Atop the Empire State, biplanes circling
+# =========================================================================
+
+class WonderKingKong(Visual):
+    name = "WONDER KING KONG"
+    description = "Top of the world"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+
+        # Dusk sky gradient
+        for y in range(GRID_SIZE):
+            grad = y / GRID_SIZE
+            r = int(40 + 60 * (1 - grad))
+            g = int(25 + 40 * (1 - grad))
+            b = int(50 + 30 * (1 - grad))
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (r, g, b))
+
+        # Empire State Building spire
+        spire_x = cx
+        spire_base = GRID_SIZE  # Goes off screen at bottom
+
+        # Main spire (narrow tower top)
+        for y in range(20, GRID_SIZE):
+            # Tower narrows toward top
+            if y < 30:
+                hw = 1
+            elif y < 40:
+                hw = 2
+            elif y < 50:
+                hw = 4 + (y - 40) // 3
+            else:
+                hw = 7 + (y - 50) // 2
+            hw = min(hw, 14)
+            for dx in range(-hw, hw + 1):
+                px = spire_x + dx
+                if 0 <= px < GRID_SIZE:
+                    edge = abs(dx) / max(1, hw)
+                    # Art deco limestone
+                    bri = 0.5 + 0.3 * (1 - edge)
+                    # Window pattern
+                    if y > 35 and abs(dx) < hw - 1 and (y % 3 == 0) and (dx % 2 == 0):
+                        d.set_pixel(px, y, (int(160 * bri), int(140 * bri),
+                                            int(60 * bri)))
+                    else:
+                        d.set_pixel(px, y, (int(120 * bri), int(115 * bri),
+                                            int(100 * bri)))
+
+        # Antenna
+        for y in range(14, 21):
+            if 0 <= spire_x < GRID_SIZE:
+                d.set_pixel(spire_x, y, (100, 95, 85))
+
+        # Kong silhouette on the spire
+        kong_x = spire_x - 1
+        kong_top = 25
+        sil = (8, 6, 5)
+
+        # Head
+        for dy in range(5):
+            for dx in range(-2, 3):
+                dist = math.sqrt(dx * dx + (dy - 2) ** 2)
+                if dist <= 2.5:
+                    px, py = kong_x + dx, kong_top + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, sil)
+
+        # Body (hunched, holding onto spire)
+        for dy in range(5, 14):
+            row = kong_top + dy
+            if row >= GRID_SIZE:
+                break
+            hw = 3 if dy < 10 else 2
+            for dx in range(-hw, hw + 1):
+                px = kong_x + dx
+                if 0 <= px < GRID_SIZE and 0 <= row < GRID_SIZE:
+                    d.set_pixel(px, row, sil)
+
+        # Arm reaching out (holding something)
+        arm_y = kong_top + 7
+        for i in range(5):
+            ax = kong_x - 3 - i
+            ay = arm_y - i // 2
+            if 0 <= ax < GRID_SIZE and 0 <= ay < GRID_SIZE:
+                d.set_pixel(ax, ay, sil)
+                if ay + 1 < GRID_SIZE:
+                    d.set_pixel(ax, ay + 1, sil)
+
+        # Biplanes circling
+        for plane_i in range(3):
+            angle = t * 0.8 + plane_i * math.pi * 2 / 3
+            orbit_r = 22
+            px = int(cx + orbit_r * math.cos(angle))
+            py = int(30 + orbit_r * 0.3 * math.sin(angle))
+
+            # Plane silhouette (tiny)
+            facing_right = math.cos(angle - math.pi / 2) > 0
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                d.set_pixel(px, py, (60, 60, 50))
+                # Wings
+                wing_dir = 1 if facing_right else -1
+                for w in range(-2, 3):
+                    wx = px + w
+                    if 0 <= wx < GRID_SIZE:
+                        d.set_pixel(wx, py, (60, 60, 50))
+                # Tail
+                tx = px - wing_dir * 2
+                if 0 <= tx < GRID_SIZE and 0 <= py - 1 < GRID_SIZE:
+                    d.set_pixel(tx, py - 1, (60, 60, 50))
+
+        # Searchlight beams from below
+        for beam_i in range(2):
+            beam_angle = math.sin(t * 0.5 + beam_i * 2) * 0.4
+            for by in range(GRID_SIZE - 1, 20, -1):
+                bx = int(cx + (GRID_SIZE - by) * math.tan(beam_angle) +
+                         beam_i * 10 - 5)
+                if 0 <= bx < GRID_SIZE:
+                    fall = (GRID_SIZE - by) / 40.0
+                    intensity = int(20 * max(0, 1.0 - fall))
+                    if intensity > 0:
+                        ex = d.get_pixel(bx, by)
+                        d.set_pixel(bx, by, (min(255, ex[0] + intensity),
+                                             min(255, ex[1] + intensity),
+                                             min(255, ex[2] + intensity)))
+
+        # Title text
+        tp = 0.6 + 0.4 * math.sin(t * 1.0)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(220 * tp), int(190 * tp), int(120 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.0 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(200 * tp2), int(170 * tp2), int(100 * tp2)))
+
+
+# =========================================================================
+# WonderWizardOz - Sepia to color with tornado
+# =========================================================================
+
+class WonderWizardOz(Visual):
+    name = "WONDER WIZARD OF OZ"
+    description = "Somewhere over rainbow"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self._debris = []
+
+    def update(self, dt: float):
+        self.time += dt
+        for p in self._debris:
+            p['x'] += p['vx'] * dt
+            p['y'] += p['vy'] * dt
+            p['angle'] += p['spin'] * dt
+            p['life'] -= dt
+        self._debris = [p for p in self._debris if p['life'] > 0]
+        # Spawn debris near tornado
+        if random.random() < 0.2:
+            self._debris.append({
+                'x': float(GRID_SIZE // 2 + random.randint(-5, 5)),
+                'y': float(random.randint(15, 50)),
+                'vx': random.uniform(-8, 8),
+                'vy': random.uniform(-10, -2),
+                'angle': random.uniform(0, math.pi * 2),
+                'spin': random.uniform(-5, 5),
+                'life': random.uniform(0.5, 1.5),
+            })
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx = GRID_SIZE // 2
+
+        # The visual cycles between sepia (Kansas) and color (Oz)
+        cycle = 10.0
+        ct = t % cycle
+        color_blend = 0.0
+        if ct > 5.0:
+            color_blend = min(1.0, (ct - 5.0) / 2.0)
+
+        # Background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                if color_blend < 0.5:
+                    # Sepia Kansas sky
+                    grad = y / GRID_SIZE
+                    base = int(120 - grad * 50)
+                    sepia = (base, int(base * 0.85), int(base * 0.65))
+                    d.set_pixel(x, y, sepia)
+                else:
+                    # Technicolor Oz - rainbow sky
+                    grad = y / GRID_SIZE
+                    hue = (x / GRID_SIZE * 0.3 + grad * 0.1 + t * 0.05) % 1.0
+                    rgb = _hue_to_rgb(hue)
+                    blend = (color_blend - 0.5) * 2  # 0-1 for Oz portion
+                    # Blend from sepia to color
+                    base = int(120 - grad * 50)
+                    sepia = (base, int(base * 0.85), int(base * 0.65))
+                    r = int(sepia[0] + (rgb[0] // 3 - sepia[0]) * blend)
+                    g = int(sepia[1] + (rgb[1] // 3 - sepia[1]) * blend)
+                    b = int(sepia[2] + (rgb[2] // 3 - sepia[2]) * blend)
+                    d.set_pixel(x, y, (max(0, r), max(0, g), max(0, b)))
+
+        # Tornado (in Kansas phase)
+        if color_blend < 0.8:
+            tornado_opacity = 1.0 - color_blend
+            # Funnel shape: narrow at top, wide at bottom
+            for y in range(5, 58):
+                progress = (y - 5) / 53.0
+                width = 2 + int(progress * 12)
+                # Swirl offset
+                swirl = math.sin(y * 0.3 + t * 4.0) * (width * 0.3)
+                for dx in range(-width, width + 1):
+                    px = int(cx + dx + swirl)
+                    if 0 <= px < GRID_SIZE and 0 <= y < GRID_SIZE:
+                        edge = abs(dx) / max(1, width)
+                        bri = (0.4 - edge * 0.2) * tornado_opacity
+                        if bri > 0.05:
+                            # Dark funnel cloud
+                            ex = d.get_pixel(px, y)
+                            dark = int(bri * 80)
+                            d.set_pixel(px, y, (max(0, ex[0] - dark),
+                                                max(0, ex[1] - dark),
+                                                max(0, ex[2] - dark)))
+
+        # Flying debris
+        for p in self._debris:
+            px, py = int(p['x']), int(p['y'])
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                frac = max(0, p['life'] / 1.5)
+                d.set_pixel(px, py, (int(80 * frac), int(70 * frac),
+                                     int(50 * frac)))
+
+        # Rainbow (in Oz phase)
+        if color_blend > 0.3:
+            rb_opacity = min(1.0, (color_blend - 0.3) * 2)
+            rb_cx, rb_cy = cx, GRID_SIZE + 10
+            for angle_i in range(40):
+                angle = math.pi * 0.15 + angle_i / 40.0 * math.pi * 0.7
+                for band in range(6):
+                    r = 30 + band * 2
+                    px = int(rb_cx + r * math.cos(angle))
+                    py = int(rb_cy - r * math.sin(angle))
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        hue = band / 6.0
+                        color = _hue_to_rgb(hue)
+                        c = (int(color[0] * rb_opacity * 0.6),
+                             int(color[1] * rb_opacity * 0.6),
+                             int(color[2] * rb_opacity * 0.6))
+                        d.set_pixel(px, py, c)
+
+        # Title text - transitions from sepia to technicolor
+        if color_blend < 0.5:
+            tc = (int(200 * (0.6 + 0.4 * math.sin(t))),
+                  int(170 * (0.6 + 0.4 * math.sin(t))),
+                  int(100 * (0.6 + 0.4 * math.sin(t))))
+            tc2 = (int(180 * (0.6 + 0.4 * math.sin(t + 0.5))),
+                   int(150 * (0.6 + 0.4 * math.sin(t + 0.5))),
+                   int(80 * (0.6 + 0.4 * math.sin(t + 0.5))))
+        else:
+            tp = 0.6 + 0.4 * math.sin(t * 1.5)
+            tc = (int(100 * tp), int(220 * tp), int(100 * tp))
+            tc2 = (int(80 * tp), int(200 * tp), int(80 * tp))
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER", tc)
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET", tc2)
+
+
+# =========================================================================
+# WonderGhostbusters - Proton pack streams
+# =========================================================================
+
+class WonderGhostbusters(Visual):
+    name = "WONDER GHOSTBUSTERS"
+    description = "Don't cross the streams"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        d.clear()
+        t = self.time
+        cx, cy = GRID_SIZE // 2, GRID_SIZE // 2
+
+        # Dark background
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (3, 3, 8))
+
+        # No-ghost sign (red circle with slash)
+        sign_cx, sign_cy = cx, 22
+        sign_r = 14
+
+        # White circle fill
+        for dy in range(-sign_r, sign_r + 1):
+            for dx in range(-sign_r, sign_r + 1):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist <= sign_r - 2:
+                    px, py = sign_cx + dx, sign_cy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (240, 240, 240))
+
+        # Ghost silhouette (inside circle)
+        ghost_cx = sign_cx
+        ghost_top = sign_cy - 7
+        for dy in range(12):
+            row = ghost_top + dy
+            if dy < 5:
+                hw = 2 + dy
+            elif dy < 9:
+                hw = 7
+            else:
+                hw = 7
+            # Ghost wavy bottom
+            if dy >= 9:
+                wavy = (dy - 9)
+                for dx in range(-hw, hw + 1):
+                    # Wavy bottom edge
+                    if (dx + wavy) % 3 == 0:
+                        continue
+                    px, py = ghost_cx + dx, row
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (180, 230, 180))
+            else:
+                for dx in range(-hw, hw + 1):
+                    px, py = ghost_cx + dx, row
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, (180, 230, 180))
+
+        # Ghost eyes
+        for side in [-1, 1]:
+            ex = ghost_cx + side * 3
+            ey = ghost_top + 3
+            if 0 <= ex < GRID_SIZE and 0 <= ey < GRID_SIZE:
+                d.set_pixel(ex, ey, (10, 10, 10))
+                if 0 <= ey + 1 < GRID_SIZE:
+                    d.set_pixel(ex, ey + 1, (10, 10, 10))
+        # Ghost mouth
+        for dx in range(-2, 3):
+            mx = ghost_cx + dx
+            my = ghost_top + 6
+            if 0 <= mx < GRID_SIZE and 0 <= my < GRID_SIZE:
+                d.set_pixel(mx, my, (10, 10, 10))
+
+        # Red circle border
+        for i in range(80):
+            angle = i / 80.0 * math.pi * 2
+            for r_off in range(-1, 2):
+                rx = int(sign_cx + (sign_r + r_off) * math.cos(angle))
+                ry = int(sign_cy + (sign_r + r_off) * math.sin(angle))
+                if 0 <= rx < GRID_SIZE and 0 <= ry < GRID_SIZE:
+                    d.set_pixel(rx, ry, (220, 30, 20))
+
+        # Red slash (diagonal line through ghost)
+        for i in range(sign_r * 2 + 2):
+            frac = i / (sign_r * 2 + 1)
+            sx = int(sign_cx - sign_r + i)
+            sy = int(sign_cy - sign_r + i)
+            for w in range(-1, 2):
+                px = sx
+                py = sy + w
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (220, 30, 20))
+
+        # Proton streams (two beams converging)
+        for beam_i in range(2):
+            start_x = 5 if beam_i == 0 else 58
+            start_y = 55
+            target_x = cx + int(math.sin(t * 2.0 + beam_i * 3) * 5)
+            target_y = 38 + int(math.cos(t * 1.5) * 3)
+
+            segments = 20
+            for s in range(segments):
+                frac = s / segments
+                bx = int(start_x + (target_x - start_x) * frac)
+                by = int(start_y + (target_y - start_y) * frac)
+                # Wavy beam
+                wobble_x = int(math.sin(s * 1.5 + t * 8 + beam_i * 5) * 2)
+                wobble_y = int(math.cos(s * 1.2 + t * 6 + beam_i * 3) * 1.5)
+                px = bx + wobble_x
+                py = by + wobble_y
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    # Orange-red proton stream
+                    intensity = 0.5 + 0.5 * math.sin(s * 0.8 + t * 10)
+                    d.set_pixel(px, py, (int(255 * intensity),
+                                         int(120 * intensity),
+                                         int(30 * intensity)))
+
+        # Crossing point sparks
+        spark_x = target_x
+        spark_y = target_y
+        if random.random() < 0.5:
+            for _ in range(3):
+                sx = spark_x + random.randint(-3, 3)
+                sy = spark_y + random.randint(-3, 3)
+                if 0 <= sx < GRID_SIZE and 0 <= sy < GRID_SIZE:
+                    d.set_pixel(sx, sy, (255, 255, 200))
+
+        # Title text
+        tp = 0.6 + 0.4 * math.sin(t * 1.5)
+        d.draw_text_small(WONDER_X, WONDER_Y + 20, "WONDER",
+                          (int(255 * tp), int(50 * tp), int(30 * tp)))
+        tp2 = 0.6 + 0.4 * math.sin(t * 1.5 + 0.5)
+        d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
+                          (int(230 * tp2), int(40 * tp2), int(20 * tp2)))
