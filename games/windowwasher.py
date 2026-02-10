@@ -349,12 +349,14 @@ class WindowWasher(Game):
         self.building_w = self.num_cols * (WINDOW_W + WINDOW_GAP_X) + WINDOW_GAP_X + 8  # padding
         self.building_h = GRID_SIZE
 
-        # Timer
-        self.timer = max(30.0, 90.0 - (level - 1) * 10.0)
-        self.par_time = self.timer * 0.6  # par = 60% of time
+        # Timer scales with work required; headroom shrinks each level
+        num_windows = self.num_cols * WINDOW_ROWS
+        headroom = max(1.25, 2.0 - (level - 1) * 0.07)
+        self.timer = num_windows * CLEAN_TIME * headroom
+        self.par_time = self.timer * 0.25  # par = finish with 25% time left
 
-        # Cleaning speed (gets slower at higher levels)
-        self.clean_speed = 1.0 / max(1.0, CLEAN_TIME + (level - 1) * 0.2)
+        # Cleaning speed (constant — difficulty comes from more windows + tighter headroom)
+        self.clean_speed = 1.0 / CLEAN_TIME
 
         # Player position (world coords)
         self.player_x = float(self.building_w // 2)
