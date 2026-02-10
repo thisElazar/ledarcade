@@ -22,10 +22,10 @@ from . import Visual, Display, Colors, GRID_SIZE
 N = GRID_SIZE  # 64
 
 # ── Wave equation parameters ─────────────────────────────────────
-C = 0.45           # Wave speed (must keep c*dt/dx < 1 for stability)
-DAMPING = 0.998    # Per-substep damping to prevent blowup
-SUB_STEPS = 6      # Physics substeps per frame
-DT_SUB = 1.0       # Substep dt (unitless, tuned with C)
+C = 0.25           # Wave speed (must keep c*dt/dx < 1 for stability)
+DAMPING = 0.9995   # Per-substep damping to prevent blowup
+SUB_STEPS = 16     # Physics substeps per frame
+DT_SUB = 0.25      # Substep dt (unitless, tuned with C)
 
 # ── Scenarios ────────────────────────────────────────────────────
 _SCENARIOS = ['SINGLE SOURCE', 'DOUBLE SLIT', 'INTERFERENCE', 'RIPPLE', 'REFLECTION']
@@ -224,7 +224,7 @@ class WaveTank(Visual):
     def _setup_single_source(self):
         """One oscillating point source at center-left."""
         self.sources.append({
-            'x': 16, 'y': 32, 'freq': 0.12, 'phase': 0.0,
+            'x': 16, 'y': 32, 'freq': 0.025, 'phase': 0.0,
             'type': 'point', 'amp': 1.0,
         })
 
@@ -232,7 +232,7 @@ class WaveTank(Visual):
         """Plane wave from left hits a vertical barrier with two slits."""
         # Plane wave source along left edge
         self.sources.append({
-            'x': 3, 'y': 32, 'freq': 0.15, 'phase': 0.0,
+            'x': 3, 'y': 32, 'freq': 0.03, 'phase': 0.0,
             'type': 'plane_left', 'amp': 0.8,
         })
         # Vertical barrier at x=24 with two slits
@@ -249,11 +249,11 @@ class WaveTank(Visual):
     def _setup_interference(self):
         """Two point sources oscillating in phase."""
         self.sources.append({
-            'x': 32, 'y': 20, 'freq': 0.14, 'phase': 0.0,
+            'x': 32, 'y': 20, 'freq': 0.028, 'phase': 0.0,
             'type': 'point', 'amp': 1.0,
         })
         self.sources.append({
-            'x': 32, 'y': 44, 'freq': 0.14, 'phase': 0.0,
+            'x': 32, 'y': 44, 'freq': 0.028, 'phase': 0.0,
             'type': 'point', 'amp': 1.0,
         })
 
@@ -265,7 +265,7 @@ class WaveTank(Visual):
     def _setup_reflection(self):
         """Point source with angled barrier walls."""
         self.sources.append({
-            'x': 16, 'y': 16, 'freq': 0.12, 'phase': 0.0,
+            'x': 16, 'y': 16, 'freq': 0.025, 'phase': 0.0,
             'type': 'point', 'amp': 1.0,
         })
         # Angled barrier: diagonal from (40, 10) to (55, 50)
@@ -393,14 +393,20 @@ class WaveTank(Visual):
     def update(self, dt: float):
         self.time += dt
 
-        # Ripple scenario: spawn random drops
+        # Ripple scenario: spawn random drops as wide gaussian blobs
         if _SCENARIOS[self.scenario_idx] == 'RIPPLE':
             self.ripple_timer += dt * self.speed
-            if self.ripple_timer > 0.35:
+            if self.ripple_timer > 1.0:
                 self.ripple_timer = 0.0
-                rx = random.randint(4, N - 5)
-                ry = random.randint(4, N - 5)
-                self.u[ry, rx] = random.uniform(0.6, 1.0)
+                rx = random.randint(8, N - 9)
+                ry = random.randint(8, N - 9)
+                amp = random.uniform(0.15, 0.35)
+                r = 5  # blob radius — wide to suppress high frequencies
+                for dy in range(-r, r + 1):
+                    for dx in range(-r, r + 1):
+                        d2 = dx * dx + dy * dy
+                        if d2 <= r * r:
+                            self.u[ry + dy, rx + dx] += amp * math.exp(-d2 / 3.0)
 
         # Run substeps (scaled by speed)
         steps = max(1, int(SUB_STEPS * self.speed))
@@ -408,9 +414,9 @@ class WaveTank(Visual):
             self._apply_sources()
             self._step_wave()
             self.phys_time += DT_SUB
-
-        # Clamp to prevent any runaway values
-        np.clip(self.u, -2.0, 2.0, out=self.u)
+            # Clamp per-substep to prevent overflow
+            np.clip(self.u, -2.0, 2.0, out=self.u)
+            np.clip(self.u_prev, -2.0, 2.0, out=self.u_prev)
 
         # Overlay timer
         if self.overlay_timer > 0:
@@ -444,28 +450,22 @@ class WaveTank(Visual):
 
     def _draw_waves(self, d, pal):
         """Render bipolar wave amplitude."""
-        # Find max amplitude for normalization (avoid division by zero)
-        amp_max = max(float(np.max(np.abs(self.u))), 0.01)
-        scale = 1.0 / min(amp_max, 1.5)  # Normalize but cap so faint waves still show
-
         for y in range(N):
             for x in range(N):
                 if self.walls[y, x]:
                     continue
-                val = float(self.u[y, x]) * scale
+                val = float(self.u[y, x])
                 color = _bipolar_color(val, pal)
                 d.set_pixel(x, y, color)
 
     def _draw_energy(self, d, pal):
         """Render energy density (u^2), single-sided color ramp."""
         energy = self.u * self.u
-        e_max = max(float(np.max(energy)), 0.001)
-        scale = 1.0 / min(e_max, 2.0)
 
         for y in range(N):
             for x in range(N):
                 if self.walls[y, x]:
                     continue
-                val = float(energy[y, x]) * scale
+                val = float(energy[y, x])
                 color = _energy_color(val, pal)
                 d.set_pixel(x, y, color)

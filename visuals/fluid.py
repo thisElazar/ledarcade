@@ -305,7 +305,7 @@ class FluidTunnel(Visual):
     def reset(self):
         self.time = 0.0
         self.viz_mode = 0
-        self.viscosity = 0.0008
+        self.viscosity = 0.0002
         self.diffusion = 0.0001
         self.shape_idx = 0
         self.overlay_text = ""
@@ -320,6 +320,9 @@ class FluidTunnel(Visual):
         self.dens = _new_field()
         self.dens_prev = _new_field()
         self.obstacle = _make_obstacle(self.shape_idx)
+        # Start with uniform rightward flow so advection kicks in immediately
+        self.u[1:N+1, 1:N+1] = 3.0
+        self._apply_obstacle()
 
     def _viz_mode_name(self):
         if self.viz_mode < len(PALETTES):
@@ -332,7 +335,7 @@ class FluidTunnel(Visual):
 
     # Re = U * L / viscosity.  U = 3.0 (inflow), L = 8/N (circle diameter).
     _RE_UL = 3.0 * 8.0 / N
-    _VISC_MIN = 0.0003
+    _VISC_MIN = 0.00005
     _VISC_MAX = 0.002
 
     def _re_label(self):
