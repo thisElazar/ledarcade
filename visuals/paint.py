@@ -45,12 +45,17 @@ TOOL_PENCIL = 0
 TOOL_ERASER = 1
 TOOL_FILL = 2
 TOOL_EYEDROP = 3
-TOOL_SAVE = 4
-TOOL_LOAD = 5
-TOOL_CLEAR = 6
+TOOL_UNDO = 4
+TOOL_REDO = 5
+TOOL_SAVE = 6
+TOOL_LOAD = 7
+TOOL_CLEAR = 8
 
-TOOL_NAMES = ["PENCIL", "ERASER", "FILL", "EYEDROP", "SAVE", "LOAD", "CLEAR"]
-TOOL_INITIALS = ["P", "E", "F", "D", "S", "L", "C"]
+TOOL_NAMES = ["PENCIL", "ERASER", "FILL", "EYEDROP",
+              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR"]
+TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C"]
+
+UNDO_MAX = 32
 
 # Modes
 MODE_DRAW = 0
@@ -112,6 +117,11 @@ class Paint(Visual):
         # Load browser
         self.load_files = []
         self.load_idx = 0
+
+        # Undo/redo stacks
+        self.undo_stack = []
+        self.redo_stack = []
+        self.stroke_saved = False  # True once snapshot taken for current stroke
 
         # Overlay text feedback
         self.overlay_text = ""
@@ -178,6 +188,10 @@ class Paint(Visual):
         if btn_now:
             self.btn_hold_time += dt
             if self.btn_hold_time >= 0.15:
+                if not self.painting:
+                    # Stroke start — snapshot for undo
+                    if self.tool in (TOOL_PENCIL, TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP):
+                        self._snapshot()
                 self.painting = True
         else:
             if self.btn_was_held and self.btn_hold_time < 0.15:
@@ -245,6 +259,34 @@ class Paint(Visual):
             queue.append((x, y - 1))
             queue.append((x, y + 1))
 
+    def _snapshot(self):
+        """Save current canvas to undo stack, clear redo."""
+        snap = [row[:] for row in self.canvas]
+        self.undo_stack.append(snap)
+        if len(self.undo_stack) > UNDO_MAX:
+            self.undo_stack.pop(0)
+        self.redo_stack.clear()
+
+    def _do_undo(self):
+        if not self.undo_stack:
+            self.overlay_text = "NO UNDO"
+            self.overlay_timer = 1.5
+            return
+        self.redo_stack.append([row[:] for row in self.canvas])
+        if len(self.redo_stack) > UNDO_MAX:
+            self.redo_stack.pop(0)
+        self.canvas = self.undo_stack.pop()
+
+    def _do_redo(self):
+        if not self.redo_stack:
+            self.overlay_text = "NO REDO"
+            self.overlay_timer = 1.5
+            return
+        self.undo_stack.append([row[:] for row in self.canvas])
+        if len(self.undo_stack) > UNDO_MAX:
+            self.undo_stack.pop(0)
+        self.canvas = self.redo_stack.pop()
+
     def _update_menu(self, inp, dt):
         # Total rows: 3 palette rows + 7 tool rows = 10
         total_rows = PALETTE_ROWS + len(TOOL_NAMES)
@@ -271,15 +313,24 @@ class Paint(Visual):
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
             else:
-                # Tool/file selection
+                # Tool/action selection
                 tool_idx = self.menu_row - PALETTE_ROWS
-                if tool_idx == TOOL_SAVE:
+                if tool_idx == TOOL_UNDO:
+                    self._do_undo()
+                    self.mode = MODE_DRAW
+                    self.debounce = 0.12
+                elif tool_idx == TOOL_REDO:
+                    self._do_redo()
+                    self.mode = MODE_DRAW
+                    self.debounce = 0.12
+                elif tool_idx == TOOL_SAVE:
                     self._do_save()
                     self.mode = MODE_DRAW
                     self.debounce = 0.12
                 elif tool_idx == TOOL_LOAD:
                     self._enter_load_browser()
                 elif tool_idx == TOOL_CLEAR:
+                    self._snapshot()
                     self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
                     self.overlay_text = "CLEARED!"
                     self.overlay_timer = 1.5
@@ -349,6 +400,7 @@ class Paint(Visual):
         self.overlay_timer = 1.5
 
     def _do_load(self, filename):
+        self._snapshot()
         if not HAS_PIL:
             self.overlay_text = "NO PIL!"
             self.overlay_timer = 1.5
@@ -456,24 +508,18 @@ class Paint(Visual):
                 self.display.set_pixel(cx0, cy0 + i, (255, 255, 255))
                 self.display.set_pixel(cx0 + 7, cy0 + i, (255, 255, 255))
 
-        # Tool + file list below palette
+        # Tool + action list below palette
         list_y = PALETTE_ROWS * 8 + 2  # 26
         for i, name in enumerate(TOOL_NAMES):
             y = list_y + i * 7
-            is_selected = (self.menu_row == PALETTE_ROWS + i)
-            if is_selected:
-                # Active tool gets bright color + arrow
-                if i == self.tool:
-                    color = (255, 255, 0)
-                else:
-                    color = (255, 255, 255)
+            is_cursor = (self.menu_row == PALETTE_ROWS + i)
+            is_active_tool = (i <= TOOL_EYEDROP and i == self.tool)
+            if is_cursor:
+                color = (255, 255, 0) if is_active_tool else (255, 255, 255)
                 self.display.draw_text_small(2, y, ">", color)
                 self.display.draw_text_small(7, y, name, color)
             else:
-                if i == self.tool:
-                    color = (180, 180, 0)
-                else:
-                    color = (100, 100, 100)
+                color = (180, 180, 0) if is_active_tool else (100, 100, 100)
                 self.display.draw_text_small(7, y, name, color)
 
     def _draw_load_browser(self):
