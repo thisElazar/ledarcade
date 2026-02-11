@@ -944,11 +944,11 @@ class GalleryEffects(_Gallery3DBase):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Gallery 7: SALON — Paris Salon-style, all paintings, 5 high
+#  Gallery 7: SALON — connected gallery rooms, paintings 5 high
 # ══════════════════════════════════════════════════════════════════
 
 class GallerySalon(_Gallery3DBase):
-    """Paris Salon: every painting on the walls, stacked 5 panels high."""
+    """Paris Salon: 4 connected rooms, paintings stacked 5 panels high."""
 
     name = "SALON"
     description = "Wall-to-wall paintings"
@@ -959,14 +959,18 @@ class GallerySalon(_Gallery3DBase):
     def __init__(self, display):
         import random as _rng
 
-        # Room sized so perimeter fits all paintings:
-        #   2*(W-2) + 2*(H-4) = 116  →  W=36, H=28
-        W, H = 36, 28
+        # 4 rooms in a line, each 10 wide × 12 tall
+        # Doorways at rows 5-6 in dividing walls
+        # Painting slots: end rooms 30, middle rooms 28  →  30+28+28+30=116
+        RW, RH = 10, 12
+        N_ROOMS = 4
+        W = RW * N_ROOMS  # 40
+        H = RH             # 12
         self.MAP_W = W
         self.MAP_H = H
-        self.START_POS = (W / 2.0, H / 2.0)
+        self.START_POS = (RW / 2.0, H / 2.0)  # center of Room 1
 
-        # Collect available painting PIDs
+        # Collect painting PIDs
         proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         paint_dir = os.path.join(proj, "assets", "paintings")
         try:
@@ -977,7 +981,7 @@ class GallerySalon(_Gallery3DBase):
             pids = []
         _rng.shuffle(pids)
 
-        # Assign cell IDs and build MAP + PAINTINGS dict
+        # Build MAP + PAINTINGS dict
         _P = "paintings/"
         self.PAINTINGS = {}
         cell_id = 2
@@ -995,12 +999,42 @@ class GallerySalon(_Gallery3DBase):
             cell_id += 1
             return cid
 
-        grid = [[1] * W]                                          # row 0: border
-        grid.append([1] + [_next() for _ in range(W - 2)] + [1])  # row 1: north
-        for _ in range(H - 4):                                    # rows 2..H-3
-            grid.append([_next()] + [0] * (W - 2) + [_next()])
-        grid.append([1] + [_next() for _ in range(W - 2)] + [1])  # row H-2: south
-        grid.append([1] * W)                                      # row H-1: border
+        # Start with solid grid, carve rooms
+        grid = [[1] * W for _ in range(H)]
+
+        DOOR_ROWS = (5, 6)  # doorway position (center of 8-row interior)
+
+        for room in range(N_ROOMS):
+            x0 = room * RW
+            x1 = x0 + RW - 1
+
+            # Carve interior (rows 2..H-3, cols x0+1..x1-1)
+            for r in range(2, H - 2):
+                for c in range(x0 + 1, x1):
+                    grid[r][c] = 0
+
+            # North painting wall (row 1)
+            for c in range(x0 + 1, x1):
+                grid[1][c] = _next()
+
+            # South painting wall (row H-2)
+            for c in range(x0 + 1, x1):
+                grid[H - 2][c] = _next()
+
+            # West wall (col x0)
+            for r in range(2, H - 2):
+                if room > 0 and r in DOOR_ROWS:
+                    grid[r][x0] = 0       # doorway
+                else:
+                    grid[r][x0] = _next()
+
+            # East wall (col x1)
+            for r in range(2, H - 2):
+                if room < N_ROOMS - 1 and r in DOOR_ROWS:
+                    grid[r][x1] = 0       # doorway
+                else:
+                    grid[r][x1] = _next()
+
         self.MAP = grid
 
         # Stack map: 4 random paintings above each ground-level painting
@@ -1011,19 +1045,33 @@ class GallerySalon(_Gallery3DBase):
                     _rng.choice(paint_cells)
                     for _ in range(self._WALL_SCALE - 1)]
 
-        # Viewing waypoints along each wall, shuffled for random exploration
+        # Waypoints: sweep forward through rooms then back, with doorway
+        # transitions.  Within each room visit the 4 corners.
+        cy = H / 2.0
         wps = []
-        for x in range(4, W - 2, 4):
-            wps.append((float(x), 3.5))          # north wall
-        for x in range(4, W - 2, 4):
-            wps.append((float(x), H - 4.5))      # south wall
-        for y in range(5, H - 3, 4):
-            wps.append((2.5, float(y)))           # west wall
-        for y in range(5, H - 3, 4):
-            wps.append((W - 3.5, float(y)))       # east wall
-        _rng.shuffle(wps)
-        self.WAYPOINTS = wps
 
+        # Forward sweep: rooms 0 → 1 → 2 → 3
+        for room in range(N_ROOMS):
+            x0 = room * RW
+            corners = [
+                (x0 + 2.5, 3.5),            # NW — see N + W walls
+                (x0 + RW - 3.5, 3.5),       # NE — see N + E walls
+                (x0 + RW - 3.5, H - 4.5),   # SE — see S + E walls
+                (x0 + 2.5, H - 4.5),        # SW — see S + W walls
+            ]
+            _rng.shuffle(corners)
+            wps.extend(corners)
+            if room < N_ROOMS - 1:
+                wps.append((x0 + RW - 0.5, 5.5))   # doorway exit
+
+        # Return sweep: rooms 3 → 2 → 1 → 0  (room centers only)
+        for room in range(N_ROOMS - 1, -1, -1):
+            x0 = room * RW
+            wps.append((x0 + RW / 2.0, cy))
+            if room > 0:
+                wps.append((x0 + 0.5, 5.5))         # doorway exit
+
+        self.WAYPOINTS = wps
         super().__init__(display)
 
     def _load_textures(self):
@@ -1034,25 +1082,27 @@ class GallerySalon(_Gallery3DBase):
     def reset(self):
         super().reset()
         self.move_speed = 2.0
-        import random
-        random.shuffle(self.WAYPOINTS)
 
-    # -- Warm Salon ceiling / floor --
+    # -- Emissive ceiling + white marble floor --
 
     def _render_frame(self):
         half = GRID_SIZE // 2
-        ceil = (50, 45, 35)
-        floor = (55, 40, 30)
+        # Bright emissive ceiling (gallery lighting)
+        ceil = (220, 215, 200)
         for y in range(half):
             for x in range(GRID_SIZE):
                 self.display.set_pixel(x, y, ceil)
+        # White marble floor with perspective gradient
         for y in range(half, GRID_SIZE):
+            f = (y - half) / (GRID_SIZE - half)   # 0 at horizon, 1 at viewer
+            v = int(160 + 60 * f)                  # 160 (far) → 220 (near)
+            marble = (v, v, v - 5)
             for x in range(GRID_SIZE):
-                self.display.set_pixel(x, y, floor)
+                self.display.set_pixel(x, y, marble)
         for col in range(GRID_SIZE):
             self._cast_ray(col, self.pa + self.ray_offsets[col])
 
-    # -- Raycaster with 5-panel stacking --
+    # -- Raycaster with 5-panel stacking + bright gallery lighting --
 
     def _cast_ray(self, col, angle):
         cos_a = math.cos(angle)
@@ -1083,7 +1133,7 @@ class GallerySalon(_Gallery3DBase):
 
         hit = False
         side = 0
-        for _ in range(72):
+        for _ in range(48):
             if side_dist_x < side_dist_y:
                 side_dist_x += delta_x
                 map_x += step_x
@@ -1120,9 +1170,10 @@ class GallerySalon(_Gallery3DBase):
         if tex_col >= GRID_SIZE:
             tex_col = GRID_SIZE - 1
 
-        fog = min(1.0, 2.0 / (perp_dist + 0.5))
+        # Well-lit gallery: much brighter than base class fog
+        fog = min(1.0, 5.0 / (perp_dist + 1.0))
         if side == 1:
-            fog *= 0.75
+            fog *= 0.85
 
         # --- 5-panel stacked wall ---
         scale = self._WALL_SCALE
@@ -1163,7 +1214,7 @@ class GallerySalon(_Gallery3DBase):
                         or tex_y <= 1 or tex_y >= GRID_SIZE - 2):
                     r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
             else:
-                r, g, b = 90, 80, 65         # warm plaster
+                r, g, b = 210, 205, 195      # bright warm plaster
 
             r = int(r * fog)
             g = int(g * fog)
