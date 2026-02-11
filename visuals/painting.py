@@ -208,24 +208,26 @@ class _PaintingBase(Visual):
                     idx = (idx - 1) % len(self._all_pids)
                 self._current_pid = self._all_pids[idx]
                 self._load()
-            # Show overlay on any joystick input
-            self._show_overlay = True
-            self._overlay_time = 0.0
+                self._overlay_time = 0.0
+            else:
+                self._toggle_overlay()
             return True
         if input_state.left or input_state.right:
             return True  # consume held state so menu doesn't see it
-        # Up/Down: also show overlay
+        # Up/Down: toggle overlay
         if input_state.up_pressed or input_state.down_pressed:
-            self._show_overlay = True
-            self._overlay_time = 0.0
+            self._toggle_overlay()
             return True
-        # Action: toggle info overlay on/off
+        # Action: toggle overlay
         if input_state.action_l or input_state.action_r:
-            self._show_overlay = not self._show_overlay
-            if self._show_overlay:
-                self._overlay_time = 0.0
+            self._toggle_overlay()
             return True
         return False
+
+    def _toggle_overlay(self):
+        self._show_overlay = not self._show_overlay
+        if self._show_overlay:
+            self._overlay_time = 0.0
 
     def update(self, dt):
         self.time += dt
@@ -240,18 +242,26 @@ class _PaintingBase(Visual):
             self._overlay_time += dt
 
     def _scroll_text(self, y, text, color):
-        """Draw text with auto-scroll for long strings."""
+        """Draw text with bounce-scroll for long strings."""
         text_w = len(text) * _CHAR_W
         if text_w <= _VISIBLE_W:
-            # Fits — draw static
             self.display.draw_text_small(2, y, text, color)
+            return
+        # Bounce scroll: pause → scroll right → pause → scroll back → repeat
+        max_offset = text_w - _VISIBLE_W
+        scroll_time = max_offset / _SCROLL_SPEED  # time to scroll one direction
+        cycle = _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE + scroll_time
+        t = self._overlay_time % cycle
+        if t < _SCROLL_PAUSE:
+            offset = 0
+        elif t < _SCROLL_PAUSE + scroll_time:
+            offset = int((t - _SCROLL_PAUSE) * _SCROLL_SPEED)
+        elif t < _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE:
+            offset = max_offset
         else:
-            # Scroll: pause, then slide left to reveal full text
-            scroll_elapsed = max(0.0, self._overlay_time - _SCROLL_PAUSE)
-            offset = int(scroll_elapsed * _SCROLL_SPEED)
-            max_offset = text_w - _VISIBLE_W + 8
-            offset = min(offset, max_offset)
-            self.display.draw_text_small(2 - offset, y, text, color)
+            offset = max_offset - int((t - 2 * _SCROLL_PAUSE - scroll_time) * _SCROLL_SPEED)
+        offset = max(0, min(int(max_offset), offset))
+        self.display.draw_text_small(2 - offset, y, text, color)
 
     def draw(self):
         if not self.pixels:
