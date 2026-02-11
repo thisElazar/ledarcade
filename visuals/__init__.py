@@ -158,6 +158,7 @@ from .controls import Controls
 from .inputtest import InputTest
 from .shutdown import Shutdown
 from .refresh import Refresh
+from .paint import Paint
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
 from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
@@ -385,6 +386,7 @@ ALL_VISUALS = [
     InputTest,
     Shutdown,
     Refresh,
+    Paint,
     NewtonCradle,
     DblPendulum,
     OrbitsSolar,
