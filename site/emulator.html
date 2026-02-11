@@ -376,7 +376,6 @@
         <li><span class="cat">SPRITES</span> &mdash; GIF/PNG sprite animations</li>
         <li><span class="cat">SUPERHEROES</span> &mdash; GIF sprite animations</li>
         <li><span class="cat">GALLERY</span> &mdash; 3D galleries with image assets</li>
-<li><span class="cat">ART</span>: Great Wave, Scream &mdash; PNG images</li>
         <li><span class="cat">SCIENCE</span>: Earth &mdash; globe texture</li>
         <li><span class="cat">UTILITY</span>: Info, Update &mdash; system access</li>
       </ul>
@@ -431,6 +430,7 @@
   let emuState = 'init';
   let hasFocus = false;
   const loadedModules = new Set();
+  let paintingAtlasLoaded = false;
 
   function setStatus(text, cls) {
     pyStatusEl.textContent = text;
@@ -1075,6 +1075,21 @@ class EmulatorMenu:
 _menu = EmulatorMenu(_catalog)
   `);
 
+  async function loadPaintingAtlas() {
+    if (paintingAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/paintings_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_PAINTING_PIXELS', pyDict);
+      pyDict.destroy();
+      paintingAtlasLoaded = true;
+    } catch(e) {
+      console.error('Painting atlas error:', e);
+    }
+  }
+
   async function loadPythonModule(modulePath) {
     if (loadedModules.has(modulePath)) return true;
     try {
@@ -1101,6 +1116,11 @@ _menu = EmulatorMenu(_catalog)
       // Load numpy on demand if the source imports it
       if (/^import numpy|^from numpy /m.test(source)) {
         await pyodide.loadPackage('numpy');
+      }
+
+      // Load painting atlas before painting module
+      if (modulePath === 'visuals/painting.py') {
+        await loadPaintingAtlas();
       }
 
       pyodide.runPython(source);

@@ -10,7 +10,8 @@ Usage:
     python tools/build_paintings.py --meta         # Print Python dict
     python tools/build_paintings.py --preview      # Contact sheet
     python tools/build_paintings.py --search "van gogh starry"
-    python tools/build_paintings.py --clean        # Clear download cache
+    python tools/build_paintings.py --atlas         # Build web emulator atlas
+    python tools/build_paintings.py --clean         # Clear download cache
 """
 
 import json, os, sys, time
@@ -261,6 +262,35 @@ def cmd_search(query):
     print(f"\nCopy the filename into paintings.json as the \"file\" value.")
 
 
+def cmd_atlas():
+    """Generate paintings atlas JSON for the web emulator.
+
+    Packs all built 64x64 painting PNGs into a single JSON file
+    with base64-encoded raw RGB data per painting.
+    """
+    import base64
+    manifest = json.loads(MANIFEST.read_text())
+    atlas = {}
+    for pid in manifest:
+        png_path = OUT_DIR / f"{pid}.png"
+        if not png_path.exists():
+            continue
+        img = Image.open(png_path).convert("RGB")
+        if img.size != (SIZE, SIZE):
+            img = img.resize((SIZE, SIZE), Image.NEAREST)
+        raw = bytearray()
+        for y in range(SIZE):
+            for x in range(SIZE):
+                r, g, b = img.getpixel((x, y))
+                raw.extend([r, g, b])
+        atlas[pid] = base64.b64encode(bytes(raw)).decode('ascii')
+
+    out_path = ROOT / "site" / "paintings_atlas.json"
+    with open(out_path, 'w') as f:
+        json.dump(atlas, f)
+    print(f"Atlas: {out_path} ({len(atlas)} paintings, {out_path.stat().st_size:,} bytes)")
+
+
 def cmd_clean():
     import shutil
     if CACHE.exists():
@@ -282,6 +312,8 @@ def main():
         cmd_preview()
     elif args[0] == "--search" and len(args) > 1:
         cmd_search(" ".join(args[1:]))
+    elif args[0] == "--atlas":
+        cmd_atlas()
     elif args[0] == "--clean":
         cmd_clean()
     else:

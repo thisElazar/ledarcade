@@ -233,6 +233,58 @@ def scan_file(filepath, pkg, exported_classes=None):
     return classes, deps, needs_numpy
 
 
+def scan_painting_entries():
+    """Generate catalog entries for dynamically-created painting visuals.
+
+    painting.py creates classes at runtime via type(), which the AST scanner
+    can't see. This reads PAINTING_META and generates entries for each painting
+    that has a built PNG asset.
+    """
+    painting_path = os.path.join(ROOT, 'visuals', 'painting.py')
+    paintings_dir = os.path.join(ROOT, 'assets', 'paintings')
+    if not os.path.isfile(painting_path):
+        return []
+
+    with open(painting_path) as f:
+        source = f.read()
+
+    # Extract PAINTING_META dict literal from source
+    start = source.find('PAINTING_META = {')
+    if start < 0:
+        return []
+    start = source.index('{', start)
+    depth = 0
+    end = start
+    for i in range(start, len(source)):
+        if source[i] == '{':
+            depth += 1
+        elif source[i] == '}':
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    else:
+        return []
+
+    try:
+        meta = ast.literal_eval(source[start:end])
+    except (ValueError, SyntaxError):
+        return []
+
+    entries = []
+    for pid, (title, artist, year) in meta.items():
+        if not os.path.isfile(os.path.join(paintings_dir, f'{pid}.png')):
+            continue
+        cls_name = 'Painting' + ''.join(w.capitalize() for w in pid.split('_'))
+        entries.append({
+            'name': title.upper(),
+            'cls': cls_name,
+            'module': 'visuals/painting.py',
+            'is_game': False,
+        })
+    return entries
+
+
 def resolve_transitive_deps(file_deps):
     """Expand deps transitively: if A needs B and B needs C, A needs [B, C]."""
     resolved = {}
@@ -406,6 +458,10 @@ def main():
                     'is_game': is_game,
                 }
                 items_by_cat.setdefault(cat_key, []).append(entry)
+
+    # Add dynamically-generated painting visual entries
+    for entry in scan_painting_entries():
+        items_by_cat.setdefault('art', []).append(entry)
 
     # Resolve transitive deps and attach to items
     all_deps = resolve_transitive_deps(file_deps)

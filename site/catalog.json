@@ -972,33 +972,699 @@
       "key": "art",
       "items": [
         {
-          "name": "GREATWAVE",
-          "cls": "GreatWave",
-          "module": "visuals/greatwave.py",
+          "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+          "cls": "PaintingBarFoliesBergere",
+          "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "MONDRIAN",
-          "cls": "Mondrian",
-          "module": "visuals/mondrian.py",
+          "name": "A GIRL WITH A WATERING CAN",
+          "cls": "PaintingGirlWateringCan",
+          "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "SCREAM",
-          "cls": "Scream",
-          "module": "visuals/scream.py",
+          "name": "A SUNDAY ON LA GRANDE JATTE",
+          "cls": "PaintingSundayGrandeJatte",
+          "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "STARRYNIGHT",
-          "cls": "StarryNight",
-          "module": "visuals/starrynight.py",
+          "name": "ALMOND BLOSSOMS",
+          "cls": "PaintingAlmondBlossoms",
+          "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "WATERLILIES",
-          "cls": "WaterLilies",
-          "module": "visuals/waterlilies.py",
+          "name": "AMERICAN GOTHIC",
+          "cls": "PaintingAmericanGothic",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BACCHUS",
+          "cls": "PaintingCaravaggioBacchus",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BALLET REHEARSAL ON STAGE",
+          "cls": "PaintingDegasBallet",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BATHERS AT ASNI\u00c8RES",
+          "cls": "PaintingBathersAsnieres",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BERLIN STREET SCENE",
+          "cls": "PaintingBerlinStreet",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BLACK SQUARE",
+          "cls": "PaintingBlackSquare",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BLUE HORSE I",
+          "cls": "PaintingBlueHorse",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BOULEVARD MONTMARTRE",
+          "cls": "PaintingPissarroBoulevard",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BROADWAY BOOGIE WOOGIE",
+          "cls": "PaintingBroadwayBoogie",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BULLFINCH AND WEEPING CHERRY",
+          "cls": "PaintingHokusaiBullfinch",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "CAF\u00c9 TERRACE AT NIGHT",
+          "cls": "PaintingCafeTerrace",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "COMPOSITION VIII",
+          "cls": "PaintingCompositionViii",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "DANCE AT LE MOULIN DE LA GALETTE",
+          "cls": "PaintingDanceMoulin",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "FINE WIND, CLEAR MORNING",
+          "cls": "PaintingRedFuji",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "GIRL READING A LETTER BY WINDOW",
+          "cls": "PaintingGirlReadingLetter",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "GIRL WITH A PEARL EARRING",
+          "cls": "PaintingGirlPearlEarring",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "HAYSTACKS (END OF SUMMER)",
+          "cls": "PaintingHaystacks",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "HUNTERS IN THE SNOW",
+          "cls": "PaintingHuntersSnow",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "HYLAS AND THE NYMPHS",
+          "cls": "PaintingHylasNymphs",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "IMPRESSION, SUNRISE",
+          "cls": "PaintingImpressionSunrise",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "IRISES",
+          "cls": "PaintingIrises",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "JEANNE H\u00c9BUTERNE",
+          "cls": "PaintingModiglianiPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "JOB (CIGARETTES)",
+          "cls": "PaintingMuchaJob",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "JUDITH BEHEADING HOLOFERNES",
+          "cls": "PaintingCaravaggioJudith",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "JUDITH SLAYING HOLOFERNES",
+          "cls": "PaintingArtemisiaJudith",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "LAS MENINAS",
+          "cls": "PaintingLasMeninas",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "LIBERTY LEADING THE PEOPLE",
+          "cls": "PaintingLibertyLeading",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "LUNCHEON OF THE BOATING PARTY",
+          "cls": "PaintingLuncheonBoating",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MADAME X",
+          "cls": "PaintingMadameX",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MADONNA",
+          "cls": "PaintingMunchMadonna",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MEDUSA",
+          "cls": "PaintingCaravaggioMedusa",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MONA LISA",
+          "cls": "PaintingMonaLisa",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MONT SAINTE-VICTOIRE",
+          "cls": "PaintingMontSainteVictoire",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MOULIN ROUGE: LA GOULUE",
+          "cls": "PaintingMoulinRouge",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "NAPOLEON CROSSING THE ALPS",
+          "cls": "PaintingNapoleonAlps",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "NIAGARA",
+          "cls": "PaintingNiagara",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "NIGHTHAWKS",
+          "cls": "PaintingNighthawks",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "NYMPHS AND SATYR",
+          "cls": "PaintingNymphsSatyr",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "OLYMPIA",
+          "cls": "PaintingOlympia",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "OPHELIA",
+          "cls": "PaintingOphelia",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PARIS STREET; RAINY DAY",
+          "cls": "PaintingCaillebotteRainy",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PLUM PARK IN KAMEIDO",
+          "cls": "PaintingHiroshigePlum",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "POPPY FIELD",
+          "cls": "PaintingPoppies",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PORTRAIT OF ADELE BLOCH-BAUER I",
+          "cls": "PaintingKlimtAdele",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PRIMAVERA",
+          "cls": "PaintingPrimavera",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "RAIN, STEAM AND SPEED",
+          "cls": "PaintingRainSteamSpeed",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "REPLY OF THE ZAPOROZHIAN COSSACKS",
+          "cls": "PaintingCossacks",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "ROUEN CATHEDRAL (SUNSET)",
+          "cls": "PaintingRouenCathedral",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SATURN DEVOURING HIS SON",
+          "cls": "PaintingSaturnDevouring",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SELF-PORTRAIT",
+          "cls": "PaintingRembrandtSelfPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SELF-PORTRAIT",
+          "cls": "PaintingVangoghSelfPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SELF-PORTRAIT AT TWENTY-EIGHT",
+          "cls": "PaintingDurerSelfPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SELF-PORTRAIT WITH PHYSALIS",
+          "cls": "PaintingSchieleSelfPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SEVERAL CIRCLES",
+          "cls": "PaintingSeveralCircles",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SIMULTANEOUS WINDOWS",
+          "cls": "PaintingDelaunayWindows",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SISTINE MADONNA",
+          "cls": "PaintingSistineMadonna",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "STROLLING ALONG THE SEASHORE",
+          "cls": "PaintingSorollaSeashore",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SUDDEN SHOWER OVER SHIN-OHASHI",
+          "cls": "PaintingHiroshigeRain",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SUMMER",
+          "cls": "PaintingArcimboldoSummer",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "SUNFLOWERS",
+          "cls": "PaintingSunflowers",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE ARNOLFINI PORTRAIT",
+          "cls": "PaintingArnolfiniPortrait",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE ART OF PAINTING",
+          "cls": "PaintingArtOfPainting",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE ASTRONOMER",
+          "cls": "PaintingVermeerAstronomer",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE BEDROOM",
+          "cls": "PaintingTheBedroom",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE BIRTH OF VENUS",
+          "cls": "PaintingBirthOfVenus",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CALLING OF SAINT MATTHEW",
+          "cls": "PaintingCallingStMatthew",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CARD PLAYERS",
+          "cls": "PaintingCardPlayers",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CHILD'S BATH",
+          "cls": "PaintingCassattBath",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CRADLE",
+          "cls": "PaintingMorisotCradle",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CREATION OF ADAM",
+          "cls": "PaintingCreationOfAdam",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE DANCE",
+          "cls": "PaintingTheDanceMatisse",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE DEATH OF MARAT",
+          "cls": "PaintingDeathOfMarat",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE DEATH OF SARDANAPALUS",
+          "cls": "PaintingDeathSardanapalus",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE DERBY AT EPSOM",
+          "cls": "PaintingEpsomDerby",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE DREAM",
+          "cls": "PaintingTheDreamRousseau",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE FIGHTING TEMERAIRE",
+          "cls": "PaintingFightingTemeraire",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE FOG WARNING",
+          "cls": "PaintingFogWarning",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE GARDEN OF EARTHLY DELIGHTS",
+          "cls": "PaintingGardenEarthlyDelights",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE GREAT WAVE OFF KANAGAWA",
+          "cls": "PaintingGreatWave",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE GULF STREAM",
+          "cls": "PaintingGulfStream",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE HAY WAIN",
+          "cls": "PaintingHayWain",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE KISS",
+          "cls": "PaintingTheKissKlimt",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE LADY OF SHALOTT",
+          "cls": "PaintingLadyOfShalott",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE LAST JUDGMENT",
+          "cls": "PaintingLastJudgmentBosch",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE LAST SUPPER",
+          "cls": "PaintingLastSupper",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE MILKMAID",
+          "cls": "PaintingTheMilkmaid",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE NIGHT WATCH",
+          "cls": "PaintingNightWatch",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE NINTH WAVE",
+          "cls": "PaintingNinthWave",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE OXBOW",
+          "cls": "PaintingTheOxbow",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE POTATO EATERS",
+          "cls": "PaintingPotatoEaters",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE RAFT OF THE MEDUSA",
+          "cls": "PaintingRaftOfMedusa",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE ROSES OF HELIOGABALUS",
+          "cls": "PaintingRosesHeliogabalus",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE SCHOOL OF ATHENS",
+          "cls": "PaintingSchoolOfAthens",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE SCREAM",
+          "cls": "PaintingTheScream",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE SLEEPING GYPSY",
+          "cls": "PaintingSleepingGypsy",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE STARRY NIGHT",
+          "cls": "PaintingStarryNight",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE SWING",
+          "cls": "PaintingTheSwing",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE TOWER OF BABEL",
+          "cls": "PaintingTowerOfBabel",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE TREE OF LIFE",
+          "cls": "PaintingKlimtTreeOfLife",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "VENUS OF URBINO",
+          "cls": "PaintingVenusUrbino",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "VIEW OF DELFT",
+          "cls": "PaintingViewOfDelft",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "VIEW OF TOLEDO",
+          "cls": "PaintingViewOfToledo",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "VISION AFTER THE SERMON",
+          "cls": "PaintingVisionSermon",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "VITRUVIAN MAN",
+          "cls": "PaintingVitruvianMan",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WANDERER ABOVE THE SEA OF FOG",
+          "cls": "PaintingWandererFog",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WATER LILIES",
+          "cls": "PaintingWaterLilies",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WATER LILIES AND JAPANESE BRIDGE",
+          "cls": "PaintingJapaneseBridge",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WHEAT FIELD WITH CYPRESSES",
+          "cls": "PaintingWheatfieldCypresses",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WHERE DO WE COME FROM?",
+          "cls": "PaintingWhereDoWeComeFrom",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WHISTLER'S MOTHER",
+          "cls": "PaintingWhistlersMother",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WHITE ON WHITE",
+          "cls": "PaintingWhiteOnWhite",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "WOMAN WITH A PARASOL",
+          "cls": "PaintingWomanParasol",
+          "module": "visuals/painting.py",
           "is_game": false
         }
       ]
@@ -1022,6 +1688,12 @@
           "name": "BOIDS",
           "cls": "Boids",
           "module": "visuals/boids.py",
+          "is_game": false
+        },
+        {
+          "name": "BOIDS LAB",
+          "cls": "BoidsLab",
+          "module": "visuals/boidslab.py",
           "is_game": false
         },
         {
@@ -1110,9 +1782,21 @@
           "is_game": false
         },
         {
+          "name": "MITOSIS LAB",
+          "cls": "MitosisLab",
+          "module": "visuals/mitosislab.py",
+          "is_game": false
+        },
+        {
           "name": "QUARKS",
           "cls": "Quarks",
           "module": "visuals/quarks.py",
+          "is_game": false
+        },
+        {
+          "name": "QUARKS LAB",
+          "cls": "QuarksLab",
+          "module": "visuals/quarkslab.py",
           "is_game": false
         },
         {
@@ -1137,6 +1821,12 @@
           "name": "SLIME",
           "cls": "Slime",
           "module": "visuals/slime.py",
+          "is_game": false
+        },
+        {
+          "name": "SLIME LAB",
+          "cls": "SlimeLab",
+          "module": "visuals/slimelab.py",
           "is_game": false
         },
         {
@@ -1177,6 +1867,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -2182,6 +2873,9 @@
           "cls": "GalleryAdventureTime",
           "module": "visuals/gallery3d.py",
           "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
           "needs_numpy": true
         },
         {
@@ -2189,6 +2883,9 @@
           "cls": "GalleryKidIcarus",
           "module": "visuals/gallery3d.py",
           "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
           "needs_numpy": true
         },
         {
@@ -2196,6 +2893,19 @@
           "cls": "GalleryKirby",
           "module": "visuals/gallery3d.py",
           "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
+          "needs_numpy": true
+        },
+        {
+          "name": "SALON",
+          "cls": "GallerySalon",
+          "module": "visuals/gallery3d.py",
+          "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
           "needs_numpy": true
         },
         {
@@ -2203,6 +2913,9 @@
           "cls": "GallerySMB3",
           "module": "visuals/gallery3d.py",
           "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
           "needs_numpy": true
         },
         {
@@ -2210,6 +2923,9 @@
           "cls": "GalleryZelda",
           "module": "visuals/gallery3d.py",
           "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ],
           "needs_numpy": true
         }
       ]
@@ -3592,6 +4308,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -4017,6 +4734,7 @@
               "cls": "Demos",
               "module": "visuals/slideshow.py",
               "deps": [
+                "visuals/painting.py",
                 "visuals/pacmandemo.py",
                 "visuals/tetrisdemo.py",
                 "visuals/snakedemo.py",
@@ -4424,6 +5142,11 @@
               "module": "visuals/boids.py"
             },
             {
+              "name": "BOIDS LAB",
+              "cls": "BoidsLab",
+              "module": "visuals/boidslab.py"
+            },
+            {
               "name": "CYCLIC LAB",
               "cls": "CyclicLab",
               "module": "visuals/cycliclab.py"
@@ -4491,9 +5214,19 @@
               "module": "visuals/mitosis.py"
             },
             {
+              "name": "MITOSIS LAB",
+              "cls": "MitosisLab",
+              "module": "visuals/mitosislab.py"
+            },
+            {
               "name": "QUARKS",
               "cls": "Quarks",
               "module": "visuals/quarks.py"
+            },
+            {
+              "name": "QUARKS LAB",
+              "cls": "QuarksLab",
+              "module": "visuals/quarkslab.py"
             },
             {
               "name": "RUG",
@@ -4514,6 +5247,11 @@
               "name": "SLIME",
               "cls": "Slime",
               "module": "visuals/slime.py"
+            },
+            {
+              "name": "SLIME LAB",
+              "cls": "SlimeLab",
+              "module": "visuals/slimelab.py"
             },
             {
               "name": "STARWARS",
@@ -4785,59 +5523,58 @@
               "module": "visuals/turntable.py"
             },
             {
+              "name": "SALON",
+              "cls": "GallerySalon",
+              "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
+              "needs_numpy": true
+            },
+            {
               "name": "SMB3 MUSEUM",
               "cls": "GallerySMB3",
               "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
               "needs_numpy": true
             },
             {
               "name": "KIRBY MUSEUM",
               "cls": "GalleryKirby",
               "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
               "needs_numpy": true
             },
             {
               "name": "ZELDA MUSEUM",
               "cls": "GalleryZelda",
               "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
               "needs_numpy": true
             },
             {
               "name": "ICARUS MUSEUM",
               "cls": "GalleryKidIcarus",
               "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
               "needs_numpy": true
             },
             {
               "name": "ADVENTURE TIME",
               "cls": "GalleryAdventureTime",
               "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ],
               "needs_numpy": true
-            },
-            {
-              "name": "GREATWAVE",
-              "cls": "GreatWave",
-              "module": "visuals/greatwave.py"
-            },
-            {
-              "name": "MONDRIAN",
-              "cls": "Mondrian",
-              "module": "visuals/mondrian.py"
-            },
-            {
-              "name": "SCREAM",
-              "cls": "Scream",
-              "module": "visuals/scream.py"
-            },
-            {
-              "name": "STARRYNIGHT",
-              "cls": "StarryNight",
-              "module": "visuals/starrynight.py"
-            },
-            {
-              "name": "WATERLILIES",
-              "cls": "WaterLilies",
-              "module": "visuals/waterlilies.py"
             },
             {
               "name": "KIRBY",
@@ -5488,6 +6225,586 @@
               "deps": [
                 "visuals/gifcache.py"
               ]
+            },
+            {
+              "name": "MONA LISA",
+              "cls": "PaintingMonaLisa",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE LAST SUPPER",
+              "cls": "PaintingLastSupper",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "VITRUVIAN MAN",
+              "cls": "PaintingVitruvianMan",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE BIRTH OF VENUS",
+              "cls": "PaintingBirthOfVenus",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PRIMAVERA",
+              "cls": "PaintingPrimavera",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CREATION OF ADAM",
+              "cls": "PaintingCreationOfAdam",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SISTINE MADONNA",
+              "cls": "PaintingSistineMadonna",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE SCHOOL OF ATHENS",
+              "cls": "PaintingSchoolOfAthens",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE GARDEN OF EARTHLY DELIGHTS",
+              "cls": "PaintingGardenEarthlyDelights",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE LAST JUDGMENT",
+              "cls": "PaintingLastJudgmentBosch",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE TOWER OF BABEL",
+              "cls": "PaintingTowerOfBabel",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "HUNTERS IN THE SNOW",
+              "cls": "PaintingHuntersSnow",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SUMMER",
+              "cls": "PaintingArcimboldoSummer",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SELF-PORTRAIT AT TWENTY-EIGHT",
+              "cls": "PaintingDurerSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE ARNOLFINI PORTRAIT",
+              "cls": "PaintingArnolfiniPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "VENUS OF URBINO",
+              "cls": "PaintingVenusUrbino",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BACCHUS",
+              "cls": "PaintingCaravaggioBacchus",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "JUDITH BEHEADING HOLOFERNES",
+              "cls": "PaintingCaravaggioJudith",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CALLING OF SAINT MATTHEW",
+              "cls": "PaintingCallingStMatthew",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MEDUSA",
+              "cls": "PaintingCaravaggioMedusa",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "JUDITH SLAYING HOLOFERNES",
+              "cls": "PaintingArtemisiaJudith",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "GIRL WITH A PEARL EARRING",
+              "cls": "PaintingGirlPearlEarring",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE MILKMAID",
+              "cls": "PaintingTheMilkmaid",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE ART OF PAINTING",
+              "cls": "PaintingArtOfPainting",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "GIRL READING A LETTER BY WINDOW",
+              "cls": "PaintingGirlReadingLetter",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE ASTRONOMER",
+              "cls": "PaintingVermeerAstronomer",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "VIEW OF DELFT",
+              "cls": "PaintingViewOfDelft",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE NIGHT WATCH",
+              "cls": "PaintingNightWatch",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SELF-PORTRAIT",
+              "cls": "PaintingRembrandtSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "LAS MENINAS",
+              "cls": "PaintingLasMeninas",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE SWING",
+              "cls": "PaintingTheSwing",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SATURN DEVOURING HIS SON",
+              "cls": "PaintingSaturnDevouring",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE DEATH OF MARAT",
+              "cls": "PaintingDeathOfMarat",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NAPOLEON CROSSING THE ALPS",
+              "cls": "PaintingNapoleonAlps",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WANDERER ABOVE THE SEA OF FOG",
+              "cls": "PaintingWandererFog",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "LIBERTY LEADING THE PEOPLE",
+              "cls": "PaintingLibertyLeading",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE DEATH OF SARDANAPALUS",
+              "cls": "PaintingDeathSardanapalus",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE RAFT OF THE MEDUSA",
+              "cls": "PaintingRaftOfMedusa",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE DERBY AT EPSOM",
+              "cls": "PaintingEpsomDerby",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE FIGHTING TEMERAIRE",
+              "cls": "PaintingFightingTemeraire",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "RAIN, STEAM AND SPEED",
+              "cls": "PaintingRainSteamSpeed",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE HAY WAIN",
+              "cls": "PaintingHayWain",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE OXBOW",
+              "cls": "PaintingTheOxbow",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NIAGARA",
+              "cls": "PaintingNiagara",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE NINTH WAVE",
+              "cls": "PaintingNinthWave",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE GREAT WAVE OFF KANAGAWA",
+              "cls": "PaintingGreatWave",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "FINE WIND, CLEAR MORNING",
+              "cls": "PaintingRedFuji",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BULLFINCH AND WEEPING CHERRY",
+              "cls": "PaintingHokusaiBullfinch",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SUDDEN SHOWER OVER SHIN-OHASHI",
+              "cls": "PaintingHiroshigeRain",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PLUM PARK IN KAMEIDO",
+              "cls": "PaintingHiroshigePlum",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "OPHELIA",
+              "cls": "PaintingOphelia",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE LADY OF SHALOTT",
+              "cls": "PaintingLadyOfShalott",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "HYLAS AND THE NYMPHS",
+              "cls": "PaintingHylasNymphs",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NYMPHS AND SATYR",
+              "cls": "PaintingNymphsSatyr",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE ROSES OF HELIOGABALUS",
+              "cls": "PaintingRosesHeliogabalus",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WHISTLER'S MOTHER",
+              "cls": "PaintingWhistlersMother",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "OLYMPIA",
+              "cls": "PaintingOlympia",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+              "cls": "PaintingBarFoliesBergere",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "IMPRESSION, SUNRISE",
+              "cls": "PaintingImpressionSunrise",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WATER LILIES",
+              "cls": "PaintingWaterLilies",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "ROUEN CATHEDRAL (SUNSET)",
+              "cls": "PaintingRouenCathedral",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "POPPY FIELD",
+              "cls": "PaintingPoppies",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WATER LILIES AND JAPANESE BRIDGE",
+              "cls": "PaintingJapaneseBridge",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WOMAN WITH A PARASOL",
+              "cls": "PaintingWomanParasol",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "HAYSTACKS (END OF SUMMER)",
+              "cls": "PaintingHaystacks",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "DANCE AT LE MOULIN DE LA GALETTE",
+              "cls": "PaintingDanceMoulin",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "LUNCHEON OF THE BOATING PARTY",
+              "cls": "PaintingLuncheonBoating",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "A GIRL WITH A WATERING CAN",
+              "cls": "PaintingGirlWateringCan",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BALLET REHEARSAL ON STAGE",
+              "cls": "PaintingDegasBallet",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PARIS STREET; RAINY DAY",
+              "cls": "PaintingCaillebotteRainy",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CRADLE",
+              "cls": "PaintingMorisotCradle",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CHILD'S BATH",
+              "cls": "PaintingCassattBath",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BOULEVARD MONTMARTRE",
+              "cls": "PaintingPissarroBoulevard",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "A SUNDAY ON LA GRANDE JATTE",
+              "cls": "PaintingSundayGrandeJatte",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BATHERS AT ASNI\u00c8RES",
+              "cls": "PaintingBathersAsnieres",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "STROLLING ALONG THE SEASHORE",
+              "cls": "PaintingSorollaSeashore",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MADAME X",
+              "cls": "PaintingMadameX",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE GULF STREAM",
+              "cls": "PaintingGulfStream",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE FOG WARNING",
+              "cls": "PaintingFogWarning",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NIGHTHAWKS",
+              "cls": "PaintingNighthawks",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "AMERICAN GOTHIC",
+              "cls": "PaintingAmericanGothic",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE STARRY NIGHT",
+              "cls": "PaintingStarryNight",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "CAF\u00c9 TERRACE AT NIGHT",
+              "cls": "PaintingCafeTerrace",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE BEDROOM",
+              "cls": "PaintingTheBedroom",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SELF-PORTRAIT",
+              "cls": "PaintingVangoghSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "IRISES",
+              "cls": "PaintingIrises",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SUNFLOWERS",
+              "cls": "PaintingSunflowers",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "ALMOND BLOSSOMS",
+              "cls": "PaintingAlmondBlossoms",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WHEAT FIELD WITH CYPRESSES",
+              "cls": "PaintingWheatfieldCypresses",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE POTATO EATERS",
+              "cls": "PaintingPotatoEaters",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MONT SAINTE-VICTOIRE",
+              "cls": "PaintingMontSainteVictoire",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CARD PLAYERS",
+              "cls": "PaintingCardPlayers",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WHERE DO WE COME FROM?",
+              "cls": "PaintingWhereDoWeComeFrom",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "VISION AFTER THE SERMON",
+              "cls": "PaintingVisionSermon",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MOULIN ROUGE: LA GOULUE",
+              "cls": "PaintingMoulinRouge",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE DREAM",
+              "cls": "PaintingTheDreamRousseau",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE SLEEPING GYPSY",
+              "cls": "PaintingSleepingGypsy",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE SCREAM",
+              "cls": "PaintingTheScream",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MADONNA",
+              "cls": "PaintingMunchMadonna",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE KISS",
+              "cls": "PaintingTheKissKlimt",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PORTRAIT OF ADELE BLOCH-BAUER I",
+              "cls": "PaintingKlimtAdele",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE TREE OF LIFE",
+              "cls": "PaintingKlimtTreeOfLife",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "JOB (CIGARETTES)",
+              "cls": "PaintingMuchaJob",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "VIEW OF TOLEDO",
+              "cls": "PaintingViewOfToledo",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "REPLY OF THE ZAPOROZHIAN COSSACKS",
+              "cls": "PaintingCossacks",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE DANCE",
+              "cls": "PaintingTheDanceMatisse",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BLUE HORSE I",
+              "cls": "PaintingBlueHorse",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BERLIN STREET SCENE",
+              "cls": "PaintingBerlinStreet",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SELF-PORTRAIT WITH PHYSALIS",
+              "cls": "PaintingSchieleSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "JEANNE H\u00c9BUTERNE",
+              "cls": "PaintingModiglianiPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "COMPOSITION VIII",
+              "cls": "PaintingCompositionViii",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SEVERAL CIRCLES",
+              "cls": "PaintingSeveralCircles",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BLACK SQUARE",
+              "cls": "PaintingBlackSquare",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WHITE ON WHITE",
+              "cls": "PaintingWhiteOnWhite",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BROADWAY BOOGIE WOOGIE",
+              "cls": "PaintingBroadwayBoogie",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SIMULTANEOUS WINDOWS",
+              "cls": "PaintingDelaunayWindows",
+              "module": "visuals/painting.py"
             }
           ]
         },
@@ -5497,6 +6814,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -5578,33 +6896,6 @@
             "games/checkers.py",
             "games/othello.py",
             "games/agario.py"
-          ],
-          "playlist": [
-            {
-              "name": "GREATWAVE",
-              "cls": "GreatWave",
-              "module": "visuals/greatwave.py"
-            },
-            {
-              "name": "MONDRIAN",
-              "cls": "Mondrian",
-              "module": "visuals/mondrian.py"
-            },
-            {
-              "name": "SCREAM",
-              "cls": "Scream",
-              "module": "visuals/scream.py"
-            },
-            {
-              "name": "STARRYNIGHT",
-              "cls": "StarryNight",
-              "module": "visuals/starrynight.py"
-            },
-            {
-              "name": "WATERLILIES",
-              "cls": "WaterLilies",
-              "module": "visuals/waterlilies.py"
-            }
           ]
         },
         {
@@ -5613,6 +6904,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -5737,14 +7029,14 @@
               "module": "visuals/boids.py"
             },
             {
-              "name": "WATERLILIES",
-              "cls": "WaterLilies",
-              "module": "visuals/waterlilies.py"
+              "name": "LAVALAMP",
+              "cls": "Lava",
+              "module": "visuals/lava.py"
             },
             {
-              "name": "STARRYNIGHT",
-              "cls": "StarryNight",
-              "module": "visuals/starrynight.py"
+              "name": "GYRE",
+              "cls": "Gyre",
+              "module": "visuals/gyre.py"
             }
           ]
         },
@@ -5754,6 +7046,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -5915,6 +7208,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6056,6 +7350,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6197,6 +7492,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6343,6 +7639,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6547,6 +7844,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6688,6 +7986,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -6803,6 +8102,7 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/painting.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
