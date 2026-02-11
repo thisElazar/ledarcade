@@ -1,11 +1,11 @@
 """
 Paint - Pixel Art Editor
 ========================
-MS Paint-style pixel art editor on a 32x32 canvas displayed at 2x zoom.
+64x64 pixel art editor with a 2x2 brush.
 Create sprites, save/load PNG files.
 
 Controls:
-  Joystick      - Move cursor
+  Joystick      - Move cursor (2px steps)
   Button (hold) - Paint with current tool
   Button (tap)  - Open menu overlay (color/tool/file)
   Hold both 2s  - Exit to launcher
@@ -21,7 +21,8 @@ try:
 except ImportError:
     HAS_PIL = False
 
-CANVAS_SIZE = 32
+CANVAS_SIZE = 64  # 1:1 with screen
+BRUSH = 2         # 2x2 brush, cursor moves in steps of 2
 SAVE_DIR = os.path.expanduser("~/.led-arcade/paint")
 
 # 24-color palette: 8 columns x 3 rows
@@ -59,10 +60,9 @@ TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
 UNDO_MAX = 32
 
 # ── Wonder Cabinet text stamp ─────────────────────────────────────
-# Render directly at canvas resolution (1 font pixel = 1 canvas pixel).
-# 3x5 font, 4px stride.  Center each word on the 32px-wide canvas.
-# Vertical: WONDER at y=12, CABINET at y=18  (mirroring the standard
-# screen positions 24/34 halved, with a 1px gap between the two words).
+# Uses the exact screen-space positions from wondercabinet.py:
+#   WONDER  at (20, 24), CABINET at (18, 34)
+# 3x5 font, 4px stride.  Now canvas = screen, so coords are direct.
 _FONT_3X5 = {
     'A': ['010', '101', '111', '101', '101'],
     'B': ['110', '101', '110', '101', '110'],
@@ -78,10 +78,8 @@ _FONT_3X5 = {
 }
 
 
-def _build_stamp(text, canvas_y):
-    """Build set of canvas (x,y) for one line of text, centered on 32px."""
-    width = len(text) * 4 - 1  # 3px per char + 1px gap, minus trailing
-    x0 = (CANVAS_SIZE - width) // 2
+def _build_stamp(text, x0, y0):
+    """Build set of (x, y) pixels for one line of text."""
     pixels = set()
     cx = x0
     for ch in text:
@@ -90,13 +88,14 @@ def _build_stamp(text, canvas_y):
             for row_idx, row in enumerate(glyph):
                 for col_idx, pixel in enumerate(row):
                     if pixel == '1':
-                        pixels.add((cx + col_idx, canvas_y + row_idx))
+                        pixels.add((cx + col_idx, y0 + row_idx))
         cx += 4
     return pixels
 
 
+# Exact Wonder Cabinet positions (from wondercabinet.py constants)
 TEMPLATE_PIXELS = frozenset(
-    _build_stamp("WONDER", 12) | _build_stamp("CABINET", 18)
+    _build_stamp("WONDER", 20, 24) | _build_stamp("CABINET", 18, 34)
 )
 
 # Modes
@@ -123,12 +122,12 @@ class Paint(Visual):
         super().__init__(display)
 
     def reset(self):
-        # Canvas: 32x32, None = empty (black)
+        # Canvas: 64x64, None = empty (black)
         self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
 
-        # Cursor
-        self.cx = CANVAS_SIZE // 2
-        self.cy = CANVAS_SIZE // 2
+        # Cursor (snapped to even coords for 2x2 brush alignment)
+        self.cx = (CANVAS_SIZE // 2) & ~1
+        self.cy = (CANVAS_SIZE // 2) & ~1
         self.blink_timer = 0.0
 
         # Current color and tool
@@ -163,7 +162,6 @@ class Paint(Visual):
         # Undo/redo stacks
         self.undo_stack = []
         self.redo_stack = []
-        self.stroke_saved = False  # True once snapshot taken for current stroke
 
         # Overlay text feedback
         self.overlay_text = ""
@@ -210,7 +208,7 @@ class Paint(Visual):
             self._update_load(inp, dt)
 
     def _update_draw(self, inp, dt):
-        # Joystick movement with repeat
+        # Joystick movement with repeat — move in steps of BRUSH (2)
         self.move_timer += dt
         rate = 0.06
         moved = False
@@ -222,8 +220,8 @@ class Paint(Visual):
                 self.move_timer = 0.0
                 moved = True
         if moved:
-            self.cx = _clamp(self.cx + inp.dx, 0, CANVAS_SIZE - 1)
-            self.cy = _clamp(self.cy + inp.dy, 0, CANVAS_SIZE - 1)
+            self.cx = _clamp(self.cx + inp.dx * BRUSH, 0, CANVAS_SIZE - BRUSH)
+            self.cy = _clamp(self.cy + inp.dy * BRUSH, 0, CANVAS_SIZE - BRUSH)
 
         # Button hold/tap detection (unified both buttons)
         btn_now = inp.action_l_held or inp.action_r_held
@@ -250,20 +248,25 @@ class Paint(Visual):
         if self.painting:
             self._apply_tool()
 
+    def _paint_brush(self, color):
+        """Paint a 2x2 block at cursor position."""
+        for dy in range(BRUSH):
+            for dx in range(BRUSH):
+                px, py = self.cx + dx, self.cy + dy
+                if 0 <= px < CANVAS_SIZE and 0 <= py < CANVAS_SIZE:
+                    self.canvas[py][px] = color
+
     def _apply_tool(self):
-        x, y = self.cx, self.cy
         if self.tool == TOOL_PENCIL:
-            self.canvas[y][x] = PALETTE[self.color_idx]
+            self._paint_brush(PALETTE[self.color_idx])
         elif self.tool == TOOL_ERASER:
-            self.canvas[y][x] = None
+            self._paint_brush(None)
         elif self.tool == TOOL_FILL:
-            self._flood_fill(x, y)
-            # Only fill once per hold
+            self._flood_fill(self.cx, self.cy)
             self.painting = False
         elif self.tool == TOOL_EYEDROP:
-            pixel = self.canvas[y][x]
+            pixel = self.canvas[self.cy][self.cx]
             if pixel:
-                # Find closest palette color
                 best = 0
                 best_d = _color_dist_sq(pixel, PALETTE[0])
                 for i in range(1, len(PALETTE)):
@@ -283,7 +286,7 @@ class Paint(Visual):
         queue = deque([(sx, sy)])
         visited = set()
         count = 0
-        while queue and count < 1024:
+        while queue and count < 4096:
             x, y = queue.popleft()
             if (x, y) in visited:
                 continue
@@ -372,9 +375,9 @@ class Paint(Visual):
             elif t == TOOL_STAMP:
                 self._snapshot()
                 color = PALETTE[self.color_idx]
-                for cx, cy in TEMPLATE_PIXELS:
-                    if 0 <= cx < CANVAS_SIZE and 0 <= cy < CANVAS_SIZE:
-                        self.canvas[cy][cx] = color
+                for px, py in TEMPLATE_PIXELS:
+                    if 0 <= px < CANVAS_SIZE and 0 <= py < CANVAS_SIZE:
+                        self.canvas[py][px] = color
                 self.overlay_text = "STAMPED!"
                 self.overlay_timer = 1.0
                 self.mode = MODE_DRAW
@@ -387,7 +390,6 @@ class Paint(Visual):
 
     def _update_load(self, inp, dt):
         if not self.load_files:
-            # No files, go back
             self.mode = MODE_MENU
             self.debounce = 0.12
             return
@@ -397,7 +399,6 @@ class Paint(Visual):
         if inp.down_pressed:
             self.load_idx = (self.load_idx + 1) % len(self.load_files)
         if inp.left_pressed:
-            # Cancel
             self.mode = MODE_MENU
             self.debounce = 0.12
         btn_tap = inp.action_l or inp.action_r
@@ -428,7 +429,6 @@ class Paint(Visual):
             self.overlay_timer = 1.5
             return
         os.makedirs(SAVE_DIR, exist_ok=True)
-        # Find next number
         num = 1
         while os.path.exists(os.path.join(SAVE_DIR, f"paint_{num:03d}.png")):
             num += 1
@@ -488,17 +488,11 @@ class Paint(Visual):
             self.display.draw_text_small(2, 57, self.overlay_text, (c, c, 0))
 
     def _draw_canvas(self):
-        for cy in range(CANVAS_SIZE):
-            for cx in range(CANVAS_SIZE):
-                pixel = self.canvas[cy][cx]
+        for y in range(CANVAS_SIZE):
+            for x in range(CANVAS_SIZE):
+                pixel = self.canvas[y][x]
                 if pixel:
-                    # 2x zoom: each canvas pixel = 2x2 screen pixels
-                    sx = cx * 2
-                    sy = cy * 2
-                    self.display.set_pixel(sx, sy, pixel)
-                    self.display.set_pixel(sx + 1, sy, pixel)
-                    self.display.set_pixel(sx, sy + 1, pixel)
-                    self.display.set_pixel(sx + 1, sy + 1, pixel)
+                    self.display.set_pixel(x, y, pixel)
 
     def _draw_hud(self):
         # Color swatch in top-left: 3x3
@@ -511,31 +505,25 @@ class Paint(Visual):
         self.display.draw_text_small(60, 0, letter, (180, 180, 180))
 
     def _draw_cursor(self):
-        # Blink at ~4Hz
+        # Blink at ~4Hz, 2x2 block
         blink = int(self.blink_timer * 4) % 2 == 0
         if not blink:
             return
-        sx = self.cx * 2
-        sy = self.cy * 2
         cursor_color = (255, 255, 255)
-        self.display.set_pixel(sx, sy, cursor_color)
-        self.display.set_pixel(sx + 1, sy, cursor_color)
-        self.display.set_pixel(sx, sy + 1, cursor_color)
-        self.display.set_pixel(sx + 1, sy + 1, cursor_color)
+        for dy in range(BRUSH):
+            for dx in range(BRUSH):
+                self.display.set_pixel(self.cx + dx, self.cy + dy, cursor_color)
 
     def _draw_menu(self):
         n_colors = len(PALETTE)
         # ── Color strip: 7 swatches, current in center (larger) ──
-        # Neighbor swatches: 6x6 at y=4, center swatch: 10x10 at y=2
-        center_slot = 3  # 0-indexed, 7 slots total
+        center_slot = 3
         for slot in range(7):
             idx = (self.menu_color + slot - center_slot) % n_colors
             c = PALETTE[idx]
             if slot == center_slot:
-                # Current color: large swatch centered
                 x0 = 27
                 self.display.draw_rect(x0, 2, 10, 10, c)
-                # White border
                 for i in range(12):
                     self.display.set_pixel(x0 - 1 + i, 1, (255, 255, 255))
                     self.display.set_pixel(x0 - 1 + i, 12, (255, 255, 255))
@@ -543,7 +531,6 @@ class Paint(Visual):
                     self.display.set_pixel(x0 - 1, 2 + i, (255, 255, 255))
                     self.display.set_pixel(x0 + 10, 2 + i, (255, 255, 255))
             else:
-                # Neighbor swatch
                 if slot < center_slot:
                     x0 = slot * 9
                 else:
@@ -551,7 +538,6 @@ class Paint(Visual):
                 dim = tuple(v // 2 for v in c)
                 self.display.draw_rect(x0, 4, 7, 6, dim)
 
-        # Left/right arrows
         self.display.draw_text_small(1, 14, "<", (120, 120, 120))
         self.display.draw_text_small(59, 14, ">", (120, 120, 120))
 
@@ -564,22 +550,16 @@ class Paint(Visual):
         prev_t = (self.menu_tool - 1) % n_tools
         next_t = (self.menu_tool + 1) % n_tools
 
-        # Previous tool (dim)
         self.display.draw_text_small(7, 25, TOOL_NAMES[prev_t], (60, 60, 60))
-        # Current tool (bright, with arrow)
-        cur_name = TOOL_NAMES[self.menu_tool]
         self.display.draw_text_small(2, 34, ">", (255, 255, 255))
-        self.display.draw_text_small(7, 34, cur_name, (255, 255, 255))
-        # Next tool (dim)
+        self.display.draw_text_small(7, 34, TOOL_NAMES[self.menu_tool], (255, 255, 255))
         self.display.draw_text_small(7, 43, TOOL_NAMES[next_t], (60, 60, 60))
 
-        # Up/down arrows
         self.display.draw_text_small(55, 25, "^", (120, 120, 120))
         self.display.draw_text_small(55, 43, "v", (120, 120, 120))
 
     def _draw_load_browser(self):
         self.display.draw_text_small(2, 1, "LOAD FILE", (200, 200, 200))
-        # Separator
         for x in range(GRID_SIZE):
             self.display.set_pixel(x, 8, (40, 40, 40))
 
@@ -590,7 +570,6 @@ class Paint(Visual):
         y = 10
         for i in range(scroll, min(scroll + visible, total)):
             name = self.load_files[i]
-            # Strip .png, show just the name
             label = name[:-4] if name.endswith(".png") else name
             if i == self.load_idx:
                 self.display.draw_text_small(2, y, ">", (255, 255, 255))
@@ -599,5 +578,4 @@ class Paint(Visual):
                 self.display.draw_text_small(7, y, label, (100, 100, 100))
             y += 7
 
-        # Hint at bottom
         self.display.draw_text_small(2, 57, "< CANCEL", (80, 80, 80))
