@@ -142,8 +142,11 @@ PAINTING_META = {
     "delaunay_windows": ("Simultaneous Windows", "Robert Delaunay", 1912),
 }
 
-ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__))), "assets", "paintings")
+try:
+    ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))), "assets", "paintings")
+except NameError:
+    ASSETS_DIR = ""  # emulator: no local filesystem, uses _PRELOADED
 
 # Max visible chars at 4px/char with 2px left margin on 64px screen
 _MAX_CHARS = 15
