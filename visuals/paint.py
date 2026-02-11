@@ -22,7 +22,6 @@ except ImportError:
     HAS_PIL = False
 
 CANVAS_SIZE = 64  # 1:1 with screen
-BRUSH = 2         # 2x2 brush, cursor moves in steps of 2
 SAVE_DIR = os.path.expanduser("~/.led-arcade/paint")
 
 # 24-color palette: 8 columns x 3 rows
@@ -41,21 +40,26 @@ PALETTE = [
 PALETTE_COLS = 8
 PALETTE_ROWS = 3
 
-# Tools
-TOOL_PENCIL = 0
-TOOL_ERASER = 1
-TOOL_FILL = 2
-TOOL_EYEDROP = 3
-TOOL_UNDO = 4
-TOOL_REDO = 5
-TOOL_SAVE = 6
-TOOL_LOAD = 7
-TOOL_CLEAR = 8
-TOOL_STAMP = 9
+# Tools — PENCIL/MARKER/BRUSH are draw tools with 1/2/3 px brush size
+TOOL_PENCIL = 0   # 1px
+TOOL_MARKER = 1   # 2x2
+TOOL_BRUSH = 2    # 3x3
+TOOL_ERASER = 3
+TOOL_FILL = 4
+TOOL_EYEDROP = 5
+TOOL_UNDO = 6
+TOOL_REDO = 7
+TOOL_SAVE = 8
+TOOL_LOAD = 9
+TOOL_CLEAR = 10
+TOOL_STAMP = 11
 
-TOOL_NAMES = ["PENCIL", "ERASER", "FILL", "EYEDROP",
+TOOL_NAMES = ["PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
               "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP"]
-TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
+TOOL_INITIALS = ["P", "M", "B", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
+
+# Brush size per drawing tool
+_TOOL_BRUSH = {TOOL_PENCIL: 1, TOOL_MARKER: 2, TOOL_BRUSH: 3}
 
 UNDO_MAX = 32
 
@@ -125,14 +129,15 @@ class Paint(Visual):
         # Canvas: 64x64, None = empty (black)
         self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
 
-        # Cursor (snapped to even coords for 2x2 brush alignment)
-        self.cx = (CANVAS_SIZE // 2) & ~1
-        self.cy = (CANVAS_SIZE // 2) & ~1
+        # Cursor
+        self.cx = CANVAS_SIZE // 2
+        self.cy = CANVAS_SIZE // 2
         self.blink_timer = 0.0
 
         # Current color and tool
         self.color_idx = 9  # red
-        self.tool = TOOL_PENCIL
+        self.tool = TOOL_MARKER  # default 2x2
+        self.brush_size = 2  # tracks last draw-tool brush size
 
         # Mode
         self.mode = MODE_DRAW
@@ -207,8 +212,12 @@ class Paint(Visual):
         elif self.mode == MODE_LOAD:
             self._update_load(inp, dt)
 
+    @property
+    def _brush(self):
+        return _TOOL_BRUSH.get(self.tool, self.brush_size)
+
     def _update_draw(self, inp, dt):
-        # Joystick movement with repeat — move in steps of BRUSH (2)
+        # Joystick movement with repeat — step size matches brush
         self.move_timer += dt
         rate = 0.06
         moved = False
@@ -219,9 +228,10 @@ class Paint(Visual):
             elif self.move_timer >= rate:
                 self.move_timer = 0.0
                 moved = True
+        b = self._brush
         if moved:
-            self.cx = _clamp(self.cx + inp.dx * BRUSH, 0, CANVAS_SIZE - BRUSH)
-            self.cy = _clamp(self.cy + inp.dy * BRUSH, 0, CANVAS_SIZE - BRUSH)
+            self.cx = _clamp(self.cx + inp.dx * b, 0, CANVAS_SIZE - b)
+            self.cy = _clamp(self.cy + inp.dy * b, 0, CANVAS_SIZE - b)
 
         # Button hold/tap detection (unified both buttons)
         btn_now = inp.action_l_held or inp.action_r_held
@@ -230,7 +240,8 @@ class Paint(Visual):
             if self.btn_hold_time >= 0.15:
                 if not self.painting:
                     # Stroke start — snapshot for undo
-                    if self.tool in (TOOL_PENCIL, TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP):
+                    if self.tool in (TOOL_PENCIL, TOOL_MARKER, TOOL_BRUSH,
+                                     TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP):
                         self._snapshot()
                 self.painting = True
         else:
@@ -249,15 +260,16 @@ class Paint(Visual):
             self._apply_tool()
 
     def _paint_brush(self, color):
-        """Paint a 2x2 block at cursor position."""
-        for dy in range(BRUSH):
-            for dx in range(BRUSH):
+        """Paint a BxB block at cursor position."""
+        b = self._brush
+        for dy in range(b):
+            for dx in range(b):
                 px, py = self.cx + dx, self.cy + dy
                 if 0 <= px < CANVAS_SIZE and 0 <= py < CANVAS_SIZE:
                     self.canvas[py][px] = color
 
     def _apply_tool(self):
-        if self.tool == TOOL_PENCIL:
+        if self.tool in (TOOL_PENCIL, TOOL_MARKER, TOOL_BRUSH):
             self._paint_brush(PALETTE[self.color_idx])
         elif self.tool == TOOL_ERASER:
             self._paint_brush(None)
@@ -275,7 +287,7 @@ class Paint(Visual):
                         best_d = d
                         best = i
                 self.color_idx = best
-            self.tool = TOOL_PENCIL
+            self.tool = TOOL_MARKER
             self.painting = False
 
     def _flood_fill(self, sx, sy):
@@ -383,8 +395,10 @@ class Paint(Visual):
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
             else:
-                # Selectable tool (pencil, eraser, fill, eyedrop)
+                # Selectable tool (pencil, marker, brush, eraser, fill, eyedrop)
                 self.tool = t
+                if t in _TOOL_BRUSH:
+                    self.brush_size = _TOOL_BRUSH[t]
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
 
@@ -505,13 +519,14 @@ class Paint(Visual):
         self.display.draw_text_small(60, 0, letter, (180, 180, 180))
 
     def _draw_cursor(self):
-        # Blink at ~4Hz, 2x2 block
+        # Blink at ~4Hz, sized to current brush
         blink = int(self.blink_timer * 4) % 2 == 0
         if not blink:
             return
         cursor_color = (255, 255, 255)
-        for dy in range(BRUSH):
-            for dx in range(BRUSH):
+        b = self._brush
+        for dy in range(b):
+            for dx in range(b):
                 self.display.set_pixel(self.cx + dx, self.cy + dy, cursor_color)
 
     def _draw_menu(self):
