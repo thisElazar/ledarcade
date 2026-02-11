@@ -110,9 +110,9 @@ class Paint(Visual):
         # Debounce: suppress button input briefly after mode switch
         self.debounce = 0.0
 
-        # Menu cursor
-        self.menu_row = 0  # 0..2 = palette rows, 3..9 = tool/file rows
-        self.menu_col = 0
+        # Menu cursor (indexes into PALETTE and TOOL_NAMES directly)
+        self.menu_color = self.color_idx
+        self.menu_tool = self.tool
 
         # Load browser
         self.load_files = []
@@ -198,10 +198,8 @@ class Paint(Visual):
                 # Tap → open menu
                 self.mode = MODE_MENU
                 self.debounce = 0.12
-                self.menu_row = 0
-                self.menu_col = min(self.color_idx % PALETTE_COLS, PALETTE_COLS - 1)
-                # Position menu row to match current color
-                self.menu_row = self.color_idx // PALETTE_COLS
+                self.menu_color = self.color_idx
+                self.menu_tool = self.tool
             self.btn_hold_time = 0.0
             self.painting = False
         self.btn_was_held = btn_now
@@ -276,6 +274,8 @@ class Paint(Visual):
         if len(self.redo_stack) > UNDO_MAX:
             self.redo_stack.pop(0)
         self.canvas = self.undo_stack.pop()
+        self.overlay_text = "UNDO"
+        self.overlay_timer = 1.0
 
     def _do_redo(self):
         if not self.redo_stack:
@@ -286,60 +286,52 @@ class Paint(Visual):
         if len(self.undo_stack) > UNDO_MAX:
             self.undo_stack.pop(0)
         self.canvas = self.redo_stack.pop()
+        self.overlay_text = "REDO"
+        self.overlay_timer = 1.0
 
     def _update_menu(self, inp, dt):
-        # Total rows: 3 palette rows + 7 tool rows = 10
-        total_rows = PALETTE_ROWS + len(TOOL_NAMES)
-
-        if inp.up_pressed:
-            self.menu_row = (self.menu_row - 1) % total_rows
-        if inp.down_pressed:
-            self.menu_row = (self.menu_row + 1) % total_rows
+        # Left/Right cycles colors, Up/Down cycles tools
         if inp.left_pressed:
-            if self.menu_row < PALETTE_ROWS:
-                self.menu_col = (self.menu_col - 1) % PALETTE_COLS
+            self.menu_color = (self.menu_color - 1) % len(PALETTE)
         if inp.right_pressed:
-            if self.menu_row < PALETTE_ROWS:
-                self.menu_col = (self.menu_col + 1) % PALETTE_COLS
+            self.menu_color = (self.menu_color + 1) % len(PALETTE)
+        if inp.up_pressed:
+            self.menu_tool = (self.menu_tool - 1) % len(TOOL_NAMES)
+        if inp.down_pressed:
+            self.menu_tool = (self.menu_tool + 1) % len(TOOL_NAMES)
 
-        # Button tap to select
+        # Button tap to confirm
         btn_tap = inp.action_l or inp.action_r
         if btn_tap:
-            if self.menu_row < PALETTE_ROWS:
-                # Color selection
-                idx = self.menu_row * PALETTE_COLS + self.menu_col
-                if 0 <= idx < len(PALETTE):
-                    self.color_idx = idx
+            # Always apply the selected color
+            self.color_idx = self.menu_color
+            t = self.menu_tool
+            if t == TOOL_UNDO:
+                self._do_undo()
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
+            elif t == TOOL_REDO:
+                self._do_redo()
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
+            elif t == TOOL_SAVE:
+                self._do_save()
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
+            elif t == TOOL_LOAD:
+                self._enter_load_browser()
+            elif t == TOOL_CLEAR:
+                self._snapshot()
+                self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
+                self.overlay_text = "CLEARED!"
+                self.overlay_timer = 1.5
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
             else:
-                # Tool/action selection
-                tool_idx = self.menu_row - PALETTE_ROWS
-                if tool_idx == TOOL_UNDO:
-                    self._do_undo()
-                    self.mode = MODE_DRAW
-                    self.debounce = 0.12
-                elif tool_idx == TOOL_REDO:
-                    self._do_redo()
-                    self.mode = MODE_DRAW
-                    self.debounce = 0.12
-                elif tool_idx == TOOL_SAVE:
-                    self._do_save()
-                    self.mode = MODE_DRAW
-                    self.debounce = 0.12
-                elif tool_idx == TOOL_LOAD:
-                    self._enter_load_browser()
-                elif tool_idx == TOOL_CLEAR:
-                    self._snapshot()
-                    self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
-                    self.overlay_text = "CLEARED!"
-                    self.overlay_timer = 1.5
-                    self.mode = MODE_DRAW
-                    self.debounce = 0.12
-                else:
-                    self.tool = tool_idx
-                    self.mode = MODE_DRAW
-                    self.debounce = 0.12
+                # Selectable tool (pencil, eraser, fill, eyedrop)
+                self.tool = t
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
 
     def _update_load(self, inp, dt):
         if not self.load_files:
@@ -480,47 +472,58 @@ class Paint(Visual):
         self.display.set_pixel(sx + 1, sy + 1, cursor_color)
 
     def _draw_menu(self):
-        # Color palette grid: 8x3, each swatch 7x7 with 1px gap = 8px cells
-        for row in range(PALETTE_ROWS):
-            for col in range(PALETTE_COLS):
-                idx = row * PALETTE_COLS + col
-                c = PALETTE[idx]
-                x0 = col * 8
-                y0 = row * 8
-                self.display.draw_rect(x0, y0, 7, 7, c)
-                # Highlight selected color
-                if idx == self.color_idx:
-                    # White corner dots
-                    self.display.set_pixel(x0, y0, (255, 255, 255))
-                    self.display.set_pixel(x0 + 6, y0, (255, 255, 255))
-                    self.display.set_pixel(x0, y0 + 6, (255, 255, 255))
-                    self.display.set_pixel(x0 + 6, y0 + 6, (255, 255, 255))
-
-        # Cursor highlight on palette
-        if self.menu_row < PALETTE_ROWS:
-            cx0 = self.menu_col * 8
-            cy0 = self.menu_row * 8
-            # Draw border around selected cell
-            for i in range(8):
-                self.display.set_pixel(cx0 + i, cy0, (255, 255, 255))
-                self.display.set_pixel(cx0 + i, cy0 + 7, (255, 255, 255))
-            for i in range(8):
-                self.display.set_pixel(cx0, cy0 + i, (255, 255, 255))
-                self.display.set_pixel(cx0 + 7, cy0 + i, (255, 255, 255))
-
-        # Tool + action list below palette
-        list_y = PALETTE_ROWS * 8 + 2  # 26
-        for i, name in enumerate(TOOL_NAMES):
-            y = list_y + i * 7
-            is_cursor = (self.menu_row == PALETTE_ROWS + i)
-            is_active_tool = (i <= TOOL_EYEDROP and i == self.tool)
-            if is_cursor:
-                color = (255, 255, 0) if is_active_tool else (255, 255, 255)
-                self.display.draw_text_small(2, y, ">", color)
-                self.display.draw_text_small(7, y, name, color)
+        n_colors = len(PALETTE)
+        # ── Color strip: 7 swatches, current in center (larger) ──
+        # Neighbor swatches: 6x6 at y=4, center swatch: 10x10 at y=2
+        center_slot = 3  # 0-indexed, 7 slots total
+        for slot in range(7):
+            idx = (self.menu_color + slot - center_slot) % n_colors
+            c = PALETTE[idx]
+            if slot == center_slot:
+                # Current color: large swatch centered
+                x0 = 27
+                self.display.draw_rect(x0, 2, 10, 10, c)
+                # White border
+                for i in range(12):
+                    self.display.set_pixel(x0 - 1 + i, 1, (255, 255, 255))
+                    self.display.set_pixel(x0 - 1 + i, 12, (255, 255, 255))
+                for i in range(11):
+                    self.display.set_pixel(x0 - 1, 2 + i, (255, 255, 255))
+                    self.display.set_pixel(x0 + 10, 2 + i, (255, 255, 255))
             else:
-                color = (180, 180, 0) if is_active_tool else (100, 100, 100)
-                self.display.draw_text_small(7, y, name, color)
+                # Neighbor swatch
+                if slot < center_slot:
+                    x0 = slot * 9
+                else:
+                    x0 = 27 + 12 + (slot - center_slot - 1) * 9
+                dim = tuple(v // 2 for v in c)
+                self.display.draw_rect(x0, 4, 7, 6, dim)
+
+        # Left/right arrows
+        self.display.draw_text_small(1, 14, "<", (120, 120, 120))
+        self.display.draw_text_small(59, 14, ">", (120, 120, 120))
+
+        # ── Separator ──
+        for x in range(GRID_SIZE):
+            self.display.set_pixel(x, 21, (40, 40, 40))
+
+        # ── Tool: show prev / current / next ──
+        n_tools = len(TOOL_NAMES)
+        prev_t = (self.menu_tool - 1) % n_tools
+        next_t = (self.menu_tool + 1) % n_tools
+
+        # Previous tool (dim)
+        self.display.draw_text_small(7, 25, TOOL_NAMES[prev_t], (60, 60, 60))
+        # Current tool (bright, with arrow)
+        cur_name = TOOL_NAMES[self.menu_tool]
+        self.display.draw_text_small(2, 34, ">", (255, 255, 255))
+        self.display.draw_text_small(7, 34, cur_name, (255, 255, 255))
+        # Next tool (dim)
+        self.display.draw_text_small(7, 43, TOOL_NAMES[next_t], (60, 60, 60))
+
+        # Up/down arrows
+        self.display.draw_text_small(55, 25, "^", (120, 120, 120))
+        self.display.draw_text_small(55, 43, "v", (120, 120, 120))
 
     def _draw_load_browser(self):
         self.display.draw_text_small(2, 1, "LOAD FILE", (200, 200, 200))
