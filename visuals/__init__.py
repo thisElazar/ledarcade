@@ -81,6 +81,7 @@ from .weather import Weather
 from .dvd import DVD
 from .lava import Lava
 from .slime import Slime
+from .slimelab import SlimeLab
 from .solitaire import Solitaire
 from .polaroid import Polaroid
 from .road import Road
@@ -105,8 +106,10 @@ from .rug import Rug
 from .trance import Trance
 from .wolfram import Wolfram
 from .mitosis import Mitosis
+from .mitosislab import MitosisLab
 from .balloons import Balloons
 from .boids import Boids
+from .boidslab import BoidsLab
 from .attractors import Attractors
 from .flux import Flux
 from .cat import Cat
@@ -171,6 +174,7 @@ from .grayscott import GrayScott
 from .hodgelab import HodgeLab
 from .ruglab import RugLab
 from .cycliclab import CyclicLab
+from .quarkslab import QuarksLab
 from .lenia import Lenia, LeniaLab
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing
@@ -308,6 +312,7 @@ ALL_VISUALS = [
     DVD,
     Lava,
     Slime,
+    SlimeLab,
     Solitaire,
     Polaroid,
     Road,
@@ -316,6 +321,7 @@ ALL_VISUALS = [
     Mobius,
     Lake,
     Quarks,
+    QuarksLab,
     Hodge,
     Faders,
     Ripples,
@@ -325,8 +331,10 @@ ALL_VISUALS = [
     Trance,
     Wolfram,
     Mitosis,
+    MitosisLab,
     Balloons,
     Boids,
+    BoidsLab,
     Attractors,
     Flux,
     Cat,
