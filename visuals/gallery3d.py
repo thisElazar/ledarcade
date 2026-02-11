@@ -944,147 +944,231 @@ class GalleryEffects(_Gallery3DBase):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Gallery 7: SALON — dense painting room, every wall is art
+#  Gallery 7: SALON — Paris Salon-style, all paintings, 5 high
 # ══════════════════════════════════════════════════════════════════
 
 class GallerySalon(_Gallery3DBase):
+    """Paris Salon: every painting on the walls, stacked 5 panels high."""
+
     name = "SALON"
     description = "Wall-to-wall paintings"
     category = "gallery"
 
-    MAP_W = 20
-    MAP_H = 14
-    START_POS = (10.0, 7.0)
+    _WALL_SCALE = 5  # paintings stacked 5 panels high
 
-    # Large salon — paintings on every wall, center partition for more surface
-    #   North wall: 18 paintings (cells 2-19)
-    #   South wall: 18 paintings (cells 20-37)
-    #   West wall:  10 paintings (cells 38-47)
-    #   East wall:  10 paintings (cells 48-57)
-    #   Center partition: 12 paintings (cells 58-69)
-    MAP = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  # 0
-        [1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19, 1],  # 1  north
-        [38,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,48],  # 2
-        [39,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,49],  # 3
-        [40,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50],  # 4
-        [41,0, 0, 0,58,59,60,61,62,63, 0, 0, 0, 0, 0, 0, 0, 0, 0,51],  # 5  partition
-        [42,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,52],  # 6
-        [43,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,53],  # 7
-        [44,0, 0, 0, 0, 0, 0, 0, 0, 0,64,65,66,67,68,69, 0, 0, 0,54],  # 8  partition
-        [45,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55],  # 9
-        [46,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,56],  # 10
-        [47,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,57],  # 11
-        [1,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37, 1],  # 12 south
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  # 13
-    ]
+    def __init__(self, display):
+        import random as _rng
 
-    # All paintings sourced from the painting pipeline (assets/paintings/)
-    _P = "paintings/"
-    PAINTINGS = {
-        # North wall — Renaissance + Baroque masterworks
-        2:  ("png", _P + "mona_lisa.png"),
-        3:  ("png", _P + "girl_pearl_earring.png"),
-        4:  ("png", _P + "starry_night.png"),
-        5:  ("png", _P + "great_wave.png"),
-        6:  ("png", _P + "the_scream.png"),
-        7:  ("png", _P + "birth_of_venus.png"),
-        8:  ("png", _P + "creation_of_adam.png"),
-        9:  ("png", _P + "night_watch.png"),
-        10: ("png", _P + "the_kiss_klimt.png"),
-        11: ("png", _P + "water_lilies.png"),
-        12: ("png", _P + "wanderer_fog.png"),
-        13: ("png", _P + "liberty_leading.png"),
-        14: ("png", _P + "school_of_athens.png"),
-        15: ("png", _P + "last_supper.png"),
-        16: ("png", _P + "las_meninas.png"),
-        17: ("png", _P + "american_gothic.png"),
-        18: ("png", _P + "nighthawks.png"),
-        19: ("png", _P + "sunday_grande_jatte.png"),
-        # South wall — Impressionism + Post-Impressionism
-        20: ("png", _P + "impression_sunrise.png"),
-        21: ("png", _P + "dance_moulin.png"),
-        22: ("png", _P + "luncheon_boating.png"),
-        23: ("png", _P + "degas_ballet.png"),
-        24: ("png", _P + "woman_parasol.png"),
-        25: ("png", _P + "cafe_terrace.png"),
-        26: ("png", _P + "sunflowers.png"),
-        27: ("png", _P + "irises.png"),
-        28: ("png", _P + "almond_blossoms.png"),
-        29: ("png", _P + "poppies.png"),
-        30: ("png", _P + "japanese_bridge.png"),
-        31: ("png", _P + "haystacks.png"),
-        32: ("png", _P + "caillebotte_rainy.png"),
-        33: ("png", _P + "pissarro_boulevard.png"),
-        34: ("png", _P + "morisot_cradle.png"),
-        35: ("png", _P + "cassatt_bath.png"),
-        36: ("png", _P + "sorolla_seashore.png"),
-        37: ("png", _P + "bar_folies_bergere.png"),
-        # West wall — Romanticism + Baroque drama
-        38: ("png", _P + "caravaggio_judith.png"),
-        39: ("png", _P + "artemisia_judith.png"),
-        40: ("png", _P + "saturn_devouring.png"),
-        41: ("png", _P + "raft_of_medusa.png"),
-        42: ("png", _P + "napoleon_alps.png"),
-        43: ("png", _P + "death_of_marat.png"),
-        44: ("png", _P + "ophelia.png"),
-        45: ("png", _P + "lady_of_shalott.png"),
-        46: ("png", _P + "fighting_temeraire.png"),
-        47: ("png", _P + "ninth_wave.png"),
-        # East wall — Portraits + Dutch/Flemish
-        48: ("png", _P + "the_milkmaid.png"),
-        49: ("png", _P + "art_of_painting.png"),
-        50: ("png", _P + "arnolfini_portrait.png"),
-        51: ("png", _P + "rembrandt_self_portrait.png"),
-        52: ("png", _P + "vangogh_self_portrait.png"),
-        53: ("png", _P + "durer_self_portrait.png"),
-        54: ("png", _P + "klimt_adele.png"),
-        55: ("png", _P + "madame_x.png"),
-        56: ("png", _P + "the_swing.png"),
-        57: ("png", _P + "modigliani_portrait.png"),
-        # Center partition (left, row 5) — Ukiyo-e + Modern
-        58: ("png", _P + "red_fuji.png"),
-        59: ("png", _P + "hokusai_bullfinch.png"),
-        60: ("png", _P + "hiroshige_rain.png"),
-        61: ("png", _P + "the_dance_matisse.png"),
-        62: ("png", _P + "composition_viii.png"),
-        63: ("png", _P + "broadway_boogie.png"),
-        # Center partition (right, row 8) — Abstract + Expressionism
-        64: ("png", _P + "black_square.png"),
-        65: ("png", _P + "white_on_white.png"),
-        66: ("png", _P + "several_circles.png"),
-        67: ("png", _P + "delaunay_windows.png"),
-        68: ("png", _P + "blue_horse.png"),
-        69: ("png", _P + "sleeping_gypsy.png"),
-    }
+        # Room sized so perimeter fits all paintings:
+        #   2*(W-2) + 2*(H-4) = 116  →  W=36, H=28
+        W, H = 36, 28
+        self.MAP_W = W
+        self.MAP_H = H
+        self.START_POS = (W / 2.0, H / 2.0)
 
-    WAYPOINTS = [
-        # Start at center, face north
-        (10.0, 3.5),    # approach north wall
-        # Walk along north wall
-        (3.0, 2.5),     # far left
-        (7.0, 2.5),     # left-center
-        (13.0, 2.5),    # right-center
-        (17.0, 2.5),    # far right
-        # East wall
-        (18.0, 5.0),    # upper east
-        (18.0, 9.0),    # lower east
-        # South wall
-        (17.0, 11.5),   # far right south
-        (13.0, 11.5),   # center-right
-        (7.0, 11.5),    # center-left
-        (3.0, 11.5),    # far left south
-        # West wall
-        (1.5, 9.0),     # lower west
-        (1.5, 5.0),     # upper west
-        # Center partitions
-        (5.0, 4.0),     # north of left partition
-        (8.0, 6.5),     # south of left partition
-        (14.0, 7.5),    # north of right partition
-        (12.0, 9.5),    # south of right partition
-        # Back to center
-        (10.0, 7.0),    # center
-    ]
+        # Collect available painting PIDs
+        proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        paint_dir = os.path.join(proj, "assets", "paintings")
+        try:
+            from visuals.painting import PAINTING_META
+            pids = [p for p in PAINTING_META
+                    if os.path.exists(os.path.join(paint_dir, f"{p}.png"))]
+        except ImportError:
+            pids = []
+        _rng.shuffle(pids)
+
+        # Assign cell IDs and build MAP + PAINTINGS dict
+        _P = "paintings/"
+        self.PAINTINGS = {}
+        cell_id = 2
+        paint_cells = []
+        pid_iter = iter(pids)
+
+        def _next():
+            nonlocal cell_id
+            pid = next(pid_iter, None)
+            if pid is None:
+                return 1
+            cid = cell_id
+            self.PAINTINGS[cid] = ("png", _P + f"{pid}.png")
+            paint_cells.append(cid)
+            cell_id += 1
+            return cid
+
+        grid = [[1] * W]                                          # row 0: border
+        grid.append([1] + [_next() for _ in range(W - 2)] + [1])  # row 1: north
+        for _ in range(H - 4):                                    # rows 2..H-3
+            grid.append([_next()] + [0] * (W - 2) + [_next()])
+        grid.append([1] + [_next() for _ in range(W - 2)] + [1])  # row H-2: south
+        grid.append([1] * W)                                      # row H-1: border
+        self.MAP = grid
+
+        # Stack map: 4 random paintings above each ground-level painting
+        self._stack_map = {}
+        if paint_cells:
+            for cid in paint_cells:
+                self._stack_map[cid] = [
+                    _rng.choice(paint_cells)
+                    for _ in range(self._WALL_SCALE - 1)]
+
+        # Viewing waypoints along each wall, shuffled for random exploration
+        wps = []
+        for x in range(4, W - 2, 4):
+            wps.append((float(x), 3.5))          # north wall
+        for x in range(4, W - 2, 4):
+            wps.append((float(x), H - 4.5))      # south wall
+        for y in range(5, H - 3, 4):
+            wps.append((2.5, float(y)))           # west wall
+        for y in range(5, H - 3, 4):
+            wps.append((W - 3.5, float(y)))       # east wall
+        _rng.shuffle(wps)
+        self.WAYPOINTS = wps
+
+        super().__init__(display)
+
+    def _load_textures(self):
+        if self.textures:
+            return  # already loaded — skip on subsequent resets
+        super()._load_textures()
+
+    def reset(self):
+        super().reset()
+        self.move_speed = 2.0
+        import random
+        random.shuffle(self.WAYPOINTS)
+
+    # -- Warm Salon ceiling / floor --
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        ceil = (50, 45, 35)
+        floor = (55, 40, 30)
+        for y in range(half):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, ceil)
+        for y in range(half, GRID_SIZE):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, floor)
+        for col in range(GRID_SIZE):
+            self._cast_ray(col, self.pa + self.ray_offsets[col])
+
+    # -- Raycaster with 5-panel stacking --
+
+    def _cast_ray(self, col, angle):
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        if abs(cos_a) < 1e-8:
+            cos_a = 1e-8
+        if abs(sin_a) < 1e-8:
+            sin_a = 1e-8
+
+        map_x = int(self.px)
+        map_y = int(self.py)
+        delta_x = abs(1.0 / cos_a)
+        delta_y = abs(1.0 / sin_a)
+
+        if cos_a < 0:
+            step_x = -1
+            side_dist_x = (self.px - map_x) * delta_x
+        else:
+            step_x = 1
+            side_dist_x = (map_x + 1.0 - self.px) * delta_x
+
+        if sin_a < 0:
+            step_y = -1
+            side_dist_y = (self.py - map_y) * delta_y
+        else:
+            step_y = 1
+            side_dist_y = (map_y + 1.0 - self.py) * delta_y
+
+        hit = False
+        side = 0
+        for _ in range(72):
+            if side_dist_x < side_dist_y:
+                side_dist_x += delta_x
+                map_x += step_x
+                side = 0
+            else:
+                side_dist_y += delta_y
+                map_y += step_y
+                side = 1
+            if (map_x < 0 or map_x >= self.MAP_W
+                    or map_y < 0 or map_y >= self.MAP_H):
+                break
+            cell = self.MAP[map_y][map_x]
+            if cell != 0:
+                hit = True
+                break
+
+        if not hit:
+            return
+
+        if side == 0:
+            perp_dist = (map_x - self.px + (1 - step_x) / 2) / cos_a
+        else:
+            perp_dist = (map_y - self.py + (1 - step_y) / 2) / sin_a
+        if perp_dist < 0.01:
+            perp_dist = 0.01
+
+        # Texture column
+        if side == 0:
+            wall_x = self.py + perp_dist * sin_a
+        else:
+            wall_x = self.px + perp_dist * cos_a
+        wall_x -= int(wall_x)
+        tex_col = int(wall_x * GRID_SIZE)
+        if tex_col >= GRID_SIZE:
+            tex_col = GRID_SIZE - 1
+
+        fog = min(1.0, 2.0 / (perp_dist + 0.5))
+        if side == 1:
+            fog *= 0.75
+
+        # --- 5-panel stacked wall ---
+        scale = self._WALL_SCALE
+        unit_h = GRID_SIZE / perp_dist          # screen pixels per world unit
+        half = GRID_SIZE // 2
+        # Camera at 0.5 units; wall spans 0 (floor) to scale (top)
+        draw_top = half - (scale - 0.5) * unit_h
+        draw_bot = half + 0.5 * unit_h
+        ds = max(0, int(draw_top))
+        de = min(GRID_SIZE - 1, int(draw_bot))
+
+        is_painting = cell >= 2 and cell in self.textures
+
+        for y in range(ds, de + 1):
+            # World height from floor (0 = floor, scale = ceiling)
+            world_h = (draw_bot - y) / unit_h
+            panel = int(world_h)
+            panel = max(0, min(scale - 1, panel))
+            frac = world_h - panel           # 0 at panel bottom, ~1 at top
+            tex_y = int((1.0 - frac) * GRID_SIZE)
+            tex_y = max(0, min(GRID_SIZE - 1, tex_y))
+
+            tex = None
+            if is_painting:
+                if panel == 0:
+                    tex_cell = cell          # ground level = actual painting
+                else:
+                    stack = self._stack_map.get(cell)
+                    tex_cell = stack[panel - 1] if stack else cell
+                frames = self.textures.get(tex_cell)
+                if frames:
+                    tex = frames[0]
+
+            if tex is not None:
+                r, g, b = tex[tex_y * GRID_SIZE + tex_col]
+                # Gold frame at panel edges
+                if (tex_col <= 1 or tex_col >= GRID_SIZE - 2
+                        or tex_y <= 1 or tex_y >= GRID_SIZE - 2):
+                    r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
+            else:
+                r, g, b = 90, 80, 65         # warm plaster
+
+            r = int(r * fog)
+            g = int(g * fog)
+            b = int(b * fog)
+            self.display.set_pixel(col, y, (r, g, b))
 
 
 # ══════════════════════════════════════════════════════════════════
