@@ -1099,7 +1099,7 @@ class GallerySalon(_Gallery3DBase):
 
     def reset(self):
         super().reset()
-        self.move_speed = 2.0
+        self.move_speed = 1.4       # slow gallery stroll
         self._face_angle = None   # target angle during viewing pause
 
     # -- Auto-walk override: (x, y, face_angle, pause) waypoints --
@@ -1116,7 +1116,7 @@ class GallerySalon(_Gallery3DBase):
                     diff -= 2 * math.pi
                 while diff < -math.pi:
                     diff += 2 * math.pi
-                self.pa += diff * min(1.0, 6.0 * dt)
+                self.pa += diff * min(1.0, 2.0 * dt)
             return
 
         wp = self.WAYPOINTS[self.wp_idx]
@@ -1139,7 +1139,7 @@ class GallerySalon(_Gallery3DBase):
             diff -= 2 * math.pi
         while diff < -math.pi:
             diff += 2 * math.pi
-        self.pa += diff * min(1.0, 6.0 * dt)
+        self.pa += diff * min(1.0, 2.5 * dt)
 
         speed = self.move_speed * dt
         cos_a = math.cos(self.pa)
