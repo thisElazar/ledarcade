@@ -208,11 +208,17 @@ class _PaintingBase(Visual):
                     idx = (idx - 1) % len(self._all_pids)
                 self._current_pid = self._all_pids[idx]
                 self._load()
-                # Reset scroll position but don't auto-show overlay
-                self._overlay_time = 0.0
+            # Show overlay on any joystick input
+            self._show_overlay = True
+            self._overlay_time = 0.0
             return True
         if input_state.left or input_state.right:
             return True  # consume held state so menu doesn't see it
+        # Up/Down: also show overlay
+        if input_state.up_pressed or input_state.down_pressed:
+            self._show_overlay = True
+            self._overlay_time = 0.0
+            return True
         # Action: toggle info overlay on/off
         if input_state.action_l or input_state.action_r:
             self._show_overlay = not self._show_overlay
