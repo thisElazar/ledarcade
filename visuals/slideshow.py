@@ -151,6 +151,22 @@ class ArtGallery(Slideshow):
         from visuals.painting import PAINTING_VISUALS
         return list(PAINTING_VISUALS)
 
+    def handle_input(self, input_state):
+        # Button: skip to next painting
+        if input_state.action_l or input_state.action_r:
+            self._advance()
+            return True
+        # Any joystick press: toggle child's nameplate
+        if (input_state.up_pressed or input_state.down_pressed
+                or input_state.left_pressed or input_state.right_pressed):
+            if self._child and hasattr(self._child, '_toggle_overlay'):
+                self._child._toggle_overlay()
+            return True
+        # Consume held joystick so menu doesn't see it
+        if input_state.any_direction:
+            return True
+        return False
+
 
 class SpriteGallery(Slideshow):
     name = "SPRITE GALLERY"
