@@ -102,6 +102,9 @@ class Paint(Visual):
         # Exit hold (both buttons)
         self.exit_hold = 0.0
 
+        # Debounce: suppress button input briefly after mode switch
+        self.debounce = 0.0
+
         # Menu cursor
         self.menu_row = 0  # 0..2 = palette rows, 3..9 = tool/file rows
         self.menu_col = 0
@@ -139,6 +142,14 @@ class Paint(Visual):
         if self.overlay_timer > 0:
             self.overlay_timer -= dt
 
+        # Debounce: skip button processing briefly after mode switch
+        if self.debounce > 0:
+            self.debounce -= dt
+            self.btn_hold_time = 0.0
+            self.btn_was_held = False
+            self.painting = False
+            return
+
         if self.mode == MODE_DRAW:
             self._update_draw(inp, dt)
         elif self.mode == MODE_MENU:
@@ -172,6 +183,7 @@ class Paint(Visual):
             if self.btn_was_held and self.btn_hold_time < 0.15:
                 # Tap → open menu
                 self.mode = MODE_MENU
+                self.debounce = 0.12
                 self.menu_row = 0
                 self.menu_col = min(self.color_idx % PALETTE_COLS, PALETTE_COLS - 1)
                 # Position menu row to match current color
@@ -257,12 +269,14 @@ class Paint(Visual):
                 if 0 <= idx < len(PALETTE):
                     self.color_idx = idx
                 self.mode = MODE_DRAW
+                self.debounce = 0.12
             else:
                 # Tool/file selection
                 tool_idx = self.menu_row - PALETTE_ROWS
                 if tool_idx == TOOL_SAVE:
                     self._do_save()
                     self.mode = MODE_DRAW
+                    self.debounce = 0.12
                 elif tool_idx == TOOL_LOAD:
                     self._enter_load_browser()
                 elif tool_idx == TOOL_CLEAR:
@@ -270,14 +284,17 @@ class Paint(Visual):
                     self.overlay_text = "CLEARED!"
                     self.overlay_timer = 1.5
                     self.mode = MODE_DRAW
+                    self.debounce = 0.12
                 else:
                     self.tool = tool_idx
                     self.mode = MODE_DRAW
+                    self.debounce = 0.12
 
     def _update_load(self, inp, dt):
         if not self.load_files:
             # No files, go back
             self.mode = MODE_MENU
+            self.debounce = 0.12
             return
 
         if inp.up_pressed:
@@ -287,10 +304,12 @@ class Paint(Visual):
         if inp.left_pressed:
             # Cancel
             self.mode = MODE_MENU
+            self.debounce = 0.12
         btn_tap = inp.action_l or inp.action_r
         if btn_tap:
             self._do_load(self.load_files[self.load_idx])
             self.mode = MODE_DRAW
+            self.debounce = 0.12
 
     def _enter_load_browser(self):
         self.load_files = []
@@ -302,9 +321,11 @@ class Paint(Visual):
             self.overlay_text = "NO FILES"
             self.overlay_timer = 1.5
             self.mode = MODE_DRAW
+            self.debounce = 0.12
             return
         self.load_idx = 0
         self.mode = MODE_LOAD
+        self.debounce = 0.12
 
     def _do_save(self):
         if not HAS_PIL:
