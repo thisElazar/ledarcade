@@ -50,11 +50,11 @@ TOOL_REDO = 5
 TOOL_SAVE = 6
 TOOL_LOAD = 7
 TOOL_CLEAR = 8
-TOOL_TEMPLATE = 9
+TOOL_STAMP = 9
 
 TOOL_NAMES = ["PENCIL", "ERASER", "FILL", "EYEDROP",
-              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "GUIDE"]
-TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C", "G"]
+              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP"]
+TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
 
 UNDO_MAX = 32
 
@@ -161,9 +161,6 @@ class Paint(Visual):
         self.undo_stack = []
         self.redo_stack = []
         self.stroke_saved = False  # True once snapshot taken for current stroke
-
-        # Template overlay
-        self.template_on = False
 
         # Overlay text feedback
         self.overlay_text = ""
@@ -369,9 +366,13 @@ class Paint(Visual):
                 self.overlay_timer = 1.5
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
-            elif t == TOOL_TEMPLATE:
-                self.template_on = not self.template_on
-                self.overlay_text = "GUIDE ON" if self.template_on else "GUIDE OFF"
+            elif t == TOOL_STAMP:
+                self._snapshot()
+                color = PALETTE[self.color_idx]
+                for cx, cy in TEMPLATE_PIXELS:
+                    if 0 <= cx < CANVAS_SIZE and 0 <= cy < CANVAS_SIZE:
+                        self.canvas[cy][cx] = color
+                self.overlay_text = "STAMPED!"
                 self.overlay_timer = 1.0
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
@@ -470,8 +471,6 @@ class Paint(Visual):
 
         if self.mode == MODE_DRAW:
             self._draw_canvas()
-            if self.template_on:
-                self._draw_template()
             self._draw_hud()
             self._draw_cursor()
         elif self.mode == MODE_MENU:
@@ -497,20 +496,6 @@ class Paint(Visual):
                     self.display.set_pixel(sx + 1, sy, pixel)
                     self.display.set_pixel(sx, sy + 1, pixel)
                     self.display.set_pixel(sx + 1, sy + 1, pixel)
-
-    def _draw_template(self):
-        """Draw Wonder Cabinet text guide as dim overlay."""
-        guide_color = (30, 30, 50)
-        for cx, cy in TEMPLATE_PIXELS:
-            if 0 <= cx < CANVAS_SIZE and 0 <= cy < CANVAS_SIZE:
-                # Only show guide where canvas is empty
-                if self.canvas[cy][cx] is None:
-                    sx = cx * 2
-                    sy = cy * 2
-                    self.display.set_pixel(sx, sy, guide_color)
-                    self.display.set_pixel(sx + 1, sy, guide_color)
-                    self.display.set_pixel(sx, sy + 1, guide_color)
-                    self.display.set_pixel(sx + 1, sy + 1, guide_color)
 
     def _draw_hud(self):
         # Color swatch in top-left: 3x3
