@@ -168,6 +168,8 @@ class _PaintingBase(Visual):
         self.pixels = None
         self.overlay_timer = _OVERLAY_DURATION
         self._current_pid = self._pid
+        self._prev_left = False
+        self._prev_right = False
         self._load()
 
     def _load(self):
@@ -186,14 +188,19 @@ class _PaintingBase(Visual):
         ]
 
     def handle_input(self, input_state):
-        # Left/Right: cycle between paintings
-        if input_state.left or input_state.right:
+        # Left/Right: cycle between paintings (edge-triggered, one per press)
+        left_edge = input_state.left and not self._prev_left
+        right_edge = input_state.right and not self._prev_right
+        self._prev_left = input_state.left
+        self._prev_right = input_state.right
+
+        if left_edge or right_edge:
             if self._all_pids:
                 try:
                     idx = self._all_pids.index(self._current_pid)
                 except ValueError:
                     idx = 0
-                if input_state.right:
+                if right_edge:
                     idx = (idx + 1) % len(self._all_pids)
                 else:
                     idx = (idx - 1) % len(self._all_pids)
@@ -201,6 +208,8 @@ class _PaintingBase(Visual):
                 self._load()
                 self.overlay_timer = _OVERLAY_DURATION
             return True
+        if input_state.left or input_state.right:
+            return True  # consume held state so menu doesn't see it
         # Action: re-show info overlay
         if input_state.action_l or input_state.action_r:
             self.overlay_timer = _OVERLAY_DURATION
