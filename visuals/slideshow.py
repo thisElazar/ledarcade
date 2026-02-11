@@ -147,20 +147,41 @@ class ArtGallery(Slideshow):
     name = "ART GALLERY"
     description = "Famous paintings slideshow"
 
+    def reset(self):
+        self._show_nameplate = False  # user-controlled, persists across paintings
+        super().reset()
+
     def _get_visual_classes(self):
         from visuals.painting import PAINTING_VISUALS
         return list(PAINTING_VISUALS)
+
+    def _advance(self):
+        """Pick next painting, skip randomize, carry overlay state."""
+        if not self._queue:
+            self._queue = self._get_visual_classes()
+            random.shuffle(self._queue)
+        if self._queue:
+            cls = self._queue.pop()
+            self._child = cls(self.display)
+            self._child.reset()
+            # Inherit nameplate state from previous painting
+            self._child._show_overlay = self._show_nameplate
+            self._child._overlay_alpha = 1.0 if self._show_nameplate else 0.0
+            self._child._overlay_time = 0.0
+            self._cycle_timer = 0.0
 
     def handle_input(self, input_state):
         # Button: skip to next painting
         if input_state.action_l or input_state.action_r:
             self._advance()
             return True
-        # Any joystick press: toggle child's nameplate
+        # Any joystick press: toggle nameplate for current and future paintings
         if (input_state.up_pressed or input_state.down_pressed
                 or input_state.left_pressed or input_state.right_pressed):
-            if self._child and hasattr(self._child, '_toggle_overlay'):
-                self._child._toggle_overlay()
+            self._show_nameplate = not self._show_nameplate
+            if self._child and hasattr(self._child, '_show_overlay'):
+                self._child._show_overlay = self._show_nameplate
+                self._child._overlay_time = 0.0
             return True
         # Consume held joystick so menu doesn't see it
         if input_state.any_direction:
