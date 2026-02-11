@@ -166,7 +166,9 @@ class _PaintingBase(Visual):
 
     def reset(self):
         self.pixels = None
-        self.overlay_timer = _OVERLAY_DURATION
+        self._show_overlay = False
+        self._overlay_alpha = 0.0
+        self._overlay_time = 0.0      # how long overlay has been visible
         self._current_pid = self._pid
         self._prev_left = False
         self._prev_right = False
@@ -206,20 +208,30 @@ class _PaintingBase(Visual):
                     idx = (idx - 1) % len(self._all_pids)
                 self._current_pid = self._all_pids[idx]
                 self._load()
-                self.overlay_timer = _OVERLAY_DURATION
+                # Reset scroll position but don't auto-show overlay
+                self._overlay_time = 0.0
             return True
         if input_state.left or input_state.right:
             return True  # consume held state so menu doesn't see it
-        # Action: re-show info overlay
+        # Action: toggle info overlay on/off
         if input_state.action_l or input_state.action_r:
-            self.overlay_timer = _OVERLAY_DURATION
+            self._show_overlay = not self._show_overlay
+            if self._show_overlay:
+                self._overlay_time = 0.0
             return True
         return False
 
     def update(self, dt):
         self.time += dt
-        if self.overlay_timer > 0:
-            self.overlay_timer -= dt
+        # Smooth fade: alpha approaches target (1.0 if showing, 0.0 if hiding)
+        target = 1.0 if self._show_overlay else 0.0
+        if self._overlay_alpha < target:
+            self._overlay_alpha = min(target, self._overlay_alpha + dt / 0.3)
+        elif self._overlay_alpha > target:
+            self._overlay_alpha = max(target, self._overlay_alpha - dt / 0.3)
+        # Track how long overlay has been visible (for scroll timing)
+        if self._overlay_alpha > 0.01:
+            self._overlay_time += dt
 
     def _scroll_text(self, y, text, color):
         """Draw text with auto-scroll for long strings."""
@@ -229,8 +241,7 @@ class _PaintingBase(Visual):
             self.display.draw_text_small(2, y, text, color)
         else:
             # Scroll: pause, then slide left to reveal full text
-            elapsed = _OVERLAY_DURATION - self.overlay_timer
-            scroll_elapsed = max(0.0, elapsed - _SCROLL_PAUSE)
+            scroll_elapsed = max(0.0, self._overlay_time - _SCROLL_PAUSE)
             offset = int(scroll_elapsed * _SCROLL_SPEED)
             max_offset = text_w - _VISIBLE_W + 8
             offset = min(offset, max_offset)
@@ -247,10 +258,9 @@ class _PaintingBase(Visual):
             for x in range(GRID_SIZE):
                 self.display.set_pixel(x, y, self.pixels[y][x])
 
-        # Info overlay
-        if self.overlay_timer > 0:
-            alpha = min(1.0, self.overlay_timer / _FADE_TIME)
-
+        # Info overlay (toggle on/off with button)
+        alpha = self._overlay_alpha
+        if alpha > 0.01:
             # Dim bottom strip with gradient
             for y in range(_DIM_TOP, GRID_SIZE):
                 fade = alpha * min(1.0, (y - _DIM_TOP) / 5.0)

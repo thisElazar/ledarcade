@@ -1037,39 +1037,57 @@ class GallerySalon(_Gallery3DBase):
 
         self.MAP = grid
 
-        # Stack map: 4 random paintings above each ground-level painting
+        # Stack map: 4 paintings above each ground-level painting (no repeats)
         self._stack_map = {}
         if paint_cells:
+            n_stack = self._WALL_SCALE - 1  # 4 panels above ground
             for cid in paint_cells:
-                self._stack_map[cid] = [
-                    _rng.choice(paint_cells)
-                    for _ in range(self._WALL_SCALE - 1)]
+                pool = [c for c in paint_cells if c != cid]
+                if len(pool) >= n_stack:
+                    self._stack_map[cid] = _rng.sample(pool, n_stack)
+                else:
+                    self._stack_map[cid] = (pool * ((n_stack // len(pool)) + 1))[:n_stack]
 
-        # Waypoints: sweep forward through rooms then back, with doorway
-        # transitions.  Within each room visit the 4 corners.
-        cy = H / 2.0
+        # Waypoints: (x, y, face_angle, pause_time)
+        # Walk through each room, stopping to face each painting wall
+        # face_angle: direction camera looks while paused
+        FACE_N = -math.pi / 2   # look north (up, -Y)
+        FACE_S = math.pi / 2    # look south (down, +Y)
+        FACE_W = math.pi        # look west (-X)
+        FACE_E = 0.0            # look east (+X)
+        VIEW_PAUSE = 3.5        # seconds to gaze at a wall section
+        TRANSIT = 0.2           # quick transit pause
+
         wps = []
 
-        # Forward sweep: rooms 0 → 1 → 2 → 3
         for room in range(N_ROOMS):
             x0 = room * RW
-            corners = [
-                (x0 + 2.5, 3.5),            # NW — see N + W walls
-                (x0 + RW - 3.5, 3.5),       # NE — see N + E walls
-                (x0 + RW - 3.5, H - 4.5),   # SE — see S + E walls
-                (x0 + 2.5, H - 4.5),        # SW — see S + W walls
-            ]
-            _rng.shuffle(corners)
-            wps.extend(corners)
-            if room < N_ROOMS - 1:
-                wps.append((x0 + RW - 0.5, 5.5))   # doorway exit
+            cx = x0 + RW / 2.0
+            # Enter room center
+            wps.append((cx, H / 2.0, None, TRANSIT))
 
-        # Return sweep: rooms 3 → 2 → 1 → 0  (room centers only)
-        for room in range(N_ROOMS - 1, -1, -1):
-            x0 = room * RW
-            wps.append((x0 + RW / 2.0, cy))
-            if room > 0:
-                wps.append((x0 + 0.5, 5.5))         # doorway exit
+            # North wall: stand at y=3.5, sweep left to right
+            for spot_x in (x0 + 3.0, cx, x0 + RW - 4.0):
+                wps.append((spot_x, 3.5, FACE_N, VIEW_PAUSE))
+
+            # East wall: stand at x = x0+RW-3, sweep top to bottom
+            ex = x0 + RW - 3.0
+            for spot_y in (3.5, H / 2.0, H - 4.5):
+                wps.append((ex, spot_y, FACE_E, VIEW_PAUSE))
+
+            # South wall: sweep right to left
+            for spot_x in (x0 + RW - 4.0, cx, x0 + 3.0):
+                wps.append((spot_x, H - 4.5, FACE_S, VIEW_PAUSE))
+
+            # West wall: sweep bottom to top
+            wx = x0 + 3.0
+            for spot_y in (H - 4.5, H / 2.0, 3.5):
+                wps.append((wx, spot_y, FACE_W, VIEW_PAUSE))
+
+            # Walk through doorway to next room
+            if room < N_ROOMS - 1:
+                door_x = x0 + RW - 0.5
+                wps.append((door_x, 5.5, FACE_E, TRANSIT))
 
         self.WAYPOINTS = wps
         super().__init__(display)
@@ -1082,6 +1100,57 @@ class GallerySalon(_Gallery3DBase):
     def reset(self):
         super().reset()
         self.move_speed = 2.0
+        self._face_angle = None   # target angle during viewing pause
+
+    # -- Auto-walk override: (x, y, face_angle, pause) waypoints --
+
+    def _auto_walk(self, dt):
+        if not self.WAYPOINTS:
+            return
+        # During pause: smoothly rotate to face_angle
+        if self.wp_pause > 0:
+            self.wp_pause -= dt
+            if self._face_angle is not None:
+                diff = self._face_angle - self.pa
+                while diff > math.pi:
+                    diff -= 2 * math.pi
+                while diff < -math.pi:
+                    diff += 2 * math.pi
+                self.pa += diff * min(1.0, 6.0 * dt)
+            return
+
+        wp = self.WAYPOINTS[self.wp_idx]
+        tx, ty = wp[0], wp[1]
+        face = wp[2] if len(wp) > 2 else None
+        pause = wp[3] if len(wp) > 3 else 0.8
+
+        dx = tx - self.px
+        dy = ty - self.py
+        dist = math.sqrt(dx * dx + dy * dy)
+        if dist < 0.3:
+            self._face_angle = face
+            self.wp_pause = pause
+            self.wp_idx = (self.wp_idx + 1) % len(self.WAYPOINTS)
+            return
+
+        target_a = math.atan2(dy, dx)
+        diff = target_a - self.pa
+        while diff > math.pi:
+            diff -= 2 * math.pi
+        while diff < -math.pi:
+            diff += 2 * math.pi
+        self.pa += diff * min(1.0, 6.0 * dt)
+
+        speed = self.move_speed * dt
+        cos_a = math.cos(self.pa)
+        sin_a = math.sin(self.pa)
+        nx = self.px + cos_a * speed
+        ny = self.py + sin_a * speed
+        margin = 0.25
+        if not self._solid(nx, self.py, margin):
+            self.px = nx
+        if not self._solid(self.px, ny, margin):
+            self.py = ny
 
     # -- Emissive ceiling + white marble floor --
 
