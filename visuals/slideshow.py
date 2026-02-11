@@ -127,9 +127,9 @@ class Chill(Slideshow):
 
     def _get_visual_classes(self):
         from visuals import (Lake, Aurora, Starfield, Fireflies, Ripples,
-                             Flux, Weather, Boids, WaterLilies, StarryNight)
+                             Flux, Weather, Boids, Lava, Gyre)
         return [Lake, Aurora, Starfield, Fireflies, Ripples,
-                Flux, Weather, Boids, WaterLilies, StarryNight]
+                Flux, Weather, Boids, Lava, Gyre]
 
 
 class Energy(Slideshow):
@@ -145,11 +145,11 @@ class Energy(Slideshow):
 
 class ArtGallery(Slideshow):
     name = "ART GALLERY"
-    description = "Famous paintings and art reproductions"
+    description = "Famous paintings slideshow"
 
     def _get_visual_classes(self):
-        from visuals import GreatWave, Mondrian, Scream, StarryNight, WaterLilies
-        return [GreatWave, Mondrian, Scream, StarryNight, WaterLilies]
+        from visuals.painting import PAINTING_VISUALS
+        return list(PAINTING_VISUALS)
 
 
 class SpriteGallery(Slideshow):

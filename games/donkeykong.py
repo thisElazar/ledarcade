@@ -87,8 +87,8 @@ class DonkeyKong(Game):
 
         # Barrels
         self.barrels = []
-        self.barrel_spawn_timer = 0.0
         self.barrel_spawn_rate = 2.5  # seconds between barrels
+        self.barrel_spawn_timer = self.barrel_spawn_rate
 
         # Hammer powerups: {'x': x, 'y': y, 'active': bool}
         self.hammers = []
@@ -559,7 +559,7 @@ class DonkeyKong(Game):
             self.jumping = False
             self.has_hammer = False
             self.barrels.clear()
-            self.barrel_spawn_timer = 0.0
+            self.barrel_spawn_timer = self.barrel_spawn_rate
             # Restore hammers
             for hammer in self.hammers:
                 hammer['active'] = True
@@ -576,7 +576,7 @@ class DonkeyKong(Game):
         self.jumping = False
         self.has_hammer = False
         self.barrels.clear()
-        self.barrel_spawn_timer = 0.0
+        self.barrel_spawn_timer = self.barrel_spawn_rate
         self.build_level()
 
     def draw(self):

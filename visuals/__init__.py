@@ -92,8 +92,7 @@ from .roundabout import Roundabout
 from .interchange import Interchange
 from .greenwave import GreenWave
 from .merge import Merge
-from .waterlilies import WaterLilies
-from .starrynight import StarryNight
+from .painting import PAINTING_VISUALS
 from .mobius import Mobius
 from .lake import Lake
 from .quarks import Quarks
@@ -121,9 +120,7 @@ from .rainbow import Rainbow
 from .moire import Moire
 from .cylon import Cylon
 from .sinescroller import SineScroller
-from .mondrian import Mondrian
 from .copperbars import CopperBars
-from .greatwave import GreatWave
 from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GalleryScience, GalleryDigital, GalleryEffects,
                         GallerySalon, GallerySMB3, GalleryKirby,
@@ -137,7 +134,6 @@ from .fireflies import Fireflies
 from .starwarsca import StarWarsCA
 from .truchet import Truchet
 from .sandpile import Sandpile
-from .scream import Scream
 from .mario import Mario
 from .sonic import Sonic
 from .link import Link
@@ -316,8 +312,6 @@ ALL_VISUALS = [
     Solitaire,
     Polaroid,
     Road,
-    WaterLilies,
-    StarryNight,
     Mobius,
     Lake,
     Quarks,
@@ -346,9 +340,7 @@ ALL_VISUALS = [
     Moire,
     Cylon,
     SineScroller,
-    Mondrian,
     CopperBars,
-    GreatWave,
     GalleryArt,
     GallerySprites,
     GalleryAutomata,
@@ -361,6 +353,7 @@ ALL_VISUALS = [
     GalleryZelda,
     GalleryKidIcarus,
     GalleryAdventureTime,
+    *PAINTING_VISUALS,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -368,7 +361,6 @@ ALL_VISUALS = [
     StarWarsCA,
     Truchet,
     Sandpile,
-    Scream,
     Mario,
     Sonic,
     Link,
@@ -618,8 +610,7 @@ __all__ = [
     'Solitaire',
     'Polaroid',
     'Road',
-    'WaterLilies',
-    'StarryNight',
+    'PAINTING_VISUALS',
     'Mobius',
     'Lake',
     'Quarks',
@@ -645,9 +636,7 @@ __all__ = [
     'Moire',
     'Cylon',
     'SineScroller',
-    'Mondrian',
     'CopperBars',
-    'GreatWave',
     'GalleryArt',
     'GallerySprites',
     'GalleryAutomata',
@@ -668,7 +657,6 @@ __all__ = [
     'StarWarsCA',
     'Truchet',
     'Sandpile',
-    'Scream',
     'Mario',
     'Sonic',
     'Link',

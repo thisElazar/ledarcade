@@ -509,15 +509,16 @@ class GalleryArt(_Gallery3DBase):
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],       # 15
     ]
 
+    _P = "paintings/"
     PAINTINGS = {
-        2: ("png", "greatwave.png"),
-        3: ("png", "scream.png"),
-        4: ("visual", "starrynight", "StarryNight"),
-        5: ("visual", "waterlilies", "WaterLilies"),
-        6: ("visual", "mondrian", "Mondrian"),
-        7: ("visual", "greatwave", "GreatWave"),
-        8: ("visual", "scream", "Scream"),
-        9: ("visual", "starrynight", "StarryNight"),
+        2: ("png", _P + "great_wave.png"),
+        3: ("png", _P + "the_scream.png"),
+        4: ("png", _P + "starry_night.png"),
+        5: ("png", _P + "water_lilies.png"),
+        6: ("png", _P + "broadway_boogie.png"),
+        7: ("png", _P + "girl_pearl_earring.png"),
+        8: ("png", _P + "mona_lisa.png"),
+        9: ("png", _P + "birth_of_venus.png"),
     }
 
     WAYPOINTS = [
@@ -950,94 +951,139 @@ class GallerySalon(_Gallery3DBase):
     name = "SALON"
     description = "Wall-to-wall paintings"
     category = "gallery"
-    dev_only = True
 
-    MAP_W = 16
-    MAP_H = 10
-    START_POS = (7.5, 5.0)
+    MAP_W = 20
+    MAP_H = 14
+    START_POS = (10.0, 7.0)
 
-    # One big room — paintings on every wall surface
+    # Large salon — paintings on every wall, center partition for more surface
+    #   North wall: 18 paintings (cells 2-19)
+    #   South wall: 18 paintings (cells 20-37)
+    #   West wall:  10 paintings (cells 38-47)
+    #   East wall:  10 paintings (cells 48-57)
+    #   Center partition: 12 paintings (cells 58-69)
     MAP = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],       # 0
-        [1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15, 1],       # 1  north wall
-        [16,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,17],       # 2  side paintings
-        [18,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,19],       # 3  side paintings
-        [20,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,21],       # 4  side paintings
-        [22,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,23],       # 5  side paintings
-        [24,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,25],       # 6  side paintings
-        [26,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,27],       # 7  side paintings
-        [1,28,29,30,31,32,33,34,35,36,37,38,39,40,41, 1],       # 8  south wall
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],       # 9
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  # 0
+        [1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19, 1],  # 1  north
+        [38,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,48],  # 2
+        [39,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,49],  # 3
+        [40,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50],  # 4
+        [41,0, 0, 0,58,59,60,61,62,63, 0, 0, 0, 0, 0, 0, 0, 0, 0,51],  # 5  partition
+        [42,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,52],  # 6
+        [43,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,53],  # 7
+        [44,0, 0, 0, 0, 0, 0, 0, 0, 0,64,65,66,67,68,69, 0, 0, 0,54],  # 8  partition
+        [45,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55],  # 9
+        [46,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,56],  # 10
+        [47,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,57],  # 11
+        [1,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37, 1],  # 12 south
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  # 13
     ]
 
+    # All paintings sourced from the painting pipeline (assets/paintings/)
+    _P = "paintings/"
     PAINTINGS = {
-        # North wall — the masters + vivid generative art
-        2:  ("png", "greatwave.png"),
-        3:  ("visual", "starrynight", "StarryNight"),
-        4:  ("png", "scream.png"),
-        5:  ("visual", "waterlilies", "WaterLilies"),
-        6:  ("visual", "mondrian", "Mondrian"),
-        7:  ("visual", "plasma", "Plasma"),
-        8:  ("visual", "fire", "Fire"),
-        9:  ("visual", "aurora", "Aurora"),
-        10: ("visual", "life", "Life"),
-        11: ("visual", "hodge", "Hodge"),
-        12: ("visual", "demonspirals", "DemonSpirals"),
-        13: ("visual", "ripples", "Ripples"),
-        14: ("visual", "xorpattern", "XORPattern"),
-        15: ("visual", "truchet", "Truchet"),
-        # West wall
-        16: ("visual", "moire", "Moire"),
-        18: ("visual", "boids", "Boids"),
-        20: ("visual", "lava", "Lava"),
-        22: ("visual", "earth", "Earth"),
-        24: ("visual", "gyre", "Gyre"),
-        26: ("visual", "slime", "Slime"),
-        # East wall
-        17: ("visual", "rotozoom", "Rotozoom"),
-        19: ("visual", "starfield", "Starfield"),
-        21: ("visual", "matrix", "Matrix"),
-        23: ("visual", "lattice", "Lattice"),
-        25: ("visual", "flux", "Flux"),
-        27: ("visual", "attractors", "Attractors"),
-        # South wall — science + abstract
-        28: ("visual", "chladni", "Chladni"),
-        29: ("visual", "neurons", "Neurons"),
-        30: ("visual", "fluid", "FluidInk"),
-        31: ("visual", "wolfram", "Wolfram"),
-        32: ("visual", "sandpile", "Sandpile"),
-        33: ("visual", "faders", "Faders"),
-        34: ("visual", "trance", "Trance"),
-        35: ("visual", "copperbars", "CopperBars"),
-        36: ("visual", "rainbow", "Rainbow"),
-        37: ("visual", "quarks", "Quarks"),
-        38: ("visual", "mobius", "Mobius"),
-        39: ("visual", "lake", "Lake"),
-        40: ("visual", "greatwave", "GreatWave"),
-        41: ("visual", "scream", "Scream"),
+        # North wall — Renaissance + Baroque masterworks
+        2:  ("png", _P + "mona_lisa.png"),
+        3:  ("png", _P + "girl_pearl_earring.png"),
+        4:  ("png", _P + "starry_night.png"),
+        5:  ("png", _P + "great_wave.png"),
+        6:  ("png", _P + "the_scream.png"),
+        7:  ("png", _P + "birth_of_venus.png"),
+        8:  ("png", _P + "creation_of_adam.png"),
+        9:  ("png", _P + "night_watch.png"),
+        10: ("png", _P + "the_kiss_klimt.png"),
+        11: ("png", _P + "water_lilies.png"),
+        12: ("png", _P + "wanderer_fog.png"),
+        13: ("png", _P + "liberty_leading.png"),
+        14: ("png", _P + "school_of_athens.png"),
+        15: ("png", _P + "last_supper.png"),
+        16: ("png", _P + "las_meninas.png"),
+        17: ("png", _P + "american_gothic.png"),
+        18: ("png", _P + "nighthawks.png"),
+        19: ("png", _P + "sunday_grande_jatte.png"),
+        # South wall — Impressionism + Post-Impressionism
+        20: ("png", _P + "impression_sunrise.png"),
+        21: ("png", _P + "dance_moulin.png"),
+        22: ("png", _P + "luncheon_boating.png"),
+        23: ("png", _P + "degas_ballet.png"),
+        24: ("png", _P + "woman_parasol.png"),
+        25: ("png", _P + "cafe_terrace.png"),
+        26: ("png", _P + "sunflowers.png"),
+        27: ("png", _P + "irises.png"),
+        28: ("png", _P + "almond_blossoms.png"),
+        29: ("png", _P + "poppies.png"),
+        30: ("png", _P + "japanese_bridge.png"),
+        31: ("png", _P + "haystacks.png"),
+        32: ("png", _P + "caillebotte_rainy.png"),
+        33: ("png", _P + "pissarro_boulevard.png"),
+        34: ("png", _P + "morisot_cradle.png"),
+        35: ("png", _P + "cassatt_bath.png"),
+        36: ("png", _P + "sorolla_seashore.png"),
+        37: ("png", _P + "bar_folies_bergere.png"),
+        # West wall — Romanticism + Baroque drama
+        38: ("png", _P + "caravaggio_judith.png"),
+        39: ("png", _P + "artemisia_judith.png"),
+        40: ("png", _P + "saturn_devouring.png"),
+        41: ("png", _P + "raft_of_medusa.png"),
+        42: ("png", _P + "napoleon_alps.png"),
+        43: ("png", _P + "death_of_marat.png"),
+        44: ("png", _P + "ophelia.png"),
+        45: ("png", _P + "lady_of_shalott.png"),
+        46: ("png", _P + "fighting_temeraire.png"),
+        47: ("png", _P + "ninth_wave.png"),
+        # East wall — Portraits + Dutch/Flemish
+        48: ("png", _P + "the_milkmaid.png"),
+        49: ("png", _P + "art_of_painting.png"),
+        50: ("png", _P + "arnolfini_portrait.png"),
+        51: ("png", _P + "rembrandt_self_portrait.png"),
+        52: ("png", _P + "vangogh_self_portrait.png"),
+        53: ("png", _P + "durer_self_portrait.png"),
+        54: ("png", _P + "klimt_adele.png"),
+        55: ("png", _P + "madame_x.png"),
+        56: ("png", _P + "the_swing.png"),
+        57: ("png", _P + "modigliani_portrait.png"),
+        # Center partition (left, row 5) — Ukiyo-e + Modern
+        58: ("png", _P + "red_fuji.png"),
+        59: ("png", _P + "hokusai_bullfinch.png"),
+        60: ("png", _P + "hiroshige_rain.png"),
+        61: ("png", _P + "the_dance_matisse.png"),
+        62: ("png", _P + "composition_viii.png"),
+        63: ("png", _P + "broadway_boogie.png"),
+        # Center partition (right, row 8) — Abstract + Expressionism
+        64: ("png", _P + "black_square.png"),
+        65: ("png", _P + "white_on_white.png"),
+        66: ("png", _P + "several_circles.png"),
+        67: ("png", _P + "delaunay_windows.png"),
+        68: ("png", _P + "blue_horse.png"),
+        69: ("png", _P + "sleeping_gypsy.png"),
     }
 
     WAYPOINTS = [
-        # Open facing north wall
-        (7.5, 2.5),    # approach north paintings
+        # Start at center, face north
+        (10.0, 3.5),    # approach north wall
         # Walk along north wall
-        (2.0, 2.5),    # far left
-        (5.0, 2.5),    # left-center
-        (10.0, 2.5),   # right-center
-        (13.0, 2.5),   # far right
+        (3.0, 2.5),     # far left
+        (7.0, 2.5),     # left-center
+        (13.0, 2.5),    # right-center
+        (17.0, 2.5),    # far right
         # East wall
-        (13.5, 4.0),   # upper east
-        (13.5, 6.0),   # lower east
+        (18.0, 5.0),    # upper east
+        (18.0, 9.0),    # lower east
         # South wall
-        (13.0, 7.5),   # far right south
-        (10.0, 7.5),   # right-center
-        (5.0, 7.5),    # left-center
-        (2.0, 7.5),    # far left south
+        (17.0, 11.5),   # far right south
+        (13.0, 11.5),   # center-right
+        (7.0, 11.5),    # center-left
+        (3.0, 11.5),    # far left south
         # West wall
-        (1.5, 6.0),    # lower west
-        (1.5, 4.0),    # upper west
+        (1.5, 9.0),     # lower west
+        (1.5, 5.0),     # upper west
+        # Center partitions
+        (5.0, 4.0),     # north of left partition
+        (8.0, 6.5),     # south of left partition
+        (14.0, 7.5),    # north of right partition
+        (12.0, 9.5),    # south of right partition
         # Back to center
-        (7.5, 5.0),    # center
+        (10.0, 7.0),    # center
     ]
 
 

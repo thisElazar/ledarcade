@@ -1,0 +1,930 @@
+{
+    "mona_lisa": {
+        "title": "Mona Lisa",
+        "artist": "Leonardo da Vinci",
+        "year": 1503,
+        "movement": "Renaissance",
+        "file": "Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",
+        "crop": "top"
+    },
+    "last_supper": {
+        "title": "The Last Supper",
+        "artist": "Leonardo da Vinci",
+        "year": 1498,
+        "movement": "Renaissance",
+        "file": "Última_Cena_-_Da_Vinci_5.jpg",
+        "crop": "center"
+    },
+    "vitruvian_man": {
+        "title": "Vitruvian Man",
+        "artist": "Leonardo da Vinci",
+        "year": 1490,
+        "movement": "Renaissance",
+        "file": "Da Vinci Vitruve Luc Viatour.jpg",
+        "crop": "center"
+    },
+    "birth_of_venus": {
+        "title": "The Birth of Venus",
+        "artist": "Sandro Botticelli",
+        "year": 1485,
+        "movement": "Renaissance",
+        "file": "Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+        "crop": "center"
+    },
+    "primavera": {
+        "title": "Primavera",
+        "artist": "Sandro Botticelli",
+        "year": 1482,
+        "movement": "Renaissance",
+        "file": "Botticelli-primavera.jpg",
+        "crop": "center"
+    },
+    "creation_of_adam": {
+        "title": "The Creation of Adam",
+        "artist": "Michelangelo",
+        "year": 1512,
+        "movement": "Renaissance",
+        "file": "Michelangelo_-_Creation_of_Adam_(cropped).jpg",
+        "crop": "center"
+    },
+    "sistine_madonna": {
+        "title": "Sistine Madonna",
+        "artist": "Raphael",
+        "year": 1512,
+        "movement": "Renaissance",
+        "file": "Raffaello Sanzio - Madonna Sistina.jpg",
+        "crop": "top"
+    },
+    "school_of_athens": {
+        "title": "The School of Athens",
+        "artist": "Raphael",
+        "year": 1511,
+        "movement": "Renaissance",
+        "file": "\"The School of Athens\" by Raffaello Sanzio da Urbino.jpg",
+        "crop": "center"
+    },
+    "garden_earthly_delights": {
+        "title": "The Garden of Earthly Delights",
+        "artist": "Hieronymus Bosch",
+        "year": 1500,
+        "movement": "Renaissance",
+        "file": "The_Garden_of_earthly_delights.jpg",
+        "crop": "center"
+    },
+    "last_judgment_bosch": {
+        "title": "The Last Judgment",
+        "artist": "Hieronymus Bosch",
+        "year": 1482,
+        "movement": "Renaissance",
+        "file": "Last judgement Bosch.jpg",
+        "crop": "center"
+    },
+    "tower_of_babel": {
+        "title": "The Tower of Babel",
+        "artist": "Pieter Bruegel",
+        "year": 1563,
+        "movement": "Renaissance",
+        "file": "Pieter_Bruegel_the_Elder_-_The_Tower_of_Babel_(Vienna)_-_Google_Art_Project_-_edited.jpg",
+        "crop": "center"
+    },
+    "hunters_snow": {
+        "title": "Hunters in the Snow",
+        "artist": "Pieter Bruegel",
+        "year": 1565,
+        "movement": "Renaissance",
+        "file": "Pieter Bruegel the Elder - Hunters in the Snow (Winter) - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "arcimboldo_summer": {
+        "title": "Summer",
+        "artist": "Giuseppe Arcimboldo",
+        "year": 1563,
+        "movement": "Renaissance",
+        "file": "Giuseppe Arcimboldo - Summer - WGA00814.jpg",
+        "crop": "top"
+    },
+    "durer_self_portrait": {
+        "title": "Self-Portrait at Twenty-Eight",
+        "artist": "Albrecht Dürer",
+        "year": 1500,
+        "movement": "Renaissance",
+        "file": "Albrecht Dürer - 1500 self-portrait (High resolution and detail).jpg",
+        "crop": "top"
+    },
+    "arnolfini_portrait": {
+        "title": "The Arnolfini Portrait",
+        "artist": "Jan van Eyck",
+        "year": 1434,
+        "movement": "Renaissance",
+        "file": "Van_Eyck_-_Arnolfini_Portrait.jpg",
+        "crop": "top"
+    },
+    "venus_urbino": {
+        "title": "Venus of Urbino",
+        "artist": "Titian",
+        "year": 1538,
+        "movement": "Renaissance",
+        "file": "Tiziano - Venere di Urbino - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "caravaggio_bacchus": {
+        "title": "Bacchus",
+        "artist": "Caravaggio",
+        "year": 1598,
+        "movement": "Baroque",
+        "file": "Bacchus-Caravaggio (1598).jpg",
+        "crop": "top"
+    },
+    "caravaggio_judith": {
+        "title": "Judith Beheading Holofernes",
+        "artist": "Caravaggio",
+        "year": 1599,
+        "movement": "Baroque",
+        "file": "Judith Beheading Holofernes-Caravaggio (c.1598-9).jpg",
+        "crop": "top"
+    },
+    "calling_st_matthew": {
+        "title": "The Calling of Saint Matthew",
+        "artist": "Caravaggio",
+        "year": 1600,
+        "movement": "Baroque",
+        "file": "The Calling of Saint Matthew-Caravaggo (1599-1600).jpg",
+        "crop": "center"
+    },
+    "caravaggio_medusa": {
+        "title": "Medusa",
+        "artist": "Caravaggio",
+        "year": 1597,
+        "movement": "Baroque",
+        "file": "Caravaggio - Medusa - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "artemisia_judith": {
+        "title": "Judith Slaying Holofernes",
+        "artist": "Artemisia Gentileschi",
+        "year": 1620,
+        "movement": "Baroque",
+        "file": "Artemisia Gentileschi - Judith Beheading Holofernes - WGA8563.jpg",
+        "crop": "top"
+    },
+    "girl_pearl_earring": {
+        "title": "Girl with a Pearl Earring",
+        "artist": "Johannes Vermeer",
+        "year": 1665,
+        "movement": "Baroque",
+        "file": "Meisje_met_de_parel.jpg",
+        "crop": "top"
+    },
+    "the_milkmaid": {
+        "title": "The Milkmaid",
+        "artist": "Johannes Vermeer",
+        "year": 1658,
+        "movement": "Baroque",
+        "file": "Johannes_Vermeer_-_Het_melkmeisje_-_Google_Art_Project.jpg",
+        "crop": "top"
+    },
+    "art_of_painting": {
+        "title": "The Art of Painting",
+        "artist": "Johannes Vermeer",
+        "year": 1666,
+        "movement": "Baroque",
+        "file": "Jan Vermeer - The Art of Painting - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "girl_reading_letter": {
+        "title": "Girl Reading a Letter at an Open Window",
+        "artist": "Johannes Vermeer",
+        "year": 1657,
+        "movement": "Baroque",
+        "file": "Johannes Vermeer - Girl Reading a Letter by an Open Window - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "vermeer_astronomer": {
+        "title": "The Astronomer",
+        "artist": "Johannes Vermeer",
+        "year": 1668,
+        "movement": "Baroque",
+        "file": "Johannes Vermeer - The Astronomer - 1668.jpg",
+        "crop": "top"
+    },
+    "view_of_delft": {
+        "title": "View of Delft",
+        "artist": "Johannes Vermeer",
+        "year": 1661,
+        "movement": "Baroque",
+        "file": "Vermeer-view-of-delft.jpg",
+        "crop": "center"
+    },
+    "night_watch": {
+        "title": "The Night Watch",
+        "artist": "Rembrandt",
+        "year": 1642,
+        "movement": "Baroque",
+        "file": "The_Night_Watch_-_HD.jpg",
+        "crop": "center"
+    },
+    "rembrandt_self_portrait": {
+        "title": "Self-Portrait",
+        "artist": "Rembrandt",
+        "year": 1660,
+        "movement": "Baroque",
+        "file": "Rembrandt van Rijn - Self-Portrait - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "las_meninas": {
+        "title": "Las Meninas",
+        "artist": "Diego Velázquez",
+        "year": 1656,
+        "movement": "Baroque",
+        "file": "Las Meninas, by Diego Velázquez, from Prado in Google Earth.jpg",
+        "crop": "center"
+    },
+    "the_swing": {
+        "title": "The Swing",
+        "artist": "Jean-Honoré Fragonard",
+        "year": 1767,
+        "movement": "Rococo",
+        "file": "Fragonard, The Swing.jpg",
+        "crop": "top"
+    },
+    "saturn_devouring": {
+        "title": "Saturn Devouring His Son",
+        "artist": "Francisco Goya",
+        "year": 1823,
+        "movement": "Romanticism",
+        "file": "Francisco_de_Goya,_Saturno_devorando_a_su_hijo_(1819-1823).jpg",
+        "crop": "top"
+    },
+    "death_of_marat": {
+        "title": "The Death of Marat",
+        "artist": "Jacques-Louis David",
+        "year": 1793,
+        "movement": "Neoclassicism",
+        "file": "Death of Marat by David.jpg",
+        "crop": "top"
+    },
+    "napoleon_alps": {
+        "title": "Napoleon Crossing the Alps",
+        "artist": "Jacques-Louis David",
+        "year": 1801,
+        "movement": "Neoclassicism",
+        "file": "David_-_Napoleon_crossing_the_Alps_-_Malmaison2.jpg",
+        "crop": "top"
+    },
+    "wanderer_fog": {
+        "title": "Wanderer Above the Sea of Fog",
+        "artist": "Caspar David Friedrich",
+        "year": 1818,
+        "movement": "Romanticism",
+        "file": "Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+        "crop": "top"
+    },
+    "liberty_leading": {
+        "title": "Liberty Leading the People",
+        "artist": "Eugène Delacroix",
+        "year": 1830,
+        "movement": "Romanticism",
+        "file": "Eugène_Delacroix_-_Le_28_Juillet._La_Liberté_guidant_le_peuple.jpg",
+        "crop": "center"
+    },
+    "death_sardanapalus": {
+        "title": "The Death of Sardanapalus",
+        "artist": "Eugène Delacroix",
+        "year": 1827,
+        "movement": "Romanticism",
+        "file": "Eugène Delacroix - The Death of Sardanapalus - WGA6173.jpg",
+        "crop": "center"
+    },
+    "raft_of_medusa": {
+        "title": "The Raft of the Medusa",
+        "artist": "Théodore Géricault",
+        "year": 1819,
+        "movement": "Romanticism",
+        "file": "JEAN_LOUIS_THÉODORE_GÉRICAULT_-_La_Balsa_de_la_Medusa_(Museo_del_Louvre,_1818-19).jpg",
+        "crop": "center"
+    },
+    "epsom_derby": {
+        "title": "The Derby at Epsom",
+        "artist": "Théodore Géricault",
+        "year": 1821,
+        "movement": "Romanticism",
+        "file": "Théodore Géricault - The Epsom Derby - WGA08637.jpg",
+        "crop": "center"
+    },
+    "fighting_temeraire": {
+        "title": "The Fighting Temeraire",
+        "artist": "J.M.W. Turner",
+        "year": 1839,
+        "movement": "Romanticism",
+        "file": "Turner, J. M. W. - The Fighting Téméraire tugged to her last Berth to be broken.jpg",
+        "crop": "center"
+    },
+    "rain_steam_speed": {
+        "title": "Rain, Steam and Speed",
+        "artist": "J.M.W. Turner",
+        "year": 1844,
+        "movement": "Romanticism",
+        "file": "Turner - Rain, Steam and Speed - National Gallery file.jpg",
+        "crop": "center"
+    },
+    "hay_wain": {
+        "title": "The Hay Wain",
+        "artist": "John Constable",
+        "year": 1821,
+        "movement": "Romanticism",
+        "file": "John Constable The Hay Wain.jpg",
+        "crop": "center"
+    },
+    "the_oxbow": {
+        "title": "The Oxbow",
+        "artist": "Thomas Cole",
+        "year": 1836,
+        "movement": "Hudson River School",
+        "file": "Cole Thomas The Oxbow (The Connecticut River near Northampton 1836).jpg",
+        "crop": "center"
+    },
+    "niagara": {
+        "title": "Niagara",
+        "artist": "Frederic Edwin Church",
+        "year": 1857,
+        "movement": "Hudson River School",
+        "file": "Frederic Edwin Church - Niagara Falls - WGA04867.jpg",
+        "crop": "center"
+    },
+    "ninth_wave": {
+        "title": "The Ninth Wave",
+        "artist": "Ivan Aivazovsky",
+        "year": 1850,
+        "movement": "Romanticism",
+        "file": "Hovhannes Aivazovsky - The Ninth Wave - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "great_wave": {
+        "title": "The Great Wave off Kanagawa",
+        "artist": "Katsushika Hokusai",
+        "year": 1831,
+        "movement": "Ukiyo-e",
+        "file": "Tsunami_by_hokusai_19th_century.jpg",
+        "crop": "center"
+    },
+    "red_fuji": {
+        "title": "Fine Wind, Clear Morning",
+        "artist": "Katsushika Hokusai",
+        "year": 1831,
+        "movement": "Ukiyo-e",
+        "file": "Red_Fuji_southern_wind_clear_morning.jpg",
+        "crop": "center"
+    },
+    "hokusai_bullfinch": {
+        "title": "Bullfinch and Weeping Cherry",
+        "artist": "Katsushika Hokusai",
+        "year": 1834,
+        "movement": "Ukiyo-e",
+        "file": "Bullfinch and Weeping Cherry (Uso, shidarezakura).jpg",
+        "crop": "center"
+    },
+    "hiroshige_rain": {
+        "title": "Sudden Shower over Shin-Ohashi",
+        "artist": "Utagawa Hiroshige",
+        "year": 1857,
+        "movement": "Ukiyo-e",
+        "file": "Hiroshige, Sudden shower over Shin-Ōhashi bridge and Atake, 1857.jpg",
+        "crop": "center"
+    },
+    "hiroshige_plum": {
+        "title": "Plum Park in Kameido",
+        "artist": "Utagawa Hiroshige",
+        "year": 1857,
+        "movement": "Ukiyo-e",
+        "file": "Ando Hiroshige - Plum Garden, Kameido - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "ophelia": {
+        "title": "Ophelia",
+        "artist": "John Everett Millais",
+        "year": 1851,
+        "movement": "Pre-Raphaelite",
+        "file": "John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg",
+        "crop": "center"
+    },
+    "lady_of_shalott": {
+        "title": "The Lady of Shalott",
+        "artist": "John William Waterhouse",
+        "year": 1888,
+        "movement": "Pre-Raphaelite",
+        "file": "John William Waterhouse - The Lady of Shalott - Google Art Project edit.jpg",
+        "crop": "center"
+    },
+    "hylas_nymphs": {
+        "title": "Hylas and the Nymphs",
+        "artist": "John William Waterhouse",
+        "year": 1896,
+        "movement": "Pre-Raphaelite",
+        "file": "Waterhouse Hylas and the Nymphs Manchester Art Gallery 1896.15.jpg",
+        "crop": "center"
+    },
+    "nymphs_satyr": {
+        "title": "Nymphs and Satyr",
+        "artist": "William-Adolphe Bouguereau",
+        "year": 1873,
+        "movement": "Academic",
+        "file": "William-Adolphe Bouguereau (1825-1905) - Nymphs and Satyr (1873).jpg",
+        "crop": "top"
+    },
+    "roses_heliogabalus": {
+        "title": "The Roses of Heliogabalus",
+        "artist": "Lawrence Alma-Tadema",
+        "year": 1888,
+        "movement": "Academic",
+        "file": "The Roses of Heliogabalus.jpg",
+        "crop": "center"
+    },
+    "whistlers_mother": {
+        "title": "Whistler's Mother",
+        "artist": "James McNeill Whistler",
+        "year": 1871,
+        "movement": "Realism",
+        "file": "Whistlers_Mother_high_res.jpg",
+        "crop": "center"
+    },
+    "olympia": {
+        "title": "Olympia",
+        "artist": "Édouard Manet",
+        "year": 1863,
+        "movement": "Realism",
+        "file": "Edouard Manet - Olympia - Google Art Project 3.jpg",
+        "crop": "center"
+    },
+    "bar_folies_bergere": {
+        "title": "A Bar at the Folies-Bergère",
+        "artist": "Édouard Manet",
+        "year": 1882,
+        "movement": "Impressionism",
+        "file": "Edouard Manet, A Bar at the Folies-Bergère.jpg",
+        "crop": "center"
+    },
+    "impression_sunrise": {
+        "title": "Impression, Sunrise",
+        "artist": "Claude Monet",
+        "year": 1872,
+        "movement": "Impressionism",
+        "file": "Claude_Monet,_Impression,_soleil_levant.jpg",
+        "crop": "center"
+    },
+    "water_lilies": {
+        "title": "Water Lilies",
+        "artist": "Claude Monet",
+        "year": 1906,
+        "movement": "Impressionism",
+        "file": "Claude_Monet_-_Water_Lilies_-_1906,_Ryerson.jpg",
+        "crop": "center"
+    },
+    "rouen_cathedral": {
+        "title": "Rouen Cathedral (Sunset)",
+        "artist": "Claude Monet",
+        "year": 1894,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Rouen Cathedral, Facade (Sunset).JPG",
+        "crop": "center"
+    },
+    "poppies": {
+        "title": "Poppy Field",
+        "artist": "Claude Monet",
+        "year": 1873,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Poppy Field - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "japanese_bridge": {
+        "title": "Water Lilies and Japanese Bridge",
+        "artist": "Claude Monet",
+        "year": 1899,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Water Lilies and Japanese Bridge - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "dance_moulin": {
+        "title": "Dance at Le Moulin de la Galette",
+        "artist": "Pierre-Auguste Renoir",
+        "year": 1876,
+        "movement": "Impressionism",
+        "file": "Pierre-Auguste_Renoir,_Le_Moulin_de_la_Galette.jpg",
+        "crop": "center"
+    },
+    "luncheon_boating": {
+        "title": "Luncheon of the Boating Party",
+        "artist": "Pierre-Auguste Renoir",
+        "year": 1881,
+        "movement": "Impressionism",
+        "file": "Pierre-Auguste Renoir - Luncheon of the Boating Party - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "girl_watering_can": {
+        "title": "A Girl with a Watering Can",
+        "artist": "Pierre-Auguste Renoir",
+        "year": 1876,
+        "movement": "Impressionism",
+        "file": "Auguste Renoir - A Girl with a Watering Can - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "degas_ballet": {
+        "title": "Ballet Rehearsal on Stage",
+        "artist": "Edgar Degas",
+        "year": 1874,
+        "movement": "Impressionism",
+        "file": "Edgar Degas - Ballet Rehearsal on Stage - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "caillebotte_rainy": {
+        "title": "Paris Street; Rainy Day",
+        "artist": "Gustave Caillebotte",
+        "year": 1877,
+        "movement": "Impressionism",
+        "file": "Gustave Caillebotte - Paris Street; Rainy Day - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "sunday_grande_jatte": {
+        "title": "A Sunday on La Grande Jatte",
+        "artist": "Georges Seurat",
+        "year": 1886,
+        "movement": "Pointillism",
+        "file": "A_Sunday_on_La_Grande_Jatte,_Georges_Seurat,_1884.jpg",
+        "crop": "center"
+    },
+    "bathers_asnieres": {
+        "title": "Bathers at Asnières",
+        "artist": "Georges Seurat",
+        "year": 1884,
+        "movement": "Pointillism",
+        "file": "Baigneurs a Asnieres.jpg",
+        "crop": "center"
+    },
+    "sorolla_seashore": {
+        "title": "Strolling Along the Seashore",
+        "artist": "Joaquín Sorolla",
+        "year": 1909,
+        "movement": "Impressionism",
+        "file": "Joaquín Sorolla y Bastida - Strolling along the Seashore - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "madame_x": {
+        "title": "Madame X",
+        "artist": "John Singer Sargent",
+        "year": 1884,
+        "movement": "Realism",
+        "file": "Sargent MadameX.jpeg",
+        "crop": "top"
+    },
+    "gulf_stream": {
+        "title": "The Gulf Stream",
+        "artist": "Winslow Homer",
+        "year": 1899,
+        "movement": "Realism",
+        "file": "Winslow Homer - The Gulf Stream - Metropolitan Museum of Art.jpg",
+        "crop": "center"
+    },
+    "fog_warning": {
+        "title": "The Fog Warning",
+        "artist": "Winslow Homer",
+        "year": 1885,
+        "movement": "Realism",
+        "file": "Winslow Homer - The Fog Warning - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "nighthawks": {
+        "title": "Nighthawks",
+        "artist": "Edward Hopper",
+        "year": 1942,
+        "movement": "Realism",
+        "file": "Nighthawks_by_Edward_Hopper_1942.jpg",
+        "crop": "center"
+    },
+    "american_gothic": {
+        "title": "American Gothic",
+        "artist": "Grant Wood",
+        "year": 1930,
+        "movement": "Regionalism",
+        "file": "Grant_Wood_-_American_Gothic_-_Google_Art_Project.jpg",
+        "crop": "top"
+    },
+    "starry_night": {
+        "title": "The Starry Night",
+        "artist": "Vincent van Gogh",
+        "year": 1889,
+        "movement": "Post-Impressionism",
+        "file": "Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+        "crop": "center"
+    },
+    "cafe_terrace": {
+        "title": "Café Terrace at Night",
+        "artist": "Vincent van Gogh",
+        "year": 1888,
+        "movement": "Post-Impressionism",
+        "file": "Vincent_Willem_van_Gogh_-_Cafe_Terrace_at_Night_(Yorck).jpg",
+        "crop": "center"
+    },
+    "the_bedroom": {
+        "title": "The Bedroom",
+        "artist": "Vincent van Gogh",
+        "year": 1888,
+        "movement": "Post-Impressionism",
+        "file": "Vincent_van_Gogh_-_De_slaapkamer_-_Google_Art_Project.jpg",
+        "crop": "center"
+    },
+    "vangogh_self_portrait": {
+        "title": "Self-Portrait",
+        "artist": "Vincent van Gogh",
+        "year": 1889,
+        "movement": "Post-Impressionism",
+        "file": "Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_(454045).jpg",
+        "crop": "top"
+    },
+    "irises": {
+        "title": "Irises",
+        "artist": "Vincent van Gogh",
+        "year": 1889,
+        "movement": "Post-Impressionism",
+        "file": "Irises-Vincent_van_Gogh.jpg",
+        "crop": "center"
+    },
+    "sunflowers": {
+        "title": "Sunflowers",
+        "artist": "Vincent van Gogh",
+        "year": 1888,
+        "movement": "Post-Impressionism",
+        "file": "Vincent van Gogh - Sunflowers - VGM F458.jpg",
+        "crop": "center"
+    },
+    "almond_blossoms": {
+        "title": "Almond Blossoms",
+        "artist": "Vincent van Gogh",
+        "year": 1890,
+        "movement": "Post-Impressionism",
+        "file": "Vincent van Gogh - Almond Blossom - VGM F671.jpg",
+        "crop": "center"
+    },
+    "wheatfield_cypresses": {
+        "title": "Wheat Field with Cypresses",
+        "artist": "Vincent van Gogh",
+        "year": 1889,
+        "movement": "Post-Impressionism",
+        "file": "Vincent_van_Gogh_-_Wheat_Field_with_Cypresses_-_Google_Art_Project.jpg",
+        "crop": "center"
+    },
+    "potato_eaters": {
+        "title": "The Potato Eaters",
+        "artist": "Vincent van Gogh",
+        "year": 1885,
+        "movement": "Post-Impressionism",
+        "file": "Vincent van Gogh - The potato eaters - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "mont_sainte_victoire": {
+        "title": "Mont Sainte-Victoire",
+        "artist": "Paul Cézanne",
+        "year": 1887,
+        "movement": "Post-Impressionism",
+        "file": "1904, Cézanne, Mont Sainte-Victoire.jpg",
+        "crop": "center"
+    },
+    "card_players": {
+        "title": "The Card Players",
+        "artist": "Paul Cézanne",
+        "year": 1895,
+        "movement": "Post-Impressionism",
+        "file": "Paul Cézanne, Les joueurs de carte (1892-95).jpg",
+        "crop": "center"
+    },
+    "where_do_we_come_from": {
+        "title": "Where Do We Come From?",
+        "artist": "Paul Gauguin",
+        "year": 1897,
+        "movement": "Post-Impressionism",
+        "file": "Paul Gauguin - D'ou venons-nous.jpg",
+        "crop": "center"
+    },
+    "vision_sermon": {
+        "title": "Vision After the Sermon",
+        "artist": "Paul Gauguin",
+        "year": 1888,
+        "movement": "Post-Impressionism",
+        "file": "Paul Gauguin 137.jpg",
+        "crop": "center"
+    },
+    "moulin_rouge": {
+        "title": "Moulin Rouge: La Goulue",
+        "artist": "Henri de Toulouse-Lautrec",
+        "year": 1891,
+        "movement": "Post-Impressionism",
+        "file": "Toulouse-Lautrec - Moulin Rouge - La Goulue.jpg",
+        "crop": "top"
+    },
+    "the_dream_rousseau": {
+        "title": "The Dream",
+        "artist": "Henri Rousseau",
+        "year": 1910,
+        "movement": "Post-Impressionism",
+        "file": "Henri_Rousseau_-_Le_Rêve_-_Google_Art_Project.jpg",
+        "crop": "center"
+    },
+    "sleeping_gypsy": {
+        "title": "The Sleeping Gypsy",
+        "artist": "Henri Rousseau",
+        "year": 1897,
+        "movement": "Post-Impressionism",
+        "file": "Henri Rousseau Sleeping Gypsy (2346770).jpg",
+        "crop": "center"
+    },
+    "the_scream": {
+        "title": "The Scream",
+        "artist": "Edvard Munch",
+        "year": 1893,
+        "movement": "Expressionism",
+        "file": "Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
+        "crop": "top"
+    },
+    "munch_madonna": {
+        "title": "Madonna",
+        "artist": "Edvard Munch",
+        "year": 1894,
+        "movement": "Expressionism",
+        "file": "Edvard Munch - Madonna (1894-1895).jpg",
+        "crop": "top"
+    },
+    "the_kiss_klimt": {
+        "title": "The Kiss",
+        "artist": "Gustav Klimt",
+        "year": 1907,
+        "movement": "Art Nouveau",
+        "file": "The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg",
+        "crop": "top"
+    },
+    "klimt_adele": {
+        "title": "Portrait of Adele Bloch-Bauer I",
+        "artist": "Gustav Klimt",
+        "year": 1907,
+        "movement": "Art Nouveau",
+        "file": "Gustav Klimt, 1907, Adele Bloch-Bauer I, Neue Galerie New York.jpg",
+        "crop": "top"
+    },
+    "klimt_tree_of_life": {
+        "title": "The Tree of Life",
+        "artist": "Gustav Klimt",
+        "year": 1909,
+        "movement": "Art Nouveau",
+        "file": "Klimt Tree of Life 1909.jpg",
+        "crop": "center"
+    },
+    "mucha_job": {
+        "title": "Job (Cigarettes)",
+        "artist": "Alphonse Mucha",
+        "year": 1896,
+        "movement": "Art Nouveau",
+        "file": "Alphonse Mucha - Advertisment for Job cigarettes, 1896.jpg",
+        "crop": "top"
+    },
+    "view_of_toledo": {
+        "title": "View of Toledo",
+        "artist": "El Greco",
+        "year": 1600,
+        "movement": "Mannerism",
+        "file": "El Greco View of Toledo.jpg",
+        "crop": "center"
+    },
+    "cossacks": {
+        "title": "Reply of the Zaporozhian Cossacks",
+        "artist": "Ilya Repin",
+        "year": 1891,
+        "movement": "Realism",
+        "file": "Ilja Jefimowitsch Repin - Reply of the Zaporozhian Cossacks - Yorck.jpg",
+        "crop": "center"
+    },
+    "the_dance_matisse": {
+        "title": "The Dance",
+        "artist": "Henri Matisse",
+        "year": 1910,
+        "movement": "Fauvism",
+        "file": "Matissedance.jpg",
+        "crop": "center"
+    },
+    "blue_horse": {
+        "title": "Blue Horse I",
+        "artist": "Franz Marc",
+        "year": 1911,
+        "movement": "Expressionism",
+        "file": "Marc, Franz - Blue Horse I - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "berlin_street": {
+        "title": "Berlin Street Scene",
+        "artist": "Ernst Ludwig Kirchner",
+        "year": 1913,
+        "movement": "Expressionism",
+        "file": "Ernst Ludwig Kirchner - Berlin Street Scene - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "schiele_self_portrait": {
+        "title": "Self-Portrait with Physalis",
+        "artist": "Egon Schiele",
+        "year": 1912,
+        "movement": "Expressionism",
+        "file": "Egon Schiele - Self-Portrait with Physalis - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "modigliani_portrait": {
+        "title": "Jeanne Hébuterne",
+        "artist": "Amedeo Modigliani",
+        "year": 1919,
+        "movement": "Expressionism",
+        "file": "Amedeo Modigliani, 1919, Jeanne Hébuterne, oil on canvas, 91.4 x 73 cm, Metropolitan Museum of Art.jpg",
+        "crop": "top"
+    },
+    "composition_viii": {
+        "title": "Composition VIII",
+        "artist": "Wassily Kandinsky",
+        "year": 1923,
+        "movement": "Abstract",
+        "file": "Vassily_Kandinsky,_1923_-_Composition_8,_huile_sur_toile,_140_cm_x_201_cm,_Musée_Guggenheim,_New_York.jpg",
+        "crop": "center"
+    },
+    "several_circles": {
+        "title": "Several Circles",
+        "artist": "Wassily Kandinsky",
+        "year": 1926,
+        "movement": "Abstract",
+        "file": "Vassily Kandinsky, 1926 - Several Circles, Gugg 0910 25.jpg",
+        "crop": "center"
+    },
+    "black_square": {
+        "title": "Black Square",
+        "artist": "Kazimir Malevich",
+        "year": 1915,
+        "movement": "Suprematism",
+        "file": "Kazimir Malevich, 1915, Black Suprematic Square, oil on linen canvas, 79.5 x 79.5 cm, Tretyakov Gallery, Moscow.jpg",
+        "crop": "center"
+    },
+    "broadway_boogie": {
+        "title": "Broadway Boogie Woogie",
+        "artist": "Piet Mondrian",
+        "year": 1943,
+        "movement": "Abstract",
+        "file": "Piet Mondrian, 1942 - Broadway Boogie Woogie.jpg",
+        "crop": "center"
+    },
+    "white_on_white": {
+        "title": "White on White",
+        "artist": "Kazimir Malevich",
+        "year": 1918,
+        "movement": "Suprematism",
+        "file": "White on White (Malevich, 1918).png",
+        "crop": "center"
+    },
+    "woman_parasol": {
+        "title": "Woman with a Parasol",
+        "artist": "Claude Monet",
+        "year": 1875,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Woman with a Parasol - Madame Monet and Her Son - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "haystacks": {
+        "title": "Haystacks (End of Summer)",
+        "artist": "Claude Monet",
+        "year": 1891,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Haystacks, end of Summer - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "morisot_cradle": {
+        "title": "The Cradle",
+        "artist": "Berthe Morisot",
+        "year": 1872,
+        "movement": "Impressionism",
+        "file": "Berthe Morisot - The Cradle - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "cassatt_bath": {
+        "title": "The Child's Bath",
+        "artist": "Mary Cassatt",
+        "year": 1893,
+        "movement": "Impressionism",
+        "file": "Mary Cassatt - The Child's Bath - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "pissarro_boulevard": {
+        "title": "Boulevard Montmartre",
+        "artist": "Camille Pissarro",
+        "year": 1897,
+        "movement": "Impressionism",
+        "file": "Camille Pissarro - Boulevard Montmartre, Spring - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "delaunay_windows": {
+        "title": "Simultaneous Windows",
+        "artist": "Robert Delaunay",
+        "year": 1912,
+        "movement": "Abstract",
+        "file": "Robert Delaunay, 1912, Les Fenêtres simultanée sur la ville (Simultaneous Windows on the City), 40 x 46 cm, Kunsthalle Hamburg.jpg",
+        "crop": "center"
+    }
+}

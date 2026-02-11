@@ -6000,11 +6000,11 @@ class WonderExorcist(Visual):
                                               min(255, ex[1] + g),
                                               min(255, ex[2] + g // 2)))
 
-        # Title text
+        # Title text (pushed below the scene to avoid the lit window)
         tp = 0.5 + 0.5 * beam_intensity
-        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+        d.draw_text_small(WONDER_X, 50, "WONDER",
                           (int(220 * tp), int(190 * tp), int(80 * tp)))
-        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+        d.draw_text_small(CABINET_X, 56, "CABINET",
                           (int(200 * tp), int(170 * tp), int(60 * tp)))
 
 
