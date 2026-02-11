@@ -58,43 +58,46 @@ TOOL_INITIALS = ["P", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
 
 UNDO_MAX = 32
 
-# ── Wonder Cabinet text template ──────────────────────────────────
-# Pre-compute canvas pixels where "WONDER" and "CABINET" text falls.
-# Screen coords: WONDER at (20,24), CABINET at (18,34), 3x5 font, 4px stride.
-# Canvas = screen // 2 (32x32 at 2x zoom).
+# ── Wonder Cabinet text stamp ─────────────────────────────────────
+# Render directly at canvas resolution (1 font pixel = 1 canvas pixel).
+# 3x5 font, 4px stride.  Center each word on the 32px-wide canvas.
+# Vertical: WONDER at y=12, CABINET at y=18  (mirroring the standard
+# screen positions 24/34 halved, with a 1px gap between the two words).
 _FONT_3X5 = {
-    'W': ['101', '101', '111', '111', '101'],
-    'O': ['010', '101', '101', '101', '010'],
-    'N': ['101', '111', '111', '111', '101'],
-    'D': ['110', '101', '101', '101', '110'],
-    'E': ['111', '100', '110', '100', '111'],
-    'R': ['110', '101', '110', '101', '101'],
-    'C': ['011', '100', '100', '100', '011'],
     'A': ['010', '101', '111', '101', '101'],
     'B': ['110', '101', '110', '101', '110'],
+    'C': ['011', '100', '100', '100', '011'],
+    'D': ['110', '101', '101', '101', '110'],
+    'E': ['111', '100', '110', '100', '111'],
     'I': ['111', '010', '010', '010', '111'],
+    'N': ['101', '111', '111', '111', '101'],
+    'O': ['010', '101', '101', '101', '010'],
+    'R': ['110', '101', '110', '101', '101'],
     'T': ['111', '010', '010', '010', '010'],
+    'W': ['101', '101', '111', '111', '101'],
 }
 
 
-def _build_template():
-    """Build set of canvas (x,y) pixels for Wonder Cabinet text guide."""
+def _build_stamp(text, canvas_y):
+    """Build set of canvas (x,y) for one line of text, centered on 32px."""
+    width = len(text) * 4 - 1  # 3px per char + 1px gap, minus trailing
+    x0 = (CANVAS_SIZE - width) // 2
     pixels = set()
-    for text, sx, sy in [("WONDER", 20, 24), ("CABINET", 18, 34)]:
-        cx = sx
-        for ch in text:
-            glyph = _FONT_3X5.get(ch)
-            if glyph:
-                for row_idx, row in enumerate(glyph):
-                    for col_idx, pixel in enumerate(row):
-                        if pixel == '1':
-                            # Map screen coords to canvas coords
-                            pixels.add(((cx + col_idx) // 2, (sy + row_idx) // 2))
-            cx += 4
-    return frozenset(pixels)
+    cx = x0
+    for ch in text:
+        glyph = _FONT_3X5.get(ch)
+        if glyph:
+            for row_idx, row in enumerate(glyph):
+                for col_idx, pixel in enumerate(row):
+                    if pixel == '1':
+                        pixels.add((cx + col_idx, canvas_y + row_idx))
+        cx += 4
+    return pixels
 
 
-TEMPLATE_PIXELS = _build_template()
+TEMPLATE_PIXELS = frozenset(
+    _build_stamp("WONDER", 12) | _build_stamp("CABINET", 18)
+)
 
 # Modes
 MODE_DRAW = 0
