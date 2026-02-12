@@ -1,9 +1,11 @@
 """
-Controls - Input reference display
+Controls - Live input reference
 ====================================
-Shows the arcade panel control layout and button functions.
+Shows the arcade panel control layout with live input feedback.
+Press buttons and directions to see them light up.
 
 Controls:
+  All inputs shown live on screen
   Hold both buttons 2s to exit
 """
 
@@ -41,69 +43,71 @@ class Controls(Visual):
         else:
             self.exit_hold = 0.0
 
-    def _draw_joystick(self, cx, cy):
-        """Draw a small joystick icon with directional arrows."""
-        # Center knob
-        self.display.set_pixel(cx, cy, Colors.RED)
-        self.display.set_pixel(cx + 1, cy, Colors.RED)
-        self.display.set_pixel(cx, cy + 1, Colors.RED)
-        self.display.set_pixel(cx + 1, cy + 1, Colors.RED)
+    def _draw_dpad(self, cx, cy):
+        """Draw joystick state as a d-pad with lit directions."""
+        off = (50, 50, 50)
+        on = Colors.RED
 
-        # Up arrow
-        self.display.set_pixel(cx, cy - 2, (180, 40, 40))
-        self.display.set_pixel(cx + 1, cy - 2, (180, 40, 40))
-        self.display.set_pixel(cx, cy - 1, (180, 40, 40))
-        self.display.set_pixel(cx + 1, cy - 1, (180, 40, 40))
+        # Center
+        self.display.draw_rect(cx, cy, 4, 4, (80, 80, 80))
 
-        # Down arrow
-        self.display.set_pixel(cx, cy + 3, (180, 40, 40))
-        self.display.set_pixel(cx + 1, cy + 3, (180, 40, 40))
-        self.display.set_pixel(cx, cy + 2, (180, 40, 40))
-        self.display.set_pixel(cx + 1, cy + 2, (180, 40, 40))
+        inp = getattr(self, '_input', None)
 
-        # Left arrow
-        self.display.set_pixel(cx - 2, cy, (180, 40, 40))
-        self.display.set_pixel(cx - 2, cy + 1, (180, 40, 40))
-        self.display.set_pixel(cx - 1, cy, (180, 40, 40))
-        self.display.set_pixel(cx - 1, cy + 1, (180, 40, 40))
+        # Up
+        color = on if (inp and inp.up) else off
+        self.display.draw_rect(cx, cy - 5, 4, 4, color)
 
-        # Right arrow
-        self.display.set_pixel(cx + 3, cy, (180, 40, 40))
-        self.display.set_pixel(cx + 3, cy + 1, (180, 40, 40))
-        self.display.set_pixel(cx + 2, cy, (180, 40, 40))
-        self.display.set_pixel(cx + 2, cy + 1, (180, 40, 40))
+        # Down
+        color = on if (inp and inp.down) else off
+        self.display.draw_rect(cx, cy + 5, 4, 4, color)
 
-    def _draw_button(self, cx, cy, color):
-        """Draw a small circular button."""
-        self.display.set_pixel(cx, cy, color)
-        self.display.set_pixel(cx + 1, cy, color)
-        self.display.set_pixel(cx, cy + 1, color)
-        self.display.set_pixel(cx + 1, cy + 1, color)
+        # Left
+        color = on if (inp and inp.left) else off
+        self.display.draw_rect(cx - 5, cy, 4, 4, color)
+
+        # Right
+        color = on if (inp and inp.right) else off
+        self.display.draw_rect(cx + 5, cy, 4, 4, color)
+
+    def _draw_button(self, cx, cy, radius, pressed):
+        """Draw a button circle that lights up when pressed."""
+        off = (50, 50, 50)
+        on = Colors.WHITE
+
+        color = on if pressed else off
+        for dy in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                if dx * dx + dy * dy <= radius * radius:
+                    self.display.set_pixel(cx + dx, cy + dy, color)
 
     def draw(self):
         self.display.clear(Colors.BLACK)
 
+        inp = getattr(self, '_input', None)
+
         # Title
         self.display.draw_text_small(2, 2, "CONTROLS", Colors.CYAN)
 
+        # Blinking dot to show the screen is live
+        if int(self.time * 3) % 2 == 0:
+            self.display.set_pixel(61, 2, Colors.GREEN)
+
         # Separator
-        for x in range(2, 62):
-            self.display.set_pixel(x, 9, Colors.GRAY)
+        self.display.draw_line(2, 9, 61, 9, Colors.GRAY)
 
-        # Joystick section
-        self._draw_joystick(8, 17)
-        self.display.draw_text_small(17, 14, "MOVE", Colors.WHITE)
-        self.display.draw_text_small(17, 21, "NAVIGATE", Colors.GRAY)
+        # Joystick d-pad on left side
+        self._draw_dpad(13, 22)
+        self.display.draw_text_small(24, 19, "MOVE", Colors.WHITE)
 
-        # Buttons section
-        self._draw_button(6, 33, Colors.WHITE)
-        self._draw_button(11, 33, Colors.WHITE)
-        self.display.draw_text_small(17, 32, "ACTION", Colors.WHITE)
-        self.display.draw_text_small(17, 39, "SELECT", Colors.GRAY)
+        # Buttons on right side
+        btn_l = inp.action_l_held if inp else False
+        btn_r = inp.action_r_held if inp else False
+        self._draw_button(13, 42, 4, btn_l)
+        self._draw_button(27, 42, 4, btn_r)
+        self.display.draw_text_small(34, 39, "ACTION", Colors.WHITE)
 
-        # Exit info
-        self.display.draw_text_small(2, 48, "HOLD BOTH", Colors.YELLOW)
-        self.display.draw_text_small(2, 55, "BUTTONS:BACK", Colors.YELLOW)
+        # Hold both to exit
+        self.display.draw_text_small(2, 55, "HOLD BOTH:BACK", Colors.YELLOW)
 
         # Exit hold progress bar
         if self.exit_hold > 0:

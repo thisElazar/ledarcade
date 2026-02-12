@@ -8840,12 +8840,6 @@
           "is_game": false
         },
         {
-          "name": "INPUT TEST",
-          "cls": "InputTest",
-          "module": "visuals/inputtest.py",
-          "is_game": false
-        },
-        {
           "name": "PIXEL TEST",
           "cls": "TestPattern",
           "module": "visuals/testpattern.py",

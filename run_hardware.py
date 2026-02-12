@@ -948,7 +948,7 @@ def main():
                             current_item.draw()
                     else:
                         # Visual — hold both buttons 2s to return to menu
-                        # Skip for visuals that handle their own exit (e.g. InputTest)
+                        # Skip for visuals that handle their own exit (e.g. Controls)
                         if not getattr(current_item, 'custom_exit', False):
                             if input_state.action_l_held and input_state.action_r_held:
                                 exit_hold += dt
