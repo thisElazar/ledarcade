@@ -4,7 +4,7 @@ Controls - Input reference display
 Shows the arcade panel control layout and button functions.
 
 Controls:
-  Any button - Exit to menu
+  Hold both buttons 2s to exit
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -14,23 +14,32 @@ class Controls(Visual):
     name = "CONTROLS"
     description = "Button guide"
     category = "utility"
+    custom_exit = True
 
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
+        self.exit_hold = 0.0
 
     def handle_input(self, input_state) -> bool:
-        if (input_state.action_l or input_state.action_r or
-                input_state.up_pressed or input_state.down_pressed or
-                input_state.left_pressed or input_state.right_pressed):
-            self.wants_exit = True
-            return True
-        return False
+        self._input = input_state
+        if input_state.action_l_held and input_state.action_r_held:
+            pass  # accumulated in update via dt
+        else:
+            self.exit_hold = 0.0
+        return True
 
     def update(self, dt: float):
         self.time += dt
+        inp = getattr(self, '_input', None)
+        if inp and inp.action_l_held and inp.action_r_held:
+            self.exit_hold += dt
+            if self.exit_hold >= 2.0:
+                self.wants_exit = True
+        else:
+            self.exit_hold = 0.0
 
     def _draw_joystick(self, cx, cy):
         """Draw a small joystick icon with directional arrows."""
@@ -93,4 +102,12 @@ class Controls(Visual):
         self.display.draw_text_small(17, 39, "SELECT", Colors.GRAY)
 
         # Exit info
-        self.display.draw_text_small(2, 50, "HOLD 2S:MENU", Colors.YELLOW)
+        self.display.draw_text_small(2, 48, "HOLD BOTH", Colors.YELLOW)
+        self.display.draw_text_small(2, 55, "BUTTONS:BACK", Colors.YELLOW)
+
+        # Exit hold progress bar
+        if self.exit_hold > 0:
+            bar_w = int((self.exit_hold / 2.0) * 60)
+            bar_w = min(60, bar_w)
+            if bar_w > 0:
+                self.display.draw_rect(2, 62, bar_w, 2, Colors.RED)

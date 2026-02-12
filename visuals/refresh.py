@@ -130,9 +130,12 @@ class Refresh(Visual):
 
         if input_state.action_l or input_state.action_r:
             if self.page == 1 and not self.has_rollback:
-                return False
+                self.wants_exit = True
+                return True
             if self.selection == 0:
                 self.confirmed = True
+            else:
+                self.wants_exit = True
             return True
 
         return False
