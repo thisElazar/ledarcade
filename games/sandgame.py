@@ -68,7 +68,34 @@ SIM_TOP = 7  # rows 0-6 are HUD
 MODE_PLAY = 0
 MODE_SELECT = 1
 
-WIND_MAX = 3.0  # clamp wind values
+WIND_MAX = 10.0  # clamp wind values
+
+# Thermal properties: material -> (emit_temp or None, conductivity)
+THERMAL = {
+    EMPTY:     (None, 0.6),
+    SAND:      (None, 0.25),
+    WATER:     (None, 0.4),
+    STONE:     (None, 0.2),
+    FIRE:      (400,  1.0),
+    OIL:       (None, 0.15),
+    GUNPOWDER: (None, 0.2),
+    ACID:      (None, 0.4),
+    LAVA:      (600,  0.8),
+    ICE:       (-30,  0.5),
+    STEAM:     (105,  0.4),
+    WOOD:      (None, 0.1),
+    PLANT:     (None, 0.1),
+    GAS:       (None, 0.5),
+    METAL:     (None, 0.9),
+    NITRO:     (None, 0.35),
+    FUSE:      (None, 0.1),
+    VINE:      (None, 0.1),
+}
+
+# Wind drag: material-specific overrides and behavior defaults
+WIND_DRAG = {GAS: 0.8, STEAM: 0.7, FIRE: 0.6, LAVA: 0.0}
+DRAG_POWDER = 0.65
+DRAG_LIQUID = 0.2
 
 
 def clamp(v, lo, hi):
@@ -85,7 +112,7 @@ def mat_color(mat_id, var=0):
 
 
 class SandGame(Game):
-    name = "SANDGAME"
+    name = "POWDER GAME"
     description = "Falling sand physics sandbox"
     category = "modern"
 
@@ -103,9 +130,12 @@ class SandGame(Game):
         self.life = [[0] * W for _ in range(H)]
         self.color_var = [[0] * W for _ in range(H)]
 
-        # Wind grid: force per cell, decays rapidly each frame
+        # Wind grid: force per cell
         self.wind_x = [[0.0] * W for _ in range(H)]
         self.wind_y = [[0.0] * W for _ in range(H)]
+
+        # Temperature grid (room temp = 20)
+        self.temp = [[20.0] * W for _ in range(H)]
 
         # Cursor
         self.cx = W // 2
@@ -127,8 +157,14 @@ class SandGame(Game):
         self.grid[y][x] = mat_id
         if mat_id == FIRE:
             self.life[y][x] = random.randint(3, 8)
+            self.temp[y][x] = 400.0
+        elif mat_id == LAVA:
+            self.life[y][x] = 0
+            self.temp[y][x] = 600.0
+        elif mat_id == ICE:
+            self.life[y][x] = 0
+            self.temp[y][x] = -20.0
         elif mat_id == FUSE:
-            # Fuse burns slowly: life=0 means unlit, >0 means burning
             self.life[y][x] = 0
         else:
             self.life[y][x] = 0
@@ -140,6 +176,7 @@ class SandGame(Game):
         self.grid[y1][x1], self.grid[y2][x2] = self.grid[y2][x2], self.grid[y1][x1]
         self.life[y1][x1], self.life[y2][x2] = self.life[y2][x2], self.life[y1][x1]
         self.color_var[y1][x1], self.color_var[y2][x2] = self.color_var[y2][x2], self.color_var[y1][x1]
+        self.temp[y1][x1], self.temp[y2][x2] = self.temp[y2][x2], self.temp[y1][x1]
         self.updated[y1][x1] = True
         self.updated[y2][x2] = True
 
@@ -279,8 +316,6 @@ class SandGame(Game):
         if self.life[y][x] <= 0:
             self._set_cell(x, y, EMPTY)
             return
-        # Fire generates gentle upward wind
-        self._add_wind(x, y, 0.0, -0.15)
         # Fire rises
         if random.random() < 0.6:
             if self._empty_at(x, y - 1):
@@ -395,12 +430,8 @@ class SandGame(Game):
                 self._set_cell(nx, ny, VINE)
                 return
 
-    def _is_heat_source(self, mat):
-        """Check if a material is a heat source (for ignition checks)."""
-        return mat in (FIRE, LAVA)
-
     def _check_interactions(self, x, y):
-        """Check and apply material interactions for cell at (x,y)."""
+        """Check and apply direct (non-thermal) material interactions."""
         mat = self.grid[y][x]
         if mat == EMPTY:
             return
@@ -412,59 +443,18 @@ class SandGame(Game):
             if nm >= 0:
                 neighbors.append((nx, ny, nm))
 
-        if mat == FIRE:
-            for nx, ny, nm in neighbors:
-                if nm == WOOD:
-                    if random.random() < 0.08:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == PLANT:
-                    if random.random() < 0.45:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == VINE:
-                    # Vine burns extremely fast
-                    if random.random() < 0.6:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == OIL:
-                    if random.random() < 0.5:
-                        self._set_cell(nx, ny, FIRE)
-                        for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                            if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.3:
-                                self._set_cell(nx + ddx, ny + ddy, FIRE)
-                elif nm == GAS:
-                    # Gas is extremely flammable: 1 gas -> up to 4 fire
-                    self._set_cell(nx, ny, FIRE)
-                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.5:
-                            self._set_cell(nx + ddx, ny + ddy, FIRE)
-                    # Gas fire creates pressure burst
-                    self._add_wind(nx, ny, 0.0, -1.0)
-                elif nm == GUNPOWDER:
-                    self._explode(nx, ny, 5)
-                    return
-                elif nm == NITRO:
-                    self._explode(nx, ny, 7)
-                    return
-                elif nm == FUSE:
-                    if self._in_sim(nx, ny) and self.life[ny][nx] == 0:
-                        self.life[ny][nx] = random.randint(8, 15)
-                elif nm == ICE:
-                    if random.random() < 0.12:
-                        self._set_cell(nx, ny, WATER)
-
-        elif mat == WATER:
+        if mat == WATER:
             for nx, ny, nm in neighbors:
                 if nm == FIRE:
                     self._set_cell(nx, ny, STEAM)
+                    self.temp[ny][nx] = 100.0
                 elif nm == LAVA:
                     self._set_cell(nx, ny, STONE)
+                    self.temp[ny][nx] = 80.0
                     self._set_cell(x, y, STEAM)
+                    self.temp[y][x] = 100.0
                     return
-                elif nm == ICE:
-                    if random.random() < 0.06:
-                        self._set_cell(x, y, ICE)
-                        return
                 elif nm == METAL:
-                    # Metal rusts in water -> sand
                     if random.random() < 0.005:
                         self._set_cell(nx, ny, SAND)
 
@@ -472,42 +462,14 @@ class SandGame(Game):
             for nx, ny, nm in neighbors:
                 if nm == WATER:
                     self._set_cell(nx, ny, STEAM)
+                    self.temp[ny][nx] = 100.0
                     self._set_cell(x, y, STONE)
+                    self.temp[y][x] = 80.0
                     return
                 elif nm == STONE:
                     if random.random() < 0.02:
                         self._set_cell(nx, ny, LAVA)
-                elif nm == WOOD:
-                    if random.random() < 0.15:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == PLANT:
-                    if random.random() < 0.5:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == VINE:
-                    if random.random() < 0.6:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == ICE:
-                    if random.random() < 0.15:
-                        self._set_cell(nx, ny, WATER)
-                elif nm == OIL:
-                    if random.random() < 0.4:
-                        self._set_cell(nx, ny, FIRE)
-                elif nm == GAS:
-                    self._set_cell(nx, ny, FIRE)
-                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        if self._empty_at(nx + ddx, ny + ddy) and random.random() < 0.5:
-                            self._set_cell(nx + ddx, ny + ddy, FIRE)
-                elif nm == GUNPOWDER:
-                    self._explode(nx, ny, 5)
-                    return
-                elif nm == NITRO:
-                    self._explode(nx, ny, 7)
-                    return
-                elif nm == FUSE:
-                    if self._in_sim(nx, ny) and self.life[ny][nx] == 0:
-                        self.life[ny][nx] = random.randint(8, 15)
                 elif nm == METAL:
-                    # Lava melts metal into more lava
                     if random.random() < 0.03:
                         self._set_cell(nx, ny, LAVA)
 
@@ -520,7 +482,6 @@ class SandGame(Game):
                             self._set_cell(x, y, EMPTY)
                             return
                 elif nm == METAL:
-                    # Acid dissolves metal slowly (1:10 in original)
                     if random.random() < 0.03:
                         self._set_cell(nx, ny, EMPTY)
                         if random.random() < 0.5:
@@ -535,80 +496,208 @@ class SandGame(Game):
                         self._set_cell(x, y, EMPTY)
                         return
 
-        elif mat == ICE:
-            for nx, ny, nm in neighbors:
-                if nm == WATER:
-                    if random.random() < 0.04:
-                        self._set_cell(nx, ny, ICE)
+    def _generate_wind(self):
+        """Step A: heat sources inject wind with turbulence."""
+        for y in range(SIM_TOP, H):
+            for x in range(W):
+                mat = self.grid[y][x]
+                if mat == FIRE:
+                    self._add_wind(x, y, random.uniform(-0.8, 0.8), -1.2)
+                elif mat == LAVA:
+                    self._add_wind(x, y, random.uniform(-1.4, 1.4), -1.8)
+                elif mat == STEAM:
+                    self._add_wind(x, y, random.uniform(-0.3, 0.3), -0.6)
 
-        elif mat == NITRO:
-            # Nitro explodes on contact with ANY heat source
-            for nx, ny, nm in neighbors:
-                if nm in (FIRE, LAVA):
-                    self._explode(x, y, 7)
-                    return
+    def _propagate_wind(self):
+        """Step B: wind propagates via advection (directional) + diffusion."""
+        new_wx = [[0.0] * W for _ in range(H)]
+        new_wy = [[0.0] * W for _ in range(H)]
 
-        elif mat == GAS:
-            # Gas ignites from nearby heat
-            for nx, ny, nm in neighbors:
-                if nm in (FIRE, LAVA):
-                    # 1 gas -> fire + extra fire in neighbors
-                    self._set_cell(x, y, FIRE)
-                    for ddx, ddy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        if self._empty_at(x + ddx, y + ddy) and random.random() < 0.5:
-                            self._set_cell(x + ddx, y + ddy, FIRE)
-                    self._add_wind(x, y, 0.0, -1.0)
-                    return
+        for y in range(SIM_TOP, H):
+            for x in range(W):
+                wx = self.wind_x[y][x]
+                wy = self.wind_y[y][x]
+                if abs(wx) < 0.05 and abs(wy) < 0.05:
+                    continue
 
-        elif mat == VINE:
-            # Vine burns from fire/lava
-            for nx, ny, nm in neighbors:
-                if nm == FIRE:
-                    if random.random() < 0.6:
-                        self._set_cell(x, y, FIRE)
-                        return
-                elif nm == LAVA:
-                    if random.random() < 0.6:
-                        self._set_cell(x, y, FIRE)
-                        return
+                # Normalize wind direction for advection weighting
+                mag = (wx * wx + wy * wy) ** 0.5
+                if mag > 0.01:
+                    dir_x = wx / mag
+                    dir_y = wy / mag
+                else:
+                    dir_x = dir_y = 0.0
+
+                diffuse = 0.08   # isotropic spread (creates eddies)
+                advect = 0.45    # strong directional push
+                total_sent = 0.0
+
+                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = x + dx, y + dy
+                    if not self._in_sim(nx, ny):
+                        continue
+                    nm = self.grid[ny][nx]
+                    behav = self._behavior(nm) if nm != EMPTY else 'none'
+                    if behav in ('solid', 'fuse') and nm != ICE:
+                        continue  # blocked by solid
+
+                    # Advection: how aligned is this neighbor with wind flow?
+                    dot = dir_x * dx + dir_y * dy  # -1 to 1
+                    share = diffuse + advect * max(dot, 0.0)
+                    new_wx[ny][nx] += wx * share
+                    new_wy[ny][nx] += wy * share
+                    total_sent += share
+
+                # Keep remainder (more kept when blocked on sides)
+                kept = max(1.0 - total_sent, 0.0)
+                new_wx[y][x] += wx * kept
+                new_wy[y][x] += wy * kept
+
+        # Decay, turbulence perturbation, and apply
+        for y in range(SIM_TOP, H):
+            for x in range(W):
+                vx = new_wx[y][x] * 0.94
+                vy = new_wy[y][x] * 0.94
+                # Turbulence: wind drifts randomly as it flows
+                if abs(vx) > 0.1 or abs(vy) > 0.1:
+                    vx += random.uniform(-0.15, 0.15)
+                    vy += random.uniform(-0.15, 0.15)
+                self.wind_x[y][x] = clamp(vx, -WIND_MAX, WIND_MAX)
+                self.wind_y[y][x] = clamp(vy, -WIND_MAX, WIND_MAX)
+                if abs(self.wind_x[y][x]) < 0.05:
+                    self.wind_x[y][x] = 0.0
+                if abs(self.wind_y[y][x]) < 0.05:
+                    self.wind_y[y][x] = 0.0
 
     def _apply_wind(self):
-        """Apply wind forces to movable particles, then decay. Solids block wind."""
+        """Step C: wind displaces particles based on drag coefficients."""
         for y in range(H - 1, SIM_TOP - 1, -1):
             for x in range(W):
                 wx = self.wind_x[y][x]
                 wy = self.wind_y[y][x]
-
-                # Kill small wind
-                if abs(wx) < 0.2 and abs(wy) < 0.2:
-                    self.wind_x[y][x] = 0.0
-                    self.wind_y[y][x] = 0.0
+                if abs(wx) < 0.05 and abs(wy) < 0.05:
                     continue
 
                 mat = self.grid[y][x]
-                behav = self._behavior(mat) if mat != EMPTY else 'none'
-
-                # Solids block wind: absorb it
-                if behav in ('solid', 'fuse'):
-                    self.wind_x[y][x] = 0.0
-                    self.wind_y[y][x] = 0.0
+                if mat == EMPTY:
                     continue
 
-                # Move particles that wind can push
-                if mat != EMPTY and behav in ('powder', 'liquid', 'gas_up', 'grow', 'vine'):
-                    # Probabilistic displacement based on wind strength
-                    if random.random() < min(abs(wx), 1.0) * 0.5:
-                        dx = 1 if wx > 0 else -1
-                        if self._empty_at(x + dx, y):
-                            self._swap(x, y, x + dx, y)
-                    if random.random() < min(abs(wy), 1.0) * 0.5:
-                        dy = 1 if wy > 0 else -1
-                        if self._empty_at(x, y + dy):
-                            self._swap(x, y, x, y + dy)
+                # Get drag coefficient
+                if mat in WIND_DRAG:
+                    drag = WIND_DRAG[mat]
+                else:
+                    behav = self._behavior(mat)
+                    if behav == 'powder':
+                        drag = DRAG_POWDER
+                    elif behav == 'liquid':
+                        drag = DRAG_LIQUID
+                    else:
+                        drag = 0.0  # solid, plant, vine, fuse
 
-                # Aggressive decay: wind dies fast
-                self.wind_x[y][x] *= 0.4
-                self.wind_y[y][x] *= 0.4
+                if drag <= 0.0:
+                    continue
+
+                force = (wx * wx + wy * wy) ** 0.5 * drag
+                moved = False
+
+                # Horizontal displacement
+                if abs(wx) * drag > 0.05 and random.random() < abs(wx) * drag:
+                    dx = 1 if wx > 0 else -1
+                    nx = x + dx
+                    if self._empty_at(nx, y):
+                        self._swap(x, y, nx, y)
+                        moved = True
+                    elif self._in_sim(nx, y) and self.grid[y][nx] != EMPTY:
+                        # Swap with lighter material (wind pushes through)
+                        nm = self.grid[y][nx]
+                        if self._density(nm) < self._density(mat) and self._behavior(nm) not in ('solid', 'fuse'):
+                            self._swap(x, y, nx, y)
+                            moved = True
+
+                # Vertical displacement
+                cur_mat = self.grid[y][x]
+                if cur_mat != EMPTY and abs(wy) * drag > 0.05 and random.random() < abs(wy) * drag:
+                    dy = 1 if wy > 0 else -1
+                    ny = y + dy
+                    if self._empty_at(x, ny):
+                        self._swap(x, y, x, ny)
+                    elif self._in_sim(x, ny) and self.grid[ny][x] != EMPTY:
+                        nm = self.grid[ny][x]
+                        if self._density(nm) < self._density(cur_mat) and self._behavior(nm) not in ('solid', 'fuse'):
+                            self._swap(x, y, x, ny)
+
+    def _conduct_temp(self):
+        """Spread temperature via conduction; heat sources emit."""
+        new_temp = [row[:] for row in self.temp]
+
+        for y in range(SIM_TOP, H):
+            for x in range(W):
+                mat = self.grid[y][x]
+                emit, cond = THERMAL.get(mat, (None, 0.3))
+                t = self.temp[y][x]
+
+                # Heat sources drive toward emit_temp
+                if emit is not None:
+                    t += (emit - t) * 0.3
+
+                # Average with neighbors weighted by conductivity
+                n_sum = 0.0
+                c_sum = 0.0
+                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    nx, ny = x + dx, y + dy
+                    if self._in_sim(nx, ny):
+                        nm = self.grid[ny][nx]
+                        _, nc = THERMAL.get(nm, (None, 0.3))
+                        n_sum += self.temp[ny][nx] * nc
+                        c_sum += nc
+
+                if c_sum > 0:
+                    avg = n_sum / c_sum
+                    t += (avg - t) * 0.15
+
+                # Empty cells cool toward ambient
+                if mat == EMPTY:
+                    t += (20.0 - t) * 0.05
+
+                new_temp[y][x] = max(-50.0, min(800.0, t))
+
+        self.temp = new_temp
+
+    def _check_phase_trans(self):
+        """Check temperature-based phase transitions."""
+        for y in range(SIM_TOP, H):
+            for x in range(W):
+                mat = self.grid[y][x]
+                if mat == EMPTY:
+                    continue
+                t = self.temp[y][x]
+
+                if mat == ICE and t > 5:
+                    self._set_cell(x, y, WATER)
+                elif mat == WATER and t < -5:
+                    self._set_cell(x, y, ICE)
+                elif mat == WATER and t > 105:
+                    self._set_cell(x, y, STEAM)
+                elif mat == STEAM and t < 60:
+                    self._set_cell(x, y, WATER)
+                elif mat == WOOD and t > 250:
+                    self._set_cell(x, y, FIRE)
+                elif mat == OIL and t > 180:
+                    self._set_cell(x, y, FIRE)
+                elif mat == GAS and t > 120:
+                    self._set_cell(x, y, FIRE)
+                elif mat == GUNPOWDER and t > 200:
+                    self._explode(x, y, 5)
+                elif mat == NITRO and t > 100:
+                    self._explode(x, y, 7)
+                elif mat == PLANT and t > 220:
+                    self._set_cell(x, y, FIRE)
+                elif mat == VINE and t > 180:
+                    self._set_cell(x, y, FIRE)
+                elif mat == FUSE and self.life[y][x] == 0 and t > 200:
+                    self.life[y][x] = random.randint(8, 15)
+                elif mat == SAND and t > 700:
+                    self._set_cell(x, y, LAVA)
 
     def _simulate(self):
         """Run one frame of physics simulation."""
@@ -616,8 +705,14 @@ class SandGame(Game):
             for x in range(W):
                 self.updated[y][x] = False
 
-        # Apply wind before main sim
+        # Wind pipeline: generate → propagate → apply
+        self._generate_wind()
+        self._propagate_wind()
         self._apply_wind()
+
+        # Temperature: conduct heat, then check phase transitions
+        self._conduct_temp()
+        self._check_phase_trans()
 
         # Randomize horizontal scan direction
         x_range = list(range(W))
@@ -634,16 +729,24 @@ class SandGame(Game):
                     continue
 
                 behav = self._behavior(mat)
+
+                # Probabilistic movement — slower relative speed on small grid
+                # Powder/liquid skip ~40% of frames, gas ~30%
                 if behav == 'powder':
-                    self._update_powder(x, y)
+                    if random.random() < 0.6:
+                        self._update_powder(x, y)
                 elif behav == 'liquid':
-                    self._update_liquid(x, y)
+                    if random.random() < 0.6:
+                        self._update_liquid(x, y)
                 elif mat == FIRE:
-                    self._update_fire(x, y)
+                    if random.random() < 0.7:
+                        self._update_fire(x, y)
                 elif mat == STEAM:
-                    self._update_steam(x, y)
+                    if random.random() < 0.7:
+                        self._update_steam(x, y)
                 elif mat == GAS:
-                    self._update_gas_element(x, y)
+                    if random.random() < 0.7:
+                        self._update_gas_element(x, y)
                 elif behav == 'grow':
                     self._update_plant(x, y)
                 elif behav == 'vine':
@@ -702,16 +805,15 @@ class SandGame(Game):
                 self.cx = clamp(self.cx + inp.dx, 0, W - 1)
                 self.cy = clamp(self.cy + inp.dy, SIM_TOP, H - 1)
 
-        # Paint material with 2x2 brush while button held
+        # Paint material with 2x2 brush while button held (overwrites)
         if self.painting:
             for dy in range(2):
                 for dx in range(2):
                     bx, by = self.cx + dx, self.cy + dy
-                    if self.selected == ERASE:
-                        if self._in_sim(bx, by):
+                    if self._in_sim(bx, by):
+                        if self.selected == ERASE:
                             self._set_cell(bx, by, EMPTY)
-                    else:
-                        if self._in_sim(bx, by) and self.grid[by][bx] == EMPTY:
+                        else:
                             self._set_cell(bx, by, self.selected)
 
     def _update_select_mode(self, inp: InputState, dt: float):
@@ -781,6 +883,18 @@ class SandGame(Game):
                         c = (clamp(c[0] + flicker, 0, 255),
                              clamp(c[1] + flicker, 0, 255),
                              clamp(c[2] + flicker, 0, 255))
+                    # Temperature tinting
+                    t = self.temp[y][x]
+                    if t > 100:
+                        heat = min((t - 100) / 300.0, 1.0)
+                        c = (min(c[0] + int(heat * 80), 255),
+                             max(c[1] - int(heat * 30), 0),
+                             c[2])
+                    elif t < 0:
+                        cold = min(-t / 30.0, 1.0)
+                        c = (max(c[0] - int(cold * 20), 0),
+                             c[1],
+                             min(c[2] + int(cold * 60), 255))
                     self.display.set_pixel(x, y, c)
 
         # Draw cursor

@@ -53,10 +53,11 @@ TOOL_SAVE = 8
 TOOL_LOAD = 9
 TOOL_CLEAR = 10
 TOOL_STAMP = 11
+TOOL_NEW = 12
 
 TOOL_NAMES = ["PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
-              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP"]
-TOOL_INITIALS = ["P", "M", "B", "E", "F", "D", "U", "R", "S", "L", "C", "W"]
+              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP", "NEW"]
+TOOL_INITIALS = ["P", "M", "B", "E", "F", "D", "U", "R", "S", "L", "C", "W", "N"]
 
 # Brush size per drawing tool
 _TOOL_BRUSH = {TOOL_PENCIL: 1, TOOL_MARKER: 2, TOOL_BRUSH: 3}
@@ -392,6 +393,14 @@ class Paint(Visual):
                         self.canvas[py][px] = color
                 self.overlay_text = "STAMPED!"
                 self.overlay_timer = 1.0
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
+            elif t == TOOL_NEW:
+                self.canvas = [[None] * CANVAS_SIZE for _ in range(CANVAS_SIZE)]
+                self.undo_stack.clear()
+                self.redo_stack.clear()
+                self.overlay_text = "NEW!"
+                self.overlay_timer = 1.5
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
             else:

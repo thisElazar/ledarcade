@@ -17,7 +17,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 from .paint import (
     PALETTE, PALETTE_COLS, PALETTE_ROWS,
-    CANVAS_SIZE, UNDO_MAX,
+    CANVAS_SIZE, UNDO_MAX, TEMPLATE_PIXELS,
     TOOL_PENCIL, TOOL_MARKER, TOOL_BRUSH, TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP,
     _TOOL_BRUSH, _clamp, _color_dist_sq,
 )
@@ -45,16 +45,17 @@ TOOL_EXPORT = 15
 TOOL_CLEAR = 16
 TOOL_SAVE = 17
 TOOL_LOAD = 18
+TOOL_STAMP = 19
 
 TOOL_NAMES = [
     "PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
     "UNDO", "REDO", "PREV", "NEXT", "ADD", "DUP", "DEL",
-    "ONION", "PLAY", "EXPORT", "CLEAR", "SAVE", "LOAD",
+    "ONION", "PLAY", "EXPORT", "CLEAR", "SAVE", "LOAD", "STAMP",
 ]
 TOOL_INITIALS = [
     "P", "M", "B", "E", "F", "D",
     "U", "R", "<", ">", "+", "2", "X",
-    "O", "!", "G", "C", "S", "L",
+    "O", "!", "G", "C", "S", "L", "W",
 ]
 
 # Draw tools (tools that paint on canvas)
@@ -469,6 +470,15 @@ class PaintGif(Visual):
             self._to_draw()
         elif t == TOOL_LOAD:
             self._enter_load_browser()
+        elif t == TOOL_STAMP:
+            self._snapshot()
+            color = PALETTE[self.color_idx]
+            for px, py in TEMPLATE_PIXELS:
+                if 0 <= px < CANVAS_SIZE and 0 <= py < CANVAS_SIZE:
+                    self.canvas[py][px] = color
+            self.overlay_text = "STAMPED!"
+            self.overlay_timer = 1.0
+            self._to_draw()
         else:
             # Draw tool selected
             self.tool = t
