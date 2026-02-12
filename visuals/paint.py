@@ -23,6 +23,7 @@ except ImportError:
 
 CANVAS_SIZE = 64  # 1:1 with screen
 SAVE_DIR = os.path.expanduser("~/.led-arcade/paint")
+GIF_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
 
 # 24-color palette: 8 columns x 3 rows
 PALETTE = [
@@ -54,10 +55,11 @@ TOOL_LOAD = 9
 TOOL_CLEAR = 10
 TOOL_STAMP = 11
 TOOL_NEW = 12
+TOOL_EXPORT = 13
 
 TOOL_NAMES = ["PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
-              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP", "NEW"]
-TOOL_INITIALS = ["P", "M", "B", "E", "F", "D", "U", "R", "S", "L", "C", "W", "N"]
+              "UNDO", "REDO", "SAVE", "LOAD", "CLEAR", "STAMP", "NEW", "EXPORT"]
+TOOL_INITIALS = ["P", "M", "B", "E", "F", "D", "U", "R", "S", "L", "C", "W", "N", "G"]
 
 # Brush size per drawing tool
 _TOOL_BRUSH = {TOOL_PENCIL: 1, TOOL_MARKER: 2, TOOL_BRUSH: 3}
@@ -403,6 +405,10 @@ class Paint(Visual):
                 self.overlay_timer = 1.5
                 self.mode = MODE_DRAW
                 self.debounce = 0.12
+            elif t == TOOL_EXPORT:
+                self._do_export()
+                self.mode = MODE_DRAW
+                self.debounce = 0.12
             else:
                 # Selectable tool (pencil, marker, brush, eraser, fill, eyedrop)
                 self.tool = t
@@ -464,6 +470,27 @@ class Paint(Visual):
         path = os.path.join(SAVE_DIR, f"paint_{num:03d}.png")
         img.save(path)
         self.overlay_text = f"SAVED {num:03d}"
+        self.overlay_timer = 1.5
+
+    def _do_export(self):
+        """Export canvas as single-frame GIF to CUSTOMS playlist."""
+        if not HAS_PIL:
+            self.overlay_text = "NO PIL!"
+            self.overlay_timer = 1.5
+            return
+        os.makedirs(GIF_DIR, exist_ok=True)
+        num = 1
+        while os.path.exists(os.path.join(GIF_DIR, f"sprite_{num:03d}.gif")):
+            num += 1
+        img = Image.new("RGB", (CANVAS_SIZE, CANVAS_SIZE), (0, 0, 0))
+        for y in range(CANVAS_SIZE):
+            for x in range(CANVAS_SIZE):
+                c = self.canvas[y][x]
+                if c:
+                    img.putpixel((x, y), c)
+        path = os.path.join(GIF_DIR, f"sprite_{num:03d}.gif")
+        img.save(path, save_all=True, duration=1000, loop=0)
+        self.overlay_text = f"GIF {num:03d}"
         self.overlay_timer = 1.5
 
     def _do_load(self, filename):

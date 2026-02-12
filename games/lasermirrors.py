@@ -718,8 +718,8 @@ class LaserMirrors(Game):
         self.clear_timer = 0.0
         self.mirror_anims = {}
 
-        # Show hints
-        self.hint_timer = 4.0
+        # Show hints only on first level
+        self.hint_timer = 4.0 if idx == 0 else 0.0
 
         self.phase = 'playing'
 
@@ -1543,8 +1543,6 @@ class LaserMirrors(Game):
         alpha = min(1.0, self.hint_timer / 0.8)
         # Dark band
         y0, y1 = 18, 48
-        if self.level > 0:
-            y0, y1 = 20, 46
         for y in range(y0, y1):
             for x in range(GRID_SIZE):
                 pr, pg, pb = self.display.get_pixel(x, y)
@@ -1554,24 +1552,10 @@ class LaserMirrors(Game):
         c = (int(220 * alpha), int(220 * alpha), int(240 * alpha))
         h = (int(160 * alpha), int(180 * alpha), int(160 * alpha))
 
-        if self.level == 0:
-            self.display.draw_text_small(2, 20, "ARROWS:MOVE", c)
-            self.display.draw_text_small(2, 28, "SPC:ROTATE", c)
-            self.display.draw_text_small(2, 36, "LIGHT TARGETS", h)
-            self.display.draw_text_small(2, 44, "WITH THE BEAM", h)
-        else:
-            self.display.draw_text_small(2, 22, f"LEVEL {self.level + 1}", c)
-            n_targets = len(self.targets)
-            n_mirrors = sum(1 for row in self.map for cl in row if cl in MIRROR_TYPES)
-            n_splitters = sum(1 for row in self.map for cl in row if cl in SPLITTER_TYPES)
-            info = f"{n_mirrors}M {n_targets}T"
-            if n_splitters > 0:
-                info += f" {n_splitters}S"
-            self.display.draw_text_small(2, 30, info, h)
-            if self.door_link:
-                self.display.draw_text_small(2, 38, "DOOR+SWITCH", (int(120 * alpha), int(200 * alpha), int(200 * alpha)))
-            else:
-                self.display.draw_text_small(2, 38, "SPC:ROTATE", h)
+        self.display.draw_text_small(2, 20, "LIGHT TARGET", c)
+        self.display.draw_text_small(2, 28, "BY BOUNCING", c)
+        self.display.draw_text_small(2, 36, "THE BEAM", c)
+        self.display.draw_text_small(2, 44, "PRESS:ROTATE", h)
 
     def _draw_title(self):
         self.display.clear((10, 12, 25))

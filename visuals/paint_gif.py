@@ -18,6 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 from .paint import (
     PALETTE, PALETTE_COLS, PALETTE_ROWS,
     CANVAS_SIZE, UNDO_MAX, TEMPLATE_PIXELS,
+    SAVE_DIR as PAINT_SAVE_DIR,
     TOOL_PENCIL, TOOL_MARKER, TOOL_BRUSH, TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP,
     _TOOL_BRUSH, _clamp, _color_dist_sq,
 )
@@ -30,7 +31,7 @@ except ImportError:
 
 SAVE_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
 
-# Extended tool list (19 tools)
+# Extended tool list
 # 0-5 reuse paint.py constants
 TOOL_UNDO = 6
 TOOL_REDO = 7
@@ -39,22 +40,26 @@ TOOL_NEXT = 9
 TOOL_ADD = 10
 TOOL_DUP = 11
 TOOL_DEL = 12
-TOOL_ONION = 13
-TOOL_PLAY = 14
-TOOL_EXPORT = 15
-TOOL_CLEAR = 16
-TOOL_SAVE = 17
-TOOL_LOAD = 18
-TOOL_STAMP = 19
+TOOL_MOVE_FWD = 13
+TOOL_MOVE_BCK = 14
+TOOL_ONION = 15
+TOOL_PLAY = 16
+TOOL_EXPORT = 17
+TOOL_CLEAR = 18
+TOOL_SAVE = 19
+TOOL_LOAD = 20
+TOOL_STAMP = 21
 
 TOOL_NAMES = [
     "PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
     "UNDO", "REDO", "PREV", "NEXT", "ADD", "DUP", "DEL",
+    "MOVE FWD", "MOVE BCK",
     "ONION", "PLAY", "EXPORT", "CLEAR", "SAVE", "LOAD", "STAMP",
 ]
 TOOL_INITIALS = [
     "P", "M", "B", "E", "F", "D",
     "U", "R", "<", ">", "+", "2", "X",
+    "}", "{",
     "O", "!", "G", "C", "S", "L", "W",
 ]
 
@@ -70,6 +75,10 @@ MODE_MENU = 1
 MODE_LOAD = 2
 MODE_PREVIEW = 3
 MODE_NAME = 4
+
+# Load sources
+LOAD_PROJECTS = 0  # GIF projects (proj_XXX)
+LOAD_PAINT = 1     # Paint PNGs as first frame
 
 # Name entry charset
 NAME_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
@@ -137,7 +146,8 @@ class PaintGif(Visual):
         self.menu_tool = self.tool
 
         # Load browser
-        self.load_dirs = []
+        self.load_source = LOAD_PROJECTS
+        self.load_items = []
         self.load_idx = 0
 
         # Overlay
@@ -404,6 +414,28 @@ class PaintGif(Visual):
         self.overlay_text = f"DEL {self.frame_idx+1}/{len(self.frames)}"
         self.overlay_timer = 1.0
 
+    def _move_frame(self, direction):
+        """Move current frame forward (+1) or backward (-1) in the timeline."""
+        idx = self.frame_idx
+        new_idx = idx + direction
+        if new_idx < 0 or new_idx >= len(self.frames):
+            self.overlay_text = "CANT MOVE"
+            self.overlay_timer = 1.0
+            return
+        # Swap frames
+        self.frames[idx], self.frames[new_idx] = self.frames[new_idx], self.frames[idx]
+        # Swap undo/redo stacks
+        for stacks in (self.undo_stacks, self.redo_stacks):
+            a = stacks.pop(idx, None)
+            b = stacks.pop(new_idx, None)
+            if a is not None:
+                stacks[new_idx] = a
+            if b is not None:
+                stacks[idx] = b
+        self.frame_idx = new_idx
+        self.overlay_text = f"MOVED {new_idx+1}/{len(self.frames)}"
+        self.overlay_timer = 1.0
+
     # ── Menu mode ─────────────────────────────────────────────────────
 
     def _update_menu(self, inp, dt):
@@ -443,6 +475,12 @@ class PaintGif(Visual):
             self._to_draw()
         elif t == TOOL_DEL:
             self._del_frame()
+            self._to_draw()
+        elif t == TOOL_MOVE_FWD:
+            self._move_frame(1)
+            self._to_draw()
+        elif t == TOOL_MOVE_BCK:
+            self._move_frame(-1)
             self._to_draw()
         elif t == TOOL_ONION:
             self.onion_skin = not self.onion_skin
@@ -492,40 +530,59 @@ class PaintGif(Visual):
 
     # ── Load browser ──────────────────────────────────────────────────
 
+    def _scan_load_items(self):
+        """Populate load_items based on current load_source."""
+        self.load_items = []
+        if self.load_source == LOAD_PROJECTS:
+            if os.path.isdir(SAVE_DIR):
+                for d in sorted(os.listdir(SAVE_DIR)):
+                    full = os.path.join(SAVE_DIR, d)
+                    if os.path.isdir(full) and d.startswith("proj_"):
+                        self.load_items.append(d)
+        else:  # LOAD_PAINT
+            if os.path.isdir(PAINT_SAVE_DIR):
+                for f in sorted(os.listdir(PAINT_SAVE_DIR)):
+                    if f.endswith(".png"):
+                        self.load_items.append(f)
+        self.load_idx = 0
+
     def _enter_load_browser(self):
-        self.load_dirs = []
-        if os.path.isdir(SAVE_DIR):
-            for d in sorted(os.listdir(SAVE_DIR)):
-                full = os.path.join(SAVE_DIR, d)
-                if os.path.isdir(full) and d.startswith("proj_"):
-                    self.load_dirs.append(d)
-        if not self.load_dirs:
-            self.overlay_text = "NO PROJECTS"
+        self._scan_load_items()
+        if not self.load_items:
+            # Try the other source
+            self.load_source = 1 - self.load_source
+            self._scan_load_items()
+        if not self.load_items:
+            self.overlay_text = "NO FILES"
             self.overlay_timer = 1.5
             self._to_draw()
             return
-        self.load_idx = 0
         self.mode = MODE_LOAD
         self.debounce = 0.12
 
     def _update_load(self, inp, dt):
-        if not self.load_dirs:
-            self.mode = MODE_MENU
-            self.debounce = 0.12
-            return
+        if inp.up_pressed and self.load_items:
+            self.load_idx = (self.load_idx - 1) % len(self.load_items)
+        if inp.down_pressed and self.load_items:
+            self.load_idx = (self.load_idx + 1) % len(self.load_items)
 
-        if inp.up_pressed:
-            self.load_idx = (self.load_idx - 1) % len(self.load_dirs)
-        if inp.down_pressed:
-            self.load_idx = (self.load_idx + 1) % len(self.load_dirs)
-        if inp.left_pressed:
-            self.mode = MODE_MENU
-            self.debounce = 0.12
+        # Left/Right switches between Projects and Paint PNGs
+        if inp.left_pressed or inp.right_pressed:
+            self.load_source = 1 - self.load_source
+            self._scan_load_items()
+            self.debounce = 0.1
             return
 
         btn_tap = inp.action_l or inp.action_r
         if btn_tap:
-            self._do_load(self.load_dirs[self.load_idx])
+            if not self.load_items:
+                self._to_draw()
+                return
+            item = self.load_items[self.load_idx]
+            if self.load_source == LOAD_PROJECTS:
+                self._do_load(item)
+            else:
+                self._do_load_paint(item)
             self._to_draw()
 
     def _do_save(self):
@@ -579,6 +636,30 @@ class PaintGif(Visual):
         self.undo_stacks.clear()
         self.redo_stacks.clear()
         self.overlay_text = f"LOADED {len(self.frames)}F"
+        self.overlay_timer = 1.5
+
+    def _do_load_paint(self, filename):
+        """Load a single Paint PNG as the first frame of a new project."""
+        if not HAS_PIL:
+            self.overlay_text = "NO PIL!"
+            self.overlay_timer = 1.5
+            return
+        path = os.path.join(PAINT_SAVE_DIR, filename)
+        img = Image.open(path).convert("RGB")
+        if img.size != (CANVAS_SIZE, CANVAS_SIZE):
+            img = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.NEAREST)
+        canvas = self._blank_canvas()
+        for y in range(CANVAS_SIZE):
+            for x in range(CANVAS_SIZE):
+                r, g, b = img.getpixel((x, y))
+                if r or g or b:
+                    canvas[y][x] = (r, g, b)
+        self.frames = [canvas]
+        self.frame_idx = 0
+        self.undo_stacks.clear()
+        self.redo_stacks.clear()
+        label = filename.replace(".png", "")
+        self.overlay_text = f"LOADED {label}"
         self.overlay_timer = 1.5
 
     # ── Preview mode ──────────────────────────────────────────────────
@@ -797,26 +878,36 @@ class PaintGif(Visual):
         self.display.draw_text_small(2, 55, info, (80, 120, 80))
 
     def _draw_load_browser(self):
-        self.display.draw_text_small(2, 1, "LOAD PROJ", (200, 200, 200))
+        # Header shows current source with left/right hints
+        if self.load_source == LOAD_PROJECTS:
+            title = "PROJECTS"
+        else:
+            title = "PAINT"
+        self.display.draw_text_small(2, 1, f"<{title}>", (200, 200, 200))
         for x in range(GRID_SIZE):
             self.display.set_pixel(x, 8, (40, 40, 40))
 
         visible = 7
-        total = len(self.load_dirs)
-        scroll = max(0, min(self.load_idx - visible // 2, total - visible))
+        total = len(self.load_items)
+        if total == 0:
+            self.display.draw_text_small(7, 20, "EMPTY", (80, 80, 80))
+        else:
+            scroll = max(0, min(self.load_idx - visible // 2, total - visible))
+            y = 10
+            for i in range(scroll, min(scroll + visible, total)):
+                name = self.load_items[i]
+                if self.load_source == LOAD_PROJECTS:
+                    label = name.replace("proj_", "P")
+                else:
+                    label = name.replace(".png", "")
+                if i == self.load_idx:
+                    self.display.draw_text_small(2, y, ">", (255, 255, 255))
+                    self.display.draw_text_small(7, y, label, (255, 255, 255))
+                else:
+                    self.display.draw_text_small(7, y, label, (100, 100, 100))
+                y += 7
 
-        y = 10
-        for i in range(scroll, min(scroll + visible, total)):
-            name = self.load_dirs[i]
-            label = name.replace("proj_", "P")
-            if i == self.load_idx:
-                self.display.draw_text_small(2, y, ">", (255, 255, 255))
-                self.display.draw_text_small(7, y, label, (255, 255, 255))
-            else:
-                self.display.draw_text_small(7, y, label, (100, 100, 100))
-            y += 7
-
-        self.display.draw_text_small(2, 57, "< CANCEL", (80, 80, 80))
+        self.display.draw_text_small(2, 57, "L/R SOURCE", (80, 80, 80))
 
     def _draw_name_entry(self):
         self.display.draw_text_small(2, 2, "EXPORT GIF", (200, 160, 40))
