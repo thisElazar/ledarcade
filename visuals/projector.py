@@ -144,6 +144,7 @@ class Projector(Visual):
         self.takeup_angle = 0.0
         self.beam_on = False
         self.flicker_timer = 0.0
+        self.film_offset = 0.0
 
     def handle_input(self, input_state):
         consumed = False

@@ -17,7 +17,7 @@ from arcade import InputState, GameState
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from games.indy500 import Indy500
+from games.indy500 import Indy500, TRACKS
 
 
 class Indy500Demo(Visual):
@@ -76,15 +76,25 @@ class Indy500Demo(Visual):
         car_y = game.y
         car_angle = game.angle
 
+        # Get track geometry from current track config
+        track_cfg = TRACKS[game.level]
+        arc_seg = None
+        for seg in track_cfg['segments']:
+            if seg[0] == 'arc':
+                arc_seg = seg
+                break
+        if arc_seg is None:
+            return False, False
+        _, tcx, tcy, trx, try_, _, _ = arc_seg
+
         # Find car's parametric angle on the ellipse
-        dx = car_x - game.TRACK_CENTER_X
-        dy = car_y - game.TRACK_CENTER_Y
-        track_angle = math.atan2(dy / game.TRACK_RADIUS_Y,
-                                 dx / game.TRACK_RADIUS_X)
+        dx = car_x - tcx
+        dy = car_y - tcy
+        track_angle = math.atan2(dy / try_, dx / trx)
 
         # Centerline point at car's current angle
-        center_x = game.TRACK_CENTER_X + game.TRACK_RADIUS_X * math.cos(track_angle)
-        center_y = game.TRACK_CENTER_Y + game.TRACK_RADIUS_Y * math.sin(track_angle)
+        center_x = tcx + trx * math.cos(track_angle)
+        center_y = tcy + try_ * math.sin(track_angle)
 
         # Distance from centerline — look further ahead when drifting off-center
         off_x = car_x - center_x
@@ -99,8 +109,8 @@ class Indy500Demo(Visual):
         # Target point on centerline ahead of car (track_angle increases in
         # the driving direction — counterclockwise on screen)
         ahead_angle = track_angle + lookahead
-        target_x = game.TRACK_CENTER_X + game.TRACK_RADIUS_X * math.cos(ahead_angle)
-        target_y = game.TRACK_CENTER_Y + game.TRACK_RADIUS_Y * math.sin(ahead_angle)
+        target_x = tcx + trx * math.cos(ahead_angle)
+        target_y = tcy + try_ * math.sin(ahead_angle)
 
         # Desired heading toward the lookahead point
         desired_angle = math.atan2(target_y - car_y, target_x - car_x)
