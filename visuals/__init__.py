@@ -194,6 +194,7 @@ from .drummachine import DrumMachine
 from .jukebox import Jukebox
 from .synthesizer import Synthesizer
 from .chordchart import ChordChart
+from .rudiments import DrumRudiments
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -427,6 +428,7 @@ ALL_VISUALS = [
     Jukebox,
     Synthesizer,
     ChordChart,
+    DrumRudiments,
     WatchGears,
     Camshaft,
     GrandfatherClock,
@@ -722,6 +724,7 @@ __all__ = [
     'Jukebox',
     'Synthesizer',
     'ChordChart',
+    'DrumRudiments',
     'WatchGears',
     'Camshaft',
     'GrandfatherClock',
