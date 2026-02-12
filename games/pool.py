@@ -362,7 +362,7 @@ class Pool(Game):
             self.aim_angle += smooth_speed * dt
 
         # Up/Down = precision discrete steps (pressed)
-        precision_step = math.pi / 64  # ~2.8 degrees per tap
+        precision_step = math.pi / 180  # ~1 degree, ~1px at far wall
         if inp.up_pressed:
             self.aim_angle -= precision_step
         if inp.down_pressed:
