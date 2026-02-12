@@ -5,9 +5,18 @@ Auto-cycling visual playlists that rotate through curated sets of visuals.
 Hold 2 seconds to exit back to menu (handled by main loop).
 """
 
+import os
 import random
-from . import Visual
+from . import Visual, GRID_SIZE
 from arcade import InputState
+
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
+GIF_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
 
 
 def _randomize_style(visual):
@@ -346,3 +355,121 @@ class Demos(Slideshow):
             # Board games
             ChessDemo, CheckersDemo, OthelloDemo,
         ]
+
+
+# ---------------------------------------------------------------------------
+# GIF Player — displays an exported GIF on the LED panel
+# ---------------------------------------------------------------------------
+
+class GifPlayer(Visual):
+    """Plays a single GIF file frame-by-frame on the display."""
+
+    name = "GIF"
+    description = "Plays an animated GIF"
+    category = "utility"
+
+    _gif_path = None  # set by factory or subclass
+
+    def reset(self):
+        self.frames = []   # list of [(r,g,b) or None per pixel] row-major
+        self.frame_idx = 0
+        self.fps = 6
+        self.timer = 0.0
+        self._load()
+
+    def _load(self):
+        if not HAS_PIL or not self._gif_path or not os.path.exists(self._gif_path):
+            return
+        img = Image.open(self._gif_path)
+        # Extract FPS from GIF duration
+        duration = img.info.get('duration', 166)  # ms per frame
+        if duration > 0:
+            self.fps = max(1, min(24, round(1000 / duration)))
+        try:
+            while True:
+                frame = img.convert("RGB")
+                if frame.size != (GRID_SIZE, GRID_SIZE):
+                    frame = frame.resize((GRID_SIZE, GRID_SIZE), Image.NEAREST)
+                pixels = []
+                for y in range(GRID_SIZE):
+                    row = []
+                    for x in range(GRID_SIZE):
+                        r, g, b = frame.getpixel((x, y))
+                        row.append((r, g, b) if (r or g or b) else None)
+                    pixels.append(row)
+                self.frames.append(pixels)
+                img.seek(img.tell() + 1)
+        except EOFError:
+            pass
+
+    def update(self, dt):
+        self.time += dt
+        if not self.frames:
+            return
+        self.timer += dt
+        interval = 1.0 / self.fps
+        if self.timer >= interval:
+            self.timer -= interval
+            self.frame_idx = (self.frame_idx + 1) % len(self.frames)
+
+    def draw(self):
+        self.display.clear()
+        if not self.frames:
+            self.display.draw_text_small(2, 28, "NO GIF", (255, 0, 0))
+            return
+        frame = self.frames[self.frame_idx]
+        for y in range(GRID_SIZE):
+            row = frame[y]
+            for x in range(GRID_SIZE):
+                pixel = row[x]
+                if pixel:
+                    self.display.set_pixel(x, y, pixel)
+
+    def handle_input(self, input_state):
+        return False
+
+
+def _make_gif_visual(path):
+    """Factory: create a GifPlayer subclass bound to a specific file."""
+    gif_name = os.path.splitext(os.path.basename(path))[0].upper()
+
+    class _Gif(GifPlayer):
+        name = gif_name
+        _gif_path = path
+    return _Gif
+
+
+class Customs(Slideshow):
+    name = "CUSTOMS"
+    description = "Your exported GIF animations"
+    category = "visual_mix"
+    cycle_interval = 15.0  # shorter cycle for user art
+
+    def _get_visual_classes(self):
+        if not os.path.isdir(GIF_DIR):
+            return []
+        gifs = sorted(f for f in os.listdir(GIF_DIR) if f.endswith(".gif"))
+        return [_make_gif_visual(os.path.join(GIF_DIR, g)) for g in gifs]
+
+    def _advance(self):
+        """Pick next GIF; show message if none found."""
+        if not self._queue:
+            self._queue = self._get_visual_classes()
+            random.shuffle(self._queue)
+        if self._queue:
+            cls = self._queue.pop()
+            self._child = cls(self.display)
+            self._child.reset()
+            self._cycle_timer = 0.0
+        else:
+            self._child = None
+            self._cycle_timer = 0.0
+
+    def draw(self):
+        if self._child:
+            self._child.draw()
+        else:
+            self.display.clear()
+            self.display.draw_text_small(2, 24, "NO GIFS", (180, 180, 180))
+            self.display.draw_text_small(2, 34, "EXPORT FROM", (100, 100, 100))
+            self.display.draw_text_small(2, 42, "PAINT GIF", (100, 100, 100))

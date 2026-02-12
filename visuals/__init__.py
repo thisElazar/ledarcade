@@ -295,7 +295,7 @@ from .trashblasterdemo import TrashBlasterDemo
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
-    ScienceLab, Title, Demos, MusicMix,
+    ScienceLab, Title, Demos, MusicMix, Customs,
 )
 
 # List of all available visuals
@@ -544,6 +544,7 @@ ALL_VISUALS = [
     Complexity,
     ScienceLab,
     MusicMix,
+    Customs,
     Demos,
     # Individual game demos
     AgarioDemo,
@@ -763,6 +764,7 @@ __all__ = [
     'Complexity',
     'ScienceLab',
     'MusicMix',
+    'Customs',
     'Demos',
     'AgarioDemo',
     'DefenderDemo',
