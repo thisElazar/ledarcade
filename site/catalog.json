@@ -3130,6 +3130,12 @@
           "is_game": false
         },
         {
+          "name": "CHORD CHART",
+          "cls": "ChordChart",
+          "module": "visuals/chordchart.py",
+          "is_game": false
+        },
+        {
           "name": "EQUALIZER",
           "cls": "Equalizer",
           "module": "visuals/equalizer.py",
@@ -7630,6 +7636,11 @@
               "name": "SYNTHESIZER",
               "cls": "Synthesizer",
               "module": "visuals/synthesizer.py"
+            },
+            {
+              "name": "CHORD CHART",
+              "cls": "ChordChart",
+              "module": "visuals/chordchart.py"
             }
           ]
         },

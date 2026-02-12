@@ -193,6 +193,7 @@ from .turntable import Turntable
 from .drummachine import DrumMachine
 from .jukebox import Jukebox
 from .synthesizer import Synthesizer
+from .chordchart import ChordChart
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -425,6 +426,7 @@ ALL_VISUALS = [
     DrumMachine,
     Jukebox,
     Synthesizer,
+    ChordChart,
     WatchGears,
     Camshaft,
     GrandfatherClock,
@@ -719,6 +721,7 @@ __all__ = [
     'DrumMachine',
     'Jukebox',
     'Synthesizer',
+    'ChordChart',
     'WatchGears',
     'Camshaft',
     'GrandfatherClock',

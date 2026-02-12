@@ -197,8 +197,8 @@ class Metronome(Visual):
                 d.set_pixel(ind_x, iy - 1, BEAT_DIM)
                 d.set_pixel(ind_x, iy + 1, BEAT_DIM)
 
-        # -- Beat counter number --
-        d.draw_text_small(55, 56, str(self.beat_in_measure), BEAT_TEXT)
+        # -- Beat counter number (bottom left) --
+        d.draw_text_small(2, 56, str(self.beat_in_measure), BEAT_TEXT)
 
         # -- BPM and time signature text --
         bpm_str = f"{self.bpm} BPM"

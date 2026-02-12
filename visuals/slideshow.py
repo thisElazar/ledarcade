@@ -279,10 +279,10 @@ class MusicMix(Slideshow):
     def _get_visual_classes(self):
         from visuals import (MusicBox, Metronome, HurdyGurdy, Equalizer,
                              Turntable, PianoRoll, DrumMachine, Jukebox,
-                             Theremin, Gramophone, Synthesizer)
+                             Theremin, Gramophone, Synthesizer, ChordChart)
         return [MusicBox, Metronome, HurdyGurdy, Equalizer,
                 Turntable, PianoRoll, DrumMachine, Jukebox,
-                Theremin, Gramophone, Synthesizer]
+                Theremin, Gramophone, Synthesizer, ChordChart]
 
 
 class Demos(Slideshow):
