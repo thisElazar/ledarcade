@@ -5008,14 +5008,18 @@ class Molecule(Visual):
     description = "3D ball-and-stick molecular models"
     category = "science"
 
-    def __init__(self, display: Display):
-        super().__init__(display)
+    _saved_group_idx = None
+    _saved_mol_pos = None
 
     def reset(self):
         self.time = 0.0
         self.group_indices = _build_group_indices()
-        self.group_idx = 0  # Index into GROUPS (starts on ALL)
-        self.mol_pos = random.randint(0, len(MOLECULES) - 1)
+        if Molecule._saved_group_idx is not None:
+            self.group_idx = Molecule._saved_group_idx
+            self.mol_pos = Molecule._saved_mol_pos
+        else:
+            self.group_idx = 0
+            self.mol_pos = random.randint(0, len(MOLECULES) - 1)
         self.rotation_y = 0.0  # Manual: left/right
         self.tilt_x = 0.0      # Manual: up/down
         self.rotation_z = 0.0  # Continuous auto-rotate around Z
@@ -5067,6 +5071,9 @@ class Molecule(Visual):
         self.scale = 6.0
         self.large = False
         self.label_timer = 0.0
+
+        Molecule._saved_group_idx = self.group_idx
+        Molecule._saved_mol_pos = self.mol_pos
 
     def handle_input(self, input_state) -> bool:
         consumed = False
