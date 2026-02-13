@@ -15,29 +15,13 @@
         "file": "Última_Cena_-_Da_Vinci_5.jpg",
         "crop": "center"
     },
-    "vitruvian_man": {
-        "title": "Vitruvian Man",
+    "lady_ermine": {
+        "title": "Lady with an Ermine",
         "artist": "Leonardo da Vinci",
         "year": 1490,
         "movement": "Renaissance",
-        "file": "Da Vinci Vitruve Luc Viatour.jpg",
-        "crop": "center"
-    },
-    "birth_of_venus": {
-        "title": "The Birth of Venus",
-        "artist": "Sandro Botticelli",
-        "year": 1485,
-        "movement": "Renaissance",
-        "file": "Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
-        "crop": "center"
-    },
-    "primavera": {
-        "title": "Primavera",
-        "artist": "Sandro Botticelli",
-        "year": 1482,
-        "movement": "Renaissance",
-        "file": "Botticelli-primavera.jpg",
-        "crop": "center"
+        "file": "Lady with an Ermine - Leonardo da Vinci - Google Art Project.jpg",
+        "crop": "top"
     },
     "creation_of_adam": {
         "title": "The Creation of Adam",
@@ -61,6 +45,22 @@
         "year": 1511,
         "movement": "Renaissance",
         "file": "\"The School of Athens\" by Raffaello Sanzio da Urbino.jpg",
+        "crop": "center"
+    },
+    "botticelli_annunciation": {
+        "title": "Cestello Annunciation",
+        "artist": "Sandro Botticelli",
+        "year": 1489,
+        "movement": "Renaissance",
+        "file": "Botticelli, Cestello Annunciation, 1489, Uffizi.jpg",
+        "crop": "center"
+    },
+    "fra_angelico_annunciation": {
+        "title": "The Annunciation",
+        "artist": "Fra Angelico",
+        "year": 1440,
+        "movement": "Renaissance",
+        "file": "La Anunciación, by Fra Angelico, from Prado in Google Earth.jpg",
         "crop": "center"
     },
     "garden_earthly_delights": {
@@ -119,13 +119,13 @@
         "file": "Van_Eyck_-_Arnolfini_Portrait.jpg",
         "crop": "top"
     },
-    "venus_urbino": {
-        "title": "Venus of Urbino",
+    "titian_assumption": {
+        "title": "Assumption of the Virgin",
         "artist": "Titian",
-        "year": 1538,
+        "year": 1518,
         "movement": "Renaissance",
-        "file": "Tiziano - Venere di Urbino - Google Art Project.jpg",
-        "crop": "center"
+        "file": "Tizian 041.jpg",
+        "crop": "top"
     },
     "caravaggio_bacchus": {
         "title": "Bacchus",
@@ -133,14 +133,6 @@
         "year": 1598,
         "movement": "Baroque",
         "file": "Bacchus-Caravaggio (1598).jpg",
-        "crop": "top"
-    },
-    "caravaggio_judith": {
-        "title": "Judith Beheading Holofernes",
-        "artist": "Caravaggio",
-        "year": 1599,
-        "movement": "Baroque",
-        "file": "Judith Beheading Holofernes-Caravaggio (c.1598-9).jpg",
         "crop": "top"
     },
     "calling_st_matthew": {
@@ -151,6 +143,14 @@
         "file": "The Calling of Saint Matthew-Caravaggo (1599-1600).jpg",
         "crop": "center"
     },
+    "supper_emmaus": {
+        "title": "The Supper at Emmaus",
+        "artist": "Caravaggio",
+        "year": 1601,
+        "movement": "Baroque",
+        "file": "Supper at Emmaus-Caravaggio (1601).jpg",
+        "crop": "center"
+    },
     "caravaggio_medusa": {
         "title": "Medusa",
         "artist": "Caravaggio",
@@ -159,12 +159,12 @@
         "file": "Caravaggio - Medusa - Google Art Project.jpg",
         "crop": "center"
     },
-    "artemisia_judith": {
-        "title": "Judith Slaying Holofernes",
+    "gentileschi_self_portrait": {
+        "title": "Self-Portrait as Allegory of Painting",
         "artist": "Artemisia Gentileschi",
-        "year": 1620,
+        "year": 1639,
         "movement": "Baroque",
-        "file": "Artemisia Gentileschi - Judith Beheading Holofernes - WGA8563.jpg",
+        "file": "Self-portrait as the Allegory of Painting (La Pittura) - Artemisia Gentileschi.jpg",
         "crop": "top"
     },
     "girl_pearl_earring": {
@@ -247,13 +247,13 @@
         "file": "Fragonard, The Swing.jpg",
         "crop": "top"
     },
-    "saturn_devouring": {
-        "title": "Saturn Devouring His Son",
+    "goya_parasol": {
+        "title": "The Parasol",
         "artist": "Francisco Goya",
-        "year": 1823,
-        "movement": "Romanticism",
-        "file": "Francisco_de_Goya,_Saturno_devorando_a_su_hijo_(1819-1823).jpg",
-        "crop": "top"
+        "year": 1777,
+        "movement": "Rococo",
+        "file": "Francisco de Goya y Lucientes - The Parasol - WGA9984.jpg",
+        "crop": "center"
     },
     "death_of_marat": {
         "title": "The Death of Marat",
@@ -279,20 +279,20 @@
         "file": "Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
         "crop": "top"
     },
-    "liberty_leading": {
-        "title": "Liberty Leading the People",
-        "artist": "Eugène Delacroix",
-        "year": 1830,
-        "movement": "Romanticism",
-        "file": "Eugène_Delacroix_-_Le_28_Juillet._La_Liberté_guidant_le_peuple.jpg",
-        "crop": "center"
-    },
     "death_sardanapalus": {
         "title": "The Death of Sardanapalus",
         "artist": "Eugène Delacroix",
         "year": 1827,
         "movement": "Romanticism",
         "file": "Eugène Delacroix - The Death of Sardanapalus - WGA6173.jpg",
+        "crop": "center"
+    },
+    "horse_fair": {
+        "title": "The Horse Fair",
+        "artist": "Rosa Bonheur",
+        "year": 1853,
+        "movement": "Realism",
+        "file": "Rosa bonheur horse fair 1835 55FXD.jpg",
         "crop": "center"
     },
     "raft_of_medusa": {
@@ -415,20 +415,12 @@
         "file": "John William Waterhouse - The Lady of Shalott - Google Art Project edit.jpg",
         "crop": "center"
     },
-    "hylas_nymphs": {
-        "title": "Hylas and the Nymphs",
+    "waterhouse_miranda": {
+        "title": "Miranda - The Tempest",
         "artist": "John William Waterhouse",
-        "year": 1896,
+        "year": 1916,
         "movement": "Pre-Raphaelite",
-        "file": "Waterhouse Hylas and the Nymphs Manchester Art Gallery 1896.15.jpg",
-        "crop": "center"
-    },
-    "nymphs_satyr": {
-        "title": "Nymphs and Satyr",
-        "artist": "William-Adolphe Bouguereau",
-        "year": 1873,
-        "movement": "Academic",
-        "file": "William-Adolphe Bouguereau (1825-1905) - Nymphs and Satyr (1873).jpg",
+        "file": "Miranda - The Tempest JWW.jpg",
         "crop": "top"
     },
     "roses_heliogabalus": {
@@ -439,20 +431,20 @@
         "file": "The Roses of Heliogabalus.jpg",
         "crop": "center"
     },
+    "bouguereau_shepherdess": {
+        "title": "The Shepherdess",
+        "artist": "William-Adolphe Bouguereau",
+        "year": 1889,
+        "movement": "Academic",
+        "file": "William-Adolphe Bouguereau (1825-1905) - The Shepherdess (1889).jpg",
+        "crop": "top"
+    },
     "whistlers_mother": {
         "title": "Whistler's Mother",
         "artist": "James McNeill Whistler",
         "year": 1871,
         "movement": "Realism",
         "file": "Whistlers_Mother_high_res.jpg",
-        "crop": "center"
-    },
-    "olympia": {
-        "title": "Olympia",
-        "artist": "Édouard Manet",
-        "year": 1863,
-        "movement": "Realism",
-        "file": "Edouard Manet - Olympia - Google Art Project 3.jpg",
         "crop": "center"
     },
     "bar_folies_bergere": {
@@ -462,6 +454,14 @@
         "movement": "Impressionism",
         "file": "Edouard Manet, A Bar at the Folies-Bergère.jpg",
         "crop": "center"
+    },
+    "the_fifer": {
+        "title": "The Fifer",
+        "artist": "Edouard Manet",
+        "year": 1866,
+        "movement": "Realism",
+        "file": "Manet, Edouard - Young Flautist, or The Fifer, 1866 (2).jpg",
+        "crop": "top"
     },
     "impression_sunrise": {
         "title": "Impression, Sunrise",
@@ -695,20 +695,20 @@
         "file": "Paul Cézanne, Les joueurs de carte (1892-95).jpg",
         "crop": "center"
     },
-    "where_do_we_come_from": {
-        "title": "Where Do We Come From?",
-        "artist": "Paul Gauguin",
-        "year": 1897,
-        "movement": "Post-Impressionism",
-        "file": "Paul Gauguin - D'ou venons-nous.jpg",
-        "crop": "center"
-    },
     "vision_sermon": {
         "title": "Vision After the Sermon",
         "artist": "Paul Gauguin",
         "year": 1888,
         "movement": "Post-Impressionism",
         "file": "Paul Gauguin 137.jpg",
+        "crop": "center"
+    },
+    "gauguin_arearea": {
+        "title": "Arearea (The Red Dog)",
+        "artist": "Paul Gauguin",
+        "year": 1892,
+        "movement": "Post-Impressionism",
+        "file": "Paul Gauguin - Arearea - Google Art Project.jpg",
         "crop": "center"
     },
     "moulin_rouge": {
@@ -743,13 +743,13 @@
         "file": "Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
         "crop": "top"
     },
-    "munch_madonna": {
-        "title": "Madonna",
+    "munch_karl_johan": {
+        "title": "Evening on Karl Johan",
         "artist": "Edvard Munch",
-        "year": 1894,
+        "year": 1892,
         "movement": "Expressionism",
-        "file": "Edvard Munch - Madonna (1894-1895).jpg",
-        "crop": "top"
+        "file": "Edvard Munch - Evening on Karl Johan Street (1892).jpg",
+        "crop": "center"
     },
     "the_kiss_klimt": {
         "title": "The Kiss",
@@ -799,12 +799,12 @@
         "file": "Ilja Jefimowitsch Repin - Reply of the Zaporozhian Cossacks - Yorck.jpg",
         "crop": "center"
     },
-    "the_dance_matisse": {
-        "title": "The Dance",
+    "harmony_in_red": {
+        "title": "Harmony in Red",
         "artist": "Henri Matisse",
-        "year": 1910,
+        "year": 1908,
         "movement": "Fauvism",
-        "file": "Matissedance.jpg",
+        "file": "Matisse-The-Dessert-Harmony-in-Red-Henri-1908-fast.jpg",
         "crop": "center"
     },
     "blue_horse": {

@@ -5,12 +5,12 @@ Optics - Geometric Ray Tracing Visualization
 across the grid, interacting with prisms, lenses, and mirrors via
 Snell's law and reflection.
 
-Scenarios: PRISM, LENS, MIRRORS, DOUBLE PRISM, KALEIDOSCOPE
+Scenarios: PRISM, LENS, MIRRORS
 
 Controls:
-  Left/Right     - Adjust beam angle (or kaleidoscope rotation speed)
+  Left/Right     - Adjust beam angle (pauses auto-animation)
   Up/Down        - Cycle color palette
-  Single button  - Cycle scenario / sub-variant
+  Single button  - Cycle scenario / sub-variant (resumes auto-animation)
   Both buttons   - Toggle scrolling notes
 """
 
@@ -52,7 +52,7 @@ PALETTES = [
 
 # ── Scenarios ───────────────────────────────────────────────────
 
-_SCENARIOS = ['PRISM', 'LENS', 'MIRRORS', 'DOUBLE PRISM', 'KALEIDOSCOPE']
+_SCENARIOS = ['PRISM', 'LENS', 'MIRRORS']
 
 
 # ── Geometry helpers ────────────────────────────────────────────
@@ -228,9 +228,10 @@ class Optics(Visual):
         self.notes_scroll_len = 1
         self._both_pressed_prev = False
 
-        # User-controlled angle / speed
+        # User-controlled angle
         self.user_angle = 0.0            # beam angle offset (radians)
-        self.kaleidoscope_speed = 0.15   # rotation speed for kaleidoscope
+        self.prism_angle = 0.0           # accumulated prism rotation for PRISM
+        self.auto_cycle = True           # auto-rotate/sweep when True
 
         # Optical elements
         self.prisms = []
@@ -257,10 +258,6 @@ class Optics(Visual):
             self._setup_lens()
         elif scenario == 'MIRRORS':
             self._setup_mirrors()
-        elif scenario == 'DOUBLE PRISM':
-            self._setup_double_prism()
-        elif scenario == 'KALEIDOSCOPE':
-            self._setup_kaleidoscope()
 
     def _setup_prism(self):
         """White light -> prism -> rainbow spectrum."""
@@ -318,60 +315,6 @@ class Optics(Visual):
                 'x': 2.0, 'y': 30.0 + i * 1.5, 'dx': 0.9, 'dy': -0.44,
                 'color': colors[i], 'wavelength': 550, 'n': 1.0,
             })
-
-    def _setup_double_prism(self):
-        """Two prisms: first disperses, second recombines (Newton's experiment)."""
-        # First prism - left side
-        cx1, cy1 = 18, 32
-        size = 9
-        v0 = (cx1 - size * 0.5, cy1 - size * 0.58)
-        v1 = (cx1 - size * 0.5, cy1 + size * 0.58)
-        v2 = (cx1 + size * 0.6, cy1)
-        self.prisms.append({'vertices': [v0, v1, v2], 'n_base': 1.52})
-
-        # Second prism - right side, inverted
-        cx2, cy2 = 48, 32
-        v3 = (cx2 + size * 0.5, cy2 - size * 0.58)
-        v4 = (cx2 + size * 0.5, cy2 + size * 0.58)
-        v5 = (cx2 - size * 0.6, cy2)
-        self.prisms.append({'vertices': [v3, v4, v5], 'n_base': 1.52})
-
-        # White beam from left
-        for s in SPECTRUM:
-            self.sources.append({
-                'x': 2.0, 'y': 32.0, 'dx': 1.0, 'dy': 0.0,
-                'color': s['color'], 'wavelength': s['wavelength'], 'n': s['n'],
-            })
-
-    def _setup_kaleidoscope(self):
-        """Triangular mirror arrangement with colored light sources."""
-        cx, cy = 32, 32
-        r = 22
-        # Three mirrors forming equilateral triangle
-        angles = [math.pi / 2, math.pi / 2 + 2 * math.pi / 3, math.pi / 2 + 4 * math.pi / 3]
-        verts = [(cx + r * math.cos(a), cy + r * math.sin(a)) for a in angles]
-        for i in range(3):
-            j = (i + 1) % 3
-            self.mirrors.append({
-                'x1': verts[i][0], 'y1': verts[i][1],
-                'x2': verts[j][0], 'y2': verts[j][1],
-            })
-        # Colored point sources inside the triangle, radiating outward
-        source_colors = [
-            (255, 60, 60), (60, 255, 60), (60, 60, 255),
-            (255, 255, 0), (0, 255, 255), (255, 0, 255),
-        ]
-        for i in range(6):
-            angle = 2 * math.pi * i / 6
-            sx = cx + 3 * math.cos(angle)
-            sy = cy + 3 * math.sin(angle)
-            for j in range(3):
-                a2 = angle + (j - 1) * 0.3
-                self.sources.append({
-                    'x': sx, 'y': sy,
-                    'dx': math.cos(a2), 'dy': math.sin(a2),
-                    'color': source_colors[i], 'wavelength': 550, 'n': 1.0,
-                })
 
     # ── ray tracing ──────────────────────────────────────────────
 
@@ -457,7 +400,7 @@ class Optics(Visual):
                     lr = lens['radius']
                     fl = lens['focal_len']
                     ltype = lens['type']
-                    if self.sub_variant == 1:
+                    if self.sub_variant == 1 and _SCENARIOS[self.scenario_idx] == 'LENS':
                         ltype = 'concave'
                     # Thin lens approximation: when ray crosses the lens plane (x = lcx)
                     if (x - lcx) * (nx - lcx) <= 0 and abs(ny - lcy) < lr:
@@ -527,18 +470,20 @@ class Optics(Visual):
         consumed = False
         scenario = _SCENARIOS[self.scenario_idx]
 
-        # Left/Right: adjust beam angle or kaleidoscope rotation speed
+        # Left/Right: adjust angle (pauses auto-cycle)
         if input_state.left_pressed or input_state.left:
-            if scenario == 'KALEIDOSCOPE':
-                self.kaleidoscope_speed = max(-1.0, self.kaleidoscope_speed - 0.05)
+            if scenario == 'PRISM':
+                self.prism_angle -= 0.06
             else:
                 self.user_angle -= 0.06
+            self.auto_cycle = False
             consumed = True
         if input_state.right_pressed or input_state.right:
-            if scenario == 'KALEIDOSCOPE':
-                self.kaleidoscope_speed = min(1.0, self.kaleidoscope_speed + 0.05)
+            if scenario == 'PRISM':
+                self.prism_angle += 0.06
             else:
                 self.user_angle += 0.06
+            self.auto_cycle = False
             consumed = True
 
         # Up/Down: cycle palette
@@ -581,13 +526,13 @@ class Optics(Visual):
             label = self._sub_variant_label(scenario, self.sub_variant)
             if scenario == 'MIRRORS':
                 self._rearrange_mirrors()
-            elif scenario == 'KALEIDOSCOPE':
-                self._rearrange_kaleidoscope()
             self._show_overlay(label)
         else:
             # Advance to next scenario
             self.scenario_idx = (self.scenario_idx + 1) % len(_SCENARIOS)
             self.user_angle = 0.0
+            self.prism_angle = 0.0
+            self.auto_cycle = True
             self._setup_scenario()
             new_scenario = _SCENARIOS[self.scenario_idx]
             label = self._sub_variant_label(new_scenario, 0)
@@ -599,9 +544,7 @@ class Optics(Visual):
             return 2        # convex, concave
         elif scenario == 'MIRRORS':
             return 3        # double, corner, parallel
-        elif scenario == 'KALEIDOSCOPE':
-            return 3        # 3-fold, 4-fold, 6-fold
-        return 1            # PRISM, DOUBLE PRISM have no sub-variants
+        return 1
 
     @staticmethod
     def _sub_variant_label(scenario, sub):
@@ -609,8 +552,6 @@ class Optics(Visual):
             return ['CONVEX LENS', 'CONCAVE LENS'][sub]
         elif scenario == 'MIRRORS':
             return ['DOUBLE', 'CORNER', 'PARALLEL'][sub]
-        elif scenario == 'KALEIDOSCOPE':
-            return ['3-FOLD', '4-FOLD', '6-FOLD'][sub]
         return scenario
 
     def _rearrange_mirrors(self):
@@ -657,41 +598,6 @@ class Optics(Visual):
                     'color': colors[i], 'wavelength': 550, 'n': 1.0,
                 })
 
-    def _rearrange_kaleidoscope(self):
-        """Rearrange kaleidoscope mirror geometry for sub-variants."""
-        self.mirrors = []
-        self.sources = []
-        cx, cy = 32, 32
-
-        folds = [3, 4, 6][self.sub_variant]
-        r = 22
-        angles = [math.pi / 2 + 2 * math.pi * i / folds for i in range(folds)]
-        verts = [(cx + r * math.cos(a), cy + r * math.sin(a)) for a in angles]
-        for i in range(folds):
-            j = (i + 1) % folds
-            self.mirrors.append({
-                'x1': verts[i][0], 'y1': verts[i][1],
-                'x2': verts[j][0], 'y2': verts[j][1],
-            })
-
-        source_colors = [
-            (255, 60, 60), (60, 255, 60), (60, 60, 255),
-            (255, 255, 0), (0, 255, 255), (255, 0, 255),
-        ]
-        n_sources = min(6, folds * 2)
-        for i in range(n_sources):
-            angle = 2 * math.pi * i / n_sources
-            sx = cx + 3 * math.cos(angle)
-            sy = cy + 3 * math.sin(angle)
-            for j in range(3):
-                a2 = angle + (j - 1) * 0.3
-                self.sources.append({
-                    'x': sx, 'y': sy,
-                    'dx': math.cos(a2), 'dy': math.sin(a2),
-                    'color': source_colors[i % len(source_colors)],
-                    'wavelength': 550, 'n': 1.0,
-                })
-
     # ── update ───────────────────────────────────────────────────
 
     def update(self, dt: float):
@@ -706,7 +612,9 @@ class Optics(Visual):
         # Rotate prism for PRISM scenario
         scenario = _SCENARIOS[self.scenario_idx]
         if scenario == 'PRISM' and len(self.prisms) > 0:
-            angle = self.time * 0.15 + self.user_angle  # slow rotation
+            if self.auto_cycle:
+                self.prism_angle += 0.15 * dt
+            angle = self.prism_angle
             cx, cy = 32, 32
             size = 12
             # Rebuild prism vertices with rotation
@@ -741,14 +649,12 @@ class Optics(Visual):
 
     def _get_anim_angle(self, scenario):
         """Return beam angle based on user control and auto-animation."""
-        if scenario == 'KALEIDOSCOPE':
-            return self.time * self.kaleidoscope_speed
-        elif scenario == 'PRISM':
-            # For PRISM, don't rotate beam - we rotate the prism itself
-            return self.user_angle
-        # Auto-animate beam angle for other scenarios, plus user offset
-        auto_angle = self.time * 0.08  # slow automatic sweep
-        return auto_angle + self.user_angle
+        if scenario == 'PRISM':
+            return 0.0  # beam always horizontal; prism physically rotates
+        # LENS, MIRRORS: auto-sweep if in auto-cycle mode
+        if self.auto_cycle:
+            return self.time * 0.08 + self.user_angle
+        return self.user_angle
 
     def _draw_elements(self, pal):
         """Draw prisms, lenses, and mirrors."""

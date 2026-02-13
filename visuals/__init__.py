@@ -293,10 +293,16 @@ from .stackdemo import StackDemo
 from .stickrunnerdemo import StickRunnerDemo
 from .tetrisdemo import TetrisDemo
 from .trashblasterdemo import TrashBlasterDemo
+from .moon import MoonPhases
+from .constellations import Constellations
+from .fractals import Fractals
+from .watercycle import WaterCycle
+from .flags import Flags
+from .matter import MatterPhases
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     SpriteGallery, SuperheroGallery, Demoscene, Complexity,
-    ScienceLab, Title, Demos, MusicMix, Customs,
+    ScienceLab, Title, Demos, MusicMix, Customs, Education,
 )
 
 # List of all available visuals
@@ -534,6 +540,12 @@ ALL_VISUALS = [
     Interchange,
     GreenWave,
     Merge,
+    MoonPhases,
+    Constellations,
+    Fractals,
+    WaterCycle,
+    Flags,
+    MatterPhases,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
@@ -547,6 +559,7 @@ ALL_VISUALS = [
     ScienceLab,
     MusicMix,
     Customs,
+    Education,
     Demos,
     # Individual game demos
     AgarioDemo,
@@ -756,6 +769,12 @@ __all__ = [
     'Interchange',
     'GreenWave',
     'Merge',
+    'MoonPhases',
+    'Constellations',
+    'Fractals',
+    'WaterCycle',
+    'Flags',
+    'MatterPhases',
     'Slideshow',
     'AllVisuals',
     'Chill',
@@ -768,6 +787,7 @@ __all__ = [
     'ScienceLab',
     'MusicMix',
     'Customs',
+    'Education',
     'Demos',
     'AgarioDemo',
     'DefenderDemo',

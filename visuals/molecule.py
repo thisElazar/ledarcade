@@ -5025,6 +5025,9 @@ class Molecule(Visual):
         self.cycle_duration = 8.0
         self.overlay_timer = 0.0  # Group name overlay countdown
         self.label_timer = 0.0    # Time since current molecule loaded
+        self._both_held_prev = False
+        self._l_was_held = False
+        self._r_was_held = False
         self._prepare_molecule()
 
     def _current_mol_list(self):
@@ -5089,8 +5092,11 @@ class Molecule(Visual):
             self.auto_cycle = False
             consumed = True
 
-        # Two-button press (Z+X together) cycles through groups
-        if input_state.action_l and input_state.action_r:
+        both_held = input_state.action_l_held and input_state.action_r_held
+        both_released = self._both_held_prev and not both_held
+
+        # Both-button release (short tap): cycle category
+        if both_released:
             self.group_idx = (self.group_idx + 1) % len(GROUPS)
             self.mol_pos = 0
             self.cycle_timer = 0.0
@@ -5098,23 +5104,30 @@ class Molecule(Visual):
             self.overlay_timer = 2.5
             self._prepare_molecule()
             consumed = True
-        # Single button cycles through molecules in current group
-        elif input_state.action_l:
-            mol_list = self._current_mol_list()
-            if mol_list:
-                self.mol_pos = (self.mol_pos - 1) % len(mol_list)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_molecule()
-            consumed = True
-        elif input_state.action_r:
-            mol_list = self._current_mol_list()
-            if mol_list:
-                self.mol_pos = (self.mol_pos + 1) % len(mol_list)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_molecule()
-            consumed = True
+        # Single button release (wasn't a both-hold) cycles molecules
+        elif not both_held:
+            l_released = self._l_was_held and not input_state.action_l_held
+            r_released = self._r_was_held and not input_state.action_r_held
+            if l_released and not self._r_was_held:
+                mol_list = self._current_mol_list()
+                if mol_list:
+                    self.mol_pos = (self.mol_pos - 1) % len(mol_list)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_molecule()
+                consumed = True
+            elif r_released and not self._l_was_held:
+                mol_list = self._current_mol_list()
+                if mol_list:
+                    self.mol_pos = (self.mol_pos + 1) % len(mol_list)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_molecule()
+                consumed = True
+
+        self._both_held_prev = both_held
+        self._l_was_held = input_state.action_l_held
+        self._r_was_held = input_state.action_r_held
 
         return consumed
 

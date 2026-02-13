@@ -473,3 +473,26 @@ class Customs(Slideshow):
             self.display.draw_text_small(2, 24, "NO GIFS", (180, 180, 180))
             self.display.draw_text_small(2, 34, "EXPORT FROM", (100, 100, 100))
             self.display.draw_text_small(2, 42, "PAINT GIF", (100, 100, 100))
+
+
+class Education(Slideshow):
+    name = "EDUCATION"
+    description = "School-friendly educational visuals"
+    category = "visual_mix"
+    cycle_interval = 30.0
+
+    def _get_visual_classes(self):
+        from visuals import (
+            MoonPhases, Constellations, Fractals, WaterCycle, Flags,
+            MatterPhases, OrbitsSolar, OrbitsMulti, DNA, Periodic,
+            Spectroscope, Microscope, Cell, Molecule, Chladni, Coulomb,
+            Optics, WaveTank, Life, TuringPatterns, Boids, Orrery,
+            Antikythera, Astrolabe,
+        )
+        return [
+            MoonPhases, Constellations, Fractals, WaterCycle, Flags,
+            MatterPhases, OrbitsSolar, OrbitsMulti, DNA, Periodic,
+            Spectroscope, Microscope, Cell, Molecule, Chladni, Coulomb,
+            Optics, WaveTank, Life, TuringPatterns, Boids, Orrery,
+            Antikythera, Astrolabe,
+        ]

@@ -518,7 +518,7 @@ class GalleryArt(_Gallery3DBase):
         6: ("png", _P + "broadway_boogie.png"),
         7: ("png", _P + "girl_pearl_earring.png"),
         8: ("png", _P + "mona_lisa.png"),
-        9: ("png", _P + "birth_of_venus.png"),
+        9: ("png", _P + "nighthawks.png"),
     }
 
     WAYPOINTS = [
