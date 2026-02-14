@@ -267,6 +267,36 @@ class Flags(Visual):
                     self.flag_pos = (self.flag_pos + 1) % len(lst)
                 self.scroll_offset = 0.0
 
+    def _draw_usa_overdraw(self, d):
+        """Overdraw crisp stripes, canton, and stars on the USA flag."""
+        RED = (178, 34, 52)
+        WHITE = (255, 255, 255)
+        NAVY = (10, 49, 97)
+        # 13 stripes across 40px height
+        stripe_tops = [round(i * FLAG_H / 13) for i in range(14)]
+        for s in range(13):
+            color = RED if s % 2 == 0 else WHITE
+            for y in range(stripe_tops[s], stripe_tops[s + 1]):
+                for x in range(FLAG_W):
+                    d.set_pixel(FX + x, FY + y, color)
+        # Canton over top 7 stripes, 2/5 width
+        cw = 24
+        ch = stripe_tops[7]
+        for y in range(ch):
+            for x in range(cw):
+                d.set_pixel(FX + x, FY + y, NAVY)
+        # 50 stars: 5 rows of 6 + 4 rows of 5 (staggered)
+        for row in range(9):
+            sy = FY + 2 + row * 2
+            if sy >= FY + ch:
+                break
+            if row % 2 == 0:  # 6-star rows
+                for col in range(6):
+                    d.set_pixel(FX + 1 + col * 4, sy, WHITE)
+            else:  # 5-star rows (offset)
+                for col in range(5):
+                    d.set_pixel(FX + 3 + col * 4, sy, WHITE)
+
     def draw(self):
         d = self.display
         d.clear()
@@ -279,6 +309,10 @@ class Flags(Visual):
         for y, row in enumerate(pixels):
             for x, color in enumerate(row):
                 d.set_pixel(FX + x, FY + y, color)
+
+        # USA: overdraw canton with crisp stars
+        if iso_code == 'us':
+            self._draw_usa_overdraw(d)
 
         # Flag border
         d.draw_rect(FX - 1, FY - 1, FLAG_W + 2, FLAG_H + 2,
