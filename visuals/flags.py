@@ -51,137 +51,138 @@ MAR = (128, 0, 0)
 NAV = (0, 0, 80)
 
 FLAGS = [
-    # ===== EUROPE =====
-    ('FRANCE',        'EUROPE', VSTRIPES, [B, W, R]),
-    ('GERMANY',       'EUROPE', HSTRIPES, [BK, R, Y]),
-    ('ITALY',         'EUROPE', VSTRIPES, [G, W, R]),
-    ('SPAIN',         'EUROPE', CUSTOM, '_spain'),
-    ('UK',            'EUROPE', CUSTOM, '_uk'),
-    ('IRELAND',       'EUROPE', VSTRIPES, [G, W, O]),
-    ('BELGIUM',       'EUROPE', VSTRIPES, [BK, Y, R]),
-    ('NETHERLANDS',   'EUROPE', HSTRIPES, [R, W, B]),
-    ('LUXEMBOURG',    'EUROPE', HSTRIPES, [R, W, LB]),
-    ('AUSTRIA',       'EUROPE', HSTRIPES, [R, W, R]),
-    ('SWITZERLAND',   'EUROPE', CUSTOM, '_swiss'),
-    ('SWEDEN',        'EUROPE', NORDIC, [(0, 100, 170), Y]),
-    ('NORWAY',        'EUROPE', NORDIC, [R, (0, 32, 91), W]),
-    ('DENMARK',       'EUROPE', NORDIC, [R, W]),
-    ('FINLAND',       'EUROPE', NORDIC, [W, B]),
-    ('ICELAND',       'EUROPE', NORDIC, [B, R, W]),
-    ('POLAND',        'EUROPE', HSTRIPES, [W, R]),
-    ('CZECH REPUBLIC','EUROPE', TRIANGLE, [(W, R), B]),
-    ('ROMANIA',       'EUROPE', VSTRIPES, [B, Y, R]),
-    ('HUNGARY',       'EUROPE', HSTRIPES, [R, W, G]),
-    ('BULGARIA',      'EUROPE', HSTRIPES, [W, G, R]),
-    ('GREECE',        'EUROPE', CUSTOM, '_greece'),
-    ('PORTUGAL',      'EUROPE', CUSTOM, '_portugal'),
-    ('UKRAINE',       'EUROPE', HSTRIPES, [B, Y]),
-    ('RUSSIA',        'EUROPE', HSTRIPES, [W, B, R]),
-    ('CROATIA',       'EUROPE', HSTRIPES, [R, W, B]),
-    ('SERBIA',        'EUROPE', HSTRIPES, [R, B, W]),
-    ('SLOVENIA',      'EUROPE', HSTRIPES, [W, B, R]),
-    ('SLOVAKIA',      'EUROPE', HSTRIPES, [W, B, R]),
-    ('ESTONIA',       'EUROPE', HSTRIPES, [B, BK, W]),
-    ('LATVIA',        'EUROPE', HSTRIPES, [MAR, W, MAR]),
-    ('LITHUANIA',     'EUROPE', HSTRIPES, [Y, G, R]),
-    ('MONACO',        'EUROPE', HSTRIPES, [R, W]),
-    ('MALTA',         'EUROPE', VSTRIPES, [W, R]),
-    ('ALBANIA',       'EUROPE', CUSTOM, '_albania'),
-
-    # ===== AMERICAS =====
-    ('USA',           'AMERICAS', CUSTOM, '_usa'),
-    ('CANADA',        'AMERICAS', CUSTOM, '_canada'),
-    ('MEXICO',        'AMERICAS', VSTRIPES, [G, W, R]),
-    ('BRAZIL',        'AMERICAS', CUSTOM, '_brazil'),
-    ('ARGENTINA',     'AMERICAS', HSTRIPES, [LB, W, LB]),
-    ('CHILE',         'AMERICAS', CUSTOM, '_chile'),
-    ('COLOMBIA',      'AMERICAS', CUSTOM, '_colombia'),
-    ('PERU',          'AMERICAS', VSTRIPES, [R, W, R]),
-    ('VENEZUELA',     'AMERICAS', HSTRIPES, [Y, B, R]),
-    ('CUBA',          'AMERICAS', CUSTOM, '_cuba'),
-    ('JAMAICA',       'AMERICAS', CUSTOM, '_jamaica'),
-    ('HAITI',         'AMERICAS', HSTRIPES, [B, R]),
-    ('DOM. REPUBLIC', 'AMERICAS', CUSTOM, '_dominican'),
-    ('COSTA RICA',    'AMERICAS', CUSTOM, '_costarica'),
-    ('PANAMA',        'AMERICAS', CUSTOM, '_panama'),
-    ('URUGUAY',       'AMERICAS', HSTRIPES, [W, B, W, B, W, B, W, B, W]),
-    ('HONDURAS',      'AMERICAS', HSTRIPES, [B, W, B]),
-    ('GUATEMALA',     'AMERICAS', VSTRIPES, [LB, W, LB]),
-    ('ECUADOR',       'AMERICAS', CUSTOM, '_colombia'),
-    ('BOLIVIA',       'AMERICAS', HSTRIPES, [R, Y, G]),
-    ('PARAGUAY',      'AMERICAS', HSTRIPES, [R, W, B]),
-    ('EL SALVADOR',   'AMERICAS', HSTRIPES, [B, W, B]),
-    ('NICARAGUA',     'AMERICAS', HSTRIPES, [B, W, B]),
-    ('TRINIDAD',      'AMERICAS', CUSTOM, '_trinidad'),
-    ('BAHAMAS',       'AMERICAS', CUSTOM, '_bahamas'),
-
-    # ===== ASIA =====
-    ('JAPAN',         'ASIA', DISC, (W, R, 8)),
-    ('CHINA',         'ASIA', CUSTOM, '_china'),
-    ('SOUTH KOREA',   'ASIA', CUSTOM, '_skorea'),
-    ('INDIA',         'ASIA', CUSTOM, '_india'),
-    ('INDONESIA',     'ASIA', HSTRIPES, [R, W]),
-    ('THAILAND',      'ASIA', HSTRIPES, [R, W, B, B, W, R]),
-    ('VIETNAM',       'ASIA', CUSTOM, '_vietnam'),
-    ('PHILIPPINES',   'ASIA', CUSTOM, '_philippines'),
-    ('MALAYSIA',      'ASIA', CUSTOM, '_malaysia'),
-    ('SINGAPORE',     'ASIA', HSTRIPES, [R, W]),
-    ('TURKEY',        'ASIA', CUSTOM, '_turkey'),
-    ('ISRAEL',        'ASIA', CUSTOM, '_israel'),
-    ('SAUDI ARABIA',  'ASIA', CUSTOM, '_saudi'),
-    ('UAE',           'ASIA', CUSTOM, '_uae'),
-    ('IRAN',          'ASIA', HSTRIPES, [G, W, R]),
-    ('IRAQ',          'ASIA', HSTRIPES, [R, W, BK]),
-    ('PAKISTAN',       'ASIA', CUSTOM, '_pakistan'),
-    ('BANGLADESH',    'ASIA', DISC, (DG, R, 9)),
-    ('SRI LANKA',     'ASIA', CUSTOM, '_srilanka'),
-    ('NEPAL',         'ASIA', CUSTOM, '_nepal'),
-    ('MYANMAR',       'ASIA', HSTRIPES, [Y, G, R]),
-    ('CAMBODIA',      'ASIA', HSTRIPES, [B, R, B]),
-    ('LAOS',          'ASIA', CUSTOM, '_laos'),
-    ('MONGOLIA',      'ASIA', VSTRIPES, [R, B, R]),
-    ('NORTH KOREA',   'ASIA', CUSTOM, '_nkorea'),
-    ('JORDAN',        'ASIA', CUSTOM, '_jordan'),
-    ('LEBANON',       'ASIA', CUSTOM, '_lebanon'),
-    ('QATAR',         'ASIA', CUSTOM, '_qatar'),
-    ('KUWAIT',        'ASIA', CUSTOM, '_kuwait'),
-    ('UZBEKISTAN',    'ASIA', HSTRIPES, [B, W, G]),
-
     # ===== AFRICA =====
-    ('SOUTH AFRICA',  'AFRICA', CUSTOM, '_safrica'),
-    ('NIGERIA',       'AFRICA', VSTRIPES, [G, W, G]),
+    ('ALGERIA',       'AFRICA', CUSTOM, '_algeria'),
+    ('CAMEROON',      'AFRICA', VSTRIPES, [G, R, Y]),
+    ('CHAD',          'AFRICA', VSTRIPES, [B, Y, R]),
     ('EGYPT',         'AFRICA', HSTRIPES, [R, W, BK]),
-    ('KENYA',         'AFRICA', CUSTOM, '_kenya'),
     ('ETHIOPIA',      'AFRICA', HSTRIPES, [G, Y, R]),
     ('GHANA',         'AFRICA', HSTRIPES, [R, Y, G]),
-    ('TANZANIA',      'AFRICA', CUSTOM, '_tanzania'),
     ('IVORY COAST',   'AFRICA', VSTRIPES, [O, W, G]),
-    ('CAMEROON',      'AFRICA', VSTRIPES, [G, R, Y]),
-    ('MOROCCO',       'AFRICA', CUSTOM, '_morocco'),
-    ('TUNISIA',       'AFRICA', CUSTOM, '_tunisia'),
-    ('ALGERIA',       'AFRICA', CUSTOM, '_algeria'),
+    ('KENYA',         'AFRICA', CUSTOM, '_kenya'),
     ('LIBYA',         'AFRICA', HSTRIPES, [R, BK, G]),
-    ('UGANDA',        'AFRICA', HSTRIPES, [BK, Y, R, BK, Y, R]),
-    ('SENEGAL',       'AFRICA', VSTRIPES, [G, Y, R]),
-    ('MALI',          'AFRICA', VSTRIPES, [G, Y, R]),
     ('MADAGASCAR',    'AFRICA', CUSTOM, '_madagascar'),
+    ('MALI',          'AFRICA', VSTRIPES, [G, Y, R]),
+    ('MOROCCO',       'AFRICA', CUSTOM, '_morocco'),
     ('MOZAMBIQUE',    'AFRICA', CUSTOM, '_mozambique'),
-    ('CHAD',          'AFRICA', VSTRIPES, [B, Y, R]),
     ('NIGER',         'AFRICA', HSTRIPES, [O, W, G]),
+    ('NIGERIA',       'AFRICA', VSTRIPES, [G, W, G]),
+    ('SENEGAL',       'AFRICA', VSTRIPES, [G, Y, R]),
+    ('SOUTH AFRICA',  'AFRICA', CUSTOM, '_safrica'),
+    ('TANZANIA',      'AFRICA', CUSTOM, '_tanzania'),
+    ('TUNISIA',       'AFRICA', CUSTOM, '_tunisia'),
+    ('UGANDA',        'AFRICA', HSTRIPES, [BK, Y, R, BK, Y, R]),
+
+    # ===== AMERICAS =====
+    ('ARGENTINA',     'AMERICAS', HSTRIPES, [LB, W, LB]),
+    ('BAHAMAS',       'AMERICAS', CUSTOM, '_bahamas'),
+    ('BOLIVIA',       'AMERICAS', HSTRIPES, [R, Y, G]),
+    ('BRAZIL',        'AMERICAS', CUSTOM, '_brazil'),
+    ('CANADA',        'AMERICAS', CUSTOM, '_canada'),
+    ('CHILE',         'AMERICAS', CUSTOM, '_chile'),
+    ('COLOMBIA',      'AMERICAS', CUSTOM, '_colombia'),
+    ('COSTA RICA',    'AMERICAS', CUSTOM, '_costarica'),
+    ('CUBA',          'AMERICAS', CUSTOM, '_cuba'),
+    ('DOM. REPUBLIC', 'AMERICAS', CUSTOM, '_dominican'),
+    ('ECUADOR',       'AMERICAS', CUSTOM, '_colombia'),
+    ('EL SALVADOR',   'AMERICAS', HSTRIPES, [B, W, B]),
+    ('GUATEMALA',     'AMERICAS', VSTRIPES, [LB, W, LB]),
+    ('HAITI',         'AMERICAS', HSTRIPES, [B, R]),
+    ('HONDURAS',      'AMERICAS', HSTRIPES, [B, W, B]),
+    ('JAMAICA',       'AMERICAS', CUSTOM, '_jamaica'),
+    ('MEXICO',        'AMERICAS', CUSTOM, '_mexico'),
+    ('NICARAGUA',     'AMERICAS', HSTRIPES, [B, W, B]),
+    ('PANAMA',        'AMERICAS', CUSTOM, '_panama'),
+    ('PARAGUAY',      'AMERICAS', HSTRIPES, [R, W, B]),
+    ('PERU',          'AMERICAS', VSTRIPES, [R, W, R]),
+    ('TRINIDAD',      'AMERICAS', CUSTOM, '_trinidad'),
+    ('URUGUAY',       'AMERICAS', HSTRIPES, [W, B, W, B, W, B, W, B, W]),
+    ('USA',           'AMERICAS', CUSTOM, '_usa'),
+    ('VENEZUELA',     'AMERICAS', HSTRIPES, [Y, B, R]),
+
+    # ===== ASIA =====
+    ('BANGLADESH',    'ASIA', DISC, (DG, R, 9)),
+    ('CAMBODIA',      'ASIA', HSTRIPES, [B, R, B]),
+    ('CHINA',         'ASIA', CUSTOM, '_china'),
+    ('INDIA',         'ASIA', CUSTOM, '_india'),
+    ('INDONESIA',     'ASIA', HSTRIPES, [R, W]),
+    ('IRAN',          'ASIA', HSTRIPES, [G, W, R]),
+    ('IRAQ',          'ASIA', HSTRIPES, [R, W, BK]),
+    ('ISRAEL',        'ASIA', CUSTOM, '_israel'),
+    ('JAPAN',         'ASIA', DISC, (W, R, 8)),
+    ('JORDAN',        'ASIA', CUSTOM, '_jordan'),
+    ('KUWAIT',        'ASIA', CUSTOM, '_kuwait'),
+    ('LAOS',          'ASIA', CUSTOM, '_laos'),
+    ('LEBANON',       'ASIA', CUSTOM, '_lebanon'),
+    ('MALAYSIA',      'ASIA', CUSTOM, '_malaysia'),
+    ('MONGOLIA',      'ASIA', VSTRIPES, [R, B, R]),
+    ('MYANMAR',       'ASIA', HSTRIPES, [Y, G, R]),
+    ('NEPAL',         'ASIA', CUSTOM, '_nepal'),
+    ('NORTH KOREA',   'ASIA', CUSTOM, '_nkorea'),
+    ('PAKISTAN',       'ASIA', CUSTOM, '_pakistan'),
+    ('PALESTINE',     'ASIA', CUSTOM, '_palestine'),
+    ('PHILIPPINES',   'ASIA', CUSTOM, '_philippines'),
+    ('QATAR',         'ASIA', CUSTOM, '_qatar'),
+    ('SAUDI ARABIA',  'ASIA', CUSTOM, '_saudi'),
+    ('SINGAPORE',     'ASIA', HSTRIPES, [R, W]),
+    ('SOUTH KOREA',   'ASIA', CUSTOM, '_skorea'),
+    ('SRI LANKA',     'ASIA', CUSTOM, '_srilanka'),
+    ('THAILAND',      'ASIA', HSTRIPES, [R, W, B, B, W, R]),
+    ('TURKEY',        'ASIA', CUSTOM, '_turkey'),
+    ('UAE',           'ASIA', CUSTOM, '_uae'),
+    ('UZBEKISTAN',    'ASIA', HSTRIPES, [B, W, G]),
+    ('VIETNAM',       'ASIA', CUSTOM, '_vietnam'),
+
+    # ===== EUROPE =====
+    ('ALBANIA',       'EUROPE', CUSTOM, '_albania'),
+    ('AUSTRIA',       'EUROPE', HSTRIPES, [R, W, R]),
+    ('BELGIUM',       'EUROPE', VSTRIPES, [BK, Y, R]),
+    ('BULGARIA',      'EUROPE', HSTRIPES, [W, G, R]),
+    ('CROATIA',       'EUROPE', HSTRIPES, [R, W, B]),
+    ('CZECH REPUBLIC','EUROPE', TRIANGLE, [(W, R), B]),
+    ('DENMARK',       'EUROPE', NORDIC, [R, W]),
+    ('ESTONIA',       'EUROPE', HSTRIPES, [B, BK, W]),
+    ('FINLAND',       'EUROPE', NORDIC, [W, B]),
+    ('FRANCE',        'EUROPE', VSTRIPES, [B, W, R]),
+    ('GERMANY',       'EUROPE', HSTRIPES, [BK, R, Y]),
+    ('GREECE',        'EUROPE', CUSTOM, '_greece'),
+    ('HUNGARY',       'EUROPE', HSTRIPES, [R, W, G]),
+    ('ICELAND',       'EUROPE', NORDIC, [B, R, W]),
+    ('IRELAND',       'EUROPE', VSTRIPES, [G, W, O]),
+    ('ITALY',         'EUROPE', VSTRIPES, [G, W, R]),
+    ('LATVIA',        'EUROPE', HSTRIPES, [MAR, W, MAR]),
+    ('LITHUANIA',     'EUROPE', HSTRIPES, [Y, G, R]),
+    ('LUXEMBOURG',    'EUROPE', HSTRIPES, [R, W, LB]),
+    ('MALTA',         'EUROPE', VSTRIPES, [W, R]),
+    ('MONACO',        'EUROPE', HSTRIPES, [R, W]),
+    ('NETHERLANDS',   'EUROPE', HSTRIPES, [R, W, B]),
+    ('NORWAY',        'EUROPE', NORDIC, [R, (0, 32, 91), W]),
+    ('POLAND',        'EUROPE', HSTRIPES, [W, R]),
+    ('PORTUGAL',      'EUROPE', CUSTOM, '_portugal'),
+    ('ROMANIA',       'EUROPE', VSTRIPES, [B, Y, R]),
+    ('RUSSIA',        'EUROPE', HSTRIPES, [W, B, R]),
+    ('SERBIA',        'EUROPE', HSTRIPES, [R, B, W]),
+    ('SLOVAKIA',      'EUROPE', HSTRIPES, [W, B, R]),
+    ('SLOVENIA',      'EUROPE', HSTRIPES, [W, B, R]),
+    ('SPAIN',         'EUROPE', CUSTOM, '_spain'),
+    ('SWEDEN',        'EUROPE', NORDIC, [(0, 100, 170), Y]),
+    ('SWITZERLAND',   'EUROPE', CUSTOM, '_swiss'),
+    ('UK',            'EUROPE', CUSTOM, '_uk'),
+    ('UKRAINE',       'EUROPE', HSTRIPES, [B, Y]),
 
     # ===== OCEANIA =====
     ('AUSTRALIA',     'OCEANIA', CUSTOM, '_australia'),
-    ('NEW ZEALAND',   'OCEANIA', CUSTOM, '_nzealand'),
     ('FIJI',          'OCEANIA', CUSTOM, '_fiji'),
-    ('PAPUA N.G.',    'OCEANIA', CUSTOM, '_png'),
-    ('TONGA',         'OCEANIA', CUSTOM, '_tonga'),
-    ('SAMOA',         'OCEANIA', CUSTOM, '_samoa'),
-    ('SOLOMON IS.',   'OCEANIA', CUSTOM, '_solomon'),
-    ('VANUATU',       'OCEANIA', CUSTOM, '_vanuatu'),
-    ('PALAU',         'OCEANIA', DISC, (LB, Y, 8)),
     ('MARSHALL IS.',  'OCEANIA', CUSTOM, '_marshall'),
     ('MICRONESIA',    'OCEANIA', CUSTOM, '_micronesia'),
     ('NAURU',         'OCEANIA', CUSTOM, '_nauru'),
+    ('NEW ZEALAND',   'OCEANIA', CUSTOM, '_nzealand'),
+    ('PALAU',         'OCEANIA', DISC, (LB, Y, 8)),
+    ('PAPUA N.G.',    'OCEANIA', CUSTOM, '_png'),
+    ('SAMOA',         'OCEANIA', CUSTOM, '_samoa'),
+    ('SOLOMON IS.',   'OCEANIA', CUSTOM, '_solomon'),
+    ('TONGA',         'OCEANIA', CUSTOM, '_tonga'),
+    ('VANUATU',       'OCEANIA', CUSTOM, '_vanuatu'),
 ]
 
 # ---------------------------------------------------------------------------
@@ -189,17 +190,18 @@ FLAGS = [
 # ---------------------------------------------------------------------------
 GROUPS = [
     ('ALL',      'ALL COUNTRIES'),
-    ('EUROPE',   'EUROPE'),
+    ('AFRICA',   'AFRICA'),
     ('AMERICAS', 'AMERICAS'),
     ('ASIA',     'ASIA'),
-    ('AFRICA',   'AFRICA'),
+    ('EUROPE',   'EUROPE'),
     ('OCEANIA',  'OCEANIA'),
 ]
 
 
 def _build_group_indices():
-    indices = {'ALL': list(range(len(FLAGS)))}
-    for key in ['EUROPE', 'AMERICAS', 'ASIA', 'AFRICA', 'OCEANIA']:
+    all_sorted = sorted(range(len(FLAGS)), key=lambda i: FLAGS[i][0])
+    indices = {'ALL': all_sorted}
+    for key in ['AFRICA', 'AMERICAS', 'ASIA', 'EUROPE', 'OCEANIA']:
         indices[key] = [i for i, f in enumerate(FLAGS) if f[1] == key]
     return indices
 
@@ -401,6 +403,19 @@ class Flags(Visual):
                 d.set_pixel(FX + x, FY + y, tri_c)
 
     # -----------------------------------------------------------------------
+    # Helpers
+    # -----------------------------------------------------------------------
+
+    def _star(self, d, x, y, c, size=3):
+        """Draw a small star cross: size 3 = 5px cross, size 5 = bigger."""
+        d.set_pixel(x, y, c)
+        for i in range(1, size // 2 + 1):
+            d.set_pixel(x - i, y, c)
+            d.set_pixel(x + i, y, c)
+            d.set_pixel(x, y - i, c)
+            d.set_pixel(x, y + i, c)
+
+    # -----------------------------------------------------------------------
     # Custom flag drawing methods
     # -----------------------------------------------------------------------
 
@@ -414,22 +429,19 @@ class Flags(Visual):
                 for x in range(FX, FX + FW):
                     d.set_pixel(x, y, c)
         # Blue canton
-        cw, ch = 20, 17
+        cw, ch = 21, 20
         for y in range(FY, FY + ch):
             for x in range(FX, FX + cw):
                 d.set_pixel(x, y, NAV)
-        # Stars (simplified 5x4 grid + 4x3 offset)
-        star_c = W
-        for row in range(4):
-            for col in range(4):
-                sx = FX + 2 + col * 5
-                sy = FY + 2 + row * 4
-                d.set_pixel(sx, sy, star_c)
-        for row in range(3):
-            for col in range(3):
-                sx = FX + 4 + col * 5
-                sy = FY + 4 + row * 4
-                d.set_pixel(sx, sy, star_c)
+        # 50 stars: 5 rows of 6 + 4 rows of 5 (staggered)
+        for row in range(9):
+            sy = FY + 2 + row * 2
+            if row % 2 == 0:  # 6-star rows
+                for col in range(6):
+                    d.set_pixel(FX + 2 + col * 3, sy, W)
+            else:  # 5-star rows (offset)
+                for col in range(5):
+                    d.set_pixel(FX + 4 + col * 3, sy, W)
 
     def _uk(self, d):
         # Blue background
@@ -542,15 +554,33 @@ class Flags(Visual):
                 d.set_pixel(x, y, W)
             for x in range(FX + 3 * q, FX + FW):
                 d.set_pixel(x, y, R)
-        # Maple leaf (simplified diamond)
+        # Maple leaf with pointed lobes
         cx, cy = FX + FW // 2, FY + FH // 2
-        for dy in range(-6, 7):
-            w = max(0, 6 - abs(dy))
-            for dx in range(-w, w + 1):
-                d.set_pixel(cx + dx, cy + dy, R)
-        # Stem
-        d.set_pixel(cx, cy + 7, R)
-        d.set_pixel(cx, cy + 8, R)
+        leaf = [
+            #        top point
+                     (0, -8),
+            (-1, -7), (0, -7), (1, -7),
+            #        upper side lobes
+            (-4, -5), (-3, -5), (-2, -5), (-1, -5), (0, -5), (1, -5), (2, -5), (3, -5), (4, -5),
+                      (-3, -4),(-2, -4), (-1, -4), (0, -4), (1, -4), (2, -4), (3, -4),
+            (-6, -3), (-5, -3),(-2, -3), (-1, -3), (0, -3), (1, -3), (2, -3), (5, -3), (6, -3),
+                               (-1, -2), (0, -2), (1, -2),
+            #        lower side lobes
+            (-7, -1), (-6, -1), (-5, -1), (-4, -1), (-3, -1), (-2, -1), (-1, -1),
+            (0, -1),
+            (1, -1), (2, -1), (3, -1), (4, -1), (5, -1), (6, -1), (7, -1),
+                      (-5, 0), (-4, 0), (-3, 0), (-2, 0), (-1, 0), (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0),
+                               (-3, 1), (-2, 1), (-1, 1), (0, 1), (1, 1), (2, 1), (3, 1),
+                               (-3, 2), (-2, 2), (-1, 2), (0, 2), (1, 2), (2, 2), (3, 2),
+            #        base notches
+            (-4, 3), (-3, 3),          (-1, 3), (0, 3), (1, 3),          (3, 3), (4, 3),
+            (-5, 4), (-4, 4),                   (0, 4),                  (4, 4), (5, 4),
+            #        stem
+                                                 (0, 5),
+                                        (-1, 6), (0, 6), (1, 6),
+        ]
+        for dx, dy in leaf:
+            d.set_pixel(cx + dx, cy + dy, R)
 
     def _brazil(self, d):
         # Green background
@@ -647,12 +677,17 @@ class Flags(Visual):
         for y in range(FY + FH - 6, FY + FH - 3):
             for x in range(FX, FX + FW):
                 d.set_pixel(x, y, B)
-        # Star of David (simplified)
+        # Star of David — two overlapping triangle outlines
         cx, cy = FX + FW // 2, FY + FH // 2
-        for dy in range(-5, 6):
-            w = max(0, 5 - abs(dy))
-            d.set_pixel(cx - w, cy + dy, B)
-            d.set_pixel(cx + w, cy + dy, B)
+        s = 6  # half-height
+        # Upward triangle: apex at top, base at cy + s//2
+        d.draw_line(cx, cy - s, cx - s, cy + s // 2, B)
+        d.draw_line(cx, cy - s, cx + s, cy + s // 2, B)
+        d.draw_line(cx - s, cy + s // 2, cx + s, cy + s // 2, B)
+        # Downward triangle: apex at bottom, base at cy - s//2
+        d.draw_line(cx, cy + s, cx - s, cy - s // 2, B)
+        d.draw_line(cx, cy + s, cx + s, cy - s // 2, B)
+        d.draw_line(cx - s, cy - s // 2, cx + s, cy - s // 2, B)
 
     def _cuba(self, d):
         # 5 stripes blue/white
@@ -669,7 +704,7 @@ class Flags(Visual):
             for x in range(min(w + 2, FW)):
                 d.set_pixel(FX + x, FY + y, R)
         # White star
-        d.set_pixel(FX + 5, FY + FH // 2, W)
+        self._star(d, FX + 6, FY + FH // 2, W)
 
     def _chile(self, d):
         half = FH // 2
@@ -685,7 +720,7 @@ class Flags(Visual):
         for y in range(FY, FY + half):
             for x in range(FX, FX + sq):
                 d.set_pixel(x, y, B)
-        d.set_pixel(FX + sq // 2, FY + half // 2, W)
+        self._star(d, FX + sq // 2, FY + half // 2, W)
 
     def _colombia(self, d):
         # Yellow (half), blue (quarter), red (quarter)
@@ -700,6 +735,42 @@ class Flags(Visual):
         for y in range(FY + h2, FY + FH):
             for x in range(FX, FX + FW):
                 d.set_pixel(x, y, R)
+
+    def _mexico(self, d):
+        # Green-white-red vertical stripes
+        self._draw_vstripes(d, [G, W, R])
+        # Coat of arms: eagle on cactus in center white stripe
+        cx, cy = FX + FW // 2, FY + FH // 2
+        # Cactus (green vertical with pads)
+        for dy in range(2, 8):
+            d.set_pixel(cx, cy + dy, DG)
+        d.set_pixel(cx - 1, cy + 4, DG)
+        d.set_pixel(cx + 1, cy + 5, DG)
+        # Eagle body (brown/dark)
+        BR = (120, 70, 20)
+        for dx in range(-3, 4):
+            d.set_pixel(cx + dx, cy, BR)
+        for dx in range(-2, 3):
+            d.set_pixel(cx + dx, cy - 1, BR)
+            d.set_pixel(cx + dx, cy + 1, BR)
+        for dx in range(-1, 2):
+            d.set_pixel(cx + dx, cy - 2, BR)
+        # Wings spread
+        for dx in range(3, 7):
+            d.set_pixel(cx - dx, cy - 1, BR)
+            d.set_pixel(cx + dx, cy - 1, BR)
+            d.set_pixel(cx - dx, cy - 2, BR)
+            d.set_pixel(cx + dx, cy - 2, BR)
+        d.set_pixel(cx - 7, cy - 2, BR)
+        d.set_pixel(cx + 7, cy - 2, BR)
+        d.set_pixel(cx - 7, cy - 3, BR)
+        d.set_pixel(cx + 7, cy - 3, BR)
+        # Head
+        d.set_pixel(cx, cy - 3, BR)
+        d.set_pixel(cx, cy - 4, BR)
+        # Snake (green, in beak)
+        d.set_pixel(cx + 1, cy - 3, G)
+        d.set_pixel(cx + 2, cy - 4, G)
 
     def _jamaica(self, d):
         # Green background with gold X
@@ -810,7 +881,7 @@ class Flags(Visual):
             for x in range(min(w + 2, FW)):
                 d.set_pixel(FX + x, FY + y, W)
         # Yellow sun
-        d.set_pixel(FX + 5, FY + FH // 2, Y)
+        self._star(d, FX + 6, FY + FH // 2, Y)
 
     def _malaysia(self, d):
         # 14 stripes red/white
@@ -835,9 +906,26 @@ class Flags(Visual):
         for y in range(FY, FY + FH):
             for x in range(FX, FX + FW):
                 d.set_pixel(x, y, G)
-        d.draw_text_small(FX + 6, FY + 8, "SHAHADA", W)
-        # Sword
-        d.draw_line(FX + 10, FY + 22, FX + 38, FY + 22, W)
+        # Stylized calligraphy (pixel-art suggestion of Arabic script)
+        # Main script line with vertical strokes (alifs/lams)
+        for x in range(FX + 6, FX + 42):
+            d.set_pixel(x, FY + 14, W)  # baseline
+        # Vertical strokes (tall letters)
+        for vx in [8, 14, 20, 28, 34, 40]:
+            for dy in range(-5, 0):
+                d.set_pixel(FX + vx, FY + 14 + dy, W)
+        # Connecting curves / dots above
+        for px in [11, 17, 24, 31, 37]:
+            d.set_pixel(FX + px, FY + 7, W)
+        # Sub-baseline curves (letter tails)
+        for px in [12, 25, 38]:
+            d.set_pixel(FX + px, FY + 15, W)
+            d.set_pixel(FX + px + 1, FY + 16, W)
+        # Sword — blade with handle
+        d.draw_line(FX + 8, FY + 23, FX + 40, FY + 23, W)
+        d.set_pixel(FX + 7, FY + 22, W)  # handle guard
+        d.set_pixel(FX + 7, FY + 24, W)
+        d.set_pixel(FX + 6, FY + 23, W)  # grip
 
     def _uae(self, d):
         # Red vertical band + 3 horizontal stripes
@@ -921,6 +1009,14 @@ class Flags(Visual):
         cx, cy = FX + FW // 3, FY + FH // 2
         d.draw_circle(cx, cy, 6, W, filled=True)
         d.draw_circle(cx, cy, 5, R, filled=True)
+
+    def _palestine(self, d):
+        self._draw_hstripes(d, [BK, W, G])
+        # Red triangle on hoist side
+        for y in range(FH):
+            w = int((FH // 2 - abs(y - FH // 2)) * 0.6)
+            for x in range(min(w + 2, FW)):
+                d.set_pixel(FX + x, FY + y, R)
 
     def _jordan(self, d):
         self._draw_hstripes(d, [BK, W, G])
@@ -1013,8 +1109,8 @@ class Flags(Visual):
         for y in range(FY + hh, FY + FH):
             for x in range(FX, FX + hw): d.set_pixel(x, y, B)
             for x in range(FX + hw, FX + FW): d.set_pixel(x, y, W)
-        d.set_pixel(FX + hw // 2, FY + hh // 2, B)
-        d.set_pixel(FX + hw + hw // 2, FY + hh + hh // 2, R)
+        self._star(d, FX + hw // 2, FY + hh // 2, B)
+        self._star(d, FX + hw + hw // 2, FY + hh + hh // 2, R)
 
     def _madagascar(self, d):
         vw = FW // 3
@@ -1052,7 +1148,7 @@ class Flags(Visual):
             d.set_pixel(x, cy, R)
         # Southern Cross stars
         for pos in [(38, 10), (42, 16), (38, 24), (34, 18), (40, 20)]:
-            d.set_pixel(FX + pos[0] - 8, FY + pos[1], W)
+            self._star(d, FX + pos[0] - 8, FY + pos[1], W)
 
     def _nzealand(self, d):
         # Blue background
@@ -1067,7 +1163,7 @@ class Flags(Visual):
         for x in range(FX, FX + FW // 2): d.set_pixel(x, cy, R)
         # 4 red stars
         for pos in [(38, 8), (42, 14), (40, 22), (36, 18)]:
-            d.set_pixel(FX + pos[0] - 8, FY + pos[1], R)
+            self._star(d, FX + pos[0] - 8, FY + pos[1], R)
 
     def _fiji(self, d):
         for y in range(FY, FY + FH):
@@ -1089,11 +1185,9 @@ class Flags(Visual):
             split = FX + int((y - FY) * FW / FH)
             for x in range(FX, split): d.set_pixel(x, y, BK)
             for x in range(split, FX + FW): d.set_pixel(x, y, R)
-        # Stars on black side
-        d.set_pixel(FX + 8, FY + 18, W)
-        d.set_pixel(FX + 5, FY + 22, W)
-        d.set_pixel(FX + 10, FY + 26, W)
-        d.set_pixel(FX + 7, FY + 14, W)
+        # Stars on black side (Southern Cross)
+        for pos in [(8, 18), (5, 22), (10, 26), (7, 14)]:
+            self._star(d, FX + pos[0], FY + pos[1], W)
         # Bird on red side
         d.set_pixel(FX + 32, FY + 10, Y)
         d.set_pixel(FX + 33, FY + 11, Y)
@@ -1116,7 +1210,7 @@ class Flags(Visual):
             for x in range(FX, FX + FW // 2): d.set_pixel(x, y, B)
         # Stars (Southern Cross)
         for pos in [(8, 4), (14, 8), (10, 14), (6, 10)]:
-            d.set_pixel(FX + pos[0], FY + pos[1], W)
+            self._star(d, FX + pos[0], FY + pos[1], W)
 
     def _solomon(self, d):
         # Diagonally split: blue upper, green lower
@@ -1153,17 +1247,17 @@ class Flags(Visual):
         d.draw_line(FX, FY + FH * 2 // 3, FX + FW - 1, FY + 2, O)
         d.draw_line(FX, FY + FH * 3 // 4, FX + FW - 1, FY + 4, W)
         # Star
-        d.set_pixel(FX + 6, FY + 6, W)
+        self._star(d, FX + 6, FY + 6, W)
 
     def _micronesia(self, d):
         for y in range(FY, FY + FH):
             for x in range(FX, FX + FW): d.set_pixel(x, y, LB)
         # 4 white stars in diamond
         cx, cy = FX + FW // 2, FY + FH // 2
-        d.set_pixel(cx, cy - 8, W)
-        d.set_pixel(cx, cy + 8, W)
-        d.set_pixel(cx - 10, cy, W)
-        d.set_pixel(cx + 10, cy, W)
+        self._star(d, cx, cy - 8, W)
+        self._star(d, cx, cy + 8, W)
+        self._star(d, cx - 10, cy, W)
+        self._star(d, cx + 10, cy, W)
 
     def _nauru(self, d):
         for y in range(FY, FY + FH):
@@ -1174,7 +1268,7 @@ class Flags(Visual):
             d.set_pixel(x, cy, Y)
             d.set_pixel(x, cy + 1, Y)
         # White star below
-        d.set_pixel(FX + FW // 3, FY + FH * 2 // 3, W)
+        self._star(d, FX + FW // 3, FY + FH * 2 // 3, W)
 
     def _albania(self, d):
         for y in range(FY, FY + FH):
