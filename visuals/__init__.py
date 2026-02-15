@@ -217,6 +217,7 @@ from .hurdygurdy import HurdyGurdy
 from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
+from .frozen_lake import FrozenLake
 from .drift import DriftVisual
 from .drift3d import Drift3D
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
@@ -298,6 +299,7 @@ from .constellations import Constellations
 from .fractals import Fractals
 from .watercycle import WaterCycle
 from .flags import Flags
+from .signs import Signs
 from .matter import MatterPhases
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
@@ -340,6 +342,7 @@ ALL_VISUALS = [
     BoidsLab,
     Attractors,
     Flux,
+    FrozenLake,
     Cat,
     Aquarium,
     XORPattern,
@@ -545,6 +548,7 @@ ALL_VISUALS = [
     Fractals,
     WaterCycle,
     Flags,
+    Signs,
     MatterPhases,
     # Slideshows (visual playlists)
     Title,
@@ -774,6 +778,7 @@ __all__ = [
     'Fractals',
     'WaterCycle',
     'Flags',
+    'Signs',
     'MatterPhases',
     'Slideshow',
     'AllVisuals',
