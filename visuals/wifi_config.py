@@ -220,17 +220,30 @@ class WiFiConfig(Visual):
         if self._is_already_connected(ssid):
             return True
 
-        # Try activating a saved/known connection profile first
-        try:
-            out = subprocess.check_output(
-                ['nmcli', 'connection', 'up', 'id', ssid],
-                timeout=30, stderr=subprocess.STDOUT, text=True
-            )
+        # Try connecting (may fail if stale profile exists)
+        ok, err = self._nmcli_connect(ssid, password)
+        if ok:
             return True
-        except subprocess.CalledProcessError:
-            pass  # not a saved connection or activation failed
 
-        # Full wifi connect (creates new profile or updates existing)
+        # If failed with a property/profile error, delete stale profile and retry
+        if 'property' in err or 'key-mgmt' in err or '802-11' in err:
+            try:
+                subprocess.call(
+                    ['nmcli', 'connection', 'delete', 'id', ssid],
+                    timeout=10,
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                )
+            except Exception:
+                pass
+            ok, err = self._nmcli_connect(ssid, password)
+            if ok:
+                return True
+
+        self._connect_error = err
+        return False
+
+    def _nmcli_connect(self, ssid, password):
+        """Attempt nmcli wifi connect. Returns (success, error_str)."""
         try:
             cmd = ['nmcli', 'dev', 'wifi', 'connect', ssid]
             if password:
@@ -238,13 +251,11 @@ class WiFiConfig(Visual):
             subprocess.check_output(
                 cmd, timeout=30, stderr=subprocess.STDOUT, text=True
             )
-            return True
+            return True, ''
         except subprocess.CalledProcessError as e:
-            self._connect_error = (e.output or '').strip()
-            return False
+            return False, (e.output or '').strip()
         except Exception as e:
-            self._connect_error = str(e)
-            return False
+            return False, str(e)
 
     # ------------------------------------------------------------------
     # Input
