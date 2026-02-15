@@ -86,6 +86,8 @@ class WiFiConfig(Visual):
         self._connect_result = None  # True/False/None
         self._result_ip = ''
         self._result_timer = 0.0
+        # Both-button exit detection
+        self._both_pressed_prev = False
         # Auto-repeat scroll state
         self._scroll_dir = 0       # -1=up, +1=down
         self._scroll_held = 0.0    # how long held
@@ -210,6 +212,17 @@ class WiFiConfig(Visual):
         # Track held directions for auto-repeat in update()
         self._input_held_up = input_state.up
         self._input_held_down = input_state.down
+
+        # Suppress single-press actions when both buttons held (exit gesture)
+        both_held = input_state.action_l_held and input_state.action_r_held
+        if both_held:
+            self._both_pressed_prev = True
+            return False
+        # Don't fire action on the release frame after both were held
+        if self._both_pressed_prev:
+            self._both_pressed_prev = False
+            if not input_state.action_l_held and not input_state.action_r_held:
+                return False
 
         if self._state == _SCAN:
             return self._handle_scan(input_state)
