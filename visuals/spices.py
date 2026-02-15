@@ -15,7 +15,7 @@ REGION_COLORS = [
     (240, 160, 40),    # SOUTH ASIA = saffron
     (220, 60, 60),     # EAST ASIA = red
     (80, 180, 100),    # AMERICAS = green
-    (140, 130, 200),   # EUROPE = lavender
+    (180, 140, 200),   # EUROPE = lavender
 ]
 
 HEADER_BG = (20, 20, 30)
@@ -260,7 +260,7 @@ class Spices(Visual):
         self._comp_scroll_x = self._advance_scroll(
             self._comp_scroll_x, b['components'], 60, dt, 16)
         self._mean_scroll_x = self._advance_scroll(
-            self._mean_scroll_x, b['meaning'], 48, dt, 16)
+            self._mean_scroll_x, b['meaning'], 60, dt, 16)
         self._use_scroll_x = self._advance_scroll(
             self._use_scroll_x, b['use'], 60, dt, 16)
 

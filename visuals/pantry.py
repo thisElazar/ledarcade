@@ -45,7 +45,7 @@ ITEMS = [
 
     # ROUX (family 1)
     {'name': 'WHITE ROUX', 'family': 1, 'num': 6,
-     'parts': [('BUTTER', 1, (240, 220, 100)), ('FLOUR', 1, (220, 200, 160))],
+     'parts': [('BUTTER', 1, (240, 220, 100)), ('FLOUR', 1, (220, 180, 120))],
      'method': 'MELT BUTTER  ADD FLOUR  COOK 2-3 MIN  NO COLOR',
      'use': 'BECHAMEL  CREAM SOUPS  GRATINS'},
     {'name': 'BLOND ROUX', 'family': 1, 'num': 7,
