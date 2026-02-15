@@ -49,8 +49,8 @@ PHASE_DURATIONS = {
     PH_DISSOLUTION: (2.5, 3.0),
 }
 
-# MC sweeps per physics frame
-SWEEPS_PER_FRAME = 8
+# MC sweeps per frame (4 keeps transitions visible; 8 was overkill)
+SWEEPS_PER_FRAME = 4
 
 # Ghost memory parameters
 GHOST_DECAY = 0.7      # per cycle
@@ -298,13 +298,8 @@ class Crystallize(Visual):
         # Proximity to committed pixels (for anticipation flicker)
         self._proximity = np.zeros((N, N), dtype=np.float32)
 
-        # Frame interpolation: pixel buffers
-        self._pixels_prev = np.zeros((N, N, 3), dtype=np.float32)
-        self._pixels_curr = np.zeros((N, N, 3), dtype=np.float32)
-        self._pixels_display = np.zeros((N, N, 3), dtype=np.uint8)
-        self._sim_frame = 0
-        self._built_this_frame = False
-        self._needs_full_rebuild = True
+        # Pixel buffer (rebuilt every frame, no interpolation)
+        self._pixels = np.zeros((N, N, 3), dtype=np.uint8)
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -313,7 +308,6 @@ class Crystallize(Visual):
             self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
             self.overlay_text = PALETTES[self.palette_idx]["name"]
             self.overlay_timer = 1.5
-            self._needs_full_rebuild = True
             consumed = True
         if input_state.down_pressed:
             self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
@@ -338,7 +332,6 @@ class Crystallize(Visual):
                 self._start_dissolution()
             else:
                 self._force_seed()
-            self._needs_full_rebuild = True
             consumed = True
 
         return consumed
@@ -404,8 +397,6 @@ class Crystallize(Visual):
             self.T = T_HIGH
             self.phase = PH_FOG
             self.phase_timer = random.uniform(*PHASE_DURATIONS[PH_FOG])
-        self._needs_full_rebuild = True
-
     def _update_ghost(self):
         self.ghost *= GHOST_DECAY
         rows = np.arange(N)[:, None]
@@ -447,16 +438,9 @@ class Crystallize(Visual):
             self._advance_phase()
             return
 
-        # Physics: run every 2nd frame (odd frames interpolate)
-        self._sim_frame += 1
-        is_physics_frame = (self._sim_frame % 2 == 0) or self._needs_full_rebuild
-        self._built_this_frame = is_physics_frame
+        # Physics every frame (fewer sweeps keeps it affordable)
+        self._run_physics(effective_dt)
 
-        if is_physics_frame:
-            self._run_physics(effective_dt)
-            self._needs_full_rebuild = False
-
-        # Breathing advances every frame (smooth)
         if self.phase == PH_HOLD:
             self._breath_phase += effective_dt * 0.8
 
@@ -590,22 +574,11 @@ class Crystallize(Visual):
     # ── Draw ──────────────────────────────────────────────────────
 
     def draw(self):
-        # Build or interpolate pixel buffer
-        if self._built_this_frame:
-            # Full rebuild: swap buffers and compute new target
-            self._pixels_prev[:] = self._pixels_curr
-            self._pixels_curr[:] = self._build_pixel_buffer()
-            self._pixels_display[:] = np.clip(
-                self._pixels_curr, 0, 255).astype(np.uint8)
-        else:
-            # Cheap interp frame: lerp prev→curr (no fog recompute)
-            np.clip((self._pixels_prev + self._pixels_curr) * 0.5,
-                    0, 255, out=self._pixels_prev)  # reuse as scratch
-            self._pixels_display[:] = self._pixels_prev.astype(np.uint8)
-            self._pixels_prev[:] = self._pixels_curr  # restore for next interp
+        self._pixels[:] = np.clip(
+            self._build_pixel_buffer(), 0, 255).astype(np.uint8)
 
         # Render to display — the only Python loop (unavoidable)
-        pixels = self._pixels_display
+        pixels = self._pixels
         display = self.display
         for y in range(N):
             row = pixels[y]
