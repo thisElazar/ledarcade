@@ -1357,13 +1357,9 @@ _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
       return;
     }
 
-    // Load sprite museum atlas on demand before instantiation
-    const museumClasses = ['GallerySMB3', 'GalleryKirby', 'GalleryZelda', 'GalleryKidIcarus'];
-    for (const mc of museumClasses) {
-      if (itemData.cls === mc) {
-        await loadMuseumAtlas(mc);
-        break;
-      }
+    // Load sprite museum atlas on demand before instantiation (local-only galleries)
+    if (itemData.cls && itemData.cls.startsWith('Gallery') && itemData.cls !== 'Gallery3D') {
+      await loadMuseumAtlas(itemData.cls);
     }
 
     try {
