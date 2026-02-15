@@ -288,6 +288,36 @@ class Flags(Visual):
                     self.flag_pos = (self.flag_pos + 1) % len(lst)
                 self.scroll_offset = 0.0
 
+    def _draw_china_overdraw(self, d):
+        """Overdraw yellow stars on China's red flag."""
+        RED = (222, 41, 16)
+        YELLOW = (255, 222, 0)
+        # Fill red background
+        for y in range(FLAG_H):
+            for x in range(FLAG_W):
+                d.set_pixel(FX + x, FY + y, RED)
+        # Large star at ~(10,10) — 5-pointed, radius ~4px
+        # Draw as a filled diamond/star shape at pixel level
+        big = [
+            (10, 6), (9, 7), (10, 7), (11, 7),
+            (7, 8), (8, 8), (9, 8), (10, 8), (11, 8), (12, 8), (13, 8),
+            (8, 9), (9, 9), (10, 9), (11, 9), (12, 9),
+            (7, 10), (8, 10), (9, 10), (10, 10), (11, 10), (12, 10), (13, 10),
+            (8, 11), (9, 11), (10, 11), (11, 11), (12, 11),
+            (9, 12), (10, 12), (11, 12),
+            (9, 13), (11, 13),
+        ]
+        for px, py in big:
+            d.set_pixel(FX + px, FY + py, YELLOW)
+        # Four small stars — each a 3px cross/diamond
+        small_centers = [(20, 4), (23, 8), (23, 14), (20, 18)]
+        for cx, cy in small_centers:
+            d.set_pixel(FX + cx, FY + cy, YELLOW)
+            d.set_pixel(FX + cx - 1, FY + cy, YELLOW)
+            d.set_pixel(FX + cx + 1, FY + cy, YELLOW)
+            d.set_pixel(FX + cx, FY + cy - 1, YELLOW)
+            d.set_pixel(FX + cx, FY + cy + 1, YELLOW)
+
     def _draw_usa_overdraw(self, d):
         """Overdraw crisp stripes, canton, and stars on the USA flag."""
         RED = (178, 34, 52)
@@ -331,8 +361,10 @@ class Flags(Visual):
             for x, color in enumerate(row):
                 d.set_pixel(FX + x, FY + y, color)
 
-        # USA: overdraw canton with crisp stars
-        if iso_code == 'us':
+        # Overdraw flags that lose detail at 60x40
+        if iso_code == 'cn':
+            self._draw_china_overdraw(d)
+        elif iso_code == 'us':
             self._draw_usa_overdraw(d)
 
         # Flag border
