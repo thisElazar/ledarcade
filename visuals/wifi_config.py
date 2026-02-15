@@ -22,13 +22,19 @@ import socket
 import threading
 from . import Visual, Display, Colors, GRID_SIZE
 
-# Character set for password entry
+# Character set for password entry (space included)
 CHARS = (
     'abcdefghijklmnopqrstuvwxyz'
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     '0123456789'
-    '!@#$%&*_-+.()~'
+    '!@#$%&*_-+.()~ '
 )
+
+# Auto-repeat timing (matches menu behavior)
+_REPEAT_DELAY = 0.4    # seconds before repeat starts
+_REPEAT_FAST = 0.06    # fastest repeat interval
+_REPEAT_SLOW = 0.18    # initial repeat interval
+_REPEAT_RAMP = 1.5     # seconds to reach fastest
 
 # State constants
 _SCAN = 0
@@ -80,6 +86,12 @@ class WiFiConfig(Visual):
         self._connect_result = None  # True/False/None
         self._result_ip = ''
         self._result_timer = 0.0
+        # Auto-repeat scroll state
+        self._scroll_dir = 0       # -1=up, +1=down
+        self._scroll_held = 0.0    # how long held
+        self._scroll_accum = 0.0   # accumulator for repeat timing
+        self._input_held_up = False
+        self._input_held_down = False
         # Dot animation
         self._dot_timer = 0.0
         # Current IP for status line
@@ -195,6 +207,10 @@ class WiFiConfig(Visual):
     # ------------------------------------------------------------------
 
     def handle_input(self, input_state) -> bool:
+        # Track held directions for auto-repeat in update()
+        self._input_held_up = input_state.up
+        self._input_held_down = input_state.down
+
         if self._state == _SCAN:
             return self._handle_scan(input_state)
         elif self._state == _PASSWORD:
@@ -207,13 +223,27 @@ class WiFiConfig(Visual):
             return self._handle_result(input_state)
         return False
 
+    def _step_up_down(self, direction):
+        """Apply one scroll step in the given direction (-1=up, +1=down).
+        Works for whichever screen is active."""
+        if self._state == _SCAN:
+            total = len(self._networks) + 1
+            self._scan_cursor = (self._scan_cursor + direction) % total
+        elif self._state in (_PASSWORD, _SSID_ENTRY):
+            self._char_idx = (self._char_idx + direction) % len(CHARS)
+
     def _handle_scan(self, inp):
-        total = len(self._networks) + 1  # +1 for OTHER...
         if inp.up_pressed:
-            self._scan_cursor = (self._scan_cursor - 1) % total
+            self._step_up_down(-1)
+            self._scroll_dir = -1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.down_pressed:
-            self._scan_cursor = (self._scan_cursor + 1) % total
+            self._step_up_down(1)
+            self._scroll_dir = 1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.action_l or inp.action_r:
             if self._scan_cursor >= len(self._networks):
@@ -229,15 +259,22 @@ class WiFiConfig(Visual):
                 self._char_idx = 0
                 self._pw_scroll = 0
                 self._state = _PASSWORD
+            self._scroll_dir = 0
             return True
         return False
 
     def _handle_password(self, inp):
         if inp.up_pressed:
-            self._char_idx = (self._char_idx - 1) % len(CHARS)
+            self._step_up_down(-1)
+            self._scroll_dir = -1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.down_pressed:
-            self._char_idx = (self._char_idx + 1) % len(CHARS)
+            self._step_up_down(1)
+            self._scroll_dir = 1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.right_pressed:
             # Confirm current char and advance
@@ -262,10 +299,16 @@ class WiFiConfig(Visual):
     def _handle_ssid_entry(self, inp):
         # Same scroll-wheel as password, but building SSID string
         if inp.up_pressed:
-            self._char_idx = (self._char_idx - 1) % len(CHARS)
+            self._step_up_down(-1)
+            self._scroll_dir = -1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.down_pressed:
-            self._char_idx = (self._char_idx + 1) % len(CHARS)
+            self._step_up_down(1)
+            self._scroll_dir = 1
+            self._scroll_held = 0.0
+            self._scroll_accum = 0.0
             return True
         if inp.right_pressed:
             self._password.append(CHARS[self._char_idx])
@@ -307,6 +350,24 @@ class WiFiConfig(Visual):
         self.time += dt
         self._dot_timer += dt
 
+        # Auto-repeat for held up/down (matches menu scroll acceleration)
+        if self._scroll_dir != 0:
+            still_held = ((self._scroll_dir == -1 and self._input_held_up) or
+                          (self._scroll_dir == 1 and self._input_held_down))
+            if still_held:
+                self._scroll_held += dt
+                if self._scroll_held >= _REPEAT_DELAY:
+                    t_accel = min(self._scroll_held - _REPEAT_DELAY, _REPEAT_RAMP)
+                    interval = _REPEAT_SLOW - ((_REPEAT_SLOW - _REPEAT_FAST) * t_accel / _REPEAT_RAMP)
+                    self._scroll_accum += dt
+                    while self._scroll_accum >= interval:
+                        self._scroll_accum -= interval
+                        self._step_up_down(self._scroll_dir)
+            else:
+                self._scroll_dir = 0
+                self._scroll_held = 0.0
+                self._scroll_accum = 0.0
+
         if self._state == _CONNECTING and not self._connecting:
             # Thread finished
             self._state = _RESULT
@@ -333,6 +394,27 @@ class WiFiConfig(Visual):
             self._draw_connecting()
         elif self._state == _RESULT:
             self._draw_result()
+
+    @staticmethod
+    def _char_label(ch):
+        """Display label for a character — 'SPC' for space, char otherwise."""
+        return 'SPC' if ch == ' ' else ch
+
+    def _draw_char_wheel(self, d, y_start, n_visible=5):
+        """Draw the character selection wheel centered on self._char_idx."""
+        half = n_visible // 2
+        for offset in range(-half, half + 1):
+            ci = (self._char_idx + offset) % len(CHARS)
+            ch = self._char_label(CHARS[ci])
+            wy = y_start + (offset + half) * 7
+            if wy < 0 or wy > 60:
+                continue
+            col = _HIGHLIGHT_COLOR if offset == 0 else _DIM
+            if offset == 0:
+                d.draw_rect(0, wy - 1, 64, 7, (30, 30, 60))
+                d.draw_text_raw(10, wy, '> ' + ch + ' <', col)
+            else:
+                d.draw_text_raw(14, wy, ch, col)
 
     def _draw_scan(self):
         d = self.display
@@ -419,24 +501,14 @@ class WiFiConfig(Visual):
         d.draw_line(cursor_x, 18, cursor_x + 2, 18, _CURSOR_COLOR)
 
         # Character wheel — show 5 chars centered on current
-        wheel_y = 24
-        d.draw_text_small(2, wheel_y, 'CHAR:', _DIM)
-        for offset in range(-2, 3):
-            ci = (self._char_idx + offset) % len(CHARS)
-            ch = CHARS[ci]
-            wy = wheel_y + 8 + (offset + 2) * 7
-            if wy < 0 or wy > 60:
-                continue
-            col = _HIGHLIGHT_COLOR if offset == 0 else _DIM
-            if offset == 0:
-                d.draw_rect(0, wy - 1, 64, 7, (30, 30, 60))
-                d.draw_text_raw(10, wy, '> ' + ch + ' <', col)
-            else:
-                d.draw_text_raw(14, wy, ch, col)
+        d.draw_text_small(2, 24, 'CHAR:', _DIM)
+        self._draw_char_wheel(d, 32)
 
         # Case/region indicator at bottom
         c = CHARS[self._char_idx]
-        if c.islower():
+        if c == ' ':
+            indicator = 'SPC'
+        elif c.islower():
             indicator = 'abc'
         elif c.isupper():
             indicator = 'ABC'
@@ -470,19 +542,7 @@ class WiFiConfig(Visual):
         d.draw_line(cursor_x, 18, cursor_x + 2, 18, _CURSOR_COLOR)
 
         # Character wheel
-        wheel_y = 24
-        for offset in range(-2, 3):
-            ci = (self._char_idx + offset) % len(CHARS)
-            ch = CHARS[ci]
-            wy = wheel_y + (offset + 2) * 7
-            if wy < 0 or wy > 60:
-                continue
-            col = _HIGHLIGHT_COLOR if offset == 0 else _DIM
-            if offset == 0:
-                d.draw_rect(0, wy - 1, 64, 7, (30, 30, 60))
-                d.draw_text_raw(10, wy, '> ' + ch + ' <', col)
-            else:
-                d.draw_text_raw(14, wy, ch, col)
+        self._draw_char_wheel(d, 24)
 
         d.draw_text_small(30, 58, 'BTN:OK', _DIM)
 
