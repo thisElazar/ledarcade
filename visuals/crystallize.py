@@ -298,20 +298,24 @@ class Crystallize(Visual):
         # Proximity to committed pixels (for anticipation flicker)
         self._proximity = np.zeros((N, N), dtype=np.float32)
 
+        # Shared crystallized snapshot — updated once per HOLD entry
+        self._hold_snapshot = None
+
         # View mode: '2d' (spatial field), '1d' (sequential readout), 'stream'
         self.view_mode = '2d'
-        self.seq_cursor = 0.0           # float column position
-        self.seq_committed_cols = np.zeros(N, dtype=bool)
-        self.seq_frozen_spins = np.zeros((N, N), dtype=np.int8)  # snapshot at commit
-        self.seq_wrap_fade = 0.0        # >0 = fading for wrap reset
         self.view_transition = 0.0      # >0 = transitioning between views
         self.view_transition_from = None  # '2d', '1d', or 'stream'
         self.view_transition_to = None    # '2d', '1d', or 'stream'
 
+        # Sequence mode state
+        self.seq_cursor = 0.0           # float column position
+        self.seq_wrap_fade = 0.0        # >0 = fading for wrap reset
+        self.seq_snapshot = None        # locked at sweep start from _hold_snapshot
+
         # Stream mode state
         self.stream_cursor = 0.0        # float, linear position 0..N*N
         self.stream_wrap_fade = 0.0     # >0 = fading for page-turn reset
-        self.stream_snapshot = None     # full spin field snapshot taken at page start
+        self.stream_snapshot = None     # locked at page start from _hold_snapshot
 
         # Pixel buffer (rebuilt every frame, no interpolation)
         self._pixels = np.zeros((N, N, 3), dtype=np.uint8)
@@ -391,6 +395,8 @@ class Crystallize(Visual):
             self.phase = PH_HOLD
             self.phase_timer = random.uniform(*PHASE_DURATIONS[PH_HOLD])
             self._breath_phase = 0.0
+            # Snapshot crystallized field for 1D readout modes
+            self._hold_snapshot = self.spins.copy()
         elif self.phase == PH_HOLD:
             self._start_dissolution()
         elif self.phase == PH_DISSOLUTION:
@@ -442,25 +448,24 @@ class Crystallize(Visual):
         if self.view_transition > 0:
             self.view_transition = max(0.0, self.view_transition - dt)
 
-        # 1D cursor advancement
+        # 1D sequence cursor advancement
         if self.view_mode == '1d' and self.view_transition <= 0:
             if self.seq_wrap_fade > 0:
-                # Fading for wrap reset
                 self.seq_wrap_fade = max(0.0, self.seq_wrap_fade - dt)
                 if self.seq_wrap_fade <= 0:
                     self.seq_cursor = 0.0
-                    self.seq_committed_cols[:] = False
+                    # Lock a fresh snapshot from the latest crystallized state
+                    if self._hold_snapshot is not None:
+                        self.seq_snapshot = self._hold_snapshot.copy()
             else:
-                prev_col = int(self.seq_cursor)
-                self.seq_cursor += dt * self.speed_mult * 1.5
-                new_col = int(self.seq_cursor)
-                # Snapshot spins for newly crossed columns
-                for c in range(prev_col, min(new_col, N)):
-                    self.seq_committed_cols[c] = True
-                    self.seq_frozen_spins[:, c] = self.spins[:, c]
-                # Wrap
-                if self.seq_cursor >= N:
-                    self.seq_wrap_fade = 0.5
+                # Lock snapshot on first entry if we have one
+                if self.seq_snapshot is None and self._hold_snapshot is not None:
+                    self.seq_snapshot = self._hold_snapshot.copy()
+                # Only advance if snapshot is ready
+                if self.seq_snapshot is not None:
+                    self.seq_cursor += dt * self.speed_mult * 1.5
+                    if self.seq_cursor >= N:
+                        self.seq_wrap_fade = 0.5
 
         # Stream cursor advancement
         if self.view_mode == 'stream' and self.view_transition <= 0:
@@ -468,14 +473,18 @@ class Crystallize(Visual):
                 self.stream_wrap_fade = max(0.0, self.stream_wrap_fade - dt)
                 if self.stream_wrap_fade <= 0:
                     self.stream_cursor = 0.0
-                    self.stream_snapshot = self.spins.copy()
+                    # Lock a fresh snapshot from the latest crystallized state
+                    if self._hold_snapshot is not None:
+                        self.stream_snapshot = self._hold_snapshot.copy()
             else:
-                # Snapshot on first frame of stream mode
-                if self.stream_snapshot is None:
-                    self.stream_snapshot = self.spins.copy()
-                self.stream_cursor += dt * self.speed_mult * 48.0
-                if self.stream_cursor >= N * N:
-                    self.stream_wrap_fade = 0.6
+                # Lock snapshot on first entry if we have one
+                if self.stream_snapshot is None and self._hold_snapshot is not None:
+                    self.stream_snapshot = self._hold_snapshot.copy()
+                # Only advance if snapshot is ready
+                if self.stream_snapshot is not None:
+                    self.stream_cursor += dt * self.speed_mult * 48.0
+                    if self.stream_cursor >= N * N:
+                        self.stream_wrap_fade = 0.6
 
         # Flash decay (every frame — fast snap)
         self._nuc_flash = np.maximum(0.0, self._nuc_flash - dt * 15.0)
@@ -629,16 +638,15 @@ class Crystallize(Visual):
         crystals = pal["crystals"]
         front_color = pal["front"]
 
-        cursor_col = int(self.seq_cursor)
+        snapshot = self.seq_snapshot
+        cursor_col = int(self.seq_cursor) if snapshot is not None else 0
         pixels = np.zeros((N, N, 3), dtype=np.float32)
 
         # ── Committed wake (columns behind cursor) ──
-        if cursor_col > 0:
+        if cursor_col > 0 and snapshot is not None:
             wake_cols = min(cursor_col, N)
-            # Get spin colors from frozen snapshot
-            wake_spins = self.seq_frozen_spins[:, :wake_cols]  # [N, wake_cols]
-            wake_px = crystals[wake_spins]  # [N, wake_cols, 3]
-            # Subtle texture variation
+            wake_spins = snapshot[:, :wake_cols]
+            wake_px = crystals[wake_spins]
             tex = self._crystal_texture[:, :wake_cols, np.newaxis]
             wake_px = wake_px * (0.85 + tex * 0.3)
             pixels[:, :wake_cols] = wake_px
@@ -659,44 +667,31 @@ class Crystallize(Visual):
                 pixels[:, future_start:][tint_mask] += (ghost_colors * tint)[tint_mask]
 
         # ── Cursor column: Boltzmann probability distribution ──
-        if 0 <= cursor_col < N:
+        if 0 <= cursor_col < N and snapshot is not None:
             cx = cursor_col
+            # Use snapshot neighbors for consistent probabilities
+            col_left = snapshot[:, (cx - 1) % N]
+            col_right = snapshot[:, (cx + 1) % N]
+            col_up = np.roll(snapshot[:, cx], -1)
+            col_down = np.roll(snapshot[:, cx], 1)
+
             beta = 1.0 / max(self.T, 0.01)
-
-            # Compute neighbor counts for cursor column
-            col_left = self.spins[:, (cx - 1) % N]
-            col_right = self.spins[:, (cx + 1) % N]
-            col_up = np.roll(self.spins[:, cx], -1)
-            col_down = np.roll(self.spins[:, cx], 1)
-
-            # For each row, compute Boltzmann weights over Q states
             neighbor_counts = np.zeros((N, Q), dtype=np.float32)
             for nb in (col_left, col_right, col_up, col_down):
                 for q in range(Q):
                     neighbor_counts[:, q] += (nb == q).astype(np.float32)
 
-            ghost_col = self.ghost[:, cx, :]  # [N, Q]
+            ghost_col = self.ghost[:, cx, :]
             energy = -(neighbor_counts + ghost_col)
             weights = np.exp(-beta * energy)
             total = weights.sum(axis=1, keepdims=True)
-            probs = weights / total  # [N, Q]
+            probs = weights / total
 
-            # Render probability as stacked color bands per row
-            # For each row, draw the column as a vertical stack of Q bands
-            # We'll render the full column by averaging across rows in small bands
-            # Actually: each row gets its own probability display
-            # But that's too fine — instead, show the marginal distribution
-            # averaged over all rows as a single vertical bar
-
-            # Average probabilities across all rows for a clean display
-            avg_probs = probs.mean(axis=0)  # [Q]
-
-            # Sort by probability for visual clarity
+            avg_probs = probs.mean(axis=0)
             sorted_idx = np.argsort(-avg_probs)
             sorted_probs = avg_probs[sorted_idx]
             sorted_colors = crystals[sorted_idx]
 
-            # Draw stacked bands
             y_pos = 0.0
             for i in range(Q):
                 band_height = sorted_probs[i] * N
@@ -706,15 +701,12 @@ class Crystallize(Visual):
                     break
                 y_end = min(y_end, N)
                 if y_end > y_start:
-                    # Slight flicker: random brightness variation per frame
                     flicker = 0.85 + np.random.random() * 0.3
                     pixels[y_start:y_end, cx] = sorted_colors[i] * flicker
                 y_pos += band_height
 
-            # Front color glow on cursor edges (±1 column if available)
             glow_alpha = 0.4 + 0.2 * math.sin(self.time * 8.0)
             pixels[:, cx] = pixels[:, cx] * (1.0 - glow_alpha) + front_color * glow_alpha
-            # Softer glow on adjacent columns
             for offset in (-1, 1):
                 gx = cx + offset
                 if 0 <= gx < N:
@@ -739,31 +731,23 @@ class Crystallize(Visual):
         front_color = pal["front"]
 
         snapshot = self.stream_snapshot
-        if snapshot is None:
-            snapshot = self.spins
 
-        n_committed = int(self.stream_cursor)
+        n_committed = int(self.stream_cursor) if snapshot is not None else 0
         total = N * N
-        trail_len = 24  # pixels of chaotic front ahead of committed edge
+        trail_front = 24   # chaotic pixels ahead of cursor
+        trail_back = 80    # resolving pixels behind cursor
         pixels = np.zeros((N, N, 3), dtype=np.float32)
 
-        # ── Future pixels: fog + ghost tint ──
-        fog = _fog_noise_vectorized(self.time)
+        # ── Future pixels: slow dark fog ──
+        # Use very slow time so fog doesn't visibly shift during a page
+        fog = _fog_noise_vectorized(self.time * 0.05)
         fog_t = fog[:, :, np.newaxis] * 0.3
         pixels[:] = fog_lo + (fog_hi - fog_lo) * fog_t
 
-        # Ghost tint on future fog
-        ghost_str = np.minimum(np.max(self.ghost, axis=2), 1.0)
-        ghost_max_q = np.argmax(self.ghost, axis=2)
-        ghost_colors = crystals[ghost_max_q]
-        ghost_mask = ghost_str > 0.05
-        if ghost_mask.any():
-            tint = (ghost_str * 0.2)[:, :, np.newaxis]
-            pixels[ghost_mask] += (ghost_colors * tint)[ghost_mask]
-
-        # ── Committed pixels (behind cursor): from page snapshot ──
-        if n_committed > 0:
-            indices = np.arange(min(n_committed, total))
+        # ── Fully committed pixels (far behind cursor): pure snapshot ──
+        solid_end = max(n_committed - trail_back, 0)
+        if solid_end > 0 and snapshot is not None:
+            indices = np.arange(solid_end)
             ys = indices // N
             xs = indices % N
             committed_colors = crystals[snapshot[ys, xs]]
@@ -771,50 +755,71 @@ class Crystallize(Visual):
             committed_colors = committed_colors * (0.85 + tex * 0.3)
             pixels[ys, xs] = committed_colors
 
-        # ── Chaotic trail: probability flicker zone ahead of committed edge ──
-        trail_start = max(n_committed, 0)
-        trail_end = min(n_committed + trail_len, total)
-        if trail_end > trail_start:
-            trail_indices = np.arange(trail_start, trail_end)
-            tys = trail_indices // N
-            txs = trail_indices % N
+        # ── Resolving + chaotic trail zone (trail_back behind → trail_front ahead) ──
+        zone_start = max(solid_end, 0)
+        zone_end = min(n_committed + trail_front, total)
+        if zone_end > zone_start and snapshot is not None:
+            zone_indices = np.arange(zone_start, zone_end)
+            zys = zone_indices // N
+            zxs = zone_indices % N
 
-            # Distance from committed edge: 0 = just committed, 1 = far ahead
-            dist = (trail_indices - n_committed).astype(np.float32) / trail_len
+            # Target color from snapshot
+            target_colors = crystals[snapshot[zys, zxs]]
+            tex_vals = self._crystal_texture[zys, zxs, np.newaxis]
+            target_colors = target_colors * (0.85 + tex_vals * 0.3)
 
-            # Target color: what this pixel will resolve to (from snapshot)
-            target_colors = crystals[snapshot[tys, txs]]
+            # Chaos factor: 0 = fully resolved, 1 = fully chaotic
+            # Linear ramp: solid_end=0 chaos, n_committed=moderate, zone_end=1
+            total_zone = float(zone_end - zone_start)
+            positions = (zone_indices - zone_start).astype(np.float32) / total_zone
 
-            # Random flicker: each pixel picks a random spin color weighted
-            # by Boltzmann probs from live neighbors
+            # Behind cursor: resolving (chaos decreases toward solid_end)
+            # Ahead of cursor: chaotic (chaos increases toward zone_end)
+            # Cursor is at fractional position within the zone
+            cursor_frac = float(n_committed - zone_start) / total_zone if total_zone > 0 else 0.5
+
             beta = 1.0 / max(self.T, 0.01)
-            for i, (ty, tx) in enumerate(zip(tys, txs)):
+            glow_base = 0.3 + 0.15 * math.sin(self.time * 10.0)
+
+            for i, (zy, zx) in enumerate(zip(zys, zxs)):
+                pos = positions[i]
+
+                # Chaos: 0 at zone_start (fully resolved), peaks at zone_end
+                # Use cubic ease so it ramps slowly behind cursor, fast ahead
+                if pos <= cursor_frac:
+                    # Behind cursor: resolving wake
+                    t = pos / cursor_frac if cursor_frac > 0 else 0.0
+                    chaos = t * t * 0.5  # quadratic, max 0.5 at cursor
+                else:
+                    # Ahead of cursor: chaotic front
+                    t = (pos - cursor_frac) / (1.0 - cursor_frac) if cursor_frac < 1.0 else 1.0
+                    chaos = 0.5 + t * 0.5  # 0.5 at cursor → 1.0 at end
+
+                # Random flicker color from Boltzmann probabilities
+                # Use snapshot neighbors so trail is consistent with target
                 nb_spins = [
-                    self.spins[(ty - 1) % N, tx],
-                    self.spins[(ty + 1) % N, tx],
-                    self.spins[ty, (tx - 1) % N],
-                    self.spins[ty, (tx + 1) % N],
+                    snapshot[(zy - 1) % N, zx],
+                    snapshot[(zy + 1) % N, zx],
+                    snapshot[zy, (zx - 1) % N],
+                    snapshot[zy, (zx + 1) % N],
                 ]
                 counts = np.zeros(Q, dtype=np.float32)
                 for nb in nb_spins:
                     counts[nb] += 1.0
-                energy = -(counts + self.ghost[ty, tx])
+                energy = -(counts + self.ghost[zy, zx])
                 weights = np.exp(-beta * energy)
                 probs = weights / weights.sum()
                 flicker_q = np.random.choice(Q, p=probs)
                 flicker_color = crystals[flicker_q]
 
-                # Blend: near committed edge → mostly resolved (target),
-                #         far ahead → mostly chaotic (flicker)
-                d = dist[i]
-                chaos = d  # 0 at edge, 1 at trail end
                 color = target_colors[i] * (1.0 - chaos) + flicker_color * chaos
 
-                # Front glow: brightest at the leading edge (cursor)
-                glow = (1.0 - d) * (0.3 + 0.15 * math.sin(self.time * 10.0))
+                # Front glow near cursor position
+                dist_to_cursor = abs(pos - cursor_frac) / max(cursor_frac, 0.1)
+                glow = max(0.0, 1.0 - dist_to_cursor * 2.0) * glow_base
                 color = color * (1.0 - glow) + front_color * glow
 
-                pixels[ty, tx] = color
+                pixels[zy, zx] = color
 
         # ── Wrap fade (page turn) ──
         if self.stream_wrap_fade > 0:
