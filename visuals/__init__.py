@@ -218,6 +218,7 @@ from .antikythera import Antikythera
 from .astrolabe import Astrolabe
 from .archimedes import Archimedes
 from .frozen_lake import FrozenLake
+from .crystallize import Crystallize
 from .drift import DriftVisual
 from .drift3d import Drift3D
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
@@ -343,6 +344,7 @@ ALL_VISUALS = [
     Attractors,
     Flux,
     FrozenLake,
+    Crystallize,
     Cat,
     Aquarium,
     XORPattern,
@@ -764,6 +766,7 @@ __all__ = [
     'Antikythera',
     'Astrolabe',
     'Archimedes',
+    'Crystallize',
     'DriftVisual',
     'Drift3D',
     'BML',
