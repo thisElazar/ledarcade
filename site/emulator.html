@@ -483,6 +483,21 @@
 
   let joystickTouchId = null;
 
+  // ── Smoothed joystick state ──
+  const DEAD_ZONE = 0.15;        // 15% radius dead zone
+  const EMA_ALPHA = 0.35;        // smoothing factor (lower = smoother)
+  const HYSTERESIS_DEG = 12;     // degrees of "stickiness" per direction
+  const DIR_COOLDOWN_MS = 60;    // min ms between direction changes
+  let smoothX = 0, smoothY = 0;  // EMA-filtered position
+  let currentDirs = { arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
+  let lastDirChangeTime = 0;
+
+  // Angle distance helper (handles wraparound)
+  function angleDist(a, b) {
+    let d = Math.abs(a - b) % 360;
+    return d > 180 ? 360 - d : d;
+  }
+
   function handleJoystickMove(touchX, touchY) {
     const rect = joystickBase.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
@@ -493,39 +508,94 @@
     let dy = touchY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    // Clamp knob to base radius
+    // Clamp knob visual to base radius
+    let knobDx = dx, knobDy = dy;
     if (dist > maxR) {
-      dx = (dx / dist) * maxR;
-      dy = (dy / dist) * maxR;
+      knobDx = (dx / dist) * maxR;
+      knobDy = (dy / dist) * maxR;
     }
-
     joystickKnob.classList.remove('idle');
-    joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    joystickKnob.style.transform = `translate(calc(-50% + ${knobDx}px), calc(-50% + ${knobDy}px))`;
 
-    // Dead zone: inner 20%
-    const norm = dist / maxR;
-    if (norm < 0.2) {
-      keys['arrowup'] = false;
-      keys['arrowdown'] = false;
-      keys['arrowleft'] = false;
-      keys['arrowright'] = false;
+    // Normalize to -1..1
+    let nx = dx / maxR;
+    let ny = dy / maxR;
+    const mag = Math.sqrt(nx * nx + ny * ny);
+
+    // Scaled radial dead zone: remap [DEAD_ZONE..1] → [0..1] smoothly
+    if (mag < DEAD_ZONE) {
+      smoothX *= 0.5;  // decay toward zero
+      smoothY *= 0.5;
+      applyDirections(0, 0, 0);
       return;
     }
+    const scaledMag = Math.min(1, (mag - DEAD_ZONE) / (1 - DEAD_ZONE));
+    nx = (nx / mag) * scaledMag;
+    ny = (ny / mag) * scaledMag;
 
-    // Angle in degrees (0 = right, 90 = down, etc.)
-    const angle = ((Math.atan2(dy, dx) * 180 / Math.PI) + 360) % 360;
+    // EMA smoothing
+    smoothX = EMA_ALPHA * nx + (1 - EMA_ALPHA) * smoothX;
+    smoothY = EMA_ALPHA * ny + (1 - EMA_ALPHA) * smoothY;
 
-    // Cardinal + diagonal mapping with 90-degree zones
-    keys['arrowright'] = (angle < 60 || angle > 300);
-    keys['arrowdown']  = (angle > 30 && angle < 150);
-    keys['arrowleft']  = (angle > 120 && angle < 240);
-    keys['arrowup']    = (angle > 210 && angle < 330);
+    const sMag = Math.sqrt(smoothX * smoothX + smoothY * smoothY);
+    const angle = ((Math.atan2(smoothY, smoothX) * 180 / Math.PI) + 360) % 360;
+    applyDirections(angle, sMag, Date.now());
+  }
+
+  function applyDirections(angle, magnitude, now) {
+    if (magnitude < 0.05) {
+      currentDirs.arrowup = false;
+      currentDirs.arrowdown = false;
+      currentDirs.arrowleft = false;
+      currentDirs.arrowright = false;
+    } else {
+      // Cardinal centers: right=0, down=90, left=180, up=270
+      const cardinals = [
+        { key: 'arrowright', center: 0 },
+        { key: 'arrowdown',  center: 90 },
+        { key: 'arrowleft',  center: 180 },
+        { key: 'arrowup',    center: 270 },
+      ];
+
+      // Threshold: 45° to enter a direction, 45+hysteresis to leave
+      const enterThresh = 55;  // ~half of 110° zone
+      const leaveThresh = enterThresh + HYSTERESIS_DEG;
+
+      const cooldownOk = (now - lastDirChangeTime) >= DIR_COOLDOWN_MS;
+      let changed = false;
+
+      for (const c of cardinals) {
+        const dist = angleDist(angle, c.center);
+        if (currentDirs[c.key]) {
+          // Currently active — only deactivate past leave threshold
+          if (dist > leaveThresh && cooldownOk) {
+            currentDirs[c.key] = false;
+            changed = true;
+          }
+        } else {
+          // Currently inactive — activate within enter threshold
+          if (dist < enterThresh && cooldownOk) {
+            currentDirs[c.key] = true;
+            changed = true;
+          }
+        }
+      }
+      if (changed) lastDirChangeTime = now;
+    }
+
+    keys['arrowup']    = currentDirs.arrowup;
+    keys['arrowdown']  = currentDirs.arrowdown;
+    keys['arrowleft']  = currentDirs.arrowleft;
+    keys['arrowright'] = currentDirs.arrowright;
   }
 
   function resetJoystick() {
     joystickTouchId = null;
     joystickKnob.classList.add('idle');
     joystickKnob.style.transform = 'translate(-50%, -50%)';
+    smoothX = 0;
+    smoothY = 0;
+    currentDirs = { arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
     keys['arrowup'] = false;
     keys['arrowdown'] = false;
     keys['arrowleft'] = false;
