@@ -154,6 +154,7 @@ from .testpattern import TestPattern
 from .about import About
 from .sysinfo import SysInfo
 from .credits import Credits
+from .stats import Stats
 from .controls import Controls
 from .shutdown import Shutdown
 from .refresh import Refresh
@@ -395,6 +396,7 @@ ALL_VISUALS = [
     About,
     SysInfo,
     Credits,
+    Stats,
     Controls,
     Shutdown,
     Refresh,
@@ -701,6 +703,7 @@ __all__ = [
     'About',
     'SysInfo',
     'Credits',
+    'Stats',
     'Controls',
     'Shutdown',
     'Refresh',

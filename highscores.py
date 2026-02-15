@@ -34,7 +34,7 @@ class HighScoreManager:
         """
         if filepath is None:
             # Default to user's home directory
-            data_dir = Path.home() / ".led-arcade"
+            data_dir = Path(__file__).resolve().parent / "data"
             data_dir.mkdir(exist_ok=True)
             self.filepath = data_dir / "highscores.json"
         else:

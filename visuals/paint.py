@@ -22,8 +22,9 @@ except ImportError:
     HAS_PIL = False
 
 CANVAS_SIZE = 64  # 1:1 with screen
-SAVE_DIR = os.path.expanduser("~/.led-arcade/paint")
-GIF_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
+_DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+SAVE_DIR = os.path.join(_DATA, "paint")
+GIF_DIR = os.path.join(_DATA, "paint_gif")
 
 # 24-color palette: 8 columns x 3 rows
 PALETTE = [

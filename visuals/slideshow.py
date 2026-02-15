@@ -16,7 +16,7 @@ try:
 except ImportError:
     HAS_PIL = False
 
-GIF_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
+GIF_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "paint_gif")
 
 
 def _randomize_style(visual):

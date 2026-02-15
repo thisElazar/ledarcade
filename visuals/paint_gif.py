@@ -29,7 +29,7 @@ try:
 except ImportError:
     HAS_PIL = False
 
-SAVE_DIR = os.path.expanduser("~/.led-arcade/paint_gif")
+SAVE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "paint_gif")
 
 # Extended tool list
 # 0-5 reuse paint.py constants

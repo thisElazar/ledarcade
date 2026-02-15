@@ -33,6 +33,9 @@ CLAUDE.md
 .rollback_ref
 .dev
 
+# Runtime data (high scores, play history, paint saves)
+data/
+
 # Environment
 .env
 .venv/
