@@ -190,6 +190,7 @@ from .flavors import Flavors
 from .baking import Baking
 from .pantry import Pantry
 from .pasta import Pasta
+from .spices import Spices
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -427,6 +428,7 @@ ALL_VISUALS = [
     Baking,
     Pantry,
     Pasta,
+    Spices,
     WatchGears,
     Camshaft,
     GrandfatherClock,
@@ -720,6 +722,7 @@ __all__ = [
     'Baking',
     'Pantry',
     'Pasta',
+    'Spices',
     'WatchGears',
     'Camshaft',
     'GrandfatherClock',
