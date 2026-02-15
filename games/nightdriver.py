@@ -14,7 +14,7 @@ import random
 
 
 class NightDriver(Game):
-    name = "NIGHT DRIVER"
+    name = "NITE DRIVER"
     description = "Night Racing"
     category = "arcade"
 

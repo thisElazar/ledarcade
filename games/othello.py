@@ -17,7 +17,7 @@ PLAYER_2 = 2  # White
 
 
 class Othello(Game):
-    name = "OTHELLO"
+    name = "REVERSI"
     description = "2P Strategy"
     category = "2_player"
 

@@ -15,7 +15,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Asteroids(Game):
-    name = "ASTEROIDS"
+    name = "ASTROIDS"
     description = "Destroy the rocks!"
     category = "arcade"
     

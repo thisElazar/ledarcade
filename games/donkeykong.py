@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class DonkeyKong(Game):
-    name = "DONKEY KONG"
+    name = "MONKEY KONG"
     description = "Climb & Rescue!"
     category = "arcade"
 

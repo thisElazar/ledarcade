@@ -23,7 +23,7 @@ from games.loderunner import LodeRunner
 
 
 class LodeRunnerDemo(Visual):
-    name = "LODE RUNNER"
+    name = "GOLD RUNNER"
     description = "AI collects gold"
     category = "demos"
 

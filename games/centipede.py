@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Centipede(Game):
-    name = "CENTIPEDE"
+    name = "CENTIPEED"
     description = "Blast the bugs!"
     category = "arcade"
 

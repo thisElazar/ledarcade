@@ -14,7 +14,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Galaga(Game):
-    name = "GALAGA"
+    name = "GALAXA"
     description = "Shoot the aliens!"
     category = "arcade"
 

@@ -24,7 +24,7 @@ from games.asteroids import Asteroids
 
 
 class AsteroidsDemo(Visual):
-    name = "ASTEROIDS"
+    name = "ASTROIDS"
     description = "AI plays Asteroids"
     category = "demos"
 

@@ -174,7 +174,7 @@ LEVELS = [
 
 
 class BurgerTime(Game):
-    name = "BURGERTIME"
+    name = "BURGER TIME"
     description = "Stack the burgers!"
     category = "arcade"
 

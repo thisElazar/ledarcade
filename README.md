@@ -56,33 +56,33 @@ Classic coin-op arcade machines.
 
 | Game | Description | Controls |
 |------|-------------|----------|
-| **Asteroids** | Destroy asteroids in space | Arrows rotate/thrust, Space fires |
-| **Bomberman** | Place bombs, destroy enemies | Arrows move, Space places bomb |
-| **Breakout** | Break all bricks with the ball | Left/Right moves paddle, Space launches |
-| **Centipede** | Shoot the descending centipede | Arrows move, Space fires |
-| **Dig Dug** | Dig tunnels, pump up enemies | Arrows dig/move, Space pumps |
-| **Donkey Kong** | Climb ladders, jump barrels | Arrows move/climb, Space jumps |
-| **Frogger** | Cross traffic and river | Arrows hop |
-| **Galaga** | Formation-based shooter | Left/Right moves, Space fires |
+| **Astroids** | Destroy asteroids in space | Arrows rotate/thrust, Space fires |
+| **Bombman** | Place bombs, destroy enemies | Arrows move, Space places bomb |
+| **Break Out** | Break all bricks with the ball | Left/Right moves paddle, Space launches |
+| **Centipeed** | Shoot the descending centipede | Arrows move, Space fires |
+| **Dig Dig** | Dig tunnels, pump up enemies | Arrows dig/move, Space pumps |
+| **Monkey Kong** | Climb ladders, jump barrels | Arrows move/climb, Space jumps |
+| **Froggy** | Cross traffic and river | Arrows hop |
+| **Galaxa** | Formation-based shooter | Left/Right moves, Space fires |
 | **Invaders** | Defend Earth from aliens | Left/Right moves, Space fires |
-| **Lode Runner** | Collect gold, trap enemies | Arrows move/climb, Space digs |
+| **Gold Runner** | Collect gold, trap enemies | Arrows move/climb, Space digs |
 | **Lunar Lander** | Land safely on the pad | Arrows thrust |
-| **Night Driver** | First-person night racing | Left/Right steers |
-| **Pac-Man** | Eat dots, avoid ghosts | Arrows set direction |
-| **Pong** | Classic paddle game vs AI | Up/Down moves paddle |
-| **Q*bert** | Hop on cubes to change color | Arrows hop diagonally |
+| **Nite Driver** | First-person night racing | Left/Right steers |
+| **Pak-Man** | Eat dots, avoid ghosts | Arrows set direction |
+| **Ping** | Classic paddle game vs AI | Up/Down moves paddle |
+| **Q*Bit** | Hop on cubes to change color | Arrows hop diagonally |
 | **Snake** | Eat food, grow longer | Arrows change direction |
-| **Tetris** | Stack blocks, clear lines | Arrows move, Up rotates, Space drops |
+| **Tetrominos** | Stack blocks, clear lines | Arrows move, Up rotates, Space drops |
 
 ### Retro (6 games)
 Classic computer and console games.
 
 | Game | Description | Controls |
 |------|-------------|----------|
-| **Arkanoid** | 1986 Taito classic | Left/Right moves paddle |
-| **Indy 500** | Top-down racing | Arrows steer, Space gas |
-| **JezzBall** | Trap bouncing atoms | Arrows + Space builds walls |
-| **Pipe Dream** | Connect pipes before flood | Arrows move, Space places |
+| **Arcanoid** | 1986 brick breaker | Left/Right moves paddle |
+| **Indie 500** | Top-down racing | Arrows steer, Space gas |
+| **Jazzball** | Trap bouncing atoms | Arrows + Space builds walls |
+| **Pipe Maze** | Connect pipes before flood | Arrows move, Space places |
 | **Space Cruise** | Space exploration | Arrows move |
 | **Trash Blaster** | Shoot trash | Arrows aim, Space fires |
 
@@ -94,7 +94,7 @@ Mobile-era and puzzle games.
 | **2048** | Slide tiles to combine | Arrows slide all tiles |
 | **Flappy** | Tap to fly through pipes | Space flaps |
 | **Geometry Dash** | Jump over obstacles | Space jumps |
-| **Lights Out** | Toggle all lights off | Arrows select, Space toggles |
+| **Lite Out** | Toggle all lights off | Arrows select, Space toggles |
 | **Stack** | Stack blocks perfectly | Space drops block |
 | **Stick Runner** | Endless runner | Space jumps |
 
@@ -105,10 +105,10 @@ Turn-based multiplayer with shared controller.
 |------|-------------|----------|
 | **Checkers** | Classic checkers | Arrows select, Space moves |
 | **Chess** | Full chess game | Arrows select, Space confirms |
-| **Connect 4** | Get 4 in a row | Left/Right selects, Space drops |
+| **Connect Four** | Get 4 in a row | Left/Right selects, Space drops |
 | **Go** | 9x9 Go board | Arrows place, Space confirms |
 | **Mancala** | Sow seeds, capture | Arrows select, Space sows |
-| **Othello** | Flip opponent's discs | Arrows place, Space confirms |
+| **Reversi** | Flip opponent's discs | Arrows place, Space confirms |
 
 ---
 

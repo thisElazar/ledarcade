@@ -14,7 +14,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Pong(Game):
-    name = "PONG"
+    name = "PING"
     description = "Beat the AI!"
     category = "arcade"
     

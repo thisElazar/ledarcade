@@ -49,3 +49,34 @@ tools/.sign_cache/
 # Research/experiment docs (not part of runtime)
 docs/
 tools/basin_experiment.py
+
+# Local/personal visuals (not shipped with product)
+visuals/local/*.py
+!visuals/local/__init__.py
+
+# Copyrighted character sprite assets (personal use only)
+assets/mario_walk*.png
+assets/sonic_run*.png
+assets/ani_link_spin.gif
+assets/SamusRunning*.gif
+assets/Metroidgif.gif
+assets/yoshi_tongue.gif
+assets/kirby_eats.gif
+assets/kirby_*.png
+assets/PitFlying*.gif
+assets/megamanxpack2.gif
+assets/spidey_swing.gif
+assets/batman.gif
+assets/greenlantern.gif
+assets/jake_*.gif
+assets/at_*
+assets/smb3_*.png
+assets/zelda_*.png
+assets/kidicarus_*.png
+
+# Copyrighted gallery atlas files
+site/gallery_GallerySMB3.json
+site/gallery_GalleryKirby.json
+site/gallery_GalleryZelda.json
+site/gallery_GalleryKidIcarus.json
+site/gallery_GalleryAdventureTime.json

@@ -252,7 +252,7 @@ class IagoAI:
 
 
 class OthelloDemo(Visual):
-    name = "OTHELLO"
+    name = "REVERSI"
     description = "AI vs AI Othello"
     category = "demos"
 

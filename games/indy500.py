@@ -104,7 +104,7 @@ TRACKS = _define_tracks()
 
 
 class Indy500(Game):
-    name = "INDY 500"
+    name = "INDIE 500"
     description = "5 tracks!"
     category = "retro"
 

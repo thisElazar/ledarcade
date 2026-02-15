@@ -43,7 +43,7 @@ BRICK_CHAR_MAP = {
 
 
 class Arkanoid(Game):
-    name = "ARKANOID"
+    name = "ARCANOID"
     description = "1986 Taito classic"
     category = "retro"
 

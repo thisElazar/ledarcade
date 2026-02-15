@@ -18,13 +18,46 @@ class HighScoreManager:
 
     MAX_SCORES_PER_GAME = 5  # Top 5 leaderboard
 
-    # Games renamed in commit 7f69468 — map old keys to new keys
+    # Games renamed — map old keys to new keys (migrated on init)
     _RENAME_MAP = {
+        # Previous renames
         "STICKRUN": "STICK RUN",
         "FLAPPY": "FLAPPY BIRD",
         "SPACECRUISE": "SPACE CRUISE",
-        "CONNECT4": "CONNECT 4",
-        "DONKEY K": "DONKEY KONG",
+        "CONNECT4": "CONNECT FOUR",
+        "DONKEY K": "MONKEY KONG",
+        # IP cleanup renames
+        "PAC-MAN": "PAK-MAN",
+        "MS. PAC-MAN": "MS. PAK-MAN",
+        "TETRIS": "TETROMINOS",
+        "DONKEY KONG": "MONKEY KONG",
+        "FROGGER": "FROGGY",
+        "GALAGA": "GALAXA",
+        "CENTIPEDE": "CENTIPEED",
+        "DEFENDER": "DEFENDR",
+        "Q*BERT": "Q*BIT",
+        "DIG DUG": "DIG DIG",
+        "BOMBERMAN": "BOMBMAN",
+        "ARKANOID": "ARCANOID",
+        "BURGERTIME": "BURGER TIME",
+        "LODE RUNNER": "GOLD RUNNER",
+        "LODERUN": "GOLD RUNNER",
+        "SKI FREE": "SKI RUN",
+        "SKIFREE": "SKI RUN",
+        "BREAKOUT": "BREAK OUT",
+        "PONG": "PING",
+        "ASTEROIDS": "ASTROIDS",
+        "NIGHT DRIVER": "NITE DRIVER",
+        "INDY 500": "INDIE 500",
+        "JEZZBALL": "JAZZBALL",
+        "PIPE DREAM": "PIPE MAZE",
+        "SIMON": "SAIMON",
+        "BOP IT": "TAP IT",
+        "MASTERMIND": "MASTER CODE",
+        "RUSH HOUR": "RUSH HR",
+        "LIGHTS OUT": "LITE OUT",
+        "CONNECT 4": "CONNECT FOUR",
+        "OTHELLO": "REVERSI",
     }
 
     def __init__(self, filepath: Optional[str] = None):
@@ -44,6 +77,7 @@ class HighScoreManager:
         self.scores = {}  # {game_name: [(initials, score, timestamp), ...]}
         self.load_scores()
         self._migrate_renamed_games()
+        self._migrate_play_history()
 
     @staticmethod
     def _migrate_old_data(data_dir: Path):
@@ -115,6 +149,29 @@ class HighScoreManager:
             changed = True
         if changed:
             self.save_scores()
+
+    def _migrate_play_history(self):
+        """One-time migration of play_history.jsonl game names."""
+        history_path = self.filepath.parent / "play_history.jsonl"
+        if not history_path.exists():
+            return
+        try:
+            lines = history_path.read_text().splitlines()
+            changed = False
+            new_lines = []
+            for line in lines:
+                if not line.strip():
+                    continue
+                entry = json.loads(line)
+                old_name = entry.get("game", "")
+                if old_name in self._RENAME_MAP:
+                    entry["game"] = self._RENAME_MAP[old_name]
+                    changed = True
+                new_lines.append(json.dumps(entry))
+            if changed:
+                history_path.write_text("\n".join(new_lines) + "\n")
+        except Exception:
+            pass
 
     def get_top_scores(self, game_name: str) -> List[Tuple[str, int]]:
         """Get the top scores for a game.

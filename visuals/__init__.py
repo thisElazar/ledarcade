@@ -123,9 +123,7 @@ from .sinescroller import SineScroller
 from .copperbars import CopperBars
 from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GalleryScience, GalleryDigital, GalleryEffects,
-                        GallerySalon, GallerySMB3, GalleryKirby,
-                        GalleryZelda, GalleryKidIcarus,
-                        GalleryAdventureTime,
+                        GallerySalon,
                         GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
@@ -134,18 +132,6 @@ from .fireflies import Fireflies
 from .starwarsca import StarWarsCA
 from .truchet import Truchet
 from .sandpile import Sandpile
-from .mario import Mario
-from .sonic import Sonic
-from .link import Link
-from .metroid import MetroidChase
-from .yoshi import Yoshi
-from .kirby import Kirby
-from .pit import Pit
-from .spidey import Spidey
-from .batman import Batman
-from .greenlantern import GreenLantern
-from .jakemusic import JakeMusic
-from .megaman import MegaMan
 from .settings import Settings
 from .gamma import Gamma
 from .timers import Timers
@@ -197,6 +183,12 @@ from .jukebox import Jukebox
 from .synthesizer import Synthesizer
 from .chordchart import ChordChart
 from .rudiments import DrumRudiments
+from .latindna import LatinDNA
+from .latingrooves import LatinGrooves
+from .sauces import Sauces
+from .flavors import Flavors
+from .baking import Baking
+from .pantry import Pantry
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -240,7 +232,7 @@ from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderBreakout, WonderSnake, WonderAsteroids,
                             WonderDoom, WonderPipe, WonderWinXP,
                             WonderGlitch, WonderTypewriter, WonderZoom,
-                            WonderVinyl, WonderCassette, WonderJake,
+                            WonderVinyl, WonderCassette,
                             WonderVertigo, WonderStargate, WonderPsycho,
                             WonderNosferatu, WonderJaws, WonderShining,
                             WonderET, WonderAlien, WonderExorcist,
@@ -306,7 +298,7 @@ from .signs import Signs
 from .matter import MatterPhases
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
-    SpriteGallery, SuperheroGallery, Demoscene, Complexity,
+    Demoscene, Complexity,
     ScienceLab, Title, Demos, MusicMix, Customs, Education,
 )
 
@@ -364,11 +356,6 @@ ALL_VISUALS = [
     GalleryDigital,
     GalleryEffects,
     GallerySalon,
-    GallerySMB3,
-    GalleryKirby,
-    GalleryZelda,
-    GalleryKidIcarus,
-    GalleryAdventureTime,
     *PAINTING_VISUALS,
     Win95Maze,
     DemonSpirals,
@@ -377,18 +364,6 @@ ALL_VISUALS = [
     StarWarsCA,
     Truchet,
     Sandpile,
-    Mario,
-    Sonic,
-    Link,
-    MetroidChase,
-    Yoshi,
-    Kirby,
-    Pit,
-    Spidey,
-    Batman,
-    GreenLantern,
-    JakeMusic,
-    MegaMan,
     Settings,
     Gamma,
     Timers,
@@ -444,6 +419,12 @@ ALL_VISUALS = [
     Synthesizer,
     ChordChart,
     DrumRudiments,
+    LatinDNA,
+    LatinGrooves,
+    Sauces,
+    Flavors,
+    Baking,
+    Pantry,
     WatchGears,
     Camshaft,
     GrandfatherClock,
@@ -521,7 +502,6 @@ ALL_VISUALS = [
     WonderZoom,
     WonderVinyl,
     WonderCassette,
-    WonderJake,
     WonderVertigo,
     WonderStargate,
     WonderPsycho,
@@ -562,8 +542,6 @@ ALL_VISUALS = [
     Chill,
     Energy,
     ArtGallery,
-    SpriteGallery,
-    SuperheroGallery,
     Demoscene,
     Complexity,
     ScienceLab,
@@ -674,11 +652,6 @@ __all__ = [
     'GalleryDigital',
     'GalleryEffects',
     'GallerySalon',
-    'GallerySMB3',
-    'GalleryKirby',
-    'GalleryZelda',
-    'GalleryKidIcarus',
-    'GalleryAdventureTime',
     'Gallery3D',
     'Win95Maze',
     'DemonSpirals',
@@ -687,17 +660,6 @@ __all__ = [
     'StarWarsCA',
     'Truchet',
     'Sandpile',
-    'Mario',
-    'Sonic',
-    'Link',
-    'MetroidChase',
-    'Yoshi',
-    'Kirby',
-    'Pit',
-    'Spidey',
-    'Batman',
-    'GreenLantern',
-    'MegaMan',
     'Settings',
     'Gamma',
     'Timers',
@@ -749,6 +711,12 @@ __all__ = [
     'Synthesizer',
     'ChordChart',
     'DrumRudiments',
+    'LatinDNA',
+    'LatinGrooves',
+    'Sauces',
+    'Flavors',
+    'Baking',
+    'Pantry',
     'WatchGears',
     'Camshaft',
     'GrandfatherClock',
@@ -793,8 +761,6 @@ __all__ = [
     'Chill',
     'Energy',
     'ArtGallery',
-    'SpriteGallery',
-    'SuperheroGallery',
     'Demoscene',
     'Complexity',
     'ScienceLab',
@@ -806,3 +772,10 @@ __all__ = [
     'DefenderDemo',
     'MonsterMazeDemo',
 ]
+
+# Load local/personal visuals (copyrighted content, user add-ons)
+try:
+    from .local import LOCAL_VISUALS
+    ALL_VISUALS.extend(LOCAL_VISUALS)
+except Exception:
+    pass

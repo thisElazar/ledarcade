@@ -21,7 +21,7 @@ from games.indy500 import Indy500, TRACKS
 
 
 class Indy500Demo(Visual):
-    name = "INDY 500"
+    name = "INDIE 500"
     description = "AI races"
     category = "demos"
 

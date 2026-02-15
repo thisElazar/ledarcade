@@ -37,7 +37,7 @@ TERRAIN_MAX_Y = 54
 
 
 class Defender(Game):
-    name = "DEFENDER"
+    name = "DEFENDR"
     description = "Protect humans from aliens!"
     category = "arcade"
 

@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Bomberman(Game):
-    name = "BOMBERMAN"
+    name = "BOMBMAN"
     description = "Bomb & Blast!"
     category = "arcade"
 

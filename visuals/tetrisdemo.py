@@ -22,7 +22,7 @@ from games.tetris import Tetris, TETROMINOS, TETROMINO_COLORS
 
 
 class TetrisDemo(Visual):
-    name = "TETRIS"
+    name = "TETROMINOS"
     description = "AI plays Tetris"
     category = "demos"
 

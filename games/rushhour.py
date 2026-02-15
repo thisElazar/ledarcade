@@ -17,7 +17,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class RushHour(Game):
-    name = "RUSH HOUR"
+    name = "RUSH HR"
     description = "Sliding block puzzle"
     category = "toys"
 
@@ -407,7 +407,7 @@ class RushHour(Game):
 
     def draw_select(self):
         """Draw level selection screen."""
-        self.display.draw_text_small(8, 2, "RUSH HOUR", Colors.RED)
+        self.display.draw_text_small(8, 2, "RUSH HR", Colors.RED)
 
         y = 14
         for i, diff in enumerate(self.DIFFICULTY_ORDER):

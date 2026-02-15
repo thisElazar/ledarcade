@@ -417,7 +417,7 @@ class WonderSpin(Visual):
 # =========================================================================
 
 class WonderPacMan(Visual):
-    name = "WONDER PAC"
+    name = "WONDER CHOMP"
     description = "Pac-Man reveals title"
     category = "titles"
 
@@ -506,7 +506,7 @@ class WonderPacMan(Visual):
 # =========================================================================
 
 class WonderInvaders(Visual):
-    name = "WONDER INVADE"
+    name = "WONDER FLEET"
     description = "Space Invaders title"
     category = "titles"
 
@@ -570,7 +570,7 @@ class WonderInvaders(Visual):
 # =========================================================================
 
 class WonderTetris(Visual):
-    name = "WONDER TETRIS"
+    name = "WONDER FALLING"
     description = "Tetris blocks title"
     category = "titles"
 
@@ -975,7 +975,7 @@ class WonderRetroTV(Visual):
 # =========================================================================
 
 class WonderDK(Visual):
-    name = "WONDER DK"
+    name = "WONDER BARRELS"
     description = "Donkey Kong girder title"
     category = "titles"
 
@@ -1032,7 +1032,7 @@ class WonderDK(Visual):
 # =========================================================================
 
 class WonderFrogger(Visual):
-    name = "WONDER FROG"
+    name = "WONDER CROSSING"
     description = "Frogger lane title"
     category = "titles"
 
@@ -2192,7 +2192,7 @@ class WonderSand(Visual):
 # =========================================================================
 
 class WonderPong(Visual):
-    name = "WONDER PONG"
+    name = "WONDER RALLY"
     description = "Pong rally title"
     category = "titles"
 
@@ -2297,8 +2297,8 @@ class WonderPong(Visual):
 # =========================================================================
 
 class WonderSega(Visual):
-    name = "WONDER SEGA"
-    description = "Sega zoom splash"
+    name = "WONDER SWOOSH"
+    description = "Zoom splash screen"
     category = "titles"
 
     def __init__(self, display: Display):
@@ -2377,7 +2377,7 @@ class WonderSega(Visual):
 # =========================================================================
 
 class WonderPS1(Visual):
-    name = "WONDER PS1"
+    name = "WONDER SPARKLE"
     description = "PS1 startup particles"
     category = "titles"
 
@@ -2558,7 +2558,7 @@ class WonderInsertCoin(Visual):
 # =========================================================================
 
 class WonderCreeper(Visual):
-    name = "WONDER CREEP"
+    name = "WONDER PIXEL FACE"
     description = "Creeper explosion title"
     category = "titles"
 
@@ -2674,7 +2674,7 @@ class WonderCreeper(Visual):
 # =========================================================================
 
 class WonderNyanCat(Visual):
-    name = "WONDER NYAN"
+    name = "WONDER RAINBOW CAT"
     description = "Nyan Cat rainbow title"
     category = "titles"
 
@@ -2752,7 +2752,7 @@ class WonderNyanCat(Visual):
 # =========================================================================
 
 class WonderC64(Visual):
-    name = "WONDER C64"
+    name = "WONDER BOOT"
     description = "C64 boot screen"
     category = "titles"
 
@@ -2833,7 +2833,7 @@ class WonderC64(Visual):
 # =========================================================================
 
 class WonderGameBoy(Visual):
-    name = "WONDER GBOY"
+    name = "WONDER HANDHELD"
     description = "Game Boy startup"
     category = "titles"
 
@@ -2993,7 +2993,7 @@ class WonderDOS(Visual):
 # =========================================================================
 
 class WonderBSOD(Visual):
-    name = "WONDER BSOD"
+    name = "WONDER ERROR"
     description = "Blue screen of death"
     category = "titles"
 
@@ -3376,7 +3376,7 @@ class WonderVHS(Visual):
 # =========================================================================
 
 class WonderBoing(Visual):
-    name = "WONDER BOING"
+    name = "WONDER BOUNCE"
     description = "Amiga Boing Ball"
     category = "titles"
 
@@ -3462,7 +3462,7 @@ class WonderBoing(Visual):
 # =========================================================================
 
 class WonderNES(Visual):
-    name = "WONDER NES"
+    name = "WONDER CURTAIN"
     description = "NES startup curtain"
     category = "titles"
 
@@ -3524,7 +3524,7 @@ class WonderNES(Visual):
 # =========================================================================
 
 class WonderN64(Visual):
-    name = "WONDER N64"
+    name = "WONDER ORBIT"
     description = "N64 spinning logo"
     category = "titles"
 
@@ -3624,7 +3624,7 @@ class WonderN64(Visual):
 # =========================================================================
 
 class WonderAtari(Visual):
-    name = "WONDER ATARI"
+    name = "WONDER PRISM"
     description = "Atari rainbow logo"
     category = "titles"
 
@@ -3687,7 +3687,7 @@ class WonderAtari(Visual):
 # =========================================================================
 
 class WonderBreakout(Visual):
-    name = "WONDER BREAK"
+    name = "WONDER PADDLE"
     description = "Breakout bricks title"
     category = "titles"
 
@@ -3824,7 +3824,7 @@ class WonderBreakout(Visual):
 # =========================================================================
 
 class WonderSnake(Visual):
-    name = "WONDER SNAKE"
+    name = "WONDER TRAIL"
     description = "Snake traces title"
     category = "titles"
 
@@ -3910,7 +3910,7 @@ class WonderSnake(Visual):
 # =========================================================================
 
 class WonderAsteroids(Visual):
-    name = "WONDER ASTRDS"
+    name = "WONDER DEBRIS"
     description = "Asteroids vector title"
     category = "titles"
 
@@ -3989,7 +3989,7 @@ class WonderAsteroids(Visual):
 # =========================================================================
 
 class WonderDoom(Visual):
-    name = "WONDER DOOM"
+    name = "WONDER HELLFIRE"
     description = "Fire engulfed title"
     category = "titles"
 
@@ -4136,7 +4136,7 @@ class WonderPipe(Visual):
 # =========================================================================
 
 class WonderWinXP(Visual):
-    name = "WONDER XP"
+    name = "WONDER HILLSIDE"
     description = "Windows XP Bliss hill"
     category = "titles"
 
@@ -4598,124 +4598,11 @@ class WonderCassette(Visual):
 
 
 # =========================================================================
-# WonderJake - Dancing Jake with popping text
-# =========================================================================
-
-class WonderJake(Visual):
-    name = "WONDER JAKE"
-    description = "Jake dance title"
-    category = "titles"
-
-    GIF_FILE = "jake_dance.gif"
-    
-    def __init__(self, display: Display):
-        super().__init__(display)
-        
-    def reset(self):
-        self.time = 0.0
-        self.frame_timer = 0.0
-        self.frame_index = 0
-        self.frames = []
-        self._load_gif()
-        
-    def _load_gif(self):
-        """Load Jake dance GIF frames."""
-        try:
-            from PIL import Image
-            from .gifcache import cache_frames, extract_rgb
-
-            project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            path = os.path.join(project_dir, "assets", self.GIF_FILE)
-            if not os.path.exists(path):
-                return
-
-            def process():
-                gif = Image.open(path)
-                orig_w, orig_h = gif.size
-                # Center crop to square
-                sq = min(orig_w, orig_h)
-                x_off = (orig_w - sq) // 2
-                y_off = (orig_h - sq) // 2
-                canvas = None
-                frames = []
-                for i in range(getattr(gif, 'n_frames', 1)):
-                    gif.seek(i)
-                    frame = gif.convert("RGBA")
-                    if canvas is None:
-                        canvas = frame.copy()
-                    else:
-                        canvas.paste(frame, (0, 0), frame)
-                    cropped = canvas.copy().crop((x_off, y_off, x_off + sq, y_off + sq))
-                    scaled = cropped.resize((GRID_SIZE, GRID_SIZE),
-                                            Image.Resampling.NEAREST)
-                    frames.append(extract_rgb(scaled))
-                return frames
-
-            self.frames = cache_frames(path, process)
-        except:
-            pass
-    
-    def update(self, dt: float):
-        self.time += dt
-        
-        # Animate Jake
-        if self.frames:
-            self.frame_timer += dt
-            if self.frame_timer >= 0.08:  # ~12 fps
-                self.frame_timer = 0.0
-                self.frame_index = (self.frame_index + 1) % len(self.frames)
-        
-    def draw(self):
-        d = self.display
-        d.clear(Colors.BLACK)
-        t = self.time
-        
-        # Draw Jake dancing GIF
-        if self.frames and len(self.frames) > 0:
-            frame = self.frames[self.frame_index]
-            for y in range(GRID_SIZE):
-                for x in range(GRID_SIZE):
-                    d.set_pixel(x, y, frame[y][x])
-        
-        # Pop-up text effect for WONDER and CABINET
-        # WONDER pops up first, then CABINET
-        if t > 1.0:
-            # WONDER pop
-            wonder_t = min(1.0, (t - 1.0) / 0.5)
-            # Bounce effect
-            if wonder_t < 1.0:
-                bounce = abs(math.sin(wonder_t * math.pi * 2)) * 3
-                y_off = int((1.0 - wonder_t) * 10 - bounce)
-            else:
-                y_off = 0
-            
-            # Scale and fade in
-            alpha = wonder_t
-            c = (int(255 * alpha), int(220 * alpha), int(100 * alpha))
-            d.draw_text_small(WONDER_X, max(2, 8 - y_off), "WONDER", c)
-        
-        if t > 1.8:
-            # CABINET pop
-            cabinet_t = min(1.0, (t - 1.8) / 0.5)
-            # Bounce effect
-            if cabinet_t < 1.0:
-                bounce = abs(math.sin(cabinet_t * math.pi * 2)) * 3
-                y_off = int((1.0 - cabinet_t) * 10 - bounce)
-            else:
-                y_off = 0
-            
-            # Scale and fade in
-            alpha = cabinet_t
-            c = (int(40 * alpha), int(140 * alpha), int(200 * alpha))
-            d.draw_text_small(CABINET_X, max(2, 16 - y_off), "CABINET", c)
-
-
-# =========================================================================
 # WonderSauron - Eye of Sauron title
 # =========================================================================
 
 class WonderSauron(Visual):
-    name = "WONDER SAURON"
+    name = "WONDER DARK EYE"
     description = "The Eye of Sauron"
     category = "titles"
 
@@ -4847,7 +4734,7 @@ class WonderSauron(Visual):
 # =========================================================================
 
 class WonderVertigo(Visual):
-    name = "WONDER VERTIGO"
+    name = "WONDER SPIRAL"
     description = "Saul Bass spiral"
     category = "titles"
 
@@ -4923,7 +4810,7 @@ class WonderVertigo(Visual):
 # =========================================================================
 
 class WonderStargate(Visual):
-    name = "WONDER STARGATE"
+    name = "WONDER WARP"
     description = "2001 slit-scan tunnel"
     category = "titles"
 
@@ -4998,7 +4885,7 @@ class WonderStargate(Visual):
 # =========================================================================
 
 class WonderPsycho(Visual):
-    name = "WONDER PSYCHO"
+    name = "WONDER DRAIN"
     description = "Shower drain spiral"
     category = "titles"
 
@@ -5093,7 +4980,7 @@ class WonderPsycho(Visual):
 # =========================================================================
 
 class WonderNosferatu(Visual):
-    name = "WONDER NOSFERATU"
+    name = "WONDER SHADOW"
     description = "Shadow on the stairs"
     category = "titles"
 
@@ -5227,7 +5114,7 @@ class WonderNosferatu(Visual):
 # =========================================================================
 
 class WonderJaws(Visual):
-    name = "WONDER JAWS"
+    name = "WONDER DEPTHS"
     description = "Shark from below"
     category = "titles"
 
@@ -5462,7 +5349,7 @@ class WonderJaws(Visual):
 # =========================================================================
 
 class WonderShining(Visual):
-    name = "WONDER SHINING"
+    name = "WONDER CORRIDOR"
     description = "The Overlook corridor"
     category = "titles"
 
@@ -5619,7 +5506,7 @@ class WonderShining(Visual):
 # =========================================================================
 
 class WonderET(Visual):
-    name = "WONDER ET"
+    name = "WONDER MOONRISE"
     description = "Moon bicycle flight"
     category = "titles"
 
@@ -5739,7 +5626,7 @@ class WonderET(Visual):
 # =========================================================================
 
 class WonderAlien(Visual):
-    name = "WONDER ALIEN"
+    name = "WONDER HATCH"
     description = "In space no one can hear"
     category = "titles"
 
@@ -5857,7 +5744,7 @@ class WonderAlien(Visual):
 # =========================================================================
 
 class WonderExorcist(Visual):
-    name = "WONDER EXORCIST"
+    name = "WONDER WINDOW"
     description = "The power of light"
     category = "titles"
 
@@ -6013,7 +5900,7 @@ class WonderExorcist(Visual):
 # =========================================================================
 
 class WonderTerminator(Visual):
-    name = "WONDER TERMINATOR"
+    name = "WONDER CHROME"
     description = "I'll be back"
     category = "titles"
 
@@ -6162,7 +6049,7 @@ class WonderTerminator(Visual):
 # =========================================================================
 
 class WonderGodzilla(Visual):
-    name = "WONDER GODZILLA"
+    name = "WONDER KAIJU"
     description = "King of the monsters"
     category = "titles"
 
@@ -6344,7 +6231,7 @@ class WonderGodzilla(Visual):
 # =========================================================================
 
 class WonderBladeRunner(Visual):
-    name = "WONDER BLADE RUNNER"
+    name = "WONDER NEON RAIN"
     description = "Tears in rain"
     category = "titles"
 
@@ -6464,7 +6351,7 @@ class WonderBladeRunner(Visual):
 # =========================================================================
 
 class WonderCloseEncounters(Visual):
-    name = "WONDER CLOSE ENCOUNTERS"
+    name = "WONDER SIGNAL"
     description = "Devil's Tower lights"
     category = "titles"
 
@@ -6600,7 +6487,7 @@ class WonderCloseEncounters(Visual):
 # =========================================================================
 
 class WonderTron(Visual):
-    name = "WONDER TRON"
+    name = "WONDER LIGHTCYCLE"
     description = "Light cycle grid"
     category = "titles"
 
@@ -6713,7 +6600,7 @@ class WonderTron(Visual):
 # =========================================================================
 
 class WonderJurassicPark(Visual):
-    name = "WONDER JURASSIC PARK"
+    name = "WONDER RIPPLE"
     description = "Water ripple impact"
     category = "titles"
 
@@ -6813,7 +6700,7 @@ class WonderJurassicPark(Visual):
 # =========================================================================
 
 class WonderIndiana(Visual):
-    name = "WONDER INDIANA"
+    name = "WONDER BOULDER"
     description = "Rolling boulder chase"
     category = "titles"
 
@@ -6964,7 +6851,7 @@ class WonderIndiana(Visual):
 # =========================================================================
 
 class WonderMetropolis(Visual):
-    name = "WONDER METROPOLIS"
+    name = "WONDER AUTOMATON"
     description = "Maria the machine"
     category = "titles"
 
@@ -7108,7 +6995,7 @@ class WonderMetropolis(Visual):
 # =========================================================================
 
 class WonderKingKong(Visual):
-    name = "WONDER KING KONG"
+    name = "WONDER SUMMIT"
     description = "Top of the world"
     category = "titles"
 
@@ -7257,7 +7144,7 @@ class WonderKingKong(Visual):
 # =========================================================================
 
 class WonderWizardOz(Visual):
-    name = "WONDER WIZARD OF OZ"
+    name = "WONDER TORNADO"
     description = "Somewhere over rainbow"
     category = "titles"
 
@@ -7393,7 +7280,7 @@ class WonderWizardOz(Visual):
 # =========================================================================
 
 class WonderGhostbusters(Visual):
-    name = "WONDER GHOSTBUSTERS"
+    name = "WONDER NO GHOSTS"
     description = "Don't cross the streams"
     category = "titles"
 

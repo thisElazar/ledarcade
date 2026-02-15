@@ -14,7 +14,7 @@ import random
 
 
 class LightsOut(Game):
-    name = "LIGHTS OUT"
+    name = "LITE OUT"
     description = "1995 Tiger Electronics"
     category = "toys"
 

@@ -72,7 +72,7 @@ TETROMINO_COLORS = {
 
 
 class Tetris(Game):
-    name = "TETRIS"
+    name = "TETROMINOS"
     description = "Clear lines!"
     category = "arcade"
 

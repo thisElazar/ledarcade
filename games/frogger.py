@@ -14,7 +14,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Frogger(Game):
-    name = "FROGGER"
+    name = "FROGGY"
     description = "Cross the road and river!"
     category = "arcade"
 

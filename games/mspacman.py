@@ -15,7 +15,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class MsPacMan(Game):
-    name = "MS. PAC-MAN"
+    name = "MS. PAK-MAN"
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
 

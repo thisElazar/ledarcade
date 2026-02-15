@@ -16,7 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class SkiFree(Game):
-    name = "SKIFREE"
+    name = "SKI RUN"
     description = "Ski the slopes!"
     category = "retro"
 

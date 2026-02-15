@@ -22,7 +22,7 @@ from games.skifree import SkiFree
 
 
 class SkiFreeDemo(Visual):
-    name = "SKIFREE"
+    name = "SKI RUN"
     description = "AI skis down"
     category = "demos"
 

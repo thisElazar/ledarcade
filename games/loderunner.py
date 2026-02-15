@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class LodeRunner(Game):
-    name = "LODERUN"
+    name = "GOLD RUNNER"
     description = "Dig & Escape!"
     category = "arcade"
 

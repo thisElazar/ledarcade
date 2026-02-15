@@ -296,7 +296,7 @@ class Connect4AI:
 
 class Connect4Demo(Visual):
     """AI vs AI Connect 4 demo for attract mode."""
-    name = "CONNECT 4"
+    name = "CONNECT FOUR"
     description = "AI vs AI"
     category = "demos"
 

@@ -16,7 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Mastermind(Game):
-    name = "MASTERMIND"
+    name = "MASTER CODE"
     description = "Break the code"
     category = "toys"
 

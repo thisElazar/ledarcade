@@ -41,7 +41,7 @@ PIPE_CONNECTIONS = {
 
 
 class PipeDream(Game):
-    name = "PIPE DREAM"
+    name = "PIPE MAZE"
     description = "Build Pipes"
     category = "retro"
 

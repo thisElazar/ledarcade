@@ -21,7 +21,7 @@ from games.defender import Defender
 
 
 class DefenderDemo(Visual):
-    name = "DEFENDER"
+    name = "DEFENDR"
     description = "AI plays Defender"
     category = "demos"
 

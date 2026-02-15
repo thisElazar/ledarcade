@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class DigDug(Game):
-    name = "DIGDUG"
+    name = "DIG DIG"
     description = "Pump 'em up!"
     category = "arcade"
 

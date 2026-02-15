@@ -18,7 +18,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class Simon(Game):
-    name = "SIMON"
+    name = "SAIMON"
     description = "1978 Milton Bradley"
     category = "toys"
 

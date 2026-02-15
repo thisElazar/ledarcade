@@ -13,7 +13,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class QBert(Game):
-    name = "Q*BERT"
+    name = "Q*BIT"
     description = "Hop & Color!"
     category = "arcade"
 

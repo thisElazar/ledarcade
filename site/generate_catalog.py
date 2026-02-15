@@ -442,6 +442,8 @@ def main():
             filepath = os.path.join(pkg_dir, fname)
             module_path = f"{pkg}/{fname}"
             mod_name = fname.replace('.py', '')
+            if pkg_exports and mod_name not in pkg_exports:
+                continue
             exported = pkg_exports.get(mod_name) if pkg_exports else None
             classes, deps, needs_numpy = scan_file(filepath, pkg, exported)
             if deps:

@@ -22,7 +22,7 @@ from games.lightsout import LightsOut
 
 
 class LightsOutDemo(Visual):
-    name = "LIGHTS OUT"
+    name = "LITE OUT"
     description = "AI solves puzzle"
     category = "demos"
 

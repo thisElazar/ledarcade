@@ -65,7 +65,7 @@ class Wall:
 
 
 class JezzBall(Game):
-    name = "JEZZBALL"
+    name = "JAZZBALL"
     description = "Trap the bouncing atoms!"
     category = "retro"
 

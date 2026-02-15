@@ -21,7 +21,7 @@ from games.breakout import Breakout, PLAY_LEFT, PLAY_RIGHT
 
 
 class BreakoutDemo(Visual):
-    name = "BREAKOUT"
+    name = "BREAK OUT"
     description = "AI plays Breakout"
     category = "demos"
 

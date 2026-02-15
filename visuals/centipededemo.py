@@ -25,7 +25,7 @@ from games.centipede import Centipede
 
 
 class CentipedeDemo(Visual):
-    name = "CENTIPEDE"
+    name = "CENTIPEED"
     description = "AI plays Centipede"
     category = "demos"
 

@@ -16,7 +16,7 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 
 
 class BopIt(Game):
-    name = "BOP IT"
+    name = "TAP IT"
     description = "Reaction toy game"
     category = "toys"
 

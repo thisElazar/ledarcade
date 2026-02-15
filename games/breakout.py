@@ -29,7 +29,7 @@ BRICKS_PER_ROW = 14
 
 
 class Breakout(Game):
-    name = "BREAKOUT"
+    name = "BREAK OUT"
     description = "Classic 1976 Atari"
     category = "arcade"
 
