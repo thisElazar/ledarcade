@@ -290,7 +290,8 @@ class WiFiConfig(Visual):
                 self._state = _SCAN
             return True
         if inp.action_l or inp.action_r:
-            # Connect
+            # Include the currently selected character, then connect
+            self._password.append(CHARS[self._char_idx])
             pw = ''.join(self._password)
             self._start_connect(self._selected_ssid, pw)
             return True
@@ -321,7 +322,8 @@ class WiFiConfig(Visual):
                 self._state = _SCAN
             return True
         if inp.action_l or inp.action_r:
-            # SSID entered — move to password
+            # Include current char, then move to password
+            self._password.append(CHARS[self._char_idx])
             self._selected_ssid = ''.join(self._password)
             self._password = []
             self._char_idx = 0
