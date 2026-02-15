@@ -57,6 +57,7 @@ VISUAL_CATEGORIES = [
     Category("GALLERY", (180, 150, 50), "gallery"),
     Category("COOKING", (120, 160, 100), "cooking"),
     Category("HOUSEHOLD", Colors.ORANGE, "household"),
+    Category("MATH", (100, 200, 255), "math"),
     Category("MECHANICS", Colors.PURPLE, "mechanics"),
     Category("MUSIC", (255, 180, 50), "music"),
     Category("OUTDOORS", Colors.GREEN, "nature"),

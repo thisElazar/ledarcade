@@ -57,7 +57,7 @@ MAX_ITER = 64
 class Fractals(Visual):
     name = "FRACTALS"
     description = "Interactive fractal explorer"
-    category = "science"
+    category = "math"
 
     def reset(self):
         self.time = 0.0

@@ -24,7 +24,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Attractors(Visual):
     name = "ATTRACTORS"
     description = "Chaotic beauty"
-    category = "science"
+    category = "math"
 
     def __init__(self, display: Display):
         super().__init__(display)

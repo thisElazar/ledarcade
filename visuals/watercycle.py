@@ -48,7 +48,7 @@ LABELS = [
 class WaterCycle(Visual):
     name = "WATER CYCLE"
     description = "Animated hydrological cycle"
-    category = "science"
+    category = "outdoors"
 
     def reset(self):
         self.time = 0.0

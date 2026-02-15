@@ -39,7 +39,7 @@ BOB2_RADIUS = 3    # Lower bob draw radius
 class DblPendulum(Visual):
     name = "DBL PENDULUM"
     description = "Chaotic double pendulum"
-    category = "science"
+    category = "math"
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -192,6 +192,12 @@ from .pantry import Pantry
 from .pasta import Pasta
 from .spices import Spices
 from .knife import Knife
+from .knots import Knots
+from .colortheory import ColorTheory
+from .butcher import Butcher
+from .scales import Scales
+from .circle5ths import CircleOfFifths
+from .clouds import Clouds
 from .watchgears import WatchGears
 from .camshaft import Camshaft
 from .grandfather import GrandfatherClock
@@ -431,6 +437,12 @@ ALL_VISUALS = [
     Pasta,
     Spices,
     Knife,
+    Knots,
+    ColorTheory,
+    Butcher,
+    Scales,
+    CircleOfFifths,
+    Clouds,
     WatchGears,
     Camshaft,
     GrandfatherClock,
