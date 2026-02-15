@@ -7,6 +7,7 @@ Supports per-game leaderboards with player initials.
 
 import json
 import os
+import shutil
 import time
 from typing import List, Tuple, Optional
 from pathlib import Path
@@ -33,16 +34,39 @@ class HighScoreManager:
             filepath: Path to the JSON file. Defaults to ~/.led-arcade/highscores.json
         """
         if filepath is None:
-            # Default to user's home directory
             data_dir = Path(__file__).resolve().parent / "data"
             data_dir.mkdir(exist_ok=True)
             self.filepath = data_dir / "highscores.json"
+            self._migrate_old_data(data_dir)
         else:
             self.filepath = Path(filepath)
 
         self.scores = {}  # {game_name: [(initials, score, timestamp), ...]}
         self.load_scores()
         self._migrate_renamed_games()
+
+    @staticmethod
+    def _migrate_old_data(data_dir: Path):
+        """One-time migration from ~/.led-arcade/ to project data/ dir."""
+        old_dir = Path.home() / ".led-arcade"
+        if not old_dir.exists():
+            return
+        # Only migrate if destination is empty (no highscores.json yet)
+        if (data_dir / "highscores.json").exists():
+            return
+        try:
+            for name in ("highscores.json", "play_history.jsonl"):
+                src = old_dir / name
+                if src.exists():
+                    shutil.copy2(src, data_dir / name)
+            for subdir in ("paint", "paint_gif"):
+                src = old_dir / subdir
+                if src.is_dir():
+                    dst = data_dir / subdir
+                    if not dst.exists():
+                        shutil.copytree(src, dst)
+        except (IOError, OSError):
+            pass
 
     def load_scores(self):
         """Load scores from JSON file."""
