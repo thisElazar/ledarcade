@@ -32,6 +32,7 @@ VISUAL_CATEGORIES = [
     {"name": "DIGITAL", "color": [0, 255, 255], "key": "digital"},
     {"name": "GALLERY", "color": [180, 150, 50], "key": "gallery"},
     {"name": "HOUSEHOLD", "color": [255, 128, 0], "key": "household"},
+    {"name": "COOKING", "color": [120, 160, 100], "key": "cooking"},
     {"name": "MECHANICS", "color": [128, 0, 255], "key": "mechanics"},
     {"name": "MUSIC", "color": [255, 180, 50], "key": "music"},
     {"name": "OUTDOORS", "color": [0, 255, 0], "key": "nature"},

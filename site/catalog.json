@@ -2952,6 +2952,47 @@
       ]
     },
     {
+      "name": "COOKING",
+      "color": [
+        120,
+        160,
+        100
+      ],
+      "key": "cooking",
+      "items": [
+        {
+          "name": "BAKING",
+          "cls": "Baking",
+          "module": "visuals/baking.py",
+          "is_game": false
+        },
+        {
+          "name": "FLAVORS",
+          "cls": "Flavors",
+          "module": "visuals/flavors.py",
+          "is_game": false
+        },
+        {
+          "name": "PANTRY",
+          "cls": "Pantry",
+          "module": "visuals/pantry.py",
+          "is_game": false
+        },
+        {
+          "name": "PASTA",
+          "cls": "Pasta",
+          "module": "visuals/pasta.py",
+          "is_game": false
+        },
+        {
+          "name": "SAUCES",
+          "cls": "Sauces",
+          "module": "visuals/sauces.py",
+          "is_game": false
+        }
+      ]
+    },
+    {
       "name": "MECHANICS",
       "color": [
         128,
@@ -4970,6 +5011,11 @@
               "name": "PANTRY",
               "cls": "Pantry",
               "module": "visuals/pantry.py"
+            },
+            {
+              "name": "PASTA",
+              "cls": "Pasta",
+              "module": "visuals/pasta.py"
             },
             {
               "name": "SAUCES",
