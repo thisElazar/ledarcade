@@ -157,6 +157,7 @@ from .credits import Credits
 from .stats import Stats
 from .controls import Controls
 from .shutdown import Shutdown
+from .wifi_config import WiFiConfig
 from .refresh import Refresh
 from .paint import Paint
 from .paint_gif import PaintGif
@@ -399,6 +400,7 @@ ALL_VISUALS = [
     Stats,
     Controls,
     Shutdown,
+    WiFiConfig,
     Refresh,
     Paint,
     PaintGif,
