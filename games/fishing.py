@@ -1,8 +1,8 @@
 """
-Fishing - Catch fish, don't let them escape!
-=============================================
-Side-view underwater fishing game. Score accumulates across catches.
-Press button on the bite (not the nibbles!) and hold/mash to reel in.
+Fishing - Catch as much as you can!
+====================================
+90-second timed fishing game. Maximize your total catch weight.
+Wait for the bite, then hold/mash to reel in. Don't strike too early!
 
 Controls:
   Up/Down    - Adjust lure depth
@@ -36,6 +36,7 @@ WATER_LINE_COLOR = (100, 180, 230)
 SAND_COLOR = (140, 110, 60)
 SAND_DARK = (110, 85, 45)
 SEAWEED_COLOR = (40, 140, 50)
+GAME_DURATION = 90.0  # seconds
 
 
 def _water_color(y):
@@ -119,7 +120,7 @@ class _Fish:
 
 class Fishing(Game):
     name = "FISHING"
-    description = "Catch fish, don't let them escape!"
+    description = "Catch as much as you can in 90 seconds!"
     category = "unique"
 
     def __init__(self, display: Display):
@@ -131,6 +132,7 @@ class Fishing(Game):
         self.score = 0.0
         self.fish_count = 0
         self.time = 0.0
+        self.time_remaining = GAME_DURATION
 
         # Phase state machine
         self.phase = "casting"
@@ -183,6 +185,13 @@ class Fishing(Game):
             return
 
         self.time += dt
+
+        # Countdown timer
+        self.time_remaining -= dt
+        if self.time_remaining <= 0:
+            self.time_remaining = 0
+            self.state = GameState.GAME_OVER
+            return
 
         # Spawn bubbles occasionally
         if random.random() < 0.3 * dt:
@@ -298,10 +307,10 @@ class Fishing(Game):
         self.phase_timer = 0.0
 
     def _update_nibbling(self, inp, dt):
-        """Bobber bobs. Button press during nibble = game over."""
-        # Any button press during nibbles is a fail
+        """Bobber bobs. Button press during nibble scares fish away."""
+        # Any button press during nibbles scares the fish — wasted time
         if inp.action_l or inp.action_r:
-            self.state = GameState.GAME_OVER
+            self._scare_fish()
             return
 
         self.phase_timer += dt
@@ -365,8 +374,26 @@ class Fishing(Game):
         if self.catch_meter >= 100:
             self._catch_fish()
         elif self.catch_meter <= 0:
-            # Fish escaped
-            self.state = GameState.GAME_OVER
+            # Fish escaped — wasted time but not game over
+            self._scare_fish()
+
+    def _scare_fish(self):
+        """Fish got away — release everything and recast."""
+        self.flash_text = "ESCAPED!"
+        self.flash_timer = 1.2
+        self.flash_color = Colors.RED
+        # Release all attracted fish
+        for f in self.fish:
+            f.attracted = False
+            f.attract_target = None
+        # Target fish swims away fast
+        if self.target and self.target in self.fish:
+            self.target.speed = 25
+        self.target = None
+        self.phase = "casting"
+        self.phase_timer = 0.0
+        self.bobber_y = self.bobber_base_y
+        self.lure_y = 12.0
 
     def _catch_fish(self):
         self.phase = "caught"
@@ -536,16 +563,17 @@ class Fishing(Game):
     def _draw_hud(self):
         # Separator
         self.display.draw_line(0, 6, 63, 6, Colors.DARK_GRAY)
-        # Score (total weight)
+        # Score (total weight) — left
         score_str = f"{self.score:.1f}LB" if self.score > 0 else "0.0LB"
         self.display.draw_text_small(1, 1, score_str, Colors.WHITE)
-        # Fish count
-        count_str = f"x{self.fish_count}"
-        self.display.draw_text_small(48, 1, count_str, Colors.CYAN)
+        # Timer — right, flash red when low
+        secs = max(0, int(self.time_remaining))
+        timer_color = Colors.RED if secs <= 10 else Colors.YELLOW
+        self.display.draw_text_small(48, 1, f"{secs:02d}", timer_color)
 
     def draw_game_over(self, selection=0):
         self.display.clear(Colors.BLACK)
-        self.display.draw_text_small(8, 16, "GAME OVER", Colors.RED)
+        self.display.draw_text_small(6, 16, "TIME'S UP!", Colors.YELLOW)
         score_str = f"{self.score:.1f}LB"
         self.display.draw_text_small(2, 26, f"TOTAL:{score_str}", Colors.WHITE)
         self.display.draw_text_small(2, 34, f"FISH:{self.fish_count}", Colors.CYAN)
