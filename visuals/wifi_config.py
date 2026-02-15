@@ -54,7 +54,7 @@ _CURSOR_COLOR = (255, 255, 255)
 
 
 class WiFiConfig(Visual):
-    name = "WIFI"
+    name = "INTERNET"
     description = "Configure WiFi"
     category = "utility"
 
@@ -84,6 +84,7 @@ class WiFiConfig(Visual):
         self._connect_thread = None
         self._connecting = False
         self._connect_result = None  # True/False/None
+        self._submitted_pw = ''     # password sent to system (for display)
         self._result_ip = ''
         self._result_timer = 0.0
         # Both-button exit detection
@@ -173,6 +174,7 @@ class WiFiConfig(Visual):
         self._state = _CONNECTING
         self._connecting = True
         self._connect_result = None
+        self._submitted_pw = password  # keep for display on result screen
         self._dot_timer = 0.0
         t = threading.Thread(target=self._connect_worker,
                              args=(ssid, password), daemon=True)
@@ -195,10 +197,12 @@ class WiFiConfig(Visual):
             time.sleep(2.0)
             return True
         try:
+            cmd = ['nmcli', 'dev', 'wifi', 'connect', ssid]
+            if password:
+                cmd += ['password', password]
             subprocess.check_call(
-                ['nmcli', 'dev', 'wifi', 'connect', ssid,
-                 'password', password],
-                timeout=30, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                cmd, timeout=30,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
             return True
         except Exception:
@@ -352,8 +356,13 @@ class WiFiConfig(Visual):
                 # Success → back to menu
                 self.wants_exit = True
             else:
-                # Failure → back to password
+                # Failure → back to password to retry
                 self._state = _PASSWORD
+            return True
+        if not self._connect_result and inp.left_pressed:
+            # Back to scan list
+            self._state = _SCAN
+            self._start_scan()
             return True
         return False
 
@@ -434,7 +443,7 @@ class WiFiConfig(Visual):
     def _draw_scan(self):
         d = self.display
         # Title
-        d.draw_text_small(2, 1, 'WIFI', _TITLE_COLOR)
+        d.draw_text_small(2, 1, 'WIFI', _TITLE_COLOR)  # short label to leave room for IP
         # Status line
         if self._current_ip:
             d.draw_text_small(22, 1, self._current_ip, _SUCCESS)
@@ -561,28 +570,52 @@ class WiFiConfig(Visual):
 
         d.draw_text_small(30, 58, 'BTN:OK', _DIM)
 
+    def _draw_scrolling_pw(self, d, y, color):
+        """Draw submitted password, scrolling left if too long for display."""
+        pw = self._submitted_pw
+        if not pw:
+            d.draw_text_small(2, y, '(NONE)', _DIM)
+            return
+        max_vis = 14
+        if len(pw) <= max_vis:
+            d.draw_text_raw(2, y, pw, color)
+        else:
+            # Scroll: 2 chars/sec
+            offset = int(self.time * 2) % (len(pw) - max_vis + 4)
+            start = max(0, min(offset, len(pw) - max_vis))
+            d.draw_text_raw(2, y, pw[start:start + max_vis], color)
+
     def _draw_connecting(self):
         d = self.display
-        frame = int(self._dot_timer * 2) % 4
-        dots = '.' * (frame + 1) + ' ' * (3 - frame)
-        d.draw_text_small(2, 24, 'CONNECTING', _TITLE_COLOR)
-        d.draw_text_small(2, 32, dots, _WHITE)
         # Show SSID
         label = self._selected_ssid[:15]
-        d.draw_text_small(2, 14, label, _DIM)
+        d.draw_text_small(2, 2, label, _DIM)
+        d.draw_line(0, 8, 63, 8, _DIM)
+        # Password sent
+        d.draw_text_small(2, 12, 'PW:', _DIM)
+        self._draw_scrolling_pw(d, 18, _DIM)
+
+        frame = int(self._dot_timer * 2) % 4
+        dots = '.' * (frame + 1) + ' ' * (3 - frame)
+        d.draw_text_small(2, 30, 'CONNECTING', _TITLE_COLOR)
+        d.draw_text_small(2, 38, dots, _WHITE)
 
     def _draw_result(self):
         d = self.display
+        # SSID header
+        label = self._selected_ssid[:15]
+        d.draw_text_small(2, 2, label, _DIM)
+        d.draw_line(0, 8, 63, 8, _DIM)
+
         if self._connect_result:
-            d.draw_text_small(2, 18, 'CONNECTED!', _SUCCESS)
+            d.draw_text_small(2, 12, 'CONNECTED!', _SUCCESS)
             if self._result_ip:
-                d.draw_text_small(2, 28, self._result_ip, _WHITE)
-            # Countdown hint
-            remaining = max(0, 3.0 - self._result_timer)
-            d.draw_text_small(2, 40, 'OK', _DIM)
+                d.draw_text_small(2, 20, self._result_ip, _WHITE)
+            d.draw_text_small(2, 32, 'OK', _DIM)
         else:
-            d.draw_text_small(2, 18, 'FAILED', _FAIL)
-            label = self._selected_ssid[:15]
-            d.draw_text_small(2, 28, label, _DIM)
-            d.draw_text_small(2, 40, 'BTN:RETRY', _WHITE)
-            d.draw_text_small(2, 50, 'LEFT:BACK', _DIM)
+            d.draw_text_small(2, 12, 'FAILED', _FAIL)
+            # Show the password that was sent
+            d.draw_text_small(2, 22, 'PW:', _DIM)
+            self._draw_scrolling_pw(d, 28, _WHITE)
+            d.draw_text_small(2, 42, 'BTN:RETRY', _WHITE)
+            d.draw_text_small(2, 52, 'LEFT:BACK', _DIM)
