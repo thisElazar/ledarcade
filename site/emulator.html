@@ -484,10 +484,10 @@
   let joystickTouchId = null;
 
   // ── Smoothed joystick state ──
-  const DEAD_ZONE = 0.15;        // 15% radius dead zone
-  const EMA_ALPHA = 0.35;        // smoothing factor (lower = smoother)
-  const HYSTERESIS_DEG = 12;     // degrees of "stickiness" per direction
-  const DIR_COOLDOWN_MS = 60;    // min ms between direction changes
+  const DEAD_ZONE = 0.18;        // 18% radius dead zone
+  const EMA_ALPHA = 0.25;        // smoothing factor (lower = smoother)
+  const HYSTERESIS_DEG = 15;     // degrees of "stickiness" per direction
+  const DIR_COOLDOWN_MS = 80;    // min ms between direction changes
   let smoothX = 0, smoothY = 0;  // EMA-filtered position
   let currentDirs = { arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
   let lastDirChangeTime = 0;
@@ -672,6 +672,12 @@
     escapePressed = true;
   });
 
+  // Repeat guard for joystick-sourced pressed edges.
+  // When the joystick is active, suppress rapid re-triggers of the same
+  // direction that occur when the smoothed value briefly dips and recovers.
+  const DIR_PRESS_COOLDOWN = 200;  // ms — min time between repeated "pressed" edges per direction
+  const dirPressTime = { arrowup: 0, arrowdown: 0, arrowleft: 0, arrowright: 0 };
+
   function pushInputToPython() {
     const up = !!keys['arrowup'];
     const down = !!keys['arrowdown'];
@@ -679,10 +685,27 @@
     const right = !!keys['arrowright'];
     const space = !!keys[' '];
     const z = !!keys['z'];
-    const up_p = up && !prevKeys['arrowup'];
-    const down_p = down && !prevKeys['arrowdown'];
-    const left_p = left && !prevKeys['arrowleft'];
-    const right_p = right && !prevKeys['arrowright'];
+
+    const now = Date.now();
+    const isTouch = joystickTouchId !== null;
+
+    // Edge detection with touch repeat guard
+    let up_p = up && !prevKeys['arrowup'];
+    let down_p = down && !prevKeys['arrowdown'];
+    let left_p = left && !prevKeys['arrowleft'];
+    let right_p = right && !prevKeys['arrowright'];
+
+    if (isTouch) {
+      if (up_p    && now - dirPressTime.arrowup    < DIR_PRESS_COOLDOWN) up_p = false;
+      if (down_p  && now - dirPressTime.arrowdown  < DIR_PRESS_COOLDOWN) down_p = false;
+      if (left_p  && now - dirPressTime.arrowleft  < DIR_PRESS_COOLDOWN) left_p = false;
+      if (right_p && now - dirPressTime.arrowright < DIR_PRESS_COOLDOWN) right_p = false;
+    }
+    if (up_p)    dirPressTime.arrowup    = now;
+    if (down_p)  dirPressTime.arrowdown  = now;
+    if (left_p)  dirPressTime.arrowleft  = now;
+    if (right_p) dirPressTime.arrowright = now;
+
     const action_l = space && !prevKeys[' '];
     const action_r = z && !prevKeys['z'];
     lastActionPressed = action_l || action_r;
