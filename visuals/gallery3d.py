@@ -24,6 +24,11 @@ try:
 except ImportError:
     HAS_PIL = False
 
+# Pre-loaded texture data for emulator mode (injected before this module loads)
+_PRELOADED_GALLERY = globals().get('_GALLERY_PIXELS', {})
+# Painting atlas (shared with painting.py, for Salon)
+_PRELOADED_PAINTINGS = globals().get('_PAINTING_PIXELS', {})
+
 # Gold frame color
 GOLD = (180, 150, 50)
 GOLD_DARK = (120, 100, 30)
@@ -86,13 +91,21 @@ class _Gallery3DBase(Visual):
     # ------------------------------------------------------------------
 
     def _load_textures(self):
+        # Emulator mode: use pre-loaded gallery atlas
+        cls_name = type(self).__name__
+        preloaded = _PRELOADED_GALLERY.get(cls_name)
+        if preloaded:
+            self._decode_preloaded(preloaded)
+            return
+
         project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         assets = os.path.join(project_dir, "assets")
 
         for cell_id, spec in self.PAINTINGS.items():
             kind = spec[0]
             if kind == "png":
-                self._load_png(cell_id, os.path.join(assets, spec[1]))
+                # Check paintings atlas for Salon/Art gallery paintings
+                self._load_png_or_atlas(cell_id, os.path.join(assets, spec[1]))
             elif kind == "png_seq":
                 paths = [os.path.join(assets, p) for p in spec[1]]
                 self._load_png_sequence(cell_id, paths)
@@ -102,6 +115,38 @@ class _Gallery3DBase(Visual):
                 self._capture_visual(cell_id, spec[1], spec[2])
 
         self._load_immersive_textures()
+
+    def _decode_preloaded(self, preloaded):
+        """Decode pre-loaded base64 texture data into self.textures."""
+        import base64 as b64mod
+        for cell_id_str, frames_b64 in preloaded.items():
+            cell_id = int(cell_id_str)
+            frames = []
+            for b64_data in frames_b64:
+                raw = b64mod.b64decode(b64_data)
+                tex = []
+                for i in range(0, len(raw), 3):
+                    tex.append((raw[i], raw[i + 1], raw[i + 2]))
+                frames.append(tex)
+            self.textures[cell_id] = frames
+
+    def _load_png_or_atlas(self, slot, path):
+        """Load PNG from file, or fall back to paintings atlas for emulator."""
+        # Check paintings atlas (for Salon and Art gallery in emulator)
+        if _PRELOADED_PAINTINGS:
+            basename = os.path.basename(path)
+            if basename.endswith('.png'):
+                pid = basename[:-4]
+                b64 = _PRELOADED_PAINTINGS.get(pid)
+                if b64:
+                    import base64 as b64mod
+                    raw = b64mod.b64decode(b64)
+                    tex = []
+                    for i in range(0, len(raw), 3):
+                        tex.append((raw[i], raw[i + 1], raw[i + 2]))
+                    self.textures[slot] = [tex]
+                    return
+        self.textures[slot] = [self._read_png(path)]
 
     def _load_png(self, slot, path):
         self.textures[slot] = [self._read_png(path)]
@@ -976,7 +1021,8 @@ class GallerySalon(_Gallery3DBase):
         try:
             from visuals.painting import PAINTING_META
             pids = [p for p in PAINTING_META
-                    if os.path.exists(os.path.join(paint_dir, f"{p}.png"))]
+                    if (os.path.exists(os.path.join(paint_dir, f"{p}.png"))
+                        or p in _PRELOADED_PAINTINGS)]
         except ImportError:
             pids = []
         _rng.shuffle(pids)
@@ -1357,6 +1403,24 @@ class GallerySMB3(_Gallery3DBase):
         import gc
         phase = self._load_phase
         if phase == -1:
+            # Check for preloaded gallery atlas (emulator mode)
+            cls_name = type(self).__name__
+            preloaded = _PRELOADED_GALLERY.get(cls_name)
+            if preloaded:
+                import base64 as b64mod
+                all_tex = []
+                # Sort by cell_id to maintain order
+                for cid_str in sorted(preloaded.keys(), key=lambda k: int(k)):
+                    frames_b64 = preloaded[cid_str]
+                    raw = b64mod.b64decode(frames_b64[0])
+                    # Store as bytes (compact format matching hardware path)
+                    all_tex.append(bytes(raw))
+                if all_tex:
+                    self._all_textures = all_tex
+                    self._load_phase = len(self._SHEETS)  # skip to build phase
+                    return
+                self._loading = False
+                return
             # First frame: just show loading screen, set up paths
             if not HAS_PIL:
                 self._loading = False

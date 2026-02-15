@@ -431,6 +431,9 @@
   let hasFocus = false;
   const loadedModules = new Set();
   let paintingAtlasLoaded = false;
+  let flagsAtlasLoaded = false;
+  let signsAtlasLoaded = false;
+  let galleryAtlasLoaded = false;
 
   function setStatus(text, cls) {
     pyStatusEl.textContent = text;
@@ -1090,6 +1093,74 @@ _menu = EmulatorMenu(_catalog)
     }
   }
 
+  async function loadFlagsAtlas() {
+    if (flagsAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/flags_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_FLAGS_PIXELS', pyDict);
+      pyDict.destroy();
+      flagsAtlasLoaded = true;
+    } catch(e) {
+      console.error('Flags atlas error:', e);
+    }
+  }
+
+  async function loadSignsAtlas() {
+    if (signsAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/signs_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_SIGNS_PIXELS', pyDict);
+      pyDict.destroy();
+      signsAtlasLoaded = true;
+    } catch(e) {
+      console.error('Signs atlas error:', e);
+    }
+  }
+
+  async function loadGalleryAtlas() {
+    if (galleryAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/gallery_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_GALLERY_PIXELS', pyDict);
+      pyDict.destroy();
+      galleryAtlasLoaded = true;
+    } catch(e) {
+      console.error('Gallery atlas error:', e);
+    }
+  }
+
+  const museumAtlasLoaded = {};
+  async function loadMuseumAtlas(clsName) {
+    if (museumAtlasLoaded[clsName]) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/gallery_' + clsName + '.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      // Merge museum data into the _GALLERY_PIXELS global dict via Python
+      const pyAtlas = pyodide.toPy(atlas);
+      pyodide.globals.set('_tmp_museum', pyAtlas);
+      pyodide.runPython(`
+_gp = globals().get('_GALLERY_PIXELS', {})
+_gp.update(_tmp_museum)
+globals()['_GALLERY_PIXELS'] = _gp
+del _tmp_museum
+      `);
+      pyAtlas.destroy();
+      museumAtlasLoaded[clsName] = true;
+    } catch(e) {
+      console.error('Museum atlas error for ' + clsName + ':', e);
+    }
+  }
+
   async function loadPythonModule(modulePath) {
     if (loadedModules.has(modulePath)) return true;
     try {
@@ -1118,9 +1189,19 @@ _menu = EmulatorMenu(_catalog)
         await pyodide.loadPackage('numpy');
       }
 
-      // Load painting atlas before painting module
+      // Load atlases before their respective modules
       if (modulePath === 'visuals/painting.py') {
         await loadPaintingAtlas();
+      }
+      if (modulePath === 'visuals/flags.py') {
+        await loadFlagsAtlas();
+      }
+      if (modulePath === 'visuals/signs.py') {
+        await loadSignsAtlas();
+      }
+      if (modulePath === 'visuals/gallery3d.py') {
+        await loadPaintingAtlas();
+        await loadGalleryAtlas();
       }
 
       pyodide.runPython(source);
@@ -1181,6 +1262,15 @@ _display.draw_text_small(6, 28, "LOADING...", Colors.CYAN)
     if (!ok) {
       showError('LOAD FAIL');
       return;
+    }
+
+    // Load sprite museum atlas on demand before instantiation
+    const museumClasses = ['GallerySMB3', 'GalleryKirby', 'GalleryZelda', 'GalleryKidIcarus'];
+    for (const mc of museumClasses) {
+      if (itemData.cls === mc) {
+        await loadMuseumAtlas(mc);
+        break;
+      }
     }
 
     try {

@@ -8,8 +8,15 @@ via tools/build_signs.py from Wikimedia Commons SVGs.
 """
 
 import os
-from PIL import Image
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 from . import Visual, Colors
+
+# Pre-loaded pixel data for emulator mode (injected before this module loads)
+_PRELOADED_SIGNS = globals().get('_SIGNS_PIXELS', {})
 
 # Sign dimensions and position
 SIGN_SIZE = 44
@@ -116,12 +123,13 @@ _GROUP_TO_TYPE = {
 
 
 def _filter_manifest():
-    """Return only manifest entries whose PNG files exist on disk."""
+    """Return only manifest entries whose PNG files exist on disk or in atlas."""
     available = []
     for entry in SIGN_MANIFEST:
         name, stype, stem = entry
-        path = os.path.join(ASSETS_DIR, f"{stem}.png")
-        if os.path.exists(path):
+        if stem in _PRELOADED_SIGNS:
+            available.append(entry)
+        elif os.path.exists(os.path.join(ASSETS_DIR, f"{stem}.png")):
             available.append(entry)
     return available
 
@@ -137,6 +145,20 @@ def _build_group_indices(manifest):
 
 def _load_sign_png(stem):
     """Load a sign PNG and return pixel rows as list of lists of RGB tuples."""
+    # Emulator mode: decode from pre-loaded base64 atlas
+    b64 = _PRELOADED_SIGNS.get(stem)
+    if b64:
+        import base64
+        raw = base64.b64decode(b64)
+        pixels = []
+        for y in range(SIGN_SIZE):
+            row = []
+            for x in range(SIGN_SIZE):
+                i = (y * SIGN_SIZE + x) * 3
+                row.append((raw[i], raw[i + 1], raw[i + 2]))
+            pixels.append(row)
+        return pixels
+    # Hardware mode: load PNG via PIL
     path = os.path.join(ASSETS_DIR, f"{stem}.png")
     img = Image.open(path).convert('RGB')
     raw = img.tobytes()

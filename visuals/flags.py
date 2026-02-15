@@ -6,8 +6,15 @@ Flag images sourced from flagcdn.com, pre-rendered at 60x40 via tools/build_flag
 """
 
 import os
-from PIL import Image
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 from . import Visual, Colors
+
+# Pre-loaded pixel data for emulator mode (injected before this module loads)
+_PRELOADED_FLAGS = globals().get('_FLAGS_PIXELS', {})
 
 # Flag dimensions and position
 FLAG_W, FLAG_H = 60, 40
@@ -171,6 +178,20 @@ def _build_group_indices():
 
 def _load_flag_png(iso_code):
     """Load a flag PNG and return pixel rows as list of lists of RGB tuples."""
+    # Emulator mode: decode from pre-loaded base64 atlas
+    b64 = _PRELOADED_FLAGS.get(iso_code)
+    if b64:
+        import base64
+        raw = base64.b64decode(b64)
+        pixels = []
+        for y in range(FLAG_H):
+            row = []
+            for x in range(FLAG_W):
+                i = (y * FLAG_W + x) * 3
+                row.append((raw[i], raw[i + 1], raw[i + 2]))
+            pixels.append(row)
+        return pixels
+    # Hardware mode: load PNG via PIL
     path = os.path.join(ASSETS_DIR, f"{iso_code}.png")
     img = Image.open(path).convert('RGB')
     raw = img.tobytes()
