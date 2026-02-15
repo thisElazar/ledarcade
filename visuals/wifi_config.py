@@ -193,24 +193,44 @@ class WiFiConfig(Visual):
         self._connect_result = success
         self._connecting = False
 
+    def _is_already_connected(self, ssid):
+        """Check if we're already connected to this SSID."""
+        try:
+            out = subprocess.check_output(
+                ['nmcli', '-t', '-f', 'NAME,TYPE', 'connection', 'show',
+                 '--active'],
+                timeout=5, text=True, stderr=subprocess.DEVNULL
+            )
+            for line in out.strip().split('\n'):
+                if ':' in line:
+                    name = line.rsplit(':', 1)[0]
+                    if name == ssid:
+                        return True
+        except Exception:
+            pass
+        return False
+
     def _do_connect(self, ssid, password):
         if not self._has_nmcli:
             import time
             time.sleep(2.0)
             return True
 
-        # If no password given, try activating a saved connection first
-        if not password:
-            try:
-                subprocess.check_call(
-                    ['nmcli', 'connection', 'up', ssid],
-                    timeout=30,
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-                )
-                return True
-            except Exception:
-                pass  # fall through to wifi connect
+        # Already connected? Just confirm.
+        if self._is_already_connected(ssid):
+            return True
 
+        # Try activating a saved/known connection profile first
+        try:
+            out = subprocess.check_output(
+                ['nmcli', 'connection', 'up', 'id', ssid],
+                timeout=30, stderr=subprocess.STDOUT, text=True
+            )
+            return True
+        except subprocess.CalledProcessError:
+            pass  # not a saved connection or activation failed
+
+        # Full wifi connect (creates new profile or updates existing)
         try:
             cmd = ['nmcli', 'dev', 'wifi', 'connect', ssid]
             if password:
@@ -220,10 +240,10 @@ class WiFiConfig(Visual):
             )
             return True
         except subprocess.CalledProcessError as e:
-            self._connect_error = (e.output or '').strip()[:60]
+            self._connect_error = (e.output or '').strip()
             return False
         except Exception as e:
-            self._connect_error = str(e)[:60]
+            self._connect_error = str(e)
             return False
 
     # ------------------------------------------------------------------
@@ -633,9 +653,15 @@ class WiFiConfig(Visual):
             # Show the password that was sent
             d.draw_text_small(2, 22, 'PW:', _DIM)
             self._draw_scrolling_pw(d, 28, _WHITE)
-            # Show nmcli error if available
+            # Show nmcli error (scrolling if long)
             if self._connect_error:
-                err = self._connect_error[:15]
-                d.draw_text_small(2, 36, err, _FAIL)
+                err = self._connect_error
+                max_vis = 14
+                if len(err) <= max_vis:
+                    d.draw_text_small(2, 36, err, _FAIL)
+                else:
+                    offset = int(self.time * 2) % (len(err) - max_vis + 4)
+                    start = max(0, min(offset, len(err) - max_vis))
+                    d.draw_text_small(2, 36, err[start:start + max_vis], _FAIL)
             d.draw_text_small(2, 46, 'BTN:RETRY', _WHITE)
             d.draw_text_small(2, 54, 'LEFT:BACK', _DIM)
