@@ -38,3 +38,11 @@ CLAUDE.md
 .venv/
 venv/
 ENV/
+
+# Build caches (derived from build scripts, regeneratable)
+tools/.flag_cache/
+tools/.sign_cache/
+
+# Research/experiment docs (not part of runtime)
+docs/
+tools/basin_experiment.py
