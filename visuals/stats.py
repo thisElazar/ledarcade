@@ -83,22 +83,20 @@ class Stats(Visual):
         if game_counts:
             self.lines.append(("- MOST PLAYED -", M))
             self.lines.append(("", G))
-            for game, count in game_counts.most_common(8):
+            for game, count in game_counts.most_common():
                 self.lines.append((game, C))
                 self.lines.append((f"  {count} PLAYS", G))
             self.lines.append(("", G))
 
         # --- High Scores ---
         if scores:
-            # Sort games by their #1 score descending
-            ranked = sorted(scores.items(),
-                            key=lambda kv: kv[1][0][1] if kv[1] else 0,
-                            reverse=True)
+            # Sort games alphabetically
+            ranked = sorted(scores.items(), key=lambda kv: kv[0])
             self.lines.append(("- HIGH SCORES -", M))
             self.lines.append(("", G))
-            for game, entries in ranked[:6]:
+            for game, entries in ranked:
                 self.lines.append((game, C))
-                for initials, score, *_ in entries[:3]:
+                for initials, score, *_ in entries:
                     self.lines.append((f" {initials} {score}", Y))
                 self.lines.append(("", G))
 
@@ -111,7 +109,7 @@ class Stats(Visual):
         if player_counts:
             self.lines.append(("- LEADERBOARD -", M))
             self.lines.append(("", G))
-            for initials, count in player_counts.most_common(8):
+            for initials, count in player_counts.most_common():
                 self.lines.append((f"{initials}  {count} ENTRIES", W))
             self.lines.append(("", G))
 
