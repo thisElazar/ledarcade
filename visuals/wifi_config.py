@@ -85,6 +85,7 @@ class WiFiConfig(Visual):
         self._connecting = False
         self._connect_result = None  # True/False/None
         self._submitted_pw = ''     # password sent to system (for display)
+        self._connect_error = ''    # error message from nmcli
         self._result_ip = ''
         self._result_timer = 0.0
         # Both-button exit detection
@@ -174,6 +175,7 @@ class WiFiConfig(Visual):
         self._state = _CONNECTING
         self._connecting = True
         self._connect_result = None
+        self._connect_error = ''
         self._submitted_pw = password  # keep for display on result screen
         self._dot_timer = 0.0
         t = threading.Thread(target=self._connect_worker,
@@ -196,16 +198,32 @@ class WiFiConfig(Visual):
             import time
             time.sleep(2.0)
             return True
+
+        # If no password given, try activating a saved connection first
+        if not password:
+            try:
+                subprocess.check_call(
+                    ['nmcli', 'connection', 'up', ssid],
+                    timeout=30,
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                )
+                return True
+            except Exception:
+                pass  # fall through to wifi connect
+
         try:
             cmd = ['nmcli', 'dev', 'wifi', 'connect', ssid]
             if password:
                 cmd += ['password', password]
-            subprocess.check_call(
-                cmd, timeout=30,
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            subprocess.check_output(
+                cmd, timeout=30, stderr=subprocess.STDOUT, text=True
             )
             return True
-        except Exception:
+        except subprocess.CalledProcessError as e:
+            self._connect_error = (e.output or '').strip()[:60]
+            return False
+        except Exception as e:
+            self._connect_error = str(e)[:60]
             return False
 
     # ------------------------------------------------------------------
@@ -307,8 +325,7 @@ class WiFiConfig(Visual):
                 self._state = _SCAN
             return True
         if inp.action_l or inp.action_r:
-            # Include the currently selected character, then connect
-            self._password.append(CHARS[self._char_idx])
+            # Submit confirmed characters only (wheel char is just a preview)
             pw = ''.join(self._password)
             self._start_connect(self._selected_ssid, pw)
             return True
@@ -339,8 +356,7 @@ class WiFiConfig(Visual):
                 self._state = _SCAN
             return True
         if inp.action_l or inp.action_r:
-            # Include current char, then move to password
-            self._password.append(CHARS[self._char_idx])
+            # Submit confirmed characters only
             self._selected_ssid = ''.join(self._password)
             self._password = []
             self._char_idx = 0
@@ -617,5 +633,9 @@ class WiFiConfig(Visual):
             # Show the password that was sent
             d.draw_text_small(2, 22, 'PW:', _DIM)
             self._draw_scrolling_pw(d, 28, _WHITE)
-            d.draw_text_small(2, 42, 'BTN:RETRY', _WHITE)
-            d.draw_text_small(2, 52, 'LEFT:BACK', _DIM)
+            # Show nmcli error if available
+            if self._connect_error:
+                err = self._connect_error[:15]
+                d.draw_text_small(2, 36, err, _FAIL)
+            d.draw_text_small(2, 46, 'BTN:RETRY', _WHITE)
+            d.draw_text_small(2, 54, 'LEFT:BACK', _DIM)
