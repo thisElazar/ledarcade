@@ -196,15 +196,15 @@ class WiFiConfig(Visual):
     def _is_already_connected(self, ssid):
         """Check if we're already connected to this SSID."""
         try:
+            # Check actual WiFi SSID (not connection profile name)
             out = subprocess.check_output(
-                ['nmcli', '-t', '-f', 'NAME,TYPE', 'connection', 'show',
-                 '--active'],
+                ['nmcli', '-t', '-f', 'ACTIVE,SSID', 'dev', 'wifi'],
                 timeout=5, text=True, stderr=subprocess.DEVNULL
             )
             for line in out.strip().split('\n'):
-                if ':' in line:
-                    name = line.rsplit(':', 1)[0]
-                    if name == ssid:
+                if line.startswith('yes:'):
+                    active_ssid = line[4:]
+                    if active_ssid == ssid:
                         return True
         except Exception:
             pass
