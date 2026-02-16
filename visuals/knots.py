@@ -280,6 +280,79 @@ def _lerp_points(pts_a, pts_b, t):
     return result
 
 
+def _catmull_rom(points, n_sub=6):
+    """Subdivide control points into a smooth Catmull-Rom spline.
+
+    Duplicates first/last points as ghost endpoints for natural boundaries.
+    Each original segment becomes n_sub sub-segments.
+    """
+    if len(points) < 2:
+        return list(points)
+    # Ghost endpoints
+    pts = [points[0]] + list(points) + [points[-1]]
+    result = []
+    for i in range(1, len(pts) - 2):
+        p0, p1, p2, p3 = pts[i - 1], pts[i], pts[i + 1], pts[i + 2]
+        for j in range(n_sub):
+            t = j / n_sub
+            t2 = t * t
+            t3 = t2 * t
+            # Catmull-Rom basis
+            x = 0.5 * ((2 * p1[0]) +
+                        (-p0[0] + p2[0]) * t +
+                        (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 +
+                        (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3)
+            y = 0.5 * ((2 * p1[1]) +
+                        (-p0[1] + p2[1]) * t +
+                        (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 +
+                        (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)
+            result.append((x, y))
+    # Always include the last point
+    result.append(points[-1])
+    return result
+
+
+def _seg_intersect(a, b, c, d):
+    """Line-segment intersection test between AB and CD.
+
+    Returns (ix, iy, t, u) if they intersect within margin, else None.
+    Margin avoids false positives near shared endpoints.
+    """
+    dx1 = b[0] - a[0]
+    dy1 = b[1] - a[1]
+    dx2 = d[0] - c[0]
+    dy2 = d[1] - c[1]
+    denom = dx1 * dy2 - dy1 * dx2
+    if abs(denom) < 1e-10:
+        return None
+    t = ((c[0] - a[0]) * dy2 - (c[1] - a[1]) * dx2) / denom
+    u = ((c[0] - a[0]) * dy1 - (c[1] - a[1]) * dx1) / denom
+    if 0.05 < t < 0.95 and 0.05 < u < 0.95:
+        ix = a[0] + t * dx1
+        iy = a[1] + t * dy1
+        return (ix, iy, t, u)
+    return None
+
+
+def _find_crossings(pts, min_sep=8):
+    """Find self-crossings in a polyline.
+
+    Skips adjacent segments within min_sep indices.
+    Returns list of (cx, cy, under_seg_idx, over_seg_idx).
+    Convention: later segment = over (working end on top).
+    """
+    crossings = []
+    n = len(pts) - 1
+    for i in range(n):
+        for j in range(i + min_sep, n):
+            hit = _seg_intersect(pts[i], pts[i + 1], pts[j], pts[j + 1])
+            if hit:
+                cx, cy, _t, _u = hit
+                # Earlier segment (i) is over, later (j) is under
+                crossings.append((cx, cy, j, i))
+    return crossings
+
+
 class Knots(Visual):
     name = "KNOTS"
     description = "Knot-tying reference"
@@ -489,42 +562,89 @@ class Knots(Visual):
             self._draw_rope(d, pts2, ROPE2_MAIN, ROPE2_HI, ROPE2_SHAD)
             self._draw_tip(d, pts2, ROPE2_TIP)
 
+    # Crossing classification
+    _ST_NORMAL = 0
+    _ST_UNDER  = 1
+    _ST_GAP    = 2
+    _ST_OVER   = 3
+
+    # Radii (in smooth-segment indices)
+    _GAP_R  = 2   # ~4px gap at crossing on under strand
+    _DIM_R  = 5   # dim zone around crossing on under strand
+    _OVER_R = 3   # over strand highlight zone
+    _UNDER_DIM = 0.45
+
     def _draw_rope(self, d, points, color, highlight, _shadow):
-        """Draw 2px rope with standing→working gradient."""
+        """Draw 2px rope with spline smoothing and crossing gaps."""
         if len(points) < 2:
             return
 
-        n_segs = len(points) - 1
-        for i in range(n_segs):
-            # Gradient: standing end dim, working end bright
-            f = (0.5 + 0.5 * (i / (n_segs - 1))) if n_segs > 1 else 1.0
-            seg_c = _dim(color, f)
-            seg_h = _dim(highlight, f)
+        # 1. Subdivide into smooth spline
+        smooth = _catmull_rom(points, n_sub=6)
+        n_segs = len(smooth) - 1
+        if n_segs < 1:
+            return
 
-            x0, y0 = int(points[i][0]), int(points[i][1])
-            x1, y1 = int(points[i + 1][0]), int(points[i + 1][1])
+        # 2. Find self-crossings
+        crossings = _find_crossings(smooth, min_sep=8)
 
-            # Clamp to animation area
-            y0 = max(self.ANIM_TOP, min(self.ANIM_BOT, y0))
-            y1 = max(self.ANIM_TOP, min(self.ANIM_BOT, y1))
-            x0 = max(0, min(63, x0))
-            x1 = max(0, min(63, x1))
+        # 3. Classify each segment
+        state = [self._ST_NORMAL] * n_segs
+        for _cx, _cy, under_i, over_i in crossings:
+            # Mark under strand: gap at crossing, dim nearby
+            for off in range(-self._DIM_R, self._DIM_R + 1):
+                idx = under_i + off
+                if 0 <= idx < n_segs:
+                    if abs(off) <= self._GAP_R:
+                        state[idx] = self._ST_GAP
+                    elif state[idx] == self._ST_NORMAL:
+                        state[idx] = self._ST_UNDER
+            # Mark over strand
+            for off in range(-self._OVER_R, self._OVER_R + 1):
+                idx = over_i + off
+                if 0 <= idx < n_segs:
+                    if state[idx] != self._ST_GAP:
+                        state[idx] = self._ST_OVER
 
-            # Main line
-            d.draw_line(x0, y0, x1, y1, seg_c)
+        # 4. Draw in 3 passes: normal, under-dim, over (so over is on top)
+        for draw_pass in (self._ST_NORMAL, self._ST_UNDER, self._ST_OVER):
+            for i in range(n_segs):
+                if state[i] == self._ST_GAP:
+                    continue
+                if state[i] != draw_pass:
+                    continue
 
-            # Highlight offset (2px total width)
-            dx = x1 - x0
-            dy = y1 - y0
-            length = math.sqrt(dx * dx + dy * dy)
-            if length > 0:
-                nx = -dy / length
-                ny = dx / length
-                d.draw_line(x0 + int(round(nx)), y0 + int(round(ny)),
-                            x1 + int(round(nx)), y1 + int(round(ny)),
-                            seg_h)
+                # Gradient: standing end dim, working end bright
+                f = (0.5 + 0.5 * (i / max(1, n_segs - 1)))
+                if state[i] == self._ST_UNDER:
+                    f *= self._UNDER_DIM
+                seg_c = _dim(color, f)
+                seg_h = _dim(highlight, f)
 
-        # Dots at control points for knot texture
+                x0, y0 = int(smooth[i][0]), int(smooth[i][1])
+                x1, y1 = int(smooth[i + 1][0]), int(smooth[i + 1][1])
+
+                # Clamp to animation area
+                y0 = max(self.ANIM_TOP, min(self.ANIM_BOT, y0))
+                y1 = max(self.ANIM_TOP, min(self.ANIM_BOT, y1))
+                x0 = max(0, min(63, x0))
+                x1 = max(0, min(63, x1))
+
+                # Main line
+                d.draw_line(x0, y0, x1, y1, seg_c)
+
+                # Highlight offset (2px total width)
+                dx = x1 - x0
+                dy = y1 - y0
+                length = math.sqrt(dx * dx + dy * dy)
+                if length > 0:
+                    nx = -dy / length
+                    ny = dx / length
+                    d.draw_line(x0 + int(round(nx)), y0 + int(round(ny)),
+                                x1 + int(round(nx)), y1 + int(round(ny)),
+                                seg_h)
+
+        # Dots at original control points for knot texture
         for idx, (px, py) in enumerate(points):
             ix, iy = int(px), int(py)
             if self.ANIM_TOP <= iy <= self.ANIM_BOT and 0 <= ix < 64:
