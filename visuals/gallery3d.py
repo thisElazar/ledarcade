@@ -1107,32 +1107,56 @@ class GallerySalon(_Gallery3DBase):
         TRANSIT = 0.2           # quick transit pause
 
         wps = []
+        CORNER = 0.1  # brief corner-transition pause
+
+        # Walk path distances from walls:
+        # Interior rows 2-9, cols x0+1..x0+8
+        # Stand 0.5 into the interior from the walkable edge
+        NY = 2.5   # north walk path (row 2 center, close to north wall at row 1)
+        SY = 9.5   # south walk path (row 9 center, close to south wall at row 10)
 
         for room in range(N_ROOMS):
             x0 = room * RW
-            cx = x0 + RW / 2.0
-            # Enter room center
-            wps.append((cx, H / 2.0, None, TRANSIT))
+            # Painting stop x-positions: center on groups of paintings
+            # Paintings at cols x0+1..x0+8; 3 stops centered on thirds
+            lx = x0 + 2.5   # left group (cols 1-3)
+            mx = x0 + 5.0   # center group (cols 4-5)
+            rx = x0 + 7.5   # right group (cols 6-8)
+            # East/west walk x-positions (close to side walls)
+            ex = x0 + 8.0   # east path (col 8 center, near east wall at col 9)
+            wx = x0 + 2.0   # west path (col 2 center, near west wall at col 0)
 
-            # North wall: stand at y=3.5, sweep left to right
-            for spot_x in (x0 + 3.0, cx, x0 + RW - 4.0):
-                wps.append((spot_x, 3.5, FACE_N, VIEW_PAUSE))
+            # -- North wall: walk left→right, camera faces north --
+            for spot_x in (lx, mx, rx):
+                wps.append((spot_x, NY, FACE_N, VIEW_PAUSE))
 
-            # East wall: stand at x = x0+RW-3, sweep top to bottom
-            ex = x0 + RW - 3.0
-            for spot_y in (3.5, H / 2.0, H - 4.5):
+            # Corner: transition to east wall
+            wps.append((ex, NY, FACE_E, CORNER))
+
+            # -- East wall: walk top→bottom, camera faces east --
+            for spot_y in (3.5, 6.0, 8.5):
                 wps.append((ex, spot_y, FACE_E, VIEW_PAUSE))
 
-            # South wall: sweep right to left
-            for spot_x in (x0 + RW - 4.0, cx, x0 + 3.0):
-                wps.append((spot_x, H - 4.5, FACE_S, VIEW_PAUSE))
+            # Corner: transition to south wall
+            wps.append((rx, SY, FACE_S, CORNER))
 
-            # West wall: sweep bottom to top
-            wx = x0 + 3.0
-            for spot_y in (H - 4.5, H / 2.0, 3.5):
+            # -- South wall: walk right→left, camera faces south --
+            for spot_x in (rx, mx, lx):
+                wps.append((spot_x, SY, FACE_S, VIEW_PAUSE))
+
+            # Corner: transition to west wall
+            wps.append((wx, SY, FACE_W, CORNER))
+
+            # -- West wall: walk bottom→top, camera faces west --
+            # Skip doorway rows (5-6) for rooms after the first
+            west_stops = [8.5, 6.0, 3.5]
+            if room > 0:
+                west_stops = [y for y in west_stops
+                              if not (4.5 < y < 7.0)]
+            for spot_y in west_stops:
                 wps.append((wx, spot_y, FACE_W, VIEW_PAUSE))
 
-            # Walk through doorway to next room
+            # Through doorway to next room (enter directly onto north wall)
             if room < N_ROOMS - 1:
                 door_x = x0 + RW - 0.5
                 wps.append((door_x, 5.5, FACE_E, TRANSIT))
@@ -1147,7 +1171,7 @@ class GallerySalon(_Gallery3DBase):
 
     def reset(self):
         super().reset()
-        self.move_speed = 1.4       # slow gallery stroll
+        self.move_speed = 1.6       # slow gallery stroll
         self._face_angle = None   # target angle during viewing pause
 
     # -- Auto-walk override: (x, y, face_angle, pause) waypoints --
@@ -1155,7 +1179,7 @@ class GallerySalon(_Gallery3DBase):
     def _auto_walk(self, dt):
         if not self.WAYPOINTS:
             return
-        # During pause: smoothly rotate to face_angle
+        # During viewing pause: hold position, smoothly face target
         if self.wp_pause > 0:
             self.wp_pause -= dt
             if self._face_angle is not None:
@@ -1164,41 +1188,40 @@ class GallerySalon(_Gallery3DBase):
                     diff -= 2 * math.pi
                 while diff < -math.pi:
                     diff += 2 * math.pi
-                self.pa += diff * min(1.0, 2.0 * dt)
+                if abs(diff) < 0.005:
+                    self.pa = self._face_angle  # snap to stop jitter
+                else:
+                    self.pa += diff * min(1.0, 2.0 * dt)
             return
 
         wp = self.WAYPOINTS[self.wp_idx]
-        tx, ty = wp[0], wp[1]
-        face = wp[2] if len(wp) > 2 else None
-        pause = wp[3] if len(wp) > 3 else 0.8
+        tx, ty, face, pause = wp[0], wp[1], wp[2], wp[3]
 
         dx = tx - self.px
         dy = ty - self.py
         dist = math.sqrt(dx * dx + dy * dy)
-        if dist < 0.3:
+
+        if dist < 0.15:
+            self.px, self.py = tx, ty  # snap exactly
             self._face_angle = face
             self.wp_pause = pause
             self.wp_idx = (self.wp_idx + 1) % len(self.WAYPOINTS)
             return
 
-        target_a = math.atan2(dy, dx)
+        # Move directly toward target (not camera-relative)
+        move_angle = math.atan2(dy, dx)
+        speed = min(self.move_speed * dt, dist)  # natural deceleration
+        self.px += math.cos(move_angle) * speed
+        self.py += math.sin(move_angle) * speed
+
+        # Camera: smoothly rotate toward face_angle of current target
+        target_a = face if face is not None else move_angle
         diff = target_a - self.pa
         while diff > math.pi:
             diff -= 2 * math.pi
         while diff < -math.pi:
             diff += 2 * math.pi
-        self.pa += diff * min(1.0, 2.5 * dt)
-
-        speed = self.move_speed * dt
-        cos_a = math.cos(self.pa)
-        sin_a = math.sin(self.pa)
-        nx = self.px + cos_a * speed
-        ny = self.py + sin_a * speed
-        margin = 0.25
-        if not self._solid(nx, self.py, margin):
-            self.px = nx
-        if not self._solid(self.px, ny, margin):
-            self.py = ny
+        self.pa += diff * min(1.0, 3.0 * dt)
 
     # -- Emissive ceiling + white marble floor --
 
@@ -1332,6 +1355,465 @@ class GallerySalon(_Gallery3DBase):
                     r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
             else:
                 r, g, b = 210, 205, 195      # bright warm plaster
+
+            r = int(r * fog)
+            g = int(g * fog)
+            b = int(b * fog)
+            self.display.set_pixel(col, y, (r, g, b))
+
+
+# ══════════════════════════════════════════════════════════════════
+#  Grand Museum — paintings organized by art-historical period
+# ══════════════════════════════════════════════════════════════════
+
+MOVEMENT_TO_WING = {
+    # Ancient & Medieval
+    "Ancient Egypt": "Ancient & Medieval",
+    "Roman Fresco": "Ancient & Medieval",
+    "Roman Mosaic": "Ancient & Medieval",
+    "Fayum (Roman Egypt)": "Ancient & Medieval",
+    "Byzantine": "Ancient & Medieval",
+    "Gothic Illumination": "Ancient & Medieval",
+    "Insular Illumination": "Ancient & Medieval",
+    "Ethiopian": "Ancient & Medieval",
+    "Indian (Gupta)": "Ancient & Medieval",
+    # Renaissance
+    "Renaissance": "Renaissance",
+    "Northern Renaissance": "Renaissance",
+    "Proto-Renaissance": "Renaissance",
+    "Mannerism": "Renaissance",
+    # Baroque & Rococo
+    "Baroque": "Baroque & Rococo",
+    "Rococo": "Baroque & Rococo",
+    "Veduta": "Baroque & Rococo",
+    # Asian
+    "Ukiyo-e": "Asian",
+    "Chinese (Five Dynasties)": "Asian",
+    "Chinese (Song Dynasty)": "Asian",
+    "Korean (Joseon)": "Asian",
+    "Japanese (Momoyama)": "Asian",
+    "Japanese (Muromachi)": "Asian",
+    "Japanese (Rinpa)": "Asian",
+    "Indian (Rajput)": "Asian",
+    "Mughal": "Asian",
+    "Persian (Safavid)": "Asian",
+    "Persian (Timurid)": "Asian",
+    "Ottoman": "Asian",
+    # Romanticism & Realism
+    "Romanticism": "Romanticism & Realism",
+    "Realism": "Romanticism & Realism",
+    "Neoclassicism": "Romanticism & Realism",
+    "Hudson River School": "Romanticism & Realism",
+    "Academic": "Romanticism & Realism",
+    "Pre-Raphaelite": "Romanticism & Realism",
+    "Scientific": "Romanticism & Realism",
+    "Regionalism": "Romanticism & Realism",
+    # Impressionism
+    "Impressionism": "Impressionism",
+    "Post-Impressionism": "Impressionism",
+    "Pointillism": "Impressionism",
+    "Art Nouveau": "Impressionism",
+    # Modern
+    "Expressionism": "Modern",
+    "Abstract": "Modern",
+    "Cubism": "Modern",
+    "Fauvism": "Modern",
+    "Suprematism": "Modern",
+    "Futurism": "Modern",
+    "Constructivism": "Modern",
+}
+
+WING_ORDER = [
+    "Ancient & Medieval",
+    "Renaissance",
+    "Baroque & Rococo",
+    "Asian",
+    "Romanticism & Realism",
+    "Impressionism",
+    "Modern",
+]
+
+WING_COLORS = {
+    "Ancient & Medieval": (200, 195, 180),
+    "Renaissance": (210, 205, 195),
+    "Baroque & Rococo": (200, 195, 205),
+    "Asian": (195, 205, 195),
+    "Romanticism & Realism": (210, 200, 195),
+    "Impressionism": (205, 210, 210),
+    "Modern": (210, 210, 210),
+}
+
+
+class GalleryMuseum(_Gallery3DBase):
+    """Grand Museum: paintings organized by period into color-coded wings."""
+
+    name = "GRAND MUSEUM"
+    description = "Paintings by period"
+    category = "gallery"
+
+    _WALL_SCALE = 5
+
+    def __init__(self, display):
+        import random as _rng
+        import json as _json
+
+        # Load movement data from paintings.json
+        proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        paint_dir = os.path.join(proj, "assets", "paintings")
+        pj_path = os.path.join(proj, "tools", "paintings.json")
+        try:
+            with open(pj_path) as f:
+                pj_data = _json.load(f)
+        except (OSError, ValueError):
+            pj_data = {}
+
+        # Get available PIDs
+        try:
+            from visuals.painting import PAINTING_META
+            pids = [p for p in PAINTING_META
+                    if (os.path.exists(os.path.join(paint_dir, f"{p}.png"))
+                        or p in _PRELOADED_PAINTINGS)]
+        except ImportError:
+            pids = []
+
+        # Sort PIDs into wings
+        wing_pids = {w: [] for w in WING_ORDER}
+        for pid in pids:
+            movement = pj_data.get(pid, {}).get("movement", "")
+            wing = MOVEMENT_TO_WING.get(movement, "Modern")
+            wing_pids[wing].append(pid)
+
+        # Shuffle within each wing
+        for w in WING_ORDER:
+            _rng.shuffle(wing_pids[w])
+
+        # Allocate rooms per wing: max(1, round(count/20))
+        wing_rooms = {}
+        for w in WING_ORDER:
+            count = len(wing_pids[w])
+            wing_rooms[w] = max(1, round(count / 20)) if count > 0 else 1
+
+        total_rooms = sum(wing_rooms.values())
+        RW, RH = 10, 12
+        W = RW * total_rooms
+        H = RH
+        self.MAP_W = W
+        self.MAP_H = H
+        self.START_POS = (RW / 2.0, H / 2.0)
+
+        # Build wing boundaries for wall coloring
+        self._wing_boundaries = []  # (x_start, x_end, color)
+        room_idx = 0
+        for w in WING_ORDER:
+            n = wing_rooms[w]
+            x_start = room_idx * RW
+            x_end = (room_idx + n) * RW
+            self._wing_boundaries.append((x_start, x_end, WING_COLORS[w]))
+            room_idx += n
+
+        # Build ordered PID list: wing by wing, distributing across rooms
+        ordered_pids = []
+        for w in WING_ORDER:
+            ordered_pids.extend(wing_pids[w])
+
+        # Build MAP + PAINTINGS dict
+        _P = "paintings/"
+        self.PAINTINGS = {}
+        cell_id = 2
+        paint_cells = []
+        pid_iter = iter(ordered_pids)
+
+        def _next():
+            nonlocal cell_id
+            pid = next(pid_iter, None)
+            if pid is None:
+                return 1
+            cid = cell_id
+            self.PAINTINGS[cid] = ("png", _P + f"{pid}.png")
+            paint_cells.append(cid)
+            cell_id += 1
+            return cid
+
+        # Start with solid grid, carve rooms
+        grid = [[1] * W for _ in range(H)]
+        DOOR_ROWS = (5, 6)
+
+        for room in range(total_rooms):
+            x0 = room * RW
+            x1 = x0 + RW - 1
+
+            # Carve interior
+            for r in range(2, H - 2):
+                for c in range(x0 + 1, x1):
+                    grid[r][c] = 0
+
+            # North painting wall
+            for c in range(x0 + 1, x1):
+                grid[1][c] = _next()
+
+            # South painting wall
+            for c in range(x0 + 1, x1):
+                grid[H - 2][c] = _next()
+
+            # West wall
+            for r in range(2, H - 2):
+                if room > 0 and r in DOOR_ROWS:
+                    grid[r][x0] = 0
+                else:
+                    grid[r][x0] = _next()
+
+            # East wall
+            for r in range(2, H - 2):
+                if room < total_rooms - 1 and r in DOOR_ROWS:
+                    grid[r][x1] = 0
+                else:
+                    grid[r][x1] = _next()
+
+        self.MAP = grid
+
+        # Stack map: 4 paintings above each ground-level painting
+        self._stack_map = {}
+        if paint_cells:
+            n_stack = self._WALL_SCALE - 1
+            for cid in paint_cells:
+                pool = [c for c in paint_cells if c != cid]
+                if len(pool) >= n_stack:
+                    self._stack_map[cid] = _rng.sample(pool, n_stack)
+                else:
+                    self._stack_map[cid] = (pool * ((n_stack // len(pool)) + 1))[:n_stack]
+
+        # Waypoints: clockwise through each room
+        FACE_N = -math.pi / 2
+        FACE_S = math.pi / 2
+        FACE_W = math.pi
+        FACE_E = 0.0
+        VIEW_PAUSE = 3.5
+        TRANSIT = 0.2
+        CORNER = 0.1
+
+        NY = 2.5
+        SY = 9.5
+
+        wps = []
+        for room in range(total_rooms):
+            x0 = room * RW
+            lx = x0 + 2.5
+            mx = x0 + 5.0
+            rx = x0 + 7.5
+            ex = x0 + 8.0
+            wx = x0 + 2.0
+
+            # North wall
+            for spot_x in (lx, mx, rx):
+                wps.append((spot_x, NY, FACE_N, VIEW_PAUSE))
+            wps.append((ex, NY, FACE_E, CORNER))
+
+            # East wall
+            for spot_y in (3.5, 6.0, 8.5):
+                wps.append((ex, spot_y, FACE_E, VIEW_PAUSE))
+            wps.append((rx, SY, FACE_S, CORNER))
+
+            # South wall
+            for spot_x in (rx, mx, lx):
+                wps.append((spot_x, SY, FACE_S, VIEW_PAUSE))
+            wps.append((wx, SY, FACE_W, CORNER))
+
+            # West wall
+            west_stops = [8.5, 6.0, 3.5]
+            if room > 0:
+                west_stops = [y for y in west_stops if not (4.5 < y < 7.0)]
+            for spot_y in west_stops:
+                wps.append((wx, spot_y, FACE_W, VIEW_PAUSE))
+
+            # Through doorway to next room
+            if room < total_rooms - 1:
+                door_x = x0 + RW - 0.5
+                wps.append((door_x, 5.5, FACE_E, TRANSIT))
+
+        self.WAYPOINTS = wps
+        super().__init__(display)
+
+    def _load_textures(self):
+        if self.textures:
+            return
+        super()._load_textures()
+
+    def reset(self):
+        super().reset()
+        self.move_speed = 1.6
+        self._face_angle = None
+
+    def _auto_walk(self, dt):
+        if not self.WAYPOINTS:
+            return
+        if self.wp_pause > 0:
+            self.wp_pause -= dt
+            if self._face_angle is not None:
+                diff = self._face_angle - self.pa
+                while diff > math.pi:
+                    diff -= 2 * math.pi
+                while diff < -math.pi:
+                    diff += 2 * math.pi
+                if abs(diff) < 0.005:
+                    self.pa = self._face_angle
+                else:
+                    self.pa += diff * min(1.0, 2.0 * dt)
+            return
+
+        wp = self.WAYPOINTS[self.wp_idx]
+        tx, ty, face, pause = wp[0], wp[1], wp[2], wp[3]
+
+        dx = tx - self.px
+        dy = ty - self.py
+        dist = math.sqrt(dx * dx + dy * dy)
+
+        if dist < 0.15:
+            self.px, self.py = tx, ty
+            self._face_angle = face
+            self.wp_pause = pause
+            self.wp_idx = (self.wp_idx + 1) % len(self.WAYPOINTS)
+            return
+
+        move_angle = math.atan2(dy, dx)
+        speed = min(self.move_speed * dt, dist)
+        self.px += math.cos(move_angle) * speed
+        self.py += math.sin(move_angle) * speed
+
+        target_a = face if face is not None else move_angle
+        diff = target_a - self.pa
+        while diff > math.pi:
+            diff -= 2 * math.pi
+        while diff < -math.pi:
+            diff += 2 * math.pi
+        self.pa += diff * min(1.0, 3.0 * dt)
+
+    def _get_wall_color(self, map_x):
+        for x_start, x_end, color in self._wing_boundaries:
+            if x_start <= map_x < x_end:
+                return color
+        return (210, 205, 195)
+
+    def _render_frame(self):
+        half = GRID_SIZE // 2
+        ceil = (220, 215, 200)
+        for y in range(half):
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, ceil)
+        for y in range(half, GRID_SIZE):
+            f = (y - half) / (GRID_SIZE - half)
+            v = int(160 + 60 * f)
+            marble = (v, v, v - 5)
+            for x in range(GRID_SIZE):
+                self.display.set_pixel(x, y, marble)
+        for col in range(GRID_SIZE):
+            self._cast_ray(col, self.pa + self.ray_offsets[col])
+
+    def _cast_ray(self, col, angle):
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        if abs(cos_a) < 1e-8:
+            cos_a = 1e-8
+        if abs(sin_a) < 1e-8:
+            sin_a = 1e-8
+
+        map_x = int(self.px)
+        map_y = int(self.py)
+        delta_x = abs(1.0 / cos_a)
+        delta_y = abs(1.0 / sin_a)
+
+        if cos_a < 0:
+            step_x = -1
+            side_dist_x = (self.px - map_x) * delta_x
+        else:
+            step_x = 1
+            side_dist_x = (map_x + 1.0 - self.px) * delta_x
+
+        if sin_a < 0:
+            step_y = -1
+            side_dist_y = (self.py - map_y) * delta_y
+        else:
+            step_y = 1
+            side_dist_y = (map_y + 1.0 - self.py) * delta_y
+
+        hit = False
+        side = 0
+        for _ in range(48):
+            if side_dist_x < side_dist_y:
+                side_dist_x += delta_x
+                map_x += step_x
+                side = 0
+            else:
+                side_dist_y += delta_y
+                map_y += step_y
+                side = 1
+            if (map_x < 0 or map_x >= self.MAP_W
+                    or map_y < 0 or map_y >= self.MAP_H):
+                break
+            cell = self.MAP[map_y][map_x]
+            if cell != 0:
+                hit = True
+                break
+
+        if not hit:
+            return
+
+        if side == 0:
+            perp_dist = (map_x - self.px + (1 - step_x) / 2) / cos_a
+        else:
+            perp_dist = (map_y - self.py + (1 - step_y) / 2) / sin_a
+        if perp_dist < 0.01:
+            perp_dist = 0.01
+
+        if side == 0:
+            wall_x = self.py + perp_dist * sin_a
+        else:
+            wall_x = self.px + perp_dist * cos_a
+        wall_x -= int(wall_x)
+        tex_col = int(wall_x * GRID_SIZE)
+        if tex_col >= GRID_SIZE:
+            tex_col = GRID_SIZE - 1
+
+        fog = min(1.0, 5.0 / (perp_dist + 1.0))
+        if side == 1:
+            fog *= 0.85
+
+        scale = self._WALL_SCALE
+        unit_h = GRID_SIZE / perp_dist
+        half = GRID_SIZE // 2
+        draw_top = half - (scale - 0.5) * unit_h
+        draw_bot = half + 0.5 * unit_h
+        ds = max(0, int(draw_top))
+        de = min(GRID_SIZE - 1, int(draw_bot))
+
+        is_painting = cell >= 2 and cell in self.textures
+        wall_color = self._get_wall_color(map_x)
+
+        for y in range(ds, de + 1):
+            world_h = (draw_bot - y) / unit_h
+            panel = int(world_h)
+            panel = max(0, min(scale - 1, panel))
+            frac = world_h - panel
+            tex_y = int((1.0 - frac) * GRID_SIZE)
+            tex_y = max(0, min(GRID_SIZE - 1, tex_y))
+
+            tex = None
+            if is_painting:
+                if panel == 0:
+                    tex_cell = cell
+                else:
+                    stack = self._stack_map.get(cell)
+                    tex_cell = stack[panel - 1] if stack else cell
+                frames = self.textures.get(tex_cell)
+                if frames:
+                    tex = frames[0]
+
+            if tex is not None:
+                r, g, b = tex[tex_y * GRID_SIZE + tex_col]
+                if (tex_col <= 1 or tex_col >= GRID_SIZE - 2
+                        or tex_y <= 1 or tex_y >= GRID_SIZE - 2):
+                    r, g, b = GOLD if (tex_col + tex_y) % 2 == 0 else GOLD_DARK
+            else:
+                r, g, b = wall_color
 
             r = int(r * fog)
             g = int(g * fog)
