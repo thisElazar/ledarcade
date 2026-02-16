@@ -72,6 +72,8 @@ class IdleMix(Visual):
         self.cat_scroll = 0
         self.vis_cursor = 0
         self.vis_scroll = 0
+        self.exit_hold = 0.0
+        self._both_pressed_prev = False
 
         # Load settings
         import settings as persistent
@@ -170,6 +172,23 @@ class IdleMix(Visual):
             self._save_blacklist()
 
     def handle_input(self, input_state) -> bool:
+        both_held = input_state.action_l_held and input_state.action_r_held
+        both_now = input_state.action_l or input_state.action_r
+
+        # Both-button hold: accumulate in update(), suppress single-press
+        if both_held:
+            self._both_pressed_prev = True
+            return True
+
+        # If both were held last frame, swallow the release
+        if self._both_pressed_prev:
+            if not both_now:
+                self._both_pressed_prev = False
+            self.exit_hold = 0.0
+            return True
+
+        self.exit_hold = 0.0
+
         if self.page == 1:
             return self._handle_page1(input_state)
         else:
@@ -178,9 +197,6 @@ class IdleMix(Visual):
     def _handle_page1(self, input_state):
         n = len(self._categories)
         if n == 0:
-            if input_state.action_l or input_state.action_r:
-                self.wants_exit = True
-                return True
             return False
 
         if input_state.up_pressed:
@@ -259,6 +275,10 @@ class IdleMix(Visual):
 
     def update(self, dt: float):
         self.time += dt
+        if self._both_pressed_prev:
+            self.exit_hold += dt
+            if self.exit_hold >= 2.0:
+                self.wants_exit = True
 
     def draw(self):
         self.display.clear(Colors.BLACK)
@@ -266,6 +286,11 @@ class IdleMix(Visual):
             self._draw_page1()
         else:
             self._draw_page2()
+        # Exit hold progress bar
+        if self.exit_hold > 0:
+            bar_w = min(60, int((self.exit_hold / 2.0) * 60))
+            if bar_w > 0:
+                self.display.draw_rect(2, 62, bar_w, 2, Colors.RED)
 
     def _draw_page1(self):
         d = self.display
