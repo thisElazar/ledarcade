@@ -1208,5 +1208,214 @@
         "movement": "Fayum (Roman Egypt)",
         "file": "Fayum mummy portrait (c. 200) - British museum, EA65344.jpg",
         "crop": "top"
+    },
+
+    "nebamun_hunting": {
+        "title": "Nebamun Hunting in the Marshes",
+        "artist": "Anonymous (Ancient Egypt)",
+        "year": -1350,
+        "movement": "Ancient Egypt",
+        "file": "Tomb of Nebamun.jpg",
+        "crop": "center"
+    },
+    "nefertari_tomb": {
+        "title": "Nefertari Led by Isis",
+        "artist": "Anonymous (Ancient Egypt)",
+        "year": -1255,
+        "movement": "Ancient Egypt",
+        "file": "Queen Nefertari being led by Isis MET DP167142.jpg",
+        "crop": "center"
+    },
+    "hunefer_book_dead": {
+        "title": "Book of the Dead of Hunefer",
+        "artist": "Anonymous (Ancient Egypt)",
+        "year": -1275,
+        "movement": "Ancient Egypt",
+        "file": "Book of the Dead of Hunefer sheet 1 (Hunefer & Nasha).jpg",
+        "crop": "center"
+    },
+    "villa_mysteries": {
+        "title": "Villa of the Mysteries",
+        "artist": "Anonymous (Roman)",
+        "year": -60,
+        "movement": "Roman Fresco",
+        "file": "Roman fresco Villa dei Misteri Pompeii 011.jpg",
+        "crop": "center"
+    },
+    "sappho_pompeii": {
+        "title": "Portrait of a Young Woman",
+        "artist": "Anonymous (Pompeii)",
+        "year": 55,
+        "movement": "Roman Fresco",
+        "file": "Girl with stylus and tablets.Fresco found in Pompei.jpg",
+        "crop": "top"
+    },
+    "flora_stabiae": {
+        "title": "Flora",
+        "artist": "Anonymous (Stabiae)",
+        "year": 60,
+        "movement": "Roman Fresco",
+        "file": "Wall painting - Flora - Stabiae (villa di Arianna) - Napoli MAN 8834.jpg",
+        "crop": "top"
+    },
+    "alexander_mosaic": {
+        "title": "Alexander Mosaic",
+        "artist": "Anonymous (Pompeii)",
+        "year": -100,
+        "movement": "Roman Mosaic",
+        "file": "Alexander the Great mosaic.jpg",
+        "crop": "center"
+    },
+    "tres_riches_heures": {
+        "title": "Très Riches Heures (January)",
+        "artist": "Limbourg Brothers",
+        "year": 1416,
+        "movement": "Gothic Illumination",
+        "file": "Les Très Riches Heures du duc de Berry Janvier.jpg",
+        "crop": "top"
+    },
+    "book_of_kells": {
+        "title": "Chi Rho Page",
+        "artist": "Anonymous (Insular)",
+        "year": 800,
+        "movement": "Insular Illumination",
+        "file": "Book of Kells ChiRho Folio 34R.png",
+        "crop": "center"
+    },
+    "lindisfarne_gospels": {
+        "title": "Carpet Page",
+        "artist": "Eadfrith of Lindisfarne",
+        "year": 700,
+        "movement": "Insular Illumination",
+        "file": "Meister des Book of Lindisfarne 002.jpg",
+        "crop": "center"
+    },
+    "ethiopian_st_george": {
+        "title": "Saint George Icon",
+        "artist": "Anonymous (Ethiopian)",
+        "year": 1500,
+        "movement": "Ethiopian",
+        "file": "Ethiopian - Diptych Icon with Saint George, and Mary and the Infant Christ - Walters 3616 - Open.jpg",
+        "crop": "center"
+    },
+    "ajanta_padmapani": {
+        "title": "Bodhisattva Padmapani",
+        "artist": "Anonymous (Ajanta)",
+        "year": 480,
+        "movement": "Indian (Gupta)",
+        "file": "Ajanta Cave1 Padmapani.jpg",
+        "crop": "top"
+    },
+    "jahangir_portrait": {
+        "title": "Jahangir Preferring a Sufi Shaikh to Kings",
+        "artist": "Bichitr",
+        "year": 1620,
+        "movement": "Mughal",
+        "file": "Bichitr - Jahangir Preferring a Sufi Shaikh to Kings, from the St. Petersburg album - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "akbar_court": {
+        "title": "Court of Akbar",
+        "artist": "Anonymous (Mughal)",
+        "year": 1590,
+        "movement": "Mughal",
+        "file": "Court of Akbar from Akbarnama.jpg",
+        "crop": "center"
+    },
+    "radha_krishna": {
+        "title": "Radha and Krishna in the Boat of Love",
+        "artist": "Anonymous (Rajput)",
+        "year": 1750,
+        "movement": "Indian (Rajput)",
+        "file": "Radha and Krishna in the boat of love - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "ragamala_dhanasri": {
+        "title": "Ragamala: Dhanasri Ragini",
+        "artist": "Anonymous (Rajput)",
+        "year": 1690,
+        "movement": "Indian (Rajput)",
+        "file": "Indian, Ragamala Painting of Dhanasri Ragini, c. 1690.jpg",
+        "crop": "center"
+    },
+    "ottoman_mohacs": {
+        "title": "Battle of Mohács",
+        "artist": "Anonymous (Ottoman)",
+        "year": 1588,
+        "movement": "Ottoman",
+        "file": "Battle of Mohács, with Suleiman I in the middle.jpg",
+        "crop": "center"
+    },
+    "huizong_cranes": {
+        "title": "Auspicious Cranes",
+        "artist": "Emperor Huizong",
+        "year": 1112,
+        "movement": "Chinese (Song Dynasty)",
+        "file": "Auspicious Cranes.jpg",
+        "crop": "center"
+    },
+    "night_revels": {
+        "title": "Night Revels of Han Xizai",
+        "artist": "Gu Hongzhong",
+        "year": 970,
+        "movement": "Chinese (Five Dynasties)",
+        "file": "Gu Hongzhong's Night Revels 1.jpg",
+        "crop": "center"
+    },
+    "sesshu_haboku": {
+        "title": "Splashed-Ink Landscape",
+        "artist": "Sesshū Tōyō",
+        "year": 1495,
+        "movement": "Japanese (Muromachi)",
+        "file": "Sesshu - Haboku-Sansui - complete.jpg",
+        "crop": "center"
+    },
+    "kim_hongdo_blacksmith": {
+        "title": "Blacksmith Shop",
+        "artist": "Kim Hong-do",
+        "year": 1780,
+        "movement": "Korean (Joseon)",
+        "file": "대장간.jpg",
+        "crop": "center"
+    },
+    "jeong_seon_geumgang": {
+        "title": "View of Geumgangsan",
+        "artist": "Jeong Seon",
+        "year": 1734,
+        "movement": "Korean (Joseon)",
+        "file": "Geumgangjeon.jpg",
+        "crop": "center"
+    },
+    "goya_third_may": {
+        "title": "The Third of May 1808",
+        "artist": "Francisco Goya",
+        "year": 1814,
+        "movement": "Romanticism",
+        "file": "El Tres de Mayo, by Francisco de Goya, from Prado thin black margin.jpg",
+        "crop": "center"
+    },
+    "goya_saturn": {
+        "title": "Saturn Devouring His Son",
+        "artist": "Francisco Goya",
+        "year": 1823,
+        "movement": "Romanticism",
+        "file": "Francisco de Goya, Saturno devorando a su hijo (1819-1823).jpg",
+        "crop": "top"
+    },
+    "canaletto_venice": {
+        "title": "Entrance to the Grand Canal",
+        "artist": "Canaletto",
+        "year": 1730,
+        "movement": "Veduta",
+        "file": "Canaletto Entrance to the Grand Canal Venice.jpg",
+        "crop": "center"
+    },
+    "watteau_cythera": {
+        "title": "Embarkation for Cythera",
+        "artist": "Antoine Watteau",
+        "year": 1717,
+        "movement": "Rococo",
+        "file": "L'Embarquement pour Cythère, by Antoine Watteau, from C2RMF retouched.jpg",
+        "crop": "center"
     }
 }

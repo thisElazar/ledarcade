@@ -175,6 +175,32 @@ PAINTING_META = {
     "reza_abbasi_lovers": ("Two Lovers", "Reza Abbasi", 1630),
     "behzad_yusuf": ("Yusuf and Zulaikha", "Kamāl ud-Dīn Behzād", 1488),
     "fayum_portrait": ("Mummy Portrait of a Young Woman", "Anonymous (Roman Egypt)", 200),
+    "nebamun_hunting": ("Nebamun Hunting in the Marshes", "Anonymous (Ancient Egypt)", -1350),
+    "nefertari_tomb": ("Nefertari Led by Isis", "Anonymous (Ancient Egypt)", -1255),
+    "hunefer_book_dead": ("Book of the Dead of Hunefer", "Anonymous (Ancient Egypt)", -1275),
+    "villa_mysteries": ("Villa of the Mysteries", "Anonymous (Roman)", -60),
+    "sappho_pompeii": ("Portrait of a Young Woman", "Anonymous (Pompeii)", 55),
+    "flora_stabiae": ("Flora", "Anonymous (Stabiae)", 60),
+    "alexander_mosaic": ("Alexander Mosaic", "Anonymous (Pompeii)", -100),
+    "tres_riches_heures": ("Très Riches Heures (January)", "Limbourg Brothers", 1416),
+    "book_of_kells": ("Chi Rho Page", "Anonymous (Insular)", 800),
+    "lindisfarne_gospels": ("Carpet Page", "Eadfrith of Lindisfarne", 700),
+    "ethiopian_st_george": ("Saint George Icon", "Anonymous (Ethiopian)", 1500),
+    "ajanta_padmapani": ("Bodhisattva Padmapani", "Anonymous (Ajanta)", 480),
+    "jahangir_portrait": ("Jahangir Preferring a Sufi Shaikh to Kings", "Bichitr", 1620),
+    "akbar_court": ("Court of Akbar", "Anonymous (Mughal)", 1590),
+    "radha_krishna": ("Radha and Krishna in the Boat of Love", "Anonymous (Rajput)", 1750),
+    "ragamala_dhanasri": ("Ragamala: Dhanasri Ragini", "Anonymous (Rajput)", 1690),
+    "ottoman_mohacs": ("Battle of Mohács", "Anonymous (Ottoman)", 1588),
+    "huizong_cranes": ("Auspicious Cranes", "Emperor Huizong", 1112),
+    "night_revels": ("Night Revels of Han Xizai", "Gu Hongzhong", 970),
+    "sesshu_haboku": ("Splashed-Ink Landscape", "Sesshū Tōyō", 1495),
+    "kim_hongdo_blacksmith": ("Blacksmith Shop", "Kim Hong-do", 1780),
+    "jeong_seon_geumgang": ("View of Geumgangsan", "Jeong Seon", 1734),
+    "goya_third_may": ("The Third of May 1808", "Francisco Goya", 1814),
+    "goya_saturn": ("Saturn Devouring His Son", "Francisco Goya", 1823),
+    "canaletto_venice": ("Entrance to the Grand Canal", "Canaletto", 1730),
+    "watteau_cythera": ("Embarkation for Cythera", "Antoine Watteau", 1717),
 }
 
 try:
@@ -352,7 +378,8 @@ class _PaintingBase(Visual):
                 yc = (int(180 * alpha), int(160 * alpha), int(80 * alpha))
                 self._scroll_text(_LINE_Y[0], title, tc)
                 self._scroll_text(_LINE_Y[1], artist, ac)
-                self.display.draw_text_small(2, _LINE_Y[2], str(year), yc)
+                yr_str = f"{abs(year)} BCE" if year < 0 else str(year)
+                self.display.draw_text_small(2, _LINE_Y[2], yr_str, yc)
 
 
 # ── Dynamic class generation ───────────────────────────────────────
@@ -367,7 +394,7 @@ for _pid, (_title, _artist, _year) in PAINTING_META.items():
     _cls_name = "Painting" + "".join(w.capitalize() for w in _pid.split("_"))
     _cls = type(_cls_name, (_PaintingBase,), {
         "name": _title.upper(),
-        "description": f"{_artist}, {_year}",
+        "description": f"{_artist}, {abs(_year)} BCE" if _year < 0 else f"{_artist}, {_year}",
         "_pid": _pid,
     })
     PAINTING_VISUALS.append(_cls)
