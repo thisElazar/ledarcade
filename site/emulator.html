@@ -434,6 +434,9 @@
   let flagsAtlasLoaded = false;
   let signsAtlasLoaded = false;
   let galleryAtlasLoaded = false;
+  let haeckelAtlasLoaded = false;
+  let audubonAtlasLoaded = false;
+  let merianAtlasLoaded = false;
 
   function setStatus(text, cls) {
     pyStatusEl.textContent = text;
@@ -1231,6 +1234,51 @@ _menu = EmulatorMenu(_catalog)
     }
   }
 
+  async function loadHaeckelAtlas() {
+    if (haeckelAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/haeckel_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_HAECKEL_PIXELS', pyDict);
+      pyDict.destroy();
+      haeckelAtlasLoaded = true;
+    } catch(e) {
+      console.error('Haeckel atlas error:', e);
+    }
+  }
+
+  async function loadAudubonAtlas() {
+    if (audubonAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/audubon_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_AUDUBON_PIXELS', pyDict);
+      pyDict.destroy();
+      audubonAtlasLoaded = true;
+    } catch(e) {
+      console.error('Audubon atlas error:', e);
+    }
+  }
+
+  async function loadMerianAtlas() {
+    if (merianAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/merian_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_MERIAN_PIXELS', pyDict);
+      pyDict.destroy();
+      merianAtlasLoaded = true;
+    } catch(e) {
+      console.error('Merian atlas error:', e);
+    }
+  }
+
   const museumAtlasLoaded = {};
   async function loadMuseumAtlas(clsName) {
     if (museumAtlasLoaded[clsName]) return;
@@ -1291,6 +1339,11 @@ del _tmp_museum
       }
       if (modulePath === 'visuals/signs.py') {
         await loadSignsAtlas();
+      }
+      if (modulePath === 'visuals/plates.py') {
+        await loadHaeckelAtlas();
+        await loadAudubonAtlas();
+        await loadMerianAtlas();
       }
       if (modulePath === 'visuals/gallery3d.py') {
         await loadPaintingAtlas();

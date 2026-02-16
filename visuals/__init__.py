@@ -93,6 +93,7 @@ from .interchange import Interchange
 from .greenwave import GreenWave
 from .merge import Merge
 from .painting import PAINTING_VISUALS
+from .plates import Haeckel, Audubon, Merian
 from .mobius import Mobius
 from .lake import Lake
 from .quarks import Quarks
@@ -374,6 +375,9 @@ ALL_VISUALS = [
     GalleryEffects,
     GallerySalon,
     *PAINTING_VISUALS,
+    Haeckel,
+    Audubon,
+    Merian,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -653,6 +657,9 @@ __all__ = [
     'Polaroid',
     'Road',
     'PAINTING_VISUALS',
+    'Haeckel',
+    'Audubon',
+    'Merian',
     'Mobius',
     'Lake',
     'Quarks',

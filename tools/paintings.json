@@ -944,14 +944,6 @@
         "file": "Sandro Botticelli - La Primavera - Google Art Project.jpg",
         "crop": "center"
     },
-    "venus_of_urbino": {
-        "title": "Venus of Urbino",
-        "artist": "Titian",
-        "year": 1538,
-        "movement": "Renaissance",
-        "file": "Tiziano - Venere di Urbino - Google Art Project.jpg",
-        "crop": "center"
-    },
     "bacchus_ariadne": {
         "title": "Bacchus and Ariadne",
         "artist": "Titian",
@@ -1388,22 +1380,6 @@
         "file": "Geumgangjeon.jpg",
         "crop": "center"
     },
-    "goya_third_may": {
-        "title": "The Third of May 1808",
-        "artist": "Francisco Goya",
-        "year": 1814,
-        "movement": "Romanticism",
-        "file": "El Tres de Mayo, by Francisco de Goya, from Prado thin black margin.jpg",
-        "crop": "center"
-    },
-    "goya_saturn": {
-        "title": "Saturn Devouring His Son",
-        "artist": "Francisco Goya",
-        "year": 1823,
-        "movement": "Romanticism",
-        "file": "Francisco de Goya, Saturno devorando a su hijo (1819-1823).jpg",
-        "crop": "top"
-    },
     "canaletto_venice": {
         "title": "Entrance to the Grand Canal",
         "artist": "Canaletto",
@@ -1418,6 +1394,182 @@
         "year": 1717,
         "movement": "Rococo",
         "file": "L'Embarquement pour Cythère, by Antoine Watteau, from C2RMF retouched.jpg",
+        "crop": "center"
+    },
+    "goya_colossus": {
+        "title": "The Colossus",
+        "artist": "Francisco Goya",
+        "year": 1812,
+        "movement": "Romanticism",
+        "file": "The Colossus, Francisco de Goya.jpg",
+        "crop": "center"
+    },
+    "goya_sleep_of_reason": {
+        "title": "The Sleep of Reason Produces Monsters",
+        "artist": "Francisco Goya",
+        "year": 1799,
+        "movement": "Romanticism",
+        "file": "Francisco José de Goya y Lucientes - The sleep of reason produces monsters (No. 43), from Los Caprichos - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "titian_pieta": {
+        "title": "Pieta",
+        "artist": "Titian",
+        "year": 1576,
+        "movement": "Renaissance",
+        "file": "Accademia - Pietà by Titian.jpg",
+        "crop": "center"
+    },
+    "durer_rhinoceros": {
+        "title": "Rhinoceros",
+        "artist": "Albrecht Durer",
+        "year": 1515,
+        "movement": "Northern Renaissance",
+        "file": "The Rhinoceros (NGA 1964.8.697) enhanced.png",
+        "crop": "center"
+    },
+    "durer_melencolia": {
+        "title": "Melencolia I",
+        "artist": "Albrecht Durer",
+        "year": 1514,
+        "movement": "Northern Renaissance",
+        "file": "Albrecht Dürer - Melencolia I - Google Art Project (427760).jpg",
+        "crop": "center"
+    },
+    "wright_air_pump": {
+        "title": "An Experiment on a Bird in the Air Pump",
+        "artist": "Joseph Wright of Derby",
+        "year": 1768,
+        "movement": "Romanticism",
+        "file": "An Experiment on a Bird in an Air Pump by Joseph Wright of Derby, 1768.jpg",
+        "crop": "center"
+    },
+    "la_tour_newborn": {
+        "title": "The Newborn",
+        "artist": "Georges de La Tour",
+        "year": 1648,
+        "movement": "Baroque",
+        "file": "Georges de La Tour - Newlyborn infant - Musée des Beaux-Arts de Rennes.jpg",
+        "crop": "center"
+    },
+    "rembrandt_philosopher": {
+        "title": "Philosopher in Meditation",
+        "artist": "Rembrandt",
+        "year": 1632,
+        "movement": "Baroque",
+        "file": "Rembrandt - The Philosopher in Meditation (cleaned).jpg",
+        "crop": "center"
+    },
+    "rembrandt_storm": {
+        "title": "Christ in the Storm on the Sea of Galilee",
+        "artist": "Rembrandt",
+        "year": 1633,
+        "movement": "Baroque",
+        "file": "Rembrandt Christ in the Storm on the Lake of Galilee.jpg",
+        "crop": "center"
+    },
+    "honthorst_candlelight": {
+        "title": "Musical Group by Candlelight",
+        "artist": "Gerrit van Honthorst",
+        "year": 1623,
+        "movement": "Baroque",
+        "file": "Gerard van Honthorst - Musical Group by Candlelight - KMSsp378 - Statens Museum for Kunst.jpg",
+        "crop": "center"
+    },
+    "caravaggio_lute_player": {
+        "title": "The Lute Player",
+        "artist": "Caravaggio",
+        "year": 1596,
+        "movement": "Baroque",
+        "file": "The Lute Player-Caravaggio (Hermitage).jpg",
+        "crop": "center"
+    },
+    "la_tour_cheat": {
+        "title": "The Cheat with the Ace of Diamonds",
+        "artist": "Georges de La Tour",
+        "year": 1635,
+        "movement": "Baroque",
+        "file": "Georges de La Tour - Cheater with the Ace of Diamonds - WGA12334.jpg",
+        "crop": "center"
+    },
+    "wright_orrery": {
+        "title": "A Philosopher Lecturing on the Orrery",
+        "artist": "Joseph Wright of Derby",
+        "year": 1766,
+        "movement": "Romanticism",
+        "file": "Wright of Derby, The Orrery.jpg",
+        "crop": "center"
+    },
+    "cellarius_star_atlas": {
+        "title": "Harmonia Macrocosmica",
+        "artist": "Andreas Cellarius",
+        "year": 1660,
+        "movement": "Scientific",
+        "file": "Cellarius' Hæmisphærium Stellatum Boreale Antiqvum, 1708 (12115549595).jpg",
+        "crop": "center"
+    },
+    "van_gogh_weaver": {
+        "title": "Weaver at the Loom",
+        "artist": "Vincent van Gogh",
+        "year": 1884,
+        "movement": "Post-Impressionism",
+        "file": "Vincent Willem van Gogh 139.jpg",
+        "crop": "center"
+    },
+    "eakins_chess": {
+        "title": "The Chess Players",
+        "artist": "Thomas Eakins",
+        "year": 1876,
+        "movement": "Realism",
+        "file": "The chess players thomas eakins.jpeg",
+        "crop": "center"
+    },
+    "constable_clouds": {
+        "title": "Cloud Study",
+        "artist": "John Constable",
+        "year": 1822,
+        "movement": "Romanticism",
+        "file": "John Constable - Cloud Study - Google Art Project (2442698).jpg",
+        "crop": "center"
+    },
+    "turner_rain_steam": {
+        "title": "Rain, Steam and Speed",
+        "artist": "J.M.W. Turner",
+        "year": 1844,
+        "movement": "Romanticism",
+        "file": "Turner - Rain, Steam and Speed - National Gallery file.jpg",
+        "crop": "center"
+    },
+    "turner_parliament": {
+        "title": "The Burning of the Houses of Parliament",
+        "artist": "J.M.W. Turner",
+        "year": 1835,
+        "movement": "Romanticism",
+        "file": "Turner-The Burning of the Houses of Lords and Commons.jpg",
+        "crop": "center"
+    },
+    "blake_newton": {
+        "title": "Newton",
+        "artist": "William Blake",
+        "year": 1795,
+        "movement": "Romanticism",
+        "file": "Newton-WilliamBlake.jpg",
+        "crop": "center"
+    },
+    "monet_gare": {
+        "title": "Gare Saint-Lazare",
+        "artist": "Claude Monet",
+        "year": 1877,
+        "movement": "Impressionism",
+        "file": "Claude Monet - Arrival of the Normandy Train, Gare Saint-Lazare - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "durer_jerome": {
+        "title": "St. Jerome in His Study",
+        "artist": "Albrecht Durer",
+        "year": 1514,
+        "movement": "Northern Renaissance",
+        "file": "Albrecht Dürer, Saint Jerome in His Study, 1514, NGA 6642.jpg",
         "crop": "center"
     }
 }

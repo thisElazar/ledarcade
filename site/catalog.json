@@ -983,7 +983,7 @@
       "key": "art",
       "items": [
         {
-          "name": "A BAR AT THE FOLIES-BERGERE",
+          "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
           "cls": "PaintingBarFoliesBergere",
           "module": "visuals/painting.py",
           "is_game": false
@@ -991,6 +991,12 @@
         {
           "name": "A GIRL WITH A WATERING CAN",
           "cls": "PaintingGirlWateringCan",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "A PHILOSOPHER LECTURING ON THE ORRERY",
+          "cls": "PaintingWrightOrrery",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1013,14 +1019,14 @@
           "is_game": false
         },
         {
-          "name": "QINGMING FESTIVAL",
-          "cls": "PaintingZhangZeduanQingming",
+          "name": "AMERICAN GOTHIC",
+          "cls": "PaintingAmericanGothic",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "AMERICAN GOTHIC",
-          "cls": "PaintingAmericanGothic",
+          "name": "AN EXPERIMENT ON A BIRD IN THE AIR PUMP",
+          "cls": "PaintingWrightAirPump",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1067,13 +1073,13 @@
           "is_game": false
         },
         {
-          "name": "BATHERS AT ASNIERES",
+          "name": "BATHERS AT ASNI\u00c8RES",
           "cls": "PaintingBathersAsnieres",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "BATTLE OF MOHACS",
+          "name": "BATTLE OF MOH\u00c1CS",
           "cls": "PaintingOttomanMohacs",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1133,7 +1139,7 @@
           "is_game": false
         },
         {
-          "name": "CAFE TERRACE AT NIGHT",
+          "name": "CAF\u00c9 TERRACE AT NIGHT",
           "cls": "PaintingCafeTerrace",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1153,6 +1159,18 @@
         {
           "name": "CHI RHO PAGE",
           "cls": "PaintingBookOfKells",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "CHRIST IN THE STORM ON THE SEA OF GALILEE",
+          "cls": "PaintingRembrandtStorm",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "CLOUD STUDY",
+          "cls": "PaintingConstableClouds",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1217,6 +1235,12 @@
           "is_game": false
         },
         {
+          "name": "GARE SAINT-LAZARE",
+          "cls": "PaintingMonetGare",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "GIRL READING A LETTER AT AN OPEN WINDOW",
           "cls": "PaintingGirlReadingLetter",
           "module": "visuals/painting.py",
@@ -1225,6 +1249,12 @@
         {
           "name": "GIRL WITH A PEARL EARRING",
           "cls": "PaintingGirlPearlEarring",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "HARMONIA MACROCOSMICA",
+          "cls": "PaintingCellariusStarAtlas",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1271,7 +1301,7 @@
           "is_game": false
         },
         {
-          "name": "JEANNE HEBUTERNE",
+          "name": "JEANNE H\u00c9BUTERNE",
           "cls": "PaintingModiglianiPortrait",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1319,13 +1349,13 @@
           "is_game": false
         },
         {
-          "name": "MAESTA",
+          "name": "MAEST\u00c0",
           "cls": "PaintingCimabueMaesta",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "MAESTA",
+          "name": "MAEST\u00c0",
           "cls": "PaintingDuccioMaesta",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1333,6 +1363,12 @@
         {
           "name": "MEDUSA",
           "cls": "PaintingCaravaggioMedusa",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MELENCOLIA I",
+          "cls": "PaintingDurerMelencolia",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1367,7 +1403,13 @@
           "is_game": false
         },
         {
-          "name": "MERODE ALTARPIECE",
+          "name": "MUSICAL GROUP BY CANDLELIGHT",
+          "cls": "PaintingHonthorstCandlelight",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "M\u00c9RODE ALTARPIECE",
           "cls": "PaintingCampinMerode",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1387,6 +1429,12 @@
         {
           "name": "NEFERTARI LED BY ISIS",
           "cls": "PaintingNefertariTomb",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "NEWTON",
+          "cls": "PaintingBlakeNewton",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1417,6 +1465,18 @@
         {
           "name": "PARIS STREET; RAINY DAY",
           "cls": "PaintingCaillebotteRainy",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PHILOSOPHER IN MEDITATION",
+          "cls": "PaintingRembrandtPhilosopher",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PIETA",
+          "cls": "PaintingTitianPieta",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1475,6 +1535,12 @@
           "is_game": false
         },
         {
+          "name": "QINGMING FESTIVAL",
+          "cls": "PaintingZhangZeduanQingming",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "RADHA AND KRISHNA IN THE BOAT OF LOVE",
           "cls": "PaintingRadhaKrishna",
           "module": "visuals/painting.py",
@@ -1493,8 +1559,20 @@
           "is_game": false
         },
         {
+          "name": "RAIN, STEAM AND SPEED",
+          "cls": "PaintingTurnerRainSteam",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "REPLY OF THE ZAPOROZHIAN COSSACKS",
           "cls": "PaintingCossacks",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "RHINOCEROS",
+          "cls": "PaintingDurerRhinoceros",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1507,12 +1585,6 @@
         {
           "name": "SAINT GEORGE ICON",
           "cls": "PaintingEthiopianStGeorge",
-          "module": "visuals/painting.py",
-          "is_game": false
-        },
-        {
-          "name": "SATURN DEVOURING HIS SON",
-          "cls": "PaintingGoyaSaturn",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1573,6 +1645,12 @@
         {
           "name": "ST. FRANCIS IN THE DESERT",
           "cls": "PaintingBelliniStFrancis",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "ST. JEROME IN HIS STUDY",
+          "cls": "PaintingDurerJerome",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1649,6 +1727,12 @@
           "is_game": false
         },
         {
+          "name": "THE BURNING OF THE HOUSES OF PARLIAMENT",
+          "cls": "PaintingTurnerParliament",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE CALLING OF SAINT MATTHEW",
           "cls": "PaintingCallingStMatthew",
           "module": "visuals/painting.py",
@@ -1661,8 +1745,26 @@
           "is_game": false
         },
         {
+          "name": "THE CHEAT WITH THE ACE OF DIAMONDS",
+          "cls": "PaintingLaTourCheat",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CHESS PLAYERS",
+          "cls": "PaintingEakinsChess",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE CHILD'S BATH",
           "cls": "PaintingCassattBath",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE COLOSSUS",
+          "cls": "PaintingGoyaColossus",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1793,8 +1895,20 @@
           "is_game": false
         },
         {
+          "name": "THE LUTE PLAYER",
+          "cls": "PaintingCaravaggioLutePlayer",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE MILKMAID",
           "cls": "PaintingTheMilkmaid",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE NEWBORN",
+          "cls": "PaintingLaTourNewborn",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1865,6 +1979,12 @@
           "is_game": false
         },
         {
+          "name": "THE SLEEP OF REASON PRODUCES MONSTERS",
+          "cls": "PaintingGoyaSleepOfReason",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE SLEEPING GYPSY",
           "cls": "PaintingSleepingGypsy",
           "module": "visuals/painting.py",
@@ -1885,12 +2005,6 @@
         {
           "name": "THE SWING",
           "cls": "PaintingTheSwing",
-          "module": "visuals/painting.py",
-          "is_game": false
-        },
-        {
-          "name": "THE THIRD OF MAY 1808",
-          "cls": "PaintingGoyaThirdMay",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1937,7 +2051,7 @@
           "is_game": false
         },
         {
-          "name": "TRES RICHES HEURES (JANUARY)",
+          "name": "TR\u00c8S RICHES HEURES (JANUARY)",
           "cls": "PaintingTresRichesHeures",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1945,12 +2059,6 @@
         {
           "name": "TWO LOVERS",
           "cls": "PaintingRezaAbbasiLovers",
-          "module": "visuals/painting.py",
-          "is_game": false
-        },
-        {
-          "name": "VENUS OF URBINO",
-          "cls": "PaintingVenusOfUrbino",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2009,6 +2117,12 @@
           "is_game": false
         },
         {
+          "name": "WEAVER AT THE LOOM",
+          "cls": "PaintingVanGoghWeaver",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "WHEAT FIELD WITH CYPRESSES",
           "cls": "PaintingWheatfieldCypresses",
           "module": "visuals/painting.py",
@@ -2039,7 +2153,7 @@
           "is_game": false
         },
         {
-          "name": "OTANI ONIJI III AS YAKKO EDOBEI",
+          "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
           "cls": "PaintingSharakuActor",
           "module": "visuals/painting.py",
           "is_game": false
@@ -3715,6 +3829,12 @@
       "key": "nature",
       "items": [
         {
+          "name": "AUDUBON",
+          "cls": "Audubon",
+          "module": "visuals/plates.py",
+          "is_game": false
+        },
+        {
           "name": "CLOUDS",
           "cls": "Clouds",
           "module": "visuals/clouds.py",
@@ -3751,6 +3871,12 @@
           "is_game": false
         },
         {
+          "name": "HAECKEL",
+          "cls": "Haeckel",
+          "module": "visuals/plates.py",
+          "is_game": false
+        },
+        {
           "name": "JELLYFISH",
           "cls": "ParticleLife",
           "module": "visuals/particlelife.py",
@@ -3760,6 +3886,12 @@
           "name": "LAKE",
           "cls": "Lake",
           "module": "visuals/lake.py",
+          "is_game": false
+        },
+        {
+          "name": "MERIAN",
+          "cls": "Merian",
+          "module": "visuals/plates.py",
           "is_game": false
         },
         {
@@ -5738,6 +5870,21 @@
               "module": "visuals/plasma.py"
             },
             {
+              "name": "HAECKEL",
+              "cls": "Haeckel",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "AUDUBON",
+              "cls": "Audubon",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "MERIAN",
+              "cls": "Merian",
+              "module": "visuals/plates.py"
+            },
+            {
               "name": "RIPPLES",
               "cls": "Ripples",
               "module": "visuals/ripples.py"
@@ -6497,7 +6644,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "A BAR AT THE FOLIES-BERGÈRE",
+              "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
               "cls": "PaintingBarFoliesBergere",
               "module": "visuals/painting.py"
             },
@@ -6562,7 +6709,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATHERS AT ASNIÈRES",
+              "name": "BATHERS AT ASNI\u00c8RES",
               "cls": "PaintingBathersAsnieres",
               "module": "visuals/painting.py"
             },
@@ -6602,7 +6749,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "CAFÉ TERRACE AT NIGHT",
+              "name": "CAF\u00c9 TERRACE AT NIGHT",
               "cls": "PaintingCafeTerrace",
               "module": "visuals/painting.py"
             },
@@ -6737,7 +6884,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "JEANNE HÉBUTERNE",
+              "name": "JEANNE H\u00c9BUTERNE",
               "cls": "PaintingModiglianiPortrait",
               "module": "visuals/painting.py"
             },
@@ -6807,11 +6954,6 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "VENUS OF URBINO",
-              "cls": "PaintingVenusOfUrbino",
-              "module": "visuals/painting.py"
-            },
-            {
               "name": "BACCHUS AND ARIADNE",
               "cls": "PaintingBacchusAriadne",
               "module": "visuals/painting.py"
@@ -6872,12 +7014,12 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAESTÀ",
+              "name": "MAEST\u00c0",
               "cls": "PaintingCimabueMaesta",
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAESTÀ",
+              "name": "MAEST\u00c0",
               "cls": "PaintingDuccioMaesta",
               "module": "visuals/painting.py"
             },
@@ -6902,7 +7044,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "MÉRODE ALTARPIECE",
+              "name": "M\u00c9RODE ALTARPIECE",
               "cls": "PaintingCampinMerode",
               "module": "visuals/painting.py"
             },
@@ -6952,7 +7094,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "ŌTANI ONIJI III AS YAKKO EDOBEI",
+              "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
               "cls": "PaintingSharakuActor",
               "module": "visuals/painting.py"
             },
@@ -7007,7 +7149,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "TRÈS RICHES HEURES (JANUARY)",
+              "name": "TR\u00c8S RICHES HEURES (JANUARY)",
               "cls": "PaintingTresRichesHeures",
               "module": "visuals/painting.py"
             },
@@ -7052,7 +7194,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATTLE OF MOHÁCS",
+              "name": "BATTLE OF MOH\u00c1CS",
               "cls": "PaintingOttomanMohacs",
               "module": "visuals/painting.py"
             },
@@ -7082,16 +7224,6 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "THE THIRD OF MAY 1808",
-              "cls": "PaintingGoyaThirdMay",
-              "module": "visuals/painting.py"
-            },
-            {
-              "name": "SATURN DEVOURING HIS SON",
-              "cls": "PaintingGoyaSaturn",
-              "module": "visuals/painting.py"
-            },
-            {
               "name": "ENTRANCE TO THE GRAND CANAL",
               "cls": "PaintingCanalettoVenice",
               "module": "visuals/painting.py"
@@ -7099,6 +7231,116 @@
             {
               "name": "EMBARKATION FOR CYTHERA",
               "cls": "PaintingWatteauCythera",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE COLOSSUS",
+              "cls": "PaintingGoyaColossus",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE SLEEP OF REASON PRODUCES MONSTERS",
+              "cls": "PaintingGoyaSleepOfReason",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PIETA",
+              "cls": "PaintingTitianPieta",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "RHINOCEROS",
+              "cls": "PaintingDurerRhinoceros",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MELENCOLIA I",
+              "cls": "PaintingDurerMelencolia",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "AN EXPERIMENT ON A BIRD IN THE AIR PUMP",
+              "cls": "PaintingWrightAirPump",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE NEWBORN",
+              "cls": "PaintingLaTourNewborn",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PHILOSOPHER IN MEDITATION",
+              "cls": "PaintingRembrandtPhilosopher",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "CHRIST IN THE STORM ON THE SEA OF GALILEE",
+              "cls": "PaintingRembrandtStorm",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "MUSICAL GROUP BY CANDLELIGHT",
+              "cls": "PaintingHonthorstCandlelight",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE LUTE PLAYER",
+              "cls": "PaintingCaravaggioLutePlayer",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CHEAT WITH THE ACE OF DIAMONDS",
+              "cls": "PaintingLaTourCheat",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "A PHILOSOPHER LECTURING ON THE ORRERY",
+              "cls": "PaintingWrightOrrery",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "HARMONIA MACROCOSMICA",
+              "cls": "PaintingCellariusStarAtlas",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WEAVER AT THE LOOM",
+              "cls": "PaintingVanGoghWeaver",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CHESS PLAYERS",
+              "cls": "PaintingEakinsChess",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "CLOUD STUDY",
+              "cls": "PaintingConstableClouds",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "RAIN, STEAM AND SPEED",
+              "cls": "PaintingTurnerRainSteam",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE BURNING OF THE HOUSES OF PARLIAMENT",
+              "cls": "PaintingTurnerParliament",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NEWTON",
+              "cls": "PaintingBlakeNewton",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "GARE SAINT-LAZARE",
+              "cls": "PaintingMonetGare",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "ST. JEROME IN HIS STUDY",
+              "cls": "PaintingDurerJerome",
               "module": "visuals/painting.py"
             }
           ]
@@ -8947,12 +9189,6 @@
           "is_game": false
         },
         {
-          "name": "IDLE TIMERS",
-          "cls": "Timers",
-          "module": "visuals/timers.py",
-          "is_game": false
-        },
-        {
           "name": "IDLE MIX",
           "cls": "IdleMix",
           "module": "visuals/idlemix.py",
@@ -9042,6 +9278,12 @@
             "games/othello.py",
             "games/agario.py"
           ]
+        },
+        {
+          "name": "IDLE TIMERS",
+          "cls": "Timers",
+          "module": "visuals/timers.py",
+          "is_game": false
         },
         {
           "name": "INFO",
