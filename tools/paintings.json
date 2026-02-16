@@ -926,5 +926,287 @@
         "movement": "Abstract",
         "file": "Robert Delaunay, 1912, Les Fenêtres simultanée sur la ville (Simultaneous Windows on the City), 40 x 46 cm, Kunsthalle Hamburg.jpg",
         "crop": "center"
+    },
+
+    "birth_of_venus": {
+        "title": "The Birth of Venus",
+        "artist": "Sandro Botticelli",
+        "year": 1485,
+        "movement": "Renaissance",
+        "file": "Sandro Botticelli - La nascita di Venere - Google Art Project - edited.jpg",
+        "crop": "center"
+    },
+    "primavera": {
+        "title": "Primavera",
+        "artist": "Sandro Botticelli",
+        "year": 1482,
+        "movement": "Renaissance",
+        "file": "Sandro Botticelli - La Primavera - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "venus_of_urbino": {
+        "title": "Venus of Urbino",
+        "artist": "Titian",
+        "year": 1538,
+        "movement": "Renaissance",
+        "file": "Tiziano - Venere di Urbino - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "bacchus_ariadne": {
+        "title": "Bacchus and Ariadne",
+        "artist": "Titian",
+        "year": 1523,
+        "movement": "Renaissance",
+        "file": "Titian - Bacchus and Ariadne - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "virgin_of_rocks": {
+        "title": "Virgin of the Rocks",
+        "artist": "Leonardo da Vinci",
+        "year": 1486,
+        "movement": "Renaissance",
+        "file": "Leonardo Da Vinci - Vergine delle Rocce (Louvre).jpg",
+        "crop": "top"
+    },
+    "last_judgment_michelangelo": {
+        "title": "The Last Judgment",
+        "artist": "Michelangelo",
+        "year": 1541,
+        "movement": "Renaissance",
+        "file": "Last Judgement (Michelangelo).jpg",
+        "crop": "center"
+    },
+    "raphael_transfiguration": {
+        "title": "The Transfiguration",
+        "artist": "Raphael",
+        "year": 1520,
+        "movement": "Renaissance",
+        "file": "Raphael - The Transfiguration - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "giotto_lamentation": {
+        "title": "Lamentation",
+        "artist": "Giotto",
+        "year": 1305,
+        "movement": "Proto-Renaissance",
+        "file": "Giotto - Scrovegni - -36- - Lamentation (The Mourning of Christ) adj.jpg",
+        "crop": "center"
+    },
+    "holbein_ambassadors": {
+        "title": "The Ambassadors",
+        "artist": "Hans Holbein the Younger",
+        "year": 1533,
+        "movement": "Renaissance",
+        "file": "Hans Holbein the Younger - The Ambassadors - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "tintoretto_last_supper": {
+        "title": "The Last Supper",
+        "artist": "Tintoretto",
+        "year": 1594,
+        "movement": "Mannerism",
+        "file": "Jacopo Tintoretto - The Last Supper - WGA22649.jpg",
+        "crop": "center"
+    },
+    "veronese_wedding_cana": {
+        "title": "The Wedding at Cana",
+        "artist": "Paolo Veronese",
+        "year": 1563,
+        "movement": "Renaissance",
+        "file": "Veronese, The Marriage at Cana (1563).jpg",
+        "crop": "center"
+    },
+    "piero_flagellation": {
+        "title": "The Flagellation of Christ",
+        "artist": "Piero della Francesca",
+        "year": 1455,
+        "movement": "Renaissance",
+        "file": "Piero della Francesca 042.jpg",
+        "crop": "center"
+    },
+    "mantegna_dead_christ": {
+        "title": "Lamentation over the Dead Christ",
+        "artist": "Andrea Mantegna",
+        "year": 1480,
+        "movement": "Renaissance",
+        "file": "Andrea Mantegna - The Lamentation over the Dead Christ - WGA13981.jpg",
+        "crop": "center"
+    },
+    "bellini_st_francis": {
+        "title": "St. Francis in the Desert",
+        "artist": "Giovanni Bellini",
+        "year": 1480,
+        "movement": "Renaissance",
+        "file": "Giovanni Bellini - Saint Francis in the Desert - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "correggio_assumption": {
+        "title": "Assumption of the Virgin",
+        "artist": "Correggio",
+        "year": 1530,
+        "movement": "Renaissance",
+        "file": "Correggio, Assumption of the Virgin, Duomo, Parma.jpg",
+        "crop": "center"
+    },
+    "cimabue_maesta": {
+        "title": "Maestà",
+        "artist": "Cimabue",
+        "year": 1280,
+        "movement": "Proto-Renaissance",
+        "file": "Cimabue - Maestà di Santa Trinita - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "duccio_maesta": {
+        "title": "Maestà",
+        "artist": "Duccio",
+        "year": 1311,
+        "movement": "Proto-Renaissance",
+        "file": "Duccio Maestà.jpg",
+        "crop": "top"
+    },
+    "rublev_trinity": {
+        "title": "Trinity",
+        "artist": "Andrei Rublev",
+        "year": 1411,
+        "movement": "Byzantine",
+        "file": "Angelsatmamre-trinity-rublev-1410.jpg",
+        "crop": "center"
+    },
+    "van_der_weyden_descent": {
+        "title": "Descent from the Cross",
+        "artist": "Rogier van der Weyden",
+        "year": 1435,
+        "movement": "Northern Renaissance",
+        "file": "El Descendimiento, by Rogier van der Weyden, from Prado in Google Earth.jpg",
+        "crop": "center"
+    },
+    "van_der_goes_portinari": {
+        "title": "Portinari Altarpiece",
+        "artist": "Hugo van der Goes",
+        "year": 1475,
+        "movement": "Northern Renaissance",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/The_Portinari_Triptych.jpg",
+        "crop": "center"
+    },
+    "memling_portrait": {
+        "title": "Portrait of a Young Woman",
+        "artist": "Hans Memling",
+        "year": 1480,
+        "movement": "Northern Renaissance",
+        "file": "PORTRAIT OF A YOUNG WOMAN ATTRIBUTED TO HANS MEMLING.jpg",
+        "crop": "top"
+    },
+    "campin_merode": {
+        "title": "Mérode Altarpiece",
+        "artist": "Robert Campin",
+        "year": 1427,
+        "movement": "Northern Renaissance",
+        "file": "Robert Campin - Triptych with the Annunciation, known as the \"Merode Altarpiece\" - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "velazquez_pope": {
+        "title": "Portrait of Pope Innocent X",
+        "artist": "Diego Velázquez",
+        "year": 1650,
+        "movement": "Baroque",
+        "file": "Portrait of Innocentius X by Diego Velázquez in Galleria Doria Pamphilj (Rome).jpg",
+        "crop": "top"
+    },
+    "rembrandt_anatomy": {
+        "title": "The Anatomy Lesson of Dr. Nicolaes Tulp",
+        "artist": "Rembrandt",
+        "year": 1632,
+        "movement": "Baroque",
+        "file": "Rembrandt - The Anatomy Lesson of Dr Nicolaes Tulp.jpg",
+        "crop": "center"
+    },
+    "la_tour_magdalene": {
+        "title": "The Penitent Magdalene",
+        "artist": "Georges de La Tour",
+        "year": 1640,
+        "movement": "Baroque",
+        "file": "Georges de La Tour 006.jpg",
+        "crop": "center"
+    },
+
+    "guo_xi_early_spring": {
+        "title": "Early Spring",
+        "artist": "Guo Xi",
+        "year": 1072,
+        "movement": "Chinese (Song Dynasty)",
+        "file": "Guo Xi - Early Spring (large).jpg",
+        "crop": "center"
+    },
+    "fan_kuan_travelers": {
+        "title": "Travelers Among Mountains and Streams",
+        "artist": "Fan Kuan",
+        "year": 1000,
+        "movement": "Chinese (Song Dynasty)",
+        "file": "Fan Kuan - Travelers Among Mountains and Streams - Google Art Project.jpg",
+        "crop": "center"
+    },
+    "zhang_zeduan_qingming": {
+        "title": "Along the River During the Qingming Festival",
+        "artist": "Zhang Zeduan",
+        "year": 1100,
+        "movement": "Chinese (Song Dynasty)",
+        "file": "Alongtheriver QingMing.jpg",
+        "crop": "center"
+    },
+    "tohaku_pine_trees": {
+        "title": "Pine Trees",
+        "artist": "Hasegawa Tōhaku",
+        "year": 1595,
+        "movement": "Japanese (Momoyama)",
+        "file": "Hasegawa Tohaku - Pine Trees (Shōrin-zu byōbu) - right hand screen.jpg",
+        "crop": "center"
+    },
+    "korin_irises": {
+        "title": "Irises",
+        "artist": "Ogata Kōrin",
+        "year": 1702,
+        "movement": "Japanese (Rinpa)",
+        "file": "Irises screen 2.jpg",
+        "crop": "center"
+    },
+    "utamaro_beauties": {
+        "title": "Three Beauties of the Present Day",
+        "artist": "Kitagawa Utamaro",
+        "year": 1793,
+        "movement": "Ukiyo-e",
+        "file": "Utamaro (1793) Three Beauties of the Present Time, MFAB 21.6382.jpg",
+        "crop": "top"
+    },
+    "sharaku_actor": {
+        "title": "Ōtani Oniji III as Yakko Edobei",
+        "artist": "Tōshūsai Sharaku",
+        "year": 1794,
+        "movement": "Ukiyo-e",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Toshusai_Sharaku-_Otani_Oniji%2C_1794.jpg",
+        "crop": "top"
+    },
+    "reza_abbasi_lovers": {
+        "title": "Two Lovers",
+        "artist": "Reza Abbasi",
+        "year": 1630,
+        "movement": "Persian (Safavid)",
+        "file": "Reza Abbasi - Two Lovers (1630).jpg",
+        "crop": "center"
+    },
+    "behzad_yusuf": {
+        "title": "Yusuf and Zulaikha",
+        "artist": "Kamāl ud-Dīn Behzād",
+        "year": 1488,
+        "movement": "Persian (Timurid)",
+        "file": "Yusuf fleeing the Advances of Zulaikha.jpg",
+        "crop": "center"
+    },
+    "fayum_portrait": {
+        "title": "Mummy Portrait of a Young Woman",
+        "artist": "Anonymous (Roman Egypt)",
+        "year": 200,
+        "movement": "Fayum (Roman Egypt)",
+        "file": "Fayum mummy portrait (c. 200) - British museum, EA65344.jpg",
+        "crop": "top"
     }
 }
