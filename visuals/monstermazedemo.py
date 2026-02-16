@@ -28,7 +28,7 @@ class MonsterMazeDemo(Visual):
         self.game = MonsterMaze(self.display)
         self.game.reset()
         self.decision_timer = 0.0
-        self.decision_interval = 0.15
+        self.decision_interval = 0.35
         self.ai_input = InputState()
         self.game_over_timer = 0.0
 
@@ -107,13 +107,7 @@ class MonsterMazeDemo(Visual):
             return inp
 
         if needed_facing == facing:
-            # Sprint if next cell after that is also open and on path
-            nx2, ny2 = nx + ddx, ny + ddy
-            if (0 <= nx2 < MAZE_SIZE and 0 <= ny2 < MAZE_SIZE and
-                    not g.walls[ny2][nx2]):
-                inp.action_l = True  # Sprint
-            else:
-                inp.up_pressed = True
+            inp.up_pressed = True
         elif (facing + 1) % 4 == needed_facing:
             inp.right_pressed = True
         elif (facing - 1) % 4 == needed_facing:

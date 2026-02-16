@@ -138,6 +138,17 @@ def set_cycle_duration(value):
     set("cycle_duration", value)
 
 
+def get_titles_cycle_duration():
+    """Get cycle duration for titles category in seconds (3-120)."""
+    return get("titles_cycle_duration", 8)
+
+
+def set_titles_cycle_duration(value):
+    """Set cycle duration for titles category in seconds (3-120)."""
+    value = max(3, min(120, int(value)))
+    set("titles_cycle_duration", value)
+
+
 def get_idle_category_weights():
     return get("idle_category_weights", {})
 

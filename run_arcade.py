@@ -663,7 +663,9 @@ def main():
                             idle_visual.update(dt)
                     else:
                         idle_cycle_timer += dt
-                        if idle_cycle_timer >= 30.0:
+                        import settings as _s
+                        _cur_cycle = _s.get_titles_cycle_duration() if (idle_visual and getattr(idle_visual, 'category', '') == 'titles') else _s.get_cycle_duration()
+                        if idle_cycle_timer >= _cur_cycle:
                             # Start transition to new visual
                             old_visual = idle_visual
                             new_visual = _pick_idle_visual(display)

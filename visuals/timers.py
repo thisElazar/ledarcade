@@ -13,16 +13,17 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Timers(Visual):
-    name = "IDLE"
+    name = "IDLE TIMERS"
     description = "Idle, cycle, sleep timers"
     category = "utility"
     custom_exit = True
 
     PARAMS = [
         # (label, setting_key, min, max, step, fmt)
-        ("IDLE",  "idle_timeout",   15, 300, 15, "s"),
-        ("CYCLE", "cycle_duration", 10, 120,  5, "s"),
-        ("SLEEP", "sleep_timer",     0, 180,  5, "m"),
+        ("IDLE",   "idle_timeout",          15, 300, 15, "s"),
+        ("CYCLE",  "cycle_duration",        10, 120,  5, "s"),
+        ("TITLES", "titles_cycle_duration",  3, 120,  1, "s"),
+        ("SLEEP",  "sleep_timer",            0, 180,  5, "m"),
     ]
 
     def __init__(self, display: Display):
@@ -35,6 +36,7 @@ class Timers(Visual):
         self.values = [
             persistent.get_idle_timeout(),
             persistent.get_cycle_duration(),
+            persistent.get_titles_cycle_duration(),
             persistent.get_sleep_timer(),
         ]
 
@@ -56,7 +58,8 @@ class Timers(Visual):
             import settings as persistent
             persistent.set_idle_timeout(self.values[0])
             persistent.set_cycle_duration(self.values[1])
-            persistent.set_sleep_timer(self.values[2])
+            persistent.set_titles_cycle_duration(self.values[2])
+            persistent.set_sleep_timer(self.values[3])
             self.wants_exit = True
             return True
 
@@ -68,7 +71,7 @@ class Timers(Visual):
     def _fmt_value(self, idx):
         label, _, _, _, _, unit = self.PARAMS[idx]
         val = self.values[idx]
-        if idx == 2 and val == 0:
+        if unit == "m" and val == 0:
             return "OFF"
         if unit == "m":
             if val >= 60:
@@ -93,34 +96,35 @@ class Timers(Visual):
 
         # Parameter rows
         for i, (label, _, _, _, _, _) in enumerate(self.PARAMS):
-            y = 14 + i * 10
+            y = 14 + i * 9
             color = Colors.WHITE if i == self.selected else Colors.GRAY
 
             d.draw_text_small(2, y, label, color)
             val_str = self._fmt_value(i)
-            d.draw_text_small(26, y, val_str, color)
+            d.draw_text_small(30, y, val_str, color)
 
             # Arrow indicators for selected row
             if i == self.selected:
                 ay = y + 2
                 # Left arrow
-                d.set_pixel(49, ay, color)
-                d.set_pixel(50, ay - 1, color)
-                d.set_pixel(50, ay + 1, color)
-                # Right arrow
-                d.set_pixel(54, ay, color)
+                d.set_pixel(52, ay, color)
                 d.set_pixel(53, ay - 1, color)
                 d.set_pixel(53, ay + 1, color)
+                # Right arrow
+                d.set_pixel(57, ay, color)
+                d.set_pixel(56, ay - 1, color)
+                d.set_pixel(56, ay + 1, color)
 
         # Descriptions
-        d.draw_line(0, 45, 63, 45, Colors.DARK_GRAY)
+        d.draw_line(0, 51, 63, 51, Colors.DARK_GRAY)
         descs = [
             "SCREENSAVER DELAY",
             "VISUAL ROTATION",
+            "TITLE CARD TIME",
             "AUTO POWER OFF",
         ]
-        d.draw_text_small(2, 48, descs[self.selected], Colors.DARK_GRAY)
+        d.draw_text_small(2, 53, descs[self.selected], Colors.DARK_GRAY)
 
         # Footer
-        d.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-        d.draw_text_small(2, 58, "BTN:ACCEPT", Colors.GRAY)
+        d.draw_line(0, 59, 63, 59, Colors.DARK_GRAY)
+        d.draw_text_small(2, 61, "BTN:ACCEPT", Colors.GRAY)

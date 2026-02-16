@@ -8947,7 +8947,7 @@
           "is_game": false
         },
         {
-          "name": "IDLE",
+          "name": "IDLE TIMERS",
           "cls": "Timers",
           "module": "visuals/timers.py",
           "is_game": false

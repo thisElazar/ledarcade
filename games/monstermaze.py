@@ -319,7 +319,8 @@ class MonsterMaze(Game):
             if self.escaped_timer <= 0:
                 self.level += 1
                 self._init_level()
-                self.phase = 'playing'
+                self.phase = 'title'
+                self.phase_timer = 2.0
             return
 
         # Flash timer
@@ -360,7 +361,7 @@ class MonsterMaze(Game):
         # Check exit
         if self.px == self.exit_x and self.py == self.exit_y:
             self.phase = 'escaped'
-            self.escaped_timer = 1.5
+            self.escaped_timer = 2.5
             self.flash_timer = 0.3
             self.flash_color = (0, 255, 0)
             bonus = 100 * self.level + max(0, 500 - self.steps * 5)

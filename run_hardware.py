@@ -541,6 +541,7 @@ def main():
     # Load timer settings
     idle_timeout = persistent.get_idle_timeout()
     cycle_duration = persistent.get_cycle_duration()
+    titles_cycle_duration = persistent.get_titles_cycle_duration()
     sleep_minutes = persistent.get_sleep_timer()
     uptime = 0.0  # Total runtime for sleep timer
 
@@ -642,7 +643,8 @@ def main():
                                 idle_visual.update(dt)
                         else:
                             idle_cycle_timer += dt
-                            if idle_cycle_timer >= cycle_duration:
+                            _cur_cycle = titles_cycle_duration if (idle_visual and getattr(idle_visual, 'category', '') == 'titles') else cycle_duration
+                            if idle_cycle_timer >= _cur_cycle:
                                 # Start transition to new visual
                                 old_visual = idle_visual
                                 new_visual = _pick_idle_visual(display)
@@ -990,6 +992,7 @@ def main():
                                 # Reload timer settings (may have changed)
                                 idle_timeout = persistent.get_idle_timeout()
                                 cycle_duration = persistent.get_cycle_duration()
+                                titles_cycle_duration = persistent.get_titles_cycle_duration()
                                 sleep_minutes = persistent.get_sleep_timer()
                             else:
                                 current_item.update(dt)
