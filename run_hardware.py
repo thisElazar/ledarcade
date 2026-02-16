@@ -128,7 +128,12 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         display.draw_text_small(2, 50, ">MENU", Colors.YELLOW)
 
 
-def draw_menu(display, categories, cat_index, item_index):
+def _text_width(text):
+    """Width in pixels of text rendered with draw_text_small (4px per char)."""
+    return len(text) * 4 - 1 if text else 0
+
+
+def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
     display.clear(Colors.BLACK)
 
     if not categories:
@@ -188,13 +193,21 @@ def draw_menu(display, categories, cat_index, item_index):
     if start_idx + visible > len(items):
         start_idx = max(0, len(items) - visible)
 
+    NAME_X = 6
+    MAX_NAME_W = 58
+
     for i, item_class in enumerate(items[start_idx:start_idx + visible]):
         actual_idx = start_idx + i
         y = 14 + i * 8
 
         if actual_idx == item_index:
             display.draw_rect(0, y - 1, 64, 7, Colors.DARK_GRAY)
-            display.draw_text_small(2, y, f">{item_class.name}", cat_color)
+            display.draw_text_small(2, y, ">", cat_color)
+            name_w = _text_width(item_class.name)
+            if name_w > MAX_NAME_W:
+                display.draw_text_small(NAME_X - int(name_scroll_x), y, item_class.name, cat_color)
+            else:
+                display.draw_text_small(NAME_X, y, item_class.name, cat_color)
         else:
             display.draw_text_small(2, y, f" {item_class.name}", Colors.WHITE)
 
@@ -532,6 +545,15 @@ def main():
     is_game = False
     exit_hold = 0.0         # Timer for hold-to-exit (gameplay and visuals)
 
+    # Menu name scroll state
+    name_scroll_x = 0.0
+    name_scroll_timer = 0.0
+    prev_cat_index = -1
+    prev_item_index = -1
+    NAME_SCROLL_DELAY = 0.8
+    NAME_SCROLL_SPEED = 20.0
+    NAME_SCROLL_PAUSE = 1.0
+
     # Idle screen state
     idle_timer = 0.0
     in_idle = False
@@ -814,7 +836,30 @@ def main():
                                     in_menu = False
                                     exit_hold = 0.0
 
-                        draw_menu(display, categories, cat_index, item_index)
+                        # Update name scroll for selected item
+                        if cat_index != prev_cat_index or item_index != prev_item_index:
+                            name_scroll_x = 0.0
+                            name_scroll_timer = 0.0
+                            prev_cat_index = cat_index
+                            prev_item_index = item_index
+                        else:
+                            name_scroll_timer += dt
+                            if name_scroll_timer > NAME_SCROLL_DELAY:
+                                items = categories[cat_index].items
+                                if items:
+                                    name = items[item_index].name
+                                    name_w = _text_width(name)
+                                    max_name_w = 58
+                                    if name_w > max_name_w:
+                                        max_scroll = name_w - max_name_w
+                                        if name_scroll_x < max_scroll:
+                                            name_scroll_x += NAME_SCROLL_SPEED * dt
+                                            name_scroll_x = min(name_scroll_x, max_scroll)
+                                        elif name_scroll_timer > NAME_SCROLL_DELAY + max_scroll / NAME_SCROLL_SPEED + NAME_SCROLL_PAUSE:
+                                            name_scroll_x = 0.0
+                                            name_scroll_timer = 0.0
+
+                        draw_menu(display, categories, cat_index, item_index, name_scroll_x)
 
             else:
                 # Running game or visual
