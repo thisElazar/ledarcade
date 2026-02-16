@@ -145,6 +145,7 @@ from .controls import Controls
 from .shutdown import Shutdown
 from .wifi_config import WiFiConfig
 from .refresh import Refresh
+from .idlemix import IdleMix
 from .paint import Paint
 from .paint_gif import PaintGif
 from .newtoncradle import NewtonCradle
@@ -301,6 +302,12 @@ from .trashblasterdemo import TrashBlasterDemo
 from .moon import MoonPhases
 from .constellations import Constellations
 from .fractals import Fractals
+from .primes import Primes
+from .fibonacci import Fibonacci
+from .pi import Pi
+from .platonic import Platonic
+from .tessellations import Tessellations
+from .spirograph import Spirograph
 from .watercycle import WaterCycle
 from .flags import Flags
 from .signs import Signs
@@ -386,6 +393,7 @@ ALL_VISUALS = [
     Shutdown,
     WiFiConfig,
     Refresh,
+    IdleMix,
     Paint,
     PaintGif,
     NewtonCradle,
@@ -550,6 +558,12 @@ ALL_VISUALS = [
     MoonPhases,
     Constellations,
     Fractals,
+    Primes,
+    Fibonacci,
+    Pi,
+    Platonic,
+    Tessellations,
+    Spirograph,
     WaterCycle,
     Flags,
     Signs,
@@ -689,6 +703,7 @@ __all__ = [
     'Controls',
     'Shutdown',
     'Refresh',
+    'IdleMix',
     'NewtonCradle',
     'DblPendulum',
     'OrbitsSolar',
@@ -773,6 +788,12 @@ __all__ = [
     'MoonPhases',
     'Constellations',
     'Fractals',
+    'Primes',
+    'Fibonacci',
+    'Pi',
+    'Platonic',
+    'Tessellations',
+    'Spirograph',
     'WaterCycle',
     'Flags',
     'Signs',

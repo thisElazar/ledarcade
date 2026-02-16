@@ -21,6 +21,9 @@ DEFAULTS = {
     "idle_timeout": 60,
     "cycle_duration": 30,
     "sleep_timer": 0,
+    "idle_category_weights": {},
+    "idle_favorites": [],
+    "idle_blacklist": [],
 }
 
 # In-memory settings cache
@@ -133,6 +136,30 @@ def set_cycle_duration(value):
     """Set visual cycle duration in seconds (10-120)."""
     value = max(10, min(120, int(value)))
     set("cycle_duration", value)
+
+
+def get_idle_category_weights():
+    return get("idle_category_weights", {})
+
+
+def set_idle_category_weights(d):
+    set("idle_category_weights", d)
+
+
+def get_idle_favorites():
+    return get("idle_favorites", [])
+
+
+def set_idle_favorites(lst):
+    set("idle_favorites", list(lst))
+
+
+def get_idle_blacklist():
+    return get("idle_blacklist", [])
+
+
+def set_idle_blacklist(lst):
+    set("idle_blacklist", list(lst))
 
 
 def get_sleep_timer():

@@ -463,8 +463,17 @@ def _pick_idle_visual(display):
     """Pick a weighted random visual for idle screen."""
     from visuals import ALL_VISUALS
     from visuals.slideshow import Slideshow, AllVisuals, _randomize_style
-    # Use same category weights as AllVisuals slideshow
-    weights = AllVisuals.CATEGORY_WEIGHTS
+    import settings
+
+    # Load user overrides
+    user_weights = settings.get_idle_category_weights()
+    favorites = set(settings.get_idle_favorites())
+    blacklist = set(settings.get_idle_blacklist())
+
+    # Base weights: user overrides > built-in defaults
+    base_weights = dict(AllVisuals.CATEGORY_WEIGHTS)
+    base_weights.update(user_weights)
+
     candidates = []
     for v in ALL_VISUALS:
         if issubclass(v, Slideshow):
@@ -472,8 +481,20 @@ def _pick_idle_visual(display):
         cat = getattr(v, 'category', '')
         if cat == 'utility':
             continue
-        weight = weights.get(cat, 2)
+
+        name = v.__name__
+        if name in blacklist:
+            continue
+
+        weight = base_weights.get(cat, 2)
+        if weight <= 0:
+            continue
+
+        if name in favorites:
+            weight *= 2
+
         candidates.extend([v] * weight)
+
     if not candidates:
         return None
     cls = random.choice(candidates)
