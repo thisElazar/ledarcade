@@ -29,7 +29,7 @@
         "year": 1512,
         "movement": "Renaissance",
         "file": "Michelangelo_-_Creation_of_Adam_(cropped).jpg",
-        "crop": "center"
+        "crop": [0.36, 0.39, 0.85]
     },
     "sistine_madonna": {
         "title": "Sistine Madonna",
@@ -597,7 +597,7 @@
         "year": 1942,
         "movement": "Realism",
         "file": "Nighthawks_by_Edward_Hopper_1942.jpg",
-        "crop": "center"
+        "crop": [0.57, 0.5, 1.0]
     },
     "american_gothic": {
         "title": "American Gothic",
@@ -732,8 +732,8 @@
         "artist": "Henri Rousseau",
         "year": 1897,
         "movement": "Post-Impressionism",
-        "file": "Henri Rousseau Sleeping Gypsy (2346770).jpg",
-        "crop": "center"
+        "file": "La Bohémienne endormie.jpg",
+        "crop": [0.65, 0.5, 1.0]
     },
     "the_scream": {
         "title": "The Scream",
@@ -1146,12 +1146,14 @@
         "crop": "center"
     },
     "zhang_zeduan_qingming": {
-        "title": "Along the River During the Qingming Festival",
+        "title": "Qingming Festival",
         "artist": "Zhang Zeduan",
         "year": 1100,
         "movement": "Chinese (Song Dynasty)",
         "file": "Alongtheriver QingMing.jpg",
-        "crop": "center"
+        "crop": [0.58, 0.5, 1.0],
+        "saturation": 1.4,
+        "contrast": 1.3
     },
     "tohaku_pine_trees": {
         "title": "Pine Trees",
@@ -1159,7 +1161,7 @@
         "year": 1595,
         "movement": "Japanese (Momoyama)",
         "file": "Hasegawa Tohaku - Pine Trees (Shōrin-zu byōbu) - right hand screen.jpg",
-        "crop": "center"
+        "crop": [0.38, 0.5, 1.0]
     },
     "korin_irises": {
         "title": "Irises",
@@ -1368,7 +1370,7 @@
         "year": 1495,
         "movement": "Japanese (Muromachi)",
         "file": "Sesshu - Haboku-Sansui - complete.jpg",
-        "crop": "center"
+        "crop": "bottom"
     },
     "kim_hongdo_blacksmith": {
         "title": "Blacksmith Shop",

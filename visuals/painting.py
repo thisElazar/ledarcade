@@ -10,7 +10,14 @@ Controls:
 """
 
 import os
+import unicodedata
 from . import Visual, Display, Colors, GRID_SIZE
+
+
+def _strip_accents(s):
+    """Replace accented characters with ASCII equivalents for LED font."""
+    nfkd = unicodedata.normalize('NFKD', s)
+    return ''.join(c for c in nfkd if not unicodedata.combining(c))
 
 try:
     from PIL import Image
@@ -167,7 +174,7 @@ PAINTING_META = {
     "la_tour_magdalene": ("The Penitent Magdalene", "Georges de La Tour", 1640),
     "guo_xi_early_spring": ("Early Spring", "Guo Xi", 1072),
     "fan_kuan_travelers": ("Travelers Among Mountains and Streams", "Fan Kuan", 1000),
-    "zhang_zeduan_qingming": ("Along the River During the Qingming Festival", "Zhang Zeduan", 1100),
+    "zhang_zeduan_qingming": ("Qingming Festival", "Zhang Zeduan", 1100),
     "tohaku_pine_trees": ("Pine Trees", "Hasegawa Tōhaku", 1595),
     "korin_irises": ("Irises", "Ogata Kōrin", 1702),
     "utamaro_beauties": ("Three Beauties of the Present Day", "Kitagawa Utamaro", 1793),
@@ -393,7 +400,7 @@ for _pid, (_title, _artist, _year) in PAINTING_META.items():
     _all_pids.append(_pid)
     _cls_name = "Painting" + "".join(w.capitalize() for w in _pid.split("_"))
     _cls = type(_cls_name, (_PaintingBase,), {
-        "name": _title.upper(),
+        "name": _strip_accents(_title).upper(),
         "description": f"{_artist}, {abs(_year)} BCE" if _year < 0 else f"{_artist}, {_year}",
         "_pid": _pid,
     })

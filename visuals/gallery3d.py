@@ -374,12 +374,14 @@ class _Gallery3DBase(Visual):
 
     def _get_room_cell(self):
         mx, my = int(self.px), int(self.py)
-        if mx < 0 or mx >= self.MAP_W or my < 0 or my >= self.MAP_H:
+        if not self.MAP or mx < 0 or mx >= self.MAP_W or my < 0 or my >= self.MAP_H:
             return 0
         for dy, dx in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             cx, cy = mx + dx, my + dy
             for _ in range(8):
                 if cx < 0 or cx >= self.MAP_W or cy < 0 or cy >= self.MAP_H:
+                    break
+                if cy >= len(self.MAP) or cx >= len(self.MAP[cy]):
                     break
                 c = self.MAP[cy][cx]
                 if c in self.IMMERSIVE:

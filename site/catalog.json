@@ -983,7 +983,7 @@
       "key": "art",
       "items": [
         {
-          "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+          "name": "A BAR AT THE FOLIES-BERGERE",
           "cls": "PaintingBarFoliesBergere",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1013,7 +1013,7 @@
           "is_game": false
         },
         {
-          "name": "ALONG THE RIVER DURING THE QINGMING FESTIVAL",
+          "name": "QINGMING FESTIVAL",
           "cls": "PaintingZhangZeduanQingming",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1067,13 +1067,13 @@
           "is_game": false
         },
         {
-          "name": "BATHERS AT ASNI\u00c8RES",
+          "name": "BATHERS AT ASNIERES",
           "cls": "PaintingBathersAsnieres",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "BATTLE OF MOH\u00c1CS",
+          "name": "BATTLE OF MOHACS",
           "cls": "PaintingOttomanMohacs",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1133,7 +1133,7 @@
           "is_game": false
         },
         {
-          "name": "CAF\u00c9 TERRACE AT NIGHT",
+          "name": "CAFE TERRACE AT NIGHT",
           "cls": "PaintingCafeTerrace",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1271,7 +1271,7 @@
           "is_game": false
         },
         {
-          "name": "JEANNE H\u00c9BUTERNE",
+          "name": "JEANNE HEBUTERNE",
           "cls": "PaintingModiglianiPortrait",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1319,13 +1319,13 @@
           "is_game": false
         },
         {
-          "name": "MAEST\u00c0",
+          "name": "MAESTA",
           "cls": "PaintingCimabueMaesta",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "MAEST\u00c0",
+          "name": "MAESTA",
           "cls": "PaintingDuccioMaesta",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1367,7 +1367,7 @@
           "is_game": false
         },
         {
-          "name": "M\u00c9RODE ALTARPIECE",
+          "name": "MERODE ALTARPIECE",
           "cls": "PaintingCampinMerode",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1937,7 +1937,7 @@
           "is_game": false
         },
         {
-          "name": "TR\u00c8S RICHES HEURES (JANUARY)",
+          "name": "TRES RICHES HEURES (JANUARY)",
           "cls": "PaintingTresRichesHeures",
           "module": "visuals/painting.py",
           "is_game": false
@@ -2039,7 +2039,7 @@
           "is_game": false
         },
         {
-          "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
+          "name": "OTANI ONIJI III AS YAKKO EDOBEI",
           "cls": "PaintingSharakuActor",
           "module": "visuals/painting.py",
           "is_game": false
@@ -6497,7 +6497,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+              "name": "A BAR AT THE FOLIES-BERGÈRE",
               "cls": "PaintingBarFoliesBergere",
               "module": "visuals/painting.py"
             },
@@ -6562,7 +6562,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATHERS AT ASNI\u00c8RES",
+              "name": "BATHERS AT ASNIÈRES",
               "cls": "PaintingBathersAsnieres",
               "module": "visuals/painting.py"
             },
@@ -6602,7 +6602,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "CAF\u00c9 TERRACE AT NIGHT",
+              "name": "CAFÉ TERRACE AT NIGHT",
               "cls": "PaintingCafeTerrace",
               "module": "visuals/painting.py"
             },
@@ -6737,7 +6737,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "JEANNE H\u00c9BUTERNE",
+              "name": "JEANNE HÉBUTERNE",
               "cls": "PaintingModiglianiPortrait",
               "module": "visuals/painting.py"
             },
@@ -6872,12 +6872,12 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAEST\u00c0",
+              "name": "MAESTÀ",
               "cls": "PaintingCimabueMaesta",
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAEST\u00c0",
+              "name": "MAESTÀ",
               "cls": "PaintingDuccioMaesta",
               "module": "visuals/painting.py"
             },
@@ -6902,7 +6902,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "M\u00c9RODE ALTARPIECE",
+              "name": "MÉRODE ALTARPIECE",
               "cls": "PaintingCampinMerode",
               "module": "visuals/painting.py"
             },
@@ -6932,7 +6932,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "ALONG THE RIVER DURING THE QINGMING FESTIVAL",
+              "name": "QINGMING FESTIVAL",
               "cls": "PaintingZhangZeduanQingming",
               "module": "visuals/painting.py"
             },
@@ -6952,7 +6952,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
+              "name": "ŌTANI ONIJI III AS YAKKO EDOBEI",
               "cls": "PaintingSharakuActor",
               "module": "visuals/painting.py"
             },
@@ -7007,7 +7007,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "TR\u00c8S RICHES HEURES (JANUARY)",
+              "name": "TRÈS RICHES HEURES (JANUARY)",
               "cls": "PaintingTresRichesHeures",
               "module": "visuals/painting.py"
             },
@@ -7052,7 +7052,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATTLE OF MOH\u00c1CS",
+              "name": "BATTLE OF MOHÁCS",
               "cls": "PaintingOttomanMohacs",
               "module": "visuals/painting.py"
             },

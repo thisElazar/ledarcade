@@ -118,10 +118,27 @@ def download(pid, entry):
 # ── Image processing ──────────────────────────────────────────────
 
 def crop_square(img, mode="center"):
-    """Crop to square using specified anchor point."""
+    """Crop to square using specified anchor point.
+
+    mode can be:
+      "center", "top", "bottom", "left", "right" — anchor-based square crop
+      "fill" — letterbox to square with black bars
+      [x, y, s] — custom crop rect (in fraction 0..1 of source dimensions)
+                   crops a square of side s*min(w,h) centered at (x*w, y*h)
+    """
     w, h = img.size
-    if w == h:
+    if w == h and mode == "center":
         return img
+
+    # Custom crop rect: [cx_frac, cy_frac, size_frac]
+    if isinstance(mode, list) and len(mode) == 3:
+        cx_frac, cy_frac, size_frac = mode
+        s = int(min(w, h) * size_frac)
+        cx = int(w * cx_frac)
+        cy = int(h * cy_frac)
+        x = max(0, min(w - s, cx - s // 2))
+        y = max(0, min(h - s, cy - s // 2))
+        return img.crop((x, y, x + s, y + s))
 
     if mode == "fill":
         side = max(w, h)
