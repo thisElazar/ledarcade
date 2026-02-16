@@ -36,38 +36,63 @@ class Category:
         return len(self.items)
 
 
-# Game categories
+# ── Color scheme ──────────────────────────────────────────────────
+# Games: rainbow spectrum (R O Y G B P Pk) at s=0.85 v=0.90
+# Visuals: family clusters — Creative (golds), Nature (greens),
+#   Digital (cyans), Knowledge (blues), Mechanical (purples),
+#   Domestic (pinks), Meta (desaturated)
+# See docs or git log for full hue/family rationale.
+
+# Game categories (chronological era → social → mix)
 GAME_CATEGORIES = [
-    Category("ARCADE GAMES", Colors.YELLOW, "arcade"),
-    Category("RETRO GAMES", Colors.GREEN, "retro"),
-    Category("MODERN GAMES", Colors.CYAN, "modern"),
-    Category("TOYS", Colors.PINK, "toys"),
-    Category("2 PLAYER GAMES", Colors.MAGENTA, "2_player"),
-    Category("BAR GAMES", (200, 150, 50), "bar"),
-    Category("UNIQUE GAMES", (100, 255, 180), "unique"),
-    Category("GAME MIX", Colors.ORANGE, "game_mix"),
+    Category("ARCADE GAMES",   (230, 35, 35),   "arcade"),     # 0° red
+    Category("RETRO GAMES",    (230, 132, 35),   "retro"),     # 30° orange
+    Category("MODERN GAMES",   (230, 197, 35),   "modern"),    # 50° yellow
+    Category("TOYS",           (35, 230, 35),    "toys"),      # 120° green
+    Category("BAR GAMES",      (35, 116, 230),   "bar"),       # 215° blue
+    Category("2 PLAYER GAMES", (132, 35, 230),   "2_player"),  # 270° purple
+    Category("UNIQUE GAMES",   (230, 35, 132),   "unique"),    # 330° pink
+    Category("GAME MIX",       (195, 195, 210),  "game_mix"),  # desaturated
 ]
 
-# Visual categories
+# Visual categories (alphabetical, VISUAL MIX + UTILITY last)
 VISUAL_CATEGORIES = [
-    Category("ART", Colors.YELLOW, "art"),
-    Category("AUTOMATA", Colors.MAGENTA, "automata"),
-    Category("DEMOS", (255, 100, 100), "demos"),
-    Category("DIGITAL", Colors.CYAN, "digital"),
-    Category("GALLERY", (180, 150, 50), "gallery"),
-    Category("COOKING", (120, 160, 100), "cooking"),
-    Category("HOUSEHOLD", Colors.ORANGE, "household"),
-    Category("MATH", (100, 200, 255), "math"),
-    Category("MECHANICS", Colors.PURPLE, "mechanics"),
-    Category("MUSIC", (255, 180, 50), "music"),
-    Category("OUTDOORS", Colors.GREEN, "nature"),
-    Category("ROAD+RAIL", (255, 160, 0), "road_rail"),
-    Category("SCIENCE", Colors.BLUE, "science"),
-    Category("SPRITES", Colors.LIME, "sprites"),
-    Category("SUPERHEROES", Colors.RED, "superheroes"),
-    Category("TITLES", (200, 180, 255), "titles"),
-    Category("VISUAL MIX", (100, 255, 100), "visual_mix"),
-    Category("UTILITY", Colors.WHITE, "utility"),      # Always last
+    # Creative family (golds, 40°-60°)
+    Category("ART",         (224, 165, 45),  "art"),         # 40°
+    # Digital family (cyans, 174°-186°)
+    Category("AUTOMATA",    (65, 217, 200),  "automata"),    # 174°
+    # Domestic family (pinks, 332°-344°)
+    Category("COOKING",     (217, 65, 136),  "cooking"),     # 332°
+    # Nature family (greens, 112°-126°)
+    Category("CULTURE",     (65, 217, 85),   "culture"),     # 112°
+    # Creative family
+    Category("DEMOS",       (217, 191, 65),  "demos"),       # 50°
+    # Digital family
+    Category("DIGITAL",     (56, 208, 224),  "digital"),     # 186°
+    # Meta (desaturated)
+    Category("GALLERY",     (204, 194, 163), "gallery"),     # 45° low-sat
+    # Domestic family
+    Category("HOUSEHOLD",   (217, 65, 106),  "household"),   # 344°
+    # Knowledge family (blues, 222°-250°)
+    Category("MATH",        (56, 107, 224),  "math"),        # 222°
+    # Mechanical family (purples, 280°-292°)
+    Category("MECHANICS",   (166, 65, 217),  "mechanics"),   # 280°
+    # Knowledge family
+    Category("MUSIC",       (65, 75, 217),   "music"),       # 236°
+    # Nature family
+    Category("OUTDOORS",    (56, 224, 73),   "nature"),      # 126°
+    # Mechanical family
+    Category("ROAD+RAIL",   (197, 65, 217),  "road_rail"),   # 292°
+    # Knowledge family
+    Category("SCIENCE",     (75, 45, 224),   "science"),     # 250°
+    # Optional / local-only
+    Category("SPRITES",     (160, 217, 65),  "sprites"),     # 85°
+    Category("SUPERHEROES", (230, 52, 35),   "superheroes"), # 5°
+    # Creative family
+    Category("TITLES",      (217, 217, 65),  "titles"),      # 60°
+    # Meta (desaturated)
+    Category("VISUAL MIX",  (173, 204, 194), "visual_mix"),  # 160° low-sat
+    Category("UTILITY",     (204, 204, 204), "utility"),     # neutral gray
 ]
 
 # Category key to object mapping for easy lookup

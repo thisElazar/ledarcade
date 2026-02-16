@@ -210,7 +210,7 @@ def _load_flag_png(iso_code):
 class Flags(Visual):
     name = "FLAGS"
     description = "Flags of the world"
-    category = "road_rail"
+    category = "culture"
 
     def reset(self):
         self.time = 0.0

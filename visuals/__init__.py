@@ -310,6 +310,7 @@ from .tessellations import Tessellations
 from .spirograph import Spirograph
 from .watercycle import WaterCycle
 from .flags import Flags
+from .weaving import Weaving
 from .signs import Signs
 from .matter import MatterPhases
 from .slideshow import (
@@ -566,6 +567,7 @@ ALL_VISUALS = [
     Spirograph,
     WaterCycle,
     Flags,
+    Weaving,
     Signs,
     MatterPhases,
     # Slideshows (visual playlists)
