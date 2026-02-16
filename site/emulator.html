@@ -437,6 +437,9 @@
   let haeckelAtlasLoaded = false;
   let audubonAtlasLoaded = false;
   let merianAtlasLoaded = false;
+  let redouteAtlasLoaded = false;
+  let sebaAtlasLoaded = false;
+  let gouldAtlasLoaded = false;
 
   function setStatus(text, cls) {
     pyStatusEl.textContent = text;
@@ -1279,6 +1282,51 @@ _menu = EmulatorMenu(_catalog)
     }
   }
 
+  async function loadRedouteAtlas() {
+    if (redouteAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/redoute_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_REDOUTE_PIXELS', pyDict);
+      pyDict.destroy();
+      redouteAtlasLoaded = true;
+    } catch(e) {
+      console.error('Redoute atlas error:', e);
+    }
+  }
+
+  async function loadSebaAtlas() {
+    if (sebaAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/seba_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_SEBA_PIXELS', pyDict);
+      pyDict.destroy();
+      sebaAtlasLoaded = true;
+    } catch(e) {
+      console.error('Seba atlas error:', e);
+    }
+  }
+
+  async function loadGouldAtlas() {
+    if (gouldAtlasLoaded) return;
+    try {
+      const resp = await fetch(GITHUB_RAW + 'site/gould_atlas.json');
+      if (!resp.ok) return;
+      const atlas = await resp.json();
+      const pyDict = pyodide.toPy(atlas);
+      pyodide.globals.set('_GOULD_PIXELS', pyDict);
+      pyDict.destroy();
+      gouldAtlasLoaded = true;
+    } catch(e) {
+      console.error('Gould atlas error:', e);
+    }
+  }
+
   const museumAtlasLoaded = {};
   async function loadMuseumAtlas(clsName) {
     if (museumAtlasLoaded[clsName]) return;
@@ -1344,6 +1392,9 @@ del _tmp_museum
         await loadHaeckelAtlas();
         await loadAudubonAtlas();
         await loadMerianAtlas();
+        await loadRedouteAtlas();
+        await loadSebaAtlas();
+        await loadGouldAtlas();
       }
       if (modulePath === 'visuals/gallery3d.py') {
         await loadPaintingAtlas();

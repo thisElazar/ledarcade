@@ -198,6 +198,53 @@ class ArtGallery(Slideshow):
         return False
 
 
+class Naturalist(Slideshow):
+    name = "NATURALIST"
+    description = "Scientific illustrations shuffled"
+    category = "visual_mix"
+    cycle_interval = 25.0
+
+    def reset(self):
+        self._show_nameplate = False
+        super().reset()
+
+    def _get_visual_classes(self):
+        from visuals.plates import Haeckel, Audubon, Merian, Redoute, Seba, Gould
+        return [Haeckel, Audubon, Merian, Redoute, Seba, Gould]
+
+    def _advance(self):
+        """Pick next collection, carry overlay state."""
+        if not self._queue:
+            self._queue = self._get_visual_classes()
+            random.shuffle(self._queue)
+        if self._queue:
+            cls = self._queue.pop()
+            self._child = cls(self.display)
+            self._child.reset()
+            # Inherit nameplate state from previous
+            self._child._show_overlay = self._show_nameplate
+            self._child._overlay_alpha = 1.0 if self._show_nameplate else 0.0
+            self._child._overlay_time = 0.0
+            self._cycle_timer = 0.0
+
+    def handle_input(self, input_state):
+        # Button: skip to next collection
+        if input_state.action_l or input_state.action_r:
+            self._advance()
+            return True
+        # Any joystick press: toggle nameplate
+        if (input_state.up_pressed or input_state.down_pressed
+                or input_state.left_pressed or input_state.right_pressed):
+            self._show_nameplate = not self._show_nameplate
+            if self._child and hasattr(self._child, '_show_overlay'):
+                self._child._show_overlay = self._show_nameplate
+                self._child._overlay_time = 0.0
+            return True
+        if input_state.any_direction:
+            return True
+        return False
+
+
 class Demoscene(Slideshow):
     name = "DEMOSCENE"
     description = "Old-school demo effects"

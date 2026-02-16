@@ -13,6 +13,7 @@ Controls:
 
 import os
 import json
+import random
 import unicodedata
 from . import Visual, Display, Colors, GRID_SIZE
 
@@ -33,6 +34,9 @@ except ImportError:
 _HAECKEL_ATLAS = globals().get('_HAECKEL_PIXELS', {})
 _AUDUBON_ATLAS = globals().get('_AUDUBON_PIXELS', {})
 _MERIAN_ATLAS = globals().get('_MERIAN_PIXELS', {})
+_REDOUTE_ATLAS = globals().get('_REDOUTE_PIXELS', {})
+_SEBA_ATLAS = globals().get('_SEBA_PIXELS', {})
+_GOULD_ATLAS = globals().get('_GOULD_PIXELS', {})
 
 try:
     _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,9 +55,12 @@ _LINE_Y_COUNT = GRID_SIZE - 6   # counter line
 _DIM_TOP = _LINE_Y_TITLE - 3
 
 # Pan speeds
-_AUTO_PAN_SPEED = 35.0   # pixels per second
+_AUTO_PAN_SPEED = 8.75   # pixels per second
 _MANUAL_PAN_SPEED = 60.0  # pixels per second
 _PAUSE_DURATION = 1.5     # seconds to pause at top/bottom
+
+# Auto-cycle
+_PLATE_DURATION = 25.0    # seconds before auto-advancing to next plate
 
 
 class _PlatesBase(Visual):
@@ -76,6 +83,9 @@ class _PlatesBase(Visual):
         self._manual_pan = False
         self._pause_timer = _PAUSE_DURATION  # start paused at top
 
+        # Auto-cycle timer
+        self._plate_timer = 0.0
+
         # Overlay state
         self._show_overlay = False
         self._overlay_alpha = 0.0
@@ -87,6 +97,7 @@ class _PlatesBase(Visual):
 
         self._load_manifest()
         if self._plates:
+            self._plate_idx = random.randint(0, len(self._plates) - 1)
             self._load_plate()
 
     def _load_manifest(self):
@@ -106,13 +117,14 @@ class _PlatesBase(Visual):
 
     def _get_atlas(self):
         """Get the atlas dict for this collection."""
-        if self._collection == "haeckel":
-            return _HAECKEL_ATLAS
-        elif self._collection == "audubon":
-            return _AUDUBON_ATLAS
-        elif self._collection == "merian":
-            return _MERIAN_ATLAS
-        return {}
+        return {
+            "haeckel": _HAECKEL_ATLAS,
+            "audubon": _AUDUBON_ATLAS,
+            "merian": _MERIAN_ATLAS,
+            "redoute": _REDOUTE_ATLAS,
+            "seba": _SEBA_ATLAS,
+            "gould": _GOULD_ATLAS,
+        }.get(self._collection, {})
 
     def _load_plate(self):
         """Load current plate's pixel data."""
@@ -178,6 +190,7 @@ class _PlatesBase(Visual):
                     self._plate_idx = (self._plate_idx - 1) % len(self._plates)
                 self._load_plate()
                 self._reset_pan()
+                self._plate_timer = 0.0
                 self._overlay_time = 0.0
             return True
         if input_state.left or input_state.right:
@@ -209,6 +222,16 @@ class _PlatesBase(Visual):
 
     def update(self, dt):
         self.time += dt
+
+        # Auto-cycle to next plate
+        if self._plates and len(self._plates) > 1:
+            self._plate_timer += dt
+            if self._plate_timer >= _PLATE_DURATION:
+                self._plate_idx = (self._plate_idx + 1) % len(self._plates)
+                self._load_plate()
+                self._reset_pan()
+                self._plate_timer = 0.0
+                self._overlay_time = 0.0
 
         # Auto-pan when not manually controlled
         if not self._manual_pan and self.pixels:
@@ -324,3 +347,24 @@ class Merian(_PlatesBase):
     description = "Metamorphosis Insectorum"
     _collection = "merian"
     _manifest_file = "merian_plates.json"
+
+
+class Redoute(_PlatesBase):
+    name = "REDOUTE"
+    description = "Les Roses"
+    _collection = "redoute"
+    _manifest_file = "redoute_plates.json"
+
+
+class Seba(_PlatesBase):
+    name = "SEBA"
+    description = "Cabinet of Curiosities"
+    _collection = "seba"
+    _manifest_file = "seba_plates.json"
+
+
+class Gould(_PlatesBase):
+    name = "GOULD"
+    description = "Hummingbirds"
+    _collection = "gould"
+    _manifest_file = "gould_plates.json"

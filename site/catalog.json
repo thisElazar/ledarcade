@@ -3871,6 +3871,12 @@
           "is_game": false
         },
         {
+          "name": "GOULD",
+          "cls": "Gould",
+          "module": "visuals/plates.py",
+          "is_game": false
+        },
+        {
           "name": "HAECKEL",
           "cls": "Haeckel",
           "module": "visuals/plates.py",
@@ -3901,9 +3907,21 @@
           "is_game": false
         },
         {
+          "name": "REDOUTE",
+          "cls": "Redoute",
+          "module": "visuals/plates.py",
+          "is_game": false
+        },
+        {
           "name": "RIPPLES",
           "cls": "Ripples",
           "module": "visuals/ripples.py",
+          "is_game": false
+        },
+        {
+          "name": "SEBA",
+          "cls": "Seba",
+          "module": "visuals/plates.py",
           "is_game": false
         },
         {
@@ -4120,6 +4138,12 @@
           "name": "PROTEINS",
           "cls": "Proteins",
           "module": "visuals/proteins.py",
+          "is_game": false
+        },
+        {
+          "name": "PEPTIDES",
+          "cls": "Peptides",
+          "module": "visuals/peptides.py",
           "is_game": false
         },
         {
@@ -5882,6 +5906,21 @@
             {
               "name": "MERIAN",
               "cls": "Merian",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "REDOUTE",
+              "cls": "Redoute",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "SEBA",
+              "cls": "Seba",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "GOULD",
+              "cls": "Gould",
               "module": "visuals/plates.py"
             },
             {
@@ -8477,6 +8516,15 @@
               "cls": "ChordChart",
               "module": "visuals/chordchart.py"
             }
+          ]
+        },
+        {
+          "name": "NATURALIST",
+          "cls": "Naturalist",
+          "module": "visuals/slideshow.py",
+          "is_game": false,
+          "deps": [
+            "visuals/plates.py"
           ]
         },
         {

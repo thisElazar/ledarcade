@@ -93,7 +93,7 @@ from .interchange import Interchange
 from .greenwave import GreenWave
 from .merge import Merge
 from .painting import PAINTING_VISUALS
-from .plates import Haeckel, Audubon, Merian
+from .plates import Haeckel, Audubon, Merian, Redoute, Seba, Gould
 from .mobius import Mobius
 from .lake import Lake
 from .quarks import Quarks
@@ -124,7 +124,7 @@ from .sinescroller import SineScroller
 from .copperbars import CopperBars
 from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GalleryScience, GalleryDigital, GalleryEffects,
-                        GallerySalon,
+                        GallerySalon, GalleryMuseum,
                         GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
@@ -169,6 +169,7 @@ from .earth import Earth
 from .molecule import Molecule
 from .lattice import Lattice
 from .proteins import Proteins
+from .peptides import Peptides
 from .periodic import Periodic
 from .microscope import Microscope
 from .cell import Cell
@@ -318,6 +319,7 @@ from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     Demoscene, Complexity,
     ScienceLab, Title, Demos, MusicMix, Customs, Education,
+    Naturalist,
 )
 
 # List of all available visuals
@@ -374,10 +376,14 @@ ALL_VISUALS = [
     GalleryDigital,
     GalleryEffects,
     GallerySalon,
+    GalleryMuseum,
     *PAINTING_VISUALS,
     Haeckel,
     Audubon,
     Merian,
+    Redoute,
+    Seba,
+    Gould,
     Win95Maze,
     DemonSpirals,
     ParticleLife,
@@ -425,6 +431,7 @@ ALL_VISUALS = [
     Molecule,
     Lattice,
     Proteins,
+    Peptides,
     Periodic,
     Microscope,
     Cell,
@@ -586,6 +593,7 @@ ALL_VISUALS = [
     MusicMix,
     Customs,
     Education,
+    Naturalist,
     Demos,
     # Individual game demos
     AgarioDemo,
@@ -660,6 +668,9 @@ __all__ = [
     'Haeckel',
     'Audubon',
     'Merian',
+    'Redoute',
+    'Seba',
+    'Gould',
     'Mobius',
     'Lake',
     'Quarks',
@@ -693,6 +704,7 @@ __all__ = [
     'GalleryDigital',
     'GalleryEffects',
     'GallerySalon',
+    'GalleryMuseum',
     'Gallery3D',
     'Win95Maze',
     'DemonSpirals',
@@ -737,6 +749,7 @@ __all__ = [
     'Molecule',
     'Lattice',
     'Proteins',
+    'Peptides',
     'Periodic',
     'Microscope',
     'Cell',
@@ -818,6 +831,7 @@ __all__ = [
     'MusicMix',
     'Customs',
     'Education',
+    'Naturalist',
     'Demos',
     'AgarioDemo',
     'DefenderDemo',
