@@ -24,8 +24,9 @@ from pathlib import Path
 
 try:
     from PIL import Image, ImageEnhance
+    import numpy as np
 except ImportError:
-    sys.exit("Pillow required: pip install Pillow")
+    sys.exit("Pillow and numpy required: pip install Pillow numpy")
 
 ROOT     = Path(__file__).resolve().parent.parent
 CACHE    = ROOT / "tools" / ".plates_cache"
@@ -47,6 +48,8 @@ COLLECTIONS = {
         "manifest": ROOT / "tools" / "merian_plates.json",
         "out_dir":  ROOT / "assets" / "merian",
         "atlas":    ROOT / "site" / "merian_atlas.json",
+        "white_balance": 90,  # percentile for sepia removal (aged paper)
+        "saturation": 1.3,    # boost after white balance
     },
     "redoute": {
         "manifest": ROOT / "tools" / "redoute_plates.json",
@@ -69,9 +72,9 @@ COLLECTIONS = {
 # ── Wikimedia Commons API ──────────────────────────────────────────
 
 # Adaptive backoff state — shared across calls within a build run
-_backoff_delay = 8.0   # current inter-request delay (seconds)
-_BACKOFF_MIN   = 6.0
-_BACKOFF_MAX   = 90.0
+_backoff_delay = 15.0  # current inter-request delay (seconds)
+_BACKOFF_MIN   = 12.0
+_BACKOFF_MAX   = 120.0
 
 
 def _api_request(url, timeout=15):
@@ -96,16 +99,12 @@ def _api_request(url, timeout=15):
     return None
 
 
-def wikimedia_resolve_batch(filenames, width=800):
-    """Resolve multiple Commons filenames to thumbnail URLs in batches.
+def wikimedia_thumb_url(filename, width=800):
+    """Resolve a single Commons filename to a thumbnail URL.
 
-    Uses the multi-title API query (up to 50 titles per call) to minimize
-    API hits. Tries cached widths (1024, 640) before the requested width.
-
-    Returns: dict mapping filename → thumb_url (missing entries = failed).
+    Tries common cached thumbnail widths first (more likely to be
+    pre-generated on Wikimedia's CDN and less likely to trigger 429s).
     """
-    BATCH_SIZE = 10  # Keep batches small to avoid triggering rate limits
-
     widths_to_try = []
     for common in (1024, 640):
         if common >= width and common not in widths_to_try:
@@ -113,67 +112,32 @@ def wikimedia_resolve_batch(filenames, width=800):
     if width not in widths_to_try:
         widths_to_try.append(width)
 
-    result = {}
-    remaining = list(filenames)
-
     for w in widths_to_try:
-        if not remaining:
-            break
-        unresolved = []
-        # Process in batches of 50
-        for i in range(0, len(remaining), BATCH_SIZE):
-            batch = remaining[i:i + BATCH_SIZE]
-            titles = "|".join(f"File:{f}" for f in batch)
-            params = urllib.parse.urlencode({
-                "action": "query",
-                "titles": titles,
-                "prop": "imageinfo",
-                "iiprop": "url",
-                "iiurlwidth": w,
-                "format": "json",
-            })
-            url = f"https://commons.wikimedia.org/w/api.php?{params}"
-            try:
-                data = _api_request(url)
-            except Exception as e:
-                print(f"  Batch API error: {e}")
-                unresolved.extend(batch)
-                continue
+        params = urllib.parse.urlencode({
+            "action": "query",
+            "titles": f"File:{filename}",
+            "prop": "imageinfo",
+            "iiprop": "url",
+            "iiurlwidth": w,
+            "format": "json",
+        })
+        url = f"https://commons.wikimedia.org/w/api.php?{params}"
+        try:
+            data = _api_request(url)
+        except Exception as e:
+            print(f"  API error: {e}")
+            continue
 
-            if not data:
-                unresolved.extend(batch)
-                continue
+        if not data:
+            continue
 
-            # Build a set of resolved filenames from this batch
-            resolved_in_batch = set()
-            for page in data.get("query", {}).get("pages", {}).values():
-                title = page.get("title", "")
-                fname = title.replace("File:", "", 1)
-                if "imageinfo" in page:
-                    info = page["imageinfo"][0]
-                    thumb = info.get("thumburl") or info.get("url")
-                    if thumb:
-                        result[fname] = thumb
-                        resolved_in_batch.add(fname)
-
-            # Track which ones from this batch weren't resolved
-            for f in batch:
-                if f not in resolved_in_batch:
-                    unresolved.append(f)
-
-            # Polite delay between batch API calls
-            if i + BATCH_SIZE < len(remaining):
-                time.sleep(_backoff_delay)
-
-        remaining = unresolved
-
-    return result
-
-
-def wikimedia_thumb_url(filename, width=800):
-    """Resolve a single Commons filename (convenience wrapper)."""
-    result = wikimedia_resolve_batch([filename], width)
-    return result.get(filename)
+        for page in data.get("query", {}).get("pages", {}).values():
+            if "imageinfo" in page:
+                info = page["imageinfo"][0]
+                thumb = info.get("thumburl") or info.get("url")
+                if thumb:
+                    return thumb
+    return None
 
 
 def wikimedia_search(query, limit=8):
@@ -196,12 +160,8 @@ def wikimedia_search(query, limit=8):
 
 # ── Download ───────────────────────────────────────────────────────
 
-def download(pid, entry, resolved_urls=None):
-    """Download source image, with caching.
-
-    Args:
-        resolved_urls: optional dict of filename→url from batch resolution.
-    """
+def download(pid, entry):
+    """Download source image, with caching."""
     global _backoff_delay
     CACHE.mkdir(parents=True, exist_ok=True)
 
@@ -215,10 +175,7 @@ def download(pid, entry, resolved_urls=None):
     if "url" in entry:
         url = entry["url"]
     elif "file" in entry:
-        # Use pre-resolved URL if available, otherwise resolve individually
-        url = (resolved_urls or {}).get(entry["file"])
-        if not url:
-            url = wikimedia_thumb_url(entry["file"])
+        url = wikimedia_thumb_url(entry["file"])
         if not url:
             print(f"  FAIL: cannot resolve '{entry['file']}'")
             return None
@@ -256,11 +213,36 @@ def download(pid, entry, resolved_urls=None):
 
 # ── Image processing ──────────────────────────────────────────────
 
-def color_correct(img, entry):
+def white_balance(img, percentile=90):
+    """Remove sepia/color cast by normalizing paper background to white.
+
+    Samples the brightest pixels (paper) and scales each RGB channel
+    so that color maps to white (255,255,255).
+    """
+    arr = np.array(img, dtype=np.float32)
+    r_wp = np.percentile(arr[:,:,0], percentile)
+    g_wp = np.percentile(arr[:,:,1], percentile)
+    b_wp = np.percentile(arr[:,:,2], percentile)
+    if r_wp > 0 and g_wp > 0 and b_wp > 0:
+        arr[:,:,0] = np.clip(arr[:,:,0] * (255.0 / r_wp), 0, 255)
+        arr[:,:,1] = np.clip(arr[:,:,1] * (255.0 / g_wp), 0, 255)
+        arr[:,:,2] = np.clip(arr[:,:,2] * (255.0 / b_wp), 0, 255)
+    return Image.fromarray(arr.astype(np.uint8))
+
+
+def color_correct(img, entry, collection_cfg=None):
     """LED panel color correction — boost sat/contrast for small bright display."""
-    sat = entry.get("saturation", 1.2)
-    con = entry.get("contrast", 1.15)
-    bri = entry.get("brightness", 1.0)
+    cfg = collection_cfg or {}
+
+    # White balance (sepia removal) — only if collection opts in
+    wb_pct = cfg.get("white_balance")
+    if wb_pct:
+        img = white_balance(img, percentile=wb_pct)
+
+    # Per-plate overrides > collection defaults > global defaults
+    sat = entry.get("saturation", cfg.get("saturation", 1.2))
+    con = entry.get("contrast", cfg.get("contrast", 1.15))
+    bri = entry.get("brightness", cfg.get("brightness", 1.0))
 
     if sat != 1.0:
         img = ImageEnhance.Color(img).enhance(sat)
@@ -273,7 +255,7 @@ def color_correct(img, entry):
 
 # ── Build ─────────────────────────────────────────────────────────
 
-def build_one(pid, entry, out_dir, resolved_urls=None):
+def build_one(pid, entry, out_dir, collection_cfg=None):
     """Download, process, save one plate (64px wide, variable height)."""
     title = entry.get("title", pid)
 
@@ -283,7 +265,7 @@ def build_one(pid, entry, out_dir, resolved_urls=None):
         return True
 
     print(f"[{pid}] {title}")
-    src = download(pid, entry, resolved_urls)
+    src = download(pid, entry)
     if not src:
         return False
 
@@ -292,7 +274,7 @@ def build_one(pid, entry, out_dir, resolved_urls=None):
     w, h = img.size
     new_h = int(h * WIDTH / w)
     img = img.resize((WIDTH, new_h), Image.LANCZOS)
-    img = color_correct(img, entry)
+    img = color_correct(img, entry, collection_cfg)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{pid}.png"
@@ -323,26 +305,24 @@ def cmd_build(collection, ids=None):
     already_done = len(plates) - len(to_build)
     if already_done:
         print(f"Skipping {already_done} already-built plates")
+    if not to_build:
+        print("All plates already built.")
+        return
 
-    # Batch-resolve all Wikimedia URLs upfront (one API call per ~50 plates)
-    resolved_urls = {}
-    wm_files = [p["file"] for p in to_build
-                if "file" in p and not _is_cached(p["id"])]
-    if wm_files:
-        print(f"Resolving {len(wm_files)} Wikimedia URLs in batch...")
-        resolved_urls = wikimedia_resolve_batch(wm_files)
-        resolved = len([f for f in wm_files if f in resolved_urls])
-        print(f"  Resolved {resolved}/{len(wm_files)} URLs")
+    print(f"Building {len(to_build)} plates one at a time "
+          f"(~{_backoff_delay:.0f}s between each)...")
 
     ok = fail = 0
-    for entry in plates:
-        if build_one(entry["id"], entry, cfg["out_dir"], resolved_urls):
+    for i, entry in enumerate(to_build):
+        # Respectful delay between downloads (skip before first)
+        if i > 0:
+            print(f"  Waiting {_backoff_delay:.0f}s...")
+            time.sleep(_backoff_delay)
+        if build_one(entry["id"], entry, cfg["out_dir"],
+                     collection_cfg=cfg):
             ok += 1
         else:
             fail += 1
-        # Adaptive delay between downloads (only for new plates)
-        if not (cfg["out_dir"] / f"{entry['id']}.png").exists():
-            time.sleep(_backoff_delay)
 
     print(f"\nDone: {ok} built, {fail} failed out of {ok + fail}")
     if ok:
