@@ -305,7 +305,7 @@ from .fractals import Fractals
 from .primes import Primes
 from .fibonacci import Fibonacci
 from .pi import Pi
-from .platonic import Platonic
+from .solids import Solids
 from .tessellations import Tessellations
 from .spirograph import Spirograph
 from .watercycle import WaterCycle
@@ -562,7 +562,7 @@ ALL_VISUALS = [
     Primes,
     Fibonacci,
     Pi,
-    Platonic,
+    Solids,
     Tessellations,
     Spirograph,
     WaterCycle,
@@ -793,7 +793,7 @@ __all__ = [
     'Primes',
     'Fibonacci',
     'Pi',
-    'Platonic',
+    'Solids',
     'Tessellations',
     'Spirograph',
     'WaterCycle',

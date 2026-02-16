@@ -287,17 +287,16 @@ class IdleMix(Visual):
             # Dim everything if weight is 0
             if w == 0:
                 color = _dim(color, 0.3)
-
-            # Selection: colored box with white text; unselected: no box, white text
-            if selected:
-                d.draw_rect(0, y - 1, 64, ROW_HEIGHT, color)
-                text_color = Colors.WHITE
-                arrow_color = Colors.WHITE
+                text_color = _dim(Colors.WHITE, 0.3)
             else:
-                text_color = Colors.WHITE if w > 0 else _dim(Colors.WHITE, 0.3)
-                arrow_color = Colors.BLACK
+                text_color = Colors.WHITE
+
+            # Selection indicator
+            if selected:
+                d.draw_rect(0, y - 1, 64, ROW_HEIGHT, (30, 30, 50))
 
             # Cursor arrow
+            arrow_color = Colors.WHITE if selected else Colors.BLACK
             d.set_pixel(1, y + 1, arrow_color)
             if selected:
                 d.set_pixel(2, y + 2, arrow_color)
@@ -305,18 +304,16 @@ class IdleMix(Visual):
 
             # Category name (truncated to 8 chars)
             name = cat['name'][:8]
-            d.draw_text_small(5, y, name, text_color)
+            d.draw_text_small(5, y, name, color)
 
             # Weight bar at right side: 5 segments starting at x=47
             bar_x = 47
             for s in range(5):
                 px = bar_x + s * 3
                 if s < w:
-                    bar_seg = Colors.WHITE if selected else color
-                    d.draw_rect(px, y + 1, 2, 3, bar_seg)
+                    d.draw_rect(px, y + 1, 2, 3, color)
                 else:
-                    empty_c = (80, 80, 80) if selected else (40, 40, 40)
-                    d.set_pixel(px, y + 2, empty_c)
+                    d.set_pixel(px, y + 2, (40, 40, 40))
 
             # Weight number
             d.draw_text_small(62 - 3, y, str(w), text_color)
@@ -364,9 +361,9 @@ class IdleMix(Visual):
             y = CONTENT_Y + i * ROW_HEIGHT
             selected = (idx == self.vis_cursor)
 
-            # Row background: category color when selected
+            # Row background
             if selected:
-                d.draw_rect(0, y - 1, 64, ROW_HEIGHT, cat['color'])
+                d.draw_rect(0, y - 1, 64, ROW_HEIGHT, (30, 30, 50))
 
             # Cursor arrow
             if selected:
@@ -376,9 +373,7 @@ class IdleMix(Visual):
 
             # Visual name (truncated to fit)
             vis_name = vis_cls.name[:9]
-            if selected:
-                name_color = Colors.WHITE
-            elif state == 'favorite':
+            if state == 'favorite':
                 name_color = (80, 220, 80)
             elif state == 'blacklisted':
                 name_color = (120, 40, 40)
