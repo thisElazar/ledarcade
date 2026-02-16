@@ -741,7 +741,7 @@
         "year": 1893,
         "movement": "Expressionism",
         "file": "Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
-        "crop": "top"
+        "crop": [0.5, 0.45, 1.0]
     },
     "munch_karl_johan": {
         "title": "Evening on Karl Johan",
@@ -781,7 +781,7 @@
         "year": 1896,
         "movement": "Art Nouveau",
         "file": "Alphonse Mucha - Advertisment for Job cigarettes, 1896.jpg",
-        "crop": "top"
+        "crop": [0.5, 0.45, 0.9]
     },
     "view_of_toledo": {
         "title": "View of Toledo",
@@ -966,7 +966,7 @@
         "year": 1486,
         "movement": "Renaissance",
         "file": "Leonardo Da Vinci - Vergine delle Rocce (Louvre).jpg",
-        "crop": "top"
+        "crop": [0.5, 0.40, 0.9]
     },
     "last_judgment_michelangelo": {
         "title": "The Last Judgment",
@@ -1314,7 +1314,7 @@
         "year": 1620,
         "movement": "Mughal",
         "file": "Bichitr - Jahangir Preferring a Sufi Shaikh to Kings, from the St. Petersburg album - Google Art Project.jpg",
-        "crop": "top"
+        "crop": [0.5, 0.40, 0.65]
     },
     "akbar_court": {
         "title": "Court of Akbar",
