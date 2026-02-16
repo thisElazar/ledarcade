@@ -4988,6 +4988,349 @@ MOLECULES = [
             (5, 12, 1),
         ],
     },
+
+    # ── HYDROGEN (H2) ───────────────────────────────────────────
+    # Simplest molecule; diatomic hydrogen
+    {
+        'name': 'HYDROGEN',
+        'formula': 'H2',
+        'groups': ['basics'],
+        'atoms': [
+            ('H', -0.37, 0.0, 0.0),    # 0
+            ('H',  0.37, 0.0, 0.0),     # 1
+        ],
+        'bonds': [(0, 1, 1)],
+    },
+
+    # ── NITROGEN (N2) ───────────────────────────────────────────
+    # Diatomic nitrogen; 78 % of atmosphere
+    {
+        'name': 'NITROGEN',
+        'formula': 'N2',
+        'groups': ['basics'],
+        'atoms': [
+            ('N', -0.55, 0.0, 0.0),    # 0
+            ('N',  0.55, 0.0, 0.0),     # 1
+        ],
+        'bonds': [(0, 1, 3)],
+    },
+
+    # ── CARBON MONOXIDE (CO) ────────────────────────────────────
+    # Toxic gas; triple bond between C and O
+    {
+        'name': 'CARBON MONOXIDE',
+        'formula': 'CO',
+        'groups': ['basics', 'workshop'],
+        'atoms': [
+            ('C', -0.565, 0.0, 0.0),   # 0
+            ('O',  0.565, 0.0, 0.0),    # 1
+        ],
+        'bonds': [(0, 1, 3)],
+    },
+
+    # ── NITRIC OXIDE (NO) ──────────────────────────────────────
+    # Signaling molecule; vasodilator
+    {
+        'name': 'NITRIC OXIDE',
+        'formula': 'NO',
+        'groups': ['basics', 'neuro'],
+        'atoms': [
+            ('N', -0.575, 0.0, 0.0),   # 0
+            ('O',  0.575, 0.0, 0.0),    # 1
+        ],
+        'bonds': [(0, 1, 2)],
+    },
+
+    # ── OZONE (O3) ─────────────────────────────────────────────
+    # Bent triatomic; ~117 degree bond angle
+    {
+        'name': 'OZONE',
+        'formula': 'O3',
+        'groups': ['basics'],
+        'atoms': [
+            ('O',  0.0,   0.0,  0.0),          # 0  central O
+            ('O',  1.22,  0.60, 0.0),           # 1  outer O
+            ('O', -1.22,  0.60, 0.0),           # 2  outer O
+        ],
+        'bonds': [(0, 1, 2), (0, 2, 1)],
+    },
+
+    # ── HYDROGEN PEROXIDE (H2O2) ───────────────────────────────
+    # Antiseptic; O-O single bond with dihedral ~111 degrees
+    {
+        'name': 'HYDROGEN PEROXIDE',
+        'formula': 'H2O2',
+        'groups': ['basics', 'kitchen'],
+        'atoms': [
+            ('O', -0.735, 0.0,  0.0),          # 0  O1
+            ('O',  0.735, 0.0,  0.0),           # 1  O2
+            ('H', -1.10,  0.40, 0.80),          # 2  H on O1
+            ('H',  1.10,  0.40, -0.80),         # 3  H on O2
+        ],
+        'bonds': [(0, 1, 1), (0, 2, 1), (1, 3, 1)],
+    },
+
+    # ── HYDROCHLORIC ACID (HCl) ────────────────────────────────
+    # Strong acid; stomach acid component
+    {
+        'name': 'HYDROCHLORIC ACID',
+        'formula': 'HCl',
+        'groups': ['basics', 'kitchen'],
+        'atoms': [
+            ('H',  -0.635, 0.0, 0.0),          # 0
+            ('Cl',  0.635, 0.0, 0.0),           # 1
+        ],
+        'bonds': [(0, 1, 1)],
+    },
+
+    # ── SULFURIC ACID (H2SO4) ──────────────────────────────────
+    # Strong acid; tetrahedral sulfur center
+    {
+        'name': 'SULFURIC ACID',
+        'formula': 'H2SO4',
+        'groups': ['basics', 'workshop'],
+        'atoms': [
+            ('S',  0.0,   0.0,   0.0),         # 0  S
+            ('O',  1.20,  0.80,  0.0),          # 1  =O
+            ('O', -1.20, -0.80,  0.0),          # 2  =O
+            ('O',  1.00, -1.00,  0.50),         # 3  -OH
+            ('O', -1.00,  1.00, -0.50),         # 4  -OH
+            ('H',  1.80, -1.40,  0.80),         # 5  H on O3
+            ('H', -1.80,  1.40, -0.80),         # 6  H on O4
+        ],
+        'bonds': [
+            (0, 1, 2), (0, 2, 2),   # S=O double bonds
+            (0, 3, 1), (0, 4, 1),   # S-O single bonds
+            (3, 5, 1), (4, 6, 1),   # O-H bonds
+        ],
+    },
+
+    # ── UREA (CH4N2O) ─────────────────────────────────────────
+    # First organic compound synthesized; planar molecule
+    {
+        'name': 'UREA',
+        'formula': 'CH4N2O',
+        'groups': ['basics'],
+        'atoms': [
+            ('C',  0.0,   0.0,   0.0),         # 0  C
+            ('O',  0.0,   1.25,  0.0),          # 1  =O
+            ('N',  1.00, -0.50,  0.0),          # 2  N1
+            ('N', -1.00, -0.50,  0.0),          # 3  N2
+            ('H',  1.85, -0.05,  0.0),          # 4  H on N1
+            ('H',  1.00, -1.50,  0.0),          # 5  H on N1
+            ('H', -1.85, -0.05,  0.0),          # 6  H on N2
+            ('H', -1.00, -1.50,  0.0),          # 7  H on N2
+        ],
+        'bonds': [
+            (0, 1, 2),              # C=O
+            (0, 2, 1), (0, 3, 1),   # C-N
+            (2, 4, 1), (2, 5, 1),   # N1-H
+            (3, 6, 1), (3, 7, 1),   # N2-H
+        ],
+    },
+
+    # ── FORMALDEHYDE (CH2O) ────────────────────────────────────
+    # Simplest aldehyde; planar trigonal
+    {
+        'name': 'FORMALDEHYDE',
+        'formula': 'CH2O',
+        'groups': ['basics', 'workshop'],
+        'atoms': [
+            ('C',  0.0,   0.0,   0.0),         # 0  C
+            ('O',  0.0,   1.21,  0.0),          # 1  =O
+            ('H',  0.94, -0.54,  0.0),          # 2  H
+            ('H', -0.94, -0.54,  0.0),          # 3  H
+        ],
+        'bonds': [
+            (0, 1, 2),              # C=O
+            (0, 2, 1), (0, 3, 1),   # C-H
+        ],
+    },
+
+    # ── ACETIC ACID (CH3COOH) ──────────────────────────────────
+    # Vinegar; methyl + carboxyl group
+    {
+        'name': 'ACETIC ACID',
+        'formula': 'C2H4O2',
+        'groups': ['basics', 'kitchen'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),        # 0  C1 (methyl)
+            ('C',  1.52,  0.00,  0.00),         # 1  C2 (carboxyl)
+            ('O',  2.20,  1.05,  0.00),         # 2  =O
+            ('O',  2.20, -1.05,  0.00),         # 3  -OH
+            ('H',  3.10, -1.05,  0.00),         # 4  H on OH
+            ('H', -0.36,  1.02,  0.00),         # 5  H on CH3
+            ('H', -0.36, -0.51,  0.88),         # 6  H on CH3
+            ('H', -0.36, -0.51, -0.88),         # 7  H on CH3
+        ],
+        'bonds': [
+            (0, 1, 1),              # C-C
+            (1, 2, 2),              # C=O
+            (1, 3, 1),              # C-OH
+            (3, 4, 1),              # O-H
+            (0, 5, 1), (0, 6, 1), (0, 7, 1),  # CH3
+        ],
+    },
+
+    # ── LACTIC ACID (C3H6O3) ──────────────────────────────────
+    # Produced during anaerobic metabolism
+    {
+        'name': 'LACTIC ACID',
+        'formula': 'C3H6O3',
+        'groups': ['basics', 'kitchen'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),        # 0  C1 (methyl)
+            ('C',  1.52,  0.00,  0.00),         # 1  C2 (chiral)
+            ('C',  2.50,  1.20,  0.00),         # 2  C3 (carboxyl)
+            ('O',  3.65,  1.00,  0.00),         # 3  =O on C3
+            ('O',  2.10,  2.40,  0.00),         # 4  -OH on C3
+            ('O',  1.90, -1.10,  0.50),         # 5  -OH on C2
+            ('H', -0.36,  1.02,  0.00),         # 6  H on CH3
+            ('H', -0.36, -0.51,  0.88),         # 7  H on CH3
+            ('H', -0.36, -0.51, -0.88),         # 8  H on CH3
+            ('H',  1.90,  0.40, -0.95),         # 9  H on C2
+            ('H',  2.70,  3.10,  0.00),         # 10 H on C3-OH
+            ('H',  2.70, -1.60,  0.50),         # 11 H on C2-OH
+        ],
+        'bonds': [
+            (0, 1, 1),              # C1-C2
+            (1, 2, 1),              # C2-C3
+            (2, 3, 2),              # C3=O
+            (2, 4, 1),              # C3-OH
+            (1, 5, 1),              # C2-OH
+            (0, 6, 1), (0, 7, 1), (0, 8, 1),  # CH3
+            (1, 9, 1),              # C2-H
+            (4, 10, 1),             # C3 OH-H
+            (5, 11, 1),             # C2 OH-H
+        ],
+    },
+
+    # ── HISTAMINE (C5H9N3) ────────────────────────────────────
+    # Neurotransmitter; allergic response mediator
+    {
+        'name': 'HISTAMINE',
+        'formula': 'C5H9N3',
+        'groups': ['neuro'],
+        'atoms': [
+            # Imidazole ring
+            ('C',  0.00,  0.00,  0.00),         # 0  C1
+            ('N',  1.10,  0.70,  0.00),          # 1  N1
+            ('C',  2.00, -0.20,  0.00),          # 2  C2
+            ('C',  1.40, -1.40,  0.00),          # 3  C3
+            ('N',  0.10, -1.20,  0.00),          # 4  N2 (NH)
+            # Ethylamine tail
+            ('C', -0.40,  1.40,  0.00),          # 5  C4
+            ('C', -1.70,  1.80,  0.00),          # 6  C5
+            ('N', -2.40,  3.10,  0.00),          # 7  N3 (NH2)
+            # Hydrogens
+            ('H',  0.10, -2.05,  0.00),          # 8  H on N2
+            ('H',  2.95,  0.05,  0.00),          # 9  H on C2
+            ('H',  1.75, -2.35,  0.00),          # 10 H on C3
+            ('H', -0.35,  1.95,  0.90),          # 11 H on C4
+            ('H', -0.35,  1.95, -0.90),          # 12 H on C4
+            ('H', -1.75,  1.25,  0.90),          # 13 H on C5
+            ('H', -1.75,  1.25, -0.90),          # 14 H on C5
+            ('H', -3.30,  3.20,  0.35),          # 15 H on N3
+            ('H', -1.90,  3.85,  0.35),          # 16 H on N3
+        ],
+        'bonds': [
+            # Imidazole ring
+            (0, 1, 1), (1, 2, 2), (2, 3, 1), (3, 4, 1), (4, 0, 2),
+            # Ethylamine tail
+            (0, 5, 1), (5, 6, 1), (6, 7, 1),
+            # Hydrogens
+            (4, 8, 1),              # N2-H
+            (2, 9, 1),              # C2-H
+            (3, 10, 1),             # C3-H
+            (5, 11, 1), (5, 12, 1), # C4-H
+            (6, 13, 1), (6, 14, 1), # C5-H
+            (7, 15, 1), (7, 16, 1), # N3-H
+        ],
+    },
+
+    # ── CORTISOL (C21H30O5) ───────────────────────────────────
+    # Stress hormone; steroid with 4 fused rings (A/B/C/D)
+    # Heavy atoms + OH hydrogens only (~27 atoms)
+    {
+        'name': 'CORTISOL',
+        'formula': 'C21H30O5',
+        'groups': ['neuro', 'medicine'],
+        'atoms': [
+            # Ring A (cyclohexenone)
+            ('C',  0.00,  0.00,  0.00),         # 0  C1
+            ('C',  1.25,  0.72,  0.00),          # 1  C2
+            ('C',  2.50,  0.00,  0.00),          # 2  C3 (ketone)
+            ('O',  3.70,  0.50,  0.00),          # 3  C3=O
+            ('C',  2.50, -1.44,  0.00),          # 4  C4
+            ('C',  1.25, -2.16,  0.00),          # 5  C5
+            ('C',  0.00, -1.44,  0.00),          # 6  C10
+            # Ring B (cyclohexane)
+            ('C',  1.25, -3.60,  0.10),          # 7  C6
+            ('C',  0.00, -4.32,  0.20),          # 8  C7
+            ('C', -1.25, -3.60,  0.10),          # 9  C8
+            ('C', -1.25, -2.16,  0.00),          # 10 C9
+            # Ring C (cyclohexane)
+            ('C', -2.50, -1.44,  0.00),          # 11 C11 (has OH)
+            ('O', -2.50, -0.30,  0.80),          # 12 C11-OH
+            ('C', -3.75, -2.16,  0.00),          # 13 C12
+            ('C', -3.75, -3.60,  0.10),          # 14 C13
+            ('C', -2.50, -4.32,  0.20),          # 15 C14
+            # Ring D (cyclopentane)
+            ('C', -5.00, -4.10,  0.10),          # 16 C15
+            ('C', -5.60, -2.80,  0.00),          # 17 C16
+            ('C', -5.00, -1.60,  0.00),          # 18 C17
+            # Side chain on C17
+            ('C', -5.80, -0.40,  0.00),          # 19 C20 (=O)
+            ('O', -5.40,  0.70,  0.00),          # 20 C20=O
+            ('C', -7.20, -0.60,  0.00),          # 21 C21 (OH)
+            ('O', -7.90,  0.50,  0.00),          # 22 C21-OH
+            # Angular methyl groups
+            ('C',  0.00, -0.80,  1.20),          # 23 C19 (methyl on C10)
+            ('C', -3.75, -4.40,  1.30),          # 24 C18 (methyl on C13)
+            # OH hydrogens
+            ('H', -1.70, -0.10,  1.20),          # 25 H on C11-OH
+            ('H', -8.80,  0.30,  0.00),          # 26 H on C21-OH
+        ],
+        'bonds': [
+            # Ring A
+            (0, 1, 1), (1, 2, 1), (2, 4, 1), (4, 5, 2), (5, 6, 1), (6, 0, 1),
+            (2, 3, 2),              # ketone
+            # Ring B
+            (5, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1), (10, 6, 1),
+            # Ring C
+            (10, 11, 1), (11, 13, 1), (13, 14, 1), (14, 15, 1), (15, 9, 1),
+            (11, 12, 1),            # C11-OH
+            # Ring D
+            (14, 16, 1), (16, 17, 1), (17, 18, 1), (18, 14, 1),
+            # Side chain
+            (18, 19, 1), (19, 20, 2), (19, 21, 1), (21, 22, 1),
+            # Methyls
+            (6, 23, 1), (14, 24, 1),
+            # OH hydrogens
+            (12, 25, 1), (22, 26, 1),
+        ],
+    },
+
+    # ── FORMIC ACID (HCOOH) ───────────────────────────────────
+    # Simplest carboxylic acid; found in ant venom
+    {
+        'name': 'FORMIC ACID',
+        'formula': 'CH2O2',
+        'groups': ['basics'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),         # 0  C
+            ('O',  0.00,  1.20,  0.00),          # 1  =O
+            ('O',  1.08, -0.50,  0.00),          # 2  -OH
+            ('H', -1.00, -0.50,  0.00),          # 3  H on C
+            ('H',  1.80,  0.10,  0.00),          # 4  H on OH
+        ],
+        'bonds': [
+            (0, 1, 2),              # C=O
+            (0, 2, 1),              # C-OH
+            (0, 3, 1),              # C-H
+            (2, 4, 1),              # O-H
+        ],
+    },
 ]
 
 

@@ -111,6 +111,14 @@
         "file": "Albrecht Dürer - 1500 self-portrait (High resolution and detail).jpg",
         "crop": "top"
     },
+    "durer_hare": {
+        "title": "Young Hare",
+        "artist": "Albrecht Dürer",
+        "year": 1502,
+        "movement": "Renaissance",
+        "file": "Albrecht Dürer - Hare, 1502 - Google Art Project.jpg",
+        "crop": "center"
+    },
     "arnolfini_portrait": {
         "title": "The Arnolfini Portrait",
         "artist": "Jan van Eyck",
@@ -159,12 +167,36 @@
         "file": "Caravaggio - Medusa - Google Art Project.jpg",
         "crop": "center"
     },
+    "caravaggio_fruit": {
+        "title": "Boy with a Basket of Fruit",
+        "artist": "Caravaggio",
+        "year": 1593,
+        "movement": "Baroque",
+        "file": "Michelangelo Merisi da Caravaggio - Boy with a Basket of Fruit - WGA04074.jpg",
+        "crop": "top"
+    },
+    "caravaggio_musicians": {
+        "title": "The Musicians",
+        "artist": "Caravaggio",
+        "year": 1595,
+        "movement": "Baroque",
+        "file": "The Musicians-Caravaggio (c.1595).jpg",
+        "crop": "center"
+    },
     "gentileschi_self_portrait": {
         "title": "Self-Portrait as Allegory of Painting",
         "artist": "Artemisia Gentileschi",
         "year": 1639,
         "movement": "Baroque",
         "file": "Self-portrait as the Allegory of Painting (La Pittura) - Artemisia Gentileschi.jpg",
+        "crop": "top"
+    },
+    "vermeer_lacemaker": {
+        "title": "The Lacemaker",
+        "artist": "Johannes Vermeer",
+        "year": 1670,
+        "movement": "Baroque",
+        "file": "Johannes Vermeer - The lacemaker (c.1669-1671).jpg",
         "crop": "top"
     },
     "girl_pearl_earring": {
@@ -230,6 +262,22 @@
         "movement": "Baroque",
         "file": "Rembrandt van Rijn - Self-Portrait - Google Art Project.jpg",
         "crop": "top"
+    },
+    "rembrandt_jewish_bride": {
+        "title": "The Jewish Bride",
+        "artist": "Rembrandt",
+        "year": 1667,
+        "movement": "Baroque",
+        "file": "Rembrandt - The Jewish Bride - WGA19158.jpg",
+        "crop": "center"
+    },
+    "rembrandt_syndics": {
+        "title": "Syndics of the Drapers' Guild",
+        "artist": "Rembrandt",
+        "year": 1662,
+        "movement": "Baroque",
+        "file": "Rembrandt - De Staalmeesters- het college van staalmeesters (waardijns) van het Amsterdamse lakenbereidersgilde - Google Art Project.jpg",
+        "crop": "center"
     },
     "las_meninas": {
         "title": "Las Meninas",
@@ -327,6 +375,22 @@
         "file": "Turner - Rain, Steam and Speed - National Gallery file.jpg",
         "crop": "center"
     },
+    "turner_snowstorm": {
+        "title": "Snow Storm: Steam-Boat off a Harbour's Mouth",
+        "artist": "J.M.W. Turner",
+        "year": 1842,
+        "movement": "Romanticism",
+        "file": "Joseph Mallord William Turner - Snow Storm - Steam-Boat off a Harbour's Mouth - WGA23178.jpg",
+        "crop": "center"
+    },
+    "turner_norham": {
+        "title": "Norham Castle, Sunrise",
+        "artist": "J.M.W. Turner",
+        "year": 1845,
+        "movement": "Romanticism",
+        "file": "Joseph Mallord William Turner - Norham Castle, Sunrise - WGA23182.jpg",
+        "crop": "center"
+    },
     "hay_wain": {
         "title": "The Hay Wain",
         "artist": "John Constable",
@@ -382,6 +446,14 @@
         "movement": "Ukiyo-e",
         "file": "Bullfinch and Weeping Cherry (Uso, shidarezakura).jpg",
         "crop": "center"
+    },
+    "hokusai_waterfall": {
+        "title": "The Amida Falls",
+        "artist": "Katsushika Hokusai",
+        "year": 1832,
+        "movement": "Ukiyo-e",
+        "file": "A Tour of the Waterfalls of the Provinces-Kisoji No Okuami Dagataki.jpg",
+        "crop": "top"
     },
     "hiroshige_rain": {
         "title": "Sudden Shower over Shin-Ohashi",
@@ -526,6 +598,22 @@
         "movement": "Impressionism",
         "file": "Auguste Renoir - A Girl with a Watering Can - Google Art Project.jpg",
         "crop": "top"
+    },
+    "renoir_two_sisters": {
+        "title": "Two Sisters (On the Terrace)",
+        "artist": "Pierre-Auguste Renoir",
+        "year": 1881,
+        "movement": "Impressionism",
+        "file": "Renoir - The Two Sisters, On the Terrace.jpg",
+        "crop": "top"
+    },
+    "renoir_grenouillere": {
+        "title": "La Grenouillère",
+        "artist": "Pierre-Auguste Renoir",
+        "year": 1869,
+        "movement": "Impressionism",
+        "file": "Auguste Renoir - La Grenouillère - Google Art Project.jpg",
+        "crop": "center"
     },
     "degas_ballet": {
         "title": "Ballet Rehearsal on Stage",
@@ -695,6 +783,38 @@
         "file": "Paul Cézanne, Les joueurs de carte (1892-95).jpg",
         "crop": "center"
     },
+    "cezanne_apples": {
+        "title": "The Basket of Apples",
+        "artist": "Paul Cézanne",
+        "year": 1893,
+        "movement": "Post-Impressionism",
+        "file": "Paul Cézanne - The Basket of Apples - 1926.252 - Art Institute of Chicago.jpg",
+        "crop": "center"
+    },
+    "cezanne_curtain": {
+        "title": "Still Life with a Curtain",
+        "artist": "Paul Cézanne",
+        "year": 1895,
+        "movement": "Post-Impressionism",
+        "file": "Cézanne, Paul - Still Life with a Curtain.jpg",
+        "crop": "center"
+    },
+    "cezanne_red_vest": {
+        "title": "The Boy in the Red Vest",
+        "artist": "Paul Cézanne",
+        "year": 1889,
+        "movement": "Post-Impressionism",
+        "file": "Paul Cézanne - Le Garçon au gilet rouge - Bührle.jpg",
+        "crop": "top"
+    },
+    "cezanne_bibemus": {
+        "title": "Bibémus Quarries",
+        "artist": "Paul Cézanne",
+        "year": 1900,
+        "movement": "Post-Impressionism",
+        "file": "Paul Cezanne Bibemus Quarry 4.jpg",
+        "crop": "center"
+    },
     "vision_sermon": {
         "title": "Vision After the Sermon",
         "artist": "Paul Gauguin",
@@ -775,6 +895,22 @@
         "file": "Klimt Tree of Life 1909.jpg",
         "crop": "center"
     },
+    "klimt_flower_garden": {
+        "title": "Cottage Garden",
+        "artist": "Gustav Klimt",
+        "year": 1907,
+        "movement": "Art Nouveau",
+        "file": "Klimt bauerngarten.jpg",
+        "crop": "center"
+    },
+    "klimt_farm_garden": {
+        "title": "Farm Garden with Sunflowers",
+        "artist": "Gustav Klimt",
+        "year": 1907,
+        "movement": "Art Nouveau",
+        "file": "Gustav Klimt - Bauerngarten mit Sonnenblumen - 3685 - Österreichische Galerie Belvedere.jpg",
+        "crop": "center"
+    },
     "mucha_job": {
         "title": "Job (Cigarettes)",
         "artist": "Alphonse Mucha",
@@ -807,6 +943,30 @@
         "file": "Matisse-The-Dessert-Harmony-in-Red-Henri-1908-fast.jpg",
         "crop": "center"
     },
+    "matisse_red_studio": {
+        "title": "The Red Studio",
+        "artist": "Henri Matisse",
+        "year": 1911,
+        "movement": "Fauvism",
+        "file": "L'Atelier rouge, par Henri Matisse.jpg",
+        "crop": "center"
+    },
+    "matisse_open_window": {
+        "title": "Open Window, Collioure",
+        "artist": "Henri Matisse",
+        "year": 1905,
+        "movement": "Fauvism",
+        "file": "Matisse-Open-Window.jpg",
+        "crop": "center"
+    },
+    "matisse_woman_hat": {
+        "title": "Woman with a Hat",
+        "artist": "Henri Matisse",
+        "year": 1905,
+        "movement": "Fauvism",
+        "file": "Matisse-Woman-with-a-Hat.jpg",
+        "crop": "top"
+    },
     "blue_horse": {
         "title": "Blue Horse I",
         "artist": "Franz Marc",
@@ -831,6 +991,14 @@
         "file": "Egon Schiele - Self-Portrait with Physalis - Google Art Project.jpg",
         "crop": "top"
     },
+    "schiele_edith": {
+        "title": "Portrait of Edith (the artist's wife)",
+        "artist": "Egon Schiele",
+        "year": 1915,
+        "movement": "Expressionism",
+        "file": "Egon Schiele - Portrait of Edith (the artist's wife) - Google Art Project.jpg",
+        "crop": "top"
+    },
     "modigliani_portrait": {
         "title": "Jeanne Hébuterne",
         "artist": "Amedeo Modigliani",
@@ -838,6 +1006,14 @@
         "movement": "Expressionism",
         "file": "Amedeo Modigliani, 1919, Jeanne Hébuterne, oil on canvas, 91.4 x 73 cm, Metropolitan Museum of Art.jpg",
         "crop": "top"
+    },
+    "composition_vii": {
+        "title": "Composition VII",
+        "artist": "Wassily Kandinsky",
+        "year": 1913,
+        "movement": "Abstract",
+        "file": "Vassily_Kandinsky,_1913_-_Composition_7.jpg",
+        "crop": "center"
     },
     "composition_viii": {
         "title": "Composition VIII",
@@ -853,6 +1029,30 @@
         "year": 1926,
         "movement": "Abstract",
         "file": "Vassily Kandinsky, 1926 - Several Circles, Gugg 0910 25.jpg",
+        "crop": "center"
+    },
+    "kandinsky_yellow_red_blue": {
+        "title": "Yellow-Red-Blue",
+        "artist": "Wassily Kandinsky",
+        "year": 1925,
+        "movement": "Abstract",
+        "file": "Kandinsky - Jaune Rouge Bleu.jpg",
+        "crop": "center"
+    },
+    "kandinsky_color_study": {
+        "title": "Color Study: Squares with Concentric Circles",
+        "artist": "Wassily Kandinsky",
+        "year": 1913,
+        "movement": "Abstract",
+        "file": "Vassily Kandinsky, 1913 - Color Study, Squares with Concentric Circles.jpg",
+        "crop": "center"
+    },
+    "kandinsky_improvisation": {
+        "title": "Improvisation 28",
+        "artist": "Wassily Kandinsky",
+        "year": 1912,
+        "movement": "Abstract",
+        "file": "Vasily Kandinsky Improvisation 28 (second version).jpg",
         "crop": "center"
     },
     "black_square": {
@@ -877,6 +1077,126 @@
         "year": 1918,
         "movement": "Suprematism",
         "file": "White on White (Malevich, 1918).png",
+        "crop": "center"
+    },
+    "klee_senecio": {
+        "title": "Senecio",
+        "artist": "Paul Klee",
+        "year": 1922,
+        "movement": "Expressionism",
+        "file": "Paul Klee, 1922, Senecio, oil on gauze, 40.3 × 37.4 cm, Kunstmuseum Basel.jpg",
+        "crop": "center"
+    },
+    "klee_castle_sun": {
+        "title": "Castle and Sun",
+        "artist": "Paul Klee",
+        "year": 1928,
+        "movement": "Expressionism",
+        "file": "Burg und Sonne - Klee.jpg",
+        "crop": "center"
+    },
+    "klee_highway": {
+        "title": "Highway and Byways",
+        "artist": "Paul Klee",
+        "year": 1929,
+        "movement": "Expressionism",
+        "file": "Paul Klee, Hauptweg und Nebenwege, 1929, Öl auf Leinwand, 83,7 x 67,5 cm, Museum Ludwig 1976.jpg",
+        "crop": "center"
+    },
+    "klee_twittering": {
+        "title": "Twittering Machine",
+        "artist": "Paul Klee",
+        "year": 1922,
+        "movement": "Expressionism",
+        "file": "Die Zwitscher-Maschine (Twittering Machine).jpg",
+        "crop": "center"
+    },
+    "gris_portrait_picasso": {
+        "title": "Portrait of Picasso",
+        "artist": "Juan Gris",
+        "year": 1912,
+        "movement": "Cubism",
+        "file": "Juan Gris - Portrait of Pablo Picasso - Google Art Project.jpg",
+        "crop": "top"
+    },
+    "gris_tablecloth": {
+        "title": "Still Life with Checked Tablecloth",
+        "artist": "Juan Gris",
+        "year": 1915,
+        "movement": "Cubism",
+        "file": "Juan Gris, 1915, Nature morte à la nappe à carreaux (Still Life with Checked Tablecloth), oil on canvas, 116.5 x 89.3 cm.jpg",
+        "crop": "center"
+    },
+    "gris_violin": {
+        "title": "Still Life (Violin and Inkwell)",
+        "artist": "Juan Gris",
+        "year": 1913,
+        "movement": "Cubism",
+        "file": "Juan Gris - Nature morte (Violon et encrier) (1913).jpg",
+        "crop": "center"
+    },
+    "leger_city": {
+        "title": "The City",
+        "artist": "Fernand Léger",
+        "year": 1919,
+        "movement": "Cubism",
+        "file": "Fernand Léger, 1919, The City (La Ville), oil on canvas, 231.1 x 298.4 cm, Philadelphia Museum of Art.jpg",
+        "crop": "center"
+    },
+    "leger_contrast": {
+        "title": "Contrast of Forms",
+        "artist": "Fernand Léger",
+        "year": 1913,
+        "movement": "Cubism",
+        "file": "Contrastes de formes, 1913 - Fernand Léger.jpg",
+        "crop": "center"
+    },
+    "gleizes_nayral": {
+        "title": "Portrait of Jacques Nayral",
+        "artist": "Albert Gleizes",
+        "year": 1911,
+        "movement": "Cubism",
+        "file": "Albert Gleizes, 1911, Portrait de Jacques Nayral, oil on canvas, 161.9 x 114 cm, Tate Modern, London.jpg",
+        "crop": "top"
+    },
+    "af_klint_adulthood": {
+        "title": "The Ten Largest, No. 7, Adulthood",
+        "artist": "Hilma af Klint",
+        "year": 1907,
+        "movement": "Abstract",
+        "file": "Hilma af Klint - The Ten Largest No. 7 - Adulthood - 1907.jpg",
+        "crop": "center"
+    },
+    "af_klint_youth": {
+        "title": "The Ten Largest, No. 3, Youth",
+        "artist": "Hilma af Klint",
+        "year": 1907,
+        "movement": "Abstract",
+        "file": "Hilma af Klint - The Ten Largest No. 3 - Youth - 1907.jpg",
+        "crop": "center"
+    },
+    "boccioni_city_rises": {
+        "title": "The City Rises",
+        "artist": "Umberto Boccioni",
+        "year": 1910,
+        "movement": "Futurism",
+        "file": "The City Rises by Umberto Boccioni 1910.jpg",
+        "crop": "center"
+    },
+    "boccioni_farewells": {
+        "title": "States of Mind: The Farewells",
+        "artist": "Umberto Boccioni",
+        "year": 1911,
+        "movement": "Futurism",
+        "file": "States of Mind- The Farewells by Umberto Boccioni, 1911.jpeg",
+        "crop": "center"
+    },
+    "lissitzky_wedge": {
+        "title": "Beat the Whites with the Red Wedge",
+        "artist": "El Lissitzky",
+        "year": 1919,
+        "movement": "Constructivism",
+        "file": "Beat the Whites with the Red Wedge.png",
         "crop": "center"
     },
     "woman_parasol": {
