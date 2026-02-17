@@ -45,6 +45,7 @@ ENV/
 # Build caches (derived from build scripts, regeneratable)
 tools/.flag_cache/
 tools/.sign_cache/
+tools/.dance_cache/
 
 # Research/experiment docs (not part of runtime)
 docs/

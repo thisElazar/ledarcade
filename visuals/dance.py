@@ -20,7 +20,9 @@ from . import Visual, Display, Colors, GRID_SIZE
 FAMILIES = ['BALLROOM', 'FOLK', 'CLASSICAL', 'STREET']
 
 # ---------------------------------------------------------------------------
-# Dance data - 12 dances with research-based keyframes
+# Dance data - 12 dances with keyframes
+# Salsa, Ballet, Swing: extracted from CMU MoCap (tools/build_dance.py)
+# Others: research-based hand estimates
 # Each keyframe: head, left hand, right hand, left foot, right foot
 # ---------------------------------------------------------------------------
 DANCES = [
@@ -78,44 +80,44 @@ DANCES = [
              'lfx':24,'lfy':44, 'rfx':38,'rfy':44},
         ],
     },
-    # 4. SALSA - Small quick steps, hip motion
+    # 4. SALSA - CMU MoCap subject 60 (salsa dance)
     {
         'name': 'SALSA', 'origin': 'Cuba', 'family': 'STREET',
         'tempo': 1.2, 'time_sig': '4/4',
         'color': (255, 100, 50),
         'keyframes': [
-            {'hx':32,'hy':18, 'lhx':24,'lhy':26, 'rhx':40,'rhy':26,
-             'lfx':28,'lfy':44, 'rfx':36,'rfy':44},
-            {'hx':32,'hy':18, 'lhx':24,'lhy':27, 'rhx':40,'rhy':27,
-             'lfx':25,'lfy':43, 'rfx':37,'rfy':44},
-            {'hx':32,'hy':18, 'lhx':24,'lhy':27, 'rhx':40,'rhy':27,
-             'lfx':25,'lfy':44, 'rfx':37,'rfy':44},
-            {'hx':32,'hy':18, 'lhx':24,'lhy':27, 'rhx':40,'rhy':27,
-             'lfx':27,'lfy':44, 'rfx':39,'rfy':44},
-            {'hx':32,'hy':17, 'lhx':24,'lhy':18, 'rhx':40,'rhy':22,
-             'lfx':28,'lfy':44, 'rfx':36,'rfy':44},
-            {'hx':32,'hy':17, 'lhx':26,'lhy':22, 'rhx':38,'rhy':22,
-             'lfx':30,'lfy':43, 'rfx':34,'rfy':43},
+            {'hx':32,'hy':17, 'lhx':29,'lhy':28, 'rhx':32,'rhy':27,
+             'lfx':27,'lfy':42, 'rfx':28,'rfy':44},
+            {'hx':32,'hy':17, 'lhx':35,'lhy':28, 'rhx':28,'rhy':26,
+             'lfx':36,'lfy':44, 'rfx':28,'rfy':44},
+            {'hx':32,'hy':17, 'lhx':28,'lhy':28, 'rhx':39,'rhy':26,
+             'lfx':28,'lfy':43, 'rfx':37,'rfy':43},
+            {'hx':32,'hy':17, 'lhx':35,'lhy':27, 'rhx':25,'rhy':24,
+             'lfx':34,'lfy':44, 'rfx':31,'rfy':43},
+            {'hx':32,'hy':18, 'lhx':35,'lhy':29, 'rhx':32,'rhy':27,
+             'lfx':38,'lfy':42, 'rfx':35,'rfy':40},
+            {'hx':32,'hy':18, 'lhx':30,'lhy':24, 'rhx':32,'rhy':31,
+             'lfx':35,'lfy':42, 'rfx':35,'rfy':43},
         ],
     },
-    # 5. BALLET - Extreme turnout, port de bras
+    # 5. BALLET - CMU MoCap subject 05 (modern dance / ballet)
     {
         'name': 'BALLET', 'origin': 'France', 'family': 'CLASSICAL',
         'tempo': 0.6, 'time_sig': '3/4',
         'color': (200, 180, 255),
         'keyframes': [
-            {'hx':32,'hy':17, 'lhx':24,'lhy':23, 'rhx':40,'rhy':23,
-             'lfx':26,'lfy':44, 'rfx':38,'rfy':44},
-            {'hx':32,'hy':17, 'lhx':18,'lhy':23, 'rhx':46,'rhy':23,
-             'lfx':22,'lfy':44, 'rfx':42,'rfy':44},
-            {'hx':32,'hy':16, 'lhx':25,'lhy':22, 'rhx':39,'rhy':22,
-             'lfx':30,'lfy':41, 'rfx':34,'rfy':41},
-            {'hx':32,'hy':17, 'lhx':18,'lhy':22, 'rhx':44,'rhy':22,
-             'lfx':30,'lfy':43, 'rfx':38,'rfy':37},
-            {'hx':32,'hy':17, 'lhx':20,'lhy':21, 'rhx':42,'rhy':22,
-             'lfx':30,'lfy':43, 'rfx':39,'rfy':35},
-            {'hx':32,'hy':17, 'lhx':18,'lhy':22, 'rhx':46,'rhy':22,
-             'lfx':29,'lfy':43, 'rfx':40,'rfy':26},
+            {'hx':32,'hy':17, 'lhx':35,'lhy':28, 'rhx':27,'rhy':28,
+             'lfx':33,'lfy':44, 'rfx':35,'rfy':44},
+            {'hx':32,'hy':17, 'lhx':40,'lhy':23, 'rhx':20,'rhy':25,
+             'lfx':36,'lfy':43, 'rfx':34,'rfy':44},
+            {'hx':32,'hy':17, 'lhx':34,'lhy':29, 'rhx':25,'rhy':22,
+             'lfx':24,'lfy':44, 'rfx':23,'rfy':43},
+            {'hx':32,'hy':19, 'lhx':22,'lhy':26, 'rhx':37,'rhy':27,
+             'lfx':24,'lfy':42, 'rfx':26,'rfy':38},
+            {'hx':32,'hy':17, 'lhx':44,'lhy':26, 'rhx':32,'rhy':31,
+             'lfx':40,'lfy':41, 'rfx':41,'rfy':44},
+            {'hx':32,'hy':17, 'lhx':26,'lhy':28, 'rhx':36,'rhy':26,
+             'lfx':33,'lfy':40, 'rfx':31,'rfy':44},
         ],
     },
     # 6. FLAMENCO - Arms overhead, zapateado heel stamps
@@ -190,22 +192,22 @@ DANCES = [
              'lfx':22,'lfy':44, 'rfx':38,'rfy':44},
         ],
     },
-    # 10. SWING - Rock step, triple step, open position
+    # 10. SWING - CMU MoCap subject 93 (charleston dance)
     {
         'name': 'SWING', 'origin': 'USA', 'family': 'STREET',
         'tempo': 1.2, 'time_sig': '4/4',
         'color': (255, 220, 50),
         'keyframes': [
-            {'hx':32,'hy':17, 'lhx':20,'lhy':21, 'rhx':44,'rhy':21,
-             'lfx':28,'lfy':44, 'rfx':36,'rfy':44},
-            {'hx':32,'hy':18, 'lhx':20,'lhy':21, 'rhx':44,'rhy':21,
-             'lfx':26,'lfy':44, 'rfx':38,'rfy':43},
-            {'hx':32,'hy':17, 'lhx':20,'lhy':21, 'rhx':44,'rhy':21,
-             'lfx':25,'lfy':43, 'rfx':33,'rfy':43},
-            {'hx':32,'hy':17, 'lhx':14,'lhy':20, 'rhx':46,'rhy':23,
-             'lfx':24,'lfy':44, 'rfx':40,'rfy':44},
-            {'hx':32,'hy':17, 'lhx':20,'lhy':22, 'rhx':44,'rhy':22,
-             'lfx':26,'lfy':43, 'rfx':36,'rfy':44},
+            {'hx':32,'hy':18, 'lhx':39,'lhy':24, 'rhx':33,'rhy':32,
+             'lfx':35,'lfy':43, 'rfx':28,'rfy':42},
+            {'hx':32,'hy':20, 'lhx':38,'lhy':33, 'rhx':36,'rhy':27,
+             'lfx':32,'lfy':41, 'rfx':31,'rfy':40},
+            {'hx':32,'hy':14, 'lhx':29,'lhy':28, 'rhx':29,'rhy':30,
+             'lfx':30,'lfy':47, 'rfx':32,'rfy':47},
+            {'hx':32,'hy':19, 'lhx':25,'lhy':26, 'rhx':36,'rhy':31,
+             'lfx':26,'lfy':37, 'rfx':35,'rfy':42},
+            {'hx':32,'hy':15, 'lhx':33,'lhy':29, 'rhx':39,'rhy':23,
+             'lfx':32,'lfy':46, 'rfx':34,'rfy':46},
         ],
     },
     # 11. CAPOEIRA - Ginga, meia lua, au cartwheel

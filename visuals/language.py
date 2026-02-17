@@ -105,20 +105,18 @@ GLYPH_RUSSIAN = [
     (12, 2), (12, 3), (12, 4), (12, 5), (12, 6), (12, 7),
 ]
 
-# Greek: Ωμ (omega mu)
+# Greek: Γε (from Γεια = hello)
 GLYPH_GREEK = [
-    # Ω omega
-    (1, 0), (2, 0), (3, 0), (4, 0),
-    (0, 1), (5, 1),
-    (0, 2), (5, 2),
-    (0, 3), (5, 3),
-    (0, 4), (5, 4),
-    (1, 5), (4, 5),
-    (0, 6), (1, 6), (2, 6), (4, 6), (5, 6),
-    # μ mu
-    (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8),
-    (12, 2), (12, 3), (12, 4), (12, 5), (12, 6),
-    (9, 6), (10, 6), (11, 6),
+    # Γ gamma (uppercase)
+    (0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
+    (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
+    (1, 1),
+    # ε epsilon (lowercase)
+    (7, 2), (8, 2), (9, 2),
+    (6, 3),
+    (6, 4), (7, 4), (8, 4),
+    (6, 5),
+    (7, 6), (8, 6), (9, 6),
 ]
 
 # Hebrew: שלום (shalom)
@@ -330,12 +328,12 @@ GREETINGS = [
     {'lang': 'VIETNAMESE', 'text': 'XIN CHAO THE GIOI',     'color': (200, 60, 40)},
     {'lang': 'THAI',       'text': 'SAWASDEE',              'color': (180, 60, 160),   'script': 'thai'},
     {'lang': 'INDONESIAN', 'text': 'HALO DUNIA',            'color': (200, 40, 40)},
-    {'lang': 'TAGALOG',    'text': 'KUMUSTA MUNDO',         'color': (40, 80, 180)},
+    {'lang': 'TAGALOG',    'text': 'KAMUSTA MUNDO',          'color': (40, 80, 180)},
     {'lang': 'MALAY',      'text': 'HAI DUNIA',             'color': (220, 180, 40)},
     {'lang': 'SWAHILI',    'text': 'HABARI DUNIA',          'color': (40, 180, 60)},
     {'lang': 'AMHARIC',    'text': 'SELAM ALEM',            'color': (60, 180, 40),    'script': 'amharic'},
     {'lang': 'HAUSA',      'text': 'SANNU DUNIYA',          'color': (120, 180, 40)},
-    {'lang': 'IGBO',       'text': 'NDO UWA',               'color': (80, 200, 80)},
+    {'lang': 'IGBO',       'text': 'NDEWO UWA',              'color': (80, 200, 80)},
     {'lang': 'YORUBA',     'text': 'BAWO NI AIYE',          'color': (100, 180, 60)},
     {'lang': 'ZULU',       'text': 'SAWUBONA MHLABA',       'color': (200, 120, 40)},
     {'lang': 'HAWAIIAN',   'text': 'ALOHA HONUA',           'color': (80, 200, 180)},
@@ -348,7 +346,7 @@ GREETINGS = [
     {'lang': 'WELSH',      'text': 'HELO BYD',              'color': (180, 40, 60)},
     {'lang': 'IRISH',      'text': 'DIA DUIT',              'color': (40, 160, 80)},
     {'lang': 'BASQUE',     'text': 'KAIXO MUNDUA',          'color': (180, 40, 40)},
-    {'lang': 'LATIN',      'text': 'SALVE MUNDI',           'color': (180, 160, 80)},
+    {'lang': 'LATIN',      'text': 'SALVE MUNDE',            'color': (180, 160, 80)},
     {'lang': 'ESPERANTO',  'text': 'SALUTON MONDO',         'color': (80, 180, 80)},
     {'lang': 'ARMENIAN',   'text': 'BAREV ASHKHARH',        'color': (200, 120, 60),   'script': 'armenian'},
     {'lang': 'GEORGIAN',   'text': 'GAMARJOBA',             'color': (160, 80, 40),    'script': 'georgian'},
