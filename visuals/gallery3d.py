@@ -1445,13 +1445,18 @@ WING_COLORS = {
 
 
 class GalleryMuseum(_Gallery3DBase):
-    """Grand Museum: paintings organized by period into color-coded wings."""
+    """Grand Museum: intimate serpentine gallery with interior baffles.
+
+    Paintings organized by period into color-coded wings.  Lower ceilings
+    (2-panel walls), spaced paintings with plaster between, interior
+    partition walls creating winding paths through each wing.
+    """
 
     name = "GRAND MUSEUM"
     description = "Paintings by period"
     category = "gallery"
 
-    _WALL_SCALE = 5
+    _WALL_SCALE = 2  # Normal-height walls: painting on bottom, plaster above
 
     def __init__(self, display):
         import random as _rng
@@ -1487,22 +1492,44 @@ class GalleryMuseum(_Gallery3DBase):
         for w in WING_ORDER:
             _rng.shuffle(wing_pids[w])
 
-        # Allocate rooms per wing: max(1, round(count/20))
+        # Allocate rooms per wing — enough capacity for every painting
+        n_paintings = sum(len(v) for v in wing_pids.values())
         wing_rooms = {}
         for w in WING_ORDER:
             count = len(wing_pids[w])
-            wing_rooms[w] = max(1, round(count / 20)) if count > 0 else 1
+            wing_rooms[w] = -(-count // 24) if count > 0 else 0  # ceil
 
         total_rooms = sum(wing_rooms.values())
-        RW, RH = 10, 12
+        # Trim if over-allocated
+        total_rooms = min(total_rooms, max(1, -(-n_paintings // 24)))
+
+        # Room: 14 wide × 15 tall — 2-cell corridors, no side-wall paintings
+        #
+        #   ##############      row 0:  outer wall
+        #   #P_P_P_P_P_P#      row 1:  N paintings (6 + spacers)
+        #   #............#      row 2:  walk ┐ 2-cell corridor
+        #   #............#      row 3:  walk ┘ (view N wall ~1.5 away)
+        #   #.PWPWPWPW...#      row 4:  left baffle  (cols 2-9, gap 10-12)
+        #   #............#      row 5:  walk ┐ 2-cell corridor
+        #   #............#      row 6:  walk ┘ (view baffles 4 & 7)
+        #   #...WPWPWPWP.#      row 7:  right baffle (cols 4-11, gap 1-3)
+        #   #............#      row 8:  walk ┐ 2-cell corridor / doorway
+        #   #............#      row 9:  walk ┘
+        #   #.PWPWPWPW...#      row 10: left baffle  (cols 2-9, gap 10-12)
+        #   #............#      row 11: walk ┐ 2-cell corridor
+        #   #............#      row 12: walk ┘ (view baffle 10 & S wall)
+        #   #P_P_P_P_P_P#      row 13: S paintings (6 + spacers)
+        #   ##############      row 14: outer wall
+
+        RW, RH = 14, 15
         W = RW * total_rooms
         H = RH
         self.MAP_W = W
         self.MAP_H = H
-        self.START_POS = (RW / 2.0, H / 2.0)
+        self.START_POS = (RW / 2.0, 2.5)
 
         # Build wing boundaries for wall coloring
-        self._wing_boundaries = []  # (x_start, x_end, color)
+        self._wing_boundaries = []
         room_idx = 0
         for w in WING_ORDER:
             n = wing_rooms[w]
@@ -1511,7 +1538,7 @@ class GalleryMuseum(_Gallery3DBase):
             self._wing_boundaries.append((x_start, x_end, WING_COLORS[w]))
             room_idx += n
 
-        # Build ordered PID list: wing by wing, distributing across rooms
+        # Build ordered PID list: wing by wing
         ordered_pids = []
         for w in WING_ORDER:
             ordered_pids.extend(wing_pids[w])
@@ -1520,115 +1547,142 @@ class GalleryMuseum(_Gallery3DBase):
         _P = "paintings/"
         self.PAINTINGS = {}
         cell_id = 2
-        paint_cells = []
         pid_iter = iter(ordered_pids)
 
         def _next():
             nonlocal cell_id
             pid = next(pid_iter, None)
             if pid is None:
-                return 1
+                return 1  # plain wall when out of paintings
             cid = cell_id
             self.PAINTINGS[cid] = ("png", _P + f"{pid}.png")
-            paint_cells.append(cid)
             cell_id += 1
             return cid
 
-        # Start with solid grid, carve rooms
+        # Start with solid grid, carve rooms with baffles
         grid = [[1] * W for _ in range(H)]
-        DOOR_ROWS = (5, 6)
+        DOOR_ROWS = (8, 9)
 
         for room in range(total_rooms):
             x0 = room * RW
-            x1 = x0 + RW - 1
 
-            # Carve interior
-            for r in range(2, H - 2):
-                for c in range(x0 + 1, x1):
+            # Carve walkable interior (rows 2-12, cols x0+1..x0+12)
+            for r in range(2, 13):
+                for c in range(x0 + 1, x0 + 13):
                     grid[r][c] = 0
 
-            # North painting wall
-            for c in range(x0 + 1, x1):
-                grid[1][c] = _next()
+            # North painting wall (row 1): 6 paintings with spacers
+            for i in range(12):
+                c = x0 + 1 + i
+                grid[1][c] = _next() if i % 2 == 0 else 1
 
-            # South painting wall
-            for c in range(x0 + 1, x1):
-                grid[H - 2][c] = _next()
+            # South painting wall (row 13): 6 paintings with spacers
+            for i in range(12):
+                c = x0 + 1 + i
+                grid[13][c] = _next() if i % 2 == 0 else 1
 
-            # West wall
-            for r in range(2, H - 2):
+            # E/W walls: no paintings — plain wall + doorway only
+            for r in range(2, 13):
                 if room > 0 and r in DOOR_ROWS:
                     grid[r][x0] = 0
                 else:
-                    grid[r][x0] = _next()
-
-            # East wall
-            for r in range(2, H - 2):
+                    grid[r][x0] = 1
+            for r in range(2, 13):
                 if room < total_rooms - 1 and r in DOOR_ROWS:
-                    grid[r][x1] = 0
+                    grid[r][x0 + 13] = 0
                 else:
-                    grid[r][x1] = _next()
+                    grid[r][x0 + 13] = 1
+
+            # Left baffles (rows 4, 10): cols x0+2..x0+9
+            for br in (4, 10):
+                for c in range(x0 + 2, x0 + 10):
+                    if (c - x0) % 2 == 0:
+                        grid[br][c] = _next()
+                    else:
+                        grid[br][c] = 1
+
+            # Right baffle (row 7): cols x0+4..x0+11
+            for c in range(x0 + 4, x0 + 12):
+                if (c - x0) % 2 == 1:
+                    grid[7][c] = _next()
+                else:
+                    grid[7][c] = 1
 
         self.MAP = grid
 
-        # Stack map: 4 paintings above each ground-level painting
-        self._stack_map = {}
-        if paint_cells:
-            n_stack = self._WALL_SCALE - 1
-            for cid in paint_cells:
-                pool = [c for c in paint_cells if c != cid]
-                if len(pool) >= n_stack:
-                    self._stack_map[cid] = _rng.sample(pool, n_stack)
-                else:
-                    self._stack_map[cid] = (pool * ((n_stack // len(pool)) + 1))[:n_stack]
-
-        # Waypoints: clockwise through each room
+        # ── Serpentine waypoints ──────────────────────────────────
+        # Snake through 2-cell corridors, viewing paintings ~1.5 cells away.
+        # (x, y, face_angle, pause_time)
         FACE_N = -math.pi / 2
         FACE_S = math.pi / 2
         FACE_W = math.pi
         FACE_E = 0.0
-        VIEW_PAUSE = 3.5
-        TRANSIT = 0.2
-        CORNER = 0.1
-
-        NY = 2.5
-        SY = 9.5
+        VIEW = 3.0    # seconds to gaze at a wall section
+        TRANSIT = 0.3  # quick transit pause
 
         wps = []
         for room in range(total_rooms):
             x0 = room * RW
-            lx = x0 + 2.5
-            mx = x0 + 5.0
-            rx = x0 + 7.5
-            ex = x0 + 8.0
-            wx = x0 + 2.0
+            # Viewing positions for N/S walls (6 paintings → 3 pair-stops)
+            wl = x0 + 2.0     # left pair  (cols 1, 3)
+            wm = x0 + 6.0     # mid pair   (cols 5, 7)
+            wr = x0 + 10.0    # right pair (cols 9, 11)
+            # Viewing positions for left baffles (paintings at cols 2,4,6,8)
+            bl = x0 + 3.0     # left pair  (cols 2, 4)
+            br = x0 + 7.0     # right pair (cols 6, 8)
+            # Viewing positions for right baffle (paintings at cols 5,7,9,11)
+            rl = x0 + 6.0     # left pair  (cols 5, 7)
+            rr = x0 + 10.0    # right pair (cols 9, 11)
+            # Gap positions
+            rgap = x0 + 11.5  # right gap (left-baffle gap at cols 10-12)
+            lgap = x0 + 2.5   # left gap  (right-baffle gap at cols 1-3)
 
-            # North wall
-            for spot_x in (lx, mx, rx):
-                wps.append((spot_x, NY, FACE_N, VIEW_PAUSE))
-            wps.append((ex, NY, FACE_E, CORNER))
-
-            # East wall
-            for spot_y in (3.5, 6.0, 8.5):
-                wps.append((ex, spot_y, FACE_E, VIEW_PAUSE))
-            wps.append((rx, SY, FACE_S, CORNER))
-
-            # South wall
-            for spot_x in (rx, mx, lx):
-                wps.append((spot_x, SY, FACE_S, VIEW_PAUSE))
-            wps.append((wx, SY, FACE_W, CORNER))
-
-            # West wall
-            west_stops = [8.5, 6.0, 3.5]
+            # Entry: rooms > 0 enter from west doorway at rows 8-9,
+            # route via col 12 (always in gap) up to north corridor
             if room > 0:
-                west_stops = [y for y in west_stops if not (4.5 < y < 7.0)]
-            for spot_y in west_stops:
-                wps.append((wx, spot_y, FACE_W, VIEW_PAUSE))
+                wps.append((x0 + 1.5, 8.5, FACE_E, TRANSIT))
+                wps.append((x0 + 12.5, 8.5, FACE_N, TRANSIT))
+                wps.append((x0 + 12.5, 2.5, FACE_W, TRANSIT))
 
-            # Through doorway to next room
+            # 1. North wall from row 2.5 (~1.5 cells away), face N
+            wps.append((wl, 2.5, FACE_N, VIEW))
+            wps.append((wm, 2.5, FACE_N, VIEW))
+            wps.append((wr, 2.5, FACE_N, VIEW))
+
+            # Down through right gap to corridor 5-6
+            wps.append((rgap, 5.5, FACE_W, TRANSIT))
+
+            # 2. Baffle 4 south face from row 5.5, face N
+            wps.append((br, 5.5, FACE_N, VIEW))
+            wps.append((bl, 5.5, FACE_N, VIEW))
+
+            # 3. Baffle 7 north face from row 5.5, face S
+            wps.append((rl, 5.5, FACE_S, VIEW))
+            wps.append((rr, 5.5, FACE_S, VIEW))
+
+            # Through left gap to corridor 8-9
+            wps.append((lgap, 5.5, FACE_S, TRANSIT))
+            wps.append((lgap, 8.5, FACE_E, TRANSIT))
+
+            # 4. Baffle 10 north face from row 8.5, face S
+            wps.append((bl, 8.5, FACE_S, VIEW))
+            wps.append((br, 8.5, FACE_S, VIEW))
+
+            # Down through right gap to corridor 11-12
+            wps.append((rgap, 11.5, FACE_W, TRANSIT))
+
+            # 5. South wall from row 12.5 (~1.5 cells away), face S
+            wps.append((wr, 12.5, FACE_S, VIEW))
+            wps.append((wm, 12.5, FACE_S, VIEW))
+            wps.append((wl, 12.5, FACE_S, VIEW))
+
+            # Exit: back up through right gap to doorway row
+            wps.append((rgap, 11.5, FACE_N, TRANSIT))
+            wps.append((rgap, 8.5, FACE_E, TRANSIT))
+
+            # Through east doorway to next room
             if room < total_rooms - 1:
-                door_x = x0 + RW - 0.5
-                wps.append((door_x, 5.5, FACE_E, TRANSIT))
+                wps.append((x0 + 13.5, 8.5, FACE_E, TRANSIT))
 
         self.WAYPOINTS = wps
         super().__init__(display)
@@ -1777,6 +1831,7 @@ class GalleryMuseum(_Gallery3DBase):
         if side == 1:
             fog *= 0.85
 
+        # 2-panel wall: panel 0 = painting, panel 1 = plaster
         scale = self._WALL_SCALE
         unit_h = GRID_SIZE / perp_dist
         half = GRID_SIZE // 2
@@ -1797,13 +1852,8 @@ class GalleryMuseum(_Gallery3DBase):
             tex_y = max(0, min(GRID_SIZE - 1, tex_y))
 
             tex = None
-            if is_painting:
-                if panel == 0:
-                    tex_cell = cell
-                else:
-                    stack = self._stack_map.get(cell)
-                    tex_cell = stack[panel - 1] if stack else cell
-                frames = self.textures.get(tex_cell)
+            if is_painting and panel == 0:
+                frames = self.textures.get(cell)
                 if frames:
                     tex = frames[0]
 
