@@ -35,7 +35,6 @@ _HAECKEL_ATLAS = globals().get('_HAECKEL_PIXELS', {})
 _AUDUBON_ATLAS = globals().get('_AUDUBON_PIXELS', {})
 _MERIAN_ATLAS = globals().get('_MERIAN_PIXELS', {})
 _REDOUTE_ATLAS = globals().get('_REDOUTE_PIXELS', {})
-_SEBA_ATLAS = globals().get('_SEBA_PIXELS', {})
 _GOULD_ATLAS = globals().get('_GOULD_PIXELS', {})
 
 try:
@@ -122,7 +121,6 @@ class _PlatesBase(Visual):
             "audubon": _AUDUBON_ATLAS,
             "merian": _MERIAN_ATLAS,
             "redoute": _REDOUTE_ATLAS,
-            "seba": _SEBA_ATLAS,
             "gould": _GOULD_ATLAS,
         }.get(self._collection, {})
 
@@ -354,13 +352,6 @@ class Redoute(_PlatesBase):
     description = "Les Roses"
     _collection = "redoute"
     _manifest_file = "redoute_plates.json"
-
-
-class Seba(_PlatesBase):
-    name = "SEBA"
-    description = "Cabinet of Curiosities"
-    _collection = "seba"
-    _manifest_file = "seba_plates.json"
 
 
 class Gould(_PlatesBase):

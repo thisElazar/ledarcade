@@ -27,7 +27,9 @@ for _fname in sorted(os.listdir(_local_dir)):
         try:
             _mod = importlib.import_module(f'.{_mod_name}', package='visuals.local')
             for _name, _cls in inspect.getmembers(_mod, inspect.isclass):
-                if issubclass(_cls, Visual) and _cls is not Visual and hasattr(_cls, 'name'):
+                if (issubclass(_cls, Visual) and _cls is not Visual
+                        and hasattr(_cls, 'name') and not _name.startswith('_')
+                        and _cls.__module__ == _mod.__name__):
                     LOCAL_VISUALS.append(_cls)
         except Exception as e:
             print(f"[local] skip {_fname}: {e}")

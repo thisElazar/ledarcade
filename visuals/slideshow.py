@@ -209,8 +209,8 @@ class Naturalist(Slideshow):
         super().reset()
 
     def _get_visual_classes(self):
-        from visuals.plates import Haeckel, Audubon, Merian, Redoute, Seba, Gould
-        return [Haeckel, Audubon, Merian, Redoute, Seba, Gould]
+        from visuals.plates import Haeckel, Audubon, Merian, Redoute, Gould
+        return [Haeckel, Audubon, Merian, Redoute, Gould]
 
     def _advance(self):
         """Pick next collection, carry overlay state."""

@@ -93,7 +93,7 @@ from .interchange import Interchange
 from .greenwave import GreenWave
 from .merge import Merge
 from .painting import PAINTING_VISUALS
-from .plates import Haeckel, Audubon, Merian, Redoute, Seba, Gould
+from .plates import Haeckel, Audubon, Merian, Redoute, Gould
 from .mobius import Mobius
 from .lake import Lake
 from .quarks import Quarks
@@ -382,7 +382,6 @@ ALL_VISUALS = [
     Audubon,
     Merian,
     Redoute,
-    Seba,
     Gould,
     Win95Maze,
     DemonSpirals,
@@ -669,7 +668,6 @@ __all__ = [
     'Audubon',
     'Merian',
     'Redoute',
-    'Seba',
     'Gould',
     'Mobius',
     'Lake',

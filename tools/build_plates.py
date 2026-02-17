@@ -38,33 +38,36 @@ COLLECTIONS = {
         "manifest": ROOT / "tools" / "haeckel_plates.json",
         "out_dir":  ROOT / "assets" / "haeckel",
         "atlas":    ROOT / "site" / "haeckel_atlas.json",
+        "auto_white_balance": True,  # slight green tint on some plates
+        "contrast": 1.2,             # many plates are low-contrast
     },
     "audubon": {
         "manifest": ROOT / "tools" / "audubon_plates.json",
         "out_dir":  ROOT / "assets" / "audubon",
         "atlas":    ROOT / "site" / "audubon_atlas.json",
+        # Clean white paper, no correction needed
     },
     "merian": {
         "manifest": ROOT / "tools" / "merian_plates.json",
         "out_dir":  ROOT / "assets" / "merian",
         "atlas":    ROOT / "site" / "merian_atlas.json",
-        "white_balance": 90,  # percentile for sepia removal (aged paper)
-        "saturation": 1.3,    # boost after white balance
+        "auto_white_balance": True,
+        "saturation": 1.3,
     },
     "redoute": {
         "manifest": ROOT / "tools" / "redoute_plates.json",
         "out_dir":  ROOT / "assets" / "redoute",
         "atlas":    ROOT / "site" / "redoute_atlas.json",
-    },
-    "seba": {
-        "manifest": ROOT / "tools" / "seba_plates.json",
-        "out_dir":  ROOT / "assets" / "seba",
-        "atlas":    ROOT / "site" / "seba_atlas.json",
+        "auto_white_balance": True,  # strong sepia on aged paper
+        "saturation": 1.3,           # roses need vivid color
     },
     "gould": {
         "manifest": ROOT / "tools" / "gould_plates.json",
         "out_dir":  ROOT / "assets" / "gould",
         "atlas":    ROOT / "site" / "gould_atlas.json",
+        "auto_white_balance": True,  # heavy sepia from aged paper
+        "saturation": 1.35,          # hummingbird iridescence needs punch
+        "contrast": 1.2,
     },
 }
 
@@ -213,31 +216,44 @@ def download(pid, entry):
 
 # ── Image processing ──────────────────────────────────────────────
 
-def white_balance(img, percentile=90):
-    """Remove sepia/color cast by normalizing paper background to white.
+def auto_white_balance(img, percentile=90, threshold=10):
+    """Smart white balance — detects color cast and corrects proportionally.
 
-    Samples the brightest pixels (paper) and scales each RGB channel
-    so that color maps to white (255,255,255).
+    Samples the brightest pixels (paper/background) at the given percentile.
+    If the channel spread exceeds threshold, normalizes toward white with
+    strength proportional to how severe the cast is.
+    Plates with already-neutral paper are left untouched.
     """
     arr = np.array(img, dtype=np.float32)
     r_wp = np.percentile(arr[:,:,0], percentile)
     g_wp = np.percentile(arr[:,:,1], percentile)
     b_wp = np.percentile(arr[:,:,2], percentile)
-    if r_wp > 0 and g_wp > 0 and b_wp > 0:
-        arr[:,:,0] = np.clip(arr[:,:,0] * (255.0 / r_wp), 0, 255)
-        arr[:,:,1] = np.clip(arr[:,:,1] * (255.0 / g_wp), 0, 255)
-        arr[:,:,2] = np.clip(arr[:,:,2] * (255.0 / b_wp), 0, 255)
-    return Image.fromarray(arr.astype(np.uint8))
+
+    spread = max(r_wp, g_wp, b_wp) - min(r_wp, g_wp, b_wp)
+    if spread < threshold or min(r_wp, g_wp, b_wp) <= 0:
+        return img  # paper is already neutral
+
+    # Blend strength: ramp from 0 at threshold to 1.0 at spread=60+
+    strength = min(1.0, (spread - threshold) / 50.0)
+
+    corrected = arr.copy()
+    for ch, wp in enumerate([r_wp, g_wp, b_wp]):
+        scale = 255.0 / wp
+        corrected[:,:,ch] = np.clip(
+            arr[:,:,ch] * (1.0 + strength * (scale - 1.0)), 0, 255)
+
+    return Image.fromarray(corrected.astype(np.uint8))
 
 
 def color_correct(img, entry, collection_cfg=None):
     """LED panel color correction — boost sat/contrast for small bright display."""
     cfg = collection_cfg or {}
 
-    # White balance (sepia removal) — only if collection opts in
-    wb_pct = cfg.get("white_balance")
-    if wb_pct:
-        img = white_balance(img, percentile=wb_pct)
+    # Auto white balance — detects and removes color cast per plate
+    if cfg.get("auto_white_balance"):
+        img = auto_white_balance(img,
+            percentile=cfg.get("wb_percentile", 90),
+            threshold=cfg.get("wb_threshold", 10))
 
     # Per-plate overrides > collection defaults > global defaults
     sat = entry.get("saturation", cfg.get("saturation", 1.2))
@@ -309,15 +325,21 @@ def cmd_build(collection, ids=None):
         print("All plates already built.")
         return
 
-    print(f"Building {len(to_build)} plates one at a time "
-          f"(~{_backoff_delay:.0f}s between each)...")
+    # Only delay for uncached Wikimedia sources (rate-limit politeness)
+    uses_wikimedia = any("file" in p and "url" not in p for p in to_build)
+    if uses_wikimedia:
+        print(f"Building {len(to_build)} plates "
+              f"(Wikimedia sources will delay ~{_backoff_delay:.0f}s between downloads)...")
+    else:
+        print(f"Building {len(to_build)} plates...")
 
     ok = fail = 0
+    last_downloaded = False  # track if previous plate hit the network
     for i, entry in enumerate(to_build):
-        # Respectful delay between downloads (skip before first)
-        if i > 0:
+        if last_downloaded and uses_wikimedia:
             print(f"  Waiting {_backoff_delay:.0f}s...")
             time.sleep(_backoff_delay)
+        last_downloaded = not _is_cached(entry["id"])
         if build_one(entry["id"], entry, cfg["out_dir"],
                      collection_cfg=cfg):
             ok += 1
