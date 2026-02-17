@@ -134,6 +134,7 @@ from .starwarsca import StarWarsCA
 from .truchet import Truchet
 from .sandpile import Sandpile
 from .settings import Settings
+from .safety import Safety
 from .gamma import Gamma
 from .timers import Timers
 from .effects import Effects
@@ -311,7 +312,14 @@ from .solids import Solids
 from .tessellations import Tessellations
 from .spirograph import Spirograph
 from .watercycle import WaterCycle
+from .calendars import Calendars
+from .coins import Coins
+from .dance import Dance
 from .flags import Flags
+from .knitting import Knitting
+from .language import Language
+from .pottery import Pottery
+from .scripts import Scripts
 from .weaving import Weaving
 from .signs import Signs
 from .matter import MatterPhases
@@ -391,6 +399,7 @@ ALL_VISUALS = [
     Truchet,
     Sandpile,
     Settings,
+    Safety,
     Gamma,
     Timers,
     Effects,
@@ -576,7 +585,14 @@ ALL_VISUALS = [
     Tessellations,
     Spirograph,
     WaterCycle,
+    Calendars,
+    Coins,
+    Dance,
     Flags,
+    Knitting,
+    Language,
+    Pottery,
+    Scripts,
     Weaving,
     Signs,
     MatterPhases,
@@ -712,6 +728,7 @@ __all__ = [
     'Truchet',
     'Sandpile',
     'Settings',
+    'Safety',
     'Gamma',
     'Timers',
     'TestPattern',
@@ -815,7 +832,14 @@ __all__ = [
     'Tessellations',
     'Spirograph',
     'WaterCycle',
+    'Calendars',
+    'Coins',
+    'Dance',
     'Flags',
+    'Knitting',
+    'Language',
+    'Pottery',
+    'Scripts',
     'Signs',
     'MatterPhases',
     'Slideshow',
