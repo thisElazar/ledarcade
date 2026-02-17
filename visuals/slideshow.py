@@ -67,7 +67,7 @@ class Slideshow(Visual):
         self._cycle_timer += dt
         if self._cycle_timer >= self.cycle_interval:
             self._advance()
-        if self._child:
+        elif self._child:
             self._child.update(dt)
 
     def draw(self):
