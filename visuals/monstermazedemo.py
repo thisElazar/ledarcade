@@ -16,7 +16,7 @@ from games.monstermaze import MonsterMaze, MAZE_SIZE, DX, DY, RexState
 
 
 class MonsterMazeDemo(Visual):
-    name = "3D MAZE"
+    name = "3D MONSTR MAZE"
     description = "AI escapes the T-Rex"
     category = "demos"
 
@@ -28,8 +28,8 @@ class MonsterMazeDemo(Visual):
         self.game = MonsterMaze(self.display)
         self.game.reset()
         self.decision_timer = 0.0
-        self.decision_interval = 0.35
-        self.ai_input = InputState()
+        self.decision_interval = 0.55
+        self.pending_input = None  # single-frame input to send next frame
         self.game_over_timer = 0.0
 
     def handle_input(self, input_state):
@@ -45,12 +45,19 @@ class MonsterMazeDemo(Visual):
                 self.game_over_timer = 0.0
             return
 
+        # Send pending single-frame input, then clear it
+        if self.pending_input:
+            self.game.update(self.pending_input, dt)
+            self.pending_input = None
+            return
+
+        # Tick with blank input between decisions
         self.decision_timer += dt
         if self.decision_timer >= self.decision_interval:
             self.decision_timer = 0.0
-            self.ai_input = self._decide()
+            self.pending_input = self._decide()
 
-        self.game.update(self.ai_input, dt)
+        self.game.update(InputState(), dt)
 
     def draw(self):
         if self.game.state == GameState.GAME_OVER:
@@ -66,10 +73,7 @@ class MonsterMazeDemo(Visual):
         inp = InputState()
         g = self.game
 
-        # During non-playing phases just press up to advance
-        if g.phase == 'title':
-            inp.up_pressed = True
-            return inp
+        # During non-playing phases just wait for auto-advance
         if g.phase != 'playing':
             return inp
 
@@ -80,11 +84,9 @@ class MonsterMazeDemo(Visual):
         target_x, target_y = g.exit_x, g.exit_y
 
         # If Rex is close and in pursuit, flee
-        rex_dist = -1
         if g.rex_state in (RexState.SEEN, RexState.BEHIND):
             rex_dist = _bfs_dist(g.walls, px, py, g.rex_x, g.rex_y)
             if rex_dist != -1 and rex_dist <= 3:
-                # Flee: move away from Rex
                 flee_target = self._flee_target(g)
                 if flee_target:
                     target_x, target_y = flee_target
@@ -113,7 +115,7 @@ class MonsterMazeDemo(Visual):
         elif (facing - 1) % 4 == needed_facing:
             inp.left_pressed = True
         else:
-            # 180: turn right twice (will take 2 decisions)
+            # 180: turn right (will take 2 decisions)
             inp.right_pressed = True
 
         return inp
@@ -128,7 +130,6 @@ class MonsterMazeDemo(Visual):
                     continue
                 rd = abs(x - g.rex_x) + abs(y - g.rex_y)
                 pd = abs(x - g.px) + abs(y - g.py)
-                # Want far from Rex but reachable (not too far from player)
                 score = rd - pd
                 if score > best_dist:
                     best_dist = score
