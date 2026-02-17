@@ -1,21 +1,19 @@
 """
 Bloons TD Demo - AI Attract Mode
 =================================
-Bloons Tower Defense plays itself using a predefined build order
-with upgrades. The AI places towers near path bends for maximum
-coverage and upgrades them for increased effectiveness.
+Bloons Tower Defense plays itself. The AI places towers near path bends,
+upgrades them, and lets waves auto-start for income. Skips steps it
+can't afford and retries when money comes in.
 
 AI Strategy:
-- Follow expanded build order of tower placements and upgrades
-- Position towers near path bends where bloons spend the most time
-- Upgrade existing towers for increased range and fire rate
-- Cycle tower type efficiently when needed
-- Idle gracefully after build order exhausted
+- Walk through a build order of placements and upgrades
+- Skip steps that are too expensive; retry when income arrives
+- Directly set tower type (demo privilege) to avoid cycling bugs
+- Idle gracefully between builds, letting waves generate income
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
 from arcade import InputState, GameState
-import random
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.bloonstd import (
@@ -25,48 +23,46 @@ from games.bloonstd import (
 )
 
 # Build steps: (grid_x, grid_y, tower_type, is_upgrade)
-# is_upgrade=True means navigate to existing tower and upgrade it
-# Positions chosen near path bends for maximum coverage
+# Positions near path bends (avoid gx>=28 near vertical path at x=58)
 BUILD_ORDER = [
-    # Phase 1: Early defense near first bend
-    (14, 7, TOWER_DART, False),       # near first horizontal pass
-    (14, 14, TOWER_DART, False),      # between first and second passes
-    # Upgrade first two darts for better range
+    # Phase 1: Cheap darts for early waves ($150 each)
+    (14, 7, TOWER_DART, False),
+    (26, 7, TOWER_DART, False),
+    # Phase 2: Cover second horizontal pass
+    (14, 14, TOWER_DART, False),
+    # Upgrade first dart while saving for tack
     (14, 7, TOWER_DART, True),
+    # Tack near second bend for burst damage
+    (26, 14, TOWER_TACK, False),
+    (26, 7, TOWER_DART, True),
+    # Phase 3: Third pass + splash
+    (14, 20, TOWER_DART, False),
+    (26, 20, TOWER_CANNON, False),
+    (26, 14, TOWER_TACK, True),
+    (26, 20, TOWER_CANNON, True),
+    # Phase 4: Slow + fourth pass
+    (14, 26, TOWER_ICE, False),
+    (26, 26, TOWER_DART, False),
+    (20, 7, TOWER_TACK, False),
     (14, 14, TOWER_DART, True),
-    # Phase 2: Second bend coverage
-    (28, 14, TOWER_TACK, False),      # tack near bend area
-    (28, 7, TOWER_DART, False),       # top area coverage
-    (14, 20, TOWER_DART, False),      # near second pass
-    # Upgrade tack for burst damage
-    (28, 14, TOWER_TACK, True),
-    # Phase 3: Splash and slow
-    (28, 20, TOWER_CANNON, False),    # splash near bends
-    (14, 26, TOWER_ICE, False),       # slow near third pass
-    (28, 26, TOWER_DART, False),      # third pass coverage
-    # Upgrade cannon and ice
-    (28, 20, TOWER_CANNON, True),
     (14, 26, TOWER_ICE, True),
-    # Phase 4: Fill coverage gaps
-    (20, 7, TOWER_TACK, False),       # more top coverage
-    (20, 20, TOWER_DART, False),      # mid coverage
-    (8, 26, TOWER_CANNON, False),     # lower splash
-    # Upgrade mid towers
     (20, 7, TOWER_TACK, True),
-    (20, 20, TOWER_DART, True),
-    # Phase 5: Late game reinforcement
-    (20, 14, TOWER_DART, False),      # fill middle
-    (8, 14, TOWER_ICE, False),        # extra slow
-    (28, 4, TOWER_DART, False),       # top right
-    (8, 20, TOWER_DART, False),       # left mid
-    # Final upgrades
-    (28, 26, TOWER_DART, True),
-    (8, 26, TOWER_CANNON, True),
+    # Phase 5: Fill gaps
+    (20, 14, TOWER_DART, False),
+    (20, 20, TOWER_DART, False),
+    (8, 14, TOWER_ICE, False),
+    (8, 26, TOWER_CANNON, False),
+    # Late upgrades
+    (14, 20, TOWER_DART, True),
+    (26, 26, TOWER_DART, True),
     (20, 14, TOWER_DART, True),
+    (20, 20, TOWER_DART, True),
+    (8, 26, TOWER_CANNON, True),
     (8, 14, TOWER_ICE, True),
 ]
 
-MOVE_INTERVAL = 0.08  # seconds between cursor steps
+MOVE_INTERVAL = 0.10   # seconds between cursor steps
+PAUSE_AFTER_ACTION = 0.4  # brief pause after placing/upgrading
 
 
 class BloonsTDDemo(Visual):
@@ -81,12 +77,11 @@ class BloonsTDDemo(Visual):
         self.time = 0.0
         self.game = BloonsTD(self.display)
         self.game.reset()
+        self.game.money = 1200  # demo gets extra money for a fuller defense
         self.build_index = 0
         self.move_timer = 0.0
         self.game_over_timer = 0.0
-        self.placing = True
-        self.wait_timer = 0.0
-        self.target_type_set = False  # whether we've set the right tower type
+        self.pending_input = None
 
     def handle_input(self, input_state):
         return False
@@ -101,16 +96,23 @@ class BloonsTDDemo(Visual):
                 self.reset()
             return
 
-        # Build AI input each frame
-        ai_input = InputState()
+        # Send pending single-frame input, then clear
+        if self.pending_input:
+            self.game.update(self.pending_input, dt)
+            self.pending_input = None
+            return
 
-        if self.build_index < len(BUILD_ORDER) and self.placing:
-            self.move_timer += dt
-            if self.move_timer >= MOVE_INTERVAL:
-                self.move_timer -= MOVE_INTERVAL
-                self._ai_step(ai_input)
+        # AI decision tick
+        self.move_timer += dt
+        if self.move_timer >= MOVE_INTERVAL:
+            self.move_timer -= MOVE_INTERVAL
+            inp = self._ai_step()
+            if inp:
+                self.pending_input = inp
+                return
 
-        self.game.update(ai_input, dt)
+        # Tick game with blank input
+        self.game.update(InputState(), dt)
 
     def _find_tower_at(self, gx, gy):
         """Find tower near the given grid position."""
@@ -119,114 +121,113 @@ class BloonsTDDemo(Visual):
                 return i
         return None
 
-    def _ai_step(self, ai_input):
-        """One step of AI logic: move cursor or press action."""
+    def _ai_step(self):
+        """One step of AI logic. Returns InputState or None."""
         game = self.game
-        target_gx, target_gy, target_type, is_upgrade = BUILD_ORDER[self.build_index]
+
+        # During wave-end phase, press action to advance
+        if game.phase == PHASE_WAVE_END:
+            inp = InputState()
+            inp.action_l = True
+            return inp
+
+        # Speed up wave starts when nothing to build
+        if game.phase == PHASE_PLACE and game.wave_countdown > 3.0:
+            game.wave_countdown = 3.0
+
+        # Scan build order for first actionable step
+        target = self._find_next_target()
+        if target is None:
+            return None
+
+        idx, gx, gy, ttype, is_upgrade = target
+        self.build_index = idx
+        inp = InputState()
 
         if is_upgrade:
-            # Upgrade step: navigate to existing tower and upgrade
-            tower_idx = self._find_tower_at(target_gx, target_gy)
-            if tower_idx is None:
-                # Tower doesn't exist, skip
-                self._advance_build()
-                return
+            return self._handle_upgrade(game, gx, gy, inp)
+        else:
+            return self._handle_place(game, gx, gy, ttype, inp)
 
-            tower = game.towers[tower_idx]
-            tdef = TOWER_DEFS[tower['type']]
-
-            # Check if already upgraded or can't afford
-            if tower['upgraded'] or game.money < tdef['upgrade_cost']:
-                if tower['upgraded']:
-                    self._advance_build()
-                # else wait for money
-                return
-
-            # Navigate cursor to tower
-            dx = tower['gx'] - game.cursor_gx
-            dy = tower['gy'] - game.cursor_gy
-
-            if abs(dx) > 1 or abs(dy) > 1:
-                # Move toward tower
-                if abs(dx) >= abs(dy):
-                    if dx > 0:
-                        ai_input.right_pressed = True
-                    else:
-                        ai_input.left_pressed = True
-                else:
-                    if dy > 0:
-                        ai_input.down_pressed = True
-                    else:
-                        ai_input.up_pressed = True
-                return
-
-            # At tower position
-            if game.selected_tower == tower_idx:
-                # Already selected, press to upgrade
-                ai_input.action_l = True
-                self._advance_build()
+    def _find_next_target(self):
+        """Find the first build step that can be acted on now."""
+        game = self.game
+        for i, (gx, gy, ttype, is_up) in enumerate(BUILD_ORDER):
+            if is_up:
+                idx = self._find_tower_at(gx, gy)
+                if idx is None:
+                    continue  # tower not placed yet
+                if game.towers[idx]['upgraded']:
+                    continue  # already upgraded
+                if game.money < TOWER_DEFS[game.towers[idx]['type']]['upgrade_cost']:
+                    continue  # can't afford
+                return (i, gx, gy, ttype, True)
             else:
-                # Select the tower first
-                ai_input.action_l = True
-            return
+                if self._find_tower_at(gx, gy) is not None:
+                    continue  # already placed
+                if game.money < TOWER_DEFS[ttype]['cost']:
+                    continue  # can't afford
+                return (i, gx, gy, ttype, False)
+        return None
 
-        # Place step: need correct tower type and navigate to position
-        cost = TOWER_DEFS[target_type]['cost']
-        if game.money < cost:
-            return  # Wait for money
+    def _handle_upgrade(self, game, target_gx, target_gy, inp):
+        """Handle an upgrade build step."""
+        tower_idx = self._find_tower_at(target_gx, target_gy)
+        if tower_idx is None:
+            return None
 
-        # Ensure correct tower type is selected
-        if game.selected_tower_type != target_type and not self.target_type_set:
-            # Cycle tower type by pressing action on an invalid/path cell
-            # First make sure we're not on a tower
-            if game._tower_at(game.cursor_gx, game.cursor_gy) is not None:
-                ai_input.right_pressed = True
-                return
-            ai_input.action_l = True
-            # Check if cycling got us to the right type
-            # (The action will cycle type if on non-placeable spot)
-            return
+        tower = game.towers[tower_idx]
 
-        self.target_type_set = True
+        # Navigate cursor to tower
+        dx = tower['gx'] - game.cursor_gx
+        dy = tower['gy'] - game.cursor_gy
 
-        # Move cursor toward target position
+        if abs(dx) > 1 or abs(dy) > 1:
+            return self._move_toward(dx, dy, inp)
+
+        # At tower — select or upgrade
+        if game.selected_tower == tower_idx:
+            inp.action_l = True
+            self.move_timer = -PAUSE_AFTER_ACTION
+        else:
+            inp.action_l = True
+        return inp
+
+    def _handle_place(self, game, target_gx, target_gy, target_type, inp):
+        """Handle a tower placement build step."""
+        # Set tower type directly (demo privilege)
+        game.selected_tower_type = target_type
+
+        # Move cursor toward target
         dx = target_gx - game.cursor_gx
         dy = target_gy - game.cursor_gy
 
         if dx != 0 or dy != 0:
-            if abs(dx) >= abs(dy):
-                if dx > 0:
-                    ai_input.right_pressed = True
-                else:
-                    ai_input.left_pressed = True
-            else:
-                if dy > 0:
-                    ai_input.down_pressed = True
-                else:
-                    ai_input.up_pressed = True
-            return
+            return self._move_toward(dx, dy, inp)
 
-        # At target position — try to place
+        # At target — place
         if game._can_place(target_gx, target_gy):
-            ai_input.action_l = True
-            self._advance_build()
+            inp.action_l = True
+            self.move_timer = -PAUSE_AFTER_ACTION
+        return inp
+
+    def _move_toward(self, dx, dy, inp):
+        """Move cursor one step toward target."""
+        if abs(dx) >= abs(dy):
+            if dx > 0:
+                inp.right_pressed = True
+            else:
+                inp.left_pressed = True
         else:
-            # Position blocked — skip
-            self._advance_build()
-
-    def _advance_build(self):
-        """Move to the next entry in the build order."""
-        self.build_index += 1
-        self.target_type_set = False
-        self.move_timer = -0.3  # brief pause between placements
-
-        # If build order exhausted, stop placing
-        if self.build_index >= len(BUILD_ORDER):
-            self.placing = False
+            if dy > 0:
+                inp.down_pressed = True
+            else:
+                inp.up_pressed = True
+        return inp
 
     def draw(self):
         self.game.draw()
 
-        # Overlay blinking "DEMO" in top-right area
+        # Overlay blinking "DEMO"
         if int(self.time * 2) % 2 == 0:
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
