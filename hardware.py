@@ -216,6 +216,10 @@ class HardwareDisplay:
         # Black (0) and white (255) are pinned. toe=0 gives pure gamma.
         self._gamma_lut = self._build_lut(gamma, toe)
 
+        # Safety transforms (None = off, zero overhead)
+        self._color_lut = None         # (lut_r, lut_g, lut_b) or None
+        self._epilepsy_guard = None    # EpilepsyGuard instance or None
+
     @staticmethod
     def _build_lut(gamma, toe):
         """Build gamma lookup table with toe lift."""
@@ -229,6 +233,17 @@ class HardwareDisplay:
     def set_gamma(self, gamma, toe):
         """Rebuild gamma LUT at runtime. Takes effect on next render()."""
         self._gamma_lut = self._build_lut(gamma, toe)
+
+    def set_safety(self, colorblind_mode="none", epilepsy_safe=False,
+                   max_brightness_pct=100):
+        """Update safety color transforms. Rebuilds LUTs as needed."""
+        from safety import build_safety_lut, EpilepsyGuard
+        self._color_lut = build_safety_lut(colorblind_mode, max_brightness_pct)
+        if epilepsy_safe:
+            if self._epilepsy_guard is None:
+                self._epilepsy_guard = EpilepsyGuard(fps=30)
+        else:
+            self._epilepsy_guard = None
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
@@ -315,8 +330,21 @@ class HardwareDisplay:
     def render(self):
         """Render the buffer to the LED matrix using bulk SetImage."""
         canvas = self.canvas
-        # Apply gamma correction to a copy (keeps _fb at logical values for get_pixel)
-        corrected = self._fb.translate(self._gamma_lut)
+
+        # Apply safety transforms before gamma (operates on logical values)
+        if self._color_lut is not None or self._epilepsy_guard is not None:
+            from safety import apply_color_lut_buffer
+            # Work on a copy to preserve _fb for get_pixel
+            fb = bytearray(self._fb)
+            if self._color_lut is not None:
+                apply_color_lut_buffer(fb, self._color_lut)
+            if self._epilepsy_guard is not None:
+                self._epilepsy_guard.process(fb, GRID_SIZE * GRID_SIZE)
+            corrected = fb.translate(self._gamma_lut)
+        else:
+            # Fast path: gamma only
+            corrected = self._fb.translate(self._gamma_lut)
+
         if HAS_PIL:
             # Bulk transfer: PIL Image from bytearray, single C call to matrix
             img = Image.frombuffer('RGB', (GRID_SIZE, GRID_SIZE), corrected, 'raw', 'RGB', 0, 1)

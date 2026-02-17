@@ -24,6 +24,9 @@ DEFAULTS = {
     "idle_category_weights": {},
     "idle_favorites": [],
     "idle_blacklist": [],
+    "epilepsy_safe": False,
+    "colorblind_mode": "none",  # "none", "protanopia", "deuteranopia", "tritanopia"
+    "max_brightness_pct": 100,
 }
 
 # In-memory settings cache
@@ -182,3 +185,37 @@ def set_sleep_timer(value):
     """Set sleep timer in minutes (0=off, 5-180)."""
     value = max(0, min(180, int(value)))
     set("sleep_timer", value)
+
+
+def get_epilepsy_safe():
+    """Get epilepsy-safe mode (bool)."""
+    return get("epilepsy_safe", False)
+
+
+def set_epilepsy_safe(value):
+    """Set epilepsy-safe mode (bool)."""
+    set("epilepsy_safe", bool(value))
+
+
+def get_colorblind_mode():
+    """Get colorblind mode: 'none', 'protanopia', 'deuteranopia', 'tritanopia'."""
+    return get("colorblind_mode", "none")
+
+
+def set_colorblind_mode(value):
+    """Set colorblind mode."""
+    valid = ("none", "protanopia", "deuteranopia", "tritanopia")
+    if value not in valid:
+        value = "none"
+    set("colorblind_mode", value)
+
+
+def get_max_brightness_pct():
+    """Get max brightness percentage (10-100)."""
+    return get("max_brightness_pct", 100)
+
+
+def set_max_brightness_pct(value):
+    """Set max brightness percentage (10-100)."""
+    value = max(10, min(100, int(value)))
+    set("max_brightness_pct", value)

@@ -253,19 +253,23 @@ class Display:
     On desktop: renders via PyGame with scaling.
     On hardware: would render to LED matrix.
     """
-    
+
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("LED Arcade - 64x64")
-        
+
         self.window_size = GRID_SIZE * SCALE
         self.screen = pygame.display.set_mode((self.window_size, self.window_size))
-        
+
         # Virtual framebuffer (64x64)
         self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-        
+
         # Font for HUD (small pixel font simulation)
         self.font = pygame.font.Font(None, 24)
+
+        # Safety transforms (None = off, zero overhead)
+        self._color_lut = None         # (lut_r, lut_g, lut_b) or None
+        self._epilepsy_guard = None    # EpilepsyGuard instance or None
     
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
@@ -347,20 +351,65 @@ class Display:
         """No-op in emulator (gamma only applies to LED hardware)."""
         pass
 
+    def set_safety(self, colorblind_mode="none", epilepsy_safe=False,
+                   max_brightness_pct=100):
+        """Update safety color transforms. Rebuilds LUTs as needed."""
+        from safety import build_safety_lut, EpilepsyGuard
+        self._color_lut = build_safety_lut(colorblind_mode, max_brightness_pct)
+        if epilepsy_safe:
+            if self._epilepsy_guard is None:
+                self._epilepsy_guard = EpilepsyGuard(fps=FPS)
+        else:
+            self._epilepsy_guard = None
+
     def render(self):
         """Render the buffer to the screen."""
+        if self._color_lut is not None or self._epilepsy_guard is not None:
+            self._render_with_safety()
+        else:
+            self._render_fast()
+        pygame.display.flip()
+
+    def _render_fast(self):
+        """Render without safety transforms (zero overhead path)."""
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
                 color = self.buffer[y][x]
                 rect = (x * SCALE, y * SCALE, SCALE, SCALE)
                 pygame.draw.rect(self.screen, color, rect)
-        
-        # Optional: draw grid lines for debugging
-        # for i in range(GRID_SIZE + 1):
-        #     pygame.draw.line(self.screen, Colors.DARK_GRAY, (i*SCALE, 0), (i*SCALE, self.window_size))
-        #     pygame.draw.line(self.screen, Colors.DARK_GRAY, (0, i*SCALE), (self.window_size, i*SCALE))
-        
-        pygame.display.flip()
+
+    def _render_with_safety(self):
+        """Render with safety color transforms applied."""
+        from safety import apply_color_lut_buffer
+
+        # Build flat framebuffer from 2D buffer
+        n = GRID_SIZE * GRID_SIZE
+        fb = bytearray(n * 3)
+        for y in range(GRID_SIZE):
+            row = self.buffer[y]
+            for x in range(GRID_SIZE):
+                offset = (y * GRID_SIZE + x) * 3
+                c = row[x]
+                fb[offset] = c[0]
+                fb[offset + 1] = c[1]
+                fb[offset + 2] = c[2]
+
+        # Apply colorblind / brightness LUT
+        if self._color_lut is not None:
+            apply_color_lut_buffer(fb, self._color_lut)
+
+        # Apply epilepsy guard (rolling-window flash frequency monitor)
+        if self._epilepsy_guard is not None:
+            self._epilepsy_guard.process(fb, n)
+
+        # Draw to screen from flat buffer
+        for y in range(GRID_SIZE):
+            row_offset = y * GRID_SIZE * 3
+            for x in range(GRID_SIZE):
+                offset = row_offset + x * 3
+                color = (fb[offset], fb[offset + 1], fb[offset + 2])
+                rect = (x * SCALE, y * SCALE, SCALE, SCALE)
+                pygame.draw.rect(self.screen, color, rect)
 
 
 # =============================================================================

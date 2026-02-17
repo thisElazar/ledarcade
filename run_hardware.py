@@ -526,6 +526,12 @@ def main():
     saved_toe = persistent.get_toe()
     display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4,
                               gamma=saved_gamma, toe=saved_toe)
+    # Load persisted safety settings
+    display.set_safety(
+        colorblind_mode=persistent.get_colorblind_mode(),
+        epilepsy_safe=persistent.get_epilepsy_safe(),
+        max_brightness_pct=persistent.get_max_brightness_pct(),
+    )
 
     print("Initializing input...")
     input_handler = HardwareInput(use_gpio=True)

@@ -553,6 +553,13 @@ def main():
 
     # Initialize
     display = Display()
+    # Load persisted safety settings
+    import settings as persistent
+    display.set_safety(
+        colorblind_mode=persistent.get_colorblind_mode(),
+        epilepsy_safe=persistent.get_epilepsy_safe(),
+        max_brightness_pct=persistent.get_max_brightness_pct(),
+    )
     _show_splash(display)
     input_handler = InputHandler()
     clock = pygame.time.Clock()
