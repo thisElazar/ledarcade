@@ -1,8 +1,7 @@
 """Color Theory - Educational color theory reference on 64x64 LED matrix.
 
-10 pages: Color Wheel, Complementary, Analogous, Triadic,
-Split-Complementary, Warm vs Cool, RGB Mixing, CMY Mixing,
-Tints/Shades, Temperature.
+10 pages: Spectrum, Color Wheel, Complementary, Analogous, Triadic,
+Split-Complementary, RGB Mixing, CMY Mixing, Tints/Shades, Temperature.
 """
 
 import math
@@ -66,12 +65,12 @@ WHEEL_NAMES = ['R', 'RO', 'O', 'YO', 'Y', 'YG', 'G', 'BG', 'C', 'CB', 'B', 'BV',
 WHEEL_12 = ['R', '', 'O', '', 'Y', '', 'G', '', 'C', '', 'B', '', 'M', '']
 
 PAGE_NAMES = [
+    'SPECTRUM',
     'COLOR WHEEL',
     'COMPLEMENT',
     'ANALOGOUS',
     'TRIADIC',
     'SPLIT COMP',
-    'WARM + COOL',
     'RGB MIX',
     'CMY MIX',
     'TINT/SHADE',
@@ -96,6 +95,7 @@ class ColorTheory(Visual):
         self.page = 0
         self.hue_offset = 0.0       # user-controlled hue rotation
         self.sub_index = 0           # sub-selection within a page
+        self.value = 1.0             # brightness for SPECTRUM page
         self.overlay_timer = 0.0
         self.overlay_text = ''
 
@@ -114,20 +114,28 @@ class ColorTheory(Visual):
             consumed = True
 
         if input_state.left_pressed:
-            self.hue_offset -= 30
-            self.sub_index = (self.sub_index - 1)
+            if self.page == 0:  # SPECTRUM: adjust brightness
+                self.value = max(0.0, self.value - 0.1)
+            else:
+                self.hue_offset -= 15
+                self.sub_index = (self.sub_index - 1)
             consumed = True
         elif input_state.right_pressed:
-            self.hue_offset += 30
-            self.sub_index = (self.sub_index + 1)
+            if self.page == 0:  # SPECTRUM: adjust brightness
+                self.value = min(1.0, self.value + 0.1)
+            else:
+                self.hue_offset += 15
+                self.sub_index = (self.sub_index + 1)
             consumed = True
 
         if input_state.action_l or input_state.action_r:
             # Toggle related views on certain pages
-            if self.page == 6:      # RGB -> CMY
+            if self.page == 0:       # SPECTRUM: reset brightness
+                self.value = 1.0
+            elif self.page == 6:     # RGB -> CMY
                 self.page = 7
                 self._show_overlay(PAGE_NAMES[self.page])
-            elif self.page == 7:    # CMY -> RGB
+            elif self.page == 7:     # CMY -> RGB
                 self.page = 6
                 self._show_overlay(PAGE_NAMES[self.page])
             else:
@@ -160,12 +168,12 @@ class ColorTheory(Visual):
 
         # Page content area: y=9 to y=56
         page_fn = [
+            self._draw_spectrum,
             self._draw_wheel,
             self._draw_complement,
             self._draw_analogous,
             self._draw_triadic,
             self._draw_split_comp,
-            self._draw_warm_cool,
             self._draw_rgb_mix,
             self._draw_cmy_mix,
             self._draw_tint_shade,
@@ -243,7 +251,38 @@ class ColorTheory(Visual):
                     c = _hsv_to_rgb(idx * 30, 1.0, 1.0)
                     d.draw_text_small(lx, ly, lbl, c)
 
-    # ── Page 1: Color Wheel ───────────────────────────────────────
+    # ── Page 1: Spectrum (H×S plane) ─────────────────────────────
+
+    def _draw_spectrum(self):
+        d = self.display
+        v = self.value
+
+        # Label: brightness percentage
+        pct = int(round(v * 100))
+        d.draw_text_small(2, 9, f'V:{pct}%', TEXT_DIM)
+
+        # H×S grid: x=2..61 (60px), y=14..53 (40px)
+        for px in range(2, 62):
+            hue = (px - 2) * 6.0  # 0 to 360 across 60 pixels
+            for py in range(14, 54):
+                sat = 1.0 - (py - 14) / 39.0  # 1.0 at top, 0.0 at bottom
+                color = _hsv_to_rgb(hue, sat, v)
+                d.set_pixel(px, py, color)
+
+        # V slider bar: y=55..56 (2px), x=2..61
+        for px in range(2, 62):
+            bri = (px - 2) / 59.0
+            gray = int(bri * 255)
+            for py in range(55, 57):
+                d.set_pixel(px, py, (gray, gray, gray))
+
+        # Marker on slider showing current V
+        marker_x = int(2 + v * 59)
+        marker_x = max(2, min(61, marker_x))
+        for py in range(54, 57):
+            d.set_pixel(marker_x, py, (255, 255, 255))
+
+    # ── Page 2: Color Wheel ───────────────────────────────────────
 
     def _draw_wheel(self):
         auto_rot = self.time * 5  # slow auto rotation
@@ -251,14 +290,13 @@ class ColorTheory(Visual):
                                offset_deg=-(self.hue_offset + auto_rot),
                                labels=True)
 
-    # ── Page 2: Complementary ─────────────────────────────────────
+    # ── Page 3: Complementary ─────────────────────────────────────
 
     def _draw_complement(self):
         d = self.display
-        # 3 complementary pairs
-        pairs = [(0, 6), (4, 10), (2, 8)]  # R-C, Y-B, O-BG
-        pair_idx = self.sub_index % len(pairs)
-        i1, i2 = pairs[pair_idx]
+        # Any hue and its complement (opposite on the 12-hue wheel)
+        i1 = self.sub_index % 12
+        i2 = (i1 + 6) % 12
 
         # Small wheel with highlighted pair
         self._draw_color_wheel(18, 28, 13, 7,
@@ -281,14 +319,12 @@ class ColorTheory(Visual):
         mid = _blend(c1, c2, 0.5)
         d.draw_rect(44, 30, 10, 10, mid)
         d.draw_text_small(38, 44, 'PAIR', TEXT_DIM)
-        num_str = f'{pair_idx + 1}/{len(pairs)}'
-        d.draw_text_small(38, 50, num_str, TEXT_DIM)
 
     # ── Page 3: Analogous ─────────────────────────────────────────
 
     def _draw_analogous(self):
         d = self.display
-        base = (self.sub_index * 3) % 12
+        base = self.sub_index % 12
         group = [base % 12, (base + 1) % 12, (base + 2) % 12]
 
         self._draw_color_wheel(18, 28, 13, 7,
@@ -364,36 +400,7 @@ class ColorTheory(Visual):
         d.draw_rect(50, 30, 10, 8, colors[2])
         d.draw_text_small(38, 40, 'SPLIT', TEXT_DIM)
 
-    # ── Page 6: Warm vs Cool ──────────────────────────────────────
-
-    def _draw_warm_cool(self):
-        d = self.display
-        # Left half: warm (red/orange/yellow = hues 0,30,60 roughly)
-        # Right half: cool (green/cyan/blue = hues 120,180,240 roughly)
-        cx, cy = 31, 32
-        r = 17
-        for py in range(cy - r - 1, cy + r + 2):
-            for px in range(cx - r - 1, cx + r + 2):
-                dx = px - cx
-                dy = py - cy
-                dist_sq = dx * dx + dy * dy
-                if dist_sq > r * r:
-                    continue
-                angle = math.degrees(math.atan2(dy, dx))
-                hue = angle % 360
-                color = _hsv_to_rgb(hue, 1.0, 1.0)
-                if 0 <= px < 64 and 0 <= py < 64:
-                    d.set_pixel(px, py, color)
-
-        # Dividing line
-        d.draw_line(cx, cy - r, cx, cy + r, (0, 0, 0))
-        d.draw_line(cx - 1, cy - r, cx - 1, cy + r, (0, 0, 0))
-
-        # Labels
-        d.draw_text_small(6, 52, 'WARM', (255, 140, 40))
-        d.draw_text_small(40, 52, 'COOL', (60, 140, 255))
-
-    # ── Page 7: RGB Mixing (Additive) ─────────────────────────────
+    # ── RGB Mixing (Additive) ───────────────────────────────────────
 
     def _draw_rgb_mix(self):
         d = self.display
@@ -403,7 +410,7 @@ class ColorTheory(Visual):
 
         cx, cy = 31, 30
         radius = 12
-        offset = 7  # overlap amount
+        offset = max(4, min(10, 7 + self.sub_index))  # L/R adjusts overlap
 
         # Circle centers
         centers = [
@@ -440,7 +447,7 @@ class ColorTheory(Visual):
 
         cx, cy = 31, 30
         radius = 12
-        offset = 7
+        offset = max(4, min(10, 7 + self.sub_index))  # L/R adjusts overlap
 
         centers = [
             (cx, cy - offset, C),
