@@ -157,6 +157,249 @@ def center_and_normalize(coords):
     return [(x - cx, y - cy, z - cz) for x, y, z in coords]
 
 
+def count_nmr_models(pdb_text):
+    """Count MODEL records in PDB text."""
+    count = 0
+    for line in pdb_text.split('\n'):
+        if line.startswith('MODEL'):
+            count += 1
+    return count
+
+
+def extract_all_nmr_models(pdb_text, chain, max_models=6):
+    """Extract Cα coords from evenly-spaced NMR models.
+
+    Returns list of coord lists, one per model. Each coord list
+    has the same length (number of Cα atoms in model 1).
+    """
+    # First pass: collect all model numbers
+    model_nums = []
+    for line in pdb_text.split('\n'):
+        if line.startswith('MODEL'):
+            model_nums.append(int(line.split()[1]))
+
+    if len(model_nums) <= 1:
+        return []
+
+    # Pick evenly-spaced models (always include first and last)
+    if len(model_nums) <= max_models:
+        selected = model_nums
+    else:
+        indices = [int(round(i * (len(model_nums) - 1) / (max_models - 1)))
+                   for i in range(max_models)]
+        selected = [model_nums[i] for i in indices]
+
+    # Second pass: extract coords for selected models
+    all_coords = []
+    current_model = None
+    current_coords = []
+    seen_res = set()
+
+    for line in pdb_text.split('\n'):
+        if line.startswith('MODEL'):
+            current_model = int(line.split()[1])
+            current_coords = []
+            seen_res = set()
+        elif line.startswith('ENDMDL'):
+            if current_model in selected and current_coords:
+                all_coords.append(current_coords)
+            current_model = None
+            continue
+
+        if current_model not in selected:
+            continue
+
+        if line.startswith('ATOM') or line.startswith('HETATM'):
+            atom_name = line[12:16].strip()
+            alt_loc = line[16]
+            chain_id = line[21]
+            res_seq = line[22:27].strip()
+
+            if atom_name == 'CA' and chain_id == chain and alt_loc in (' ', 'A'):
+                if res_seq not in seen_res:
+                    seen_res.add(res_seq)
+                    x = float(line[30:38])
+                    y = float(line[38:46])
+                    z = float(line[46:54])
+                    current_coords.append((x, y, z))
+
+    # Filter: all models must have same number of atoms as model 1
+    if not all_coords:
+        return []
+    n_atoms = len(all_coords[0])
+    all_coords = [c for c in all_coords if len(c) == n_atoms]
+    if len(all_coords) < 2:
+        return []
+
+    return all_coords
+
+
+def _mat_mult_3x3(A, B):
+    """Multiply two 3x3 matrices (lists of lists)."""
+    return [[sum(A[i][k] * B[k][j] for k in range(3)) for j in range(3)]
+            for i in range(3)]
+
+
+def _mat_transpose_3x3(A):
+    """Transpose a 3x3 matrix."""
+    return [[A[j][i] for j in range(3)] for i in range(3)]
+
+
+def _jacobi_eigendecomposition_3x3(S):
+    """3x3 symmetric matrix eigendecomposition via Jacobi rotations.
+
+    Returns (eigenvalues, eigenvectors) where eigenvectors[i] is the
+    i-th column eigenvector.
+    """
+    # Work on a copy
+    A = [row[:] for row in S]
+    # V starts as identity
+    V = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+    for _ in range(100):
+        # Find largest off-diagonal element
+        max_val = 0.0
+        p, q = 0, 1
+        for i in range(3):
+            for j in range(i + 1, 3):
+                if abs(A[i][j]) > max_val:
+                    max_val = abs(A[i][j])
+                    p, q = i, j
+
+        if max_val < 1e-12:
+            break
+
+        # Compute rotation angle
+        if abs(A[p][p] - A[q][q]) < 1e-15:
+            theta = math.pi / 4
+        else:
+            theta = 0.5 * math.atan2(2 * A[p][q], A[p][p] - A[q][q])
+
+        c = math.cos(theta)
+        s = math.sin(theta)
+
+        # Apply rotation to A
+        App = c * c * A[p][p] + 2 * s * c * A[p][q] + s * s * A[q][q]
+        Aqq = s * s * A[p][p] - 2 * s * c * A[p][q] + c * c * A[q][q]
+        Apq = 0.0
+
+        new_A = [row[:] for row in A]
+        new_A[p][p] = App
+        new_A[q][q] = Aqq
+        new_A[p][q] = Apq
+        new_A[q][p] = Apq
+
+        for r in range(3):
+            if r != p and r != q:
+                new_rp = c * A[r][p] + s * A[r][q]
+                new_rq = -s * A[r][p] + c * A[r][q]
+                new_A[r][p] = new_rp
+                new_A[p][r] = new_rp
+                new_A[r][q] = new_rq
+                new_A[q][r] = new_rq
+
+        A = new_A
+
+        # Update eigenvectors
+        new_V = [row[:] for row in V]
+        for r in range(3):
+            new_V[r][p] = c * V[r][p] + s * V[r][q]
+            new_V[r][q] = -s * V[r][p] + c * V[r][q]
+        V = new_V
+
+    eigenvalues = [A[i][i] for i in range(3)]
+    return eigenvalues, V
+
+
+def _svd_3x3(H):
+    """Compute SVD of 3x3 matrix H = U * S * Vt using eigendecomposition.
+
+    Returns (U, S_diag, Vt).
+    """
+    Ht = _mat_transpose_3x3(H)
+    HtH = _mat_mult_3x3(Ht, H)
+    evals, V = _jacobi_eigendecomposition_3x3(HtH)
+
+    # Sort eigenvalues descending
+    order = sorted(range(3), key=lambda i: -evals[i])
+    evals = [evals[i] for i in order]
+    V = [[V[r][order[j]] for j in range(3)] for r in range(3)]
+
+    S_diag = [math.sqrt(max(0, e)) for e in evals]
+
+    # U = H * V * S_inv
+    HV = _mat_mult_3x3(H, V)
+    U = [[0.0] * 3 for _ in range(3)]
+    for j in range(3):
+        if S_diag[j] > 1e-10:
+            for i in range(3):
+                U[i][j] = HV[i][j] / S_diag[j]
+        else:
+            # Null singular value - set column to zero (will be fixed by det check)
+            for i in range(3):
+                U[i][j] = 0.0
+
+    Vt = _mat_transpose_3x3(V)
+    return U, S_diag, Vt
+
+
+def _det_3x3(M):
+    """Determinant of 3x3 matrix."""
+    return (M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1])
+          - M[0][1] * (M[1][0] * M[2][2] - M[1][2] * M[2][0])
+          + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]))
+
+
+def kabsch_align(coords_mobile, coords_ref):
+    """Align coords_mobile onto coords_ref using Kabsch algorithm.
+
+    Both are lists of (x,y,z) tuples of same length.
+    Returns aligned coords_mobile (centered, rotated to match ref).
+    """
+    n = len(coords_ref)
+    if n == 0:
+        return coords_mobile
+
+    # Center both
+    ref_cx = sum(c[0] for c in coords_ref) / n
+    ref_cy = sum(c[1] for c in coords_ref) / n
+    ref_cz = sum(c[2] for c in coords_ref) / n
+    mob_cx = sum(c[0] for c in coords_mobile) / n
+    mob_cy = sum(c[1] for c in coords_mobile) / n
+    mob_cz = sum(c[2] for c in coords_mobile) / n
+
+    ref_c = [(x - ref_cx, y - ref_cy, z - ref_cz) for x, y, z in coords_ref]
+    mob_c = [(x - mob_cx, y - mob_cy, z - mob_cz) for x, y, z in coords_mobile]
+
+    # Cross-covariance matrix H = mob^T * ref
+    H = [[0.0] * 3 for _ in range(3)]
+    for k in range(n):
+        for i in range(3):
+            for j in range(3):
+                H[i][j] += mob_c[k][i] * ref_c[k][j]
+
+    U, S, Vt = _svd_3x3(H)
+
+    # Ensure proper rotation (det = +1)
+    d = _det_3x3(_mat_mult_3x3(U, Vt))
+    if d < 0:
+        # Flip sign of last column of U
+        for i in range(3):
+            U[i][2] = -U[i][2]
+
+    R = _mat_mult_3x3(U, Vt)
+
+    # Apply rotation to centered mobile coords, then translate to ref center
+    aligned = []
+    for x, y, z in mob_c:
+        nx = R[0][0] * x + R[0][1] * y + R[0][2] * z + ref_cx
+        ny = R[1][0] * x + R[1][1] * y + R[1][2] * z + ref_cy
+        nz = R[2][0] * x + R[2][1] * y + R[2][2] * z + ref_cz
+        aligned.append((nx, ny, nz))
+
+    return aligned
+
+
 def generate_fallback_coords(sequence, cyclic):
     """Generate approximate coordinates when PDB fetch fails.
 
@@ -228,7 +471,7 @@ def main():
             coords = generate_fallback_coords(sequence, cyclic)
             source = 'fallback'
 
-        results.append({
+        result = {
             'name': name,
             'pdb': pdb_id,
             'description': description,
@@ -238,9 +481,34 @@ def main():
             'coords': coords,
             'source': source,
             'chain': chain,
-        })
+        }
 
-        print(f"  {name}: {len(coords)} coords ({source})", file=sys.stderr)
+        # Check for NMR ensemble models
+        if pdb_text and source == 'PDB':
+            n_models = count_nmr_models(pdb_text)
+            if n_models >= 3:
+                nmr_raw = extract_all_nmr_models(pdb_text, chain, max_models=6)
+                if len(nmr_raw) >= 2 and len(nmr_raw[0]) == len(coords):
+                    # Align all models to model 1 (already centered)
+                    ref = nmr_raw[0]
+                    aligned = [center_and_normalize(ref)]
+                    for m in nmr_raw[1:]:
+                        a = kabsch_align(m, ref)
+                        aligned.append(center_and_normalize(a))
+                    result['nmr_coords'] = aligned
+                    print(f"  {name}: {len(coords)} coords ({source}), "
+                          f"{len(aligned)} NMR models from {n_models} total",
+                          file=sys.stderr)
+                else:
+                    print(f"  {name}: {len(coords)} coords ({source}), "
+                          f"NMR models: {n_models} total but extraction failed",
+                          file=sys.stderr)
+            else:
+                print(f"  {name}: {len(coords)} coords ({source})", file=sys.stderr)
+        else:
+            print(f"  {name}: {len(coords)} coords ({source})", file=sys.stderr)
+
+        results.append(result)
 
     # Output Python code
     print("PEPTIDES = [")
@@ -256,6 +524,14 @@ def main():
         for x, y, z in r['coords']:
             print(f"            {format_coord(x, y, z)},")
         print(f"        ],")
+        if 'nmr_coords' in r:
+            print(f"        'nmr_coords': [")
+            for mi, model in enumerate(r['nmr_coords']):
+                print(f"            [  # model {mi}")
+                for x, y, z in model:
+                    print(f"                {format_coord(x, y, z)},")
+                print(f"            ],")
+            print(f"        ],")
         print(f"    }},")
     print("]")
 
@@ -263,8 +539,9 @@ def main():
     print(file=sys.stderr)
     pdb_count = sum(1 for r in results if r['source'] == 'PDB')
     fb_count = sum(1 for r in results if r['source'] == 'fallback')
-    print(f"Done: {len(results)} peptides ({pdb_count} from PDB, {fb_count} fallback)",
-          file=sys.stderr)
+    nmr_count = sum(1 for r in results if 'nmr_coords' in r)
+    print(f"Done: {len(results)} peptides ({pdb_count} from PDB, {fb_count} fallback, "
+          f"{nmr_count} with NMR ensembles)", file=sys.stderr)
 
 
 if __name__ == '__main__':
