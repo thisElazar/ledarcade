@@ -162,16 +162,31 @@ def generate_cycle(params):
             r_elbow_flex = math.radians(params['elbow_base'])
             l_elbow_flex = math.radians(params['elbow_base'])
         elif is_march:
-            # March: thigh lifts high, shin hangs vertical, stance leg straight
-            r_hip_deg = params['hip_swing'] * _cos(phase) + params['hip_bias']
-            l_hip_deg = params['hip_swing'] * _cos(phase + 0.5) + params['hip_bias']
+            # March: one leg lifts at a time, other stays planted
+            swing = params['hip_swing']
+
+            def march_hip_deg(p):
+                """Asymmetric hip curve: planted ~60%, lift-and-stamp ~40%.
+                p in [0,1): 0.0-0.6 = planted (straight down to slight back),
+                             0.6-1.0 = lift forward then stamp down."""
+                p = p % 1.0
+                if p < 0.6:
+                    # Planted: leg straight down, slight backward drift
+                    return -4 * math.sin(p / 0.6 * math.pi)
+                else:
+                    # Lift phase: sharp up to peak then back down
+                    t = (p - 0.6) / 0.4
+                    return swing * math.sin(t * math.pi)
+
+            r_hip_deg = march_hip_deg(phase)
+            l_hip_deg = march_hip_deg(phase + 0.5)
             r_hip_angle = math.radians(r_hip_deg)
             l_hip_angle = math.radians(l_hip_deg)
 
             # Knee tracks hip angle when leg is forward (shin stays vertical)
             # When leg is behind or neutral, knee is nearly locked straight
             def march_knee(hip_deg):
-                if hip_deg > 5:
+                if hip_deg > 3:
                     return math.radians(hip_deg * 0.92)
                 else:
                     return math.radians(params['knee_stance_peak'])
@@ -179,9 +194,17 @@ def generate_cycle(params):
             r_knee_angle = march_knee(r_hip_deg)
             l_knee_angle = march_knee(l_hip_deg)
 
-            r_arm_angle = math.radians(-params['arm_swing'] * _sin(phase))
-            l_arm_angle = math.radians(-params['arm_swing']
-                                        * _sin(phase + 0.5))
+            # Arms also use asymmetric curve, opposite leg
+            def march_arm_deg(p):
+                p = p % 1.0
+                if p < 0.6:
+                    return -3 * math.sin(p / 0.6 * math.pi)
+                else:
+                    t = (p - 0.6) / 0.4
+                    return -params['arm_swing'] * math.sin(t * math.pi)
+
+            r_arm_angle = math.radians(march_arm_deg(phase + 0.5))
+            l_arm_angle = math.radians(march_arm_deg(phase))
             r_elbow_flex = math.radians(params['elbow_base'])
             l_elbow_flex = math.radians(params['elbow_base'])
         else:
