@@ -104,16 +104,17 @@ MOVEMENTS = {
     },
     'MARCH': {
         'n_frames': 40,
-        'hip_swing': 30,        # High steps
-        'hip_bias': 3,          # Very upright
-        'knee_stance_peak': 10,
-        'knee_swing_peak': 85,  # Exaggerated knee lift
-        'arm_swing': 30,        # Big arm swing
-        'elbow_base': 55,       # Arms bent at 90°
-        'elbow_swing': 10,
-        'bounce': 0.015,
-        'sway': 0.010,
+        'hip_swing': 45,        # Thigh lifts high in front
+        'hip_bias': 2,          # Very upright
+        'knee_stance_peak': 3,  # Locked straight on stance
+        'knee_swing_peak': 0,   # Unused — march uses special knee logic
+        'arm_swing': 35,        # Crisp arm pump
+        'elbow_base': 80,       # Arms at sharp right angles
+        'elbow_swing': 5,
+        'bounce': 0.005,        # Minimal bounce (stiff gait)
+        'sway': 0.004,          # Minimal sway
         'crouch': 0.0,
+        'march': True,          # Special: shin hangs vertical on lift
     },
     'IDLE': {
         'n_frames': 60,         # Slow breathing cycle
@@ -136,6 +137,7 @@ def generate_cycle(params):
     """Generate one motion cycle from parameter dict."""
     n = params['n_frames']
     is_idle = params.get('idle', False)
+    is_march = params.get('march', False)
     frames = []
 
     for i in range(n):
@@ -157,6 +159,29 @@ def generate_cycle(params):
                                          + 3 * _sin(phase + 0.5))
             r_arm_angle = math.radians(2 * _sin(phase))
             l_arm_angle = math.radians(2 * _sin(phase + 0.5))
+            r_elbow_flex = math.radians(params['elbow_base'])
+            l_elbow_flex = math.radians(params['elbow_base'])
+        elif is_march:
+            # March: thigh lifts high, shin hangs vertical, stance leg straight
+            r_hip_deg = params['hip_swing'] * _cos(phase) + params['hip_bias']
+            l_hip_deg = params['hip_swing'] * _cos(phase + 0.5) + params['hip_bias']
+            r_hip_angle = math.radians(r_hip_deg)
+            l_hip_angle = math.radians(l_hip_deg)
+
+            # Knee tracks hip angle when leg is forward (shin stays vertical)
+            # When leg is behind or neutral, knee is nearly locked straight
+            def march_knee(hip_deg):
+                if hip_deg > 5:
+                    return math.radians(hip_deg * 0.92)
+                else:
+                    return math.radians(params['knee_stance_peak'])
+
+            r_knee_angle = march_knee(r_hip_deg)
+            l_knee_angle = march_knee(l_hip_deg)
+
+            r_arm_angle = math.radians(-params['arm_swing'] * _sin(phase))
+            l_arm_angle = math.radians(-params['arm_swing']
+                                        * _sin(phase + 0.5))
             r_elbow_flex = math.radians(params['elbow_base'])
             l_elbow_flex = math.radians(params['elbow_base'])
         else:
