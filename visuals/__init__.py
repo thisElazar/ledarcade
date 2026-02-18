@@ -312,9 +312,7 @@ from .solids import Solids
 from .tessellations import Tessellations
 from .spirograph import Spirograph
 from .watercycle import WaterCycle
-from .calendars import Calendars
 from .coins import Coins
-from .dance import Dance
 from .flags import Flags
 from .knitting import Knitting
 from .language import Language
@@ -585,9 +583,7 @@ ALL_VISUALS = [
     Tessellations,
     Spirograph,
     WaterCycle,
-    Calendars,
     Coins,
-    Dance,
     Flags,
     Knitting,
     Language,
@@ -832,9 +828,7 @@ __all__ = [
     'Tessellations',
     'Spirograph',
     'WaterCycle',
-    'Calendars',
     'Coins',
-    'Dance',
     'Flags',
     'Knitting',
     'Language',

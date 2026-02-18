@@ -1,0 +1,82 @@
+[
+  {
+    "id": "greek_amphora",
+    "met_id": 254896,
+    "title": "Terracotta amphora",
+    "culture": "Greek, Attic",
+    "date": "ca. 490 BCE",
+    "medium": "Terracotta"
+  },
+  {
+    "id": "egypt_taweret",
+    "met_id": 544864,
+    "title": "Statuette of Taweret",
+    "culture": "Egyptian",
+    "date": "332-30 BCE",
+    "medium": "Glassy faience"
+  },
+  {
+    "id": "korea_celadon",
+    "met_id": 39590,
+    "title": "Maebyeong with cranes",
+    "culture": "Korean",
+    "date": "late 13th century",
+    "medium": "Stoneware with inlaid design under celadon glaze"
+  },
+  {
+    "id": "iran_pierced_bowl",
+    "met_id": 452032,
+    "title": "Pierced Bowl",
+    "culture": "Iranian",
+    "date": "late 11th-early 12th century",
+    "medium": "Stonepaste; molded and pierced, monochrome under transparent glaze"
+  },
+  {
+    "id": "china_jar_dragon",
+    "met_id": 39666,
+    "title": "Jar with dragon",
+    "culture": "Chinese",
+    "date": "early 15th century",
+    "medium": "Porcelain painted with cobalt blue under transparent glaze (Jingdezhen ware)"
+  },
+  {
+    "id": "china_jar_carp",
+    "met_id": 42549,
+    "title": "Jar with carp in lotus pond",
+    "culture": "Chinese",
+    "date": "mid-16th century",
+    "medium": "Porcelain with underglaze cobalt blue and overglaze polychrome enamels (Jingdezhen ware)"
+  },
+  {
+    "id": "japan_raku_bowl",
+    "met_id": 827671,
+    "title": "Black Raku Tea Bowl \"Kaedegure\"",
+    "culture": "Japanese",
+    "date": "late 16th century",
+    "medium": "Earthenware with black Raku glaze (Raku ware)"
+  },
+  {
+    "id": "italy_jar",
+    "met_id": 468166,
+    "title": "Two-Handled Jar",
+    "culture": "Italian",
+    "date": "early 15th century",
+    "medium": "Tin-glazed earthenware"
+  },
+  {
+    "id": "iran_dish_floral",
+    "met_id": 444445,
+    "title": "Dish with Floral Designs",
+    "culture": "Iranian (Kirman)",
+    "date": "1670s",
+    "medium": "Stonepaste; polychrome painted under transparent glaze"
+  },
+  {
+    "id": "maya_vessel",
+    "met_id": 310364,
+    "title": "Vessel with mythological scene",
+    "culture": "Maya",
+    "date": "7th-8th century",
+    "medium": "Ceramic, slip"
+  }
+]

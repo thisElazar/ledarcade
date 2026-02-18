@@ -1,864 +1,60 @@
 """
 Pottery
 =======
-World ceramic traditions rendered as top-down plates/bowls (concentric
-circular decoration) and side-view vessels (silhouette with row-by-row
-decoration).
+World ceramic traditions from the Metropolitan Museum of Art Open Access
+collection (CC0 public domain).  Displays 64×64 photographs of real
+vessels with metadata overlay (title, culture, date, medium/technique).
+
+Images are pre-built by tools/build_pottery.py from the Met's API.
 
 Controls:
-  Up/Down    - Cycle traditions
-  Left/Right - Cycle vessels within current tradition
-  Action     - Next vessel (any tradition)
+  Left/Right - Cycle vessels
+  Action     - Toggle info overlay
 """
 
-import math
+import json
+import os
+import random
+import unicodedata
 from . import Visual, Display, Colors, GRID_SIZE
 
-# ═══════════════════════════════════════════════════════════════════
-# Constants
-# ═══════════════════════════════════════════════════════════════════
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 
-CX, CY = 32, 34          # center for top-down plates (shifted down for labels)
-SIDE_Y0 = 14             # top of side-view vessel area
-SIDE_ROWS = 38           # side-view vessel height
-BASE_ROWS_PER_SEC = 3.0  # decoration reveal speed (rings or rows)
-HOLD_TIME = 2.5          # seconds to hold before auto-advance
+# Pre-loaded pixel data for emulator mode (injected before this module loads)
+_POTTERY_ATLAS = globals().get('_POTTERY_PIXELS', {})
 
+try:
+    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+except NameError:
+    _ROOT = ""
 
-# ═══════════════════════════════════════════════════════════════════
-# Helpers -- side-view silhouettes
-# ═══════════════════════════════════════════════════════════════════
+# ── Layout constants ──────────────────────────────────────────────
 
-def _lerp_widths(pairs, total):
-    """Linearly interpolate between (row_count, half_width) waypoints."""
-    out = []
-    for i in range(len(pairs) - 1):
-        n, w0 = pairs[i]
-        _, w1 = pairs[i + 1]
-        for t in range(n):
-            f = t / max(1, n - 1) if n > 1 else 0.0
-            out.append(round(w0 + (w1 - w0) * f))
-    out.append(pairs[-1][1])
-    while len(out) < total:
-        out.append(out[-1])
-    return out[:total]
+_CHAR_W = 4
+_VISIBLE_W = GRID_SIZE - 4       # usable text width (2px margin each side)
+_SCROLL_SPEED = 24                # pixels per second
+_SCROLL_PAUSE = 0.6              # seconds before scroll starts
 
+_DISPLAY_DURATION = 8.0          # seconds before auto-advance
+_CROSSFADE_TIME = 0.6            # seconds for crossfade between vessels
 
-def _sym(cx, half_widths):
-    """Return list of (xl, xr) tuples centered at cx."""
-    return [(cx - hw, cx + hw) for hw in half_widths]
+# Overlay text layout (from bottom)
+_LINE_Y_1 = 2                    # title
+_LINE_Y_2 = 9                    # culture + date
+_LINE_Y_3 = 52                   # medium line 1
+_LINE_Y_4 = 58                   # medium line 2 / counter
 
 
-# ═══════════════════════════════════════════════════════════════════
-# Tile patterns -- small grids for decoration
-# ═══════════════════════════════════════════════════════════════════
+def _strip_accents(s):
+    nfkd = unicodedata.normalize('NFKD', s)
+    return ''.join(c for c in nfkd if not unicodedata.combining(c))
 
-PAT_MEANDER = [
-    [1, 1, 1, 1, 0, 0, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 0, 1],
-    [0, 0, 1, 0, 0, 1, 0, 0],
-]
 
-PAT_WAVE = [
-    [0, 0, 1, 1, 1, 0, 0, 0],
-    [0, 1, 0, 0, 0, 1, 0, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-]
-
-PAT_FLORAL = [
-    [0, 0, 1, 1, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [1, 1, 0, 0, 1, 1, 0, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0],
-]
-
-PAT_DIAMOND = [
-    [0, 0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0],
-    [1, 0, 0, 0, 1, 0],
-    [0, 1, 0, 1, 0, 0],
-    [0, 0, 1, 0, 0, 0],
-]
-
-PAT_ZIGZAG = [
-    [1, 0, 0, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0],
-    [0, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 1, 1, 0],
-    [0, 0, 1, 1, 0, 0],
-    [0, 1, 1, 0, 0, 0],
-    [1, 1, 0, 0, 0, 0],
-]
-
-PAT_DOTS = [
-    [0, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 1],
-]
-
-PAT_STRIPE_H = [
-    [1, 1, 1, 1],
-    [0, 0, 0, 0],
-    [1, 1, 1, 1],
-    [0, 0, 0, 0],
-]
-
-PAT_CORD = [
-    [1, 0, 1, 0, 0, 1],
-    [0, 1, 0, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0],
-    [0, 0, 1, 0, 1, 0],
-    [0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0],
-]
-
-PAT_STEP = [
-    [1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0],
-    [0, 0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 1, 1],
-    [0, 0, 0, 0, 1, 1],
-]
-
-PAT_TRIANGLE = [
-    [0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 1, 1, 1, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-]
-
-PAT_CROSS = [
-    [0, 0, 1, 1, 0, 0],
-    [0, 0, 1, 1, 0, 0],
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [0, 0, 1, 1, 0, 0],
-    [0, 0, 1, 1, 0, 0],
-]
-
-PAT_HOOK = [
-    [1, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0, 0],
-    [0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1],
-]
-
-
-# ═══════════════════════════════════════════════════════════════════
-# Side-view silhouette builders
-# ═══════════════════════════════════════════════════════════════════
-
-def _amphora():
-    hw = _lerp_widths([
-        (3, 6), (3, 4), (2, 3), (5, 14), (12, 15),
-        (6, 13), (4, 8), (3, 7),
-    ], SIDE_ROWS)
-    sil = _sym(CX, hw)
-    for i in range(8, min(20, SIDE_ROWS)):
-        xl, xr = sil[i]
-        sil[i] = (xl - 3, xr + 3)
-    return sil
-
-
-def _ming_vase():
-    hw = _lerp_widths([
-        (2, 5), (2, 4), (3, 3), (5, 13), (10, 15),
-        (8, 14), (5, 10), (3, 7),
-    ], SIDE_ROWS)
-    return _sym(CX, hw)
-
-
-def _canopic_jar():
-    hw = _lerp_widths([
-        (4, 9), (2, 7), (2, 4), (3, 5), (10, 12),
-        (10, 12), (4, 9), (3, 7),
-    ], SIDE_ROWS)
-    return _sym(CX, hw)
-
-
-def _zulu_pot():
-    hw = _lerp_widths([
-        (3, 5), (4, 8), (8, 16), (10, 16),
-        (6, 12), (4, 6), (3, 5),
-    ], SIDE_ROWS)
-    return _sym(CX, hw)
-
-
-def _jomon_vessel():
-    hw = _lerp_widths([
-        (3, 12), (2, 8), (2, 5), (4, 7), (10, 14),
-        (8, 13), (4, 8), (3, 7),
-    ], SIDE_ROWS)
-    return _sym(CX, hw)
-
-
-def _raku_bowl():
-    hw = _lerp_widths([
-        (4, 18), (10, 20), (10, 20), (6, 16),
-        (3, 5), (4, 6),
-    ], SIDE_ROWS)
-    return _sym(CX, hw)
-
-
-def _yixing_teapot():
-    hw = _lerp_widths([
-        (3, 4), (2, 3), (3, 5), (10, 14), (10, 14),
-        (6, 10), (3, 6),
-    ], SIDE_ROWS)
-    sil = _sym(CX, hw)
-    for i in range(10, min(20, SIDE_ROWS)):
-        xl, xr = sil[i]
-        sil[i] = (xl - 5, xr + 3)
-    return sil
-
-
-def _persian_ewer():
-    hw = _lerp_widths([
-        (2, 5), (3, 3), (3, 3), (6, 12), (10, 13),
-        (6, 10), (3, 7),
-    ], SIDE_ROWS)
-    sil = _sym(CX, hw)
-    for i in range(min(6, SIDE_ROWS)):
-        xl, xr = sil[i]
-        sil[i] = (xl, xr + 5)
-    return sil
-
-
-# ═══════════════════════════════════════════════════════════════════
-# Top-down plate decoration helpers
-# ═══════════════════════════════════════════════════════════════════
-
-def _ring_pixels(cx, cy, r):
-    """Return set of (x,y) on a circle outline at radius r."""
-    pts = set()
-    for dy in range(-r, r + 1):
-        for dx in range(-r, r + 1):
-            d2 = dx * dx + dy * dy
-            if abs(d2 - r * r) < r * 2:
-                pts.add((cx + dx, cy + dy))
-    return pts
-
-
-def _filled_circle_pixels(cx, cy, r):
-    """Return set of (x,y) inside circle of radius r."""
-    pts = set()
-    for dy in range(-r, r + 1):
-        for dx in range(-r, r + 1):
-            if dx * dx + dy * dy <= r * r:
-                pts.add((cx + dx, cy + dy))
-    return pts
-
-
-def _polar_deco(cx, cy, r, n, offset=0.0):
-    """Return n evenly spaced pixel positions around radius r."""
-    pts = []
-    for i in range(n):
-        a = 2 * math.pi * i / n + offset
-        px = int(round(cx + r * math.cos(a)))
-        py = int(round(cy + r * math.sin(a)))
-        pts.append((px, py))
-    return pts
-
-
-def _sector_pixels(cx, cy, r_inner, r_outer, a_start, a_end):
-    """Return pixels in an arc sector between two radii and angle range."""
-    pts = []
-    for dy in range(-(r_outer + 1), r_outer + 2):
-        for dx in range(-(r_outer + 1), r_outer + 2):
-            d2 = dx * dx + dy * dy
-            if r_inner * r_inner <= d2 <= r_outer * r_outer:
-                a = math.atan2(dy, dx)
-                if a < 0:
-                    a += 2 * math.pi
-                if a_start <= a <= a_end or (a_start > a_end and (a >= a_start or a <= a_end)):
-                    pts.append((cx + dx, cy + dy))
-    return pts
-
-
-# ═══════════════════════════════════════════════════════════════════
-# Top-down plate decoration functions
-# Each returns a list of "rings" (from center outward).
-# Each ring is a list of (x, y, color) pixels for that ring layer.
-# ═══════════════════════════════════════════════════════════════════
-
-def _deco_greek_kylix(cx, cy):
-    """Red-figure kylix: terracotta ground, black meander border, central figure."""
-    terra = (180, 100, 50)
-    black = (30, 25, 20)
-    dark_red = (140, 60, 30)
-    rings = []
-    # Ring 0: center medallion r=0-8
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 8):
-        r0.append((px, py, terra))
-    # Small cross figure in center
-    for d in range(-3, 4):
-        r0.append((cx + d, cy, black))
-        r0.append((cx, cy + d, black))
-    rings.append(r0)
-    # Ring 1: inner border r=9-10
-    r1 = []
-    for r in range(9, 11):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, black))
-    rings.append(r1)
-    # Ring 2: meander band r=11-16
-    r2 = []
-    for r in range(11, 17):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 24) % 24
-            row = (r - 11) % 4
-            if PAT_MEANDER[row][idx % len(PAT_MEANDER[row])]:
-                r2.append((px, py, black))
-            else:
-                r2.append((px, py, terra))
-    rings.append(r2)
-    # Ring 3: body fill r=17-22
-    r3 = []
-    for r in range(17, 23):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, terra))
-    rings.append(r3)
-    # Ring 4: outer border r=23-24
-    r4 = []
-    for r in range(23, 25):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, black))
-    rings.append(r4)
-    # Ring 5: rim r=25-26
-    r5 = []
-    for r in range(25, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r5.append((px, py, dark_red))
-    rings.append(r5)
-    return rings
-
-
-def _deco_ming_plate(cx, cy):
-    """Ming blue-and-white plate: central flower, concentric blue bands."""
-    white = (220, 220, 230)
-    blue = (40, 60, 160)
-    lt_blue = (80, 110, 200)
-    rings = []
-    # Center medallion
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 6):
-        r0.append((px, py, white))
-    # Flower: 6-petal
-    for pt in _polar_deco(cx, cy, 4, 6):
-        r0.append((pt[0], pt[1], blue))
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            r0.append((pt[0] + dx, pt[1] + dy, blue))
-    r0.append((cx, cy, blue))
-    rings.append(r0)
-    # Inner ring
-    r1 = []
-    for r in range(7, 10):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, blue if r == 8 else lt_blue))
-    rings.append(r1)
-    # Decoration band with floral repeats
-    r2 = []
-    for r in range(10, 17):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 32) % 32
-            row = (r - 10) % len(PAT_FLORAL)
-            if PAT_FLORAL[row][idx % len(PAT_FLORAL[row])]:
-                r2.append((px, py, blue))
-            else:
-                r2.append((px, py, white))
-    rings.append(r2)
-    # Outer field
-    r3 = []
-    for r in range(17, 23):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, white))
-    rings.append(r3)
-    # Rim bands
-    r4 = []
-    for r in range(23, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, blue if r in (24, 25) else lt_blue))
-    rings.append(r4)
-    return rings
-
-
-def _deco_iznik_plate(cx, cy):
-    """Iznik plate: tulip/geometric in blue, red, turquoise on white."""
-    white = (225, 225, 230)
-    blue = (30, 70, 170)
-    red = (190, 50, 40)
-    turq = (40, 160, 160)
-    rings = []
-    # Center rosette
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 5):
-        r0.append((px, py, turq))
-    for pt in _polar_deco(cx, cy, 3, 8):
-        r0.append((pt[0], pt[1], red))
-    r0.append((cx, cy, blue))
-    rings.append(r0)
-    # Inner border
-    r1 = []
-    for r in range(6, 9):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, blue))
-    rings.append(r1)
-    # Tulip zone: alternating color motifs
-    r2 = []
-    for r in range(9, 18):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            sector = int((a + math.pi) / (2 * math.pi) * 8) % 8
-            if sector % 2 == 0:
-                r2.append((px, py, red if (r - 9) % 3 == 0 else white))
-            else:
-                r2.append((px, py, turq if (r - 9) % 3 == 0 else white))
-    rings.append(r2)
-    # Outer border
-    r3 = []
-    for r in range(18, 21):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, blue))
-    rings.append(r3)
-    # White field + rim
-    r4 = []
-    for r in range(21, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, white if r < 25 else blue))
-    rings.append(r4)
-    return rings
-
-
-def _deco_talavera_plate(cx, cy):
-    """Talavera majolica: blue floral on white."""
-    white = (225, 225, 230)
-    blue = (45, 75, 165)
-    yellow = (200, 180, 60)
-    rings = []
-    # Center flower
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 4):
-        r0.append((px, py, yellow))
-    for pt in _polar_deco(cx, cy, 3, 6):
-        r0.append((pt[0], pt[1], blue))
-    rings.append(r0)
-    # Inner ring
-    r1 = []
-    for r in range(5, 8):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, blue if r == 6 else white))
-    rings.append(r1)
-    # Floral band
-    r2 = []
-    for r in range(8, 16):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 24) % 24
-            row = (r - 8) % len(PAT_FLORAL)
-            if PAT_FLORAL[row][idx % len(PAT_FLORAL[row])]:
-                r2.append((px, py, blue))
-            else:
-                r2.append((px, py, white))
-    rings.append(r2)
-    # Outer white
-    r3 = []
-    for r in range(16, 22):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, white))
-    rings.append(r3)
-    # Blue rim
-    r4 = []
-    for r in range(22, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 16) % 16
-            if idx % 4 == 0:
-                r4.append((px, py, yellow))
-            else:
-                r4.append((px, py, blue))
-    rings.append(r4)
-    return rings
-
-
-def _deco_hopi_bowl(cx, cy):
-    """Hopi bowl: black-on-cream, bold geometric asymmetric design."""
-    cream = (210, 190, 150)
-    black = (35, 30, 25)
-    rings = []
-    # Center
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 6):
-        r0.append((px, py, cream))
-    # Asymmetric spiral in center
-    for i in range(20):
-        a = i * 0.4
-        r = i * 0.3
-        px = int(round(cx + r * math.cos(a)))
-        py = int(round(cy + r * math.sin(a)))
-        r0.append((px, py, black))
-    rings.append(r0)
-    # Step pattern band
-    r1 = []
-    for r in range(7, 10):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, black))
-    rings.append(r1)
-    # Geometric zone: step/hook pattern
-    r2 = []
-    for r in range(10, 20):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 24) % 24
-            row = (r - 10) % len(PAT_STEP)
-            if PAT_STEP[row][idx % len(PAT_STEP[row])]:
-                r2.append((px, py, black))
-            else:
-                r2.append((px, py, cream))
-    rings.append(r2)
-    # Outer cream
-    r3 = []
-    for r in range(20, 24):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, cream))
-    rings.append(r3)
-    # Rim
-    r4 = []
-    for r in range(24, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, black if r == 25 else cream))
-    rings.append(r4)
-    return rings
-
-
-def _deco_delft_plate(cx, cy):
-    """Delft plate: blue on white, central windmill motif."""
-    white = (225, 225, 235)
-    blue = (35, 65, 155)
-    lt_blue = (100, 130, 200)
-    rings = []
-    # Center: windmill abstraction (cross + triangle)
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 7):
-        r0.append((px, py, white))
-    # Windmill sails (X shape)
-    for d in range(-5, 6):
-        r0.append((cx + d, cy + d, blue))
-        r0.append((cx + d, cy - d, blue))
-    # Body
-    for dy in range(-2, 3):
-        for dx in range(-1, 2):
-            r0.append((cx + dx, cy + dy, blue))
-    rings.append(r0)
-    # Inner border
-    r1 = []
-    for r in range(8, 11):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, blue if r == 9 else lt_blue))
-    rings.append(r1)
-    # Floral garland zone
-    r2 = []
-    for r in range(11, 19):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 20) % 20
-            row = (r - 11) % len(PAT_FLORAL)
-            if PAT_FLORAL[row][idx % len(PAT_FLORAL[row])]:
-                r2.append((px, py, blue))
-            else:
-                r2.append((px, py, white))
-    rings.append(r2)
-    # Outer white
-    r3 = []
-    for r in range(19, 23):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, white))
-    rings.append(r3)
-    # Rim
-    r4 = []
-    for r in range(23, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, blue if r in (24, 25) else lt_blue))
-    rings.append(r4)
-    return rings
-
-
-def _deco_imari_plate(cx, cy):
-    """Imari plate: red, blue, gold in radiating sectors."""
-    white = (225, 220, 215)
-    red = (180, 40, 30)
-    blue = (30, 50, 150)
-    gold = (200, 170, 50)
-    rings = []
-    # Center medallion
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 6):
-        r0.append((px, py, blue))
-    for pt in _polar_deco(cx, cy, 3, 6):
-        r0.append((pt[0], pt[1], gold))
-    r0.append((cx, cy, gold))
-    rings.append(r0)
-    # Divider ring
-    r1 = []
-    for r in range(7, 9):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, gold))
-    rings.append(r1)
-    # Sector zone: alternating red/blue/white panels
-    r2 = []
-    for r in range(9, 20):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            sector = int((a + math.pi) / (2 * math.pi) * 6) % 6
-            if sector % 3 == 0:
-                r2.append((px, py, red))
-            elif sector % 3 == 1:
-                r2.append((px, py, blue))
-            else:
-                r2.append((px, py, white))
-    rings.append(r2)
-    # Gold divider
-    r3 = []
-    for r in range(20, 22):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, gold))
-    rings.append(r3)
-    # Rim
-    r4 = []
-    for r in range(22, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            sector = int((a + math.pi) / (2 * math.pi) * 12) % 12
-            if sector % 2 == 0:
-                r4.append((px, py, red))
-            else:
-                r4.append((px, py, blue))
-    rings.append(r4)
-    return rings
-
-
-def _deco_celadon_bowl(cx, cy):
-    """Celadon bowl: subtle jade green with crackle pattern."""
-    jade = (75, 130, 85)
-    lt_jade = (95, 155, 105)
-    dk_jade = (55, 100, 65)
-    crack = (110, 170, 120)
-    rings = []
-    # Center
-    r0 = []
-    for px, py in _filled_circle_pixels(cx, cy, 8):
-        r0.append((px, py, jade))
-    rings.append(r0)
-    # Subtle carved pattern zone
-    r1 = []
-    for r in range(9, 12):
-        for px, py in _ring_pixels(cx, cy, r):
-            r1.append((px, py, lt_jade))
-    rings.append(r1)
-    # Body with crackle
-    r2 = []
-    for r in range(12, 21):
-        for px, py in _ring_pixels(cx, cy, r):
-            a = math.atan2(py - cy, px - cx)
-            idx = int((a + math.pi) / (2 * math.pi) * 30) % 30
-            # Crackle lines at irregular intervals
-            if idx in (3, 7, 12, 18, 23, 27) and (r + idx) % 3 == 0:
-                r2.append((px, py, crack))
-            else:
-                r2.append((px, py, jade))
-    rings.append(r2)
-    # Inner rim
-    r3 = []
-    for r in range(21, 24):
-        for px, py in _ring_pixels(cx, cy, r):
-            r3.append((px, py, lt_jade))
-    rings.append(r3)
-    # Outer rim
-    r4 = []
-    for r in range(24, 27):
-        for px, py in _ring_pixels(cx, cy, r):
-            r4.append((px, py, dk_jade))
-    rings.append(r4)
-    return rings
-
-
-# ═══════════════════════════════════════════════════════════════════
-# Vessel data
-# ═══════════════════════════════════════════════════════════════════
-
-VESSELS = [
-    # ── Top-down plates and bowls ──
-    {
-        'name': 'GREEK KYLIX',
-        'origin': 'GREECE  500 BC',
-        'tradition': 'GREEK',
-        'view': 'top',
-        'deco_fn': _deco_greek_kylix,
-    },
-    {
-        'name': 'MING PLATE',
-        'origin': 'CHINA  1400',
-        'tradition': 'CHINESE',
-        'view': 'top',
-        'deco_fn': _deco_ming_plate,
-    },
-    {
-        'name': 'IZNIK PLATE',
-        'origin': 'TURKEY  1550',
-        'tradition': 'ISLAMIC',
-        'view': 'top',
-        'deco_fn': _deco_iznik_plate,
-    },
-    {
-        'name': 'TALAVERA PLATE',
-        'origin': 'MEXICO  1600',
-        'tradition': 'MEXICAN',
-        'view': 'top',
-        'deco_fn': _deco_talavera_plate,
-    },
-    {
-        'name': 'HOPI BOWL',
-        'origin': 'SW AMERICA  1000',
-        'tradition': 'PUEBLO',
-        'view': 'top',
-        'deco_fn': _deco_hopi_bowl,
-    },
-    {
-        'name': 'DELFT PLATE',
-        'origin': 'NETHERLANDS 1650',
-        'tradition': 'EUROPEAN',
-        'view': 'top',
-        'deco_fn': _deco_delft_plate,
-    },
-    {
-        'name': 'IMARI PLATE',
-        'origin': 'JAPAN  1700',
-        'tradition': 'JAPANESE',
-        'view': 'top',
-        'deco_fn': _deco_imari_plate,
-    },
-    {
-        'name': 'CELADON BOWL',
-        'origin': 'KOREA  1100',
-        'tradition': 'KOREAN',
-        'view': 'top',
-        'deco_fn': _deco_celadon_bowl,
-    },
-    # ── Side-view vessels ──
-    {
-        'name': 'AMPHORA',
-        'origin': 'GREECE  500 BC',
-        'tradition': 'GREEK',
-        'view': 'side',
-        'body_color': (180, 100, 50),
-        'deco_color': (30, 25, 20),
-        'silhouette': _amphora(),
-        'pattern': PAT_MEANDER,
-    },
-    {
-        'name': 'MING VASE',
-        'origin': 'CHINA  1400',
-        'tradition': 'CHINESE',
-        'view': 'side',
-        'body_color': (220, 220, 230),
-        'deco_color': (40, 60, 160),
-        'silhouette': _ming_vase(),
-        'pattern': PAT_FLORAL,
-    },
-    {
-        'name': 'CANOPIC JAR',
-        'origin': 'EGYPT  1300 BC',
-        'tradition': 'EGYPTIAN',
-        'view': 'side',
-        'body_color': (190, 170, 130),
-        'deco_color': (200, 170, 80),
-        'silhouette': _canopic_jar(),
-        'pattern': PAT_STRIPE_H,
-    },
-    {
-        'name': 'ZULU BEER POT',
-        'origin': 'SOUTH AFRICA',
-        'tradition': 'AFRICAN',
-        'view': 'side',
-        'body_color': (50, 35, 25),
-        'deco_color': (130, 90, 50),
-        'silhouette': _zulu_pot(),
-        'pattern': PAT_TRIANGLE,
-    },
-    {
-        'name': 'JOMON VESSEL',
-        'origin': 'JAPAN  3000 BC',
-        'tradition': 'JAPANESE',
-        'view': 'side',
-        'body_color': (140, 100, 60),
-        'deco_color': (90, 65, 35),
-        'silhouette': _jomon_vessel(),
-        'pattern': PAT_CORD,
-    },
-    {
-        'name': 'RAKU BOWL',
-        'origin': 'JAPAN  1580',
-        'tradition': 'JAPANESE',
-        'view': 'side',
-        'body_color': (40, 35, 30),
-        'deco_color': (160, 100, 60),
-        'silhouette': _raku_bowl(),
-        'pattern': PAT_DOTS,
-    },
-    {
-        'name': 'YIXING TEAPOT',
-        'origin': 'CHINA  1500',
-        'tradition': 'CHINESE',
-        'view': 'side',
-        'body_color': (120, 50, 30),
-        'deco_color': (80, 35, 20),
-        'silhouette': _yixing_teapot(),
-        'pattern': PAT_CROSS,
-    },
-    {
-        'name': 'PERSIAN EWER',
-        'origin': 'IRAN  1200',
-        'tradition': 'ISLAMIC',
-        'view': 'side',
-        'body_color': (210, 200, 170),
-        'deco_color': (60, 160, 170),
-        'silhouette': _persian_ewer(),
-        'pattern': PAT_DIAMOND,
-    },
-]
-
-# Build tradition ordering
-TRADITIONS = []
-_seen = set()
-for _v in VESSELS:
-    t = _v['tradition']
-    if t not in _seen:
-        TRADITIONS.append(t)
-        _seen.add(t)
-
-# Pre-build top-down decoration rings (computed once)
-for _v in VESSELS:
-    if _v['view'] == 'top':
-        _v['_rings'] = _v['deco_fn'](CX, CY)
-        _v['_total_rings'] = len(_v['_rings'])
-
-
-# ═══════════════════════════════════════════════════════════════════
-# Visual class
-# ═══════════════════════════════════════════════════════════════════
+# ── Visual class ──────────────────────────────────────────────────
 
 class Pottery(Visual):
     name = "POTTERY"
@@ -867,183 +63,253 @@ class Pottery(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.vessel_idx = 0
-        self.tradition_idx = 0
-        self.revealed = 0       # rings (top-down) or rows (side)
-        self.reveal_timer = 0.0
-        self.hold_timer = 0.0
-        self.overlay_timer = 0.0
-        self._input_cooldown = 0.0
+        self._vessels = []
+        self._idx = 0
+        self._pixels = None        # current vessel: list of list of (r,g,b)
+        self._prev_pixels = None   # previous vessel for crossfade
+        self._fade = 1.0           # 0→1 crossfade progress
+        self._timer = 0.0          # auto-advance timer
 
-    # ── navigation helpers ──
+        # Overlay
+        self._show_overlay = True
+        self._overlay_alpha = 1.0
+        self._overlay_time = 0.0
+        self._overlay_hold = 3.0   # auto-hide after 3s on first show
 
-    def _vessels_for_tradition(self, trad):
-        return [i for i, v in enumerate(VESSELS) if v['tradition'] == trad]
+        # Edge detection for L/R
+        self._prev_left = False
+        self._prev_right = False
 
-    def _set_vessel(self, idx):
-        self.vessel_idx = idx % len(VESSELS)
-        self.tradition_idx = TRADITIONS.index(VESSELS[self.vessel_idx]['tradition'])
-        self.revealed = 0
-        self.reveal_timer = 0.0
-        self.hold_timer = 0.0
-        self.overlay_timer = 2.0
+        self._load_manifest()
+        if self._vessels:
+            self._idx = random.randint(0, len(self._vessels) - 1)
+            self._load_vessel()
 
-    def _advance(self, delta=1):
-        self._set_vessel(self.vessel_idx + delta)
+    def _load_manifest(self):
+        """Load vessel list from JSON manifest."""
+        if _ROOT:
+            path = os.path.join(_ROOT, "tools", "pottery_manifest.json")
+            if os.path.exists(path):
+                with open(path) as f:
+                    self._vessels = json.load(f)
+                return
+        # Emulator mode: build from atlas keys
+        if _POTTERY_ATLAS:
+            self._vessels = [{"id": k, "title": k.replace("_", " ").title()}
+                             for k in _POTTERY_ATLAS]
 
-    def _cycle_tradition(self, delta):
-        self.tradition_idx = (self.tradition_idx + delta) % len(TRADITIONS)
-        trad = TRADITIONS[self.tradition_idx]
-        indices = self._vessels_for_tradition(trad)
-        self._set_vessel(indices[0])
-
-    def _cycle_within_tradition(self, delta):
-        trad = TRADITIONS[self.tradition_idx]
-        indices = self._vessels_for_tradition(trad)
-        if not indices:
+    def _load_vessel(self):
+        """Load current vessel's pixel data."""
+        self._prev_pixels = self._pixels
+        self._pixels = None
+        self._fade = 0.0
+        if not self._vessels:
             return
-        try:
-            pos = indices.index(self.vessel_idx)
-        except ValueError:
-            pos = 0
-        pos = (pos + delta) % len(indices)
-        self._set_vessel(indices[pos])
 
-    def _total_steps(self, vessel):
-        if vessel['view'] == 'top':
-            return vessel['_total_rings']
-        return len(vessel['silhouette'])
+        vid = self._vessels[self._idx]["id"]
 
-    # ── input ──
+        # Emulator mode: pre-loaded atlas
+        atlas_entry = _POTTERY_ATLAS.get(vid)
+        if atlas_entry and isinstance(atlas_entry, dict):
+            import base64
+            d = base64.b64decode(atlas_entry["data"])
+            self._pixels = [
+                [(d[(y * GRID_SIZE + x) * 3],
+                  d[(y * GRID_SIZE + x) * 3 + 1],
+                  d[(y * GRID_SIZE + x) * 3 + 2])
+                 for x in range(GRID_SIZE)]
+                for y in range(GRID_SIZE)
+            ]
+            return
 
-    def handle_input(self, input_state) -> bool:
-        if self._input_cooldown > 0:
-            return False
-        consumed = False
-        if input_state.up_pressed:
-            self._cycle_tradition(-1)
-            consumed = True
-        if input_state.down_pressed:
-            self._cycle_tradition(1)
-            consumed = True
-        if input_state.left_pressed:
-            self._cycle_within_tradition(-1)
-            consumed = True
-        if input_state.right_pressed:
-            self._cycle_within_tradition(1)
-            consumed = True
-        if input_state.action_l or input_state.action_r:
-            self._advance()
-            consumed = True
-        if consumed:
-            self._input_cooldown = 0.15
-        return consumed
+        # Hardware mode: load PNG via PIL
+        if not HAS_PIL or not _ROOT:
+            return
+        path = os.path.join(_ROOT, "assets", "pottery", f"{vid}.png")
+        if not os.path.exists(path):
+            return
+        img = Image.open(path).convert("RGB")
+        w, h = img.size
+        if w != GRID_SIZE or h != GRID_SIZE:
+            img = img.resize((GRID_SIZE, GRID_SIZE), Image.NEAREST)
+        self._pixels = [
+            [img.getpixel((x, y)) for x in range(GRID_SIZE)]
+            for y in range(GRID_SIZE)
+        ]
 
-    # ── update ──
+    def handle_input(self, input_state):
+        left_edge = input_state.left and not self._prev_left
+        right_edge = input_state.right and not self._prev_right
+        self._prev_left = input_state.left
+        self._prev_right = input_state.right
 
-    def update(self, dt: float):
-        self.time += dt
-        if self._input_cooldown > 0:
-            self._input_cooldown -= dt
-        if self.overlay_timer > 0:
-            self.overlay_timer = max(0.0, self.overlay_timer - dt)
-
-        vessel = VESSELS[self.vessel_idx]
-        total = self._total_steps(vessel)
-
-        if self.revealed < total:
-            self.reveal_timer += dt * BASE_ROWS_PER_SEC
-            while self.reveal_timer >= 1.0 and self.revealed < total:
-                self.reveal_timer -= 1.0
-                self.revealed += 1
-        else:
-            self.hold_timer += dt
-            if self.hold_timer >= HOLD_TIME:
-                self._advance()
-
-    # ── draw ──
-
-    def _draw_top_down(self, d, vessel):
-        """Draw a top-down plate/bowl with concentric ring reveal."""
-        rings = vessel['_rings']
-        for ring_i in range(min(self.revealed, len(rings))):
-            for px, py, color in rings[ring_i]:
-                if 0 <= px < 64 and 0 <= py < 64:
-                    d.set_pixel(px, py, color)
-
-        # Shimmer on the currently revealing ring
-        if self.revealed < len(rings):
-            ring = rings[self.revealed]
-            frac = self.reveal_timer % 1.0
-            n_show = int(frac * len(ring))
-            for i in range(n_show):
-                px, py, color = ring[i]
-                bright = (
-                    min(255, color[0] + 60),
-                    min(255, color[1] + 60),
-                    min(255, color[2] + 60),
-                )
-                if 0 <= px < 64 and 0 <= py < 64:
-                    d.set_pixel(px, py, bright)
-
-    def _draw_side_view(self, d, vessel):
-        """Draw a side-view vessel with row-by-row decoration reveal."""
-        sil = vessel['silhouette']
-        body = vessel['body_color']
-        deco = vessel['deco_color']
-        pat = vessel['pattern']
-        ph = len(pat)
-        pw = len(pat[0])
-
-        for row_i, (xl, xr) in enumerate(sil):
-            y = SIDE_Y0 + row_i
-            if y < 0 or y >= 64:
-                continue
-            for x in range(max(0, xl), min(64, xr + 1)):
-                if row_i < self.revealed and pat[row_i % ph][x % pw]:
-                    d.set_pixel(x, y, deco)
+        if left_edge or right_edge:
+            if self._vessels:
+                if right_edge:
+                    self._idx = (self._idx + 1) % len(self._vessels)
                 else:
-                    d.set_pixel(x, y, body)
+                    self._idx = (self._idx - 1) % len(self._vessels)
+                self._load_vessel()
+                self._timer = 0.0
+                self._show_overlay = True
+                self._overlay_hold = 3.0
+                self._overlay_time = 0.0
+            return True
+        if input_state.left or input_state.right:
+            return True
 
-        # Cursor on the decorating row
-        if self.revealed < len(sil):
-            cy = SIDE_Y0 + self.revealed
-            if 0 <= cy < 64:
-                xl, xr = sil[self.revealed]
-                frac = self.reveal_timer % 1.0
-                sx = xl + int(frac * max(1, xr - xl))
-                bright = (
-                    min(255, deco[0] + 80),
-                    min(255, deco[1] + 80),
-                    min(255, deco[2] + 80),
-                )
-                for dx in range(-1, 2):
-                    px = sx + dx
-                    if 0 <= px < 64:
-                        d.set_pixel(px, cy, bright)
+        if input_state.action_l or input_state.action_r:
+            self._show_overlay = not self._show_overlay
+            if self._show_overlay:
+                self._overlay_time = 0.0
+                self._overlay_hold = 0.0  # manual toggle stays on
+            return True
+
+        return False
+
+    def update(self, dt):
+        self.time += dt
+
+        # Crossfade
+        if self._fade < 1.0:
+            self._fade = min(1.0, self._fade + dt / _CROSSFADE_TIME)
+
+        # Auto-advance
+        if self._vessels and len(self._vessels) > 1:
+            self._timer += dt
+            if self._timer >= _DISPLAY_DURATION:
+                self._idx = (self._idx + 1) % len(self._vessels)
+                self._load_vessel()
+                self._timer = 0.0
+                self._show_overlay = True
+                self._overlay_hold = 3.0
+                self._overlay_time = 0.0
+
+        # Auto-hide overlay
+        if self._overlay_hold > 0:
+            self._overlay_hold -= dt
+            if self._overlay_hold <= 0:
+                self._show_overlay = False
+
+        # Overlay fade
+        target = 1.0 if self._show_overlay else 0.0
+        if self._overlay_alpha < target:
+            self._overlay_alpha = min(target, self._overlay_alpha + dt / 0.3)
+        elif self._overlay_alpha > target:
+            self._overlay_alpha = max(target, self._overlay_alpha - dt / 0.3)
+        if self._overlay_alpha > 0.01:
+            self._overlay_time += dt
+
+    def _scroll_text(self, y, text, color):
+        """Draw text with bounce-scroll for long strings."""
+        text_w = len(text) * _CHAR_W
+        if text_w <= _VISIBLE_W:
+            self.display.draw_text_small(2, y, text, color)
+            return
+        max_offset = text_w - _VISIBLE_W
+        scroll_time = max_offset / _SCROLL_SPEED
+        cycle = _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE + scroll_time
+        t = self._overlay_time % cycle
+        if t < _SCROLL_PAUSE:
+            offset = 0
+        elif t < _SCROLL_PAUSE + scroll_time:
+            offset = int((t - _SCROLL_PAUSE) * _SCROLL_SPEED)
+        elif t < _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE:
+            offset = max_offset
+        else:
+            offset = max_offset - int(
+                (t - 2 * _SCROLL_PAUSE - scroll_time) * _SCROLL_SPEED)
+        offset = max(0, min(int(max_offset), offset))
+        self.display.draw_text_small(2 - offset, y, text, color)
+
+    def _split_medium(self, medium):
+        """Split medium string into two lines that fit the display."""
+        max_chars = _VISIBLE_W // _CHAR_W
+        if len(medium) <= max_chars:
+            return medium, ""
+        # Try to split at a natural break near the midpoint
+        mid = max_chars
+        for sep in ("; ", ", ", " (", " "):
+            pos = medium.rfind(sep, 0, mid + 2)
+            if pos > max_chars // 3:
+                return medium[:pos + len(sep)].rstrip(), medium[pos + len(sep):]
+        return medium[:mid], medium[mid:]
 
     def draw(self):
         d = self.display
         d.clear()
 
-        vessel = VESSELS[self.vessel_idx]
+        if not self._pixels:
+            d.draw_text_small(2, 28, "NO IMAGES", Colors.RED)
+            d.draw_text_small(2, 36, "RUN BUILD", Colors.RED)
+            return
 
-        # Draw vessel
-        if vessel['view'] == 'top':
-            self._draw_top_down(d, vessel)
-        else:
-            self._draw_side_view(d, vessel)
+        # Draw vessel image with crossfade
+        f = self._fade
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                r, g, b = self._pixels[y][x]
+                if f < 1.0 and self._prev_pixels:
+                    pr, pg, pb = self._prev_pixels[y][x]
+                    r = int(pr + (r - pr) * f)
+                    g = int(pg + (g - pg) * f)
+                    b = int(pb + (b - pb) * f)
+                d.set_pixel(x, y, (r, g, b))
 
-        # Name and origin at top
-        d.draw_text_small(2, 1, vessel['name'], (200, 200, 200))
-        d.draw_text_small(2, 7, vessel['origin'], (110, 110, 110))
+        # Info overlay
+        alpha = self._overlay_alpha
+        if alpha < 0.01 or not self._vessels:
+            return
 
-        # Tradition at bottom
-        trad = vessel['tradition']
-        d.draw_text_small(2, 59, trad, (100, 100, 100))
+        vessel = self._vessels[self._idx]
 
-        # Overlay for navigation feedback
-        if self.overlay_timer > 0:
-            alpha = min(1.0, self.overlay_timer / 0.5)
-            oc = (int(220 * alpha), int(220 * alpha), int(220 * alpha))
-            d.draw_text_small(2, 30, vessel['name'], oc)
+        # Dim strips at top and bottom for text readability
+        for y in range(0, 16):
+            fade = alpha * min(1.0, (16 - y) / 8.0)
+            if fade < 0.01:
+                continue
+            for x in range(GRID_SIZE):
+                r, g, b = self._pixels[y][x]
+                f2 = 0.65 * fade
+                d.set_pixel(x, y, (int(r * (1 - f2)),
+                                   int(g * (1 - f2)),
+                                   int(b * (1 - f2))))
+        for y in range(48, GRID_SIZE):
+            fade = alpha * min(1.0, (y - 48) / 8.0)
+            if fade < 0.01:
+                continue
+            for x in range(GRID_SIZE):
+                r, g, b = self._pixels[y][x]
+                f2 = 0.65 * fade
+                d.set_pixel(x, y, (int(r * (1 - f2)),
+                                   int(g * (1 - f2)),
+                                   int(b * (1 - f2))))
+
+        # Title
+        title = _strip_accents(vessel.get("title", vessel["id"]))
+        tc = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+        self._scroll_text(_LINE_Y_1, title.upper(), tc)
+
+        # Culture + date
+        culture = vessel.get("culture", "")
+        date = vessel.get("date", "")
+        sub = f"{culture}  {date}" if culture and date else culture or date
+        sc = (int(180 * alpha), int(170 * alpha), int(120 * alpha))
+        self._scroll_text(_LINE_Y_2, sub.upper(), sc)
+
+        # Medium (technique/glaze info) at bottom
+        medium = _strip_accents(vessel.get("medium", ""))
+        if medium:
+            mc = (int(160 * alpha), int(160 * alpha), int(160 * alpha))
+            line1, line2 = self._split_medium(medium.upper())
+            self._scroll_text(_LINE_Y_3, line1, mc)
+            if line2:
+                self._scroll_text(_LINE_Y_4, line2, mc)
+            elif len(self._vessels) > 1:
+                counter = f"{self._idx + 1}/{len(self._vessels)}"
+                cc = (int(100 * alpha), int(100 * alpha), int(100 * alpha))
+                d.draw_text_small(2, _LINE_Y_4, counter, cc)
+        elif len(self._vessels) > 1:
+            counter = f"{self._idx + 1}/{len(self._vessels)}"
+            cc = (int(100 * alpha), int(100 * alpha), int(100 * alpha))
+            d.draw_text_small(2, _LINE_Y_3, counter, cc)
