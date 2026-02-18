@@ -46,6 +46,7 @@ ENV/
 tools/.flag_cache/
 tools/.sign_cache/
 tools/.dance_cache/
+tools/.plates_cache/
 
 # Research/experiment docs (not part of runtime)
 docs/

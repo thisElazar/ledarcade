@@ -1,7 +1,7 @@
 """
 SCRIPTS - World Writing Systems
 ================================
-Stroke-by-stroke animated display of 830+ characters across 27 writing
+Stroke-by-stroke animated display of 1340 characters across 42 writing
 systems on a 64x64 LED matrix.  Each character is drawn pixel-by-pixel
 in its traditional ink color on a paper-toned background.
 """
@@ -28,13 +28,16 @@ OVERLAY_FADE = 1.5      # overlay display time
 
 # ── Script families ──────────────────────────────────────────────
 FAMILIES = [
-    'PHOENICIAN', 'HEBREW', 'ARABIC', 'GREEK', 'CYRILLIC',
+    'LATIN', 'PHOENICIAN', 'HEBREW', 'ARABIC', 'GREEK', 'CYRILLIC',
     'RUNIC', 'OGHAM', 'ARMENIAN', 'GEORGIAN',
-    'DEVANAGARI', 'TAMIL', 'BENGALI', 'TIBETAN', 'THAI',
+    'DEVANAGARI', 'GUJARATI', 'GURMUKHI', 'BENGALI',
+    'TAMIL', 'TELUGU', 'KANNADA', 'MALAYALAM', 'SINHALA',
+    'TIBETAN', 'THAI', 'LAO', 'BURMESE', 'KHMER',
     'KOREAN', 'HIRAGANA', 'KATAKANA', 'CHINESE',
-    'ETHIOPIC', 'TIFINAGH', 'NKO',
-    'CHEROKEE', 'INUKTITUT', 'MONGOLIAN',
-    'HIEROGLYPH', 'CUNEIFORM', 'MAYAN',
+    'ETHIOPIC', 'TIFINAGH', 'NKO', 'VAI',
+    'CHEROKEE', 'INUKTITUT', 'MONGOLIAN', 'BAYBAYIN',
+    'HIEROGLYPH', 'CUNEIFORM', 'MAYAN', 'LINEAR_B', 'RONGORONGO',
+    'BRAILLE',
 ]
 
 # ── Ink / paper presets ─────────────────────────────────────────
@@ -86,6 +89,36 @@ _NKO_INK = (50, 30, 20)
 _NKO_PAPER = (225, 215, 185)
 _MONGOLIAN_INK = (30, 30, 30)
 _MONGOLIAN_PAPER = (220, 215, 200)
+_TELUGU_INK = (30, 60, 130)
+_TELUGU_PAPER = (230, 225, 210)
+_KANNADA_INK = (140, 40, 20)
+_KANNADA_PAPER = (228, 222, 205)
+_MALAYALAM_INK = (20, 50, 20)
+_MALAYALAM_PAPER = (225, 225, 210)
+_GUJARATI_INK = (160, 50, 20)
+_GUJARATI_PAPER = (230, 222, 200)
+_GURMUKHI_INK = (30, 40, 120)
+_GURMUKHI_PAPER = (225, 225, 215)
+_SINHALA_INK = (120, 40, 30)
+_SINHALA_PAPER = (228, 225, 210)
+_BURMESE_INK = (30, 30, 30)
+_BURMESE_PAPER = (230, 225, 200)
+_KHMER_INK = (60, 40, 20)
+_KHMER_PAPER = (225, 218, 195)
+_LAO_INK = (80, 30, 100)
+_LAO_PAPER = (228, 225, 215)
+_LATIN_INK = (30, 30, 80)
+_LATIN_PAPER = (230, 228, 220)
+_BRAILLE_INK = (40, 40, 40)
+_BRAILLE_PAPER = (225, 225, 225)
+_BAYBAYIN_INK = (80, 40, 20)
+_BAYBAYIN_PAPER = (220, 210, 185)
+_VAI_INK = (40, 30, 20)
+_VAI_PAPER = (225, 215, 195)
+_LINEAR_B_INK = (50, 40, 100)
+_LINEAR_B_PAPER = (215, 210, 195)
+_RONGO_INK = (60, 40, 25)
+_RONGO_PAPER = (200, 185, 155)
 
 # ── Character data ───────────────────────────────────────────────
 # Each entry: name, script family, concept, origin string,
@@ -8585,6 +8618,4914 @@ CHARACTERS = [
             [(32, 42), (32, 48)],                         # tail
         ],
     },
+    # ── LATIN ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'LATIN', 'concept': 'A',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 48), (32, 22), (42, 48)],
+            [(26, 38), (38, 38)],
+        ],
+    },
+    {
+        'name': 'B', 'script': 'LATIN', 'concept': 'B',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (36, 22), (40, 26), (40, 32), (36, 35), (22, 35)],
+            [(22, 35), (36, 35), (42, 38), (42, 44), (36, 48), (22, 48)],
+        ],
+    },
+    {
+        'name': 'C', 'script': 'LATIN', 'concept': 'C',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(42, 24), (36, 22), (28, 22), (22, 26), (20, 32), (20, 38), (22, 44), (28, 48), (36, 48), (42, 46)],
+        ],
+    },
+    {
+        'name': 'D', 'script': 'LATIN', 'concept': 'D',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (34, 22), (42, 28), (44, 35), (42, 42), (34, 48), (22, 48)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'LATIN', 'concept': 'E',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (42, 22)],
+            [(22, 35), (38, 35)],
+            [(22, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'F', 'script': 'LATIN', 'concept': 'F',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (42, 22)],
+            [(22, 35), (38, 35)],
+        ],
+    },
+    {
+        'name': 'G', 'script': 'LATIN', 'concept': 'G',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(42, 24), (36, 22), (28, 22), (22, 26), (20, 32), (20, 38), (22, 44), (28, 48), (36, 48), (42, 44), (42, 36)],
+            [(34, 36), (42, 36)],
+        ],
+    },
+    {
+        'name': 'H', 'script': 'LATIN', 'concept': 'H',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(42, 22), (42, 48)],
+            [(22, 35), (42, 35)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'LATIN', 'concept': 'I',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(28, 22), (36, 22)],
+            [(32, 22), (32, 48)],
+            [(28, 48), (36, 48)],
+        ],
+    },
+    {
+        'name': 'J', 'script': 'LATIN', 'concept': 'J',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(28, 22), (38, 22)],
+            [(34, 22), (34, 42), (32, 46), (28, 48), (24, 46)],
+        ],
+    },
+    {
+        'name': 'K', 'script': 'LATIN', 'concept': 'K',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(42, 22), (22, 36)],
+            [(26, 33), (42, 48)],
+        ],
+    },
+    {
+        'name': 'L', 'script': 'LATIN', 'concept': 'L',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'M', 'script': 'LATIN', 'concept': 'M',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(20, 48), (20, 22)],
+            [(20, 22), (32, 38)],
+            [(32, 38), (44, 22)],
+            [(44, 22), (44, 48)],
+        ],
+    },
+    {
+        'name': 'N', 'script': 'LATIN', 'concept': 'N',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 48), (22, 22)],
+            [(22, 22), (42, 48)],
+            [(42, 48), (42, 22)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'LATIN', 'concept': 'O',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(32, 22), (24, 24), (20, 30), (20, 40), (24, 46), (32, 48), (40, 46), (44, 40), (44, 30), (40, 24), (32, 22)],
+        ],
+    },
+    {
+        'name': 'P', 'script': 'LATIN', 'concept': 'P',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (36, 22), (42, 26), (42, 32), (36, 36), (22, 36)],
+        ],
+    },
+    {
+        'name': 'Q', 'script': 'LATIN', 'concept': 'Q',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(32, 22), (24, 24), (20, 30), (20, 40), (24, 46), (32, 48), (40, 46), (44, 40), (44, 30), (40, 24), (32, 22)],
+            [(36, 42), (44, 50)],
+        ],
+    },
+    {
+        'name': 'R', 'script': 'LATIN', 'concept': 'R',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 22), (36, 22), (42, 26), (42, 32), (36, 36), (22, 36)],
+            [(32, 36), (42, 48)],
+        ],
+    },
+    {
+        'name': 'S', 'script': 'LATIN', 'concept': 'S',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(40, 24), (36, 22), (28, 22), (22, 24), (22, 30), (26, 34), (32, 36), (38, 38), (42, 42), (42, 46), (36, 48), (28, 48), (22, 46)],
+        ],
+    },
+    {
+        'name': 'T', 'script': 'LATIN', 'concept': 'T',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(20, 22), (44, 22)],
+            [(32, 22), (32, 48)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'LATIN', 'concept': 'U',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (22, 42), (26, 46), (32, 48), (38, 46), (42, 42), (42, 22)],
+        ],
+    },
+    {
+        'name': 'V', 'script': 'LATIN', 'concept': 'V',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(20, 22), (32, 48)],
+            [(32, 48), (44, 22)],
+        ],
+    },
+    {
+        'name': 'W', 'script': 'LATIN', 'concept': 'W',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(18, 22), (24, 48)],
+            [(24, 48), (32, 30)],
+            [(32, 30), (40, 48)],
+            [(40, 48), (46, 22)],
+        ],
+    },
+    {
+        'name': 'X', 'script': 'LATIN', 'concept': 'X',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (42, 48)],
+            [(42, 22), (22, 48)],
+        ],
+    },
+    {
+        'name': 'Y', 'script': 'LATIN', 'concept': 'Y',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(20, 22), (32, 36)],
+            [(44, 22), (32, 36)],
+            [(32, 36), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Z', 'script': 'LATIN', 'concept': 'Z',
+        'origin': 'ROMAN ~700 BC',
+        'ink': _LATIN_INK, 'paper': _LATIN_PAPER,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(42, 22), (22, 48)],
+            [(22, 48), (42, 48)],
+        ],
+    },
+    # ── TELUGU ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'TELUGU', 'concept': 'A',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (24, 28), (22, 35), (24, 42), (30, 46), (36, 42), (38, 35), (36, 28), (28, 22)],
+            [(38, 35), (42, 30), (44, 24)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'TELUGU', 'concept': 'AA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(26, 22), (22, 28), (20, 35), (22, 42), (28, 46), (34, 42), (36, 35), (34, 28), (26, 22)],
+            [(36, 35), (40, 30), (42, 24)],
+            [(42, 24), (44, 30), (44, 38), (42, 44)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'TELUGU', 'concept': 'I',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (22, 30), (24, 36), (30, 38), (36, 36), (38, 30), (36, 24), (30, 22), (24, 24)],
+            [(30, 38), (28, 44), (30, 48), (34, 46)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'TELUGU', 'concept': 'II',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (22, 30), (24, 36), (30, 38), (36, 36), (38, 30), (36, 24), (30, 22), (24, 24)],
+            [(30, 38), (28, 44), (30, 48), (34, 46)],
+            [(38, 22), (42, 26), (40, 32)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'TELUGU', 'concept': 'U',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 28), (26, 22), (32, 22), (36, 28), (34, 34), (28, 36), (24, 34), (22, 28)],
+            [(28, 36), (30, 42), (34, 46), (38, 44)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'TELUGU', 'concept': 'UU',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 28), (26, 22), (32, 22), (36, 28), (34, 34), (28, 36), (24, 34), (22, 28)],
+            [(28, 36), (30, 42), (34, 48), (40, 46), (42, 40)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'TELUGU', 'concept': 'E',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 34), (24, 26), (30, 22), (36, 26), (38, 34), (34, 40), (28, 42), (24, 38)],
+            [(34, 40), (38, 46), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Ee', 'script': 'TELUGU', 'concept': 'EE',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 34), (24, 26), (30, 22), (36, 26), (38, 34), (34, 40), (28, 42), (24, 38)],
+            [(34, 40), (38, 46), (42, 48)],
+            [(40, 22), (44, 28), (42, 34)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'TELUGU', 'concept': 'AI',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 34), (24, 26), (30, 22), (36, 26), (38, 34), (34, 40), (28, 42)],
+            [(28, 42), (32, 48), (38, 48), (42, 44)],
+            [(24, 20), (20, 24)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'TELUGU', 'concept': 'O',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 42), (30, 44), (36, 42), (38, 36), (36, 28), (28, 22)],
+            [(30, 44), (32, 48), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Oo', 'script': 'TELUGU', 'concept': 'OO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 42), (30, 44), (36, 42), (38, 36), (36, 28), (28, 22)],
+            [(30, 44), (32, 48), (36, 50)],
+            [(40, 22), (44, 28), (42, 36)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'TELUGU', 'concept': 'AU',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 40), (36, 38), (38, 30), (34, 24), (26, 24)],
+            [(30, 40), (28, 46), (32, 50), (38, 48)],
+            [(40, 22), (44, 26), (44, 34), (40, 38)],
+        ],
+    },
+    {
+        'name': 'Am', 'script': 'TELUGU', 'concept': 'AM',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (26, 38), (32, 40), (38, 36), (36, 28), (28, 24)],
+            [(34, 20), (38, 20)],
+        ],
+    },
+    {
+        'name': 'Aha', 'script': 'TELUGU', 'concept': 'AHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(26, 24), (22, 32), (26, 40), (34, 42), (40, 38), (42, 30), (38, 24), (26, 24)],
+            [(34, 42), (32, 48), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'TELUGU', 'concept': 'KA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 22), (20, 30), (22, 38), (28, 42), (34, 40), (38, 34), (36, 26), (30, 22), (24, 22)],
+            [(28, 42), (26, 48), (30, 50), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'TELUGU', 'concept': 'KHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 22), (20, 30), (22, 38), (28, 40), (34, 38), (36, 30), (32, 24), (24, 22)],
+            [(34, 38), (38, 44), (42, 48)],
+            [(42, 22), (44, 28), (42, 34)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'TELUGU', 'concept': 'GA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(32, 22), (26, 24), (22, 30), (24, 38), (30, 42), (36, 40), (40, 34)],
+            [(40, 34), (42, 28), (40, 22), (36, 20)],
+            [(30, 42), (28, 48), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'TELUGU', 'concept': 'GHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (20, 34), (24, 42), (32, 44), (38, 40), (40, 32), (36, 26), (30, 22)],
+            [(32, 44), (30, 48), (34, 50)],
+            [(40, 32), (44, 28), (44, 22)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'TELUGU', 'concept': 'NGA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 30), (26, 22), (34, 22), (38, 30), (34, 38), (26, 38), (22, 30)],
+            [(30, 38), (30, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'TELUGU', 'concept': 'CHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 28), (24, 22), (32, 20), (38, 24), (40, 32), (36, 38), (28, 40), (22, 36)],
+            [(28, 40), (30, 46), (36, 50), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'TELUGU', 'concept': 'CHHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 28), (24, 22), (32, 20), (38, 24), (40, 32), (36, 38), (28, 38)],
+            [(28, 38), (26, 44), (30, 48), (36, 46)],
+            [(40, 32), (44, 36), (44, 42)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'TELUGU', 'concept': 'JA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 26), (26, 20), (34, 20), (38, 26), (36, 34), (30, 38)],
+            [(30, 38), (24, 36), (20, 30)],
+            [(30, 38), (32, 44), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'TELUGU', 'concept': 'JHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 24), (28, 20), (36, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 28)],
+            [(30, 40), (34, 46), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'TELUGU', 'concept': 'NYA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 30), (24, 22), (32, 22), (36, 30), (32, 36), (24, 36), (20, 30)],
+            [(36, 30), (42, 26), (44, 32), (40, 38)],
+            [(30, 36), (28, 44), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'TELUGU', 'concept': 'TA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 22), (20, 30), (24, 38), (32, 40), (38, 36), (40, 28), (36, 22), (28, 20)],
+            [(32, 40), (34, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'TELUGU', 'concept': 'THA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(26, 22), (20, 28), (22, 36), (28, 40), (36, 38), (40, 30), (36, 24), (26, 22)],
+            [(28, 40), (26, 46), (30, 50), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'TELUGU', 'concept': 'DA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (22, 34), (26, 42), (34, 44), (40, 40), (42, 32), (38, 24), (30, 22)],
+            [(34, 44), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'TELUGU', 'concept': 'DHA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 42), (32, 44), (38, 40), (40, 32), (36, 24), (28, 22)],
+            [(32, 44), (30, 50)],
+            [(42, 22), (44, 30)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'TELUGU', 'concept': 'NA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 26), (28, 20), (36, 22), (40, 30), (36, 38), (28, 40), (22, 34)],
+            [(28, 40), (30, 48), (36, 50), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'TELUGU', 'concept': 'TA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 30), (26, 22), (34, 22), (40, 28), (38, 36), (30, 40), (24, 36), (20, 30)],
+            [(30, 40), (32, 46), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'TELUGU', 'concept': 'THA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 28), (28, 22), (36, 22), (42, 28), (40, 36), (32, 40), (24, 38), (22, 28)],
+            [(32, 40), (34, 46), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'TELUGU', 'concept': 'DA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(32, 20), (24, 24), (20, 32), (24, 40), (32, 42), (40, 38), (42, 30), (38, 22), (32, 20)],
+            [(32, 42), (30, 48), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'TELUGU', 'concept': 'DHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(30, 20), (22, 26), (20, 34), (24, 42), (34, 44), (42, 38), (44, 30), (40, 22), (30, 20)],
+            [(34, 44), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'TELUGU', 'concept': 'NA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (20, 32), (22, 40), (28, 44), (36, 42), (40, 36), (38, 28), (32, 22), (24, 24)],
+            [(28, 44), (26, 50)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'TELUGU', 'concept': 'PA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 26), (28, 20), (36, 22), (40, 30), (36, 38), (28, 38)],
+            [(28, 38), (22, 34), (20, 28)],
+            [(30, 38), (30, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'TELUGU', 'concept': 'PHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (20, 32), (24, 40), (32, 42), (38, 38), (40, 30), (36, 22), (28, 20), (24, 24)],
+            [(32, 42), (36, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'TELUGU', 'concept': 'BA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (24, 40), (32, 42), (38, 38), (40, 30), (36, 22), (30, 22)],
+            [(24, 40), (22, 46), (26, 50)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'TELUGU', 'concept': 'BHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 36), (28, 42), (36, 42), (40, 36), (40, 28), (34, 22), (28, 22)],
+            [(28, 42), (26, 48), (30, 50)],
+            [(40, 28), (44, 24)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'TELUGU', 'concept': 'MA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 32), (26, 24), (34, 22), (40, 28), (38, 36), (30, 40), (22, 38), (20, 32)],
+            [(30, 40), (34, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'TELUGU', 'concept': 'YA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 26), (26, 20), (34, 22), (38, 28)],
+            [(38, 28), (36, 36), (30, 42), (24, 40), (20, 34)],
+            [(30, 42), (34, 48), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'TELUGU', 'concept': 'RA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 24), (28, 20), (36, 22), (40, 30), (36, 38), (28, 40), (22, 36), (22, 24)],
+            [(28, 40), (32, 46), (28, 50)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'TELUGU', 'concept': 'LA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(26, 20), (20, 28), (22, 36), (30, 40), (38, 36), (40, 28), (34, 22), (26, 20)],
+            [(30, 40), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Va', 'script': 'TELUGU', 'concept': 'VA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(22, 30), (28, 22), (36, 22), (42, 28), (40, 36), (34, 42), (26, 40), (22, 34)],
+            [(34, 42), (38, 48), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Sha', 'script': 'TELUGU', 'concept': 'SHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 28), (26, 22), (34, 20), (40, 26), (42, 34)],
+            [(42, 34), (38, 40), (30, 42), (24, 38), (20, 32)],
+            [(30, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Sha_retro', 'script': 'TELUGU', 'concept': 'SHA_RETRO',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (20, 32), (24, 40), (32, 42), (40, 38), (42, 30), (38, 22), (30, 20), (24, 24)],
+            [(32, 42), (30, 48), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'TELUGU', 'concept': 'SA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 30), (24, 22), (34, 20), (40, 26), (38, 34), (30, 38), (24, 34), (20, 30)],
+            [(30, 38), (34, 44), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'TELUGU', 'concept': 'HA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (26, 42), (34, 42), (40, 36), (42, 28), (36, 22), (28, 22)],
+            [(30, 42), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'TELUGU', 'concept': 'LLA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 22), (20, 30), (22, 38), (30, 42), (38, 38), (42, 30), (38, 22), (30, 20), (24, 22)],
+            [(30, 42), (32, 48), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Ksha', 'script': 'TELUGU', 'concept': 'KSHA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(20, 28), (24, 22), (30, 22), (34, 28), (30, 34), (24, 34), (20, 28)],
+            [(34, 28), (40, 24), (44, 28), (42, 36), (36, 38)],
+            [(30, 38), (30, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Rra', 'script': 'TELUGU', 'concept': 'RRA',
+        'origin': 'TELUGU ~1100 AD',
+        'ink': _TELUGU_INK, 'paper': _TELUGU_PAPER,
+        'strokes': [
+            [(24, 24), (20, 32), (24, 40), (32, 44), (40, 40), (44, 32), (40, 24), (32, 20), (24, 24)],
+            [(32, 44), (30, 50)],
+        ],
+    },
+    # ── KANNADA ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'KANNADA', 'concept': 'A',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 44)],
+            [(22, 22), (34, 22), (40, 28), (40, 36), (34, 42), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'KANNADA', 'concept': 'AA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 22), (20, 44)],
+            [(20, 22), (32, 22), (38, 28), (38, 36), (32, 42), (20, 44)],
+            [(38, 28), (44, 24), (44, 36), (38, 40)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'KANNADA', 'concept': 'I',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (22, 30), (26, 38), (32, 40), (38, 36), (40, 28), (36, 22), (28, 20)],
+            [(32, 40), (34, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'KANNADA', 'concept': 'II',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (22, 30), (26, 38), (32, 40), (38, 36), (40, 28), (36, 22), (28, 20)],
+            [(32, 40), (34, 46), (30, 50)],
+            [(42, 22), (44, 28)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'KANNADA', 'concept': 'U',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 24), (22, 32), (26, 40), (34, 42), (40, 38), (42, 30), (38, 22), (30, 20), (24, 24)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'KANNADA', 'concept': 'UU',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 24), (22, 32), (26, 40), (34, 42), (40, 38), (42, 30), (38, 22), (30, 20), (24, 24)],
+            [(34, 42), (36, 48), (32, 50)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'KANNADA', 'concept': 'E',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 22), (20, 42)],
+            [(20, 22), (30, 22), (36, 26), (36, 32), (30, 36), (20, 36)],
+            [(36, 32), (42, 34), (44, 40)],
+        ],
+    },
+    {
+        'name': 'Ee', 'script': 'KANNADA', 'concept': 'EE',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 22), (20, 42)],
+            [(20, 22), (30, 22), (36, 26), (36, 32), (30, 36), (20, 36)],
+            [(36, 32), (42, 34), (44, 40), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'KANNADA', 'concept': 'AI',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 24), (20, 44)],
+            [(20, 24), (28, 22), (34, 26), (34, 34), (28, 38), (20, 38)],
+            [(34, 26), (40, 22), (44, 26), (42, 34)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'KANNADA', 'concept': 'O',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 44)],
+            [(22, 22), (32, 22), (38, 28), (38, 36), (32, 42), (22, 44)],
+            [(30, 20), (34, 20)],
+        ],
+    },
+    {
+        'name': 'Oo', 'script': 'KANNADA', 'concept': 'OO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 44)],
+            [(22, 22), (32, 22), (38, 28), (38, 36), (32, 42), (22, 44)],
+            [(28, 20), (34, 20), (38, 20)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'KANNADA', 'concept': 'AU',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 24), (22, 44)],
+            [(22, 24), (32, 24), (38, 30), (38, 38), (32, 42), (22, 44)],
+            [(38, 30), (44, 28), (44, 38), (40, 44)],
+        ],
+    },
+    {
+        'name': 'Am', 'script': 'KANNADA', 'concept': 'AM',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 42)],
+            [(22, 22), (32, 22), (38, 28), (38, 36), (32, 42), (22, 42)],
+            [(30, 20), (32, 20)],
+        ],
+    },
+    {
+        'name': 'Aha', 'script': 'KANNADA', 'concept': 'AHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 24), (22, 46)],
+            [(22, 24), (34, 24), (40, 30), (40, 38), (34, 44), (22, 46)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'KANNADA', 'concept': 'KA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 28), (30, 22), (38, 24), (42, 30), (38, 36), (30, 38), (22, 36)],
+            [(30, 38), (34, 44), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'KANNADA', 'concept': 'KHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 44)],
+            [(22, 28), (30, 22), (38, 26), (40, 34), (36, 40), (28, 42)],
+            [(40, 34), (44, 38), (44, 44)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'KANNADA', 'concept': 'GA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 22), (34, 22), (40, 28), (38, 36), (30, 40), (24, 38)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'KANNADA', 'concept': 'GHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 22), (32, 22), (40, 28), (38, 38), (30, 42), (22, 40)],
+            [(40, 28), (44, 24), (46, 30)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'KANNADA', 'concept': 'NGA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 26), (28, 20), (36, 22), (40, 30), (36, 38), (28, 40), (22, 34)],
+            [(28, 40), (32, 46), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'KANNADA', 'concept': 'CHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 30), (32, 24), (38, 28), (40, 36), (36, 42), (28, 44), (24, 40)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'KANNADA', 'concept': 'CHHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 28), (30, 22), (38, 26), (40, 34), (34, 40), (22, 42)],
+            [(40, 34), (44, 40), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'KANNADA', 'concept': 'JA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 22), (20, 46)],
+            [(20, 26), (28, 20), (36, 24), (38, 32), (34, 38), (26, 40), (20, 36)],
+            [(34, 38), (38, 44), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'KANNADA', 'concept': 'JHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 26), (32, 22), (40, 28), (40, 38), (34, 44), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'KANNADA', 'concept': 'NYA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 46)],
+            [(24, 28), (32, 22), (40, 26), (42, 34), (38, 40), (28, 42)],
+            [(38, 40), (42, 46), (40, 50)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'KANNADA', 'concept': 'TA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 28), (30, 22), (38, 26), (38, 36), (30, 42), (22, 40)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'KANNADA', 'concept': 'THA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 46)],
+            [(24, 26), (32, 20), (40, 24), (42, 32), (38, 40), (28, 44), (24, 40)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'KANNADA', 'concept': 'DA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 24), (22, 48)],
+            [(22, 30), (30, 24), (38, 28), (40, 36), (36, 42), (26, 44)],
+            [(36, 42), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'KANNADA', 'concept': 'DHA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 28), (32, 22), (40, 26), (42, 34), (38, 42), (28, 44)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'KANNADA', 'concept': 'NA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 28), (30, 22), (38, 28), (38, 38), (30, 44), (22, 42)],
+            [(30, 44), (34, 48)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'KANNADA', 'concept': 'TA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 28), (34, 22), (42, 28), (40, 38), (32, 44), (24, 42)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'KANNADA', 'concept': 'THA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 26), (32, 20), (42, 26), (42, 38), (34, 44), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'KANNADA', 'concept': 'DA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 46)],
+            [(24, 26), (34, 22), (40, 28), (38, 36), (30, 40), (24, 38)],
+            [(30, 40), (36, 44), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'KANNADA', 'concept': 'DHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 26), (30, 20), (38, 24), (40, 34), (36, 42), (26, 44)],
+            [(40, 34), (44, 40)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'KANNADA', 'concept': 'NA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 28), (32, 22), (40, 26), (42, 34), (38, 42), (28, 46), (24, 42)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'KANNADA', 'concept': 'PA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 22), (36, 22), (42, 28), (42, 36), (36, 42), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'KANNADA', 'concept': 'PHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 24), (34, 22), (42, 28), (42, 38), (34, 44), (22, 44)],
+            [(42, 28), (46, 24)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'KANNADA', 'concept': 'BA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 26), (34, 22), (40, 28), (40, 38), (34, 44), (24, 44)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'KANNADA', 'concept': 'BHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 26), (32, 20), (40, 26), (42, 36), (36, 44), (22, 44)],
+            [(42, 36), (44, 42)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'KANNADA', 'concept': 'MA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 46)],
+            [(24, 28), (32, 22), (38, 26), (40, 34), (36, 42), (28, 46)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'KANNADA', 'concept': 'YA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 24), (30, 20), (38, 24), (40, 32), (36, 40), (28, 44), (22, 40)],
+            [(28, 44), (32, 48), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'KANNADA', 'concept': 'RA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 30), (32, 24), (38, 28), (36, 36), (28, 40), (24, 38)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'KANNADA', 'concept': 'LA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 28), (30, 22), (38, 26), (40, 34), (36, 42), (26, 46)],
+        ],
+    },
+    {
+        'name': 'Va', 'script': 'KANNADA', 'concept': 'VA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 46)],
+            [(24, 26), (34, 22), (42, 28), (42, 36), (36, 44), (24, 46)],
+        ],
+    },
+    {
+        'name': 'Sha', 'script': 'KANNADA', 'concept': 'SHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 26), (30, 20), (38, 24), (40, 32)],
+            [(40, 32), (38, 40), (30, 44), (22, 42)],
+        ],
+    },
+    {
+        'name': 'Sha_retro', 'script': 'KANNADA', 'concept': 'SHA_RETRO',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 26), (32, 20), (40, 26), (42, 34), (38, 42), (28, 46)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'KANNADA', 'concept': 'SA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 46)],
+            [(22, 22), (34, 22), (40, 28), (40, 36), (34, 42), (22, 42)],
+            [(28, 42), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'KANNADA', 'concept': 'HA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(22, 22), (22, 48)],
+            [(22, 28), (34, 22), (42, 28), (42, 38), (34, 46), (22, 48)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'KANNADA', 'concept': 'LLA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 28), (34, 22), (40, 28), (40, 38), (34, 44), (24, 44)],
+            [(34, 44), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Ksha', 'script': 'KANNADA', 'concept': 'KSHA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(20, 22), (20, 46)],
+            [(20, 26), (28, 20), (34, 24), (34, 32), (28, 36), (20, 34)],
+            [(34, 24), (40, 22), (44, 28), (42, 36), (36, 40)],
+        ],
+    },
+    {
+        'name': 'Rra', 'script': 'KANNADA', 'concept': 'RRA',
+        'origin': 'KANNADA ~1000 AD',
+        'ink': _KANNADA_INK, 'paper': _KANNADA_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 26), (32, 20), (40, 24), (42, 34), (38, 44), (28, 48)],
+        ],
+    },
+    # ── MALAYALAM ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'MALAYALAM', 'concept': 'A',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (22, 34), (26, 42), (34, 44), (40, 40), (42, 32), (38, 24), (30, 22)],
+            [(34, 44), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'MALAYALAM', 'concept': 'AA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 36), (28, 42), (34, 42), (38, 36), (38, 28), (32, 22), (28, 22)],
+            [(38, 28), (44, 26), (44, 38), (40, 44)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'MALAYALAM', 'concept': 'I',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (22, 28), (24, 36), (30, 40), (36, 36), (38, 28), (34, 22), (26, 22)],
+            [(30, 40), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'MALAYALAM', 'concept': 'II',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (22, 28), (24, 36), (30, 40), (36, 36), (38, 28), (34, 22), (26, 22)],
+            [(30, 40), (28, 48)],
+            [(40, 22), (44, 26), (42, 32)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'MALAYALAM', 'concept': 'U',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (32, 42), (40, 38), (42, 30), (38, 22), (30, 20), (26, 24)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'MALAYALAM', 'concept': 'UU',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (32, 42), (40, 38), (42, 30), (38, 22), (30, 20), (26, 24)],
+            [(32, 42), (30, 48), (34, 50)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'MALAYALAM', 'concept': 'E',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 30), (26, 22), (34, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 30)],
+            [(30, 40), (34, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Ee', 'script': 'MALAYALAM', 'concept': 'EE',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 30), (26, 22), (34, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 30)],
+            [(30, 40), (34, 46), (30, 50)],
+            [(42, 22), (44, 28)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'MALAYALAM', 'concept': 'AI',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 28), (28, 22), (36, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 30)],
+            [(30, 40), (32, 46), (28, 50)],
+            [(20, 22), (22, 20)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'MALAYALAM', 'concept': 'O',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 24), (22, 30), (22, 38), (28, 44), (36, 44), (42, 38), (42, 30), (36, 24), (28, 24)],
+        ],
+    },
+    {
+        'name': 'Oo', 'script': 'MALAYALAM', 'concept': 'OO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 24), (22, 30), (22, 38), (28, 44), (36, 44), (42, 38), (42, 30), (36, 24), (28, 24)],
+            [(42, 30), (46, 28), (46, 36)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'MALAYALAM', 'concept': 'AU',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 42), (38, 40), (42, 32), (38, 24), (30, 22), (26, 24)],
+            [(42, 32), (46, 36), (44, 44)],
+        ],
+    },
+    {
+        'name': 'Am', 'script': 'MALAYALAM', 'concept': 'AM',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 24), (22, 30), (24, 38), (32, 42), (40, 38), (42, 30), (36, 24), (28, 24)],
+            [(34, 20), (36, 20)],
+        ],
+    },
+    {
+        'name': 'Aha', 'script': 'MALAYALAM', 'concept': 'AHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 44), (42, 38), (42, 28), (36, 22), (28, 22)],
+            [(32, 44), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'MALAYALAM', 'concept': 'KA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (24, 36), (30, 40), (36, 36), (38, 28), (34, 22), (28, 22)],
+            [(30, 40), (28, 46), (32, 50), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'MALAYALAM', 'concept': 'KHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (20, 28), (22, 36), (28, 40), (36, 38), (38, 30), (34, 22), (26, 22)],
+            [(28, 40), (26, 46), (30, 50)],
+            [(38, 30), (42, 26), (44, 32)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'MALAYALAM', 'concept': 'GA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (22, 34), (26, 42), (34, 44), (40, 40), (42, 32), (38, 24), (30, 22)],
+            [(26, 42), (24, 48), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'MALAYALAM', 'concept': 'GHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 42), (40, 36), (40, 26), (34, 22), (28, 22)],
+            [(28, 44), (30, 50)],
+            [(40, 26), (44, 22)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'MALAYALAM', 'concept': 'NGA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 28), (28, 22), (36, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 28)],
+            [(30, 40), (32, 46), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'MALAYALAM', 'concept': 'CHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 30), (26, 22), (34, 22), (40, 28), (40, 36), (34, 42), (26, 42), (22, 36), (22, 30)],
+            [(34, 42), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'MALAYALAM', 'concept': 'CHHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 30), (26, 22), (34, 22), (40, 28), (40, 36), (34, 42), (26, 42), (22, 36)],
+            [(34, 42), (38, 48), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'MALAYALAM', 'concept': 'JA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (32, 42), (38, 38), (40, 30), (36, 24), (26, 24)],
+            [(32, 42), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'MALAYALAM', 'concept': 'JHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (20, 30), (22, 38), (30, 42), (38, 38), (42, 30), (38, 22), (30, 20), (26, 22)],
+            [(30, 42), (34, 48), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'MALAYALAM', 'concept': 'NYA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 28), (26, 22), (34, 22), (38, 28), (36, 34), (28, 36), (22, 32)],
+            [(36, 34), (42, 32), (44, 38), (40, 44)],
+            [(30, 36), (28, 44), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'MALAYALAM', 'concept': 'TA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 44), (42, 38), (42, 28), (36, 22), (28, 22)],
+            [(28, 44), (26, 50)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'MALAYALAM', 'concept': 'THA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (20, 30), (22, 38), (30, 44), (38, 40), (42, 32), (38, 24), (30, 20), (26, 22)],
+            [(30, 44), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'MALAYALAM', 'concept': 'DA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (20, 34), (24, 42), (32, 46), (40, 42), (44, 34), (40, 26), (32, 22)],
+            [(32, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'MALAYALAM', 'concept': 'DHA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (44, 34), (40, 26), (34, 22), (28, 22)],
+            [(32, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'MALAYALAM', 'concept': 'NA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 42), (38, 40), (42, 32), (40, 24), (32, 20), (26, 24)],
+            [(30, 42), (28, 48), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'MALAYALAM', 'concept': 'TA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 26), (28, 20), (36, 20), (42, 26), (42, 36), (36, 42), (28, 42), (24, 36), (24, 26)],
+            [(32, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'MALAYALAM', 'concept': 'THA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 32), (26, 40), (34, 44), (42, 40), (44, 32), (40, 24), (32, 20), (26, 24)],
+            [(34, 44), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'MALAYALAM', 'concept': 'DA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (22, 34), (26, 42), (34, 44), (40, 40), (42, 32), (38, 24), (30, 22)],
+            [(34, 44), (38, 48), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'MALAYALAM', 'concept': 'DHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (38, 46), (44, 40), (44, 30), (38, 22), (28, 22)],
+            [(28, 44), (26, 50)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'MALAYALAM', 'concept': 'NA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 42), (38, 40), (42, 32), (40, 24), (32, 20), (26, 24)],
+            [(30, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'MALAYALAM', 'concept': 'PA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (24, 36), (30, 40), (38, 38), (42, 30), (38, 22), (28, 22)],
+            [(30, 40), (28, 46), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'MALAYALAM', 'concept': 'PHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 22), (20, 30), (22, 38), (30, 44), (38, 40), (42, 32), (38, 24), (30, 20), (26, 22)],
+            [(30, 44), (34, 50), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'MALAYALAM', 'concept': 'BA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 44), (42, 38), (42, 28), (36, 22), (28, 22)],
+            [(28, 44), (26, 50)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'MALAYALAM', 'concept': 'BHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 42), (40, 36), (40, 26), (34, 22), (28, 22)],
+            [(28, 44), (30, 50)],
+            [(40, 26), (44, 22)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'MALAYALAM', 'concept': 'MA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(30, 22), (24, 26), (20, 34), (24, 42), (32, 46), (40, 42), (44, 34), (40, 26), (34, 22), (30, 22)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'MALAYALAM', 'concept': 'YA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 26), (28, 20), (36, 20), (42, 26), (40, 34), (34, 40), (26, 40), (22, 34)],
+            [(34, 40), (36, 46), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'MALAYALAM', 'concept': 'RA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 42), (38, 40), (42, 32), (38, 24), (30, 20), (26, 24)],
+            [(30, 42), (28, 48)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'MALAYALAM', 'concept': 'LA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 44), (42, 38), (42, 28), (36, 22), (28, 22)],
+            [(32, 44), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Va', 'script': 'MALAYALAM', 'concept': 'VA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 26), (28, 20), (36, 20), (42, 26), (42, 36), (36, 42), (28, 42), (22, 36), (22, 28)],
+            [(36, 42), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Sha', 'script': 'MALAYALAM', 'concept': 'SHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(22, 28), (26, 22), (34, 22), (40, 28), (38, 36), (30, 40), (24, 36), (22, 28)],
+            [(30, 40), (34, 46), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Sha_retro', 'script': 'MALAYALAM', 'concept': 'SHA_RETRO',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 36), (28, 42), (36, 42), (42, 36), (42, 28), (36, 22), (28, 22)],
+            [(28, 42), (26, 48), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'MALAYALAM', 'concept': 'SA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 26), (28, 20), (36, 20), (42, 26), (40, 34), (34, 40), (26, 40), (22, 34), (24, 26)],
+            [(34, 40), (36, 46), (32, 50)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'MALAYALAM', 'concept': 'HA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (44, 34), (42, 26), (36, 22), (28, 22)],
+            [(32, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'MALAYALAM', 'concept': 'LLA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (24, 38), (30, 42), (38, 40), (42, 32), (40, 24), (32, 20), (26, 24)],
+            [(30, 42), (28, 48), (32, 50), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Zha', 'script': 'MALAYALAM', 'concept': 'ZHA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(24, 26), (28, 20), (36, 20), (42, 26), (40, 34), (34, 40), (26, 42), (22, 36)],
+            [(34, 40), (38, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Rra', 'script': 'MALAYALAM', 'concept': 'RRA',
+        'origin': 'MALAYALAM ~830 AD',
+        'ink': _MALAYALAM_INK, 'paper': _MALAYALAM_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 38), (28, 44), (36, 44), (42, 38), (42, 28), (36, 22), (28, 22)],
+            [(36, 44), (40, 48), (36, 50)],
+        ],
+    },
+    # ── GUJARATI ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'GUJARATI', 'concept': 'A',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(30, 24), (30, 46)],
+            [(30, 24), (40, 24), (42, 28), (40, 32), (30, 34)],
+            [(30, 34), (40, 38), (42, 44), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'GUJARATI', 'concept': 'AA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 46)],
+            [(26, 24), (36, 24), (38, 28), (36, 32), (26, 34)],
+            [(26, 34), (36, 38), (38, 44), (34, 48)],
+            [(42, 24), (42, 46)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'GUJARATI', 'concept': 'I',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (36, 24), (38, 28), (34, 32), (28, 32)],
+            [(28, 32), (28, 46)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'GUJARATI', 'concept': 'II',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (34, 24), (36, 28), (32, 32), (26, 32)],
+            [(26, 32), (26, 46)],
+            [(40, 24), (40, 36)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'GUJARATI', 'concept': 'U',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 42), (30, 46), (36, 46), (40, 42)],
+            [(40, 42), (40, 24)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'GUJARATI', 'concept': 'UU',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (24, 42), (28, 46), (34, 46), (38, 42)],
+            [(38, 42), (38, 24)],
+            [(42, 38), (44, 42), (42, 46)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'GUJARATI', 'concept': 'E',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 30), (36, 24), (42, 28), (38, 34), (28, 36)],
+            [(28, 36), (24, 42), (28, 48), (38, 46)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'GUJARATI', 'concept': 'AI',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 30), (36, 24), (42, 28), (38, 34), (28, 36)],
+            [(28, 36), (24, 42), (28, 48), (38, 46)],
+            [(36, 20), (40, 22)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'GUJARATI', 'concept': 'O',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(30, 24), (30, 46)],
+            [(30, 24), (40, 24), (42, 28), (40, 32), (30, 34)],
+            [(30, 34), (40, 38), (42, 44), (38, 48)],
+            [(28, 20), (32, 20), (34, 22)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'GUJARATI', 'concept': 'AU',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(30, 24), (30, 46)],
+            [(30, 24), (40, 24), (42, 28), (40, 32), (30, 34)],
+            [(30, 34), (40, 38), (42, 44), (38, 48)],
+            [(26, 20), (30, 20)],
+            [(34, 20), (38, 20)],
+        ],
+    },
+    {
+        'name': 'Am', 'script': 'GUJARATI', 'concept': 'AM',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(30, 26), (30, 46)],
+            [(30, 26), (40, 26), (42, 30), (40, 34), (30, 34)],
+            [(34, 20), (36, 22)],
+        ],
+    },
+    {
+        'name': 'Ah', 'script': 'GUJARATI', 'concept': 'AH',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(30, 24), (30, 46)],
+            [(30, 24), (40, 24), (42, 28), (40, 32), (30, 34)],
+            [(44, 28), (44, 32)],
+            [(44, 38), (44, 42)],
+        ],
+    },
+    {
+        'name': 'Ri', 'script': 'GUJARATI', 'concept': 'RI',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 26), (36, 22), (40, 26), (36, 30), (28, 30)],
+            [(28, 30), (24, 38), (28, 46), (36, 44), (40, 38)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'GUJARATI', 'concept': 'KA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 24), (38, 24), (42, 28), (38, 32), (28, 32)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'GUJARATI', 'concept': 'KHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 24), (38, 24), (42, 28), (38, 32), (28, 32)],
+            [(28, 36), (36, 36), (40, 40), (36, 46)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'GUJARATI', 'concept': 'GA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (40, 24)],
+            [(32, 24), (32, 34), (26, 40), (24, 46)],
+            [(32, 34), (38, 40), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'GUJARATI', 'concept': 'GHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(22, 24), (38, 24)],
+            [(30, 24), (30, 34), (24, 40), (22, 46)],
+            [(30, 34), (36, 40), (38, 46)],
+            [(42, 24), (42, 40), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'GUJARATI', 'concept': 'NGA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (36, 24), (40, 28), (36, 32), (28, 32), (24, 36), (28, 40)],
+            [(32, 40), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'GUJARATI', 'concept': 'CHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (40, 24)],
+            [(32, 24), (32, 46)],
+            [(24, 34), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'GUJARATI', 'concept': 'CHHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (40, 24)],
+            [(32, 24), (32, 46)],
+            [(24, 34), (40, 34)],
+            [(36, 40), (40, 44), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'GUJARATI', 'concept': 'JA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 28), (38, 24), (42, 28), (38, 34), (28, 36)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'GUJARATI', 'concept': 'JHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 46)],
+            [(26, 28), (36, 24), (40, 28), (36, 34), (26, 36)],
+            [(26, 40), (34, 38), (38, 42), (34, 46)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'GUJARATI', 'concept': 'NYA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 28), (32, 24), (40, 28), (36, 34), (28, 36), (24, 42), (28, 48)],
+            [(36, 36), (40, 42), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'GUJARATI', 'concept': 'TTA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (42, 24)],
+            [(42, 24), (42, 36), (36, 40), (28, 38)],
+            [(28, 38), (24, 44), (28, 48), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'GUJARATI', 'concept': 'TTHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (42, 24)],
+            [(42, 24), (42, 36), (36, 40), (28, 38)],
+            [(28, 38), (24, 44), (28, 48), (36, 48)],
+            [(32, 30), (34, 32)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'GUJARATI', 'concept': 'DDA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (40, 24), (44, 30), (40, 36), (28, 36)],
+            [(28, 36), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'GUJARATI', 'concept': 'DDHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (38, 24), (42, 30), (38, 36), (26, 36)],
+            [(26, 36), (26, 48)],
+            [(42, 36), (44, 42), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'GUJARATI', 'concept': 'NNA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (42, 24)],
+            [(32, 24), (32, 38)],
+            [(24, 38), (32, 38), (40, 42), (36, 48), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'GUJARATI', 'concept': 'TA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (40, 24), (44, 30), (40, 36), (24, 36)],
+            [(24, 36), (24, 48)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'GUJARATI', 'concept': 'THA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 28), (38, 24), (42, 28), (38, 34), (26, 34)],
+            [(26, 24), (26, 46)],
+            [(26, 46), (38, 46)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'GUJARATI', 'concept': 'DA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 34), (32, 24), (40, 28), (40, 38), (32, 42), (24, 40)],
+            [(32, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'GUJARATI', 'concept': 'DHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(22, 34), (30, 24), (38, 28), (38, 38), (30, 42), (22, 40)],
+            [(30, 42), (30, 48)],
+            [(42, 28), (44, 34), (42, 40)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'GUJARATI', 'concept': 'NA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 46)],
+            [(26, 24), (40, 24)],
+            [(40, 24), (40, 36), (34, 40), (26, 38)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'GUJARATI', 'concept': 'PA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 24), (40, 24)],
+            [(28, 34), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'GUJARATI', 'concept': 'PHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 24), (40, 24)],
+            [(28, 34), (40, 34), (42, 40), (38, 46)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'GUJARATI', 'concept': 'BA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (42, 24)],
+            [(26, 24), (26, 46)],
+            [(42, 24), (42, 46)],
+            [(26, 46), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'GUJARATI', 'concept': 'BHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (40, 24)],
+            [(24, 24), (24, 46)],
+            [(40, 24), (40, 46)],
+            [(24, 46), (40, 46)],
+            [(40, 34), (44, 38), (42, 44)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'GUJARATI', 'concept': 'MA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 24), (42, 24)],
+            [(42, 24), (42, 34)],
+            [(28, 34), (42, 34)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'GUJARATI', 'concept': 'YA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 28), (32, 24), (40, 28), (40, 40), (32, 46), (24, 42)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'GUJARATI', 'concept': 'RA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (36, 24), (40, 28), (38, 34)],
+            [(38, 34), (32, 38), (28, 44), (30, 48)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'GUJARATI', 'concept': 'LA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 46)],
+            [(28, 34), (38, 30), (42, 34), (38, 40), (28, 42)],
+        ],
+    },
+    {
+        'name': 'Va', 'script': 'GUJARATI', 'concept': 'VA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (40, 24)],
+            [(26, 24), (26, 38), (32, 42), (40, 38), (40, 24)],
+        ],
+    },
+    {
+        'name': 'Sha', 'script': 'GUJARATI', 'concept': 'SHA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(24, 24), (24, 46)],
+            [(24, 24), (42, 34)],
+            [(24, 34), (42, 24)],
+            [(42, 24), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Sha_retro', 'script': 'GUJARATI', 'concept': 'SSA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 46)],
+            [(26, 24), (40, 24)],
+            [(40, 24), (40, 36), (34, 40), (26, 38)],
+            [(34, 40), (38, 46), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'GUJARATI', 'concept': 'SA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (38, 24), (42, 28), (38, 34), (28, 34)],
+            [(28, 34), (22, 40), (28, 46), (38, 46), (42, 40)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'GUJARATI', 'concept': 'HA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(26, 24), (26, 46)],
+            [(26, 28), (36, 24), (42, 28), (42, 36)],
+            [(42, 36), (36, 40), (26, 38)],
+            [(32, 40), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'GUJARATI', 'concept': 'LLA',
+        'origin': 'GUJARATI ~1600 AD',
+        'ink': _GUJARATI_INK, 'paper': _GUJARATI_PAPER,
+        'strokes': [
+            [(28, 24), (28, 40)],
+            [(28, 40), (24, 46), (28, 50), (36, 48), (40, 42)],
+            [(28, 32), (38, 28), (42, 32), (38, 36), (28, 36)],
+        ],
+    },
+    # ── GURMUKHI ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'GURMUKHI', 'concept': 'A',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 32), (32, 32), (38, 36), (36, 42), (30, 46)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'GURMUKHI', 'concept': 'AA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 34), (36, 30), (40, 34), (36, 40), (28, 42)],
+            [(40, 22), (40, 46)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'GURMUKHI', 'concept': 'I',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(26, 28), (32, 32), (38, 28)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'GURMUKHI', 'concept': 'II',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(26, 28), (32, 32), (38, 28)],
+            [(32, 46), (28, 50), (36, 50)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'GURMUKHI', 'concept': 'U',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(30, 22), (30, 40), (34, 46), (38, 40), (38, 22)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'GURMUKHI', 'concept': 'UU',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 40), (32, 46), (36, 40), (36, 22)],
+            [(40, 38), (42, 44), (40, 48)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'GURMUKHI', 'concept': 'E',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 30), (40, 30)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'GURMUKHI', 'concept': 'AI',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 30), (40, 30)],
+            [(28, 18), (32, 20)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'GURMUKHI', 'concept': 'O',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 32), (32, 32), (38, 36), (36, 42), (30, 46)],
+            [(30, 18), (34, 18)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'GURMUKHI', 'concept': 'AU',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 32), (32, 32), (38, 36), (36, 42), (30, 46)],
+            [(28, 18), (32, 18), (36, 18)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'GURMUKHI', 'concept': 'SA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(24, 22), (24, 46)],
+            [(24, 34), (34, 30), (40, 34), (34, 40), (24, 42)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'GURMUKHI', 'concept': 'HA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(40, 22), (40, 46)],
+            [(26, 34), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'GURMUKHI', 'concept': 'KA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 28), (38, 26), (42, 30), (38, 36), (28, 36)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'GURMUKHI', 'concept': 'KHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(26, 28), (36, 26), (40, 30), (36, 36), (26, 36)],
+            [(26, 40), (34, 38), (38, 42), (34, 46)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'GURMUKHI', 'concept': 'GA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(30, 22), (30, 38), (34, 44), (40, 46)],
+            [(38, 22), (38, 34)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'GURMUKHI', 'concept': 'GHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 38), (32, 44), (38, 46)],
+            [(36, 22), (36, 34)],
+            [(32, 48), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'GURMUKHI', 'concept': 'NGA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 40), (30, 46), (36, 46), (40, 40), (40, 22)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'GURMUKHI', 'concept': 'CHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 34), (32, 38), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'GURMUKHI', 'concept': 'CHHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 34), (32, 38), (40, 34)],
+            [(36, 42), (40, 46), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'GURMUKHI', 'concept': 'JA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 30), (36, 26), (42, 30), (42, 38), (36, 44), (28, 42)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'GURMUKHI', 'concept': 'JHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(26, 30), (34, 26), (40, 30), (40, 38), (34, 44), (26, 42)],
+            [(34, 48), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'GURMUKHI', 'concept': 'NYA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 38), (32, 44), (40, 44)],
+            [(40, 22), (40, 44)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'GURMUKHI', 'concept': 'TTA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (32, 46)],
+            [(24, 28), (40, 28)],
+            [(24, 40), (40, 40)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'GURMUKHI', 'concept': 'TTHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(26, 28), (42, 28)],
+            [(26, 38), (36, 38), (40, 42), (36, 46)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'GURMUKHI', 'concept': 'DDA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 42), (32, 46), (40, 44)],
+            [(28, 32), (38, 28), (42, 32), (38, 36), (28, 36)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'GURMUKHI', 'concept': 'DDHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 42), (30, 46), (38, 44)],
+            [(26, 32), (36, 28), (40, 32), (36, 36), (26, 36)],
+            [(34, 48), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'GURMUKHI', 'concept': 'NNA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(40, 22), (40, 46)],
+            [(28, 34), (34, 38), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'GURMUKHI', 'concept': 'TA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(26, 30), (36, 26), (42, 30), (36, 36), (26, 36)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'GURMUKHI', 'concept': 'THA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 28), (38, 26), (44, 30), (44, 42), (38, 46), (28, 44)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'GURMUKHI', 'concept': 'DA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(32, 22), (24, 34), (24, 44), (32, 48), (40, 44), (40, 34), (32, 22)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'GURMUKHI', 'concept': 'DHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(30, 22), (22, 34), (22, 44), (30, 48), (38, 44), (38, 34), (30, 22)],
+            [(42, 30), (44, 36), (42, 42)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'GURMUKHI', 'concept': 'NA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(42, 22), (42, 46)],
+            [(26, 46), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'GURMUKHI', 'concept': 'PA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 26), (38, 24), (42, 28), (38, 34), (28, 34)],
+            [(28, 40), (36, 38), (40, 42), (36, 46)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'GURMUKHI', 'concept': 'PHA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(28, 22), (28, 46)],
+            [(28, 28), (36, 24), (42, 28), (42, 40), (36, 46), (28, 42)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'GURMUKHI', 'concept': 'BA',
+        'origin': 'GURU ANGAD 1539 AD',
+        'ink': _GURMUKHI_INK, 'paper': _GURMUKHI_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 22), (46, 22)],
+            [(26, 22), (26, 46)],
+            [(26, 34), (34, 30), (42, 34), (42, 42), (36, 46), (26, 46)],
+        ],
+    },
+    # ── SINHALA ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'SINHALA', 'concept': 'A',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (34, 40), (38, 34), (34, 28), (26, 28)],
+            [(34, 40), (38, 46), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Aa', 'script': 'SINHALA', 'concept': 'AA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(24, 28), (20, 34), (24, 40), (32, 40), (36, 34), (32, 28), (24, 28)],
+            [(32, 40), (36, 46), (32, 50)],
+            [(40, 24), (42, 30), (40, 36)],
+        ],
+    },
+    {
+        'name': 'Ae', 'script': 'SINHALA', 'concept': 'AE',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 30), (24, 36), (28, 42), (36, 42), (40, 36), (36, 30), (28, 30)],
+            [(22, 24), (28, 28)],
+        ],
+    },
+    {
+        'name': 'Aee', 'script': 'SINHALA', 'concept': 'AEE',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 30), (24, 36), (28, 42), (36, 42), (40, 36), (36, 30), (28, 30)],
+            [(22, 24), (28, 28)],
+            [(40, 24), (44, 28)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'SINHALA', 'concept': 'I',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (26, 30), (30, 36), (36, 36), (40, 30), (36, 24), (30, 24)],
+            [(30, 36), (26, 42), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Ii', 'script': 'SINHALA', 'concept': 'II',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 36), (34, 36), (38, 30), (34, 24), (28, 24)],
+            [(28, 36), (24, 42), (28, 48)],
+            [(40, 30), (44, 36), (40, 42)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'SINHALA', 'concept': 'U',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(24, 30), (28, 24), (36, 24), (40, 30), (36, 36), (28, 36), (24, 30)],
+            [(32, 36), (32, 44), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Uu', 'script': 'SINHALA', 'concept': 'UU',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(22, 30), (26, 24), (34, 24), (38, 30), (34, 36), (26, 36), (22, 30)],
+            [(30, 36), (30, 44), (26, 48)],
+            [(40, 36), (44, 42), (40, 48)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'SINHALA', 'concept': 'E',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(24, 38), (20, 44), (24, 48), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Ee', 'script': 'SINHALA', 'concept': 'EE',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(24, 38), (20, 44), (24, 48), (30, 48)],
+            [(42, 28), (44, 32)],
+        ],
+    },
+    {
+        'name': 'Ai', 'script': 'SINHALA', 'concept': 'AI',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (34, 40), (38, 34), (34, 28), (26, 28)],
+            [(26, 40), (22, 46), (26, 50), (32, 50)],
+            [(38, 24), (42, 28), (38, 32)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'SINHALA', 'concept': 'O',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 28), (24, 34), (28, 40), (36, 40), (40, 34), (36, 28), (28, 28)],
+            [(28, 40), (24, 44), (28, 48)],
+            [(36, 40), (40, 44), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Oo', 'script': 'SINHALA', 'concept': 'OO',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (34, 40), (38, 34), (34, 28), (26, 28)],
+            [(26, 40), (22, 44), (26, 48)],
+            [(34, 40), (38, 44), (34, 48)],
+            [(40, 26), (44, 30), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Au', 'script': 'SINHALA', 'concept': 'AU',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (34, 40), (38, 34), (34, 28), (26, 28)],
+            [(34, 40), (38, 46), (34, 50)],
+            [(20, 22), (26, 26)],
+            [(38, 22), (44, 26)],
+        ],
+    },
+    {
+        'name': 'Am', 'script': 'SINHALA', 'concept': 'AM',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 28), (24, 34), (28, 40), (36, 40), (40, 34), (36, 28), (28, 28)],
+            [(36, 40), (40, 46), (36, 50)],
+            [(32, 22), (34, 24)],
+        ],
+    },
+    {
+        'name': 'Aha', 'script': 'SINHALA', 'concept': 'AHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 28), (24, 34), (28, 40), (36, 40), (40, 34), (36, 28), (28, 28)],
+            [(36, 40), (40, 46), (36, 50)],
+            [(42, 30), (44, 34)],
+            [(42, 40), (44, 44)],
+        ],
+    },
+    {
+        'name': 'Ka', 'script': 'SINHALA', 'concept': 'KA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 26), (22, 32), (26, 38), (34, 38), (38, 32), (34, 26), (26, 26)],
+            [(34, 38), (40, 44), (36, 48), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'SINHALA', 'concept': 'KHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(24, 26), (20, 32), (24, 38), (32, 38), (36, 32), (32, 26), (24, 26)],
+            [(32, 38), (38, 44), (34, 48), (28, 48)],
+            [(40, 28), (44, 34), (40, 40)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'SINHALA', 'concept': 'GA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (26, 30), (30, 36), (38, 36), (42, 30), (38, 24), (30, 24)],
+            [(26, 36), (22, 42), (26, 48), (34, 46)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'SINHALA', 'concept': 'GHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 36), (36, 36), (40, 30), (36, 24), (28, 24)],
+            [(24, 36), (20, 42), (24, 48), (32, 46)],
+            [(40, 36), (44, 42), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'SINHALA', 'concept': 'NGA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 26), (26, 32), (30, 38), (38, 38), (42, 32), (38, 26), (30, 26)],
+            [(30, 38), (26, 44), (30, 50), (38, 50), (42, 44), (38, 38)],
+        ],
+    },
+    {
+        'name': 'Cha', 'script': 'SINHALA', 'concept': 'CHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 36), (34, 32), (38, 36), (42, 30), (38, 24)],
+            [(28, 36), (24, 42), (28, 48), (34, 48)],
+        ],
+    },
+    {
+        'name': 'Chha', 'script': 'SINHALA', 'concept': 'CHHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (26, 36), (32, 32), (36, 36), (40, 30), (36, 24)],
+            [(26, 36), (22, 42), (26, 48), (32, 48)],
+            [(40, 36), (44, 40), (42, 46)],
+        ],
+    },
+    {
+        'name': 'Ja', 'script': 'SINHALA', 'concept': 'JA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(28, 38), (32, 44), (28, 50), (22, 48)],
+        ],
+    },
+    {
+        'name': 'Jha', 'script': 'SINHALA', 'concept': 'JHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 26), (22, 32), (26, 38), (34, 38), (38, 32), (34, 26), (26, 26)],
+            [(26, 38), (30, 44), (26, 50), (20, 48)],
+            [(38, 38), (42, 44), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'SINHALA', 'concept': 'NYA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 26), (22, 30), (24, 36), (30, 36), (34, 30), (30, 26), (26, 26)],
+            [(34, 30), (38, 26), (42, 30), (42, 36), (38, 40)],
+            [(30, 36), (26, 42), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'SINHALA', 'concept': 'TTA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (24, 30), (28, 38), (36, 38), (42, 30), (38, 24)],
+            [(36, 38), (40, 44), (34, 48), (28, 44)],
+        ],
+    },
+    {
+        'name': 'Tha_retro', 'script': 'SINHALA', 'concept': 'TTHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (22, 30), (26, 38), (34, 38), (40, 30), (36, 24)],
+            [(34, 38), (38, 44), (32, 48), (26, 44)],
+            [(42, 28), (44, 34)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'SINHALA', 'concept': 'DDA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(32, 24), (26, 28), (24, 34), (28, 40), (36, 40), (40, 34), (38, 28), (32, 24)],
+            [(28, 40), (24, 46), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'SINHALA', 'concept': 'DDHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (24, 28), (22, 34), (26, 40), (34, 40), (38, 34), (36, 28), (30, 24)],
+            [(26, 40), (22, 46), (28, 50)],
+            [(40, 34), (44, 40), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'SINHALA', 'concept': 'NNA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(28, 38), (24, 44), (28, 50), (36, 50), (40, 44), (36, 38)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'SINHALA', 'concept': 'TA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (34, 40), (38, 34), (34, 28), (26, 28)],
+            [(22, 24), (26, 28)],
+            [(38, 40), (42, 46), (38, 50)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'SINHALA', 'concept': 'THA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(20, 22), (28, 26)],
+            [(36, 38), (40, 44), (44, 46)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'SINHALA', 'concept': 'DA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (24, 30), (28, 38), (36, 34), (40, 28), (36, 22), (30, 24)],
+            [(28, 38), (24, 44), (28, 50), (34, 50)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'SINHALA', 'concept': 'DHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (22, 30), (26, 38), (34, 34), (38, 28), (34, 22), (28, 24)],
+            [(26, 38), (22, 44), (26, 50), (32, 50)],
+            [(40, 30), (44, 36), (40, 42)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'SINHALA', 'concept': 'NA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(24, 28), (28, 24), (36, 24), (40, 28), (40, 36), (36, 40), (28, 40), (24, 36), (24, 28)],
+            [(32, 40), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'SINHALA', 'concept': 'PA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 26), (26, 32), (30, 38), (38, 38), (42, 32), (38, 26), (30, 26)],
+            [(30, 38), (26, 44), (30, 48)],
+            [(38, 38), (42, 44), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Pha', 'script': 'SINHALA', 'concept': 'PHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(28, 38), (24, 44), (28, 48)],
+            [(36, 38), (40, 44), (36, 48)],
+            [(42, 28), (44, 32)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'SINHALA', 'concept': 'BA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(36, 38), (40, 44), (36, 50), (28, 50), (24, 44)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'SINHALA', 'concept': 'BHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 26), (22, 32), (26, 38), (34, 38), (38, 32), (34, 26), (26, 26)],
+            [(34, 38), (38, 44), (34, 50), (26, 50), (22, 44)],
+            [(40, 28), (44, 34), (40, 40)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'SINHALA', 'concept': 'MA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 36), (36, 36), (40, 30), (36, 24), (28, 24)],
+            [(28, 36), (24, 42), (28, 48), (36, 48), (40, 42), (36, 36)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'SINHALA', 'concept': 'YA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 40), (32, 36), (36, 40), (42, 34), (38, 28)],
+            [(32, 40), (28, 46), (32, 50), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'SINHALA', 'concept': 'RA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (26, 30), (30, 36), (36, 30), (32, 24)],
+            [(30, 36), (26, 42), (30, 48), (38, 48), (42, 42)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'SINHALA', 'concept': 'LA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 38), (36, 38), (40, 30), (36, 24)],
+            [(28, 38), (24, 44), (28, 50), (36, 50), (40, 44)],
+        ],
+    },
+    {
+        'name': 'Va', 'script': 'SINHALA', 'concept': 'VA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(20, 22), (24, 26), (28, 26)],
+            [(36, 38), (40, 42), (44, 44)],
+        ],
+    },
+    {
+        'name': 'Sha', 'script': 'SINHALA', 'concept': 'SHA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(26, 26), (22, 30), (24, 36), (30, 36), (34, 30), (30, 26), (26, 26)],
+            [(34, 30), (40, 26), (44, 30), (40, 36), (34, 36)],
+            [(30, 36), (26, 42), (30, 48), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Sha_retro', 'script': 'SINHALA', 'concept': 'SSA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(24, 26), (20, 30), (22, 36), (28, 36), (32, 30), (28, 26), (24, 26)],
+            [(32, 30), (38, 26), (42, 30), (38, 36), (32, 36)],
+            [(28, 36), (24, 42), (28, 48), (34, 48)],
+            [(40, 38), (42, 42)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'SINHALA', 'concept': 'SA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(30, 24), (26, 30), (30, 36), (38, 36), (42, 30), (38, 24), (30, 24)],
+            [(30, 36), (34, 42), (30, 48), (24, 44)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'SINHALA', 'concept': 'HA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 26), (24, 32), (28, 38), (36, 38), (40, 32), (36, 26), (28, 26)],
+            [(28, 38), (24, 44), (28, 50)],
+            [(36, 38), (40, 44), (36, 50)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'SINHALA', 'concept': 'LLA',
+        'origin': 'SINHALA ~300 BC',
+        'ink': _SINHALA_INK, 'paper': _SINHALA_PAPER,
+        'strokes': [
+            [(28, 24), (24, 30), (28, 38), (36, 38), (40, 30), (36, 24), (28, 24)],
+            [(28, 38), (24, 44), (28, 50), (36, 50), (40, 44), (36, 38)],
+            [(20, 22), (24, 24)],
+        ],
+    },
+    # ── BURMESE ──────────────────────────────────────────────
+    {
+        'name': 'Ka', 'script': 'BURMESE', 'concept': 'Ka',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+        ],
+    },
+    {
+        'name': 'Kha', 'script': 'BURMESE', 'concept': 'Kha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(40, 34), (46, 30)],
+        ],
+    },
+    {
+        'name': 'Ga', 'script': 'BURMESE', 'concept': 'Ga',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(36, 22), (28, 22), (20, 28), (20, 36), (24, 44), (32, 46), (40, 42), (42, 34), (40, 26)],
+            [(40, 26), (44, 22)],
+        ],
+    },
+    {
+        'name': 'Gha', 'script': 'BURMESE', 'concept': 'Gha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 20), (22, 24), (20, 32), (22, 40), (30, 44), (38, 40), (40, 32), (38, 24), (30, 20)],
+            [(30, 44), (28, 50)],
+        ],
+    },
+    {
+        'name': 'Nga', 'script': 'BURMESE', 'concept': 'Nga',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 20), (24, 22), (20, 28), (24, 34), (30, 34)],
+            [(30, 34), (24, 36), (20, 42), (24, 48), (32, 48), (36, 44), (36, 38), (30, 34)],
+        ],
+    },
+    {
+        'name': 'Sa', 'script': 'BURMESE', 'concept': 'Sa',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(28, 24), (22, 28), (22, 36), (28, 40), (36, 36), (36, 28), (28, 24)],
+            [(36, 32), (44, 32)],
+        ],
+    },
+    {
+        'name': 'Hsa', 'script': 'BURMESE', 'concept': 'Hsa',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(34, 20), (30, 22), (28, 20)],
+            [(30, 24), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (42, 34), (38, 26), (30, 24)],
+        ],
+    },
+    {
+        'name': 'Za', 'script': 'BURMESE', 'concept': 'Za',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(18, 34), (22, 30)],
+            [(28, 24), (22, 30), (20, 38), (24, 44), (32, 46), (40, 42), (42, 34), (38, 26), (28, 24)],
+        ],
+    },
+    {
+        'name': 'Zha', 'script': 'BURMESE', 'concept': 'Zha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 22), (24, 24), (20, 32), (22, 40), (30, 46), (38, 42), (42, 34), (40, 26), (32, 22)],
+            [(30, 34), (32, 34)],
+        ],
+    },
+    {
+        'name': 'Nya', 'script': 'BURMESE', 'concept': 'Nya',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(26, 24), (20, 28), (20, 36), (26, 40), (30, 36), (30, 28), (26, 24)],
+            [(34, 24), (30, 28), (30, 36), (34, 40), (40, 36), (40, 28), (34, 24)],
+        ],
+    },
+    {
+        'name': 'Ta_retro', 'script': 'BURMESE', 'concept': 'Ta (retroflex)',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 22), (24, 26), (20, 34), (24, 42), (32, 46), (40, 42), (42, 34), (38, 26), (32, 22)],
+            [(38, 26), (42, 22), (44, 20)],
+        ],
+    },
+    {
+        'name': 'Hta_retro', 'script': 'BURMESE', 'concept': 'Hta (retroflex)',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(22, 22), (40, 22)],
+            [(30, 22), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (42, 34), (40, 26), (30, 22)],
+        ],
+    },
+    {
+        'name': 'Da_retro', 'script': 'BURMESE', 'concept': 'Da (retroflex)',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(36, 20), (24, 26), (20, 36), (24, 44), (34, 48), (42, 42), (44, 32), (40, 24), (36, 20)],
+        ],
+    },
+    {
+        'name': 'Dha_retro', 'script': 'BURMESE', 'concept': 'Dha (retroflex)',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(22, 42), (18, 48), (22, 50)],
+        ],
+    },
+    {
+        'name': 'Na_retro', 'script': 'BURMESE', 'concept': 'Na (retroflex)',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(24, 34), (36, 34)],
+        ],
+    },
+    {
+        'name': 'Ta', 'script': 'BURMESE', 'concept': 'Ta',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(24, 44), (20, 36), (22, 28), (30, 22), (38, 28), (40, 36), (36, 44)],
+        ],
+    },
+    {
+        'name': 'Hta', 'script': 'BURMESE', 'concept': 'Hta',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 20), (22, 24), (20, 32), (22, 40), (30, 44), (38, 40), (40, 32), (38, 24), (30, 20)],
+            [(30, 20), (30, 50)],
+        ],
+    },
+    {
+        'name': 'Da', 'script': 'BURMESE', 'concept': 'Da',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 24), (26, 26), (22, 32), (24, 40), (30, 44), (36, 42), (40, 36), (40, 28), (36, 24), (32, 24)],
+            [(40, 28), (44, 24)],
+        ],
+    },
+    {
+        'name': 'Dha', 'script': 'BURMESE', 'concept': 'Dha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 22), (24, 26), (20, 34), (24, 42), (32, 44), (40, 40), (42, 32), (38, 24), (32, 22)],
+            [(40, 40), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Na', 'script': 'BURMESE', 'concept': 'Na',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 24), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (42, 34), (38, 26), (30, 24)],
+            [(42, 34), (46, 32), (44, 28)],
+        ],
+    },
+    {
+        'name': 'Pa', 'script': 'BURMESE', 'concept': 'Pa',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(20, 34), (18, 42), (20, 48)],
+        ],
+    },
+    {
+        'name': 'Hpa', 'script': 'BURMESE', 'concept': 'Hpa',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(28, 22), (22, 28), (20, 36), (24, 44), (32, 46), (40, 42), (42, 34), (40, 26), (34, 22)],
+            [(28, 22), (30, 20)],
+            [(32, 20), (34, 22)],
+        ],
+    },
+    {
+        'name': 'Ba', 'script': 'BURMESE', 'concept': 'Ba',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(30, 46), (34, 50), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Bha', 'script': 'BURMESE', 'concept': 'Bha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 20), (22, 24), (20, 32), (22, 40), (30, 44), (38, 40), (40, 32), (38, 24), (30, 20)],
+            [(30, 44), (26, 48), (30, 50)],
+            [(30, 50), (36, 48)],
+        ],
+    },
+    {
+        'name': 'Ma', 'script': 'BURMESE', 'concept': 'Ma',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 20), (24, 24), (20, 32), (24, 42), (32, 46), (40, 42), (44, 32), (40, 24), (32, 20)],
+            [(32, 28), (28, 30), (26, 34), (28, 38), (32, 40), (36, 38), (38, 34), (36, 30), (32, 28)],
+        ],
+    },
+    {
+        'name': 'Ya', 'script': 'BURMESE', 'concept': 'Ya',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 20), (26, 24), (22, 32), (22, 40), (26, 48), (34, 50), (38, 46), (40, 38), (40, 30), (36, 22), (32, 20)],
+        ],
+    },
+    {
+        'name': 'Ra', 'script': 'BURMESE', 'concept': 'Ra',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(38, 24), (30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 44)],
+            [(38, 44), (44, 40)],
+        ],
+    },
+    {
+        'name': 'La', 'script': 'BURMESE', 'concept': 'La',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 22), (24, 26), (20, 34), (24, 42), (32, 46), (40, 42), (42, 34), (38, 26), (32, 22)],
+            [(40, 42), (44, 46), (44, 50)],
+        ],
+    },
+    {
+        'name': 'Wa', 'script': 'BURMESE', 'concept': 'Wa',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 22), (22, 26), (20, 34), (22, 42), (30, 46), (38, 42), (40, 34), (38, 26), (30, 22)],
+            [(40, 34), (44, 36), (44, 30), (40, 28)],
+        ],
+    },
+    {
+        'name': 'Tha', 'script': 'BURMESE', 'concept': 'Tha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(26, 24), (22, 30), (20, 38), (24, 44), (32, 48), (40, 44), (42, 36), (40, 28), (34, 22)],
+            [(26, 24), (24, 20)],
+            [(34, 22), (36, 20)],
+        ],
+    },
+    {
+        'name': 'Ha', 'script': 'BURMESE', 'concept': 'Ha',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(20, 24), (42, 24)],
+            [(26, 24), (20, 30), (20, 38), (24, 44), (32, 48), (40, 44), (42, 38), (42, 30), (36, 24)],
+        ],
+    },
+    {
+        'name': 'Lla', 'script': 'BURMESE', 'concept': 'Lla',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(30, 20), (24, 22), (22, 28), (26, 32), (32, 32), (36, 28), (34, 22), (30, 20)],
+            [(30, 34), (24, 36), (22, 42), (26, 48), (32, 48), (36, 44), (34, 38), (30, 34)],
+        ],
+    },
+    {
+        'name': 'A', 'script': 'BURMESE', 'concept': 'A',
+        'origin': 'MYANMAR ~1050 AD',
+        'ink': _BURMESE_INK, 'paper': _BURMESE_PAPER,
+        'strokes': [
+            [(32, 20), (24, 24), (20, 32), (22, 42), (30, 48), (38, 44), (42, 36), (40, 26), (32, 20)],
+            [(32, 20), (32, 34)],
+        ],
+    },
+    # ── KHMER ──────────────────────────────────────────────
+    {
+        'name': 'Ko', 'script': 'KHMER', 'concept': 'Ko',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 46)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (30, 28), (36, 30), (38, 36), (36, 42), (28, 44)],
+        ],
+    },
+    {
+        'name': 'Kho', 'script': 'KHMER', 'concept': 'Kho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (28, 26), (34, 28), (38, 34), (36, 40), (28, 42)],
+            [(38, 34), (42, 30), (44, 34), (42, 38)],
+        ],
+    },
+    {
+        'name': 'Ko_2', 'script': 'KHMER', 'concept': 'Ko (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 28), (32, 26), (38, 30), (40, 38), (36, 44), (28, 46)],
+            [(24, 20), (28, 22), (30, 20)],
+        ],
+    },
+    {
+        'name': 'Kho_2', 'script': 'KHMER', 'concept': 'Kho (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 30), (30, 26), (38, 30), (40, 38), (36, 44), (28, 46), (22, 44)],
+            [(40, 38), (44, 36)],
+        ],
+    },
+    {
+        'name': 'Ngo', 'script': 'KHMER', 'concept': 'Ngo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 32), (32, 28), (38, 32), (38, 40), (32, 44), (24, 42)],
+            [(32, 44), (32, 48)],
+        ],
+    },
+    {
+        'name': 'Cho', 'script': 'KHMER', 'concept': 'Cho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (32, 24), (40, 28), (42, 36), (38, 42), (30, 44), (22, 40)],
+        ],
+    },
+    {
+        'name': 'Chho', 'script': 'KHMER', 'concept': 'Chho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 26), (32, 24), (38, 28), (40, 34)],
+            [(40, 34), (38, 40), (30, 44), (24, 42)],
+            [(40, 34), (44, 32), (44, 38)],
+        ],
+    },
+    {
+        'name': 'Cho_2', 'script': 'KHMER', 'concept': 'Cho (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 30), (30, 26), (38, 30), (38, 38), (30, 42), (22, 40)],
+            [(38, 38), (42, 42), (40, 46)],
+        ],
+    },
+    {
+        'name': 'Chho_2', 'script': 'KHMER', 'concept': 'Chho (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 28), (34, 24), (42, 28), (44, 36), (40, 42), (30, 44)],
+            [(30, 44), (24, 42)],
+        ],
+    },
+    {
+        'name': 'Nyo', 'script': 'KHMER', 'concept': 'Nyo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 30), (28, 28), (34, 30), (34, 38), (28, 40), (22, 38)],
+            [(34, 30), (40, 28), (44, 32), (42, 36), (38, 38)],
+        ],
+    },
+    {
+        'name': 'Do', 'script': 'KHMER', 'concept': 'Do',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 26), (30, 24), (36, 28), (36, 38), (30, 44), (24, 46)],
+        ],
+    },
+    {
+        'name': 'Tho', 'script': 'KHMER', 'concept': 'Tho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (30, 24), (38, 28), (40, 36), (36, 44), (26, 46)],
+            [(40, 36), (44, 34), (46, 38)],
+        ],
+    },
+    {
+        'name': 'Do_2', 'script': 'KHMER', 'concept': 'Do (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (32, 26), (40, 30), (42, 38), (38, 44), (28, 46)],
+            [(28, 46), (24, 48)],
+        ],
+    },
+    {
+        'name': 'Tho_2', 'script': 'KHMER', 'concept': 'Tho (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 26), (30, 22), (38, 26), (42, 34), (38, 42), (28, 46), (22, 44)],
+            [(42, 34), (46, 30)],
+        ],
+    },
+    {
+        'name': 'No', 'script': 'KHMER', 'concept': 'No',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (30, 28), (36, 30), (38, 36), (36, 42), (30, 44), (24, 42)],
+        ],
+    },
+    {
+        'name': 'To', 'script': 'KHMER', 'concept': 'To',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 32), (28, 28), (36, 30), (40, 36), (38, 44), (28, 48)],
+            [(22, 48), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Tho_3', 'script': 'KHMER', 'concept': 'Tho (3rd)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 28), (32, 24), (40, 28), (42, 36), (38, 44), (28, 48)],
+            [(38, 44), (42, 46), (44, 44)],
+        ],
+    },
+    {
+        'name': 'To_2', 'script': 'KHMER', 'concept': 'To (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 30), (30, 26), (38, 30), (40, 38), (36, 46), (28, 48)],
+        ],
+    },
+    {
+        'name': 'Tho_4', 'script': 'KHMER', 'concept': 'Tho (4th)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 26), (34, 22), (42, 28), (44, 38), (38, 46), (28, 48)],
+            [(44, 38), (46, 42)],
+        ],
+    },
+    {
+        'name': 'No_2', 'script': 'KHMER', 'concept': 'No (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 32), (28, 28), (36, 32), (36, 40), (28, 44), (22, 42)],
+            [(36, 40), (40, 44), (40, 48)],
+        ],
+    },
+    {
+        'name': 'Bo', 'script': 'KHMER', 'concept': 'Bo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 28), (32, 26), (38, 30), (36, 38), (28, 40)],
+            [(28, 40), (36, 42), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Pho', 'script': 'KHMER', 'concept': 'Pho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (30, 24), (38, 28), (40, 36), (36, 42), (26, 44)],
+            [(40, 36), (44, 34), (46, 38), (44, 42)],
+        ],
+    },
+    {
+        'name': 'Bo_2', 'script': 'KHMER', 'concept': 'Bo (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (32, 26), (40, 30), (42, 38), (36, 44), (28, 46)],
+        ],
+    },
+    {
+        'name': 'Pho_2', 'script': 'KHMER', 'concept': 'Pho (2nd series)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 26), (30, 22), (40, 26), (44, 34), (40, 42), (30, 46), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Mo', 'script': 'KHMER', 'concept': 'Mo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 28), (30, 26), (36, 28), (38, 34), (36, 38), (30, 40), (24, 38)],
+            [(36, 38), (40, 42), (38, 48)],
+        ],
+    },
+    {
+        'name': 'Yo', 'script': 'KHMER', 'concept': 'Yo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 30), (30, 26), (36, 30), (36, 40), (30, 44), (22, 42)],
+            [(22, 48), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Ro', 'script': 'KHMER', 'concept': 'Ro',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (32, 28), (38, 32), (38, 40), (32, 44), (24, 42)],
+            [(38, 32), (42, 28), (44, 32)],
+        ],
+    },
+    {
+        'name': 'Lo', 'script': 'KHMER', 'concept': 'Lo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (28, 26), (34, 28), (38, 34), (36, 42), (28, 46), (22, 44)],
+        ],
+    },
+    {
+        'name': 'Vo', 'script': 'KHMER', 'concept': 'Vo',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 30), (30, 26), (38, 30), (40, 38), (34, 44), (24, 46)],
+            [(40, 38), (44, 40), (44, 46)],
+        ],
+    },
+    {
+        'name': 'Sho', 'script': 'KHMER', 'concept': 'Sho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 26), (32, 22), (40, 26), (42, 34), (38, 40), (28, 42)],
+            [(28, 42), (34, 46), (40, 44)],
+        ],
+    },
+    {
+        'name': 'So', 'script': 'KHMER', 'concept': 'So',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 28), (34, 24), (42, 28), (44, 36), (40, 44), (30, 48)],
+        ],
+    },
+    {
+        'name': 'Ho', 'script': 'KHMER', 'concept': 'Ho',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(22, 20), (22, 48)],
+            [(22, 20), (26, 22), (28, 20)],
+            [(22, 28), (30, 24), (38, 28), (38, 38), (30, 42), (22, 40)],
+            [(38, 38), (42, 42), (44, 38), (42, 34)],
+        ],
+    },
+    {
+        'name': 'Lo_2', 'script': 'KHMER', 'concept': 'Lo (2nd)',
+        'origin': 'KHMER ~600 AD',
+        'ink': _KHMER_INK, 'paper': _KHMER_PAPER,
+        'strokes': [
+            [(24, 20), (24, 48)],
+            [(24, 20), (28, 22), (30, 20)],
+            [(24, 32), (32, 28), (40, 32), (42, 40), (36, 46), (28, 48)],
+            [(42, 40), (46, 42)],
+        ],
+    },
+    # ── LAO ──────────────────────────────────────────────
+    {
+        'name': 'Ko', 'script': 'LAO', 'concept': 'Ko',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 40), (28, 46), (36, 46), (40, 40), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Kho', 'script': 'LAO', 'concept': 'Kho',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 40), (28, 46), (36, 46), (40, 40)],
+            [(40, 40), (44, 36), (42, 32)],
+        ],
+    },
+    {
+        'name': 'Kho_sung', 'script': 'LAO', 'concept': 'Kho (high)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 38), (30, 44), (38, 46), (42, 42)],
+            [(42, 42), (44, 38), (42, 34), (38, 36)],
+        ],
+    },
+    {
+        'name': 'Ngo', 'script': 'LAO', 'concept': 'Ngo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 40), (32, 46), (38, 46), (42, 42), (42, 34)],
+            [(42, 34), (40, 30), (36, 32)],
+        ],
+    },
+    {
+        'name': 'Cho', 'script': 'LAO', 'concept': 'Cho',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 36), (28, 42), (36, 44), (40, 38)],
+            [(40, 38), (40, 46)],
+        ],
+    },
+    {
+        'name': 'So_1', 'script': 'LAO', 'concept': 'So (1st)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 34), (30, 40), (36, 42), (40, 38), (40, 30)],
+            [(40, 30), (38, 26), (34, 28)],
+        ],
+    },
+    {
+        'name': 'Nyo', 'script': 'LAO', 'concept': 'Nyo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 38), (28, 44), (34, 46), (40, 42), (42, 36)],
+            [(42, 36), (44, 30), (42, 26), (38, 28)],
+        ],
+    },
+    {
+        'name': 'Do', 'script': 'LAO', 'concept': 'Do',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 36), (32, 44), (40, 46), (44, 40), (44, 32)],
+        ],
+    },
+    {
+        'name': 'To', 'script': 'LAO', 'concept': 'To',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 36), (30, 44), (38, 46), (42, 42)],
+            [(42, 42), (42, 48)],
+        ],
+    },
+    {
+        'name': 'Tho_sung', 'script': 'LAO', 'concept': 'Tho (high)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 38), (28, 46), (36, 48), (42, 44), (44, 38)],
+            [(44, 38), (44, 30), (40, 26)],
+        ],
+    },
+    {
+        'name': 'Tho', 'script': 'LAO', 'concept': 'Tho',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 36), (30, 42), (38, 44), (42, 38), (40, 30)],
+        ],
+    },
+    {
+        'name': 'No', 'script': 'LAO', 'concept': 'No',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 38), (32, 46), (40, 48), (44, 42)],
+            [(44, 42), (44, 36), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Bo', 'script': 'LAO', 'concept': 'Bo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 36), (28, 44), (36, 46), (42, 42), (44, 34)],
+            [(44, 34), (42, 28), (36, 28)],
+        ],
+    },
+    {
+        'name': 'Po', 'script': 'LAO', 'concept': 'Po',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 40), (30, 46), (38, 48), (42, 44), (42, 36)],
+        ],
+    },
+    {
+        'name': 'Pho_sung', 'script': 'LAO', 'concept': 'Pho (high)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 38), (28, 44), (36, 46), (42, 42)],
+            [(42, 42), (46, 38), (44, 32), (40, 34)],
+        ],
+    },
+    {
+        'name': 'Fo', 'script': 'LAO', 'concept': 'Fo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 36), (32, 44), (40, 46), (44, 40)],
+            [(44, 40), (44, 48)],
+        ],
+    },
+    {
+        'name': 'Pho', 'script': 'LAO', 'concept': 'Pho',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 40), (28, 48), (36, 48), (42, 44), (44, 36), (42, 28)],
+        ],
+    },
+    {
+        'name': 'Mo', 'script': 'LAO', 'concept': 'Mo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 36), (30, 44), (38, 46), (44, 42), (44, 34), (40, 28), (34, 30)],
+        ],
+    },
+    {
+        'name': 'Yo', 'script': 'LAO', 'concept': 'Yo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 42), (28, 48), (36, 48), (40, 44)],
+            [(40, 44), (40, 34), (36, 30)],
+        ],
+    },
+    {
+        'name': 'Ro', 'script': 'LAO', 'concept': 'Ro',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 38), (32, 44), (38, 44), (42, 40)],
+        ],
+    },
+    {
+        'name': 'Lo', 'script': 'LAO', 'concept': 'Lo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 38), (30, 46), (38, 48), (44, 44), (44, 36)],
+        ],
+    },
+    {
+        'name': 'Wo', 'script': 'LAO', 'concept': 'Wo',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 36), (28, 42), (36, 44), (42, 40), (42, 32), (38, 28)],
+            [(42, 40), (44, 46)],
+        ],
+    },
+    {
+        'name': 'Ho_sung', 'script': 'LAO', 'concept': 'Ho (high)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 34), (30, 42), (38, 44), (44, 40), (44, 32)],
+            [(44, 32), (42, 28), (38, 30)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'LAO', 'concept': 'O',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(28, 24), (26, 22), (28, 20), (30, 22), (28, 24)],
+            [(28, 24), (28, 38), (32, 46), (40, 48), (44, 42), (44, 34), (40, 28), (32, 28)],
+        ],
+    },
+    {
+        'name': 'Ho', 'script': 'LAO', 'concept': 'Ho',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 40), (28, 46), (36, 48), (42, 44), (42, 34)],
+            [(42, 34), (40, 30), (36, 32)],
+        ],
+    },
+    {
+        'name': 'Ho_tam', 'script': 'LAO', 'concept': 'Ho (low)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(26, 24), (24, 22), (26, 20), (28, 22), (26, 24)],
+            [(26, 24), (26, 38), (30, 44), (38, 46), (42, 42)],
+            [(42, 42), (46, 40), (44, 34), (40, 36)],
+        ],
+    },
+    {
+        'name': 'Fo_tam', 'script': 'LAO', 'concept': 'Fo (low)',
+        'origin': 'LAO ~1400 AD',
+        'ink': _LAO_INK, 'paper': _LAO_PAPER,
+        'strokes': [
+            [(24, 24), (22, 22), (24, 20), (26, 22), (24, 24)],
+            [(24, 24), (24, 36), (28, 44), (36, 48), (42, 44), (44, 38), (42, 32)],
+            [(44, 38), (46, 42)],
+        ],
+    },
+    # ── BRAILLE ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'BRAILLE', 'concept': 'A',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+        ],
+    },
+    {
+        'name': 'B', 'script': 'BRAILLE', 'concept': 'B',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+        ],
+    },
+    {
+        'name': 'C', 'script': 'BRAILLE', 'concept': 'C',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'D', 'script': 'BRAILLE', 'concept': 'D',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'BRAILLE', 'concept': 'E',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'F', 'script': 'BRAILLE', 'concept': 'F',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'G', 'script': 'BRAILLE', 'concept': 'G',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'H', 'script': 'BRAILLE', 'concept': 'H',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'BRAILLE', 'concept': 'I',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'J', 'script': 'BRAILLE', 'concept': 'J',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'K', 'script': 'BRAILLE', 'concept': 'K',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+        ],
+    },
+    {
+        'name': 'L', 'script': 'BRAILLE', 'concept': 'L',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+        ],
+    },
+    {
+        'name': 'M', 'script': 'BRAILLE', 'concept': 'M',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'N', 'script': 'BRAILLE', 'concept': 'N',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'BRAILLE', 'concept': 'O',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'P', 'script': 'BRAILLE', 'concept': 'P',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'Q', 'script': 'BRAILLE', 'concept': 'Q',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'R', 'script': 'BRAILLE', 'concept': 'R',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'S', 'script': 'BRAILLE', 'concept': 'S',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+        ],
+    },
+    {
+        'name': 'T', 'script': 'BRAILLE', 'concept': 'T',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'BRAILLE', 'concept': 'U',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    {
+        'name': 'V', 'script': 'BRAILLE', 'concept': 'V',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    {
+        'name': 'W', 'script': 'BRAILLE', 'concept': 'W',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 33), (27, 33), (27, 35), (25, 35), (25, 33)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    {
+        'name': 'X', 'script': 'BRAILLE', 'concept': 'X',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    {
+        'name': 'Y', 'script': 'BRAILLE', 'concept': 'Y',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 23), (39, 23), (39, 25), (37, 25), (37, 23)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    {
+        'name': 'Z', 'script': 'BRAILLE', 'concept': 'Z',
+        'origin': 'LOUIS BRAILLE 1824 AD',
+        'ink': _BRAILLE_INK, 'paper': _BRAILLE_PAPER,
+        'strokes': [
+            [(25, 23), (27, 23), (27, 25), (25, 25), (25, 23)],
+            [(25, 43), (27, 43), (27, 45), (25, 45), (25, 43)],
+            [(37, 33), (39, 33), (39, 35), (37, 35), (37, 33)],
+            [(37, 43), (39, 43), (39, 45), (37, 45), (37, 43)],
+        ],
+    },
+    # ── BAYBAYIN ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'BAYBAYIN', 'concept': 'A (vowel)',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(32, 22), (32, 48)],
+            [(32, 26), (38, 24), (40, 28), (36, 32), (32, 30)],
+        ],
+    },
+    {
+        'name': 'I/E', 'script': 'BAYBAYIN', 'concept': 'I / E (vowel)',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(24, 22), (22, 32), (26, 42), (28, 48)],
+            [(36, 22), (34, 32), (38, 42), (40, 48)],
+        ],
+    },
+    {
+        'name': 'O/U', 'script': 'BAYBAYIN', 'concept': 'O / U (vowel)',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(28, 24), (22, 28), (24, 34), (32, 36), (40, 34), (42, 28), (36, 24), (28, 24)],
+            [(32, 36), (32, 48)],
+        ],
+    },
+    {
+        'name': 'BA', 'script': 'BAYBAYIN', 'concept': 'BA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 26), (34, 24), (38, 28), (34, 32), (24, 34)],
+            [(24, 36), (34, 38), (36, 42), (32, 46), (24, 48)],
+        ],
+    },
+    {
+        'name': 'KA', 'script': 'BAYBAYIN', 'concept': 'KA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 22), (32, 36), (42, 22)],
+            [(32, 36), (32, 48)],
+        ],
+    },
+    {
+        'name': 'DA', 'script': 'BAYBAYIN', 'concept': 'DA / RA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 22), (26, 28), (36, 30), (40, 36), (36, 42), (26, 44), (22, 48)],
+        ],
+    },
+    {
+        'name': 'GA', 'script': 'BAYBAYIN', 'concept': 'GA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(32, 22), (26, 24), (24, 30), (28, 34), (36, 32), (38, 26), (32, 22)],
+            [(32, 34), (30, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'HA', 'script': 'BAYBAYIN', 'concept': 'HA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 48), (22, 30), (28, 22), (36, 22), (42, 30), (42, 48)],
+        ],
+    },
+    {
+        'name': 'LA', 'script': 'BAYBAYIN', 'concept': 'LA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(28, 22), (28, 44), (32, 48), (38, 46)],
+            [(28, 30), (36, 28), (40, 32)],
+        ],
+    },
+    {
+        'name': 'MA', 'script': 'BAYBAYIN', 'concept': 'MA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(20, 48), (24, 28), (32, 40), (40, 28), (44, 48)],
+        ],
+    },
+    {
+        'name': 'NA', 'script': 'BAYBAYIN', 'concept': 'NA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 44), (22, 26), (28, 22), (34, 26), (34, 44)],
+            [(34, 44), (38, 48), (42, 46)],
+        ],
+    },
+    {
+        'name': 'NGA', 'script': 'BAYBAYIN', 'concept': 'NGA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 44), (22, 26), (28, 22), (34, 26), (34, 44)],
+            [(34, 28), (40, 24), (44, 28), (40, 34), (34, 32)],
+        ],
+    },
+    {
+        'name': 'PA', 'script': 'BAYBAYIN', 'concept': 'PA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(38, 22), (38, 44), (34, 48), (28, 46)],
+            [(38, 28), (30, 26), (26, 30), (28, 34), (38, 36)],
+        ],
+    },
+    {
+        'name': 'SA', 'script': 'BAYBAYIN', 'concept': 'SA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(24, 22), (32, 26), (38, 34), (32, 42), (24, 48)],
+            [(32, 26), (40, 22), (44, 26)],
+        ],
+    },
+    {
+        'name': 'TA', 'script': 'BAYBAYIN', 'concept': 'TA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(32, 22), (26, 36), (38, 42), (32, 48)],
+        ],
+    },
+    {
+        'name': 'WA', 'script': 'BAYBAYIN', 'concept': 'WA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(20, 26), (22, 22), (26, 24)],
+            [(22, 24), (22, 40), (28, 48), (36, 48), (42, 40), (42, 24)],
+            [(38, 24), (42, 22), (44, 26)],
+        ],
+    },
+    {
+        'name': 'YA', 'script': 'BAYBAYIN', 'concept': 'YA',
+        'origin': 'PHILIPPINES ~1300 AD',
+        'ink': _BAYBAYIN_INK, 'paper': _BAYBAYIN_PAPER,
+        'strokes': [
+            [(22, 22), (30, 34)],
+            [(42, 22), (34, 34)],
+            [(32, 34), (28, 42), (32, 48), (38, 46)],
+        ],
+    },
+    # ── VAI ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'VAI', 'concept': 'A',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 48), (32, 22), (42, 48)],
+            [(27, 36), (37, 36)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'VAI', 'concept': 'E',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (36, 22), (40, 26), (36, 34), (28, 36)],
+            [(28, 36), (38, 38), (42, 44), (36, 48), (22, 48)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'VAI', 'concept': 'I',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(32, 28), (32, 48)],
+            [(30, 22), (34, 22), (34, 26), (30, 26), (30, 22)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'VAI', 'concept': 'O',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(32, 22), (24, 26), (20, 34), (24, 44), (32, 48), (40, 44), (44, 34), (40, 26), (32, 22)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'VAI', 'concept': 'U',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (22, 40), (28, 48), (36, 48), (42, 40), (42, 22)],
+        ],
+    },
+    {
+        'name': 'BA', 'script': 'VAI', 'concept': 'BA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(26, 24), (22, 32), (26, 42), (34, 46), (42, 42), (44, 32), (40, 24), (32, 22), (26, 24)],
+            [(20, 34), (44, 34)],
+        ],
+    },
+    {
+        'name': 'DA', 'script': 'VAI', 'concept': 'DA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(38, 22), (38, 48)],
+            [(38, 28), (30, 26), (24, 30), (24, 38), (30, 42), (38, 40)],
+        ],
+    },
+    {
+        'name': 'FA', 'script': 'VAI', 'concept': 'FA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(28, 22), (28, 48)],
+            [(28, 22), (40, 22), (42, 28)],
+            [(22, 34), (36, 34)],
+        ],
+    },
+    {
+        'name': 'GA', 'script': 'VAI', 'concept': 'GA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(32, 22), (28, 34), (30, 44), (36, 48)],
+        ],
+    },
+    {
+        'name': 'HA', 'script': 'VAI', 'concept': 'HA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 48), (22, 28), (32, 22), (42, 28), (42, 48)],
+            [(32, 22), (32, 48)],
+        ],
+    },
+    {
+        'name': 'JA', 'script': 'VAI', 'concept': 'JA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(36, 22), (36, 40), (30, 48), (22, 46)],
+        ],
+    },
+    {
+        'name': 'KA', 'script': 'VAI', 'concept': 'KA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(40, 22), (24, 36)],
+            [(28, 34), (42, 48)],
+        ],
+    },
+    {
+        'name': 'LA', 'script': 'VAI', 'concept': 'LA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48), (36, 48), (42, 44)],
+        ],
+    },
+    {
+        'name': 'MA', 'script': 'VAI', 'concept': 'MA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(20, 48), (20, 22), (32, 38), (44, 22), (44, 48)],
+        ],
+    },
+    {
+        'name': 'NA', 'script': 'VAI', 'concept': 'NA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 48), (22, 28), (28, 22), (36, 22), (42, 28), (42, 48)],
+        ],
+    },
+    {
+        'name': 'PA', 'script': 'VAI', 'concept': 'PA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 22), (36, 22), (42, 28), (40, 34), (32, 36), (24, 34)],
+        ],
+    },
+    {
+        'name': 'RA', 'script': 'VAI', 'concept': 'RA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(24, 22), (32, 22), (38, 26), (36, 30)],
+        ],
+    },
+    {
+        'name': 'SA', 'script': 'VAI', 'concept': 'SA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(40, 24), (34, 22), (26, 22), (22, 26), (24, 32), (32, 36), (40, 40), (42, 46), (36, 48), (26, 48), (22, 46)],
+        ],
+    },
+    {
+        'name': 'TA', 'script': 'VAI', 'concept': 'TA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(20, 34), (44, 34)],
+            [(32, 22), (32, 48)],
+        ],
+    },
+    {
+        'name': 'WA', 'script': 'VAI', 'concept': 'WA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(20, 34), (26, 26), (32, 34), (38, 26), (44, 34)],
+            [(32, 34), (32, 48)],
+        ],
+    },
+    {
+        'name': 'YA', 'script': 'VAI', 'concept': 'YA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (32, 36)],
+            [(42, 22), (32, 36)],
+            [(32, 36), (32, 48)],
+        ],
+    },
+    {
+        'name': 'ZA', 'script': 'VAI', 'concept': 'ZA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 22), (42, 22), (22, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'MBA', 'script': 'VAI', 'concept': 'MBA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(20, 48), (20, 22), (28, 38), (36, 22), (44, 38)],
+            [(44, 38), (44, 48)],
+        ],
+    },
+    {
+        'name': 'NDA', 'script': 'VAI', 'concept': 'NDA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 48), (22, 28), (32, 22), (42, 28), (42, 48)],
+            [(22, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'NGA', 'script': 'VAI', 'concept': 'NGA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(28, 22), (24, 26), (28, 30), (36, 30), (40, 26), (36, 22), (28, 22)],
+            [(32, 30), (32, 48)],
+        ],
+    },
+    {
+        'name': 'GBA', 'script': 'VAI', 'concept': 'GBA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(42, 24), (36, 22), (26, 22), (22, 28), (22, 40), (26, 48), (36, 48), (42, 42)],
+            [(30, 36), (42, 36)],
+        ],
+    },
+    {
+        'name': 'KPA', 'script': 'VAI', 'concept': 'KPA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(24, 22), (24, 48)],
+            [(42, 22), (24, 36)],
+            [(28, 34), (42, 48)],
+            [(34, 26), (40, 24), (42, 28), (38, 30)],
+        ],
+    },
+    {
+        'name': 'NYA', 'script': 'VAI', 'concept': 'NYA',
+        'origin': 'MƆMƆLU DUWALU BUKƐLƐ ~1833 AD',
+        'ink': _VAI_INK, 'paper': _VAI_PAPER,
+        'strokes': [
+            [(22, 48), (22, 28), (28, 22), (36, 22), (42, 28), (42, 42)],
+            [(42, 42), (38, 48), (32, 50)],
+        ],
+    },
+    # ── LINEAR_B ──────────────────────────────────────────────
+    {
+        'name': 'A', 'script': 'LINEAR_B', 'concept': 'A',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (32, 48)],
+            [(20, 35), (44, 35)],
+            [(24, 24), (40, 46)],
+        ],
+    },
+    {
+        'name': 'E', 'script': 'LINEAR_B', 'concept': 'E',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 35), (44, 35)],
+            [(34, 24), (44, 35), (34, 46)],
+        ],
+    },
+    {
+        'name': 'I', 'script': 'LINEAR_B', 'concept': 'I',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (32, 48)],
+            [(24, 28), (32, 28)],
+            [(24, 42), (32, 42)],
+        ],
+    },
+    {
+        'name': 'O', 'script': 'LINEAR_B', 'concept': 'O',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (44, 35), (32, 48), (20, 35), (32, 22)],
+        ],
+    },
+    {
+        'name': 'U', 'script': 'LINEAR_B', 'concept': 'U',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(22, 22), (22, 48)],
+            [(42, 22), (42, 48)],
+        ],
+    },
+    {
+        'name': 'DA', 'script': 'LINEAR_B', 'concept': 'DA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (32, 40)],
+            [(22, 48), (32, 40), (42, 48)],
+            [(24, 30), (40, 30)],
+        ],
+    },
+    {
+        'name': 'KA', 'script': 'LINEAR_B', 'concept': 'KA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (32, 48)],
+            [(22, 22), (22, 34)],
+            [(42, 22), (42, 34)],
+            [(22, 34), (42, 34)],
+        ],
+    },
+    {
+        'name': 'MA', 'script': 'LINEAR_B', 'concept': 'MA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 22), (44, 48)],
+            [(44, 22), (20, 48)],
+            [(20, 35), (44, 35)],
+        ],
+    },
+    {
+        'name': 'NA', 'script': 'LINEAR_B', 'concept': 'NA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (32, 48)],
+            [(20, 48), (44, 48)],
+            [(22, 30), (42, 30)],
+        ],
+    },
+    {
+        'name': 'PA', 'script': 'LINEAR_B', 'concept': 'PA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 35), (32, 22), (44, 35), (32, 48), (20, 35)],
+            [(20, 35), (44, 35)],
+        ],
+    },
+    {
+        'name': 'RA', 'script': 'LINEAR_B', 'concept': 'RA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 48), (32, 34)],
+            [(32, 34), (22, 22)],
+            [(32, 34), (42, 22)],
+        ],
+    },
+    {
+        'name': 'SA', 'script': 'LINEAR_B', 'concept': 'SA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 22), (42, 22), (22, 35), (42, 48)],
+        ],
+    },
+    {
+        'name': 'TA', 'script': 'LINEAR_B', 'concept': 'TA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 22), (42, 22), (42, 48), (22, 48), (22, 22)],
+            [(22, 22), (42, 48)],
+        ],
+    },
+    {
+        'name': 'WA', 'script': 'LINEAR_B', 'concept': 'WA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 22), (26, 48), (32, 30), (38, 48), (44, 22)],
+        ],
+    },
+    {
+        'name': 'JA', 'script': 'LINEAR_B', 'concept': 'JA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 48), (32, 28)],
+            [(22, 22), (32, 28)],
+            [(42, 22), (32, 28)],
+        ],
+    },
+    {
+        'name': 'QA', 'script': 'LINEAR_B', 'concept': 'QA',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 22), (42, 22)],
+            [(22, 22), (42, 48)],
+            [(42, 22), (22, 48)],
+            [(22, 48), (42, 48)],
+        ],
+    },
+    {
+        'name': 'RO', 'script': 'LINEAR_B', 'concept': 'RO',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(28, 22), (22, 28), (22, 36), (28, 40), (36, 40), (42, 36), (42, 28), (36, 22), (28, 22)],
+            [(32, 40), (32, 48)],
+        ],
+    },
+    {
+        'name': 'KO', 'script': 'LINEAR_B', 'concept': 'KO',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (20, 48), (44, 48), (32, 22)],
+            [(26, 35), (38, 35)],
+        ],
+    },
+    {
+        'name': 'NO', 'script': 'LINEAR_B', 'concept': 'NO',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 22), (44, 22)],
+            [(32, 22), (32, 48)],
+            [(24, 48), (40, 48)],
+        ],
+    },
+    {
+        'name': 'TO', 'script': 'LINEAR_B', 'concept': 'TO',
+        'origin': 'MYCENAE ~1450 BC',
+        'ink': _LINEAR_B_INK, 'paper': _LINEAR_B_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 22), (44, 35), (20, 48)],
+            [(44, 22), (20, 35), (44, 48)],
+        ],
+    },
+    # ── RONGORONGO ──────────────────────────────────────────────
+    {
+        'name': 'BIRDMAN', 'script': 'RONGORONGO', 'concept': 'BIRDMAN',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(28, 22), (24, 24), (24, 28), (28, 30), (36, 30), (40, 28), (40, 24), (36, 22), (28, 22)],
+            [(32, 30), (32, 42)],
+            [(22, 36), (32, 32), (42, 36)],
+            [(28, 42), (24, 48)],
+            [(36, 42), (40, 48)],
+            [(40, 24), (46, 22)],
+        ],
+    },
+    {
+        'name': 'FISH', 'script': 'RONGORONGO', 'concept': 'FISH',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(20, 35), (28, 28), (38, 28), (44, 32), (44, 38), (38, 42), (28, 42), (20, 35)],
+            [(44, 32), (46, 26), (44, 35), (46, 44), (44, 38)],
+            [(30, 34), (32, 36)],
+        ],
+    },
+    {
+        'name': 'TURTLE', 'script': 'RONGORONGO', 'concept': 'TURTLE',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(26, 28), (22, 34), (26, 42), (38, 42), (42, 34), (38, 28), (26, 28)],
+            [(32, 28), (32, 22)],
+            [(22, 30), (18, 26)],
+            [(42, 30), (46, 26)],
+            [(24, 42), (20, 48)],
+            [(40, 42), (44, 48)],
+        ],
+    },
+    {
+        'name': 'FRIGATE_BIRD', 'script': 'RONGORONGO', 'concept': 'FRIGATE BIRD',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(18, 30), (24, 26), (32, 24), (40, 26), (46, 30)],
+            [(32, 24), (32, 44)],
+            [(30, 44), (32, 48), (34, 44)],
+            [(32, 24), (36, 22), (38, 24)],
+        ],
+    },
+    {
+        'name': 'SEATED_FIGURE', 'script': 'RONGORONGO', 'concept': 'SEATED FIGURE',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(30, 22), (34, 22), (34, 26), (30, 26), (30, 22)],
+            [(32, 26), (32, 40)],
+            [(24, 32), (32, 34), (40, 32)],
+            [(32, 40), (22, 48), (42, 48), (32, 40)],
+        ],
+    },
+    {
+        'name': 'STANDING_FIGURE', 'script': 'RONGORONGO', 'concept': 'STANDING FIGURE',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(30, 22), (34, 22), (34, 26), (30, 26), (30, 22)],
+            [(32, 26), (32, 42)],
+            [(32, 30), (22, 22)],
+            [(32, 30), (42, 22)],
+            [(32, 42), (26, 50)],
+            [(32, 42), (38, 50)],
+        ],
+    },
+    {
+        'name': 'CRESCENT', 'script': 'RONGORONGO', 'concept': 'CRESCENT',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(36, 22), (26, 26), (22, 34), (26, 44), (36, 48)],
+            [(36, 22), (32, 28), (30, 34), (32, 42), (36, 48)],
+        ],
+    },
+    {
+        'name': 'VULVA', 'script': 'RONGORONGO', 'concept': 'FERTILITY',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 22), (24, 28), (22, 36), (26, 44), (32, 48), (38, 44), (42, 36), (40, 28), (32, 22)],
+            [(32, 24), (32, 46)],
+        ],
+    },
+    {
+        'name': 'PLANT', 'script': 'RONGORONGO', 'concept': 'PLANT',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 50), (32, 22)],
+            [(32, 28), (22, 22)],
+            [(32, 28), (42, 22)],
+            [(32, 36), (24, 30)],
+            [(32, 36), (40, 30)],
+        ],
+    },
+    {
+        'name': 'EAR', 'script': 'RONGORONGO', 'concept': 'EAR / HEARING',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(36, 22), (28, 24), (24, 30), (24, 40), (28, 46), (36, 48)],
+            [(36, 28), (30, 30), (28, 36), (30, 40), (36, 42)],
+            [(36, 36), (42, 36)],
+        ],
+    },
+    {
+        'name': 'HAND', 'script': 'RONGORONGO', 'concept': 'HAND',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 36), (42, 36), (42, 48), (22, 48), (22, 36)],
+            [(24, 36), (22, 24)],
+            [(28, 36), (28, 22)],
+            [(32, 36), (32, 20)],
+            [(36, 36), (36, 22)],
+            [(40, 36), (42, 26)],
+        ],
+    },
+    {
+        'name': 'DOUBLE_HOOK', 'script': 'RONGORONGO', 'concept': 'DOUBLE HOOK',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(22, 22), (22, 36), (32, 36), (32, 28), (26, 28)],
+            [(42, 48), (42, 34), (32, 34), (32, 42), (38, 42)],
+        ],
+    },
+    {
+        'name': 'PADDLE', 'script': 'RONGORONGO', 'concept': 'PADDLE / OAR',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(32, 48), (32, 32)],
+            [(32, 32), (24, 28), (22, 22), (32, 20), (42, 22), (40, 28), (32, 32)],
+        ],
+    },
+    {
+        'name': 'SUN', 'script': 'RONGORONGO', 'concept': 'SUN',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(28, 30), (24, 34), (28, 40), (36, 40), (40, 34), (36, 30), (28, 30)],
+            [(32, 30), (32, 22)],
+            [(32, 40), (32, 48)],
+            [(24, 34), (18, 34)],
+            [(40, 34), (46, 34)],
+        ],
+    },
+    {
+        'name': 'MOAI', 'script': 'RONGORONGO', 'concept': 'MOAI / ANCESTOR',
+        'origin': 'RAPA NUI ~1700 AD',
+        'ink': _RONGO_INK, 'paper': _RONGO_PAPER, 'thick': True,
+        'strokes': [
+            [(26, 20), (38, 20), (40, 24), (40, 44), (36, 48), (28, 48), (24, 44), (24, 24), (26, 20)],
+            [(28, 30), (30, 30)],
+            [(34, 30), (36, 30)],
+            [(26, 36), (24, 38), (26, 40), (38, 40), (40, 38), (38, 36)],
+            [(30, 44), (34, 44)],
+        ],
+    },
+
 ]
 
 # Build family -> character index mapping
