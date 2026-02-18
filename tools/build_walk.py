@@ -5,7 +5,7 @@ build_walk.py — Generate movement cycle frames from biomechanical models
 Generates clean motion cycles with 14 joints based on human gait and
 movement biomechanics. Outputs frame data for visuals/walk.py (MOVE visual).
 
-Movements: WALK, RUN, SNEAK, MARCH, IDLE
+Movements: WALK, RUN, SNEAK, IDLE
 
 Usage:
   python3 tools/build_walk.py              # All movements
@@ -102,20 +102,6 @@ MOVEMENTS = {
         'sway': 0.003,
         'crouch': 0.04,         # Lowered stance
     },
-    'MARCH': {
-        'n_frames': 40,
-        'hip_swing': 45,        # Thigh lifts high in front
-        'hip_bias': 2,          # Very upright
-        'knee_stance_peak': 3,  # Locked straight on stance
-        'knee_swing_peak': 0,   # Unused — march uses special knee logic
-        'arm_swing': 35,        # Crisp arm pump
-        'elbow_base': 80,       # Arms at sharp right angles
-        'elbow_swing': 5,
-        'bounce': 0.005,        # Minimal bounce (stiff gait)
-        'sway': 0.004,          # Minimal sway
-        'crouch': 0.0,
-        'march': True,          # Special: shin hangs vertical on lift
-    },
     'IDLE': {
         'n_frames': 60,         # Slow breathing cycle
         'hip_swing': 0,         # No walking
@@ -137,7 +123,6 @@ def generate_cycle(params):
     """Generate one motion cycle from parameter dict."""
     n = params['n_frames']
     is_idle = params.get('idle', False)
-    is_march = params.get('march', False)
     frames = []
 
     for i in range(n):
@@ -159,52 +144,6 @@ def generate_cycle(params):
                                          + 3 * _sin(phase + 0.5))
             r_arm_angle = math.radians(2 * _sin(phase))
             l_arm_angle = math.radians(2 * _sin(phase + 0.5))
-            r_elbow_flex = math.radians(params['elbow_base'])
-            l_elbow_flex = math.radians(params['elbow_base'])
-        elif is_march:
-            # March: one leg lifts at a time, other stays planted
-            swing = params['hip_swing']
-
-            def march_hip_deg(p):
-                """Asymmetric hip curve: planted ~60%, lift-and-stamp ~40%.
-                p in [0,1): 0.0-0.6 = planted (straight down to slight back),
-                             0.6-1.0 = lift forward then stamp down."""
-                p = p % 1.0
-                if p < 0.6:
-                    # Planted: leg straight down, slight backward drift
-                    return -4 * math.sin(p / 0.6 * math.pi)
-                else:
-                    # Lift phase: sharp up to peak then back down
-                    t = (p - 0.6) / 0.4
-                    return swing * math.sin(t * math.pi)
-
-            r_hip_deg = march_hip_deg(phase)
-            l_hip_deg = march_hip_deg(phase + 0.5)
-            r_hip_angle = math.radians(r_hip_deg)
-            l_hip_angle = math.radians(l_hip_deg)
-
-            # Knee tracks hip angle when leg is forward (shin stays vertical)
-            # When leg is behind or neutral, knee is nearly locked straight
-            def march_knee(hip_deg):
-                if hip_deg > 3:
-                    return math.radians(hip_deg * 0.92)
-                else:
-                    return math.radians(params['knee_stance_peak'])
-
-            r_knee_angle = march_knee(r_hip_deg)
-            l_knee_angle = march_knee(l_hip_deg)
-
-            # Arms also use asymmetric curve, opposite leg
-            def march_arm_deg(p):
-                p = p % 1.0
-                if p < 0.6:
-                    return -3 * math.sin(p / 0.6 * math.pi)
-                else:
-                    t = (p - 0.6) / 0.4
-                    return -params['arm_swing'] * math.sin(t * math.pi)
-
-            r_arm_angle = math.radians(march_arm_deg(phase + 0.5))
-            l_arm_angle = math.radians(march_arm_deg(phase))
             r_elbow_flex = math.radians(params['elbow_base'])
             l_elbow_flex = math.radians(params['elbow_base'])
         else:
