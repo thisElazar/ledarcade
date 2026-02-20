@@ -210,9 +210,30 @@ def color_correct(img, boost=1.4):
     return img
 
 
+def crop_obverse(img):
+    """If image shows both obverse and reverse side-by-side, crop to obverse.
+
+    Detects this by aspect ratio: photos showing both sides are typically
+    ~2:1 wide.  We take the left half (obverse by numismatic convention).
+    """
+    w, h = img.size
+    ratio = w / h if h > 0 else 1.0
+    if ratio > 1.4:
+        # Take the left half (obverse), with a small margin trim
+        half_w = w // 2
+        margin = int(half_w * 0.03)  # trim 3% to avoid gap/border
+        img = img.crop((margin, 0, half_w - margin, h))
+        print(f"  Cropped to obverse: {img.size[0]}x{img.size[1]}")
+    return img
+
+
 def process_coin(img, entry):
     """Full processing pipeline for a coin image."""
     shape = entry.get("shape", "round")
+
+    # Step 0: Crop to obverse if two-sided photo
+    if shape != "knife":
+        img = crop_obverse(img)
 
     # Step 1: Remove background
     img = remove_background(img)
