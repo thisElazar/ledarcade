@@ -165,7 +165,7 @@ from .cycliclab import CyclicLab
 from .quarkslab import QuarksLab
 from .lenia import Lenia, LeniaLab
 from .neurons import Neurons
-from .fluid import FluidTunnel, FluidInk, FluidMixing
+from .fluid import FluidTunnel, FluidInk, FluidMixing, FluidPlay, FluidSculpt
 from .earth import Earth
 from .molecule import Molecule
 from .lattice import Lattice
@@ -435,6 +435,8 @@ ALL_VISUALS = [
     FluidTunnel,
     FluidInk,
     FluidMixing,
+    FluidPlay,
+    FluidSculpt,
     Earth,
     Molecule,
     Lattice,
@@ -760,6 +762,8 @@ __all__ = [
     'FluidTunnel',
     'FluidInk',
     'FluidMixing',
+    'FluidPlay',
+    'FluidSculpt',
     'Earth',
     'Molecule',
     'Lattice',

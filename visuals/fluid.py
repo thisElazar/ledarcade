@@ -4,14 +4,16 @@ Fluid - Stable Fluids Solver (numpy-accelerated)
 Jos Stam's "Stable Fluids" on a 64x64 grid: semi-Lagrangian
 advection with Gauss-Seidel pressure projection.
 
-Three standalone visuals share the solver:
+Five standalone visuals share the solver:
   Wind Tunnel  - Flow past obstacle, vortex shedding
   Ink Drops    - Colored density injected at random points
   Color Mix    - Two colored fluids stirred together
+  Fluid Play   - Joystick-driven cursor drags through fluid
+  Fluid Sculpt - Move obstacle through constant flow
 
 Controls:
-  Up/Down    - Cycle color palette
-  Left/Right - Adjust viscosity
+  Up/Down    - Cycle color palette / viz mode
+  Left/Right - Adjust viscosity (Tunnel/Ink) / move cursor (Play/Sculpt)
   Space      - Variant-specific action
 """
 
@@ -758,3 +760,454 @@ class FluidMixing(Visual):
             for j in range(N):
                 p = col[j]
                 self.display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
+
+
+# ── FluidPlay ────────────────────────────────────────────────────
+
+# Rainbow hue colors for dye trail (cycling)
+_PLAY_HUES = [
+    (255, 40, 40),    # red
+    (255, 180, 0),    # orange
+    (40, 255, 40),    # green
+    (0, 160, 255),    # blue
+    (200, 60, 255),   # purple
+]
+
+
+class FluidPlay(Visual):
+    name = "FLUID PLAY"
+    description = "Drag through fluid"
+    category = "science"
+
+    _N_VIZ_MODES = len(PALETTES) + 2
+    _CURSOR_SPEED = 40.0  # px/s
+    _FORCE_RADIUS = 4.5
+    _FORCE_STRENGTH = 8.0
+    _IDLE_THRESHOLD = 3.0
+
+    _NOTES = [
+        ("NAVIER-STOKES EQUATIONS", (255, 200, 100)),
+        ("DESCRIBE ALL FLUID MOTION", (180, 220, 255)),
+        ("JOS STAM STABLE FLUIDS 1999", (255, 255, 255)),
+        ("SEMI-LAGRANGIAN ADVECTION", (180, 220, 255)),
+        ("DRAG CURSOR TO INJECT FORCE", (150, 255, 150)),
+        ("BUTTON FOR DYE BURST", (150, 255, 150)),
+        ("VISCOSITY DAMPS MOTION", (180, 220, 255)),
+        ("REYNOLDS NUMBER = INERTIA / VISCOSITY", (255, 200, 100)),
+    ]
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.viz_mode = 2  # neon palette default
+        self.viscosity = 0.0002
+        self.diffusion = 0.00005
+        self.cx = float(N // 2)
+        self.cy = float(N // 2)
+        self.hue_idx = 0.0
+        self.idle_timer = 0.0
+        self._input_dx = 0
+        self._input_dy = 0
+        self.overlay_text = ""
+        self.overlay_timer = 0.0
+        # Notes
+        self.show_notes = False
+        self.notes_scroll_offset = 0.0
+        self.notes_segments = []
+        self.notes_scroll_len = 1
+        self._both_pressed_prev = False
+        self._build_notes_segments()
+        self._init_fields()
+
+    def _init_fields(self):
+        self.u = _new_field()
+        self.v = _new_field()
+        self.u_prev = _new_field()
+        self.v_prev = _new_field()
+        self.dens = _new_field()
+        self.dens_prev = _new_field()
+
+    def _build_notes_segments(self):
+        sep = '  --  '
+        sep_color = (60, 55, 50)
+        segments = []
+        px_off = 0
+        for i, (text, color) in enumerate(self._NOTES):
+            if i > 0:
+                segments.append((px_off, sep, sep_color))
+                px_off += len(sep) * 4
+            segments.append((px_off, text, color))
+            px_off += len(text) * 4
+        segments.append((px_off, sep, sep_color))
+        px_off += len(sep) * 4
+        self.notes_segments = segments
+        self.notes_scroll_len = px_off
+
+    def _draw_notes(self):
+        d = self.display
+        scroll_x = int(self.notes_scroll_offset) % self.notes_scroll_len
+        for copy in (0, self.notes_scroll_len):
+            for seg_off, text, color in self.notes_segments:
+                px = 2 + seg_off + copy - scroll_x
+                text_w = len(text) * 4
+                if px + text_w < 0 or px > 64:
+                    continue
+                d.draw_text_small(px, 58, text, color)
+
+    def _viz_mode_name(self):
+        if self.viz_mode < len(PALETTES):
+            names = ['THERMAL', 'FIRE', 'NEON', 'OCEAN', 'MONO']
+            return names[self.viz_mode]
+        elif self.viz_mode == len(PALETTES):
+            return 'VELOCITY'
+        else:
+            return 'VORTICITY'
+
+    def handle_input(self, input_state) -> bool:
+        consumed = False
+
+        # Capture held joystick for cursor movement (applied in update)
+        self._input_dx = input_state.dx
+        self._input_dy = input_state.dy
+
+        if input_state.up_pressed:
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
+            consumed = True
+        if input_state.down_pressed:
+            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
+            consumed = True
+
+        # Both buttons: toggle notes
+        both = input_state.action_l and input_state.action_r
+        if both and not self._both_pressed_prev:
+            self.show_notes = not self.show_notes
+            self.notes_scroll_offset = 0.0
+            if self.show_notes:
+                self._build_notes_segments()
+            consumed = True
+        elif input_state.action_l or input_state.action_r:
+            if not both:
+                self._burst()
+                consumed = True
+        self._both_pressed_prev = both
+
+        return consumed
+
+    def _inject_force_and_dye(self, dx, dy, dt):
+        """Inject force + dye at cursor position along motion direction."""
+        ci = int(self.cx)
+        cj = int(self.cy)
+        r = int(self._FORCE_RADIUS)
+        i_lo = max(1, ci - r)
+        i_hi = min(N, ci + r) + 1
+        j_lo = max(1, cj - r)
+        j_hi = min(N, cj + r) + 1
+
+        # Distance mask
+        ii = np.arange(i_lo, i_hi, dtype=np.float64)
+        jj = np.arange(j_lo, j_hi, dtype=np.float64)
+        di, dj = np.meshgrid(ii - self.cx, jj - self.cy, indexing='ij')
+        d2 = di * di + dj * dj
+        r2 = self._FORCE_RADIUS ** 2
+        mask = np.exp(-d2 / (r2 * 0.4))
+
+        speed = math.sqrt(dx * dx + dy * dy)
+        if speed > 0.01:
+            # Force proportional to cursor speed
+            strength = self._FORCE_STRENGTH * min(speed / self._CURSOR_SPEED, 2.0)
+            self.u[i_lo:i_hi, j_lo:j_hi] += dx / speed * strength * mask
+            self.v[i_lo:i_hi, j_lo:j_hi] += dy / speed * strength * mask
+
+        # Dye injection (rainbow cycling)
+        hue = _PLAY_HUES[int(self.hue_idx) % len(_PLAY_HUES)]
+        # Use density as brightness
+        self.dens[i_lo:i_hi, j_lo:j_hi] += 4.0 * mask
+
+    def _burst(self):
+        """Radial burst of dye + force from cursor."""
+        ci = int(self.cx)
+        cj = int(self.cy)
+        r = 8
+        i_lo = max(1, ci - r)
+        i_hi = min(N, ci + r) + 1
+        j_lo = max(1, cj - r)
+        j_hi = min(N, cj + r) + 1
+
+        ii = np.arange(i_lo, i_hi, dtype=np.float64)
+        jj = np.arange(j_lo, j_hi, dtype=np.float64)
+        di, dj = np.meshgrid(ii - self.cx, jj - self.cy, indexing='ij')
+        d2 = di * di + dj * dj
+        dist = np.sqrt(d2) + 0.1
+        mask = np.exp(-d2 / 30.0)
+
+        # Radial outward force
+        self.u[i_lo:i_hi, j_lo:j_hi] += 12.0 * (di / dist) * mask
+        self.v[i_lo:i_hi, j_lo:j_hi] += 12.0 * (dj / dist) * mask
+        # Dye splash
+        self.dens[i_lo:i_hi, j_lo:j_hi] += 6.0 * mask
+
+    def _auto_perturb(self):
+        """Gentle random perturbation when idle."""
+        cx = random.randint(N // 4, 3 * N // 4)
+        cy = random.randint(N // 4, 3 * N // 4)
+        angle = random.uniform(0, 2 * math.pi)
+        r = 5
+        i_lo = max(1, cx - r)
+        i_hi = min(N, cx + r) + 1
+        j_lo = max(1, cy - r)
+        j_hi = min(N, cy + r) + 1
+
+        ii = np.arange(i_lo, i_hi, dtype=np.float64)
+        jj = np.arange(j_lo, j_hi, dtype=np.float64)
+        di, dj = np.meshgrid(ii - cx, jj - cy, indexing='ij')
+        d2 = di * di + dj * dj
+        mask = np.exp(-d2 / 12.0)
+
+        # Vortex (tangential force)
+        strength = random.uniform(1.5, 3.0)
+        self.u[i_lo:i_hi, j_lo:j_hi] += -dj * strength * mask / (d2 + 2.0)
+        self.v[i_lo:i_hi, j_lo:j_hi] += di * strength * mask / (d2 + 2.0)
+        # Small dye drop
+        self.dens[i_lo:i_hi, j_lo:j_hi] += 2.0 * mask
+
+    def update(self, dt: float):
+        self.time += dt
+        sim_dt = 0.1
+        if self.overlay_timer > 0:
+            self.overlay_timer = max(0.0, self.overlay_timer - dt)
+        if self.show_notes:
+            self.notes_scroll_offset += dt * 20
+
+        # Hue cycling
+        self.hue_idx += dt * 0.8
+
+        # Move cursor from held joystick
+        if self._input_dx != 0 or self._input_dy != 0:
+            move_dx = self._input_dx * self._CURSOR_SPEED * dt
+            move_dy = self._input_dy * self._CURSOR_SPEED * dt
+            self.cx = max(1.0, min(float(N), self.cx + move_dx))
+            self.cy = max(1.0, min(float(N), self.cy + move_dy))
+            self._inject_force_and_dye(move_dx, move_dy, dt)
+            self.idle_timer = 0.0
+
+        # Idle auto-activity
+        self.idle_timer += dt
+        if self.idle_timer > self._IDLE_THRESHOLD:
+            if random.random() < dt * 0.8:
+                self._auto_perturb()
+
+        self.u_prev[:] = 0.0
+        self.v_prev[:] = 0.0
+        self.dens_prev[:] = 0.0
+
+        _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
+                       self.viscosity, sim_dt)
+        _density_step(self.dens, self.dens_prev, self.u, self.v,
+                      self.diffusion, sim_dt)
+        self.dens *= 0.997
+
+    def draw(self):
+        if self.viz_mode < len(PALETTES):
+            _draw_density(self.display, self.dens, self.viz_mode,
+                          scale=0.25, sqrt_map=True)
+        elif self.viz_mode == len(PALETTES):
+            _draw_velocity(self.display, self.u, self.v)
+        else:
+            _draw_vorticity(self.display, self.u, self.v)
+
+        # Draw cursor as bright dot
+        ci = max(0, min(N - 1, int(self.cx) - 1))
+        cj = max(0, min(N - 1, int(self.cy) - 1))
+        self.display.set_pixel(ci, cj, (255, 255, 255))
+
+        # Notes
+        if self.show_notes:
+            self._draw_notes()
+
+        # Overlay
+        if self.overlay_timer > 0 and self.overlay_text:
+            alpha = min(1.0, self.overlay_timer / 0.5)
+            c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+            self.display.draw_text_small(2, 2, self.overlay_text, c)
+
+
+# ── FluidSculpt ──────────────────────────────────────────────────
+
+def _make_obstacle_at(shape_idx, ox, oy):
+    """Create obstacle mask centered at (ox, oy) with small radius."""
+    obs = np.zeros((S, S), dtype=bool)
+    dx = _II - ox
+    dy = _JJ - oy
+
+    shape = OBSTACLE_NAMES[shape_idx % len(OBSTACLE_NAMES)]
+    if shape == 'circle':
+        obs[1:N+1, 1:N+1] = (dx * dx + dy * dy) <= 12  # r~3.5
+    elif shape == 'square':
+        obs[1:N+1, 1:N+1] = (np.abs(dx) <= 3) & (np.abs(dy) <= 3)
+    elif shape == 'wedge':
+        obs[1:N+1, 1:N+1] = (dx >= -2) & (dx <= 5) & (np.abs(dy) <= np.maximum(0, (dx + 2) * 0.5))
+    elif shape == 'airfoil':
+        nose = (dx >= -2) & (dx <= 0) & (dy * dy <= 4.0 * np.maximum(0, 1 - (dx / 2.0) ** 2))
+        tail = (dx > 0) & (dx <= 6) & (np.abs(dy) <= 2.0 * (1 - dx / 6.0))
+        obs[1:N+1, 1:N+1] = nose | tail
+    elif shape == 'diamond':
+        obs[1:N+1, 1:N+1] = (np.abs(dx) + np.abs(dy)) <= 4
+    elif shape == 'plate':
+        obs[1:N+1, 1:N+1] = (np.abs(dx) <= 1) & (np.abs(dy) <= 5)
+    elif shape == 'arrow':
+        tri = (dx >= -4) & (dx <= 2) & (np.abs(dy) <= (dx + 4) * 0.4)
+        tail = (dx > 2) & (dx <= 6) & (np.abs(dy) <= 1)
+        obs[1:N+1, 1:N+1] = tri | tail
+    elif shape == 'cross':
+        horiz = (np.abs(dx) <= 5) & (np.abs(dy) <= 1)
+        vert = (np.abs(dx) <= 1) & (np.abs(dy) <= 3)
+        obs[1:N+1, 1:N+1] = horiz | vert
+    elif shape == 'elbow':
+        vert_bar = (dx >= -1) & (dx <= 1) & (dy >= -4) & (dy <= 4)
+        horiz_bar = (dx >= -1) & (dx <= 5) & (dy >= 2) & (dy <= 4)
+        obs[1:N+1, 1:N+1] = vert_bar | horiz_bar
+    elif shape == 'tesla':
+        # Simplified Tesla valve for moveable obstacle
+        walls = (np.abs(dy) >= 4) & (np.abs(dx) <= 6)
+        vane = (np.abs(dy - dx * 0.5) <= 1) & (np.abs(dx) <= 4)
+        obs[1:N+1, 1:N+1] = walls | vane
+    return obs
+
+
+class FluidSculpt(Visual):
+    name = "FLUID SCULPT"
+    description = "Move obstacle in flow"
+    category = "science"
+
+    _N_VIZ_MODES = len(PALETTES) + 2
+    _CURSOR_SPEED = 30.0
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.viz_mode = 0
+        self.viscosity = 0.0002
+        self.diffusion = 0.0001
+        self.shape_idx = 0
+        self.cx = float(N // 3)
+        self.cy = float(N // 2)
+        self._input_dx = 0
+        self._input_dy = 0
+        self.overlay_text = ""
+        self.overlay_timer = 0.0
+        self._init_fields()
+
+    def _init_fields(self):
+        self.u = _new_field()
+        self.v = _new_field()
+        self.u_prev = _new_field()
+        self.v_prev = _new_field()
+        self.dens = _new_field()
+        self.dens_prev = _new_field()
+        self.obstacle = _make_obstacle_at(self.shape_idx, self.cx, self.cy)
+        # Start with uniform rightward flow
+        self.u[1:N+1, 1:N+1] = 3.0
+        self._apply_obstacle()
+
+    def _rebuild_obstacle(self):
+        self.obstacle = _make_obstacle_at(self.shape_idx, self.cx, self.cy)
+
+    def _viz_mode_name(self):
+        if self.viz_mode < len(PALETTES):
+            names = ['THERMAL', 'FIRE', 'NEON', 'OCEAN', 'MONO']
+            return names[self.viz_mode]
+        elif self.viz_mode == len(PALETTES):
+            return 'VELOCITY'
+        else:
+            return 'VORTICITY'
+
+    def handle_input(self, input_state) -> bool:
+        consumed = False
+
+        # Capture held joystick for obstacle movement (applied in update)
+        self._input_dx = input_state.dx
+        self._input_dy = input_state.dy
+
+        if input_state.up_pressed:
+            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
+            consumed = True
+        if input_state.down_pressed:
+            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
+            self.overlay_text = self._viz_mode_name()
+            self.overlay_timer = 2.0
+            consumed = True
+        if input_state.action_l or input_state.action_r:
+            self.shape_idx = (self.shape_idx + 1) % len(OBSTACLE_NAMES)
+            self._rebuild_obstacle()
+            self.overlay_text = OBSTACLE_NAMES[self.shape_idx].upper()
+            self.overlay_timer = 2.0
+            consumed = True
+        return consumed
+
+    def _add_inflow(self):
+        """Continuous rightward inflow on left edge."""
+        self.u[1, 1:N+1] = 3.0
+        jj = np.arange(1, N + 1)
+        mask = ((jj + int(self.time * 8)) % 6 < 2)
+        self.dens[1, 1:N+1] = np.where(mask, 3.0, self.dens[1, 1:N+1])
+
+    def _apply_obstacle(self):
+        self.u[self.obstacle] = 0.0
+        self.v[self.obstacle] = 0.0
+        self.dens[self.obstacle] *= 0.5
+
+    def update(self, dt: float):
+        self.time += dt
+        sim_dt = 0.1
+        if self.overlay_timer > 0:
+            self.overlay_timer = max(0.0, self.overlay_timer - dt)
+
+        # Move obstacle from held joystick
+        if self._input_dx != 0 or self._input_dy != 0:
+            self.cx = max(4.0, min(float(N - 4),
+                          self.cx + self._input_dx * self._CURSOR_SPEED * dt))
+            self.cy = max(4.0, min(float(N - 4),
+                          self.cy + self._input_dy * self._CURSOR_SPEED * dt))
+            self._rebuild_obstacle()
+
+        self.u_prev[:] = 0.0
+        self.v_prev[:] = 0.0
+        self.dens_prev[:] = 0.0
+
+        self._add_inflow()
+        _velocity_step(self.u, self.v, self.u_prev, self.v_prev,
+                       self.viscosity, sim_dt)
+        _density_step(self.dens, self.dens_prev, self.u, self.v,
+                      self.diffusion, sim_dt)
+        self._apply_obstacle()
+        self.dens *= 0.995
+
+    def draw(self):
+        if self.viz_mode < len(PALETTES):
+            _draw_density(self.display, self.dens, self.viz_mode,
+                          scale=0.2, sqrt_map=True)
+        elif self.viz_mode == len(PALETTES):
+            _draw_velocity(self.display, self.u, self.v)
+        else:
+            _draw_vorticity(self.display, self.u, self.v)
+
+        # Draw obstacle pixels
+        obs_ij = np.argwhere(self.obstacle[1:N+1, 1:N+1])
+        for k in range(len(obs_ij)):
+            self.display.set_pixel(int(obs_ij[k, 0]), int(obs_ij[k, 1]), (60, 60, 70))
+
+        # Overlay
+        if self.overlay_timer > 0 and self.overlay_text:
+            alpha = min(1.0, self.overlay_timer / 0.5)
+            c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+            self.display.draw_text_small(2, 2, self.overlay_text, c)
