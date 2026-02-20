@@ -791,7 +791,7 @@ class FluidPlay(Visual):
         ("JOS STAM STABLE FLUIDS 1999", (255, 255, 255)),
         ("SEMI-LAGRANGIAN ADVECTION", (180, 220, 255)),
         ("DRAG CURSOR TO INJECT FORCE", (150, 255, 150)),
-        ("BUTTON FOR DYE BURST", (150, 255, 150)),
+        ("BUTTON CYCLES VIEW MODE", (150, 255, 150)),
         ("VISCOSITY DAMPS MOTION", (180, 220, 255)),
         ("REYNOLDS NUMBER = INERTIA / VISCOSITY", (255, 200, 100)),
     ]
@@ -868,20 +868,9 @@ class FluidPlay(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        # Capture held joystick for cursor movement (applied in update)
+        # Joystick: purely cursor movement (applied in update)
         self._input_dx = input_state.dx
         self._input_dy = input_state.dy
-
-        if input_state.up_pressed:
-            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
-            self.overlay_text = self._viz_mode_name()
-            self.overlay_timer = 2.0
-            consumed = True
-        if input_state.down_pressed:
-            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
-            self.overlay_text = self._viz_mode_name()
-            self.overlay_timer = 2.0
-            consumed = True
 
         # Both buttons: toggle notes
         both = input_state.action_l and input_state.action_r
@@ -893,7 +882,10 @@ class FluidPlay(Visual):
             consumed = True
         elif input_state.action_l or input_state.action_r:
             if not both:
-                self._burst()
+                # Single button: cycle viz mode
+                self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+                self.overlay_text = self._viz_mode_name()
+                self.overlay_timer = 2.0
                 consumed = True
         self._both_pressed_prev = both
 
@@ -928,29 +920,6 @@ class FluidPlay(Visual):
         hue = _PLAY_HUES[int(self.hue_idx) % len(_PLAY_HUES)]
         # Use density as brightness
         self.dens[i_lo:i_hi, j_lo:j_hi] += 4.0 * mask
-
-    def _burst(self):
-        """Radial burst of dye + force from cursor."""
-        ci = int(self.cx)
-        cj = int(self.cy)
-        r = 8
-        i_lo = max(1, ci - r)
-        i_hi = min(N, ci + r) + 1
-        j_lo = max(1, cj - r)
-        j_hi = min(N, cj + r) + 1
-
-        ii = np.arange(i_lo, i_hi, dtype=np.float64)
-        jj = np.arange(j_lo, j_hi, dtype=np.float64)
-        di, dj = np.meshgrid(ii - self.cx, jj - self.cy, indexing='ij')
-        d2 = di * di + dj * dj
-        dist = np.sqrt(d2) + 0.1
-        mask = np.exp(-d2 / 30.0)
-
-        # Radial outward force
-        self.u[i_lo:i_hi, j_lo:j_hi] += 12.0 * (di / dist) * mask
-        self.v[i_lo:i_hi, j_lo:j_hi] += 12.0 * (dj / dist) * mask
-        # Dye splash
-        self.dens[i_lo:i_hi, j_lo:j_hi] += 6.0 * mask
 
     def _auto_perturb(self):
         """Gentle random perturbation when idle."""
@@ -1081,7 +1050,7 @@ def _make_obstacle_at(shape_idx, ox, oy):
 
 
 class FluidSculpt(Visual):
-    name = "FLUID SCULPT"
+    name = "WIND TUNNEL LAB"
     description = "Move obstacle in flow"
     category = "science"
 
@@ -1101,6 +1070,7 @@ class FluidSculpt(Visual):
         self.cy = float(N // 2)
         self._input_dx = 0
         self._input_dy = 0
+        self._both_pressed_prev = False
         self.overlay_text = ""
         self.overlay_timer = 0.0
         self._init_fields()
@@ -1132,26 +1102,27 @@ class FluidSculpt(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        # Capture held joystick for obstacle movement (applied in update)
+        # Joystick: purely obstacle movement (applied in update)
         self._input_dx = input_state.dx
         self._input_dy = input_state.dy
 
-        if input_state.up_pressed:
-            self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
-            self.overlay_text = self._viz_mode_name()
-            self.overlay_timer = 2.0
-            consumed = True
-        if input_state.down_pressed:
-            self.viz_mode = (self.viz_mode - 1) % self._N_VIZ_MODES
-            self.overlay_text = self._viz_mode_name()
-            self.overlay_timer = 2.0
-            consumed = True
-        if input_state.action_l or input_state.action_r:
+        # Both buttons: cycle obstacle shape
+        both = input_state.action_l and input_state.action_r
+        if both and not self._both_pressed_prev:
             self.shape_idx = (self.shape_idx + 1) % len(OBSTACLE_NAMES)
             self._rebuild_obstacle()
             self.overlay_text = OBSTACLE_NAMES[self.shape_idx].upper()
             self.overlay_timer = 2.0
             consumed = True
+        elif input_state.action_l or input_state.action_r:
+            if not both:
+                # Single button: cycle viz mode
+                self.viz_mode = (self.viz_mode + 1) % self._N_VIZ_MODES
+                self.overlay_text = self._viz_mode_name()
+                self.overlay_timer = 2.0
+                consumed = True
+        self._both_pressed_prev = both
+
         return consumed
 
     def _add_inflow(self):
