@@ -41,6 +41,9 @@ _SCROLL_PAUSE = 0.6              # seconds before scroll starts
 
 _DISPLAY_DURATION = 8.0          # seconds before auto-advance
 _CROSSFADE_TIME = 0.6            # seconds for crossfade between vessels
+_IDLE_OVERLAY_HOLD = 4.0         # seconds overlay stays visible during idle
+_IDLE_OVERLAY_FADE_IN = 0.4      # seconds to fade in during idle
+_IDLE_OVERLAY_FADE_OUT = 0.8     # seconds to fade out during idle
 
 # Overlay text layout (from bottom)
 _LINE_Y_1 = 2                    # title
@@ -70,10 +73,12 @@ class Pottery(Visual):
         self._fade = 1.0           # 0→1 crossfade progress
         self._timer = 0.0          # auto-advance timer
 
-        # Overlay (persistent toggle, like Plates)
+        # Overlay: button toggles persistent on/off,
+        # idle auto-advance shows a timed fade independently
         self._show_overlay = False
         self._overlay_alpha = 0.0
         self._overlay_time = 0.0
+        self._idle_overlay_timer = 0.0  # countdown for idle fade
 
         # Edge detection for L/R
         self._prev_left = False
@@ -150,8 +155,9 @@ class Pottery(Visual):
                     self._idx = (self._idx - 1) % len(self._vessels)
                 self._load_vessel()
                 self._timer = 0.0
+                self._idle_overlay_timer = 0.0  # kill idle fade on manual scroll
                 if self._show_overlay:
-                    self._overlay_time = 0.0
+                    self._overlay_time = 0.0  # restart scroll text
             return True
         if input_state.left or input_state.right:
             return True
@@ -171,22 +177,47 @@ class Pottery(Visual):
         if self._fade < 1.0:
             self._fade = min(1.0, self._fade + dt / _CROSSFADE_TIME)
 
-        # Auto-advance
+        # Auto-advance (idle slideshow)
         if self._vessels and len(self._vessels) > 1:
             self._timer += dt
             if self._timer >= _DISPLAY_DURATION:
                 self._idx = (self._idx + 1) % len(self._vessels)
                 self._load_vessel()
                 self._timer = 0.0
-                if self._show_overlay:
-                    self._overlay_time = 0.0
+                self._overlay_time = 0.0
+                # Start idle overlay fade (only when not manually toggled on)
+                if not self._show_overlay:
+                    self._idle_overlay_timer = (_IDLE_OVERLAY_FADE_IN
+                                                + _IDLE_OVERLAY_HOLD
+                                                + _IDLE_OVERLAY_FADE_OUT)
 
-        # Overlay fade
-        target = 1.0 if self._show_overlay else 0.0
-        if self._overlay_alpha < target:
-            self._overlay_alpha = min(target, self._overlay_alpha + dt / 0.3)
-        elif self._overlay_alpha > target:
-            self._overlay_alpha = max(target, self._overlay_alpha - dt / 0.3)
+        # Idle overlay countdown
+        if self._idle_overlay_timer > 0:
+            self._idle_overlay_timer = max(0, self._idle_overlay_timer - dt)
+
+        # Compute effective overlay alpha
+        # Toggle: persistent on/off with smooth transition
+        toggle_target = 1.0 if self._show_overlay else 0.0
+        toggle_alpha = self._overlay_alpha
+        if toggle_alpha < toggle_target:
+            toggle_alpha = min(toggle_target, toggle_alpha + dt / 0.3)
+        elif toggle_alpha > toggle_target:
+            toggle_alpha = max(toggle_target, toggle_alpha - dt / 0.3)
+
+        # Idle fade: brief show during auto-advance
+        idle_alpha = 0.0
+        remaining = self._idle_overlay_timer
+        total = _IDLE_OVERLAY_FADE_IN + _IDLE_OVERLAY_HOLD + _IDLE_OVERLAY_FADE_OUT
+        if remaining > 0:
+            elapsed = total - remaining
+            if elapsed < _IDLE_OVERLAY_FADE_IN:
+                idle_alpha = elapsed / _IDLE_OVERLAY_FADE_IN
+            elif remaining > _IDLE_OVERLAY_FADE_OUT:
+                idle_alpha = 1.0
+            else:
+                idle_alpha = remaining / _IDLE_OVERLAY_FADE_OUT
+
+        self._overlay_alpha = max(toggle_alpha, idle_alpha)
         if self._overlay_alpha > 0.01:
             self._overlay_time += dt
 
