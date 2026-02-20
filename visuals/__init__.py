@@ -322,6 +322,7 @@ from .weaving import Weaving
 from .signs import Signs
 from .matter import MatterPhases
 from .walk import Walk
+from .yoga import Yoga
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     Demoscene, Complexity,
@@ -594,6 +595,7 @@ ALL_VISUALS = [
     Signs,
     MatterPhases,
     Walk,
+    Yoga,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
