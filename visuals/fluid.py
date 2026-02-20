@@ -183,22 +183,32 @@ VEL_PALETTES = {
         (159, 42, 99), (212, 72, 66), (245, 125, 21),
         (252, 210, 37), (252, 255, 164),
     ], dtype=np.float64),
-    'COOL': np.array([
-        (0, 0, 0), (10, 0, 40), (20, 20, 120),
-        (0, 100, 200), (0, 200, 220), (150, 255, 255), (255, 255, 255),
-    ], dtype=np.float64),
     'ELECTRIC': np.array([
         (0, 0, 0), (20, 0, 60), (60, 0, 160),
         (160, 0, 255), (255, 0, 200), (255, 100, 100), (255, 255, 255),
-    ], dtype=np.float64),
-    'THERMAL': np.array([
-        (0, 0, 0), (0, 0, 80), (0, 60, 160),
-        (80, 180, 80), (200, 200, 0), (255, 100, 0), (255, 0, 0),
     ], dtype=np.float64),
 }
 
 VEL_PALETTE_NAMES = list(VEL_PALETTES.keys())
 _VEL_PALETTE = VEL_PALETTES['RAINBOW']  # default for legacy callers
+
+# Direction hue wheels (angle → color, brightness from magnitude)
+DIR_PALETTES = {
+    'RAINBOW': np.array([
+        (255, 0, 0), (255, 180, 0), (0, 255, 0), (0, 255, 200),
+        (0, 100, 255), (120, 0, 255), (255, 0, 180), (255, 0, 0),
+    ], dtype=np.float64),
+    'WARM-COOL': np.array([
+        (255, 60, 0), (255, 200, 60), (200, 255, 120), (60, 220, 200),
+        (0, 100, 255), (40, 0, 180), (180, 0, 120), (255, 60, 0),
+    ], dtype=np.float64),
+    'NEON': np.array([
+        (255, 0, 100), (255, 0, 255), (100, 0, 255), (0, 80, 255),
+        (0, 255, 200), (0, 255, 0), (255, 255, 0), (255, 0, 100),
+    ], dtype=np.float64),
+}
+
+DIR_PALETTE_NAMES = list(DIR_PALETTES.keys())
 
 # Vorticity palettes (diverging: negative curl → zero → positive curl)
 VORT_PALETTES = {
@@ -210,10 +220,6 @@ VORT_PALETTES = {
         (0, 255, 255), (0, 100, 140), (8, 8, 12),
         (140, 0, 100), (255, 0, 255),
     ], dtype=np.float64),
-    'GREEN-PINK': np.array([
-        (0, 255, 80), (0, 120, 40), (10, 10, 10),
-        (140, 40, 80), (255, 100, 180),
-    ], dtype=np.float64),
     'GOLD-TEAL': np.array([
         (0, 200, 180), (0, 80, 100), (10, 8, 8),
         (120, 80, 0), (255, 200, 40),
@@ -222,12 +228,6 @@ VORT_PALETTES = {
 
 VORT_PALETTE_NAMES = list(VORT_PALETTES.keys())
 _VORT_PALETTE = VORT_PALETTES['FIRE-ICE']  # default for legacy callers
-
-# Direction hue wheel (8 stops around the circle, for angle-based coloring)
-_DIR_HUE = np.array([
-    (255, 0, 0), (255, 180, 0), (0, 255, 0), (0, 255, 200),
-    (0, 100, 255), (120, 0, 255), (255, 0, 180), (255, 0, 0),
-], dtype=np.float64)
 
 
 def _draw_velocity(display, u, v, palette=None):
@@ -250,8 +250,9 @@ def _draw_velocity(display, u, v, palette=None):
             display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
 
 
-def _draw_velocity_direction(display, u, v):
+def _draw_velocity_direction(display, u, v, palette=None):
     """Map velocity direction to hue, magnitude to brightness."""
+    pal = palette if palette is not None else DIR_PALETTES['RAINBOW']
     uu = u[1:N+1, 1:N+1]
     vv = v[1:N+1, 1:N+1]
     mag = np.sqrt(uu**2 + vv**2)
@@ -261,12 +262,12 @@ def _draw_velocity_direction(display, u, v):
     # Angle → 0..1 mapped to hue wheel
     angle = np.arctan2(vv, uu)  # -pi..pi
     t = (angle / (2 * np.pi) + 0.5) % 1.0  # 0..1
-    n_colors = len(_DIR_HUE)
+    n_colors = len(pal)
     idx_f = t * (n_colors - 1)
     lo = idx_f.astype(np.intp)
     hi = np.minimum(lo + 1, n_colors - 1)
     frac = (idx_f - lo)[:, :, np.newaxis]
-    hue_colors = _DIR_HUE[lo] + (_DIR_HUE[hi] - _DIR_HUE[lo]) * frac
+    hue_colors = pal[lo] + (pal[hi] - pal[lo]) * frac
 
     colors = hue_colors * brightness[:, :, np.newaxis]
     pixels = np.clip(colors, 0, 255).astype(np.uint8)
@@ -853,10 +854,10 @@ class FluidPlay(Visual):
     description = "Drag through fluid"
     category = "science"
 
-    # Viz modes: velocity palettes, direction, vorticity palettes
+    # Viz modes: 3 velocity, 3 direction, 3 vorticity
     _VIZ_MODES = (
         [('vel', name) for name in VEL_PALETTE_NAMES] +
-        [('dir', 'DIRECTION')] +
+        [('dir', name) for name in DIR_PALETTE_NAMES] +
         [('vort', name) for name in VORT_PALETTE_NAMES]
     )
     _N_VIZ_MODES = len(_VIZ_MODES)
@@ -941,7 +942,7 @@ class FluidPlay(Visual):
         if kind == 'vel':
             return 'VEL ' + name
         elif kind == 'dir':
-            return name
+            return 'DIR ' + name
         else:
             return 'VORT ' + name
 
@@ -1067,7 +1068,8 @@ class FluidPlay(Visual):
             _draw_velocity(self.display, self.u, self.v,
                            VEL_PALETTES[name])
         elif kind == 'dir':
-            _draw_velocity_direction(self.display, self.u, self.v)
+            _draw_velocity_direction(self.display, self.u, self.v,
+                                     DIR_PALETTES[name])
         else:
             _draw_vorticity(self.display, self.u, self.v,
                             VORT_PALETTES[name])
@@ -1182,7 +1184,7 @@ class FluidSculpt(Visual):
         if kind == 'vel':
             return 'VEL ' + name
         elif kind == 'dir':
-            return name
+            return 'DIR ' + name
         else:
             return 'VORT ' + name
 
@@ -1256,7 +1258,8 @@ class FluidSculpt(Visual):
             _draw_velocity(self.display, self.u, self.v,
                            VEL_PALETTES[name])
         elif kind == 'dir':
-            _draw_velocity_direction(self.display, self.u, self.v)
+            _draw_velocity_direction(self.display, self.u, self.v,
+                                     DIR_PALETTES[name])
         else:
             _draw_vorticity(self.display, self.u, self.v,
                             VORT_PALETTES[name])
