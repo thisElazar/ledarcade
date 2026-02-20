@@ -70,11 +70,10 @@ class Pottery(Visual):
         self._fade = 1.0           # 0→1 crossfade progress
         self._timer = 0.0          # auto-advance timer
 
-        # Overlay
-        self._show_overlay = True
-        self._overlay_alpha = 1.0
+        # Overlay (persistent toggle, like Plates)
+        self._show_overlay = False
+        self._overlay_alpha = 0.0
         self._overlay_time = 0.0
-        self._overlay_hold = 3.0   # auto-hide after 3s on first show
 
         # Edge detection for L/R
         self._prev_left = False
@@ -151,9 +150,8 @@ class Pottery(Visual):
                     self._idx = (self._idx - 1) % len(self._vessels)
                 self._load_vessel()
                 self._timer = 0.0
-                self._show_overlay = True
-                self._overlay_hold = 3.0
-                self._overlay_time = 0.0
+                if self._show_overlay:
+                    self._overlay_time = 0.0
             return True
         if input_state.left or input_state.right:
             return True
@@ -162,7 +160,6 @@ class Pottery(Visual):
             self._show_overlay = not self._show_overlay
             if self._show_overlay:
                 self._overlay_time = 0.0
-                self._overlay_hold = 0.0  # manual toggle stays on
             return True
 
         return False
@@ -181,15 +178,8 @@ class Pottery(Visual):
                 self._idx = (self._idx + 1) % len(self._vessels)
                 self._load_vessel()
                 self._timer = 0.0
-                self._show_overlay = True
-                self._overlay_hold = 3.0
-                self._overlay_time = 0.0
-
-        # Auto-hide overlay
-        if self._overlay_hold > 0:
-            self._overlay_hold -= dt
-            if self._overlay_hold <= 0:
-                self._show_overlay = False
+                if self._show_overlay:
+                    self._overlay_time = 0.0
 
         # Overlay fade
         target = 1.0 if self._show_overlay else 0.0
