@@ -1,7 +1,13 @@
 """
 Entropy - Shannon Entropy & Information Theory
 ================================================
-Four demonstrations making information theory visible:
+TODO: RETHINK THIS VISUAL. The current implementation has 4 modes but 3 of
+them (RLE, Huffman, Entropy grid) are chart/text-based and don't work well
+on a 64x64 LED panel. Only the Parity mode reads clearly as a visual.
+Consider: a single strong concept (e.g. entropy as disorder/order,
+reversible vs irreversible mixing, Maxwell's demon) rather than 4 weak ones.
+
+Current modes:
   1. ENTROPY  - Watch disorder grow on a grid of symbols
   2. RLE      - Run-length encoding compresses patterns
   3. HUFFMAN  - Frequency-based coding: short codes for common symbols

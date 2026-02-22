@@ -16,7 +16,8 @@ import math
 import random
 from . import Visual, Display, Colors, GRID_SIZE
 
-N = GRID_SIZE  # 64
+N_SIM = 32          # internal simulation grid
+N_DISP = GRID_SIZE  # 64 - display grid
 
 
 # ── Color mapping: temperature -> RGB ────────────────────────────
@@ -74,13 +75,14 @@ VIZ_MODES = ["TEMP", "FLOW", "BOTH"]
 class Convection(Visual):
     name = "CONVECTION"
     description = "Rayleigh-Benard cells"
-    category = "simulation"
+    category = "science"
 
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
+        S = N_SIM
 
         # Temperature gradient control  (maps to Rayleigh number)
         self.temp_gradient = 0.8
@@ -90,24 +92,24 @@ class Convection(Visual):
         self.overlay_timer = 0.0
         self.overlay_lines = []
 
-        # Physics fields
+        # Physics fields on the smaller sim grid
         # T[y][x], vx[y][x], vy[y][x]
-        self.T = [[0.0] * N for _ in range(N)]
-        self.vx = [[0.0] * N for _ in range(N)]
-        self.vy = [[0.0] * N for _ in range(N)]
+        self.T = [[0.0] * S for _ in range(S)]
+        self.vx = [[0.0] * S for _ in range(S)]
+        self.vy = [[0.0] * S for _ in range(S)]
 
         # Initialize temperature: linear gradient + tiny perturbation
-        for y in range(N):
-            base = 1.0 - y / (N - 1)  # 1.0 at bottom (y=63), 0.0 at top
-            for x in range(N):
+        for y in range(S):
+            base = 1.0 - y / (S - 1)  # 1.0 at bottom, 0.0 at top
+            for x in range(S):
                 self.T[y][x] = base + random.uniform(-0.002, 0.002)
 
-        # Step timing
+        # Step timing - 20Hz instead of 50Hz
         self.step_timer = 0.0
-        self.step_interval = 0.02
+        self.step_interval = 0.05
 
         # Scratch buffers
-        self._Tnew = [[0.0] * N for _ in range(N)]
+        self._Tnew = [[0.0] * S for _ in range(S)]
 
     # ── Input ────────────────────────────────────────────────────
     def handle_input(self, input_state) -> bool:
@@ -152,10 +154,11 @@ class Convection(Visual):
 
     def _perturb(self):
         """Inject random temperature blobs to disrupt the flow."""
+        S = N_SIM
         for _ in range(8):
-            cx = random.randint(8, N - 9)
-            cy = random.randint(8, N - 9)
-            r = random.randint(3, 7)
+            cx = random.randint(4, S - 5)
+            cy = random.randint(4, S - 5)
+            r = random.randint(2, 4)
             hot = random.random() > 0.5
             for dy in range(-r, r + 1):
                 for dx in range(-r, r + 1):
@@ -163,7 +166,7 @@ class Convection(Visual):
                     if dist2 <= r * r:
                         px = cx + dx
                         py = cy + dy
-                        if 0 <= px < N and 0 <= py < N:
+                        if 0 <= px < S and 0 <= py < S:
                             strength = 1.0 - math.sqrt(dist2) / r
                             if hot:
                                 self.T[py][px] = min(1.0, self.T[py][px] + 0.4 * strength)
@@ -177,6 +180,8 @@ class Convection(Visual):
         vy = self.vy
         Tn = self._Tnew
         grad = self.temp_gradient
+        S = N_SIM
+        S1 = S - 1
 
         # Effective Rayleigh number determines buoyancy strength
         Ra = grad * 10.0
@@ -193,83 +198,90 @@ class Convection(Visual):
         dt_phys = 0.5  # sub-timestep scaling
 
         # --- Update velocity from buoyancy ---
-        # Temperature anomaly relative to horizontal mean drives circulation
         # Compute row means for anomaly
-        row_mean = [0.0] * N
-        for y in range(N):
+        row_mean = [0.0] * S
+        for y in range(S):
             s = 0.0
-            for x in range(N):
-                s += T[y][x]
-            row_mean[y] = s / N
+            row = T[y]
+            for x in range(S):
+                s += row[x]
+            row_mean[y] = s / S
 
-        for y in range(1, N - 1):
-            for x in range(N):
-                # Temperature anomaly (deviation from horizontal mean)
-                anomaly = T[y][x] - row_mean[y]
-                # Buoyancy: hot anomaly -> upward (negative vy in screen coords)
-                vy[y][x] += -buoyancy * anomaly * dt_phys
-                # Horizontal pressure-like term: fluid pushed sideways
-                # by convergence/divergence
-                xl = T[y][(x - 1) % N]
-                xr = T[y][(x + 1) % N]
-                vx[y][x] += buoyancy * 0.3 * (xr - xl) * dt_phys
+        for y in range(1, S1):
+            Ty = T[y]
+            vxy = vx[y]
+            vyy = vy[y]
+            rm = row_mean[y]
+            for x in range(S):
+                anomaly = Ty[x] - rm
+                vyy[x] += -buoyancy * anomaly * dt_phys
+                xl = Ty[(x - 1) % S]
+                xr = Ty[(x + 1) % S]
+                vxy[x] += buoyancy * 0.3 * (xr - xl) * dt_phys
 
         # --- Velocity diffusion + damping ---
-        for y in range(1, N - 1):
-            for x in range(N):
-                xl = (x - 1) % N
-                xr = (x + 1) % N
-                # Diffuse velocity
-                vx[y][x] += vel_diff * (
-                    vx[y - 1][x] + vx[y + 1][x] +
-                    vx[y][xl] + vx[y][xr] - 4 * vx[y][x]
+        for y in range(1, S1):
+            vxy = vx[y]
+            vyy = vy[y]
+            vx_ym1 = vx[y - 1]
+            vx_yp1 = vx[y + 1]
+            vy_ym1 = vy[y - 1]
+            vy_yp1 = vy[y + 1]
+            for x in range(S):
+                xl = (x - 1) % S
+                xr = (x + 1) % S
+                vxy[x] += vel_diff * (
+                    vx_ym1[x] + vx_yp1[x] +
+                    vxy[xl] + vxy[xr] - 4 * vxy[x]
                 )
-                vy[y][x] += vel_diff * (
-                    vy[y - 1][x] + vy[y + 1][x] +
-                    vy[y][xl] + vy[y][xr] - 4 * vy[y][x]
+                vyy[x] += vel_diff * (
+                    vy_ym1[x] + vy_yp1[x] +
+                    vyy[xl] + vyy[xr] - 4 * vyy[x]
                 )
-                # Damp
-                vx[y][x] *= visc_damp
-                vy[y][x] *= visc_damp
+                vxy[x] *= visc_damp
+                vyy[x] *= visc_damp
 
         # Top/bottom boundaries: no vertical velocity
-        for x in range(N):
+        for x in range(S):
             vy[0][x] = 0.0
-            vy[N - 1][x] = 0.0
+            vy[S1][x] = 0.0
             vx[0][x] *= 0.5
-            vx[N - 1][x] *= 0.5
+            vx[S1][x] *= 0.5
 
-        # --- Enforce incompressibility (simple pressure projection) ---
-        # A few relaxation iterations to reduce divergence
-        for _ in range(3):
-            for y in range(1, N - 1):
-                for x in range(N):
-                    xl = (x - 1) % N
-                    xr = (x + 1) % N
-                    div = (vx[y][xr] - vx[y][xl] + vy[y + 1][x] - vy[y - 1][x]) * 0.5
-                    # Push back
-                    vx[y][xr] -= div * 0.25
-                    vx[y][xl] += div * 0.25
-                    vy[y + 1][x] -= div * 0.25
-                    vy[y - 1][x] += div * 0.25
+        # --- Enforce incompressibility (single relaxation iteration) ---
+        for y in range(1, S1):
+            vxy = vx[y]
+            vyy_p1 = vy[y + 1]
+            vyy_m1 = vy[y - 1]
+            for x in range(S):
+                xl = (x - 1) % S
+                xr = (x + 1) % S
+                div = (vxy[xr] - vxy[xl] + vyy_p1[x] - vyy_m1[x]) * 0.5
+                vxy[xr] -= div * 0.25
+                vxy[xl] += div * 0.25
+                vyy_p1[x] -= div * 0.25
+                vyy_m1[x] += div * 0.25
 
         # --- Advect temperature (semi-Lagrangian, with diffusion) ---
-        for y in range(N):
-            for x in range(N):
+        for y in range(S):
+            vxy = vx[y]
+            vyy = vy[y]
+            Tny = Tn[y]
+            for x in range(S):
                 # Backtrace
-                sx = x - vx[y][x] * dt_phys
-                sy = y - vy[y][x] * dt_phys
+                sx = x - vxy[x] * dt_phys
+                sy = y - vyy[x] * dt_phys
                 # Wrap horizontally, clamp vertically
-                sx = sx % N
-                sy = max(0.0, min(N - 1.001, sy))
+                sx = sx % S
+                sy = max(0.0, min(S - 1.001, sy))
                 # Bilinear interpolation
                 ix = int(sx)
                 iy = int(sy)
                 fx = sx - ix
                 fy = sy - iy
-                ix2 = (ix + 1) % N
-                iy2 = min(iy + 1, N - 1)
-                Tn[y][x] = (
+                ix2 = (ix + 1) % S
+                iy2 = min(iy + 1, S1)
+                Tny[x] = (
                     T[iy][ix] * (1 - fx) * (1 - fy) +
                     T[iy][ix2] * fx * (1 - fy) +
                     T[iy2][ix] * (1 - fx) * fy +
@@ -277,28 +289,36 @@ class Convection(Visual):
                 )
 
         # --- Thermal diffusion ---
-        for y in range(1, N - 1):
-            for x in range(N):
-                xl = (x - 1) % N
-                xr = (x + 1) % N
+        for y in range(1, S1):
+            Tny = Tn[y]
+            Tn_ym1 = Tn[y - 1]
+            Tn_yp1 = Tn[y + 1]
+            for x in range(S):
+                xl = (x - 1) % S
+                xr = (x + 1) % S
                 lap = (
-                    Tn[y - 1][x] + Tn[y + 1][x] +
-                    Tn[y][xl] + Tn[y][xr] - 4 * Tn[y][x]
+                    Tn_ym1[x] + Tn_yp1[x] +
+                    Tny[xl] + Tny[xr] - 4 * Tny[x]
                 )
-                Tn[y][x] += kappa * lap
+                Tny[x] += kappa * lap
 
         # --- Boundary conditions ---
         # Bottom heated, top cooled, scaled by gradient
         bot_T = min(1.0, 0.5 + grad * 0.25)
         top_T = max(0.0, 0.5 - grad * 0.25)
-        for x in range(N):
-            Tn[N - 1][x] = bot_T
+        for x in range(S):
+            Tn[S1][x] = bot_T
             Tn[0][x] = top_T
 
         # Clamp
-        for y in range(N):
-            for x in range(N):
-                Tn[y][x] = max(0.0, min(1.0, Tn[y][x]))
+        for y in range(S):
+            Tny = Tn[y]
+            for x in range(S):
+                v = Tny[x]
+                if v < 0.0:
+                    Tny[x] = 0.0
+                elif v > 1.0:
+                    Tny[x] = 1.0
 
         # Swap
         self.T, self._Tnew = Tn, self.T
@@ -311,12 +331,11 @@ class Convection(Visual):
             self.overlay_timer -= dt
 
         self.step_timer += dt
-        # Run multiple sub-steps per frame for responsiveness
         while self.step_timer >= self.step_interval:
             self.step_timer -= self.step_interval
             self._step()
 
-    # ── Draw ─────────────────────────────────────────────────────
+    # ── Draw (upscale 2x from 32x32 sim to 64x64 display) ───────
     def draw(self):
         self.display.clear()
         set_pixel = self.display.set_pixel
@@ -325,52 +344,76 @@ class Convection(Visual):
         vy = self.vy
         mode = self.viz_mode
         lut = _COLOR_LUT
+        S = N_SIM
 
         if mode == 0:
             # TEMP mode: pure temperature field
-            for y in range(N):
-                row = T[y]
-                for x in range(N):
-                    idx = int(row[x] * 255)
+            for sy in range(S):
+                row = T[sy]
+                dy = sy * 2
+                dy1 = dy + 1
+                for sx in range(S):
+                    idx = int(row[sx] * 255)
                     if idx < 0:
                         idx = 0
                     elif idx > 255:
                         idx = 255
-                    set_pixel(x, y, lut[idx])
+                    c = lut[idx]
+                    dx = sx * 2
+                    set_pixel(dx, dy, c)
+                    set_pixel(dx + 1, dy, c)
+                    set_pixel(dx, dy1, c)
+                    set_pixel(dx + 1, dy1, c)
 
         elif mode == 1:
             # FLOW mode: velocity direction + magnitude
-            for y in range(N):
-                for x in range(N):
-                    uvx = vx[y][x]
-                    uvy = vy[y][x]
+            for sy in range(S):
+                vx_row = vx[sy]
+                vy_row = vy[sy]
+                dy = sy * 2
+                dy1 = dy + 1
+                for sx in range(S):
+                    uvx = vx_row[sx]
+                    uvy = vy_row[sx]
                     mag = math.sqrt(uvx * uvx + uvy * uvy)
-                    set_pixel(x, y, _flow_color(uvx, uvy, mag))
+                    c = _flow_color(uvx, uvy, mag)
+                    dx = sx * 2
+                    set_pixel(dx, dy, c)
+                    set_pixel(dx + 1, dy, c)
+                    set_pixel(dx, dy1, c)
+                    set_pixel(dx + 1, dy1, c)
 
         else:
             # BOTH mode: temperature with velocity streamline dots
-            for y in range(N):
-                row = T[y]
-                for x in range(N):
-                    idx = int(row[x] * 255)
+            for sy in range(S):
+                row = T[sy]
+                dy = sy * 2
+                dy1 = dy + 1
+                for sx in range(S):
+                    idx = int(row[sx] * 255)
                     if idx < 0:
                         idx = 0
                     elif idx > 255:
                         idx = 255
-                    set_pixel(x, y, lut[idx])
+                    c = lut[idx]
+                    dx = sx * 2
+                    set_pixel(dx, dy, c)
+                    set_pixel(dx + 1, dy, c)
+                    set_pixel(dx, dy1, c)
+                    set_pixel(dx + 1, dy1, c)
 
             # Overlay velocity as bright dots on a sparse grid
-            for y in range(2, N, 4):
-                for x in range(2, N, 4):
-                    uvx = vx[y][x]
-                    uvy = vy[y][x]
+            for sy in range(1, S, 2):
+                for sx in range(1, S, 2):
+                    uvx = vx[sy][sx]
+                    uvy = vy[sy][sx]
                     mag = math.sqrt(uvx * uvx + uvy * uvy)
                     if mag > 0.05:
-                        # Draw a small line segment in velocity direction
                         norm = min(2.5, mag * 4.0) / mag
-                        ex = int(round(x + uvx * norm))
-                        ey = int(round(y + uvy * norm))
-                        if 0 <= ex < N and 0 <= ey < N:
+                        # Compute endpoint in display coords
+                        ex = int(round(sx * 2 + uvx * norm * 2))
+                        ey = int(round(sy * 2 + uvy * norm * 2))
+                        if 0 <= ex < N_DISP and 0 <= ey < N_DISP:
                             set_pixel(ex, ey, (255, 255, 255))
 
         # HUD overlay

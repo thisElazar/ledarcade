@@ -334,6 +334,7 @@ from .erosion import Erosion
 from .geneticdrift import GeneticDrift
 from .convection import Convection
 from .entropy import Entropy
+from .maxwell import MaxwellDemon
 from .network import Network
 from .seismic import Seismic
 from .ecosystem import Ecosystem
@@ -623,6 +624,7 @@ ALL_VISUALS = [
     GeneticDrift,
     Convection,
     Entropy,
+    MaxwellDemon,
     Network,
     Seismic,
     Ecosystem,
@@ -883,6 +885,7 @@ __all__ = [
     'GeneticDrift',
     'Convection',
     'Entropy',
+    'MaxwellDemon',
     'Network',
     'Seismic',
     'Ecosystem',

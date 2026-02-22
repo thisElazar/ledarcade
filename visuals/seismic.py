@@ -34,9 +34,9 @@ LAYERS = [
 BG_COLOR = (5, 5, 15)
 
 # ── Ray tracing parameters ─────────────────────────────────────
-NUM_RAYS = 50
+NUM_RAYS = 30
 RAY_STEP = 0.15         # spatial step per iteration
-MAX_RAY_STEPS = 600     # prevent infinite loops
+MAX_RAY_STEPS = 400     # prevent infinite loops
 
 # ── Focus modes ─────────────────────────────────────────────────
 FOCUS_MODES = ["WAVES", "SHADOW", "REFLECT"]
@@ -47,6 +47,47 @@ P_BRIGHT = (140, 220, 255)
 S_COLOR = (255, 100, 50)     # red-orange
 S_BRIGHT = (255, 180, 100)
 SHADOW_COLOR = (120, 20, 20) # dim red arc for shadow zone
+
+# ── Precomputed layer lookup (2D list) ──────────────────────────
+# earth_layer[y][x] = layer index, or -1 if outside earth
+# Built once at module load.
+_earth_layer = []
+_earth_bg_waves = []   # pre-dimmed colors for WAVES/REFLECT mode (dim=0.35)
+_earth_bg_shadow = []  # pre-dimmed colors for SHADOW mode (dim=0.2)
+
+def _init_earth_tables():
+    """Build earth layer and background color tables once at import."""
+    for y in range(GRID_SIZE):
+        row_layer = []
+        row_bg_w = []
+        row_bg_s = []
+        for x in range(GRID_SIZE):
+            dx = x - CX
+            dy = y - CY
+            r = math.sqrt(dx * dx + dy * dy)
+            if r < R_EARTH:
+                layer_idx = -1
+                for i, (_, r_in, r_out, _, _, _) in enumerate(LAYERS):
+                    if r_in <= r < r_out:
+                        layer_idx = i
+                        break
+                row_layer.append(layer_idx)
+                if layer_idx >= 0:
+                    c = LAYERS[layer_idx][3]
+                    row_bg_w.append((int(c[0] * 0.35), int(c[1] * 0.35), int(c[2] * 0.35)))
+                    row_bg_s.append((int(c[0] * 0.2), int(c[1] * 0.2), int(c[2] * 0.2)))
+                else:
+                    row_bg_w.append(BG_COLOR)
+                    row_bg_s.append(BG_COLOR)
+            else:
+                row_layer.append(-1)
+                row_bg_w.append(BG_COLOR)
+                row_bg_s.append(BG_COLOR)
+        _earth_layer.append(row_layer)
+        _earth_bg_waves.append(row_bg_w)
+        _earth_bg_shadow.append(row_bg_s)
+
+_init_earth_tables()
 
 
 def _get_layer(r):
@@ -69,7 +110,8 @@ def _trace_ray(source_x, source_y, angle, wave_type):
     """Trace a single seismic ray through the earth.
 
     wave_type: 'P' or 'S'
-    Returns list of (x, y) points along the ray path.
+    Returns list of (x, y) points along the ray path, snapped to int pixels.
+    Each point is (ix, iy) already rounded for fast drawing.
     """
     path = []
     x, y = source_x, source_y
@@ -77,13 +119,22 @@ def _trace_ray(source_x, source_y, angle, wave_type):
     dy = math.sin(angle)
 
     speed_idx = 4 if wave_type == 'P' else 5
+    _sqrt = math.sqrt
 
     for _ in range(MAX_RAY_STEPS):
-        path.append((x, y))
+        # Snap to pixel grid and store
+        ix = int(x + 0.5)
+        iy = int(y + 0.5)
+        if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+            path.append((ix, iy))
+        else:
+            # If off-screen but still inside earth radius, keep tracing
+            # but don't store the point
+            pass
 
         # Current radius
         rx, ry = x - CX, y - CY
-        r = math.sqrt(rx * rx + ry * ry)
+        r = _sqrt(rx * rx + ry * ry)
 
         # Outside earth?
         if r >= R_EARTH:
@@ -110,7 +161,7 @@ def _trace_ray(source_x, source_y, angle, wave_type):
 
         # Check new radius
         nrx, nry = nx - CX, ny - CY
-        nr = math.sqrt(nrx * nrx + nry * nry)
+        nr = _sqrt(nrx * nrx + nry * nry)
 
         new_layer_idx = _get_layer(nr)
 
@@ -120,7 +171,10 @@ def _trace_ray(source_x, source_y, angle, wave_type):
 
             # S-wave entering outer core
             if wave_type == 'S' and LAYERS[new_layer_idx][0] == "outer_core":
-                path.append((nx, ny))
+                nix = int(nx + 0.5)
+                niy = int(ny + 0.5)
+                if 0 <= nix < GRID_SIZE and 0 <= niy < GRID_SIZE:
+                    path.append((nix, niy))
                 break
 
             if new_speed <= 0:
@@ -132,16 +186,14 @@ def _trace_ray(source_x, source_y, angle, wave_type):
             else:
                 norm_x, norm_y = 0.0, -1.0
 
-            # Angle of incidence (between ray and inward normal)
-            # Ensure normal points in the direction the ray is crossing
+            # Angle of incidence
             dot = dx * norm_x + dy * norm_y
             if dot > 0:
                 norm_x, norm_y = -norm_x, -norm_y
                 dot = -dot
 
-            sin_i = math.sqrt(max(0, 1.0 - dot * dot))
+            sin_i = _sqrt(max(0, 1.0 - dot * dot))
             ratio = new_speed / current_speed
-
             sin_r = sin_i * ratio
 
             if sin_r >= 1.0:
@@ -149,29 +201,23 @@ def _trace_ray(source_x, source_y, angle, wave_type):
                 dot_r = dx * norm_x + dy * norm_y
                 dx = dx - 2 * dot_r * norm_x
                 dy = dy - 2 * dot_r * norm_y
-                mag = math.sqrt(dx * dx + dy * dy)
+                mag = _sqrt(dx * dx + dy * dy)
                 if mag > 0:
                     dx /= mag
                     dy /= mag
             else:
                 # Snell's law refraction
-                cos_r = math.sqrt(max(0, 1.0 - sin_r * sin_r))
-
-                # Tangent direction (perpendicular to normal, in plane of incidence)
+                cos_r = _sqrt(max(0, 1.0 - sin_r * sin_r))
                 tan_x = dx - dot * norm_x
                 tan_y = dy - dot * norm_y
-                tan_mag = math.sqrt(tan_x * tan_x + tan_y * tan_y)
+                tan_mag = _sqrt(tan_x * tan_x + tan_y * tan_y)
                 if tan_mag > 0.001:
                     tan_x /= tan_mag
                     tan_y /= tan_mag
-                    # New direction
                     dx = sin_r * tan_x + cos_r * norm_x
                     dy = sin_r * tan_y + cos_r * norm_y
-                else:
-                    # Head-on, no refraction needed
-                    pass
 
-                mag = math.sqrt(dx * dx + dy * dy)
+                mag = _sqrt(dx * dx + dy * dy)
                 if mag > 0:
                     dx /= mag
                     dy /= mag
@@ -182,22 +228,23 @@ def _trace_ray(source_x, source_y, angle, wave_type):
 
 
 def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_name):
-    """Trace a ray that reflects off a specific layer boundary.
-
-    Used for REFLECT mode to show PcP, ScS, PKP type waves.
-    """
+    """Trace a ray that reflects off a specific layer boundary."""
     path = []
     x, y = source_x, source_y
     dx = math.cos(angle)
     dy = math.sin(angle)
     speed_idx = 4 if wave_type == 'P' else 5
     reflected = False
+    _sqrt = math.sqrt
 
     for _ in range(MAX_RAY_STEPS):
-        path.append((x, y))
+        ix = int(x + 0.5)
+        iy = int(y + 0.5)
+        if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+            path.append((ix, iy))
 
         rx, ry = x - CX, y - CY
-        r = math.sqrt(rx * rx + ry * ry)
+        r = _sqrt(rx * rx + ry * ry)
 
         if r >= R_EARTH:
             break
@@ -215,13 +262,12 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
         ny = y + dy * step
 
         nrx, nry = nx - CX, ny - CY
-        nr = math.sqrt(nrx * nrx + nry * nry)
+        nr = _sqrt(nrx * nrx + nry * nry)
         new_layer_idx = _get_layer(nr)
 
         # Reflect at target boundary
         if not reflected and new_layer_idx != layer_idx and new_layer_idx >= 0:
             if LAYERS[new_layer_idx][0] == reflect_layer_name:
-                # Reflect
                 if r > 0.01:
                     norm_x, norm_y = rx / r, ry / r
                 else:
@@ -229,7 +275,7 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
                 dot = dx * norm_x + dy * norm_y
                 dx = dx - 2 * dot * norm_x
                 dy = dy - 2 * dot * norm_y
-                mag = math.sqrt(dx * dx + dy * dy)
+                mag = _sqrt(dx * dx + dy * dy)
                 if mag > 0:
                     dx /= mag
                     dy /= mag
@@ -249,20 +295,20 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
                 if dot > 0:
                     norm_x, norm_y = -norm_x, -norm_y
                     dot = -dot
-                sin_i = math.sqrt(max(0, 1.0 - dot * dot))
+                sin_i = _sqrt(max(0, 1.0 - dot * dot))
                 ratio = new_speed / current_speed
                 sin_r = sin_i * ratio
                 if sin_r < 1.0:
-                    cos_r = math.sqrt(max(0, 1.0 - sin_r * sin_r))
+                    cos_r = _sqrt(max(0, 1.0 - sin_r * sin_r))
                     tan_x = dx - dot * norm_x
                     tan_y = dy - dot * norm_y
-                    tan_mag = math.sqrt(tan_x * tan_x + tan_y * tan_y)
+                    tan_mag = _sqrt(tan_x * tan_x + tan_y * tan_y)
                     if tan_mag > 0.001:
                         tan_x /= tan_mag
                         tan_y /= tan_mag
                         dx = sin_r * tan_x + cos_r * norm_x
                         dy = sin_r * tan_y + cos_r * norm_y
-                    mag = math.sqrt(dx * dx + dy * dy)
+                    mag = _sqrt(dx * dx + dy * dy)
                     if mag > 0:
                         dx /= mag
                         dy /= mag
@@ -270,7 +316,7 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
                     dot2 = dx * norm_x + dy * norm_y
                     dx = dx - 2 * dot2 * norm_x
                     dy = dy - 2 * dot2 * norm_y
-                    mag = math.sqrt(dx * dx + dy * dy)
+                    mag = _sqrt(dx * dx + dy * dy)
                     if mag > 0:
                         dx /= mag
                         dy /= mag
@@ -310,9 +356,6 @@ class Seismic(Visual):
         # Source position
         self.source_idx = 0
 
-        # Precompute earth pixel map
-        self._build_earth_map()
-
         # Ray data
         self.p_rays = []
         self.s_rays = []
@@ -330,21 +373,12 @@ class Seismic(Visual):
         self.overlay_timer = 0.0
         self.overlay_lines = []
 
+        # Cached shadow zone
+        self._shadow_pixels = []
+        self._shadow_valid = False
+
         # Trigger initial quake
         self._trigger_quake()
-
-    def _build_earth_map(self):
-        """Precompute which pixel belongs to which layer."""
-        self.earth_map = {}
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                dx = x - CX
-                dy = y - CY
-                r = math.sqrt(dx * dx + dy * dy)
-                if r < R_EARTH:
-                    layer_idx = _get_layer(r)
-                    if layer_idx >= 0:
-                        self.earth_map[(x, y)] = layer_idx
 
     def _get_source_pos(self):
         """Get earthquake source (x, y) on the crust surface."""
@@ -388,31 +422,44 @@ class Seismic(Visual):
             if len(ref_path) > 5:
                 self.reflect_rays.append(('PcP', ref_path))
 
-        # PKP: P-waves through the core (already in p_rays, highlight them)
+        # Precompute max ray length for propagation-done check
+        self._max_ray_len = 0
+        for path in self.p_rays:
+            if len(path) > self._max_ray_len:
+                self._max_ray_len = len(path)
+        for path in self.s_rays:
+            if len(path) > self._max_ray_len:
+                self._max_ray_len = len(path)
 
         self.wave_time = 0.0
         self.propagating = True
         self.quake_flash = 0.3
         self.idle_timer = 0.0
 
-    def _compute_shadow_zone(self):
-        """Find surface angles where no direct S-waves arrive.
+        # Invalidate shadow zone cache
+        self._shadow_valid = False
 
-        Returns list of (x, y) pixel positions on the crust that are
-        in the shadow zone.
-        """
+    def _compute_shadow_zone(self):
+        """Find surface pixels where no direct S-waves arrive. Cached."""
+        if self._shadow_valid:
+            return self._shadow_pixels
+
         # Collect angles on the surface where S-wave rays arrived
         s_arrival_angles = set()
         for path in self.s_rays:
             if len(path) < 3:
                 continue
             ex, ey = path[-1]
-            er = math.sqrt((ex - CX) ** 2 + (ey - CY) ** 2)
-            if er >= R_EARTH - 3:
-                # Ray reached near surface
-                a = math.atan2(ey - CY, ex - CX)
-                # Quantize to degrees
-                s_arrival_angles.add(int(math.degrees(a)) % 360)
+            # Check if last point is near surface using the layer table
+            if 0 <= ex < GRID_SIZE and 0 <= ey < GRID_SIZE:
+                layer = _earth_layer[ey][ex]
+                if layer < 0:
+                    # outside earth = reached surface
+                    a = int(math.degrees(math.atan2(ey - CY, ex - CX))) % 360
+                    s_arrival_angles.add(a)
+                elif layer >= 3:  # upper_mantle or crust
+                    a = int(math.degrees(math.atan2(ey - CY, ex - CX))) % 360
+                    s_arrival_angles.add(a)
 
         # Shadow zone: surface pixels where no S-wave arrived
         shadow_pixels = []
@@ -420,19 +467,21 @@ class Seismic(Visual):
             self.SOURCE_ANGLES[self.source_idx])) % 360
 
         for deg in range(360):
-            # Skip near source
             diff = (deg - src_angle_deg + 180) % 360 - 180
             if abs(diff) < 15:
                 continue
-
             if deg not in s_arrival_angles:
                 rad = math.radians(deg)
+                cos_r = math.cos(rad)
+                sin_r = math.sin(rad)
                 for r in range(28, 31):
-                    px = int(CX + r * math.cos(rad))
-                    py = int(CY + r * math.sin(rad))
+                    px = int(CX + r * cos_r)
+                    py = int(CY + r * sin_r)
                     if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                         shadow_pixels.append((px, py))
 
+        self._shadow_pixels = shadow_pixels
+        self._shadow_valid = True
         return shadow_pixels
 
     def handle_input(self, input_state) -> bool:
@@ -487,14 +536,7 @@ class Seismic(Visual):
         if self.propagating:
             self.wave_time += dt * self.speed * 80.0  # steps per second
 
-            # Check if propagation is done (all rays fully drawn)
-            max_len = 0
-            for path in self.p_rays:
-                max_len = max(max_len, len(path))
-            for path in self.s_rays:
-                max_len = max(max_len, len(path))
-
-            if self.wave_time > max_len + 60:
+            if self.wave_time > self._max_ray_len + 60:
                 self.propagating = False
 
         # Auto-trigger
@@ -504,160 +546,170 @@ class Seismic(Visual):
                 self.source_idx = (self.source_idx + 1) % len(self.SOURCE_ANGLES)
                 self._trigger_quake()
 
+    def _draw_rays(self, rays, wt, base_color, bright_color):
+        """Draw a set of rays, only iterating near the wavefront + trail."""
+        wavefront_width = 8
+        trail_len = 80
+        window = wavefront_width + trail_len  # total visible portion behind front
+        set_pixel = self.display.set_pixel
+        br, bg, bb = base_color
+        hr, hg, hb = bright_color
+        dr, dg, db = hr - br, hg - bg, hb - bb
+
+        for path in rays:
+            path_len = len(path)
+            drawn = int(wt) if int(wt) < path_len else path_len
+
+            # Only iterate the visible window near the wavefront
+            start = drawn - window
+            if start < 0:
+                start = 0
+
+            for j in range(start, drawn):
+                ix, iy = path[j]
+                dist_from_front = drawn - j
+                if dist_from_front < wavefront_width:
+                    t = 1.0 - dist_from_front / wavefront_width
+                    set_pixel(ix, iy, (
+                        int(br + dr * t),
+                        int(bg + dg * t),
+                        int(bb + db * t),
+                    ))
+                else:
+                    fade = 1.0 - (dist_from_front - wavefront_width) / 80.0
+                    if fade < 0.15:
+                        fade = 0.15
+                    set_pixel(ix, iy, (
+                        int(br * fade),
+                        int(bg * fade),
+                        int(bb * fade),
+                    ))
+
     def draw(self):
         self.display.clear()
 
         focus = FOCUS_MODES[self.focus_idx]
+        set_pixel = self.display.set_pixel
 
-        # Draw background
+        # Draw earth background from pre-rendered table
+        bg_table = _earth_bg_shadow if focus == "SHADOW" else _earth_bg_waves
         for y in range(GRID_SIZE):
+            bg_row = bg_table[y]
             for x in range(GRID_SIZE):
-                if (x, y) in self.earth_map:
-                    layer_idx = self.earth_map[(x, y)]
-                    color = LAYERS[layer_idx][3]
-                    # Dim the earth layers to let waves stand out
-                    dim = 0.35
-                    if focus == "SHADOW":
-                        dim = 0.2
-                    color = (int(color[0] * dim), int(color[1] * dim),
-                             int(color[2] * dim))
-                    self.display.set_pixel(x, y, color)
-                else:
-                    self.display.set_pixel(x, y, BG_COLOR)
+                set_pixel(x, y, bg_row[x])
 
         wt = self.wave_time
-        wavefront_width = 8  # pixels of bright front
 
         if focus == "WAVES" or focus == "SHADOW":
             # Draw P-wave rays
-            for path in self.p_rays:
-                drawn = int(min(wt, len(path)))
-                for j in range(drawn):
-                    px, py = path[j]
-                    ix, iy = int(round(px)), int(round(py))
-                    if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                        # Brightness based on distance from wavefront
-                        dist_from_front = drawn - j
-                        if dist_from_front < wavefront_width:
-                            t = 1.0 - dist_from_front / wavefront_width
-                            color = (
-                                int(P_COLOR[0] + (P_BRIGHT[0] - P_COLOR[0]) * t),
-                                int(P_COLOR[1] + (P_BRIGHT[1] - P_COLOR[1]) * t),
-                                int(P_COLOR[2] + (P_BRIGHT[2] - P_COLOR[2]) * t),
-                            )
-                        else:
-                            # Trail fades
-                            fade = max(0.15, 1.0 - (dist_from_front - wavefront_width) / 80.0)
-                            color = (int(P_COLOR[0] * fade),
-                                     int(P_COLOR[1] * fade),
-                                     int(P_COLOR[2] * fade))
-                        self.display.set_pixel(ix, iy, color)
+            self._draw_rays(self.p_rays, wt, P_COLOR, P_BRIGHT)
 
-            # Draw S-wave rays (slower, so use reduced time)
-            s_time_factor = 0.55  # S-waves are ~55% speed of P-waves on average
-            s_wt = wt * s_time_factor
-
-            for path in self.s_rays:
-                drawn = int(min(s_wt, len(path)))
-                for j in range(drawn):
-                    px, py = path[j]
-                    ix, iy = int(round(px)), int(round(py))
-                    if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                        dist_from_front = drawn - j
-                        if dist_from_front < wavefront_width:
-                            t = 1.0 - dist_from_front / wavefront_width
-                            color = (
-                                int(S_COLOR[0] + (S_BRIGHT[0] - S_COLOR[0]) * t),
-                                int(S_COLOR[1] + (S_BRIGHT[1] - S_COLOR[1]) * t),
-                                int(S_COLOR[2] + (S_BRIGHT[2] - S_COLOR[2]) * t),
-                            )
-                        else:
-                            fade = max(0.15, 1.0 - (dist_from_front - wavefront_width) / 80.0)
-                            color = (int(S_COLOR[0] * fade),
-                                     int(S_COLOR[1] * fade),
-                                     int(S_COLOR[2] * fade))
-                        self.display.set_pixel(ix, iy, color)
+            # Draw S-wave rays (slower)
+            s_wt = wt * 0.55
+            self._draw_rays(self.s_rays, s_wt, S_COLOR, S_BRIGHT)
 
         if focus == "REFLECT":
             # Draw reflected rays
-            for label, path in self.reflect_rays:
-                drawn = int(min(wt * 0.7, len(path)))
-                for j in range(drawn):
-                    px, py = path[j]
-                    ix, iy = int(round(px)), int(round(py))
-                    if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                        dist_from_front = drawn - j
-                        if dist_from_front < wavefront_width:
-                            t = 1.0 - dist_from_front / wavefront_width
-                            color = (
-                                int(80 + 170 * t),
-                                int(200 + 55 * t),
-                                int(120 + 135 * t),
-                            )
-                        else:
-                            fade = max(0.15, 1.0 - (dist_from_front - wavefront_width) / 80.0)
-                            color = (int(80 * fade), int(200 * fade), int(120 * fade))
-                        self.display.set_pixel(ix, iy, color)
+            ref_wt = wt * 0.7
+            ref_base = (80, 200, 120)
+            ref_bright = (250, 255, 255)
+            wavefront_width = 8
+
+            for _, path in self.reflect_rays:
+                path_len = len(path)
+                drawn = int(ref_wt) if int(ref_wt) < path_len else path_len
+
+                start = drawn - 88
+                if start < 0:
+                    start = 0
+
+                for j in range(start, drawn):
+                    ix, iy = path[j]
+                    dist_from_front = drawn - j
+                    if dist_from_front < wavefront_width:
+                        t = 1.0 - dist_from_front / wavefront_width
+                        set_pixel(ix, iy, (
+                            int(80 + 170 * t),
+                            int(200 + 55 * t),
+                            int(120 + 135 * t),
+                        ))
+                    else:
+                        fade = 1.0 - (dist_from_front - wavefront_width) / 80.0
+                        if fade < 0.15:
+                            fade = 0.15
+                        set_pixel(ix, iy, (
+                            int(80 * fade),
+                            int(200 * fade),
+                            int(120 * fade),
+                        ))
 
         # Shadow zone highlighting
         if focus == "SHADOW" and wt > 100:
             shadow_pixels = self._compute_shadow_zone()
             pulse = 0.5 + 0.5 * math.sin(self.time * 3.0)
+            sc_mul = 0.5 + 0.5 * pulse
+            sc = (int(SHADOW_COLOR[0] * sc_mul),
+                  int(SHADOW_COLOR[1] * sc_mul),
+                  int(SHADOW_COLOR[2] * sc_mul))
             for px, py in shadow_pixels:
-                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
-                    sc = (int(SHADOW_COLOR[0] * (0.5 + 0.5 * pulse)),
-                          int(SHADOW_COLOR[1] * (0.5 + 0.5 * pulse)),
-                          int(SHADOW_COLOR[2] * (0.5 + 0.5 * pulse)))
-                    self.display.set_pixel(px, py, sc)
+                set_pixel(px, py, sc)
 
-            # Label
             self.display.draw_text_small(2, 56, "SHADOW ZONE", (180, 60, 60))
 
         # Quake flash: bright spot at source
         if self.quake_flash > 0:
             sx, sy = self._get_source_pos()
             flash_r = int(3 * self.quake_flash / 0.3)
-            bright = min(1.0, self.quake_flash / 0.15)
+            bright = self.quake_flash / 0.15
+            if bright > 1.0:
+                bright = 1.0
+            fr = int(255 * bright)
+            fg = int(255 * bright)
+            fb = int(200 * bright)
+            isx, isy = int(sx), int(sy)
             for dy in range(-flash_r, flash_r + 1):
                 for dx in range(-flash_r, flash_r + 1):
                     if dx * dx + dy * dy <= flash_r * flash_r:
-                        fx, fy = int(sx) + dx, int(sy) + dy
+                        fx, fy = isx + dx, isy + dy
                         if 0 <= fx < GRID_SIZE and 0 <= fy < GRID_SIZE:
-                            self.display.set_pixel(fx, fy,
-                                (int(255 * bright), int(255 * bright), int(200 * bright)))
+                            set_pixel(fx, fy, (fr, fg, fb))
 
         # Wavefront labels
         if focus == "WAVES" and self.propagating and wt > 10:
-            # Find P-wave front position (use middle ray)
             if self.p_rays:
                 mid_p = self.p_rays[len(self.p_rays) // 2]
-                p_idx = int(min(wt, len(mid_p) - 1))
+                p_idx = int(wt)
+                if p_idx >= len(mid_p):
+                    p_idx = len(mid_p) - 1
                 if 0 < p_idx < len(mid_p):
                     px, py = mid_p[p_idx]
-                    lx = int(round(px))
-                    ly = max(2, int(round(py)) - 4)
-                    if 2 <= lx < 50 and 2 <= ly < 60:
-                        self.display.draw_text_small(lx, ly, "P", P_BRIGHT)
+                    ly = py - 4
+                    if ly < 2:
+                        ly = 2
+                    if 2 <= px < 50 and 2 <= ly < 60:
+                        self.display.draw_text_small(px, ly, "P", P_BRIGHT)
 
-            # S-wave label
             if self.s_rays:
                 mid_s = self.s_rays[len(self.s_rays) // 2]
-                s_idx = int(min(wt * 0.55, len(mid_s) - 1))
+                s_idx = int(wt * 0.55)
+                if s_idx >= len(mid_s):
+                    s_idx = len(mid_s) - 1
                 if 0 < s_idx < len(mid_s):
                     sx2, sy2 = mid_s[s_idx]
-                    lx = int(round(sx2))
-                    ly = max(2, int(round(sy2)) - 4)
-                    if 2 <= lx < 50 and 2 <= ly < 60:
-                        self.display.draw_text_small(lx, ly, "S", S_BRIGHT)
+                    ly = sy2 - 4
+                    if ly < 2:
+                        ly = 2
+                    if 2 <= sx2 < 50 and 2 <= ly < 60:
+                        self.display.draw_text_small(sx2, ly, "S", S_BRIGHT)
 
         if focus == "REFLECT" and self.propagating and wt > 10:
             self.display.draw_text_small(2, 2, "PcP", (80, 200, 120))
 
         # Overlay
         if self.overlay_timer > 0 and self.overlay_lines:
-            alpha = min(1.0, self.overlay_timer / 0.5)
+            alpha = self.overlay_timer / 0.5
+            if alpha > 1.0:
+                alpha = 1.0
+            c = int(255 * alpha)
             for i, line in enumerate(self.overlay_lines):
-                r = int(255 * alpha)
-                g = int(255 * alpha)
-                b = int(255 * alpha)
-                self.display.draw_text_small(2, 2 + i * 8, line, (r, g, b))
+                self.display.draw_text_small(2, 2 + i * 8, line, (c, c, c))

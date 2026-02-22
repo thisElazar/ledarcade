@@ -454,5 +454,5 @@ class Invaders(Game):
         # Draw explosion particles
         for particle in self.explosion_particles:
             px, py = int(particle['x']), int(particle['y'])
-            brightness = int(255 * (particle['life'] / 0.3))
+            brightness = min(255, int(255 * (particle['life'] / 0.3)))
             self.display.set_pixel(px, py, (brightness, brightness // 2, 0))
