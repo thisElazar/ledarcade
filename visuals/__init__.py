@@ -133,6 +133,7 @@ from .fireflies import Fireflies
 from .starwarsca import StarWarsCA
 from .truchet import Truchet
 from .sandpile import Sandpile
+from .percolation import Percolation
 from .settings import Settings
 from .safety import Safety
 from .gamma import Gamma
@@ -321,8 +322,21 @@ from .scripts import Scripts
 from .weaving import Weaving
 from .signs import Signs
 from .matter import MatterPhases
+from .epidemic import Epidemic
 from .walk import Walk
 from .yoga import Yoga
+from .sorting import Sorting
+from .predprey import PredPrey
+from .turingmachine import TuringMachine
+from .evolution import Evolution
+from .gametheory import GameTheory
+from .erosion import Erosion
+from .geneticdrift import GeneticDrift
+from .convection import Convection
+from .entropy import Entropy
+from .network import Network
+from .seismic import Seismic
+from .ecosystem import Ecosystem
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
     Demoscene, Complexity,
@@ -398,6 +412,7 @@ ALL_VISUALS = [
     StarWarsCA,
     Truchet,
     Sandpile,
+    Percolation,
     Settings,
     Safety,
     Gamma,
@@ -596,8 +611,21 @@ ALL_VISUALS = [
     Weaving,
     Signs,
     MatterPhases,
+    Epidemic,
     Walk,
     Yoga,
+    Sorting,
+    PredPrey,
+    TuringMachine,
+    Evolution,
+    GameTheory,
+    Erosion,
+    GeneticDrift,
+    Convection,
+    Entropy,
+    Network,
+    Seismic,
+    Ecosystem,
     # Slideshows (visual playlists)
     Title,
     AllVisuals,
@@ -729,6 +757,7 @@ __all__ = [
     'StarWarsCA',
     'Truchet',
     'Sandpile',
+    'Percolation',
     'Settings',
     'Safety',
     'Gamma',
@@ -844,6 +873,19 @@ __all__ = [
     'Scripts',
     'Signs',
     'MatterPhases',
+    'Epidemic',
+    'Sorting',
+    'PredPrey',
+    'TuringMachine',
+    'Evolution',
+    'GameTheory',
+    'Erosion',
+    'GeneticDrift',
+    'Convection',
+    'Entropy',
+    'Network',
+    'Seismic',
+    'Ecosystem',
     'Slideshow',
     'AllVisuals',
     'Chill',
