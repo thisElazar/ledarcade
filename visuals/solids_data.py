@@ -242,7 +242,7 @@ def _truncated_cuboctahedron():
 def _snub_cube():
     # Tribonacci constant: t^3 = t^2 + t + 1
     t = 1.8392867552141612
-    # Even permutations of (±1, ±1/t, ±t) with all sign combinations
+    # Even (cyclic) permutations of (±1, ±1/t, ±t) — single chirality
     verts = []
     for sa in (1, -1):
         for sb in (1, -1):
@@ -272,8 +272,7 @@ def _icosidodecahedron():
 def _truncated_dodecahedron():
     p = PHI
     p2 = p * p
-    p3 = p2 * p
-    bases = [(0, IP, 2 + p), (IP, p, 2 * p), (p, 2, p3)]
+    bases = [(0, IP, 2 + p), (IP, p, 2 * p), (p, 2, p2)]
     verts = []
     for b in bases:
         verts += _even_perms(b)
@@ -566,7 +565,7 @@ def _tetrakis_hexahedron():
     # Dual of truncated octahedron: 14V, 36E, 24F
     # 8 cube vertices + 6 raised octahedron vertices
     verts = [(x, y, z) for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]
-    s = 1.5
+    s = 1 + math.sqrt(2)
     verts += [(s, 0, 0), (-s, 0, 0), (0, s, 0), (0, -s, 0), (0, 0, s), (0, 0, -s)]
     verts = _scale_to_unit(verts)
     edges = _edges_by_count(verts, 36)
@@ -576,10 +575,10 @@ def _tetrakis_hexahedron():
 def _deltoidal_icositetrahedron():
     # Dual of rhombicuboctahedron: 26V, 48E, 24F
     # 6 octahedral + 8 cube + 12 cuboctahedral vertices
-    s1 = 1 + 1 / math.sqrt(2)
+    s1 = 2.0
     verts = [(s1, 0, 0), (-s1, 0, 0), (0, s1, 0), (0, -s1, 0), (0, 0, s1), (0, 0, -s1)]
     verts += [(x, y, z) for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]
-    s2 = 1 + math.sqrt(2)
+    s2 = 1.0
     for pair in [(s2, s2, 0), (s2, 0, s2), (0, s2, s2)]:
         verts += _all_sign_perms(pair)
     verts = _dedup(verts)
@@ -673,9 +672,9 @@ def _deltoidal_hexecontahedron():
     s = 1.08
     mid_verts = _even_perms((0.5 * s, p / 2 * s, p2 / 2 * s))
     # Also the 6 axis points from icosidodecahedron
-    for v in [(0, 0, p * s / 2), (0, 0, -p * s / 2),
-              (0, p * s / 2, 0), (0, -p * s / 2, 0),
-              (p * s / 2, 0, 0), (-p * s / 2, 0, 0)]:
+    for v in [(0, 0, p * s), (0, 0, -p * s),
+              (0, p * s, 0), (0, -p * s, 0),
+              (p * s, 0, 0), (-p * s, 0, 0)]:
         mid_verts.append(v)
     mid_verts = _dedup(mid_verts)
     verts += mid_verts
@@ -694,9 +693,9 @@ def _disdyakis_triacontahedron():
     p2 = p * p
     s = 1.16
     mid_verts = _even_perms((0.5 * s, p / 2 * s, p2 / 2 * s))
-    for v in [(0, 0, p * s / 2), (0, 0, -p * s / 2),
-              (0, p * s / 2, 0), (0, -p * s / 2, 0),
-              (p * s / 2, 0, 0), (-p * s / 2, 0, 0)]:
+    for v in [(0, 0, p * s), (0, 0, -p * s),
+              (0, p * s, 0), (0, -p * s, 0),
+              (p * s, 0, 0), (-p * s, 0, 0)]:
         mid_verts.append(v)
     mid_verts = _dedup(mid_verts)
     verts += mid_verts
