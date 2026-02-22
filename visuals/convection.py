@@ -18,6 +18,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 N_SIM = 32          # internal simulation grid
 N_DISP = GRID_SIZE  # 64 - display grid
+SCALE = N_DISP // N_SIM  # 2x upscale
 
 
 # ── Color mapping: temperature -> RGB ────────────────────────────
@@ -51,22 +52,19 @@ _COLOR_LUT = [_temp_color(i / 255.0) for i in range(256)]
 
 
 def _flow_color(vx, vy, mag):
-    """Map velocity direction + magnitude to color."""
+    """Map velocity direction + magnitude to color — fast, no trig."""
     if mag < 0.001:
         return (5, 5, 10)
-    angle = math.atan2(vy, vx)
-    # Hue from angle, brightness from magnitude
-    h = (angle / (2 * math.pi)) % 1.0
     b = min(1.0, mag * 3.0)
-    # Simple HSV->RGB with S=1
-    i = int(h * 6) % 6
-    f = h * 6 - int(h * 6)
-    vals = [
-        (1, f, 0), (1 - f, 1, 0), (0, 1, f),
-        (0, 1 - f, 1), (f, 0, 1), (1, 0, 1 - f),
-    ]
-    r, g, bl = vals[i]
-    return (int(r * b * 255), int(g * b * 255), int(bl * b * 255))
+    # Direction via normalized components (avoids atan2)
+    inv = b / mag
+    nx = vx * inv   # -b..+b
+    ny = vy * inv
+    # R: rightward, B: leftward, G: upward/downward
+    r = max(0.0, nx)
+    bl = max(0.0, -nx)
+    g = abs(ny) * 0.7
+    return (int(r * 255), int(g * 255), int(bl * 255))
 
 
 VIZ_MODES = ["TEMP", "FLOW", "BOTH"]
@@ -104,9 +102,9 @@ class Convection(Visual):
             for x in range(S):
                 self.T[y][x] = base + random.uniform(-0.002, 0.002)
 
-        # Step timing - 20Hz instead of 50Hz
+        # Step timing - 10Hz for Pi performance
         self.step_timer = 0.0
-        self.step_interval = 0.05
+        self.step_interval = 0.1
 
         # Scratch buffers
         self._Tnew = [[0.0] * S for _ in range(S)]
@@ -337,7 +335,7 @@ class Convection(Visual):
 
     # ── Draw (upscale 2x from 32x32 sim to 64x64 display) ───────
     def draw(self):
-        self.display.clear()
+        # No clear() needed — we fill every pixel via 2x upscale
         set_pixel = self.display.set_pixel
         T = self.T
         vx = self.vx
@@ -345,6 +343,7 @@ class Convection(Visual):
         mode = self.viz_mode
         lut = _COLOR_LUT
         S = N_SIM
+        _sqrt = math.sqrt
 
         if mode == 0:
             # TEMP mode: pure temperature field
@@ -366,7 +365,8 @@ class Convection(Visual):
                     set_pixel(dx + 1, dy1, c)
 
         elif mode == 1:
-            # FLOW mode: velocity direction + magnitude
+            # FLOW mode: velocity direction + magnitude (trig-free)
+            _fc = _flow_color
             for sy in range(S):
                 vx_row = vx[sy]
                 vy_row = vy[sy]
@@ -375,8 +375,8 @@ class Convection(Visual):
                 for sx in range(S):
                     uvx = vx_row[sx]
                     uvy = vy_row[sx]
-                    mag = math.sqrt(uvx * uvx + uvy * uvy)
-                    c = _flow_color(uvx, uvy, mag)
+                    mag = _sqrt(uvx * uvx + uvy * uvy)
+                    c = _fc(uvx, uvy, mag)
                     dx = sx * 2
                     set_pixel(dx, dy, c)
                     set_pixel(dx + 1, dy, c)
@@ -403,16 +403,15 @@ class Convection(Visual):
                     set_pixel(dx + 1, dy1, c)
 
             # Overlay velocity as bright dots on a sparse grid
-            for sy in range(1, S, 2):
-                for sx in range(1, S, 2):
+            for sy in range(1, S, 3):
+                for sx in range(1, S, 3):
                     uvx = vx[sy][sx]
                     uvy = vy[sy][sx]
-                    mag = math.sqrt(uvx * uvx + uvy * uvy)
+                    mag = _sqrt(uvx * uvx + uvy * uvy)
                     if mag > 0.05:
                         norm = min(2.5, mag * 4.0) / mag
-                        # Compute endpoint in display coords
-                        ex = int(round(sx * 2 + uvx * norm * 2))
-                        ey = int(round(sy * 2 + uvy * norm * 2))
+                        ex = int(sx * 2 + uvx * norm * 2 + 0.5)
+                        ey = int(sy * 2 + uvy * norm * 2 + 0.5)
                         if 0 <= ex < N_DISP and 0 <= ey < N_DISP:
                             set_pixel(ex, ey, (255, 255, 255))
 

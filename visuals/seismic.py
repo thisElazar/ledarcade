@@ -52,15 +52,14 @@ SHADOW_COLOR = (120, 20, 20) # dim red arc for shadow zone
 # earth_layer[y][x] = layer index, or -1 if outside earth
 # Built once at module load.
 _earth_layer = []
-_earth_bg_waves = []   # pre-dimmed colors for WAVES/REFLECT mode (dim=0.35)
-_earth_bg_shadow = []  # pre-dimmed colors for SHADOW mode (dim=0.2)
+# Pre-built pixel lists: only earth-interior pixels (skip ~1200 empty bg pixels)
+# Each entry: (x, y, color_waves, color_shadow)
+_earth_pixels = []
 
 def _init_earth_tables():
-    """Build earth layer and background color tables once at import."""
+    """Build earth layer and background pixel tables once at import."""
     for y in range(GRID_SIZE):
         row_layer = []
-        row_bg_w = []
-        row_bg_s = []
         for x in range(GRID_SIZE):
             dx = x - CX
             dy = y - CY
@@ -74,18 +73,12 @@ def _init_earth_tables():
                 row_layer.append(layer_idx)
                 if layer_idx >= 0:
                     c = LAYERS[layer_idx][3]
-                    row_bg_w.append((int(c[0] * 0.35), int(c[1] * 0.35), int(c[2] * 0.35)))
-                    row_bg_s.append((int(c[0] * 0.2), int(c[1] * 0.2), int(c[2] * 0.2)))
-                else:
-                    row_bg_w.append(BG_COLOR)
-                    row_bg_s.append(BG_COLOR)
+                    cw = (int(c[0] * 0.35), int(c[1] * 0.35), int(c[2] * 0.35))
+                    cs = (int(c[0] * 0.2), int(c[1] * 0.2), int(c[2] * 0.2))
+                    _earth_pixels.append((x, y, cw, cs))
             else:
                 row_layer.append(-1)
-                row_bg_w.append(BG_COLOR)
-                row_bg_s.append(BG_COLOR)
         _earth_layer.append(row_layer)
-        _earth_bg_waves.append(row_bg_w)
-        _earth_bg_shadow.append(row_bg_s)
 
 _init_earth_tables()
 
@@ -591,12 +584,10 @@ class Seismic(Visual):
         focus = FOCUS_MODES[self.focus_idx]
         set_pixel = self.display.set_pixel
 
-        # Draw earth background from pre-rendered table
-        bg_table = _earth_bg_shadow if focus == "SHADOW" else _earth_bg_waves
-        for y in range(GRID_SIZE):
-            bg_row = bg_table[y]
-            for x in range(GRID_SIZE):
-                set_pixel(x, y, bg_row[x])
+        # Draw earth background — only interior pixels (~2800 vs 4096)
+        shadow = focus == "SHADOW"
+        for x, y, cw, cs in _earth_pixels:
+            set_pixel(x, y, cs if shadow else cw)
 
         wt = self.wave_time
 

@@ -103,15 +103,14 @@ class GeneticDrift(Visual):
         # Frequency history (list of p values)
         self.freq_history = []
 
+        # Region assignments: which region index each organism belongs to
+        self.num_regions = MAP_COLS * MAP_ROWS
+        self.region_assign = []
+
         # Population: list of (allele1, allele2) tuples
         # True = A, False = a
         self.population = []
         self._init_population()
-
-        # Region assignments: which region index each organism belongs to
-        self.num_regions = MAP_COLS * MAP_ROWS
-        self.region_assign = []
-        self._assign_regions()
 
     def _init_population(self):
         """Create initial population with ~50/50 allele frequencies."""
@@ -285,7 +284,10 @@ class GeneticDrift(Visual):
             self.fix_timer = 2.5
 
     def draw(self):
-        self.display.clear()
+        d = self.display
+        d.clear()
+        set_pixel = d.set_pixel
+        draw_rect = d.draw_rect
 
         # --- History chart (y = HISTORY_Y0 to HISTORY_Y1-1) ---
         hist = self.freq_history
@@ -295,23 +297,21 @@ class GeneticDrift(Visual):
             if col_x < 0:
                 continue
             split_y = HISTORY_Y0 + int((1.0 - p) * HISTORY_H)
-            for cy in range(HISTORY_Y0, HISTORY_Y1):
-                if cy < split_y:
-                    self.display.set_pixel(col_x, cy, CHART_a)
-                else:
-                    self.display.set_pixel(col_x, cy, CHART_A)
+            # Top portion (a allele) and bottom portion (A allele)
+            if split_y > HISTORY_Y0:
+                draw_rect(col_x, HISTORY_Y0, 1, split_y - HISTORY_Y0, CHART_a)
+            if split_y < HISTORY_Y1:
+                draw_rect(col_x, split_y, 1, HISTORY_Y1 - split_y, CHART_A)
 
         # Draw the p=0.5 line as a subtle dotted guide
         mid_y = HISTORY_Y0 + HISTORY_H // 2
         for x in range(0, N, 3):
-            self.display.set_pixel(x, mid_y, (30, 30, 40))
+            set_pixel(x, mid_y, (30, 30, 40))
 
         # Separator under chart
-        for x in range(N):
-            self.display.set_pixel(x, HISTORY_Y1, COLOR_SEP)
+        draw_rect(0, HISTORY_Y1, N, 1, COLOR_SEP)
 
         # --- Population map (y = MAP_Y0 to MAP_Y1-1) ---
-        # Compute local allele frequency per region
         region_a_count = [0] * self.num_regions
         region_total = [0] * self.num_regions
         for idx, (a1, a2) in enumerate(self.population):
@@ -320,9 +320,10 @@ class GeneticDrift(Visual):
                 region_total[r] += 2
                 region_a_count[r] += (1 if a1 else 0) + (1 if a2 else 0)
 
-        map_h = MAP_Y1 - MAP_Y0  # pixel rows for map
+        map_h = MAP_Y1 - MAP_Y0
         block_h = map_h / MAP_ROWS
         block_w = N / MAP_COLS
+        global_p = self._allele_freq()
 
         for row in range(MAP_ROWS):
             for col in range(MAP_COLS):
@@ -330,50 +331,37 @@ class GeneticDrift(Visual):
                 if region_total[r] > 0:
                     p = region_a_count[r] / region_total[r]
                 else:
-                    p = self._allele_freq()  # fallback to global
+                    p = global_p
 
                 color = _freq_color(p)
 
-                # Pixel bounds for this block
                 x0 = int(col * block_w)
                 x1 = int((col + 1) * block_w)
                 y0 = MAP_Y0 + int(row * block_h)
                 y1 = MAP_Y0 + int((row + 1) * block_h)
 
-                for py in range(y0, y1):
-                    for px in range(x0, x1):
-                        self.display.set_pixel(px, py, color)
+                draw_rect(x0, y0, x1 - x0, y1 - y0, color)
 
-                # Subtle grid lines between blocks (darken edges)
+                # Subtle grid lines (darken edges)
+                edge = (max(0, color[0] - 25),
+                        max(0, color[1] - 25),
+                        max(0, color[2] - 25))
                 if col > 0:
-                    for py in range(y0, y1):
-                        c = self.display.get_pixel(x0, py) if hasattr(self.display, 'get_pixel') else color
-                        self.display.set_pixel(x0, py, (
-                            max(0, color[0] - 25),
-                            max(0, color[1] - 25),
-                            max(0, color[2] - 25),
-                        ))
+                    draw_rect(x0, y0, 1, y1 - y0, edge)
                 if row > 0:
-                    for px in range(x0, x1):
-                        self.display.set_pixel(px, y0, (
-                            max(0, color[0] - 25),
-                            max(0, color[1] - 25),
-                            max(0, color[2] - 25),
-                        ))
+                    draw_rect(x0, y0, x1 - x0, 1, edge)
 
         # Separator above bar
-        for x in range(N):
-            self.display.set_pixel(x, BAR_Y0 - 1, COLOR_SEP)
+        draw_rect(0, BAR_Y0 - 1, N, 1, COLOR_SEP)
 
         # --- Allele frequency bar (y = BAR_Y0 to BAR_Y1) ---
         p = self._allele_freq()
         split_x = int(p * N)
-        for y in range(BAR_Y0, BAR_Y1 + 1):
-            for x in range(N):
-                if x < split_x:
-                    self.display.set_pixel(x, y, COLOR_A)
-                else:
-                    self.display.set_pixel(x, y, COLOR_a)
+        bar_h = BAR_Y1 - BAR_Y0 + 1
+        if split_x > 0:
+            draw_rect(0, BAR_Y0, split_x, bar_h, COLOR_A)
+        if split_x < N:
+            draw_rect(split_x, BAR_Y0, N - split_x, bar_h, COLOR_a)
 
         # --- HUD ---
         gen_text = f"G{self.generation}"

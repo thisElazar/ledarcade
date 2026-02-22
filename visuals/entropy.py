@@ -811,12 +811,7 @@ class Entropy(Visual):
 
     def draw(self):
         d = self.display
-        d.clear()
-
-        # Background
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                d.set_pixel(x, y, DIM_BG)
+        d.clear(DIM_BG)
 
         if self.mode == 0:
             self._draw_entropy()
