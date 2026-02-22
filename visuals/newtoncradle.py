@@ -23,7 +23,7 @@ FRAME_COLOR = (120, 120, 130)
 class NewtonCradle(Visual):
     name = "NEWTON"
     description = "Newton's cradle"
-    category = "household"
+    category = "mechanics"
 
     BALL_RADIUS = 4
     STRING_LEN = 30

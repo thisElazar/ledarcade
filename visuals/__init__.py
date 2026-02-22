@@ -227,7 +227,6 @@ from .astrolabe import Astrolabe
 from .archimedes import Archimedes
 from .frozen_lake import FrozenLake
 from .crystallize import Crystallize
-from .drift import DriftVisual
 from .drift3d import Drift3D
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderSlide, WonderDrop, WonderSpin,
@@ -511,7 +510,6 @@ ALL_VISUALS = [
     Antikythera,
     Astrolabe,
     Archimedes,
-    DriftVisual,
     Drift3D,
     WonderGlow,
     WonderMarquee,
@@ -848,7 +846,6 @@ __all__ = [
     'Astrolabe',
     'Archimedes',
     'Crystallize',
-    'DriftVisual',
     'Drift3D',
     'BML',
     'Highway',

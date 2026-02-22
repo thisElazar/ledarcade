@@ -224,7 +224,7 @@ CX, CY = 32, 28
 class Periodic(Visual):
     name = "PERIODIC"
     description = "Bohr model atomic orbitals"
-    category = "science"
+    category = "science_micro"
 
     def reset(self):
         self.time = 0.0

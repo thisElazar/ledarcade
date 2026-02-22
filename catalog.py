@@ -83,8 +83,10 @@ VISUAL_CATEGORIES = [
     Category("OUTDOORS",    (56, 224, 73),   "nature"),      # 126°
     # Mechanical family
     Category("ROAD+RAIL",   (197, 65, 217),  "road_rail"),   # 292°
-    # Knowledge family
-    Category("SCIENCE",     (75, 45, 224),   "science"),     # 250°
+    # Knowledge family (science split by scale: micro → bench → macro)
+    Category("SCIENCE MICRO", (75, 45, 224), "science_micro"),  # 250°
+    Category("SCIENCE BENCH", (75, 45, 224), "science_bench"),  # 250°
+    Category("SCIENCE MACRO", (75, 45, 224), "science_macro"),  # 250°
     # Optional / local-only
     Category("SPRITES",     (160, 217, 65),  "sprites"),     # 85°
     Category("SUPERHEROES", (230, 52, 35),   "superheroes"), # 5°

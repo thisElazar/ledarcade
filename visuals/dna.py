@@ -126,7 +126,7 @@ PALETTES = [
 class DNA(Visual):
     name = "DNA"
     description = "Molecular biology explorer"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

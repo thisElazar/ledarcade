@@ -1221,7 +1221,7 @@ def _interp_path(path, progress):
 class Cell(Visual):
     name = "CELL"
     description = "Cellular pathways"
-    category = "science"
+    category = "science_micro"
 
     def reset(self):
         self.time = 0.0

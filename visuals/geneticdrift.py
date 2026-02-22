@@ -64,7 +64,7 @@ def _freq_color(p):
 class GeneticDrift(Visual):
     name = "GENETIC DRIFT"
     description = "Population genetics"
-    category = "science"
+    category = "science_macro"
 
     # Population bounds
     POP_MIN = 10

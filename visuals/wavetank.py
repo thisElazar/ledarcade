@@ -101,7 +101,7 @@ def _energy_color(val, pal):
 class WaveTank(Visual):
     name = "WAVE TANK"
     description = "2D wave equation simulation"
-    category = "science"
+    category = "science_bench"
 
     def __init__(self, display: Display):
         super().__init__(display)

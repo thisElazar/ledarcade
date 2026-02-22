@@ -17,7 +17,7 @@ from . import Visual, Display, Colors, GRID_SIZE
 class Plasma(Visual):
     name = "PLASMA"
     description = "Classic plasma waves"
-    category = "nature"
+    category = "digital"
 
     def __init__(self, display: Display):
         super().__init__(display)

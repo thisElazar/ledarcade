@@ -198,7 +198,7 @@ SUN_MASS = 50.0  # Heavy so circular velocity formula works cleanly
 class OrbitsSolar(Visual):
     name = "SOLAR SYSTEM"
     description = "Sun and planets"
-    category = "science"
+    category = "science_macro"
     TRAIL_LENGTH = 80
 
     def __init__(self, display: Display):
@@ -323,7 +323,7 @@ class OrbitsSolar(Visual):
 class OrbitsMulti(Visual):
     name = "3 BODY PROBLEM"
     description = "Gravitational dance"
-    category = "science"
+    category = "science_macro"
     TRAIL_LENGTH = 120
     SOFT2 = 25.0       # Higher softening → gentler close passes
     MIN_MASS = 3.0     # Below this, full merge
@@ -512,7 +512,7 @@ class OrbitsMulti(Visual):
 class OrbitsBelt(Visual):
     name = "SPACE DUST"
     description = "Planets and asteroids"
-    category = "science"
+    category = "science_macro"
     TRAIL_LENGTH = 30
 
     def __init__(self, display: Display):

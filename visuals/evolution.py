@@ -121,7 +121,7 @@ def _organism_color(fitness):
 class Evolution(Visual):
     name = "EVOLUTION"
     description = "Fitness landscapes"
-    category = "science"
+    category = "science_macro"
 
     def __init__(self, display: Display):
         self._rugged = _RuggedLandscape()

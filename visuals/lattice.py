@@ -1104,7 +1104,7 @@ def _generate_amorphous_structure(crystal, seed=None):
 class Lattice(Visual):
     name = "LATTICES"
     description = "Crystal lattice structures"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

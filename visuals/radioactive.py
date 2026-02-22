@@ -108,7 +108,7 @@ PALETTES = [
 class Radioactive(Visual):
     name = "RADIOACTIVE"
     description = "Nuclear decay simulation"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

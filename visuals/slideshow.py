@@ -104,7 +104,9 @@ class AllVisuals(Slideshow):
     # Category weights: higher = more frequent in rotation
     CATEGORY_WEIGHTS = {
         'automata': 4,
-        'science': 4,
+        'science_micro': 4,
+        'science_bench': 4,
+        'science_macro': 4,
         'digital': 3,
         'nature': 3,
         'sprites': 3,

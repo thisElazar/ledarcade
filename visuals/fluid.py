@@ -371,7 +371,7 @@ def _make_obstacle(shape_idx):
 class FluidTunnel(Visual):
     name = "WIND TUNNEL"
     description = "Flow past obstacle"
-    category = "science"
+    category = "science_bench"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -503,7 +503,7 @@ class FluidTunnel(Visual):
 class FluidInk(Visual):
     name = "INK DROPS"
     description = "Swirling ink drops"
-    category = "science"
+    category = "science_bench"
 
     _N_VIZ_MODES = len(PALETTES) + 2
 
@@ -620,7 +620,7 @@ _INIT_PATTERNS = [
 class FluidMixing(Visual):
     name = "COLOR MIX"
     description = "Paint colors mixing"
-    category = "science"
+    category = "science_bench"
 
     _N_VIZ_MODES = len(PAINT_PALETTES)
 
@@ -852,7 +852,7 @@ _PLAY_HUES = [
 class FluidPlay(Visual):
     name = "FLUID PLAY"
     description = "Drag through fluid"
-    category = "science"
+    category = "science_bench"
 
     # Viz modes: 3 velocity, 3 direction, 3 vorticity
     _VIZ_MODES = (
@@ -1136,7 +1136,7 @@ def _make_obstacle_at(shape_idx, ox, oy):
 class FluidSculpt(Visual):
     name = "WIND TUNNEL LAB"
     description = "Move obstacle in flow"
-    category = "science"
+    category = "science_bench"
 
     _VIZ_MODES = (
         [('vel', name) for name in VEL_PALETTE_NAMES] +

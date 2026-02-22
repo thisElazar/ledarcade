@@ -79,7 +79,7 @@ def _build_group_indices():
 class Microscope(Visual):
     name = "MICROSCOPE"
     description = "Biological specimens"
-    category = "science"
+    category = "science_micro"
 
     def reset(self):
         self.time = 0.0

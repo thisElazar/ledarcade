@@ -5414,7 +5414,7 @@ PEPTIDES = [
 class Peptides(Visual):
     name = "PEPTIDES"
     description = "Peptide bead models + calculator"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

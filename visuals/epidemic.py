@@ -42,7 +42,7 @@ COLOR_INFECTED_FRESH = (255, 120, 40)
 class Epidemic(Visual):
     name = "EPIDEMIC"
     description = "SIR disease spread"
-    category = "automata"
+    category = "science_macro"
 
     def __init__(self, display: Display):
         super().__init__(display)

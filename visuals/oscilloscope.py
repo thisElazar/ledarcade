@@ -55,7 +55,7 @@ HALF_H = (DRAW_Y_MAX - DRAW_Y_MIN) // 2
 class Oscilloscope(Visual):
     name = "OSCILLOSCOPE"
     description = "Phosphor-green waveforms and Lissajous figures"
-    category = "science"
+    category = "science_bench"
 
     def reset(self):
         self.time = 0.0

@@ -21,7 +21,7 @@ except ImportError:
 class Earth(Visual):
     name = "EARTH"
     description = "Rotating globe"
-    category = "science"
+    category = "science_macro"
 
     GIF_FILE = "earth.gif"
     BASE_INTERVAL = 0.20  # 200ms per frame (matches GIF timing)

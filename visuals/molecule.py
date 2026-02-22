@@ -5349,7 +5349,7 @@ def _build_group_indices():
 class Molecule(Visual):
     name = "MOLECULES"
     description = "3D ball-and-stick molecular models"
-    category = "science"
+    category = "science_micro"
 
     _saved_group_idx = None
     _saved_mol_pos = None

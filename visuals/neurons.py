@@ -104,7 +104,7 @@ class Synapse:
 class Neurons(Visual):
     name = "BRAIN"
     description = "Spiking neural net"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

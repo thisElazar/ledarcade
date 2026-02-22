@@ -155,7 +155,7 @@ def _segment_normal(x1, y1, x2, y2):
 class Optics(Visual):
     name = "OPTICS"
     description = "Geometric ray tracing"
-    category = "science"
+    category = "science_bench"
 
     def __init__(self, display: Display):
         super().__init__(display)

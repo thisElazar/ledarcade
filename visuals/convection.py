@@ -73,7 +73,7 @@ VIZ_MODES = ["TEMP", "FLOW", "BOTH"]
 class Convection(Visual):
     name = "CONVECTION"
     description = "Rayleigh-Benard cells"
-    category = "science"
+    category = "science_bench"
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -170,7 +170,7 @@ WL_MAX = 700.0
 class Spectroscope(Visual):
     name = "SPECTROSCOPE"
     description = "Element emission spectra"
-    category = "science"
+    category = "science_micro"
 
     def reset(self):
         self.time = 0.0

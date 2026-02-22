@@ -99,7 +99,7 @@ IDLE_TIMEOUT = 8.0
 class MaxwellDemon(Visual):
     name = "Maxwell's Demon"
     description = "Thermodynamic thought experiment — a demon sorts hot and cold gas"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

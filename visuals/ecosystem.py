@@ -42,7 +42,7 @@ VIEW_MODES = ["ALL", "ENERGY", "GRASS", "HERBI", "PRED", "APEX"]
 class Ecosystem(Visual):
     name = "ECOSYSTEM"
     description = "Multi-trophic food web"
-    category = "nature"
+    category = "science_macro"
 
     def __init__(self, display: Display):
         super().__init__(display)

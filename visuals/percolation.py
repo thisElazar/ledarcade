@@ -63,7 +63,7 @@ class _UnionFind:
 class Percolation(Visual):
     name = "PERCOLATION"
     description = "Critical threshold"
-    category = "automata"
+    category = "math"
 
     def __init__(self, display: Display):
         super().__init__(display)

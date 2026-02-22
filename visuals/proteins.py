@@ -3567,7 +3567,7 @@ PROTEIN_BY_NAME = {p['name']: p for p in PROTEINS}
 class Proteins(Visual):
     name = "PROTEINS"
     description = "3D protein backbone structures"
-    category = "science"
+    category = "science_micro"
 
     def __init__(self, display: Display):
         super().__init__(display)

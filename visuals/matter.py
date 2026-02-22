@@ -48,7 +48,7 @@ def _temp_color(t):
 class MatterPhases(Visual):
     name = "MATTER"
     description = "States of matter: solid, liquid, gas"
-    category = "science"
+    category = "science_micro"
 
     def reset(self):
         self.time = 0.0

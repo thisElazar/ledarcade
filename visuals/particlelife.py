@@ -38,7 +38,7 @@ class Particle:
 class ParticleLife(Visual):
     name = "JELLYFISH"
     description = "Emergent particles"
-    category = "nature"
+    category = "automata"
 
     # Bright, saturated species colors
     SPECIES_COLORS = [

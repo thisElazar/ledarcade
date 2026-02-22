@@ -45,7 +45,7 @@ DRAW_OFFSET_Y = 8
 class Chladni(Visual):
     name = "CHLADNI"
     description = "Vibrating plate nodal patterns"
-    category = "science"
+    category = "science_bench"
 
     def reset(self):
         self.time = 0.0

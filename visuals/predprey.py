@@ -27,7 +27,7 @@ NEIGHBORS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 class PredPrey(Visual):
     name = "PREDATOR-PREY"
     description = "Lotka-Volterra ecology"
-    category = "automata"
+    category = "science_macro"
 
     def __init__(self, display: Display):
         super().__init__(display)

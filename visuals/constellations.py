@@ -353,7 +353,7 @@ def _build_group_indices():
 class Constellations(Visual):
     name = "CONSTELLATIONS"
     description = "Night sky star map"
-    category = "science"
+    category = "science_macro"
 
     def reset(self):
         self.time = 0.0

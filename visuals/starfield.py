@@ -30,7 +30,7 @@ class Star:
 class Starfield(Visual):
     name = "STARFIELD"
     description = "3D star tunnel"
-    category = "nature"
+    category = "digital"
 
     def __init__(self, display: Display):
         super().__init__(display)

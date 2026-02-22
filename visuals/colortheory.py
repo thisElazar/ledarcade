@@ -88,7 +88,7 @@ TITLE_COLOR = (200, 200, 220)
 class ColorTheory(Visual):
     name = "COLOR THEORY"
     description = "Color theory reference"
-    category = "science"
+    category = "science_bench"
 
     def reset(self):
         self.time = 0.0

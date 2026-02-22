@@ -210,7 +210,7 @@ def _draw_equipotential(display, charges, palette_idx):
 class EMMotor(Visual):
     name = "EM MOTOR"
     description = "Electromagnetic motor"
-    category = "science"
+    category = "science_bench"
 
     NUM_STATOR = 8
     NUM_ROTOR = 4
@@ -312,7 +312,7 @@ class EMMotor(Visual):
 class EMCircuit(Visual):
     name = "EM CIRCUIT"
     description = "Current in a circuit"
-    category = "science"
+    category = "science_bench"
 
     NUM_DOTS = 24
 
@@ -521,7 +521,7 @@ CONFIGS = [
 class EMFreeAir(Visual):
     name = "EM FIELD"
     description = "Electric field lines"
-    category = "science"
+    category = "science_bench"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -624,7 +624,7 @@ _VIEW_MODES = ['FIELD LINES', 'POTENTIAL', 'CIRCUIT']
 class Coulomb(Visual):
     name = "COULOMB"
     description = "Electrostatics sandbox"
-    category = "science"
+    category = "science_bench"
 
     NUM_STATOR = 8
     NUM_ROTOR = 4

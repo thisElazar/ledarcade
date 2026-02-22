@@ -322,7 +322,7 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
 class Seismic(Visual):
     name = "SEISMIC"
     description = "Earthquake wave propagation"
-    category = "science"
+    category = "science_macro"
 
     # Source positions: angles around the crust (in radians)
     SOURCE_ANGLES = [

@@ -52,7 +52,7 @@ MIXES = [
 class GameTheory(Visual):
     name = "GAME THEORY"
     description = "Prisoner's Dilemma"
-    category = "automata"
+    category = "math"
 
     def __init__(self, display: Display):
         super().__init__(display)

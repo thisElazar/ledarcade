@@ -51,7 +51,7 @@ CX, CY = 32, 28
 class MoonPhases(Visual):
     name = "MOON PHASES"
     description = "Lunar phase cycle with realistic shadows"
-    category = "science"
+    category = "science_macro"
 
     def reset(self):
         self.time = 0.0
