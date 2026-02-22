@@ -47,10 +47,20 @@ tools/.flag_cache/
 tools/.sign_cache/
 tools/.dance_cache/
 tools/.plates_cache/
+tools/.coins_cache/
+tools/.pottery_cache/
+
+# Tool preview/test artifacts
+tools/*_preview.png
+tools/*_test*
+tools/pottery_*.png
 
 # Research/experiment docs (not part of runtime)
 docs/
 tools/basin_experiment.py
+
+# Session transcripts
+2026-*.txt
 
 # Local/personal visuals (not shipped with product)
 visuals/local/*.py

@@ -248,13 +248,13 @@ def process_coin(img, entry):
         img = ImageOps.pad(img, (SIZE, SIZE), color=(0, 0, 0),
                            method=Image.LANCZOS)
     else:
-        # Round coins: center crop to square, then resize
-        img = center_crop_square(img)
-        img = img.resize((SIZE, SIZE), Image.LANCZOS)
+        # Round coins: pad to square (preserves full coin), then resize
+        img = ImageOps.pad(img, (SIZE, SIZE), color=(0, 0, 0),
+                           method=Image.LANCZOS)
 
     # Step 3: Circular vignette for round coins (fade edges)
     if shape in ("round", "round_square_hole", "round_with_hole"):
-        img = apply_circular_vignette(img, coin_radius=28)
+        img = apply_circular_vignette(img, coin_radius=30)
 
     # Step 4: Color boost for LED display
     img = color_correct(img)
