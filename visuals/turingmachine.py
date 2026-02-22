@@ -132,7 +132,7 @@ PROGRAMS = [
             ('D', 0): (0, R, 'HALT'),  # reached left of result, done
             ('D', 1): (1, L, 'D'),     # scan left over result
         },
-        {i: 1 for i in range(3)} | {3: 0} | {i: 1 for i in range(4, 8)},
+        lambda: ({i: 1 for i in range(3)} | {3: 0} | {i: 1 for i in range(4, 8)}, 0, 'A'),
     ),
 ]
 
