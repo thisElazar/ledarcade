@@ -222,7 +222,7 @@ CX, CY = 32, 28
 
 
 class Periodic(Visual):
-    name = "PERIODIC"
+    name = "ELEMENTS"
     description = "Bohr model atomic orbitals"
     category = "science_micro"
 

@@ -169,6 +169,8 @@ from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing, FluidPlay, FluidSculpt
 from .earth import Earth
 from .molecule import Molecule
+from .orbitals import Orbitals
+from .electrons import Electrons
 from .lattice import Lattice
 from .proteins import Proteins
 from .peptides import Peptides
@@ -454,6 +456,8 @@ ALL_VISUALS = [
     FluidSculpt,
     Earth,
     Molecule,
+    Orbitals,
+    Electrons,
     Lattice,
     Proteins,
     Peptides,
@@ -795,6 +799,8 @@ __all__ = [
     'FluidSculpt',
     'Earth',
     'Molecule',
+    'Orbitals',
+    'Electrons',
     'Lattice',
     'Proteins',
     'Peptides',
