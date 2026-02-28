@@ -8,6 +8,7 @@ Hold 2 seconds to exit back to menu (handled by main loop).
 import os
 import random
 from . import Visual, GRID_SIZE
+from .gifcache import cache_frames, extract_rgb
 from arcade import InputState
 
 try:
@@ -402,45 +403,54 @@ class GifPlayer(Visual):
     _gif_path = None  # set by factory or subclass
 
     def reset(self):
-        self.frames = []   # list of [(r,g,b) or None per pixel] row-major
+        self.frames = []    # list of pixel grids (row-major, (r,g,b) or None)
+        self.durations = []  # per-frame duration in seconds
         self.frame_idx = 0
-        self.fps = 6
         self.timer = 0.0
         self._load()
+
+    def _decode_gif(self):
+        """Decode GIF frames and per-frame durations. Used as gifcache loader."""
+        img = Image.open(self._gif_path)
+        frames = []
+        durations = []
+        try:
+            while True:
+                dur_ms = img.info.get('duration', 166)
+                if dur_ms <= 0:
+                    dur_ms = 166
+                durations.append(dur_ms / 1000.0)
+                frame = img.convert("RGB")
+                if frame.size != (GRID_SIZE, GRID_SIZE):
+                    frame = frame.resize((GRID_SIZE, GRID_SIZE), Image.NEAREST)
+                rgb = extract_rgb(frame)
+                # Replace black pixels with None for draw-time skip
+                pixels = []
+                for row in rgb:
+                    pixels.append(
+                        [c if (c[0] or c[1] or c[2]) else None for c in row])
+                frames.append(pixels)
+                img.seek(img.tell() + 1)
+        except EOFError:
+            pass
+        return (frames, durations)
 
     def _load(self):
         if not HAS_PIL or not self._gif_path or not os.path.exists(self._gif_path):
             return
-        img = Image.open(self._gif_path)
-        # Extract FPS from GIF duration
-        duration = img.info.get('duration', 166)  # ms per frame
-        if duration > 0:
-            self.fps = max(1, min(24, round(1000 / duration)))
-        try:
-            while True:
-                frame = img.convert("RGB")
-                if frame.size != (GRID_SIZE, GRID_SIZE):
-                    frame = frame.resize((GRID_SIZE, GRID_SIZE), Image.NEAREST)
-                pixels = []
-                for y in range(GRID_SIZE):
-                    row = []
-                    for x in range(GRID_SIZE):
-                        r, g, b = frame.getpixel((x, y))
-                        row.append((r, g, b) if (r or g or b) else None)
-                    pixels.append(row)
-                self.frames.append(pixels)
-                img.seek(img.tell() + 1)
-        except EOFError:
-            pass
+        data = cache_frames(self._gif_path, self._decode_gif)
+        if data:
+            self.frames, self.durations = data
 
     def update(self, dt):
         self.time += dt
         if not self.frames:
             return
         self.timer += dt
-        interval = 1.0 / self.fps
-        if self.timer >= interval:
-            self.timer -= interval
+        dur = (self.durations[self.frame_idx]
+               if self.durations else 1.0 / 6)
+        if self.timer >= dur:
+            self.timer -= dur
             self.frame_idx = (self.frame_idx + 1) % len(self.frames)
 
     def draw(self):
