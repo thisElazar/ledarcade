@@ -158,7 +158,7 @@ class Baking(Visual):
     BAR_GAP = 1      # gap between bars
     SEP3_Y = 51
     NOTE_Y = 53
-    FOOT_SEP_Y = 57
+    FOOT_SEP_Y = 58
     FOOT_Y = 59
 
     def reset(self):
