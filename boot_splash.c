@@ -30,18 +30,20 @@ int main(void) {
     struct RGBLedMatrix *matrix;
     struct LedCanvas *canvas;
 
+    struct RGBLedRuntimeOptions rt_opts;
+
     memset(&opts, 0, sizeof(opts));
     opts.rows = 64;
     opts.cols = 64;
     opts.hardware_mapping = "led-arcade";
     opts.brightness = 80;
 
-    int argc = 4;
-    char *argv[] = {"boot_splash", "--led-gpio-slowdown=4",
-                    "--led-drop-privs=0", NULL};
-    char **argv_ptr = argv;
+    memset(&rt_opts, 0, sizeof(rt_opts));
+    rt_opts.gpio_slowdown = 4;
+    rt_opts.drop_privileges = 0;
+    rt_opts.do_gpio_init = true;
 
-    matrix = led_matrix_create_from_options(&opts, &argc, &argv_ptr);
+    matrix = led_matrix_create_from_options_and_rt_options(&opts, &rt_opts);
     if (!matrix) {
         fprintf(stderr, "boot_splash: could not init matrix\n");
         return 1;
