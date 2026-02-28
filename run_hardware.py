@@ -646,8 +646,14 @@ def main():
 
             input_cooldown = max(0, input_cooldown - dt)
 
-            # Sleep timer — blank display, wake on any input
-            uptime += dt
+            # Update input
+            input_state = input_handler.update()
+
+            # Sleep timer — blank display after inactivity, wake on any input
+            if has_any_input(input_state):
+                uptime = 0.0
+            else:
+                uptime += dt
             if sleep_minutes > 0 and uptime >= sleep_minutes * 60:
                 display.clear()
                 display.render()
@@ -663,9 +669,6 @@ def main():
                 idle_timer = 0.0
                 in_idle = False
                 idle_visual = None
-
-            # Update input
-            input_state = input_handler.update()
 
             if in_menu:
                 # Idle screen logic
