@@ -493,6 +493,30 @@ def _pick_idle_visual(display):
     return vis
 
 
+def _kill_boot_splash():
+    """Kill the boot splash process so we can take over the LED matrix."""
+    import os, signal as sig
+    pid_file = "/tmp/led-arcade-bootsplash.pid"
+    try:
+        with open(pid_file) as f:
+            pid = int(f.read().strip())
+        os.kill(pid, sig.SIGTERM)
+        # Wait for it to actually release the matrix
+        for _ in range(20):
+            try:
+                os.kill(pid, 0)  # check if still alive
+                time.sleep(0.05)
+            except OSError:
+                break
+        try:
+            os.remove(pid_file)
+        except OSError:
+            pass
+        print("Boot splash stopped.")
+    except (FileNotFoundError, ValueError, ProcessLookupError):
+        pass  # no splash running, that's fine
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -517,6 +541,9 @@ def main():
     for cat in categories:
         print(f"  {cat.name}: {len(cat.items)} items")
     print()
+
+    # Kill boot splash before we take over the matrix
+    _kill_boot_splash()
 
     # Initialize hardware
     print("Initializing display...")
