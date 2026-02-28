@@ -8,7 +8,7 @@ Before=led-arcade.service
 Type=simple
 User=root
 WorkingDirectory=/home/thiselazar/led-arcade
-ExecStart=/usr/bin/python3 /home/thiselazar/led-arcade/boot_splash.py
+ExecStart=/home/thiselazar/led-arcade/boot_splash
 Restart=no
 
 [Install]

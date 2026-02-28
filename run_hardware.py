@@ -494,26 +494,13 @@ def _pick_idle_visual(display):
 
 
 def _kill_boot_splash():
-    """Kill the boot splash process so we can take over the LED matrix."""
-    import os, signal as sig
-    pid_file = "/tmp/led-arcade-bootsplash.pid"
+    """Stop the boot splash service so we can take over the LED matrix."""
+    import subprocess
     try:
-        with open(pid_file) as f:
-            pid = int(f.read().strip())
-        os.kill(pid, sig.SIGTERM)
-        # Wait for it to actually release the matrix
-        for _ in range(20):
-            try:
-                os.kill(pid, 0)  # check if still alive
-                time.sleep(0.05)
-            except OSError:
-                break
-        try:
-            os.remove(pid_file)
-        except OSError:
-            pass
+        subprocess.run(["systemctl", "stop", "led-arcade-splash"],
+                       timeout=5, capture_output=True)
         print("Boot splash stopped.")
-    except (FileNotFoundError, ValueError, ProcessLookupError):
+    except Exception:
         pass  # no splash running, that's fine
 
 
