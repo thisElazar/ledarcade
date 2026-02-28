@@ -1,0 +1,15 @@
+[Unit]
+Description=LED Arcade Boot Splash
+DefaultDependencies=no
+After=local-fs.target
+Before=led-arcade.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/thiselazar/led-arcade
+ExecStart=/usr/bin/python3 /home/thiselazar/led-arcade/boot_splash.py
+Restart=no
+
+[Install]
+WantedBy=sysinit.target
