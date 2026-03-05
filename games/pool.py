@@ -109,6 +109,7 @@ class Pool(Game):
         self.phase = PHASE_MODE_SELECT
         self.score = 0
         self.mode_select = 0  # 0 = 1P, 1 = 2P
+        self.demo_mode = getattr(self, 'demo_mode', False)
 
         # 1P state
         self.shots_left = 10
@@ -227,14 +228,30 @@ class Pool(Game):
             # Check pockets
             pocketed, mult = self._check_pocket(ball)
             if pocketed:
-                ball.active = False
-                ball.vx = 0.0
-                ball.vy = 0.0
-                if ball.num == 0:
+                if ball.num == 0 and self.demo_mode:
+                    # Demo mode: bounce cue ball away from pocket
+                    for px, py, _ in POCKETS:
+                        dx = ball.x - px
+                        dy = ball.y - py
+                        if dx * dx + dy * dy < POCKET_RADIUS * POCKET_RADIUS:
+                            dist = math.sqrt(dx * dx + dy * dy) or 1.0
+                            ball.x = px + dx / dist * (POCKET_RADIUS + 1)
+                            ball.y = py + dy / dist * (POCKET_RADIUS + 1)
+                            spd = ball.speed() * 0.6
+                            ball.vx = dx / dist * spd
+                            ball.vy = dy / dist * spd
+                            break
+                elif ball.num == 0:
                     # Cue ball scratch
+                    ball.active = False
+                    ball.vx = 0.0
+                    ball.vy = 0.0
                     self.scratch = True
                 else:
                     # Object ball pocketed
+                    ball.active = False
+                    ball.vx = 0.0
+                    ball.vy = 0.0
                     points = BALL_VALUES.get(ball.num, 10) * mult
                     self.points_earned += points
                     self.pocketed_this_shot.append(ball.num)
