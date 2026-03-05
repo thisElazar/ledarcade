@@ -48,6 +48,7 @@ class PoolDemo(Visual):
         # AI state
         self.target_angle = 0.0
         self.target_power = 0.5
+        self._was_aiming = False
         self._pick_target()
 
     def _pick_target(self):
@@ -300,7 +301,7 @@ class PoolDemo(Visual):
                 ai_input.action_l = True
 
         # Pick a new target each time we enter aiming phase
-        if phase == PHASE_AIMING and not hasattr(self, '_was_aiming'):
+        if phase == PHASE_AIMING and not self._was_aiming:
             self._was_aiming = True
             self._pick_target()
         elif phase != PHASE_AIMING:
