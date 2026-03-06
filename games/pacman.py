@@ -419,8 +419,8 @@ class PacMan(Game):
                 next_y = tile_y + d[1]
 
                 if self.tile_passable(next_x, next_y, is_ghost=True):
-                    # Don't reverse unless necessary
-                    if d != reverse or ghost['frightened'] or ghost['eaten']:
+                    # Don't reverse unless necessary (eaten ghosts can reverse to reach home)
+                    if d != reverse or ghost['eaten']:
                         possible.append(d)
 
             # If no non-reverse options, allow reverse

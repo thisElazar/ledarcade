@@ -21,31 +21,31 @@ class MsPacMan(Game):
 
     # 4 cycling maze layouts (21x19 tiles at 3px each = 63x57)
     # 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house door
-    # Rows 7-12 are identical across all mazes (ghost house region)
-    # All corridors are paths (no open areas). Two tunnels per maze.
-    # Every row is a palindrome. No dead ends.
+    # Inspired by original Ms. Pac-Man arcade mazes with wide corridors.
+    # Every row is a palindrome. No dead ends. Two tunnels per maze.
     MAZES = [
         {
             # Maze 1 (Hot Pink): Tunnels at R3, R9
+            # Edge blocks + big center block. 1-wide corridors throughout.
             'template': [
                 "111111111111111111111",  # R0
-                "122212221222122212221",  # R1
-                "121212121212121212121",  # R2  - narrowed to 1-wide vertical
-                "032212221222122212230",  # R3  tunnel + pellets
-                "121222122212221222121",  # R4
-                "122212221222122212221",  # R5
-                "121222122212221222121",  # R6
-                "122212221222122212221",  # R7  - full corridor for T-junctions
-                "121212121141121212121",  # R8  - alternating 1-wide corridors
-                "021212121000121212120",  # R9  tunnel + ghost interior
-                "121212121000121212121",  # R10
-                "121212121111121212121",  # R11
-                "122212221222122212221",  # R12 - full corridor for T-junctions
-                "121222122212221222121",  # R13
-                "122212221222122212221",  # R14
-                "131222122212221222131",  # R15  pellets
-                "121212121212121212121",  # R16 - narrowed to 1-wide vertical
-                "122212221222122212221",  # R17
+                "122222222222222222221",  # R1  highway
+                "121112121212121211121",  # R2  edge blocks + alternating
+                "031112121212121211130",  # R3  tunnel + pellets
+                "122222222222222222221",  # R4  highway
+                "121212111111111212121",  # R5  big 9-wide center block
+                "121212111111111212121",  # R6  2-tall
+                "122222222222222222221",  # R7  highway
+                "121212121141121212121",  # R8  ghost house
+                "021212121000121212120",  # R9  tunnel + ghost house
+                "121212121000121212121",  # R10 ghost house
+                "121212121111121212121",  # R11 ghost house bottom
+                "122222222222222222221",  # R12 highway
+                "121111121212121111121",  # R13 big edge blocks
+                "122222222222222222221",  # R14 highway
+                "131212111212111212131",  # R15 center blocks + pellets
+                "121212111212111212121",  # R16 center blocks
+                "122222222222222222221",  # R17 highway
                 "111111111111111111111",  # R18
             ],
             'wall_color': (255, 105, 180),  # Hot pink
@@ -53,25 +53,26 @@ class MsPacMan(Game):
         },
         {
             # Maze 2 (Cyan): Tunnels at R9, R15
+            # Mixed blocks + twin blocks + large center. 1-wide corridors.
             'template': [
                 "111111111111111111111",  # R0
-                "132112221222122211231",  # R1  pellets (F-type)
-                "122212221222122212221",  # R2
-                "121222122212221222121",  # R3
-                "122212221222122212221",  # R4
-                "121212121212121212121",  # R5  - narrowed
-                "122212221222122212221",  # R6  - full for T-junctions
-                "122212221222122212221",  # R7  - full corridor for T-junctions
-                "121212121141121212121",  # R8  - alternating 1-wide corridors
-                "021212121000121212120",  # R9  tunnel + ghost interior
-                "121212121000121212121",  # R10
-                "121212121111121212121",  # R11
-                "122212221222122212221",  # R12 - full corridor for T-junctions
-                "121222122212221222121",  # R13
-                "122212221222122212221",  # R14
-                "031222122212221222130",  # R15  tunnel + pellets
-                "122212221222122212221",  # R16
-                "122112221222122211221",  # R17  (F-type)
+                "132222222222222222231",  # R1  highway + pellets
+                "121112112121211211121",  # R2  mixed blocks
+                "121112112121211211121",  # R3  2-tall
+                "122222222222222222221",  # R4  highway
+                "121121111121111121121",  # R5  twin 5-wide blocks
+                "121121111121111121121",  # R6  2-tall
+                "122222222222222222221",  # R7  highway
+                "121212121141121212121",  # R8  ghost house
+                "021212121000121212120",  # R9  tunnel + ghost house
+                "121212121000121212121",  # R10 ghost house
+                "121212121111121212121",  # R11 ghost house bottom
+                "122222222222222222221",  # R12 highway
+                "121112111111111211121",  # R13 big 9-wide center block
+                "122222222222222222221",  # R14 highway
+                "031121111121111121130",  # R15 tunnel + twin blocks + pellets
+                "121121111121111121121",  # R16 twin blocks
+                "122222222222222222221",  # R17 highway
                 "111111111111111111111",  # R18
             ],
             'wall_color': (0, 255, 255),  # Cyan
@@ -79,25 +80,26 @@ class MsPacMan(Game):
         },
         {
             # Maze 3 (Brown/Orange): Tunnels at R3, R9
+            # Center 3-wide blocks + edge blocks. 1-wide corridors.
             'template': [
                 "111111111111111111111",  # R0
-                "132212221222122212231",  # R1  pellets
-                "121222122212221222121",  # R2
-                "022212221222122212220",  # R3  tunnel
-                "121222122212221222121",  # R4
-                "122212221222122212221",  # R5
-                "121212121212121212121",  # R6  - narrowed
-                "122212221222122212221",  # R7  - full corridor for T-junctions
-                "121212121141121212121",  # R8  - alternating 1-wide corridors
-                "021212121000121212120",  # R9  tunnel + ghost interior
-                "121212121000121212121",  # R10
-                "121212121111121212121",  # R11
-                "122212221222122212221",  # R12 - full corridor for T-junctions
-                "121212121212121212121",  # R13 - narrowed
-                "122212221222122212221",  # R14
-                "131222122212221222131",  # R15  pellets
-                "122212221222122212221",  # R16
-                "122212221222122212221",  # R17
+                "132222222222222222231",  # R1  highway + pellets
+                "121212111212111212121",  # R2  center 3-wide blocks
+                "021212111212111212120",  # R3  tunnel
+                "122222222222222222221",  # R4  highway
+                "121111211212112111121",  # R5  big edge blocks
+                "121111211212112111121",  # R6  2-tall
+                "122222222222222222221",  # R7  highway
+                "121212121141121212121",  # R8  ghost house
+                "021212121000121212120",  # R9  tunnel + ghost house
+                "121212121000121212121",  # R10 ghost house
+                "121212121111121212121",  # R11 ghost house bottom
+                "122222222222222222221",  # R12 highway
+                "121211121212121112121",  # R13 twin 3-wide blocks
+                "122222222222222222221",  # R14 highway
+                "131212111212111212131",  # R15 center blocks + pellets
+                "121212111212111212121",  # R16 center blocks
+                "122222222222222222221",  # R17 highway
                 "111111111111111111111",  # R18
             ],
             'wall_color': (180, 100, 50),  # Brown/orange
@@ -105,25 +107,26 @@ class MsPacMan(Game):
         },
         {
             # Maze 4 (Blue): Tunnels at R9, R15
+            # Pac-Man-familiar blocks rearranged. 1-wide corridors.
             'template': [
                 "111111111111111111111",  # R0
-                "122212221222122212221",  # R1
-                "121212121212121212121",  # R2  - narrowed
-                "132212221222122212231",  # R3  pellets
-                "121222122212221222121",  # R4
-                "122212221222122212221",  # R5
-                "121212121212121212121",  # R6  - narrowed
-                "122212221222122212221",  # R7  - full corridor for T-junctions
-                "121212121141121212121",  # R8  - alternating 1-wide corridors
-                "021212121000121212120",  # R9  tunnel + ghost interior
-                "121212121000121212121",  # R10
-                "121212121111121212121",  # R11
-                "122212221222122212221",  # R12 - full corridor for T-junctions
-                "121222122212221222121",  # R13
-                "122212221222122212221",  # R14
-                "031222122212221222130",  # R15  tunnel + pellets
-                "122212221222122212221",  # R16
-                "122112221222122211221",  # R17  (F-type)
+                "122222222222222222221",  # R1  highway
+                "121211212111212112121",  # R2  scattered blocks
+                "131211212111212112131",  # R3  pellets
+                "122222222222222222221",  # R4  highway
+                "121112121212121211121",  # R5  edge + alternating
+                "121112121212121211121",  # R6  2-tall
+                "122222222222222222221",  # R7  highway
+                "121212121141121212121",  # R8  ghost house
+                "021212121000121212120",  # R9  tunnel + ghost house
+                "121212121000121212121",  # R10 ghost house
+                "121212121111121212121",  # R11 ghost house bottom
+                "122222222222222222221",  # R12 highway
+                "121112111212111211121",  # R13 classic blocks
+                "122222222222222222221",  # R14 highway
+                "031211212111212112130",  # R15 tunnel + pellets
+                "121211212111212112121",  # R16 scattered blocks
+                "122222222222222222221",  # R17 highway
                 "111111111111111111111",  # R18
             ],
             'wall_color': (80, 80, 255),  # Blue
@@ -176,13 +179,13 @@ class MsPacMan(Game):
         # Ghosts - positioned in/around ghost house (rows 8-11)
         self.ghosts = [
             {'name': 'blinky', 'x': 10.0, 'y': 7.0, 'dir': (-1, 0), 'color': Colors.RED,
-             'scatter_target': (19, 0), 'in_house': False, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False},
             {'name': 'pinky', 'x': 10.0, 'y': 9.0, 'dir': (0, 1), 'color': Colors.PINK,
-             'scatter_target': (1, 0), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False},
             {'name': 'inky', 'x': 9.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.CYAN,
-             'scatter_target': (19, 18), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False},
             {'name': 'clyde', 'x': 11.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.ORANGE,
-             'scatter_target': (0, 18), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False},
         ]
         # Base speeds (will be modified by level)
         self.base_ghost_speed = 4.5
@@ -639,7 +642,7 @@ class MsPacMan(Game):
                 next_x = tile_x + d[0]
                 next_y = tile_y + d[1]
                 if self.tile_passable(next_x, next_y, is_ghost=True):
-                    if d != reverse or ghost['frightened'] or ghost['eaten']:
+                    if d != reverse or ghost['eaten']:
                         possible.append(d)
 
             if not possible:
