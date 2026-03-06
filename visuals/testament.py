@@ -626,12 +626,16 @@ class Testament(Visual):
                             cloud = (int(240 * alpha), int(240 * alpha), int(245 * alpha))
                             display.set_pixel(px, py, _add_color(existing, cloud))
 
-        # ── Large dove ── centered, ~24px wingspan, facing right
-        # Gentle bob and drift
-        cx = 30 + int(3 * math.sin(t * 0.2))
-        cy = 28 + int(2 * math.sin(t * 0.35))
-        wing_phase = math.sin(t * 1.8)  # slow, graceful flap
-        wing_lift = wing_phase * 3  # wings move 3px up/down
+        # ── Large dove ── centered, facing right, soaring in place
+        # Fixed position — no drifting. Just a very slow, subtle wing tip flex.
+        cx = 28
+        cy = 28
+
+        # Wing tip lift: only the outer 3px of each wing move, very slowly
+        # Smooth triangle wave so it spends time at each position
+        wing_raw = math.sin(t * 0.6)  # very slow cycle (~10s period)
+        # Only the tips get +/- 1px, and only when wing_raw > threshold
+        tip_lift = 1 if wing_raw > 0.3 else (-1 if wing_raw < -0.3 else 0)
 
         white = (240, 240, 235)
         light = (220, 220, 215)
@@ -639,121 +643,95 @@ class Testament(Visual):
         dark = (160, 165, 170)
 
         # ── Body (elongated oval, ~10px long, 4px tall) ──
-        # Body center at (cx, cy), extends left (tail) to right (head)
-        body_pixels = []
         for bx in range(-4, 6):
-            # Vertical thickness tapers at ends
             if bx <= -3:
                 ys = [0]
             elif bx <= -1:
                 ys = [-1, 0, 1]
             elif bx <= 3:
-                ys = [-1, 0, 1, 2]  # chest is rounder underneath
+                ys = [-1, 0, 1, 2]
             else:
                 ys = [0, 1]
             for by in ys:
-                # Shading: lighter on top, darker underneath
-                if by <= -1:
-                    c = white
-                elif by == 0:
-                    c = light if bx < 3 else white
-                else:
-                    c = shadow
-                body_pixels.append((cx + bx, cy + by, c))
+                c = white if by <= -1 else (light if by == 0 else shadow)
+                dpx, dpy = cx + bx, cy + by
+                if 0 <= dpx < 64 and 0 <= dpy < 64:
+                    display.set_pixel(dpx, dpy, c)
 
-        for px, py, pc in body_pixels:
-            if 0 <= px < 64 and 0 <= py < 64:
-                display.set_pixel(px, py, pc)
+        # ── Neck (connects body to head) ──
+        display.set_pixel(cx + 6, cy - 1, light)
+        display.set_pixel(cx + 6, cy, light)
 
         # ── Head (round, 3x3) ──
-        head_x = cx + 7
+        head_x = cx + 8
         head_y = cy - 1
         for hdx in range(-1, 2):
             for hdy in range(-1, 2):
-                if abs(hdx) + abs(hdy) < 3:  # rounded square
+                if abs(hdx) + abs(hdy) < 3:
                     c = white if hdy <= 0 else light
                     hpx, hpy = head_x + hdx, head_y + hdy
                     if 0 <= hpx < 64 and 0 <= hpy < 64:
                         display.set_pixel(hpx, hpy, c)
 
         # Eye
-        eye_x, eye_y = head_x + 1, head_y - 1
-        if 0 <= eye_x < 64 and 0 <= eye_y < 64:
-            display.set_pixel(eye_x, eye_y, (30, 30, 35))
+        if 0 <= head_x + 1 < 64 and 0 <= head_y - 1 < 64:
+            display.set_pixel(head_x + 1, head_y - 1, (30, 30, 35))
 
         # Beak
         beak_x = head_x + 2
-        beak_c = (200, 170, 80)
         if 0 <= beak_x < 64:
-            display.set_pixel(beak_x, head_y, beak_c)
+            display.set_pixel(beak_x, head_y, (200, 170, 80))
             if beak_x + 1 < 64:
                 display.set_pixel(beak_x + 1, head_y, (180, 150, 60))
 
         # ── Olive branch (hanging from beak) ──
-        branch = (70, 130, 40)
-        leaf = (50, 110, 30)
+        branch_c = (70, 130, 40)
+        leaf_c = (50, 110, 30)
         br_x = beak_x + 1
         br_y = head_y + 1
         for i in range(4):
             bpx, bpy = br_x + i // 2, br_y + i
             if 0 <= bpx < 64 and 0 <= bpy < 64:
-                display.set_pixel(bpx, bpy, branch)
-        # Leaves on the branch
+                display.set_pixel(bpx, bpy, branch_c)
         for lx, ly in [(br_x - 1, br_y + 1), (br_x + 1, br_y + 2),
                         (br_x - 1, br_y + 3), (br_x + 1, br_y + 4)]:
             if 0 <= lx < 64 and 0 <= ly < 64:
-                display.set_pixel(lx, ly, leaf)
+                display.set_pixel(lx, ly, leaf_c)
 
-        # ── Tail (fan shape, spreading left and slightly up) ──
+        # ── Tail (fan shape, spreading back-left) ──
         tail_x = cx - 5
-        tail_y = cy
         for fan in range(-3, 4):
             tx = tail_x - abs(fan) // 2
-            ty = tail_y + fan
+            ty = cy + fan
             c = light if abs(fan) < 2 else shadow
             if 0 <= tx < 64 and 0 <= ty < 64:
                 display.set_pixel(tx, ty, c)
             if tx - 1 >= 0 and 0 <= ty < 64:
                 display.set_pixel(tx - 1, ty, dark if abs(fan) > 1 else shadow)
 
-        # ── Wings (large, sweeping, with feather detail) ──
-        # Each wing: ~10px span, arcs upward from body sides
-        wl = int(wing_lift)
+        # ── Wings (large, outstretched glide, only tips flex) ──
+        # Wings arc gently upward in a fixed soaring pose.
+        # Only the last 3 pixels of each wing tip shift by tip_lift.
+        for i in range(11):
+            # Gentle fixed upward arc
+            arc = -int(round(i * 0.45))
+            # Tip flex: only outer 3 pixels move
+            tip = tip_lift if i >= 8 else 0
 
-        # Left wing (extends up-left from body)
-        for i in range(10):
-            # Wing curves upward and outward
-            wx = cx - 2 - i
-            # Parabolic arc: highest at wing tip
-            base_arc = -int((i * i) / 12)
-            wy = cy - 1 + base_arc - wl
-            # Wing is 2-3 px thick near body, 1px at tip
-            thickness = 3 if i < 3 else (2 if i < 7 else 1)
+            wy = cy - 1 + arc + tip
+            thickness = 3 if i < 3 else (2 if i < 8 else 1)
+
+            # Left wing (extends left)
+            wx_l = cx - 2 - i
             for th in range(thickness):
                 c = white if th == 0 else (light if th == 1 else shadow)
-                wpx, wpy = wx, wy + th
-                if 0 <= wpx < 64 and 0 <= wpy < 64:
-                    display.set_pixel(wpx, wpy, c)
+                if 0 <= wx_l < 64 and 0 <= wy + th < 64:
+                    display.set_pixel(wx_l, wy + th, c)
 
-        # Right wing (extends up-right from body)
-        for i in range(10):
-            wx = cx + 3 + i
-            base_arc = -int((i * i) / 12)
-            wy = cy - 1 + base_arc - wl
-            thickness = 3 if i < 3 else (2 if i < 7 else 1)
+            # Right wing (extends right)
+            wx_r = cx + 3 + i
             for th in range(thickness):
                 c = white if th == 0 else (light if th == 1 else shadow)
-                wpx, wpy = wx, wy + th
-                if 0 <= wpx < 64 and 0 <= wpy < 64:
-                    display.set_pixel(wpx, wpy, c)
+                if 0 <= wx_r < 64 and 0 <= wy + th < 64:
+                    display.set_pixel(wx_r, wy + th, c)
 
-        # ── Soft glow/halo around the dove ──
-        for dy in range(-8, 10):
-            for dx in range(-14, 16):
-                px, py = cx + dx, cy + dy
-                if 0 <= px < 64 and 0 <= py < 64:
-                    dist = math.sqrt(dx * dx + dy * dy)
-                    if 8 < dist < 16:
-                        glow_i = (1.0 - (dist - 8) / 8) * 0.08
-                        gc = (int(255 * glow_i), int(255 * glow_i), int(240 * glow_i))
-                        display.set_pixel(px, py, _add_color(display.get_pixel(px, py), gc))
