@@ -8,7 +8,6 @@ Scenes:
   1. Burning Bush    - Fire that does not consume, sandals set aside
   2. Noah's Ark      - Ark on calm waters after the flood, rainbow above
   3. Star of Bethlehem - Brilliant star over a quiet stable
-  4. Dove & Rainbow  - Dove with olive branch, rainbow of promise
 
 Controls:
   Up/Down     - Switch scene
@@ -21,7 +20,7 @@ import math
 import random
 from . import Visual, Display, Colors, GRID_SIZE
 
-NUM_SCENES = 4
+NUM_SCENES = 3
 
 
 # ── Helpers ──────────────────────────────────────────────────────────
@@ -208,13 +207,6 @@ class Testament(Visual):
                            for x in range(GRID_SIZE)]
         random.seed()
 
-        # -- Dove & Rainbow --
-        random.seed(66)
-        self.dove_stars = [(random.randint(0, 63), random.randint(0, 15),
-                            random.random() * math.pi * 2,
-                            0.3 + random.random() * 1.2)
-                           for _ in range(15)]
-        random.seed()
 
     # ── Input ────────────────────────────────────────────────────────
 
@@ -302,8 +294,6 @@ class Testament(Visual):
             self._draw_ark(display, t)
         elif self.scene == 2:
             self._draw_bethlehem(display, t)
-        elif self.scene == 3:
-            self._draw_dove(display, t)
 
     # ═════════════════════════════════════════════════════════════════
     # SCENE 0: BURNING BUSH
@@ -577,161 +567,4 @@ class Testament(Visual):
                 gc = (int(255 * glow_i), int(200 * glow_i), int(100 * glow_i))
                 display.set_pixel(sx + dx, sy_base - dy, _add_color(display.get_pixel(sx + dx, sy_base - dy), gc))
 
-    # ═════════════════════════════════════════════════════════════════
-    # SCENE 3: DOVE & RAINBOW
-    # ═════════════════════════════════════════════════════════════════
-
-    def _draw_dove(self, display, t):
-        # Soft sky after rain — lighter blue
-        for y in range(GRID_SIZE):
-            sky_t = y / GRID_SIZE
-            r = int(130 + 60 * sky_t)
-            g = int(170 + 50 * sky_t)
-            b = int(230 - 20 * sky_t)
-            for x in range(GRID_SIZE):
-                display.set_pixel(x, y, (min(255, r), min(255, g), min(255, b)))
-
-        # Rainbow — large arc across the sky (behind the dove)
-        rainbow_colors = [
-            (220, 60, 60), (230, 140, 40), (230, 220, 50),
-            (60, 200, 60), (60, 120, 230), (100, 60, 200), (160, 60, 180),
-        ]
-        rcx, rcy = 32, 60
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                dx = x - rcx
-                dy = y - rcy
-                dist = math.sqrt(dx * dx + dy * dy)
-                band = dist - 42
-                if 0 <= band < 7 and dy < 0:
-                    bi = int(band)
-                    rc = rainbow_colors[bi]
-                    alpha = 0.45 + 0.08 * math.sin(t * 0.4 + x * 0.15)
-                    existing = display.get_pixel(x, y)
-                    blended = (int(existing[0] * (1 - alpha) + rc[0] * alpha),
-                               int(existing[1] * (1 - alpha) + rc[1] * alpha),
-                               int(existing[2] * (1 - alpha) + rc[2] * alpha))
-                    display.set_pixel(x, y, blended)
-
-        # Soft clouds
-        for cx_cloud, cy_cloud, w in [(10, 50, 9), (50, 52, 10), (30, 54, 8)]:
-            for ddx in range(-w, w + 1):
-                for ddy in range(-2, 3):
-                    dist = (ddx / w) ** 2 + (ddy / 2.5) ** 2
-                    if dist < 1.0:
-                        alpha = (1.0 - dist) * 0.2
-                        px, py = cx_cloud + ddx, cy_cloud + ddy
-                        if 0 <= px < 64 and 0 <= py < 64:
-                            existing = display.get_pixel(px, py)
-                            cloud = (int(240 * alpha), int(240 * alpha), int(245 * alpha))
-                            display.set_pixel(px, py, _add_color(existing, cloud))
-
-        # ── Large dove ── centered, facing right, soaring in place
-        # Fixed position — no drifting. Just a very slow, subtle wing tip flex.
-        cx = 28
-        cy = 28
-
-        # Wing tip lift: only the outer 3px of each wing move, very slowly
-        # Smooth triangle wave so it spends time at each position
-        wing_raw = math.sin(t * 0.6)  # very slow cycle (~10s period)
-        # Only the tips get +/- 1px, and only when wing_raw > threshold
-        tip_lift = 1 if wing_raw > 0.3 else (-1 if wing_raw < -0.3 else 0)
-
-        white = (240, 240, 235)
-        light = (220, 220, 215)
-        shadow = (190, 195, 200)
-        dark = (160, 165, 170)
-
-        # ── Body (elongated oval, ~10px long, 4px tall) ──
-        for bx in range(-4, 6):
-            if bx <= -3:
-                ys = [0]
-            elif bx <= -1:
-                ys = [-1, 0, 1]
-            elif bx <= 3:
-                ys = [-1, 0, 1, 2]
-            else:
-                ys = [0, 1]
-            for by in ys:
-                c = white if by <= -1 else (light if by == 0 else shadow)
-                dpx, dpy = cx + bx, cy + by
-                if 0 <= dpx < 64 and 0 <= dpy < 64:
-                    display.set_pixel(dpx, dpy, c)
-
-        # ── Neck (connects body to head) ──
-        display.set_pixel(cx + 6, cy - 1, light)
-        display.set_pixel(cx + 6, cy, light)
-
-        # ── Head (round, 3x3) ──
-        head_x = cx + 8
-        head_y = cy - 1
-        for hdx in range(-1, 2):
-            for hdy in range(-1, 2):
-                if abs(hdx) + abs(hdy) < 3:
-                    c = white if hdy <= 0 else light
-                    hpx, hpy = head_x + hdx, head_y + hdy
-                    if 0 <= hpx < 64 and 0 <= hpy < 64:
-                        display.set_pixel(hpx, hpy, c)
-
-        # Eye
-        if 0 <= head_x + 1 < 64 and 0 <= head_y - 1 < 64:
-            display.set_pixel(head_x + 1, head_y - 1, (30, 30, 35))
-
-        # Beak
-        beak_x = head_x + 2
-        if 0 <= beak_x < 64:
-            display.set_pixel(beak_x, head_y, (200, 170, 80))
-            if beak_x + 1 < 64:
-                display.set_pixel(beak_x + 1, head_y, (180, 150, 60))
-
-        # ── Olive branch (hanging from beak) ──
-        branch_c = (70, 130, 40)
-        leaf_c = (50, 110, 30)
-        br_x = beak_x + 1
-        br_y = head_y + 1
-        for i in range(4):
-            bpx, bpy = br_x + i // 2, br_y + i
-            if 0 <= bpx < 64 and 0 <= bpy < 64:
-                display.set_pixel(bpx, bpy, branch_c)
-        for lx, ly in [(br_x - 1, br_y + 1), (br_x + 1, br_y + 2),
-                        (br_x - 1, br_y + 3), (br_x + 1, br_y + 4)]:
-            if 0 <= lx < 64 and 0 <= ly < 64:
-                display.set_pixel(lx, ly, leaf_c)
-
-        # ── Tail (fan shape, spreading back-left) ──
-        tail_x = cx - 5
-        for fan in range(-3, 4):
-            tx = tail_x - abs(fan) // 2
-            ty = cy + fan
-            c = light if abs(fan) < 2 else shadow
-            if 0 <= tx < 64 and 0 <= ty < 64:
-                display.set_pixel(tx, ty, c)
-            if tx - 1 >= 0 and 0 <= ty < 64:
-                display.set_pixel(tx - 1, ty, dark if abs(fan) > 1 else shadow)
-
-        # ── Wings (large, outstretched glide, only tips flex) ──
-        # Wings arc gently upward in a fixed soaring pose.
-        # Only the last 3 pixels of each wing tip shift by tip_lift.
-        for i in range(11):
-            # Gentle fixed upward arc
-            arc = -int(round(i * 0.45))
-            # Tip flex: only outer 3 pixels move
-            tip = tip_lift if i >= 8 else 0
-
-            wy = cy - 1 + arc + tip
-            thickness = 3 if i < 3 else (2 if i < 8 else 1)
-
-            # Left wing (extends left)
-            wx_l = cx - 2 - i
-            for th in range(thickness):
-                c = white if th == 0 else (light if th == 1 else shadow)
-                if 0 <= wx_l < 64 and 0 <= wy + th < 64:
-                    display.set_pixel(wx_l, wy + th, c)
-
-            # Right wing (extends right)
-            wx_r = cx + 3 + i
-            for th in range(thickness):
-                c = white if th == 0 else (light if th == 1 else shadow)
-                if 0 <= wx_r < 64 and 0 <= wy + th < 64:
-                    display.set_pixel(wx_r, wy + th, c)
 
