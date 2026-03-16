@@ -135,26 +135,28 @@ class GreenWave(Visual):
 
         # Update platoon
         for car in self.platoon:
-            # Check if should stop at red
+            # Check if should stop at red signal
             stopped = False
             for i, sy in enumerate(self.signal_ys):
                 state = self._signal_state(i)
-                if state == 'red':
-                    if sy - 3 < car['y'] < sy - 1:
+                if state in ('red', 'yellow'):
+                    # Stop if approaching signal (wider window to prevent blowing through)
+                    if sy - 8 < car['y'] < sy - 1:
                         stopped = True
                         break
-            # Following distance: stop if same-lane car ahead is too close
+            # Lane-aware following distance (within ±1 pixel x = same lane)
             if not stopped:
                 for other in self.platoon:
                     if other is car:
                         continue
-                    if other['x'] == car['x'] and other['y'] > car['y'] and other['y'] - car['y'] < 4:
+                    if (abs(other['x'] - car['x']) <= 1 and
+                            other['y'] > car['y'] and other['y'] - car['y'] < 5):
                         stopped = True
                         break
-            # Cross-traffic collision: stop if cross car is in our path
+            # Cross-traffic: only stop if cross car is directly ahead
             if not stopped:
                 for cc in self.cross_cars:
-                    if abs(cc['y'] - car['y']) < 2 and abs(cc['x'] - car['x']) < 3:
+                    if abs(cc['y'] - car['y']) < 2 and abs(cc['x'] - car['x']) < 2:
                         stopped = True
                         break
             if not stopped:

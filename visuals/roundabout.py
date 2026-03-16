@@ -200,8 +200,13 @@ class Roundabout(Visual):
         dest_choices = [d for d in LEG_ORDER if d != origin]
         dest = random.choice(dest_choices)
         key = f'{origin}_{dest}'
-        color = random.choice(self.CAR_COLORS)
 
+        # Don't spawn if another vehicle on the same approach is near the start
+        for other in self.vehicles:
+            if other['key'] == key and other['progress'] < 10:
+                return
+
+        color = random.choice(self.CAR_COLORS)
         self.vehicles.append({
             'key': key,
             'progress': 0.0,
@@ -218,34 +223,30 @@ class Roundabout(Visual):
             return True
         ex, ey = entry_path[yi]
 
-        # Check all other vehicles that are ON the ring or nearby
+        # Check vehicles on the ring near our entry point
         for other in self.vehicles:
             if other is entering:
                 continue
             o_yi = self.yield_indices[other['key']]
-            o_prog = other['progress']
-            # Only check vehicles past entry (on ring or exiting)
-            if o_prog < o_yi:
+            # Only check vehicles past yield (on ring or exiting)
+            if other['progress'] < o_yi:
                 continue
             ox, oy = self._vehicle_pos(other)
-            dist = math.hypot(ox - ex, oy - ey)
-            if dist < 10:
+            if math.hypot(ox - ex, oy - ey) < 6:
                 return False
         return True
 
     def _too_close(self, v):
-        """Check if any other vehicle is too close ahead of this one."""
+        """Check same-path following distance only."""
         vx, vy = self._vehicle_pos(v)
         for other in self.vehicles:
-            if other is v:
+            if other is v or other['key'] != v['key']:
+                continue
+            if other['progress'] <= v['progress']:
                 continue
             ox, oy = self._vehicle_pos(other)
-            dist = math.hypot(ox - vx, oy - vy)
-            if dist < 5:
-                # Only stop if the other is roughly ahead (closer to end of path)
-                # or on a different path (potential collision)
-                if other['key'] != v['key'] or other['progress'] > v['progress']:
-                    return True
+            if math.hypot(ox - vx, oy - vy) < 5:
+                return True
         return False
 
     def _vehicle_pos(self, v):

@@ -268,26 +268,20 @@ class Interchange(Visual):
             self.spawn_timer = 0
             self._spawn()
 
-        # Update vehicles with following distance
+        # Update vehicles — same-path following distance only.
+        # Cross-path traffic doesn't interact (grade-separated interchange).
         for v in self.vehicles:
-            vx, vy = self._vehicle_pos(v)
             blocked = False
+            vx, vy = self._vehicle_pos(v)
             for other in self.vehicles:
-                if other is v:
+                if other is v or other['key'] != v['key']:
+                    continue
+                if other['progress'] <= v['progress']:
                     continue
                 ox, oy = self._vehicle_pos(other)
-                dist = math.hypot(ox - vx, oy - vy)
-                if dist < 5:
-                    # Only brake for vehicles ahead on same path or crossing nearby
-                    if other['key'] == v['key']:
-                        if other['progress'] > v['progress']:
-                            blocked = True
-                            break
-                    else:
-                        # Cross-path: both in the interchange zone (center area)
-                        if 20 < ox < 44 and 20 < oy < 44:
-                            blocked = True
-                            break
+                if math.hypot(ox - vx, oy - vy) < 5:
+                    blocked = True
+                    break
             if not blocked:
                 v['progress'] += v['speed'] * dt
 

@@ -187,53 +187,59 @@ class Intersection(Visual):
         }
         stop = stop_lines[d]
 
-        # Check if car should stop
+        # Cars already past the stop line / in the intersection always proceed
+        in_intersection = (CENTER - HALF_W <= car['x'] <= CENTER + HALF_W and
+                           CENTER - HALF_W <= car['y'] <= CENTER + HALF_W)
+        past_stop = False
+        if d == DIR_N and car['y'] <= stop:
+            past_stop = True
+        elif d == DIR_S and car['y'] >= stop:
+            past_stop = True
+        elif d == DIR_E and car['x'] >= stop:
+            past_stop = True
+        elif d == DIR_W and car['x'] <= stop:
+            past_stop = True
+
         should_stop = False
-        if sig != SIG_GREEN:
-            if d == DIR_N and car['y'] > stop and car['y'] < stop + 12:
+
+        # Red/yellow light: only stop if approaching (not past stop line)
+        if not past_stop and sig != SIG_GREEN:
+            if d == DIR_N and car['y'] > stop and car['y'] < stop + 14:
                 should_stop = True
-            elif d == DIR_S and car['y'] < stop and car['y'] > stop - 12:
+            elif d == DIR_S and car['y'] < stop and car['y'] > stop - 14:
                 should_stop = True
-            elif d == DIR_E and car['x'] < stop and car['x'] > stop - 12:
+            elif d == DIR_E and car['x'] < stop and car['x'] > stop - 14:
                 should_stop = True
-            elif d == DIR_W and car['x'] > stop and car['x'] < stop + 12:
+            elif d == DIR_W and car['x'] > stop and car['x'] < stop + 14:
                 should_stop = True
 
-        # Check for car ahead (same direction following distance)
-        min_gap = 999
-        for other in self.cars:
-            if other is car or other['dir'] != d:
-                continue
-            if d == DIR_N:
-                if other['y'] < car['y']:
-                    min_gap = min(min_gap, car['y'] - other['y'])
-            elif d == DIR_S:
-                if other['y'] > car['y']:
-                    min_gap = min(min_gap, other['y'] - car['y'])
-            elif d == DIR_E:
-                if other['x'] > car['x']:
-                    min_gap = min(min_gap, other['x'] - car['x'])
-            elif d == DIR_W:
-                if other['x'] < car['x']:
-                    min_gap = min(min_gap, car['x'] - other['x'])
-        if min_gap < 4:
-            should_stop = True
-
-        # Cross-traffic collision avoidance in the intersection box
-        in_box = (CENTER - HALF_W <= car['x'] <= CENTER + HALF_W and
-                  CENTER - HALF_W <= car['y'] <= CENTER + HALF_W)
-        if in_box:
+        # Lane-aware following distance (same direction AND same lane)
+        if not should_stop:
             for other in self.cars:
-                if other is car or other['dir'] == d:
+                if other is car or other['dir'] != d:
                     continue
-                ox, oy = other['x'], other['y']
-                if abs(ox - car['x']) < 3 and abs(oy - car['y']) < 3:
+                # Same lane check
+                if d in (DIR_N, DIR_S):
+                    if abs(other['x'] - car['x']) > 2:
+                        continue
+                else:
+                    if abs(other['y'] - car['y']) > 2:
+                        continue
+                gap = 999
+                if d == DIR_N and other['y'] < car['y']:
+                    gap = car['y'] - other['y']
+                elif d == DIR_S and other['y'] > car['y']:
+                    gap = other['y'] - car['y']
+                elif d == DIR_E and other['x'] > car['x']:
+                    gap = other['x'] - car['x']
+                elif d == DIR_W and other['x'] < car['x']:
+                    gap = car['x'] - other['x']
+                if gap < 4:
                     should_stop = True
                     break
 
-        # Gradual braking: slow down when approaching a stop
         if should_stop:
-            speed = max(0.0, car['speed'] * max(0.0, (min_gap - 2) / 4)) if min_gap < 8 else 0.0
+            speed = 0.0
         else:
             speed = car['speed']
 
