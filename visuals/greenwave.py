@@ -140,8 +140,8 @@ class GreenWave(Visual):
             for i, sy in enumerate(self.signal_ys):
                 state = self._signal_state(i)
                 if state in ('red', 'yellow'):
-                    # Stop if approaching signal (wider window to prevent blowing through)
-                    if sy - 8 < car['y'] < sy - 1:
+                    # Stop if approaching signal (up to the signal line itself)
+                    if sy - 8 < car['y'] < sy:
                         stopped = True
                         break
             # Lane-aware following distance (within ±1 pixel x = same lane)

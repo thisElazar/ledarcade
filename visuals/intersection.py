@@ -127,11 +127,10 @@ class Intersection(Visual):
         self.time += dt
         self.phase_timer += dt
 
-        # Spawn cars
+        # Spawn cars (fixed interval per direction)
         for d in [DIR_N, DIR_S, DIR_E, DIR_W]:
             self.spawn_timers[d] += dt
-            interval = random.uniform(0.4, 1.2)
-            if self.spawn_timers[d] >= interval:
+            if self.spawn_timers[d] >= 0.8:
                 self.spawn_timers[d] = 0
                 self._spawn_car(d)
 
@@ -144,7 +143,7 @@ class Intersection(Visual):
 
     def _spawn_car(self, direction):
         """Spawn a car approaching from given direction."""
-        lane_offset = random.choice([-3, -1, 1, 3])
+        lane_offset = random.choice([1, 3])
         colors = [
             (255, 60, 60), (60, 120, 255), (255, 255, 80),
             (80, 255, 80), (255, 140, 60), (200, 80, 255),
@@ -153,25 +152,37 @@ class Intersection(Visual):
         color = random.choice(colors)
 
         if direction == DIR_N:
-            x = CENTER + abs(lane_offset)
-            y = GRID_SIZE + 2
-            self.cars.append({'x': x, 'y': float(y), 'dir': DIR_N,
-                              'speed': 20.0, 'color': color})
+            x = CENTER + lane_offset
+            y = float(GRID_SIZE + 2)
         elif direction == DIR_S:
-            x = CENTER - abs(lane_offset)
-            y = -3
-            self.cars.append({'x': x, 'y': float(y), 'dir': DIR_S,
-                              'speed': 20.0, 'color': color})
+            x = CENTER - lane_offset
+            y = -3.0
         elif direction == DIR_E:
-            x = -3
-            y = CENTER + abs(lane_offset)
-            self.cars.append({'x': float(x), 'y': y, 'dir': DIR_E,
-                              'speed': 20.0, 'color': color})
+            x = -3.0
+            y = CENTER + lane_offset
         elif direction == DIR_W:
-            x = GRID_SIZE + 2
-            y = CENTER - abs(lane_offset)
-            self.cars.append({'x': float(x), 'y': y, 'dir': DIR_W,
-                              'speed': 20.0, 'color': color})
+            x = float(GRID_SIZE + 2)
+            y = CENTER - lane_offset
+
+        # Don't spawn if another same-direction car is near the entry
+        for other in self.cars:
+            if other['dir'] != direction:
+                continue
+            if direction in (DIR_N, DIR_S):
+                if abs(other['x'] - x) <= 1:
+                    if direction == DIR_N and other['y'] > GRID_SIZE - 5:
+                        return
+                    if direction == DIR_S and other['y'] < 5:
+                        return
+            else:
+                if abs(other['y'] - y) <= 1:
+                    if direction == DIR_E and other['x'] < 5:
+                        return
+                    if direction == DIR_W and other['x'] > GRID_SIZE - 5:
+                        return
+
+        self.cars.append({'x': float(x), 'y': float(y), 'dir': direction,
+                          'speed': 20.0, 'color': color})
 
     def _update_car(self, car, dt):
         """Update a car's position, braking at red lights."""
@@ -220,10 +231,10 @@ class Intersection(Visual):
                     continue
                 # Same lane check
                 if d in (DIR_N, DIR_S):
-                    if abs(other['x'] - car['x']) > 2:
+                    if abs(other['x'] - car['x']) > 1:
                         continue
                 else:
-                    if abs(other['y'] - car['y']) > 2:
+                    if abs(other['y'] - car['y']) > 1:
                         continue
                 gap = 999
                 if d == DIR_N and other['y'] < car['y']:

@@ -232,21 +232,35 @@ class Roundabout(Visual):
             if other['progress'] < o_yi:
                 continue
             ox, oy = self._vehicle_pos(other)
-            if math.hypot(ox - ex, oy - ey) < 6:
+            if math.hypot(ox - ex, oy - ey) < 5:
                 return False
         return True
 
     def _too_close(self, v):
-        """Check same-path following distance only."""
+        """Following distance: same-path + ring-aware cross-path."""
         vx, vy = self._vehicle_pos(v)
+        v_yi = self.yield_indices[v['key']]
+        v_on_ring = v['past_yield']
+
         for other in self.vehicles:
-            if other is v or other['key'] != v['key']:
-                continue
-            if other['progress'] <= v['progress']:
+            if other is v:
                 continue
             ox, oy = self._vehicle_pos(other)
-            if math.hypot(ox - vx, oy - vy) < 5:
-                return True
+            dist = math.hypot(ox - vx, oy - vy)
+            if dist >= 4:
+                continue
+
+            if other['key'] == v['key']:
+                # Same path: yield to vehicle ahead
+                if other['progress'] > v['progress']:
+                    return True
+            elif v_on_ring and other['past_yield']:
+                # Both on ring: vehicle that's been on ring longer has priority
+                o_yi = self.yield_indices[other['key']]
+                v_ring_dist = v['progress'] - v_yi
+                o_ring_dist = other['progress'] - o_yi
+                if o_ring_dist > v_ring_dist:
+                    return True
         return False
 
     def _vehicle_pos(self, v):
