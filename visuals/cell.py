@@ -512,7 +512,7 @@ PATHWAYS = [
             ('NADH PRODUCED 3 TIMES',       (80, 160, 255)),
             ('FADH2 PRODUCED ONCE',         (160, 220, 80)),
             ('GTP MADE AT SUCCINYL-COA',    (255, 180, 50)),
-            ('8 ENZYMES  ONE TURN',         (140, 200, 100)),
+            ('6 ENZYMES  ONE TURN',         (140, 200, 100)),
         ],
     },
     # ==================================================================
@@ -833,14 +833,14 @@ PATHWAYS = [
              'color': (255, 160, 60)},
         ],
         'complexes': [
-            # Sigma factor — finds promoter, detaches after initiation
-            {'id': 'sigma', 'x': 12, 'y': 34, 'w': 5,
+            # TFIID — binds TATA box at promoter, nucleates preinitiation complex
+            {'id': 'tfiid', 'x': 12, 'y': 34, 'w': 5,
              'color': (200, 180, 60), 'above': 2, 'below': 2},
             # RNA Polymerase — reads template, builds mRNA
             {'id': 'rnap', 'x': 34, 'y': 30, 'w': 13,
              'color': (60, 150, 120), 'above': 5, 'below': 5},
-            # Rho factor — termination
-            {'id': 'rho', 'x': 56, 'y': 34, 'w': 5,
+            # CPSF — cleavage/polyadenylation, triggers termination
+            {'id': 'cpsf', 'x': 56, 'y': 34, 'w': 5,
              'color': (180, 60, 60), 'above': 2, 'below': 2},
         ],
         'flows': [
@@ -850,7 +850,7 @@ PATHWAYS = [
             # mRNA strand extending 5' to 3' (leftward from pol)
             {'type': 'mrna', 'path': [(28, 26), (20, 24), (12, 22)],
              'speed': 6, 'interval': 2.0, 'max': 3},
-            # Sigma factor detaching (moves away from promoter)
+            # TFIID releasing after promoter clearance
             {'type': 'metabolite', 'path': [(12, 30), (10, 22), (8, 14)],
              'speed': 3, 'interval': 8.0, 'max': 1},
             # DNA entering polymerase (template read 3' to 5')
@@ -864,7 +864,7 @@ PATHWAYS = [
             ('TRANSCRIPTION',                  (60, 150, 120)),
             ('RNA POLYMERASE READS DNA',       (60, 150, 120)),
             ('MRNA COPY GROWS 5 TO 3',         (255, 160, 60)),
-            ('SIGMA FINDS PROMOTER',           (200, 180, 60)),
+            ('TFIID BINDS TATA BOX',           (200, 180, 60)),
             ('TEMPLATE STRAND READ 3 TO 5',    (50, 100, 180)),
         ],
     },

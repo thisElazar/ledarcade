@@ -54,7 +54,7 @@ class Gyroscope(Visual):
         self.time = 0.0
 
         # Precession: slow rotation of gimbal orientation
-        self.precession_rate = 0.3  # radians per second
+        self.base_precession_rate = 0.3  # radians per second (at base spin)
         self.precession_angle = 0.0
 
         # Gimbal tilt angles (for 3D effect)
@@ -62,6 +62,7 @@ class Gyroscope(Visual):
         self.inner_tilt = 0.0  # inner ring tilt phase
 
         # Disc spin
+        self.base_spin_rate = 8.0  # reference spin for precession coupling
         self.spin_rate = 8.0  # radians per second (fast spin)
         self.spin_angle = 0.0
 
@@ -74,12 +75,12 @@ class Gyroscope(Visual):
     def handle_input(self, input_state) -> bool:
         consumed = False
 
-        # Left/Right: adjust precession rate
+        # Left/Right: adjust base precession rate
         if input_state.right_pressed:
-            self.precession_rate = min(self.max_precession, self.precession_rate + 0.1)
+            self.base_precession_rate = min(self.max_precession, self.base_precession_rate + 0.1)
             consumed = True
         elif input_state.left_pressed:
-            self.precession_rate = max(self.min_precession, self.precession_rate - 0.1)
+            self.base_precession_rate = max(self.min_precession, self.base_precession_rate - 0.1)
             consumed = True
 
         # Up/Down: adjust spin speed
@@ -95,8 +96,11 @@ class Gyroscope(Visual):
     def update(self, dt):
         self.time += dt
 
-        # Update precession angle
-        self.precession_angle += self.precession_rate * dt
+        # Precession rate is inversely proportional to spin speed:
+        # faster spin → slower precession (fundamental gyroscopic effect).
+        effective_precession = self.base_precession_rate * (
+            self.base_spin_rate / max(self.spin_rate, 0.1))
+        self.precession_angle += effective_precession * dt
 
         # Update gimbal tilt phases (different rates for visual interest)
         self.outer_tilt = self.precession_angle * 0.7
@@ -286,7 +290,7 @@ class Gyroscope(Visual):
     def _draw_hud(self, d):
         """Draw control information."""
         # Precession rate
-        prec_pct = int((self.precession_rate - self.min_precession) /
+        prec_pct = int((self.base_precession_rate - self.min_precession) /
                        (self.max_precession - self.min_precession) * 100)
         d.draw_text_small(2, 2, f"PREC {prec_pct}", HUD_COLOR)
 

@@ -2,9 +2,9 @@
 Antikythera Mechanism
 =====================
 Ancient Greek hand-powered orrery (c. 100 BC) - the first analog computer.
-Cross-section view showing interlocking bronze gears that predict astronomical
-positions and eclipses. Discovered in 1901 in an Aegean shipwreck.
-Nothing comparable existed for 1500 years after its creation.
+Cross-section view showing interlocking bronze gears encoding astronomical
+cycles: the Metonic cycle (19 years = 235 lunar months) and the Saros
+eclipse cycle (~18 year repeat). Discovered in 1901 in an Aegean shipwreck.
 
 Controls:
   Left/Right - Adjust rotation speed
@@ -40,24 +40,23 @@ PLATE_EDGE = (60, 55, 40)
 HUB_COLOR = (70, 65, 50)
 
 
-# Gear definitions for the Antikythera mechanism
-# The mechanism had multiple gear trains for sun, moon, and planet predictions
-# Main train: input -> sun gear -> moon train -> eclipse predictor
+# Gear definitions: tooth counts reference astronomical periods
+# 19 = Metonic years, 12 ≈ months/year, actual dial ratios use 235/19 and 223-month Saros
 GEARS = [
-    # Main input gear (large, central-left)
-    {"teeth": 12, "r": 11, "cx": 18, "cy": 32, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
-    # Sun gear (medium, center)
-    {"teeth": 10, "r": 9,  "cx": 32, "cy": 20, "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
-    # Moon gear (medium, right of sun)
-    {"teeth": 8,  "r": 7,  "cx": 46, "cy": 14, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
-    # Eclipse gear (small, far right)
-    {"teeth": 6,  "r": 5,  "cx": 56, "cy": 22, "body": VERDIGRIS, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
-    # Calendar gear (large, bottom center)
-    {"teeth": 14, "r": 12, "cx": 36, "cy": 46, "body": PATINA, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
-    # Secondary moon train (small, bottom left)
-    {"teeth": 7,  "r": 6,  "cx": 12, "cy": 50, "body": COPPER_OLD, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
-    # Planetary gear (small, top center)
-    {"teeth": 5,  "r": 4,  "cx": 32, "cy": 6,  "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 0: Main input/year wheel - 19 teeth (Metonic years)
+    {"teeth": 19, "r": 12, "cx": 18, "cy": 32, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 1: Sun transfer - 12 teeth (months/year)
+    {"teeth": 12, "r": 9, "cx": 32, "cy": 20, "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
+    # 2: Moon intermediate - 15 teeth
+    {"teeth": 15, "r": 10, "cx": 46, "cy": 14, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 3: Eclipse gear - 8 teeth
+    {"teeth": 8, "r": 6, "cx": 56, "cy": 22, "body": VERDIGRIS, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
+    # 4: Metonic calendar - 19 teeth
+    {"teeth": 19, "r": 12, "cx": 36, "cy": 46, "body": PATINA, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
+    # 5: Saros train - 10 teeth
+    {"teeth": 10, "r": 7, "cx": 12, "cy": 50, "body": COPPER_OLD, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
+    # 6: Planetary display - 7 teeth
+    {"teeth": 7, "r": 5, "cx": 32, "cy": 6, "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
 ]
 
 # Mesh relationships (gear trains)
@@ -71,14 +70,10 @@ MESHES = [
     (1, 6),  # Sun -> Planetary
 ]
 
-# Circular dials with pointers
 DIALS = [
-    # Sun position dial (top-left area)
     {"cx": 10, "cy": 12, "r": 8, "marks": 12, "pointer_len": 6, "name": "sun"},
-    # Moon phase dial (top-right area)
-    {"cx": 54, "cy": 8, "r": 6, "marks": 8, "pointer_len": 4, "name": "moon"},
-    # Eclipse predictor dial (right side)
-    {"cx": 58, "cy": 38, "r": 7, "marks": 6, "pointer_len": 5, "name": "eclipse"},
+    {"cx": 54, "cy": 8, "r": 6, "marks": 12, "pointer_len": 4, "name": "moon"},  # 12 marks for months
+    {"cx": 58, "cy": 38, "r": 7, "marks": 18, "pointer_len": 5, "name": "eclipse"},  # ~18 year cycle
 ]
 
 # Speed levels
@@ -162,13 +157,14 @@ class Antikythera(Visual):
         for i in range(len(GEARS)):
             self.rotations[i] += self.base_speed * self.ratios[i] * dt
 
-        # Update dial pointers (linked to specific gears)
-        # Sun dial linked to sun gear (1)
-        self.dial_angles[0] = self.rotations[1] * 0.5
-        # Moon dial linked to moon gear (2)
-        self.dial_angles[1] = self.rotations[2] * 0.7
-        # Eclipse dial linked to eclipse gear (3)
-        self.dial_angles[2] = self.rotations[3] * 0.3
+        # Update dial pointers - driven by input gear (gear 0) with
+        # astronomically correct ratios.
+        # Sun: 1 revolution per year (tracks the input gear directly)
+        self.dial_angles[0] = self.rotations[0]
+        # Moon: 235/19 revolutions per year (Metonic cycle)
+        self.dial_angles[1] = self.rotations[0] * (235.0 / 19.0)
+        # Eclipse: 1 revolution per Saros (223 synodic months ~= 18.03 years)
+        self.dial_angles[2] = self.rotations[0] / 18.03
 
     def draw(self):
         d = self.display
@@ -311,7 +307,7 @@ class Antikythera(Visual):
             d.set_pixel(cx, cy, BRONZE_LIGHT)
 
     def _draw_patina(self, d):
-        """Draw subtle verdigris/corrosion patches for authenticity."""
+        """Draw subtle verdigris/corrosion patches and dial labels."""
         # Static patina spots (based on time for subtle shimmer)
         patina_spots = [
             (5, 28), (8, 45), (52, 52), (48, 4), (3, 58),
@@ -332,3 +328,8 @@ class Antikythera(Visual):
                         int(VERDIGRIS[2] * pulse),
                     )
                     d.set_pixel(sx, sy, color)
+
+        # Dial labels
+        d.draw_text_small(2, 4, "SUN", DIAL_MARK)
+        d.draw_text_small(44, 1, "MOON", DIAL_MARK)
+        d.draw_text_small(48, 32, "SAROS", DIAL_MARK)

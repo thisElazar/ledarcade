@@ -268,9 +268,28 @@ class Interchange(Visual):
             self.spawn_timer = 0
             self._spawn()
 
-        # Update vehicles
+        # Update vehicles with following distance
         for v in self.vehicles:
-            v['progress'] += v['speed'] * dt
+            vx, vy = self._vehicle_pos(v)
+            blocked = False
+            for other in self.vehicles:
+                if other is v:
+                    continue
+                ox, oy = self._vehicle_pos(other)
+                dist = math.hypot(ox - vx, oy - vy)
+                if dist < 5:
+                    # Only brake for vehicles ahead on same path or crossing nearby
+                    if other['key'] == v['key']:
+                        if other['progress'] > v['progress']:
+                            blocked = True
+                            break
+                    else:
+                        # Cross-path: both in the interchange zone (center area)
+                        if 20 < ox < 44 and 20 < oy < 44:
+                            blocked = True
+                            break
+            if not blocked:
+                v['progress'] += v['speed'] * dt
 
         # Remove finished vehicles
         self.vehicles = [v for v in self.vehicles
@@ -294,6 +313,11 @@ class Interchange(Visual):
         # Color by origin direction
         origin = key.split('_')[0]
         color = self.DIR_COLORS.get(origin, (255, 255, 255))
+
+        # Check spacing: don't spawn if another vehicle is near the start of this path
+        for other in self.vehicles:
+            if other['key'] == key and other['progress'] < 8:
+                return
 
         self.vehicles.append({
             'key': key,

@@ -5,6 +5,10 @@ James Watt's beam engine (1769+) - the stationary steam engine that powered
 the Industrial Revolution. Features the iconic rocking beam pivoting at center,
 with piston/cylinder on one side and flywheel/crank on the other.
 
+Includes Watt's key innovation: the separate condenser, a vessel where exhaust
+steam is condensed without cooling the main cylinder, making the engine ~4x
+more efficient than Newcomen's atmospheric design.
+
 The beam rocks up and down in a slow, powerful rhythm as steam drives the
 piston, which rotates the flywheel through a connecting rod and crank.
 
@@ -37,6 +41,11 @@ PIVOT_COLOR = (200, 180, 60)
 BRICK = (120, 60, 50)          # Brick base/foundation
 BRICK_DARK = (90, 45, 35)
 HUD_COLOR = (140, 140, 150)
+CONDENSER_BODY = (70, 70, 90)      # Condenser vessel (darker iron)
+CONDENSER_COOL = (40, 60, 120)     # Cooling tint
+CONDENSER_PIPE = (90, 85, 80)      # Pipe from cylinder to condenser
+CONDENSATE = (80, 120, 180)        # Condensate drops
+VALVE_COLOR = (180, 140, 50)       # Injection valve
 
 # ---------------------------------------------------------------------------
 # Layout constants
@@ -69,6 +78,14 @@ NUM_SPOKES = 6          # Number of flywheel spokes
 
 # Connecting rod from beam to flywheel crank
 CON_ROD_LEN = 22        # Length of connecting rod
+
+# Separate condenser (Watt's key innovation)
+COND_CX = 5           # Condenser center x
+COND_TOP = 44         # Condenser top y
+COND_BOT = 52         # Condenser bottom y
+COND_HALF_W = 2       # Half-width of condenser vessel
+PIPE_Y = 46           # Pipe from cylinder base to condenser
+VALVE_X = 9           # Valve position (between cylinder and condenser)
 
 # Speed levels (cycles per minute - real beam engines were slow)
 SPEED_LEVELS = [4, 8, 12, 16, 20, 24]
@@ -183,6 +200,9 @@ class BeamEngine(Visual):
         # 2. Steam puffs (behind everything mechanical)
         self._draw_steam(d)
 
+        # 2.5. Watt's separate condenser
+        self._draw_condenser(d)
+
         # 3. Cylinder and piston
         self._draw_cylinder(d, piston_yi)
 
@@ -265,6 +285,53 @@ class BeamEngine(Visual):
                 if age < 0.8:
                     d.set_pixel(xi + 1, yi, color)
                     d.set_pixel(xi, yi - 1, color)
+
+    def _draw_condenser(self, d):
+        """Draw Watt's separate condenser with pipe and valve."""
+        # Pipe from cylinder bottom to condenser
+        d.draw_line(CYL_X - CYL_HALF_W - 1, CYL_BOT, VALVE_X, CYL_BOT, CONDENSER_PIPE)
+        d.draw_line(VALVE_X, CYL_BOT, VALVE_X, PIPE_Y, CONDENSER_PIPE)
+        d.draw_line(VALVE_X, PIPE_Y, COND_CX + COND_HALF_W + 1, PIPE_Y, CONDENSER_PIPE)
+
+        # Injection valve indicator (between cylinder and condenser)
+        valve_open = math.sin(self.theta) > 0  # Open during exhaust stroke
+        vc = VALVE_COLOR if valve_open else IRON_DARK
+        d.set_pixel(VALVE_X, PIPE_Y - 1, vc)
+        d.set_pixel(VALVE_X, PIPE_Y + 1, vc)
+
+        # Condenser vessel (small cylindrical shape)
+        left = COND_CX - COND_HALF_W
+        right = COND_CX + COND_HALF_W
+
+        # Vessel walls
+        d.draw_line(left - 1, COND_TOP, left - 1, COND_BOT, CONDENSER_BODY)
+        d.draw_line(right + 1, COND_TOP, right + 1, COND_BOT, CONDENSER_BODY)
+        # Top and bottom caps
+        d.draw_line(left - 1, COND_TOP - 1, right + 1, COND_TOP - 1, CONDENSER_BODY)
+        d.draw_line(left - 1, COND_BOT + 1, right + 1, COND_BOT + 1, CONDENSER_BODY)
+
+        # Interior with cooling tint
+        for y in range(COND_TOP, COND_BOT + 1):
+            for x in range(left, right + 1):
+                d.set_pixel(x, y, CONDENSER_COOL)
+
+        # Condenser glow when steam enters during exhaust stroke
+        if valve_open:
+            pulse = 0.5 + 0.5 * math.sin(self.theta * 2)
+            glow = (
+                int(CONDENSER_COOL[0] + 30 * pulse),
+                int(CONDENSER_COOL[1] + 40 * pulse),
+                int(min(255, CONDENSER_COOL[2] + 50 * pulse)),
+            )
+            for y in range(COND_TOP + 1, COND_BOT):
+                for x in range(left, right + 1):
+                    d.set_pixel(x, y, glow)
+
+        # Occasional condensate drops (falling inside condenser)
+        drop_phase = (self.time * 3) % 1.0
+        if valve_open and drop_phase < 0.6:
+            drop_y = int(COND_TOP + 1 + drop_phase * (COND_BOT - COND_TOP - 2))
+            d.set_pixel(COND_CX, drop_y, CONDENSATE)
 
     def _draw_cylinder(self, d, piston_y):
         """Draw the steam cylinder with piston."""

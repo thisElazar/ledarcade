@@ -2170,7 +2170,7 @@
       "key": "automata",
       "items": [
         {
-          "name": "AURORA",
+          "name": "RUCKER PAINT",
           "cls": "Aurora",
           "module": "visuals/aurora.py",
           "is_game": false
@@ -3669,7 +3669,7 @@
           "is_game": false
         },
         {
-          "name": "MODEL T",
+          "name": "4-STROKE",
           "cls": "ModelT",
           "module": "visuals/modelt.py",
           "is_game": false
@@ -3734,12 +3734,6 @@
           "is_game": false
         },
         {
-          "name": "EQUALIZER",
-          "cls": "Equalizer",
-          "module": "visuals/equalizer.py",
-          "is_game": false
-        },
-        {
           "name": "GRAMOPHONE",
           "cls": "Gramophone",
           "module": "visuals/gramophone.py",
@@ -3749,12 +3743,6 @@
           "name": "HURDY GURDY",
           "cls": "HurdyGurdy",
           "module": "visuals/hurdygurdy.py",
-          "is_game": false
-        },
-        {
-          "name": "JUKEBOX",
-          "cls": "Jukebox",
-          "module": "visuals/jukebox.py",
           "is_game": false
         },
         {
@@ -5267,7 +5255,7 @@
               "module": "visuals/loom.py"
             },
             {
-              "name": "MODEL T",
+              "name": "4-STROKE",
               "cls": "ModelT",
               "module": "visuals/modelt.py"
             },
@@ -5400,7 +5388,7 @@
               "module": "visuals/tessellations.py"
             },
             {
-              "name": "AURORA",
+              "name": "RUCKER PAINT",
               "cls": "Aurora",
               "module": "visuals/aurora.py"
             },
@@ -5778,11 +5766,6 @@
               "module": "visuals/drummachine.py"
             },
             {
-              "name": "EQUALIZER",
-              "cls": "Equalizer",
-              "module": "visuals/equalizer.py"
-            },
-            {
               "name": "GRAMOPHONE",
               "cls": "Gramophone",
               "module": "visuals/gramophone.py"
@@ -5791,11 +5774,6 @@
               "name": "HURDY GURDY",
               "cls": "HurdyGurdy",
               "module": "visuals/hurdygurdy.py"
-            },
-            {
-              "name": "JUKEBOX",
-              "cls": "Jukebox",
-              "module": "visuals/jukebox.py"
             },
             {
               "name": "LATIN DNA",
@@ -7570,7 +7548,7 @@
               "module": "visuals/lake.py"
             },
             {
-              "name": "AURORA",
+              "name": "RUCKER PAINT",
               "cls": "Aurora",
               "module": "visuals/aurora.py"
             },
@@ -7752,7 +7730,7 @@
               "module": "visuals/particlelife.py"
             },
             {
-              "name": "AURORA",
+              "name": "RUCKER PAINT",
               "cls": "Aurora",
               "module": "visuals/aurora.py"
             },
@@ -8472,11 +8450,6 @@
               "module": "visuals/hurdygurdy.py"
             },
             {
-              "name": "EQUALIZER",
-              "cls": "Equalizer",
-              "module": "visuals/equalizer.py"
-            },
-            {
               "name": "TURNTABLE",
               "cls": "Turntable",
               "module": "visuals/turntable.py"
@@ -8490,11 +8463,6 @@
               "name": "DRUM MACHINE",
               "cls": "DrumMachine",
               "module": "visuals/drummachine.py"
-            },
-            {
-              "name": "JUKEBOX",
-              "cls": "Jukebox",
-              "module": "visuals/jukebox.py"
             },
             {
               "name": "THEREMIN",

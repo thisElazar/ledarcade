@@ -207,11 +207,18 @@ class Merge(Visual):
         self.coop_flashes = [f for f in self.coop_flashes if f[2] > 0]
 
     def _find_gap(self, lane_idx, pos):
+        """Find contiguous gap around merge position."""
         occupied = set(car[0] for car in self.lanes[lane_idx])
-        gap = 0
-        for offset in range(-3, 4):
-            p = (pos + offset) % ROAD_LEN
-            if p not in occupied:
+        # Check if merge point itself is occupied
+        if pos % ROAD_LEN in occupied:
+            return 0
+        # Count contiguous free cells outward from merge point
+        gap = 1  # The merge point itself
+        for direction in (-1, 1):
+            for step in range(1, 4):
+                p = (pos + direction * step) % ROAD_LEN
+                if p in occupied:
+                    break
                 gap += 1
         return gap
 

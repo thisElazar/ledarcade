@@ -120,11 +120,18 @@ class GreenWave(Visual):
             self.spawn_timer = 0
             # Random lane offset
             lx = ROAD_X + random.choice([-2, -1, 1, 2])
-            self.platoon.append({
-                'x': lx, 'y': -2.0,
-                'speed': self.speed + random.uniform(-2, 2),
-                'color': (200, 220, 255),
-            })
+            # Check spacing: don't spawn if another car is near the top
+            can_spawn = True
+            for c in self.platoon:
+                if c['x'] == lx and c['y'] < 4:
+                    can_spawn = False
+                    break
+            if can_spawn:
+                self.platoon.append({
+                    'x': lx, 'y': -2.0,
+                    'speed': self.speed + random.uniform(-2, 2),
+                    'color': (200, 220, 255),
+                })
 
         # Update platoon
         for car in self.platoon:
@@ -134,6 +141,20 @@ class GreenWave(Visual):
                 state = self._signal_state(i)
                 if state == 'red':
                     if sy - 3 < car['y'] < sy - 1:
+                        stopped = True
+                        break
+            # Following distance: stop if same-lane car ahead is too close
+            if not stopped:
+                for other in self.platoon:
+                    if other is car:
+                        continue
+                    if other['x'] == car['x'] and other['y'] > car['y'] and other['y'] - car['y'] < 4:
+                        stopped = True
+                        break
+            # Cross-traffic collision: stop if cross car is in our path
+            if not stopped:
+                for cc in self.cross_cars:
+                    if abs(cc['y'] - car['y']) < 2 and abs(cc['x'] - car['x']) < 3:
                         stopped = True
                         break
             if not stopped:

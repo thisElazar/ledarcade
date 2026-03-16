@@ -71,6 +71,11 @@ BALANCE_CX = 58
 BALANCE_CY = 8
 BALANCE_R = 4
 
+# Pallet fork (lever escapement)
+FORK_COLOR = STEEL
+FORK_DARK = STEEL_DARK
+PALLET_COLOR = JEWEL  # Ruby pallet stones
+
 
 def _compute_center_distances():
     """Position gears along the S-curve using mesh angles."""
@@ -170,6 +175,7 @@ class WatchGears(Visual):
 
         self._draw_gears(d)
         self._draw_jewels(d)
+        self._draw_pallet_fork(d)
         self._draw_hairspring(d)
         self._draw_balance_wheel(d)
         self._draw_clock_hands(d)
@@ -244,6 +250,58 @@ class WatchGears(Visual):
             d.set_pixel(gcx, gcy - 1, JEWEL)
             d.set_pixel(gcx, gcy + 1, JEWEL)
             d.set_pixel(gcx - 1, gcy - 1, JEWEL_HIGHLIGHT)
+
+    def _draw_pallet_fork(self, d):
+        """Draw the pallet fork (lever escapement) between escape and balance wheels."""
+        # Fork pivot: between escape wheel and balance wheel
+        esc = GEARS[4]
+        esc_cx, esc_cy = esc["cx"], esc["cy"]
+
+        # Pivot roughly midway, slightly toward balance
+        fork_px = (esc_cx + BALANCE_CX) // 2 + 1
+        fork_py = (esc_cy + BALANCE_CY) // 2
+
+        # Fork oscillation synchronized to balance
+        swing = math.sin(self.balance_phase) * (15.0 * math.pi / 180.0)
+
+        # Fork lever arm (pointing toward escape wheel)
+        arm_len = 5
+        arm_angle = math.atan2(esc_cy - fork_py, esc_cx - fork_px) + swing
+
+        # Draw fork body (line from pivot toward escape wheel)
+        for t in range(arm_len + 1):
+            px = int(round(fork_px + t * math.cos(arm_angle)))
+            py = int(round(fork_py + t * math.sin(arm_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, FORK_COLOR)
+
+        # Two pallet stones at the end of the fork (perpendicular to arm)
+        tip_x = fork_px + arm_len * math.cos(arm_angle)
+        tip_y = fork_py + arm_len * math.sin(arm_angle)
+        perp_angle = arm_angle + math.pi / 2
+
+        for sign in (-1, 1):
+            for t in range(1, 3):  # 2px pallet stones
+                px = int(round(tip_x + sign * t * math.cos(perp_angle)))
+                py = int(round(tip_y + sign * t * math.sin(perp_angle)))
+                if 0 <= px < 64 and 0 <= py < 64:
+                    d.set_pixel(px, py, PALLET_COLOR)
+
+        # Impulse pin: thin line from fork pivot toward balance wheel
+        imp_angle = math.atan2(BALANCE_CY - fork_py, BALANCE_CX - fork_px) + swing * 0.5
+        for t in range(1, 4):
+            px = int(round(fork_px + t * math.cos(imp_angle)))
+            py = int(round(fork_py + t * math.sin(imp_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, FORK_DARK)
+
+        # Flash on "tick" - when balance phase crosses zero (pallet releases tooth)
+        tick = abs(math.sin(self.balance_phase)) < 0.15
+        if tick:
+            d.set_pixel(int(tip_x), int(tip_y), JEWEL_HIGHLIGHT)
+
+        # Fork pivot jewel
+        d.set_pixel(fork_px, fork_py, JEWEL)
 
     def _draw_balance_wheel(self, d):
         """Draw oscillating balance wheel with rim and crossbar."""

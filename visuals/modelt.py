@@ -65,8 +65,8 @@ SPEED_RPMS = [60, 200, 400, 600, 800, 1000]
 
 
 class ModelT(Visual):
-    name = "MODEL T"
-    description = "Ford engine cutaway"
+    name = "4-STROKE"
+    description = "4-stroke engine cutaway"
     category = "mechanics"
 
     def __init__(self, display: Display):

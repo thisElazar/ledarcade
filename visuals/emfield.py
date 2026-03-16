@@ -2,7 +2,7 @@
 EMField - Electric & Magnetic Field Visualization
 ===================================================
 Coulomb: unified electrostatics sandbox with 5 scenarios (DIPOLE,
-QUADRUPOLE, MOTOR, CIRCUIT, RANDOM) sharing one Coulomb physics engine,
+QUADRUPOLE, ROTOR, CIRCUIT, RANDOM) sharing one Coulomb physics engine,
 field-line tracer, equipotential renderer, and palette system.
 
 Controls:
@@ -617,7 +617,7 @@ class EMFreeAir(Visual):
 
 # ── Coulomb (unified EM visual) ──────────────────────────────────
 
-_SCENARIOS = ['DIPOLE', 'QUADRUPOLE', 'MOTOR', 'CIRCUIT', 'RANDOM']
+_SCENARIOS = ['DIPOLE', 'QUADRUPOLE', 'ROTOR', 'CIRCUIT', 'RANDOM']
 _VIEW_MODES = ['FIELD LINES', 'POTENTIAL', 'CIRCUIT']
 
 
@@ -719,7 +719,7 @@ class Coulomb(Visual):
         elif scenario == 'QUADRUPOLE':
             self._setup_lissajous([{'q': 1.0}, {'q': -1.0},
                                     {'q': 1.0}, {'q': -1.0}])
-        elif scenario == 'MOTOR':
+        elif scenario == 'ROTOR':
             self._setup_motor()
         elif scenario == 'CIRCUIT':
             self._setup_circuit()
@@ -890,7 +890,7 @@ class Coulomb(Visual):
                 c.x = max(3, min(GRID_SIZE - 4, c.x))
                 c.y = max(3, min(GRID_SIZE - 4, c.y))
 
-        elif scenario == 'MOTOR':
+        elif scenario == 'ROTOR':
             self.rotor_angle += dt * self.speed * 0.8
             for i, c in enumerate(self.rotor_charges):
                 angle = self.rotor_angle + 2 * math.pi * i / self.NUM_ROTOR

@@ -135,22 +135,24 @@ class Sandpile(Visual):
 
         for _ in range(max_steps):
             stable = True
+            # Double-buffer: snapshot the grid so all topplings read
+            # from the same state (eliminates directional asymmetry).
+            snap = [row[:] for row in grid]
             for y in range(size):
-                row = grid[y]
                 for x in range(size):
-                    if row[x] >= 4:
+                    if snap[y][x] >= 4:
                         stable = False
                         # Topple this cell
-                        row[x] -= 4
+                        grid[y][x] -= 4
                         # Distribute to cardinal neighbors (open boundary)
                         if y > 0:
                             grid[y - 1][x] += 1
                         if y < size - 1:
                             grid[y + 1][x] += 1
                         if x > 0:
-                            row[x - 1] += 1
+                            grid[y][x - 1] += 1
                         if x < size - 1:
-                            row[x + 1] += 1
+                            grid[y][x + 1] += 1
             if stable:
                 return True
         return False

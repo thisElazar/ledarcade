@@ -110,7 +110,7 @@ def _advect(b, d, d0, u, v, dt):
     _set_bnd(b, d)
 
 
-def _project(u, v, p, div, iters=6):
+def _project(u, v, p, div, iters=14):
     h = 1.0 / N
     div[1:N+1, 1:N+1] = -0.5 * h * (
         u[2:N+2, 1:N+1] - u[0:N, 1:N+1] +
@@ -132,7 +132,7 @@ def _project(u, v, p, div, iters=6):
     _set_bnd(2, v)
 
 
-def _velocity_step(u, v, u0, v0, viscosity, dt, iters=6):
+def _velocity_step(u, v, u0, v0, viscosity, dt, iters=14):
     """Full velocity step: diffuse, project, advect, project."""
     _diffuse(1, u0, u, viscosity, dt)
     _diffuse(2, v0, v, viscosity, dt)

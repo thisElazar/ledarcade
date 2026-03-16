@@ -28,7 +28,7 @@ AA_MW = {
 }
 
 # pKa values for ionizable groups
-PKA_NTERM = 9.69
+PKA_NTERM = 8.0
 PKA_CTERM = 2.34
 PKA_SIDE = {
     'C': 8.33, 'D': 3.65, 'E': 4.25, 'H': 6.00, 'K': 10.53, 'R': 12.48,

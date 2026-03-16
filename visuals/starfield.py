@@ -69,7 +69,14 @@ class Starfield(Visual):
                 star.z = 1.0
 
     def draw(self):
-        self.display.clear(Colors.BLACK)
+        # Subtle nebula background instead of pure black
+        for y in range(GRID_SIZE):
+            for x in range(GRID_SIZE):
+                v1 = math.sin(x * 0.08 + self.time * 0.1) * math.sin(y * 0.06 + self.time * 0.07)
+                nebula = max(0, v1 * 12)  # very dim, 0-12 range
+                bg = (int(nebula * 0.3), 0, int(nebula * 0.8))  # deep blue/purple
+                self.display.set_pixel(x, y, bg)
+
         cx, cy = GRID_SIZE // 2, GRID_SIZE // 2
 
         # Sort stars by depth (far to near) for proper layering

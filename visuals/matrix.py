@@ -129,4 +129,12 @@ class Matrix(Visual):
                         brightness = int(200 * fade * fade)
                         color = self._get_color(brightness, drop.x)
 
+                    # Glyph flicker: ~8% chance a trail pixel flashes brighter
+                    if i > 0 and random.random() < 0.08:
+                        flicker = self._get_color(min(255, int(200 * (1.0 - (i / drop.length)) + 80)), drop.x)
+                        color = flicker
+
                     self.display.set_pixel(drop.x, y, color)
+                    # 2px wide drops
+                    if drop.x + 1 < GRID_SIZE:
+                        self.display.set_pixel(drop.x + 1, y, color)

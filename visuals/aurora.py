@@ -19,8 +19,8 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 
 class Aurora(Visual):
-    name = "AURORA"
-    description = "Flowing paint"
+    name = "RUCKER PAINT"
+    description = "CelLab flowing paint CA"
     category = "automata"
 
     def __init__(self, display: Display):

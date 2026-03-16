@@ -199,24 +199,43 @@ class Intersection(Visual):
             elif d == DIR_W and car['x'] > stop and car['x'] < stop + 12:
                 should_stop = True
 
-        # Check for car ahead (simple following)
+        # Check for car ahead (same direction following distance)
+        min_gap = 999
         for other in self.cars:
             if other is car or other['dir'] != d:
                 continue
             if d == DIR_N:
-                if other['y'] < car['y'] and car['y'] - other['y'] < 4:
-                    should_stop = True
+                if other['y'] < car['y']:
+                    min_gap = min(min_gap, car['y'] - other['y'])
             elif d == DIR_S:
-                if other['y'] > car['y'] and other['y'] - car['y'] < 4:
-                    should_stop = True
+                if other['y'] > car['y']:
+                    min_gap = min(min_gap, other['y'] - car['y'])
             elif d == DIR_E:
-                if other['x'] > car['x'] and other['x'] - car['x'] < 4:
-                    should_stop = True
+                if other['x'] > car['x']:
+                    min_gap = min(min_gap, other['x'] - car['x'])
             elif d == DIR_W:
-                if other['x'] < car['x'] and car['x'] - other['x'] < 4:
-                    should_stop = True
+                if other['x'] < car['x']:
+                    min_gap = min(min_gap, car['x'] - other['x'])
+        if min_gap < 4:
+            should_stop = True
 
-        speed = 0.0 if should_stop else car['speed']
+        # Cross-traffic collision avoidance in the intersection box
+        in_box = (CENTER - HALF_W <= car['x'] <= CENTER + HALF_W and
+                  CENTER - HALF_W <= car['y'] <= CENTER + HALF_W)
+        if in_box:
+            for other in self.cars:
+                if other is car or other['dir'] == d:
+                    continue
+                ox, oy = other['x'], other['y']
+                if abs(ox - car['x']) < 3 and abs(oy - car['y']) < 3:
+                    should_stop = True
+                    break
+
+        # Gradual braking: slow down when approaching a stop
+        if should_stop:
+            speed = max(0.0, car['speed'] * max(0.0, (min_gap - 2) / 4)) if min_gap < 8 else 0.0
+        else:
+            speed = car['speed']
 
         if d == DIR_N:
             car['y'] -= speed * dt

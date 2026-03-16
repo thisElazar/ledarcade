@@ -143,7 +143,7 @@ RUDIMENTS = [
 
     {'name': 'SINGLE FLAMMED MILL', 'short': 'FLM MILL',
      'cat': 2, 'pas': 25, 'div': 4,
-     'notes': [('R',FA),('L',N),('R',N),('R',N),('L',FA),('R',N),('L',N),('L',N)]},
+     'notes': [('R',FA),('R',N),('L',N),('R',N),('L',FA),('L',N),('R',N),('L',N)]},
 
     {'name': 'FLAM PARADIDDLE-DIDDLE', 'short': 'FLM PDD',
      'cat': 2, 'pas': 26, 'div': 4,
@@ -152,7 +152,7 @@ RUDIMENTS = [
 
     {'name': 'PATAFLAFLA', 'short': 'PATAFLA',
      'cat': 2, 'pas': 27, 'div': 4,
-     'notes': [('R',FA),('L',N),('R',N),('L',FA),('R',N),('L',FA),('R',N),('L',FA)]},
+     'notes': [('R',FA),('L',N),('R',N),('L',FA),('R',N),('L',N),('R',FA),('L',N)]},
 
     {'name': 'SWISS ARMY TRIPLET', 'short': 'SWISS TRP',
      'cat': 2, 'pas': 28, 'div': 3,

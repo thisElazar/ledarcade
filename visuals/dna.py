@@ -181,7 +181,7 @@ class DNA(Visual):
                 ("CHROMATIN PACKAGING", (255, 255, 255)),
                 ("2 METERS OF DNA PER HUMAN CELL", mid),
                 ("DNA WRAPS AROUND HISTONE PROTEINS", mid),
-                ("NUCLEOSOMES FOLD INTO 30NM FIBER", mid),
+                ("NUCLEOSOMES FORM CHROMATIN LOOPS", mid),
                 ("FIBERS CONDENSE INTO CHROMOSOMES", mid),
             ]
 
@@ -379,7 +379,7 @@ class DNA(Visual):
                     'original': original,
                     'mutated': mutated,
                     'timer': 0.0,
-                    'repaired': random.random() < 0.5,
+                    'repaired': random.random() < 0.9,
                 }
                 self.sequence[idx] = mutated
 
@@ -797,7 +797,7 @@ class DNA(Visual):
         phase = int(t / phase_dur)
 
         labels = ['2NM DNA', '11NM NUCLEOSOME',
-                  '30NM FIBER', 'CHROMOSOME']
+                  'CHROMATIN LOOPS', 'CHROMOSOME']
 
         if phase == 0:
             self._draw_bare_dna(pal)
@@ -858,7 +858,7 @@ class DNA(Visual):
             d.draw_line(x1 + 5, y1, x2 - 5, y2, pal['dim'])
 
     def _draw_fiber(self, pal):
-        """30nm chromatin fiber: zigzag of packed nucleosomes."""
+        """Higher-order chromatin loops: zigzag of packed nucleosomes."""
         d = self.display
         fiber = self._tint((150, 120, 220), pal)
         num = 10

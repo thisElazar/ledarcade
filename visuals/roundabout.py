@@ -185,6 +185,10 @@ class Roundabout(Visual):
                     v['progress'] = min(v['progress'], float(yi - 1))
                     continue
 
+            # Following distance: slow/stop if any vehicle ahead is too close
+            if self._too_close(v):
+                continue
+
             v['progress'] += v['speed'] * dt
 
         # Remove finished
@@ -214,24 +218,35 @@ class Roundabout(Visual):
             return True
         ex, ey = entry_path[yi]
 
-        # Check all other vehicles that are ON the ring
+        # Check all other vehicles that are ON the ring or nearby
         for other in self.vehicles:
             if other is entering:
                 continue
             o_yi = self.yield_indices[other['key']]
-            o_path = self.paths[other['key']]
             o_prog = other['progress']
-            # Only check vehicles currently on the ring arc section
-            ring_end = len(o_path) - self.yield_indices.get(other['key'], 0)
-            if o_prog < o_yi or o_prog > len(o_path) - 10:
+            # Only check vehicles past entry (on ring or exiting)
+            if o_prog < o_yi:
                 continue
-            # Get their position
-            oi = int(min(o_prog, len(o_path) - 1))
-            ox, oy = o_path[oi]
+            ox, oy = self._vehicle_pos(other)
             dist = math.hypot(ox - ex, oy - ey)
-            if dist < 6:
+            if dist < 10:
                 return False
         return True
+
+    def _too_close(self, v):
+        """Check if any other vehicle is too close ahead of this one."""
+        vx, vy = self._vehicle_pos(v)
+        for other in self.vehicles:
+            if other is v:
+                continue
+            ox, oy = self._vehicle_pos(other)
+            dist = math.hypot(ox - vx, oy - vy)
+            if dist < 5:
+                # Only stop if the other is roughly ahead (closer to end of path)
+                # or on a different path (potential collision)
+                if other['key'] != v['key'] or other['progress'] > v['progress']:
+                    return True
+        return False
 
     def _vehicle_pos(self, v):
         path = self.paths[v['key']]

@@ -105,16 +105,8 @@ SCENES = [
      'groups': ['physics'], 'type': 'photoelectric', 'detail': 'hf > WORK FN'},
     {'name': 'CATHODE RAY', 'desc': 'ELECTRON BEAM',
      'groups': ['physics'], 'type': 'cathode_ray', 'detail': 'J.J. THOMSON'},
-    {'name': 'THERMIONIC', 'desc': 'HEAT FREES E',
-     'groups': ['physics'], 'type': 'thermionic', 'detail': 'RICHARDSON EQ'},
-    {'name': 'COMPTON', 'desc': 'PHOTON SCATTERS E',
-     'groups': ['physics'], 'type': 'compton', 'detail': 'WAVELENGTH SHIFT'},
     {'name': 'DOUBLE SLIT', 'desc': 'INTERFERENCE',
      'groups': ['physics'], 'type': 'double_slit', 'detail': 'WAVE-PARTICLE'},
-    {'name': 'PAIR PRODUCE', 'desc': 'GAMMA TO E+E-',
-     'groups': ['physics'], 'type': 'pair_production', 'detail': 'E=MC2'},
-    {'name': 'MILLIKAN', 'desc': 'OIL DROP E CHARGE',
-     'groups': ['physics'], 'type': 'millikan', 'detail': '1.6E-19 C'},
     {'name': 'BETA DECAY', 'desc': 'N EMITS E + NU',
      'groups': ['physics'], 'type': 'beta_decay', 'detail': 'WEAK FORCE'},
     {'name': 'SEM DETECTOR', 'desc': 'SECONDARY E',
@@ -153,15 +145,6 @@ SCENES = [
      'level_energies': [0.0, 16.6, 18.4, 19.7, 20.0],
      'transitions': [(3, 2, 640), (4, 3, 585), (5, 4, 540)],
      'detail': 'NEON SIGN'},
-    {'name': 'FLUORESCENCE', 'desc': 'UV TO VISIBLE',
-     'groups': ['transitions'], 'type': 'fluorescence',
-     'detail': 'STOKES SHIFT'},
-    {'name': 'PHOSPHORESC', 'desc': 'SLOW GLOW',
-     'groups': ['transitions'], 'type': 'phosphorescence',
-     'detail': 'DELAYED'},
-    {'name': 'LASER', 'desc': 'STIMULATED EMIT',
-     'groups': ['transitions'], 'type': 'stimulated',
-     'detail': 'COHERENT'},
 
     # ── Chemistry ──────────────────────────────────────────────────
     {'name': 'NA + CL', 'desc': 'IONIC BOND',
@@ -174,45 +157,17 @@ SCENES = [
      'donor': 'Mg', 'acceptor': 'O', 'e_count': 2,
      'donor_inner': 2, 'acceptor_inner': 2,
      'detail': 'MGO'},
-    {'name': 'ELECTROLYSIS', 'desc': 'E DRIVES RXNS',
-     'groups': ['chemistry'], 'type': 'electrolysis',
-     'detail': 'FARADAY'},
-    {'name': 'GALVANIC', 'desc': 'BATTERY CELL',
-     'groups': ['chemistry'], 'type': 'galvanic',
-     'detail': 'VOLTA'},
-    {'name': 'CORROSION', 'desc': 'IRON RUSTS',
-     'groups': ['chemistry'], 'type': 'corrosion',
-     'detail': 'FE TO FE2+'},
-    {'name': 'ELECTROPLATE', 'desc': 'METAL COATING',
-     'groups': ['chemistry'], 'type': 'electroplating',
-     'detail': 'CU DEPOSIT'},
 
     # ── Quantum ────────────────────────────────────────────────────
     {'name': 'TUNNELING', 'desc': 'THROUGH BARRIER',
      'groups': ['quantum'], 'type': 'tunneling',
      'detail': 'PSI LEAKS'},
-    {'name': 'STERN-GERLACH', 'desc': 'SPIN SPLIT',
-     'groups': ['quantum'], 'type': 'stern_gerlach',
-     'detail': 'SPIN 1/2'},
-    {'name': 'COOPER PAIRS', 'desc': 'SUPERCONDUCTOR',
-     'groups': ['quantum'], 'type': 'cooper_pairs',
-     'detail': 'BCS THEORY'},
-    {'name': 'ZEEMAN', 'desc': 'B FIELD SPLITS',
-     'groups': ['quantum'], 'type': 'zeeman',
-     'detail': 'MAGNETIC'},
-    {'name': 'DAVISSON-GER', 'desc': 'E DIFFRACTION',
-     'groups': ['quantum'], 'type': 'davisson_germer',
-     'detail': 'WAVE NATURE'},
 
     # ── Semiconductor ──────────────────────────────────────────────
     {'name': 'BAND GAP', 'desc': 'SI 1.1 EV',
      'groups': ['semicond'], 'type': 'band',
      'gap_px': 10, 'material': 'SILICON',
      'detail': '1.1 EV'},
-    {'name': 'INSULATOR', 'desc': 'DIAMOND 5.5 EV',
-     'groups': ['semicond'], 'type': 'band',
-     'gap_px': 24, 'material': 'DIAMOND',
-     'detail': '5.5 EV'},
     {'name': 'N DOPING', 'desc': 'DONOR LEVEL',
      'groups': ['semicond'], 'type': 'doping_n',
      'detail': 'PHOSPHORUS'},
@@ -349,21 +304,6 @@ class Electrons(Visual):
                 self._ds_cdf.append(running)
             self._ds_total = running
 
-        elif sc['type'] == 'thermionic':
-            for _ in range(8):
-                x = random.randint(10, 54)
-                self.particles.append(
-                    [float(x), 48.0, random.uniform(-3, 3),
-                     random.uniform(-25, -10), E_COL, 0.0, 2.0])
-
-        elif sc['type'] == 'millikan':
-            for i in range(4):
-                x = 15 + i * 10
-                y = random.uniform(18, 44)
-                vy = random.uniform(-2, 2)
-                self.particles.append(
-                    [float(x), y, 0.0, vy, (180, 160, 100), 0.0, 999.0])
-
         elif sc['type'] == 'sem_detector':
             self._sem_image = [0] * DISP_W
             self._sem_scan_x = 4.0
@@ -448,12 +388,8 @@ class Electrons(Visual):
             self._update_photoelectric(dt)
         elif stype == 'cathode_ray':
             self._update_cathode_ray(dt)
-        elif stype == 'thermionic':
-            self._update_thermionic(dt)
         elif stype == 'double_slit':
             self._update_double_slit(dt)
-        elif stype == 'millikan':
-            self._update_millikan(dt)
         elif stype == 'sem_detector':
             self._update_sem(dt)
 
@@ -467,16 +403,8 @@ class Electrons(Visual):
             self._draw_photoelectric(sc)
         elif stype == 'cathode_ray':
             self._draw_cathode_ray(sc)
-        elif stype == 'thermionic':
-            self._draw_thermionic(sc)
-        elif stype == 'compton':
-            self._draw_compton(sc)
         elif stype == 'double_slit':
             self._draw_double_slit(sc)
-        elif stype == 'pair_production':
-            self._draw_pair_production(sc)
-        elif stype == 'millikan':
-            self._draw_millikan(sc)
         elif stype == 'beta_decay':
             self._draw_beta_decay(sc)
         elif stype == 'sem_detector':
@@ -485,32 +413,10 @@ class Electrons(Visual):
             self._draw_emission(sc)
         elif stype == 'absorption':
             self._draw_absorption(sc)
-        elif stype == 'fluorescence':
-            self._draw_fluorescence(sc)
-        elif stype == 'phosphorescence':
-            self._draw_phosphorescence(sc)
-        elif stype == 'stimulated':
-            self._draw_stimulated(sc)
         elif stype == 'transfer':
             self._draw_transfer(sc)
-        elif stype == 'electrolysis':
-            self._draw_electrolysis(sc)
-        elif stype == 'galvanic':
-            self._draw_galvanic(sc)
-        elif stype == 'corrosion':
-            self._draw_corrosion(sc)
-        elif stype == 'electroplating':
-            self._draw_electroplating(sc)
         elif stype == 'tunneling':
             self._draw_tunneling(sc)
-        elif stype == 'stern_gerlach':
-            self._draw_stern_gerlach(sc)
-        elif stype == 'cooper_pairs':
-            self._draw_cooper_pairs(sc)
-        elif stype == 'zeeman':
-            self._draw_zeeman(sc)
-        elif stype == 'davisson_germer':
-            self._draw_davisson_germer(sc)
         elif stype == 'band':
             self._draw_band(sc)
         elif stype == 'doping_n':
@@ -661,63 +567,6 @@ class Electrons(Visual):
         gy = int(32 + math.sin(t * 1.5) * 12)
         _draw_circle(d, 61, gy, 2, (100, 255, 100), filled=True)
 
-    # ── Thermionic emission ────────────────────────────────────────
-
-    def _update_thermionic(self, dt):
-        t = self.scene_time
-        if int(t / 0.25) > int((t - dt) / 0.25):
-            x = random.uniform(14, 50)
-            self.particles.append(
-                [x, 47.0, random.uniform(-4, 4),
-                 random.uniform(-30, -12), E_COL, t, 2.5])
-
-    def _draw_thermionic(self, sc):
-        d = self.display
-        t = self.scene_time
-        flicker = 0.8 + 0.2 * math.sin(t * 8)
-        fil_col = _col_alpha((255, 100, 30), flicker)
-        for x in range(12, 52):
-            wave = int(math.sin(x * 0.3) * 1.5)
-            d.set_pixel(x, 48 + wave, fil_col)
-            d.set_pixel(x, 49 + wave, fil_col)
-        for x in range(10, 54):
-            for dy in range(1, 4):
-                a = (4 - dy) / 4.0 * 0.3
-                d.set_pixel(x, 50 + dy, _col_alpha((255, 60, 0), a))
-        d.draw_rect(10, 48, 2, 6, (80, 80, 80))
-        d.draw_rect(52, 48, 2, 6, (80, 80, 80))
-
-    # ── Compton scattering ─────────────────────────────────────────
-
-    def _draw_compton(self, sc):
-        d = self.display
-        t = self.scene_time
-        cycle = t % 3.0
-        ex, ey = 32, 32
-        # Incoming gamma is hard violet, not visible gold
-        gamma_col = (180, 0, 255)
-        if cycle < 1.0:
-            px = int(_lerp(-4, 30, cycle))
-            _safe_pixel(d, px, 32, gamma_col)
-            _safe_pixel(d, px - 1, 32, _col_alpha(gamma_col, 0.5))
-            _safe_pixel(d, px - 2, 32, _col_alpha(gamma_col, 0.25))
-            _draw_circle(d, ex, ey, 2, E_COL, filled=True)
-        elif cycle < 1.2:
-            _draw_circle(d, ex, ey, 3, (255, 255, 200), filled=True)
-        else:
-            frac = (cycle - 1.2) / 1.8
-            # Scattered photon — longer wavelength (redder)
-            scattered_col = (255, 120, 200)   # shifted from hard gamma
-            spx = int(_lerp(32, 62, frac))
-            spy = int(_lerp(32, 12, frac))
-            _safe_pixel(d, spx, spy, scattered_col)
-            _safe_pixel(d, spx - 1, spy, _col_alpha(scattered_col, 0.4))
-            # Recoil electron
-            rex = int(_lerp(32, 55, frac))
-            rey = int(_lerp(32, 50, frac))
-            _draw_circle(d, rex, rey, 2, E_COL, filled=True)
-        d.draw_text_small(2, 8, 'GAMMA', _col_alpha(gamma_col, 0.5))
-
     # ── Double slit: proper interference fringes ───────────────────
 
     def _update_double_slit(self, dt):
@@ -762,78 +611,6 @@ class Electrons(Visual):
                 d.set_pixel(60, y, (bright, bright, bright))
                 d.set_pixel(61, y, (bright // 2, bright // 2, bright))
         _draw_circle(d, 3, 32, 2, (60, 70, 80), filled=True)
-
-    # ── Pair production — with B field indicator ───────────────────
-
-    def _draw_pair_production(self, sc):
-        d = self.display
-        t = self.scene_time
-        cycle = t % 3.5
-
-        # Nucleus at center
-        _draw_circle(d, 32, 32, 3, NUC, filled=True)
-
-        # B field indicator (arrows on right edge, pointing into screen)
-        for y in range(8, 56, 6):
-            _safe_pixel(d, 60, y, (60, 60, 140))
-            _safe_pixel(d, 61, y, (60, 60, 140))
-            _safe_pixel(d, 60, y + 1, (40, 40, 100))
-        d.draw_text_small(56, 2, 'B', (80, 80, 160))
-
-        if cycle < 1.2:
-            gx = int(_lerp(-4, 28, cycle / 1.2))
-            _safe_pixel(d, gx, 32, (200, 0, 255))
-            _safe_pixel(d, gx - 1, 32, (140, 0, 180))
-            _safe_pixel(d, gx - 2, 32, (80, 0, 100))
-        elif cycle < 1.5:
-            frac = (cycle - 1.2) / 0.3
-            _draw_circle(d, 28, 32, int(2 + frac * 3),
-                         _col_alpha((255, 255, 200), 1.0 - frac), filled=True)
-        else:
-            # In B field: e- curves up, e+ curves down (opposite charge)
-            frac = (cycle - 1.5) / 2.0
-            angle = frac * math.pi * 0.8
-            r_path = frac * 20
-            # Electron curves upward
-            ex = int(28 + r_path * math.cos(angle))
-            ey = int(32 - r_path * math.sin(angle))
-            _draw_circle(d, ex, ey, 1, E_COL, filled=True)
-            # Positron curves downward (opposite curvature in same B)
-            px_p = int(28 + r_path * math.cos(-angle))
-            py_p = int(32 - r_path * math.sin(-angle))
-            _draw_circle(d, px_p, py_p, 1, POSITRON, filled=True)
-            if frac > 0.2:
-                a = min(1.0, frac * 2)
-                d.draw_text_small(max(2, ex - 4), max(2, ey - 6), 'E-',
-                                  _col_alpha(E_COL, a))
-                d.draw_text_small(min(px_p + 2, 54), min(py_p + 2, 54),
-                                  'E+', _col_alpha(POSITRON, a))
-
-    # ── Millikan oil drop ──────────────────────────────────────────
-
-    def _update_millikan(self, dt):
-        for p in self.particles:
-            charge = random.Random(id(p)).choice([-1, 0, 1])
-            e_field = 3.0 * math.sin(self.scene_time * 0.5)
-            p[3] += (2.0 + charge * e_field) * dt
-            p[3] *= 0.95
-            if p[1] < 18:
-                p[1] = 18
-                p[3] = abs(p[3])
-            if p[1] > 44:
-                p[1] = 44
-                p[3] = -abs(p[3])
-
-    def _draw_millikan(self, sc):
-        d = self.display
-        for x in range(6, 58):
-            d.set_pixel(x, 14, PLATE_COL)
-            d.set_pixel(x, 15, PLATE_COL)
-        d.draw_text_small(2, 10, '+', (200, 100, 100))
-        for x in range(6, 58):
-            d.set_pixel(x, 47, PLATE_COL)
-            d.set_pixel(x, 48, PLATE_COL)
-        d.draw_text_small(2, 50, '-', (100, 100, 200))
 
     # ── Beta decay ─────────────────────────────────────────────────
 
@@ -1076,159 +853,6 @@ class Electrons(Visual):
             _draw_circle(d, 17, y_to, 2,
                          _col_alpha(E_COL, pulse), filled=True)
 
-    def _draw_fluorescence(self, sc):
-        """UV absorbed → fast non-radiative drop → visible photon out.
-        Uses Jablonski-like levels: S0, S1 vibrational, S1, Sn."""
-        d = self.display
-        # Custom energies for Jablonski diagram (eV-like)
-        levels = [1, 2, 3, 4]
-        energies = [0.0, 2.5, 3.0, 3.8]
-        labels = ['S0', 'S1', 'S1*', 'SN']
-        self._draw_energy_levels(levels, level_energies=energies,
-                                 level_labels=labels)
-
-        t = self.scene_time
-        cycle = t % 4.0
-
-        if cycle < 1.0:
-            frac = cycle / 1.0
-            px = int(_lerp(58, 20, frac))
-            py = _level_y(1, levels, energies) + int(math.sin(px * 0.8) * 2)
-            _safe_pixel(d, px, py, (140, 40, 200))
-            _safe_pixel(d, px + 1, py, _col_alpha((140, 40, 200), 0.4))
-            _draw_circle(d, 17, _level_y(1, levels, energies), 2,
-                         E_COL, filled=True)
-        elif cycle < 1.5:
-            frac = (cycle - 1.0) / 0.5
-            y0 = _level_y(1, levels, energies)
-            y4 = _level_y(4, levels, energies)
-            ey = int(_lerp(y0, y4, frac))
-            _draw_circle(d, 17, ey, 2, E_COL, filled=True)
-        elif cycle < 2.0:
-            frac = (cycle - 1.5) / 0.5
-            y4 = _level_y(4, levels, energies)
-            y3 = _level_y(3, levels, energies)
-            ey = int(_lerp(y4, y3, frac))
-            _draw_circle(d, 17, ey, 2, _col_alpha(E_COL, 0.7), filled=True)
-            for i in range(3):
-                hx = 22 + i * 4
-                hy = ey + int(math.sin(t * 10 + i) * 2)
-                _safe_pixel(d, hx, hy, (200, 80, 40))
-        elif cycle < 2.5:
-            frac = (cycle - 2.0) / 0.5
-            y3 = _level_y(3, levels, energies)
-            y1 = _level_y(1, levels, energies)
-            ey = int(_lerp(y3, y1, frac))
-            _draw_circle(d, 17, ey, 2, E_COL, filled=True)
-        else:
-            frac = (cycle - 2.5) / 1.5
-            y1 = _level_y(1, levels, energies)
-            _draw_circle(d, 17, y1, 2, E_COL, filled=True)
-            px = int(_lerp(20, 58, frac))
-            py = y1 + int(math.sin(px * 0.6) * 2)
-            col = (0, 200, 100)
-            _safe_pixel(d, px, py, col)
-            _safe_pixel(d, px - 1, py, _col_alpha(col, 0.4))
-            d.draw_text_small(42, y1 - 8, 'VIS',
-                              _col_alpha(col, 0.6))
-
-    def _draw_phosphorescence(self, sc):
-        """UV → Sn → intersystem crossing to triplet T1 → slow emission."""
-        d = self.display
-        levels = [1, 2, 3, 4]
-        energies = [0.0, 1.8, 3.2, 3.8]
-        labels = ['S0', 'T1', 'S1', 'SN']
-        self._draw_energy_levels(levels, level_energies=energies,
-                                 level_labels=labels)
-
-        t = self.scene_time
-        cycle = t % 6.0
-
-        if cycle < 0.8:
-            frac = cycle / 0.8
-            y1 = _level_y(1, levels, energies)
-            px = int(_lerp(58, 20, frac))
-            _safe_pixel(d, px, y1, (140, 40, 200))
-            _draw_circle(d, 17, y1, 2, E_COL, filled=True)
-        elif cycle < 1.3:
-            frac = (cycle - 0.8) / 0.5
-            y1 = _level_y(1, levels, energies)
-            y4 = _level_y(4, levels, energies)
-            ey = int(_lerp(y1, y4, frac))
-            _draw_circle(d, 17, ey, 2, E_COL, filled=True)
-        elif cycle < 1.8:
-            frac = (cycle - 1.3) / 0.5
-            y4 = _level_y(4, levels, energies)
-            y2 = _level_y(2, levels, energies)
-            ey = int(_lerp(y4, y2, frac))
-            _draw_circle(d, 17, ey, 2, E_COL, filled=True)
-            d.draw_text_small(22, ey - 2, 'ISC',
-                              _col_alpha((180, 120, 80), frac))
-        elif cycle < 4.5:
-            pulse = 0.5 + 0.5 * math.sin(t * 3)
-            y2 = _level_y(2, levels, energies)
-            _draw_circle(d, 17, y2, 2,
-                         _col_alpha(E_COL, pulse), filled=True)
-            d.draw_text_small(22, y2 - 2, 'WAIT',
-                              _col_alpha((180, 120, 80),
-                                         0.3 + 0.2 * math.sin(t * 2)))
-        elif cycle < 5.0:
-            frac = (cycle - 4.5) / 0.5
-            y2 = _level_y(2, levels, energies)
-            y1 = _level_y(1, levels, energies)
-            ey = int(_lerp(y2, y1, frac))
-            _draw_circle(d, 17, ey, 2, E_COL, filled=True)
-        else:
-            frac = (cycle - 5.0) / 1.0
-            y1 = _level_y(1, levels, energies)
-            _draw_circle(d, 17, y1, 2, E_COL, filled=True)
-            px = int(_lerp(20, 58, frac))
-            py = y1 + int(math.sin(px * 0.6) * 2)
-            col = (0, 180, 200)
-            _safe_pixel(d, px, py, col)
-            _safe_pixel(d, px - 1, py, _col_alpha(col, 0.4))
-
-    def _draw_stimulated(self, sc):
-        """Stimulated emission: photon in → two identical coherent photons."""
-        d = self.display
-        levels = [1, 2]
-        energies = [0.0, 1.8]
-        self._draw_energy_levels(levels, x0=4, x1=24,
-                                 level_energies=energies)
-
-        t = self.scene_time
-        cycle = t % 3.5
-        y_hi = _level_y(2, levels, energies)
-        y_lo = _level_y(1, levels, energies)
-        col = (255, 40, 40)
-
-        if cycle < 0.8:
-            _draw_circle(d, 14, y_hi, 2, E_COL, filled=True)
-            frac = cycle / 0.8
-            px = int(_lerp(58, 18, frac))
-            py = y_hi + int(math.sin(px * 0.5) * 1.5)
-            _safe_pixel(d, px, py, col)
-            _safe_pixel(d, px + 1, py, _col_alpha(col, 0.5))
-        elif cycle < 1.3:
-            frac = (cycle - 0.8) / 0.5
-            ey = int(_lerp(y_hi, y_lo, frac))
-            _draw_circle(d, 14, ey, 2, E_COL, filled=True)
-            _draw_circle(d, 14, y_hi, 3,
-                         _col_alpha((255, 200, 200), 1.0 - frac), filled=True)
-        else:
-            _draw_circle(d, 14, y_lo, 2, E_COL, filled=True)
-            frac = (cycle - 1.3) / 2.2
-            # Two photons side by side, same direction (coherent)
-            for offset in (0, 2):
-                px = int(_lerp(18, 60, frac))
-                py = y_hi + int(math.sin(px * 0.5) * 1.5) + offset
-                _safe_pixel(d, px, py, col)
-                _safe_pixel(d, px - 1, py, _col_alpha(col, 0.4))
-            if frac > 0.1:
-                d.draw_text_small(34, y_hi - 8, 'COHERENT',
-                                  _col_alpha((255, 100, 100),
-                                             min(1.0, frac * 2)))
-
     # ══════════════════════════════════════════════════════════════
     #  CHEMISTRY scenes
     # ══════════════════════════════════════════════════════════════
@@ -1310,101 +934,6 @@ class Electrons(Visual):
                     if x % 3 == 0:
                         _safe_pixel(d, x, 30, _col_alpha((200, 200, 100), a))
 
-    def _draw_electrolysis(self, sc):
-        d = self.display
-        t = self.scene_time
-        for y in range(14, 50):
-            for x in range(4, 60):
-                d.set_pixel(x, y, (15, 20, 35))
-        d.draw_rect(6, 10, 3, 44, (80, 80, 80))
-        d.draw_rect(55, 10, 3, 44, (120, 80, 40))
-        d.draw_text_small(2, 6, '-', (100, 100, 200))
-        d.draw_text_small(56, 6, '+', (200, 100, 100))
-        for x in range(8, 56):
-            d.set_pixel(x, 10, WIRE_COL)
-        d.draw_rect(28, 7, 2, 6, (200, 200, 100))
-        d.draw_rect(33, 8, 2, 4, (200, 200, 100))
-        for i in range(4):
-            phase = (t * 0.3 + i * 0.25) % 1.0
-            ix = int(_lerp(52, 10, phase))
-            iy = 20 + i * 7
-            _safe_pixel(d, ix, iy, POS_ION)
-            _safe_pixel(d, ix + 1, iy, _col_alpha(POS_ION, 0.4))
-        for i in range(4):
-            phase = (t * 0.3 + i * 0.25) % 1.0
-            ix = int(_lerp(10, 52, phase))
-            iy = 23 + i * 7
-            _safe_pixel(d, ix, iy, NEG_ION)
-            _safe_pixel(d, ix - 1, iy, _col_alpha(NEG_ION, 0.4))
-
-    def _draw_galvanic(self, sc):
-        d = self.display
-        t = self.scene_time
-        d.draw_rect(4, 22, 24, 28, (40, 40, 50), filled=False)
-        d.draw_rect(36, 22, 24, 28, (40, 40, 50), filled=False)
-        for y in range(23, 49):
-            for x in range(5, 27):
-                d.set_pixel(x, y, (20, 20, 40))
-            for x in range(37, 59):
-                d.set_pixel(x, y, (20, 30, 30))
-        d.draw_rect(14, 18, 3, 32, (160, 160, 180))
-        d.draw_rect(46, 18, 3, 32, (180, 120, 60))
-        d.draw_text_small(10, 14, 'ZN', (160, 160, 200))
-        d.draw_text_small(44, 14, 'CU', (200, 140, 80))
-        for x in range(17, 47):
-            d.set_pixel(x, 18, WIRE_COL)
-        for i in range(5):
-            phase = (t * 0.4 + i * 0.2) % 1.0
-            ex = int(_lerp(17, 47, phase))
-            _safe_pixel(d, ex, 17, E_COL)
-        d.draw_rect(28, 26, 8, 3, (120, 120, 80))
-
-    def _draw_corrosion(self, sc):
-        d = self.display
-        t = self.scene_time
-        d.draw_rect(8, 28, 20, 18, (140, 130, 120))
-        d.draw_text_small(12, 34, 'FE', (180, 160, 140))
-        _draw_circle(d, 24, 25, 4, (40, 60, 120), filled=True)
-        o2_x = 44 + int(math.sin(t * 0.8) * 4)
-        o2_y = 24 + int(math.cos(t * 0.6) * 3)
-        _draw_circle(d, o2_x, o2_y, 2, (200, 60, 60), filled=True)
-        _draw_circle(d, o2_x + 4, o2_y, 2, (200, 60, 60), filled=True)
-        d.draw_text_small(o2_x - 2, o2_y - 6, 'O2', (200, 100, 100))
-        for i in range(3):
-            phase = (t * 0.5 + i * 0.33) % 1.0
-            ex = int(_lerp(28, 42, phase))
-            ey = int(_lerp(32, 26, phase) - math.sin(phase * math.pi) * 5)
-            _safe_pixel(d, ex, ey, E_COL)
-        rust_spots = [(10, 28), (15, 29), (22, 28), (18, 27), (25, 29)]
-        visible = int(t * 0.5) % (len(rust_spots) + 1)
-        for idx in range(min(visible, len(rust_spots))):
-            rx, ry = rust_spots[idx]
-            d.set_pixel(rx, ry, (180, 80, 20))
-            d.set_pixel(rx + 1, ry, (160, 70, 20))
-
-    def _draw_electroplating(self, sc):
-        d = self.display
-        t = self.scene_time
-        for y in range(16, 50):
-            for x in range(6, 58):
-                d.set_pixel(x, y, (15, 20, 40))
-        d.draw_rect(50, 14, 4, 38, (180, 120, 50))
-        d.draw_text_small(48, 10, 'CU', (200, 140, 60))
-        d.draw_rect(10, 20, 4, 26, (100, 100, 110))
-        thickness = min(4, int(t * 0.3))
-        if thickness > 0:
-            d.draw_rect(14, 20, thickness, 26, (180, 120, 50))
-        for x in range(14, 51):
-            d.set_pixel(x, 12, WIRE_COL)
-        d.draw_rect(30, 9, 4, 6, (200, 200, 100))
-        for i in range(5):
-            phase = (t * 0.3 + i * 0.2) % 1.0
-            ix = int(_lerp(48, 16, phase))
-            iy = 24 + i * 5
-            _safe_pixel(d, ix, iy, POS_ION)
-        d.draw_text_small(2, 6, '-', (100, 100, 200))
-        d.draw_text_small(56, 6, '+', (200, 100, 100))
-
     # ══════════════════════════════════════════════════════════════
     #  QUANTUM scenes
     # ══════════════════════════════════════════════════════════════
@@ -1462,144 +991,6 @@ class Electrons(Visual):
                     _safe_pixel(d, px, wave_y, _col_alpha(E_COL, amp))
 
         d.draw_text_small(bx, 8, 'BARRIER', _col_alpha(BARRIER, 0.6))
-
-    def _draw_stern_gerlach(self, sc):
-        d = self.display
-        t = self.scene_time
-        d.draw_rect(20, 6, 24, 6, (180, 60, 60))
-        d.draw_rect(20, 52, 24, 6, (60, 60, 180))
-        d.draw_text_small(28, 7, 'N', (255, 120, 120))
-        d.draw_text_small(28, 53, 'S', (120, 120, 255))
-        for y in range(14, 50):
-            frac = (y - 14) / 36.0
-            bright = int(20 + 10 * math.sin(frac * math.pi * 3))
-            for x in range(22, 42):
-                if x % 4 == 0:
-                    d.set_pixel(x, y, (bright, bright, bright + 10))
-        _draw_circle(d, 6, 32, 3, (60, 70, 80), filled=True)
-        for i in range(8):
-            phase = (t * 0.6 + i * 0.12) % 1.0
-            if phase < 0.3:
-                ex = int(_lerp(10, 20, phase / 0.3))
-                _safe_pixel(d, ex, 32, E_COL)
-            else:
-                split_frac = (phase - 0.3) / 0.7
-                ex = int(_lerp(20, 58, split_frac))
-                ey_up = int(32 - split_frac * 14)
-                _safe_pixel(d, ex, ey_up, (180, 220, 255))
-                ey_dn = int(32 + split_frac * 14)
-                _safe_pixel(d, ex, ey_dn, (255, 180, 220))
-        d.draw_text_small(48, 14, 'UP', (180, 220, 255))
-        d.draw_text_small(48, 44, 'DN', (255, 180, 220))
-
-    def _draw_cooper_pairs(self, sc):
-        """Phonon-mediated pairing: lattice distortion creates attractive
-        channel for second electron.  NOT two electrons orbiting."""
-        d = self.display
-        t = self.scene_time
-
-        # Crystal lattice ions (grid of dots)
-        ion_spacing = 6
-        for gx in range(5, 60, ion_spacing):
-            for gy in range(10, 54, ion_spacing):
-                d.set_pixel(gx, gy, (50, 50, 70))
-
-        # Multiple Cooper pairs flowing right
-        for pair_i in range(3):
-            base_x = (t * 10 + pair_i * 22) % 76 - 6
-            base_y = 18 + pair_i * 12
-
-            # Leading electron
-            e1x = base_x
-            e1y = base_y
-            _safe_pixel(d, int(e1x), int(e1y), E_COL)
-            _safe_pixel(d, int(e1x), int(e1y) - 1,
-                        _col_alpha(E_COL, 0.3))
-
-            # Lattice distortion: ions near leading e- pull inward
-            for gx in range(5, 60, ion_spacing):
-                for gy in range(10, 54, ion_spacing):
-                    ddx = gx - e1x
-                    ddy = gy - e1y
-                    dist = math.sqrt(ddx * ddx + ddy * ddy)
-                    if 2 < dist < 10:
-                        pull = 1.5 / dist
-                        ix = int(gx - ddx * pull)
-                        iy = int(gy - ddy * pull)
-                        if 0 <= ix < DISP_W and 0 <= iy < DISP_H:
-                            d.set_pixel(ix, iy, (80, 80, 120))
-
-            # Trailing electron follows in the positive-charge wake
-            # (phonon coherence length ~10px behind)
-            e2x = base_x - 8
-            e2y = base_y
-            _safe_pixel(d, int(e2x), int(e2y), E_COL)
-            _safe_pixel(d, int(e2x), int(e2y) + 1,
-                        _col_alpha(E_COL, 0.3))
-
-            # Phonon coupling indicator (faint line between pair)
-            for px in range(int(e2x) + 1, int(e1x)):
-                if 0 <= px < DISP_W and px % 2 == 0:
-                    _safe_pixel(d, px, int(base_y),
-                                _col_alpha((100, 100, 180), 0.25))
-
-        d.draw_text_small(2, 2, 'T < TC', (100, 140, 200))
-        d.draw_text_small(2, 8, 'PHONON', (80, 80, 140))
-
-    def _draw_zeeman(self, sc):
-        d = self.display
-        t = self.scene_time
-        d.draw_line(32, 4, 32, 54, (40, 40, 40))
-        d.draw_text_small(4, 4, 'B=0', (100, 100, 100))
-        d.draw_text_small(38, 4, 'B>0', (100, 100, 200))
-        line_y = 30
-        for x in range(6, 28):
-            bright = int(200 * math.exp(-((x - 17) ** 2) / 30.0))
-            if bright > 10:
-                d.set_pixel(x, line_y, (bright, bright, 0))
-        offsets = [-6, 0, 6]
-        colors = [(255, 140, 140), (255, 255, 140), (140, 140, 255)]
-        split_frac = min(1.0, t * 0.3)
-        for i, (off, col) in enumerate(zip(offsets, colors)):
-            ly = line_y + int(off * split_frac)
-            for x in range(36, 58):
-                bright = math.exp(-((x - 47) ** 2) / 30.0)
-                if bright > 0.05:
-                    d.set_pixel(x, ly, _col_alpha(col, bright))
-        for y in range(12, 50, 6):
-            _safe_pixel(d, 58, y, (60, 60, 140))
-            _safe_pixel(d, 58, y - 1, (60, 60, 140))
-
-    def _draw_davisson_germer(self, sc):
-        d = self.display
-        t = self.scene_time
-        for x in range(8, 56):
-            d.set_pixel(x, 40, (120, 120, 140))
-            d.set_pixel(x, 41, (100, 100, 120))
-            if x % 4 == 0:
-                d.set_pixel(x, 40, (200, 200, 220))
-        _draw_circle(d, 8, 10, 3, (60, 70, 80), filled=True)
-        for i in range(6):
-            phase = (t * 0.5 + i * 0.15) % 1.0
-            bx = int(_lerp(10, 32, phase))
-            by = int(_lerp(12, 38, phase))
-            _safe_pixel(d, bx, by, E_COL)
-        angles = [-0.8, -0.3, 0.3, 0.8]
-        intensities = [0.3, 0.8, 1.0, 0.5]
-        for angle, intensity in zip(angles, intensities):
-            for i in range(5):
-                phase = (t * 0.5 + i * 0.18) % 1.0
-                dx_dir = math.sin(angle)
-                dy_dir = -math.cos(angle)
-                bx = int(32 + dx_dir * phase * 24)
-                by = int(38 + dy_dir * phase * 24)
-                _safe_pixel(d, bx, by,
-                            _col_alpha(E_COL, intensity * (1.0 - phase * 0.5)))
-        for a in range(-6, 7):
-            ax = 32 + a * 3
-            ay = int(8 + abs(a) * 0.5)
-            if 0 <= ax < DISP_W and 0 <= ay < DISP_H:
-                d.set_pixel(ax, ay, (50, 50, 60))
 
     # ══════════════════════════════════════════════════════════════
     #  SEMICONDUCTOR scenes

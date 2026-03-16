@@ -255,44 +255,6 @@ canvas.glow {
   <p class="hint" id="hint">Use &larr; &rarr; arrow keys to explore</p>
 </section>
 
-<div class="divider"></div>
-
-<section class="about">
-  <h2>WHAT'S INSIDE</h2>
-  <div class="stats">
-    <div class="stat"><span class="number">55+</span><span class="label">GAMES</span></div>
-    <div class="stat"><span class="number">120+</span><span class="label">VISUALS</span></div>
-    <div class="stat"><span class="number">45+</span><span class="label">AI DEMOS</span></div>
-  </div>
-  <p>
-    A physical arcade cabinet powered by a Raspberry Pi and a
-    64&times;64 RGB LED matrix. Each pixel is a real LED &mdash;
-    warm, glowing, nostalgic, delightful.
-  </p>
-</section>
-
-<div class="divider"></div>
-
-<section class="collection">
-  <h2>THE COLLECTION</h2>
-  <div class="cat-grid">
-    <span class="cat-tag" style="color:#ffff00">ARCADE (18)</span>
-    <span class="cat-tag" style="color:#6496ff">SCIENCE (28)</span>
-    <span class="cat-tag" style="color:#b464ff">MECHANICS (18)</span>
-    <span class="cat-tag" style="color:#ff64ff">AUTOMATA (11)</span>
-    <span class="cat-tag" style="color:#64ffff">DIGITAL (13)</span>
-    <span class="cat-tag" style="color:#ffb432">MUSIC (11)</span>
-    <span class="cat-tag" style="color:#ffa000">ROAD+RAIL (8)</span>
-    <span class="cat-tag" style="color:#64ff64">OUTDOORS (7)</span>
-    <span class="cat-tag" style="color:#ff6464">AI DEMOS (44)</span>
-    <span class="cat-tag" style="color:#ffff00">ART (5)</span>
-    <span class="cat-tag" style="color:#ff8080">HOUSEHOLD (5)</span>
-    <span class="cat-tag" style="color:#80ff00">SPRITES (9)</span>
-    <span class="cat-tag" style="color:#00ff00">RETRO (6)</span>
-    <span class="cat-tag" style="color:#ff0000">SUPERHEROES (4)</span>
-  </div>
-</section>
-
 <footer>
   Programmed with AI, Designed & Curated by Hand
 </footer>
@@ -1490,6 +1452,168 @@ class Cloverleaf {
 }
 
 
+// ----- Ripples -----
+class Ripples {
+  constructor(display) {
+    this.display = display;
+    this.name = 'RIPPLES';
+    this.desc = 'Wave interference patterns';
+    this.category = 'OUTDOORS';
+  }
+  reset() {
+    this.time = 0; this.dropTimer = 0;
+    const N = GRID * GRID;
+    this.u = new Float32Array(N);
+    this.v = new Float32Array(N);
+    this.damping = 0.97;
+  }
+  update(dt) {
+    this.time += dt; this.dropTimer += dt;
+    if (this.dropTimer > 1.2) {
+      this.dropTimer = 0;
+      const cx = 8 + Math.random() * (GRID - 16) | 0;
+      const cy = 8 + Math.random() * (GRID - 16) | 0;
+      for (let dy = -2; dy <= 2; dy++)
+        for (let dx = -2; dx <= 2; dx++)
+          if (dx*dx + dy*dy <= 4) {
+            const i = (cy+dy)*GRID + cx+dx;
+            if (i >= 0 && i < GRID*GRID) this.u[i] = 255;
+          }
+    }
+    const next = new Float32Array(GRID * GRID);
+    for (let y = 1; y < GRID-1; y++) {
+      for (let x = 1; x < GRID-1; x++) {
+        const i = y*GRID+x;
+        const lap = this.u[i-1] + this.u[i+1] + this.u[i-GRID] + this.u[i+GRID] - 4*this.u[i];
+        next[i] = (2*this.u[i] - this.v[i] + lap * 0.5) * this.damping;
+      }
+    }
+    this.v = this.u;
+    this.u = next;
+  }
+  draw() {
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const val = this.u[y*GRID+x];
+        if (Math.abs(val) > 1) {
+          const pos = Math.max(0, val), neg = Math.max(0, -val);
+          this.display.setPixel(x, y, [
+            Math.min(255, neg * 0.3 | 0),
+            Math.min(255, 20 + pos * 0.8 | 0),
+            Math.min(255, 40 + pos * 1.2 + neg * 0.5 | 0)
+          ]);
+        } else {
+          this.display.setPixel(x, y, [0, 5, 15]);
+        }
+      }
+    }
+  }
+}
+
+// ----- Lorenz Attractor -----
+const LORENZ_PAL = [[20,0,60],[40,20,120],[60,100,200],[100,200,255],[200,255,255]];
+class Lorenz {
+  constructor(display) {
+    this.display = display;
+    this.name = 'LORENZ';
+    this.desc = 'Strange attractor trajectory';
+    this.category = 'SCIENCE';
+  }
+  reset() {
+    this.time = 0;
+    this.x = 0.1; this.y = 0; this.z = 0;
+    this.trail = []; this.maxTrail = 800;
+    this.sigma = 10; this.rho = 28; this.beta = 8/3;
+  }
+  update(dt) {
+    this.time += dt;
+    const {sigma, rho, beta} = this;
+    const h = 0.005;
+    for (let i = 0; i < 12; i++) {
+      const dx = sigma * (this.y - this.x);
+      const dy = this.x * (rho - this.z) - this.y;
+      const dz = this.x * this.y - beta * this.z;
+      this.x += dx * h; this.y += dy * h; this.z += dz * h;
+    }
+    const sx = 32 + this.x * 0.9 | 0;
+    const sy = 60 - this.z * 0.7 | 0;
+    this.trail.push([sx, sy]);
+    if (this.trail.length > this.maxTrail) this.trail.shift();
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    const pal = LORENZ_PAL, nC = pal.length, total = this.trail.length;
+    for (let i = 0; i < total; i++) {
+      const [tx, ty] = this.trail[i];
+      if (tx >= 0 && tx < GRID && ty >= 0 && ty < GRID) {
+        const t = i / total;
+        const fi = t * (nC - 1), lo = fi | 0, hi = Math.min(lo + 1, nC - 1), f = fi - lo;
+        this.display.setPixel(tx, ty, [
+          (pal[lo][0]+(pal[hi][0]-pal[lo][0])*f) * (0.2 + 0.8*t) | 0,
+          (pal[lo][1]+(pal[hi][1]-pal[lo][1])*f) * (0.2 + 0.8*t) | 0,
+          (pal[lo][2]+(pal[hi][2]-pal[lo][2])*f) * (0.2 + 0.8*t) | 0,
+        ]);
+      }
+    }
+  }
+}
+
+// ----- Cyclic CA (Demon Spirals) -----
+class CyclicCA {
+  constructor(display) {
+    this.display = display;
+    this.name = 'DEMON SPIRALS';
+    this.desc = 'Cyclic cellular automaton';
+    this.category = 'AUTOMATA';
+  }
+  reset() {
+    this.time = 0; this.stepTimer = 0;
+    this.states = 14;
+    this.grid = new Uint8Array(GRID * GRID);
+    for (let i = 0; i < GRID * GRID; i++)
+      this.grid[i] = Math.random() * this.states | 0;
+    this.colors = [];
+    for (let i = 0; i < this.states; i++) {
+      const h = i / this.states * 6, hi = h | 0, f = h - hi;
+      let r, g, b;
+      switch (hi) {
+        case 0: r=255; g=255*f|0; b=0; break;
+        case 1: r=255*(1-f)|0; g=255; b=0; break;
+        case 2: r=0; g=255; b=255*f|0; break;
+        case 3: r=0; g=255*(1-f)|0; b=255; break;
+        case 4: r=255*f|0; g=0; b=255; break;
+        default: r=255; g=0; b=255*(1-f)|0; break;
+      }
+      this.colors.push([r, g, b]);
+    }
+  }
+  update(dt) {
+    this.time += dt; this.stepTimer += dt;
+    if (this.stepTimer < 0.07) return;
+    this.stepTimer = 0;
+    const {grid, states} = this;
+    const next = new Uint8Array(GRID * GRID);
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const i = y*GRID+x, target = (grid[i] + 1) % states;
+        const up = ((y-1+GRID)%GRID)*GRID+x;
+        const dn = ((y+1)%GRID)*GRID+x;
+        const lt = y*GRID+(x-1+GRID)%GRID;
+        const rt = y*GRID+(x+1)%GRID;
+        next[i] = (grid[up]===target||grid[dn]===target||grid[lt]===target||grid[rt]===target)
+          ? target : grid[i];
+      }
+    }
+    grid.set(next);
+  }
+  draw() {
+    for (let y = 0; y < GRID; y++)
+      for (let x = 0; x < GRID; x++)
+        this.display.setPixel(x, y, this.colors[this.grid[y*GRID+x]]);
+  }
+}
+
+
 // =============================================================
 // SHOWCASE CONTROLLER
 // =============================================================
@@ -1511,23 +1635,29 @@ const VISUALS = [
   () => new DblPendulum(display),
   () => new Orbits3Body(display),
   () => new DVD(display),
+  () => new Ripples(display),
+  () => new Lorenz(display),
+  () => new CyclicCA(display),
 ];
 
 const LABELS = [
-  { name: 'FIRE',        desc: 'Classic fire simulation',             cat: 'OUTDOORS' },
-  { name: 'MATRIX',      desc: 'Falling digital rain',                cat: 'DIGITAL' },
-  { name: 'BOIDS',       desc: 'Emergent flocking behavior',          cat: 'AUTOMATA' },
-  { name: 'LAVA LAMP',   desc: 'Metaball blob simulation',            cat: 'HOUSEHOLD' },
-  { name: 'CAT',         desc: 'Cozy feline on a pillow',             cat: 'HOUSEHOLD' },
-  { name: 'CLOVERLEAF',  desc: 'Highway interchange simulation',      cat: 'ROAD + RAIL' },
-  { name: 'PLASMA',      desc: 'Sine wave interference patterns',     cat: 'DIGITAL' },
-  { name: 'TURING',      desc: 'Gray-Scott reaction-diffusion',       cat: 'SCIENCE' },
-  { name: 'STARFIELD',   desc: '3D perspective star tunnel',           cat: 'OUTDOORS' },
-  { name: 'LIFE',        desc: "Conway's cellular automaton",          cat: 'AUTOMATA' },
-  { name: 'HODGEPODGE',  desc: 'Spiral wave cellular automaton',      cat: 'AUTOMATA' },
-  { name: 'PENDULUM',    desc: 'Chaotic double pendulum',             cat: 'SCIENCE' },
-  { name: 'ORBITS',      desc: 'Three-body gravitational dance',      cat: 'SCIENCE' },
-  { name: 'DVD',         desc: 'The iconic bouncing screensaver',      cat: 'HOUSEHOLD' },
+  { name: 'FIRE',           desc: 'Classic fire simulation',             cat: 'OUTDOORS' },
+  { name: 'MATRIX',         desc: 'Falling digital rain',                cat: 'DIGITAL' },
+  { name: 'BOIDS',          desc: 'Emergent flocking behavior',          cat: 'AUTOMATA' },
+  { name: 'LAVA LAMP',      desc: 'Metaball blob simulation',            cat: 'HOUSEHOLD' },
+  { name: 'CAT',            desc: 'Cozy feline on a pillow',             cat: 'HOUSEHOLD' },
+  { name: 'CLOVERLEAF',     desc: 'Highway interchange simulation',      cat: 'ROAD + RAIL' },
+  { name: 'PLASMA',         desc: 'Sine wave interference patterns',     cat: 'DIGITAL' },
+  { name: 'TURING',         desc: 'Gray-Scott reaction-diffusion',       cat: 'SCIENCE' },
+  { name: 'STARFIELD',      desc: '3D perspective star tunnel',           cat: 'OUTDOORS' },
+  { name: 'LIFE',           desc: "Conway's cellular automaton",          cat: 'AUTOMATA' },
+  { name: 'HODGEPODGE',     desc: 'Spiral wave cellular automaton',      cat: 'AUTOMATA' },
+  { name: 'PENDULUM',       desc: 'Chaotic double pendulum',             cat: 'SCIENCE' },
+  { name: 'ORBITS',         desc: 'Three-body gravitational dance',      cat: 'SCIENCE' },
+  { name: 'DVD',            desc: 'The iconic bouncing screensaver',      cat: 'HOUSEHOLD' },
+  { name: 'RIPPLES',        desc: 'Wave equation interference',           cat: 'OUTDOORS' },
+  { name: 'LORENZ',         desc: 'Strange attractor trajectory',         cat: 'SCIENCE' },
+  { name: 'DEMON SPIRALS',  desc: 'Cyclic cellular automaton',            cat: 'AUTOMATA' },
 ];
 
 let currentIndex = 0;

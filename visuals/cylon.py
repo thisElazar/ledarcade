@@ -42,7 +42,7 @@ class Cylon(Visual):
         self.palettes = ["red", "blue", "cyan", "rainbow"]
 
         # Display mode: 0 = single bar, 1 = full screen (multiple scanners)
-        self.mode = 0
+        self.mode = 1
 
         # Trail buffer - stores brightness (0-255) for each column
         # In full mode, we have a trail buffer per row

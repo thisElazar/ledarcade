@@ -37,7 +37,7 @@ SYMBOL_COLORS = [
     (220, 60, 160),   # pink
 ]
 
-MODE_NAMES = ["ENTROPY", "RLE", "HUFFMAN", "PARITY"]
+MODE_NAMES = ["ENTROPY", "PARITY"]
 DIM_BG = (4, 4, 12)
 
 
@@ -174,7 +174,7 @@ class Entropy(Visual):
     # -----------------------------------------------------------------
     def reset(self):
         self.time = 0.0
-        self.mode = 0  # 0=entropy, 1=rle, 2=huffman, 3=parity
+        self.mode = 0  # 0=entropy, 1=parity
         self.alphabet = 4
 
         # Overlay
@@ -183,8 +183,6 @@ class Entropy(Visual):
 
         # Init all modes
         self._reset_entropy()
-        self._reset_rle()
-        self._reset_huffman()
         self._reset_parity()
 
     def _show_overlay(self, text):
@@ -762,15 +760,11 @@ class Entropy(Visual):
             self._show_overlay(f"ALPHA={self.alphabet}")
             # Refresh modes that depend on alphabet
             self._reset_entropy()
-            self._reset_rle()
-            self._reset_huffman()
             consumed = True
         elif input_state.right_pressed:
             self.alphabet = min(8, self.alphabet + 1)
             self._show_overlay(f"ALPHA={self.alphabet}")
             self._reset_entropy()
-            self._reset_rle()
-            self._reset_huffman()
             consumed = True
 
         # Action: mode-specific reset
@@ -779,12 +773,6 @@ class Entropy(Visual):
                 self._reset_entropy()
                 self._show_overlay("RESET")
             elif self.mode == 1:
-                self._reset_rle()
-                self._show_overlay("NEW MSG")
-            elif self.mode == 2:
-                self._reset_huffman()
-                self._show_overlay("NEW MSG")
-            elif self.mode == 3:
                 self._reset_parity()
                 self._show_overlay("RESET")
             consumed = True
@@ -803,10 +791,6 @@ class Entropy(Visual):
         if self.mode == 0:
             self._update_entropy(dt)
         elif self.mode == 1:
-            self._update_rle(dt)
-        elif self.mode == 2:
-            self._update_huffman(dt)
-        elif self.mode == 3:
             self._update_parity(dt)
 
     def draw(self):
@@ -816,10 +800,6 @@ class Entropy(Visual):
         if self.mode == 0:
             self._draw_entropy()
         elif self.mode == 1:
-            self._draw_rle()
-        elif self.mode == 2:
-            self._draw_huffman()
-        elif self.mode == 3:
             self._draw_parity()
 
         # Overlay

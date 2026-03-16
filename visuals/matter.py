@@ -1,15 +1,17 @@
 """
-STATES OF MATTER - Temperature-Driven Particle Simulation
-==========================================================
-~50 particles transition between solid, liquid, and gas states
-based on temperature. Demonstrates molecular behavior at each phase.
+STATES OF MATTER - Particle Simulation with Emergent Phases
+============================================================
+~60 particles with soft pairwise attraction + repulsion.  Phases emerge:
+  Solid — lattice holds its shape mid-screen (bonds resist gravity)
+  Liquid — bonds break, particles fall and pool at the bottom
+  Gas   — thermal energy overwhelms everything, particles fill the chamber
 """
 
 import math
 import random
 from . import Visual, Display, Colors
 
-NUM_PARTICLES = 50
+NUM_PARTICLES = 60
 WORK_W = 60  # leave 4px for temp bar on right
 WORK_H = 64
 
@@ -29,6 +31,19 @@ PALETTES = [
     ('FIRE',    (255, 120, 40)),
     ('NEON',    (0, 255, 180)),
 ]
+
+# Pair potential parameters — soft repulsion + parabolic attractive well.
+# Much gentler than Lennard-Jones, stable at game-loop timestep (1/60s).
+R_EQ   = 4.0   # Equilibrium distance (pixels) — pair spacing
+R_CUT  = 9.0   # Attraction cutoff distance
+K_REP  = 2.5   # Repulsive spring constant (r < R_EQ)
+WELL   = 1.5   # Attractive well depth (R_EQ < r < R_CUT)
+R_RANGE = R_CUT - R_EQ
+
+# Gravity — peaks in liquid phase, fades in gas phase.
+# In a 64px container, gas thermal energy >> gravitational PE,
+# so effectively zero gravity for gas is the right visual.
+GRAVITY = 0.80
 
 
 def _temp_color(t):
@@ -56,24 +71,26 @@ class MatterPhases(Visual):
         self.palette_idx = 0
         self.show_labels = True
         self.overlay_timer = 0.0
-        # Particles: [x, y, vx, vy]
-        self.particles = []
-        # Grid positions for solid state
-        cols = 7
-        rows = NUM_PARTICLES // cols + 1
-        gx0 = (WORK_W - cols * 8) // 2
-        gy0 = (WORK_H - rows * 8) // 2
+
+        # Build hexagonal lattice — roughly square block, centered
+        self.particles = []  # [x, y, vx, vy]
+        spacing = R_EQ
+        row_h = spacing * 0.866
+        cols = round(math.sqrt(NUM_PARTICLES * 0.866))
+        rows = (NUM_PARTICLES + cols - 1) // cols
+        lattice_w = (cols - 1) * spacing + spacing * 0.5
+        lattice_h = (rows - 1) * row_h
+        gx0 = (WORK_W - lattice_w) / 2.0
+        gy0 = (WORK_H - lattice_h) / 2.0  # vertically centered
         for i in range(NUM_PARTICLES):
             r = i // cols
             c = i % cols
-            x = gx0 + c * 8 + 4.0
-            y = gy0 + r * 8 + 4.0
+            x = gx0 + c * spacing + (spacing * 0.5 if r % 2 else 0.0)
+            y = gy0 + r * row_h
             self.particles.append([x, y, 0.0, 0.0])
-        self.grid_positions = [(p[0], p[1]) for p in self.particles]
 
     def handle_input(self, input_state):
         consumed = False
-        # Temperature adjustment (held)
         if input_state.left:
             self.temp = max(0.0, self.temp - 0.008)
             consumed = True
@@ -99,75 +116,74 @@ class MatterPhases(Visual):
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
 
         t = self.temp
-        # Blend factors for transition zones
-        solid_f = max(0.0, min(1.0, (0.33 - t) / 0.05)) if t < 0.38 else 0.0
-        gas_f = max(0.0, min(1.0, (t - 0.66) / 0.05)) if t > 0.61 else 0.0
-        liquid_f = 1.0 - solid_f - gas_f
+        # Thermal noise — cubic so solid is calm, gas is wild
+        thermal_noise = t * t * t * 200.0
+        # Heavy damping at low T (lattice settles), lighter at high T
+        damping = 0.88 + 0.10 * t
+        # Gravity: 0 in solid, peaks in liquid, fades in gas
+        grav_rise = max(0.0, min(1.0, (t - 0.25) / 0.25))
+        grav_fade = max(0.0, min(1.0, (t - 0.60) / 0.30))
+        gravity = GRAVITY * grav_rise * (1.0 - grav_fade)
+        # Velocity cap scales with temperature
+        max_v = 1.5 + 10.0 * t
+        max_v2 = max_v * max_v
 
-        gravity = 0.3 * (1.0 - gas_f)
-        brownian = 20.0 * liquid_f + 80.0 * gas_f
-        damping = 0.95 - 0.1 * gas_f
+        particles = self.particles
+        n = len(particles)
+        dt60 = dt * 60
+        cut2 = R_CUT * R_CUT
+        _sqrt = math.sqrt
 
-        for i, p in enumerate(self.particles):
-            x, y, vx, vy = p
+        # --- Pair forces: soft repulsion + attractive well ---
+        for i in range(n):
+            p = particles[i]
+            pxi, pyi = p[0], p[1]
+            for j in range(i + 1, n):
+                q = particles[j]
+                dx = pxi - q[0]
+                dy = pyi - q[1]
+                r2 = dx * dx + dy * dy
+                if r2 < 0.25:
+                    r2 = 0.25
+                if r2 < cut2:
+                    r = _sqrt(r2)
+                    if r < R_EQ:
+                        # Linear repulsion (pushes apart when too close)
+                        f = K_REP * (R_EQ - r) / r
+                    else:
+                        # Parabolic attractive well (pulls together)
+                        wp = (r - R_EQ) / R_RANGE
+                        f = -WELL * 4.0 * wp * (1.0 - wp) / r
+                    fx = f * dx * dt60
+                    fy = f * dy * dt60
+                    p[2] += fx;  p[3] += fy
+                    q[2] -= fx;  q[3] -= fy
 
-            # Solid: spring force toward grid position
-            if solid_f > 0:
-                gx, gy = self.grid_positions[i]
-                vx += (gx - x) * 2.0 * solid_f * dt * 60
-                vy += (gy - y) * 2.0 * solid_f * dt * 60
-                # Small jitter
-                vx += random.uniform(-0.5, 0.5) * solid_f
-                vy += random.uniform(-0.5, 0.5) * solid_f
+        # --- Gravity, noise, damping, integration ---
+        for p in particles:
+            p[3] += gravity * dt60
+            p[2] += random.uniform(-1, 1) * thermal_noise * dt
+            p[3] += random.uniform(-1, 1) * thermal_noise * dt
+            p[2] *= damping
+            p[3] *= damping
 
-            # Liquid/gas: gravity + brownian
-            if liquid_f > 0 or gas_f > 0:
-                vy += gravity * dt * 60
-                vx += random.uniform(-1, 1) * brownian * dt
-                vy += random.uniform(-1, 1) * brownian * dt
+            spd2 = p[2] * p[2] + p[3] * p[3]
+            if spd2 > max_v2:
+                scale = max_v / _sqrt(spd2)
+                p[2] *= scale
+                p[3] *= scale
 
-            # Soft repulsion between particles
-            for j in range(i + 1, len(self.particles)):
-                ox, oy = self.particles[j][0], self.particles[j][1]
-                ddx = x - ox
-                ddy = y - oy
-                dist2 = ddx * ddx + ddy * ddy + 0.01
-                if dist2 < 64:  # repel within 8px
-                    force = (1.0 - dist2 / 64) * 2.0
-                    inv_d = 1.0 / math.sqrt(dist2)
-                    fx = ddx * inv_d * force * dt * 60
-                    fy = ddy * inv_d * force * dt * 60
-                    vx += fx
-                    vy += fy
-                    self.particles[j][2] -= fx
-                    self.particles[j][3] -= fy
+            p[0] += p[2] * dt60
+            p[1] += p[3] * dt60
 
-            # Damping
-            vx *= damping
-            vy *= damping
-
-            # Velocity cap
-            max_v = 3.0 + 5.0 * gas_f
-            speed = math.sqrt(vx * vx + vy * vy)
-            if speed > max_v:
-                vx = vx / speed * max_v
-                vy = vy / speed * max_v
-
-            # Move
-            x += vx * dt * 60
-            y += vy * dt * 60
-
-            # Wall bounce
-            if x < 1:
-                x = 1; vx = abs(vx) * 0.5
-            if x > WORK_W - 2:
-                x = WORK_W - 2; vx = -abs(vx) * 0.5
-            if y < 1:
-                y = 1; vy = abs(vy) * 0.5
-            if y > WORK_H - 2:
-                y = WORK_H - 2; vy = -abs(vy) * 0.5
-
-            p[0], p[1], p[2], p[3] = x, y, vx, vy
+            if p[0] < 1:
+                p[0] = 1; p[2] = abs(p[2]) * 0.5
+            if p[0] > WORK_W - 2:
+                p[0] = WORK_W - 2; p[2] = -abs(p[2]) * 0.5
+            if p[1] < 1:
+                p[1] = 1; p[3] = abs(p[3]) * 0.5
+            if p[1] > WORK_H - 2:
+                p[1] = WORK_H - 2; p[3] = -abs(p[3]) * 0.5
 
     def draw(self):
         d = self.display
@@ -190,7 +206,6 @@ class MatterPhases(Visual):
             dim = (c[0] // 3, c[1] // 3, c[2] // 3)
             d.set_pixel(62, y, dim)
             d.set_pixel(63, y, dim)
-        # White marker at current temp
         marker_y = int((1.0 - self.temp) * 63)
         d.set_pixel(62, marker_y, Colors.WHITE)
         d.set_pixel(63, marker_y, Colors.WHITE)

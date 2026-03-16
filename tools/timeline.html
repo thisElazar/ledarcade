@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LED Arcade — Creation Timeline</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #ccc;
+    font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  #toolbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 48px;
+    background: #111118;
+    border-bottom: 1px solid #222;
+    display: flex; align-items: center;
+    padding: 0 16px;
+    z-index: 100;
+    gap: 12px;
+  }
+  #toolbar h1 {
+    font-size: 14px; color: #fff; margin-right: 24px; white-space: nowrap;
+  }
+  .filter-btn {
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    background: transparent;
+    color: #888;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn.active { border-color: currentColor; color: #fff; }
+  .filter-btn[data-dir="visuals"].active { color: #4caf50; border-color: #4caf50; background: #4caf5018; }
+  .filter-btn[data-dir="games"].active   { color: #2196f3; border-color: #2196f3; background: #2196f318; }
+  .filter-btn[data-dir="tools"].active   { color: #ab47bc; border-color: #ab47bc; background: #ab47bc18; }
+  .filter-btn[data-dir="site"].active    { color: #ff9800; border-color: #ff9800; background: #ff980018; }
+
+  .tb-spacer { flex: 1; }
+
+  .tb-btn {
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid #444;
+    background: transparent;
+    color: #aaa;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .tb-btn:hover { color: #fff; border-color: #666; }
+
+  #canvas-wrap {
+    position: absolute;
+    top: 48px; left: 0; right: 0; bottom: 0;
+  }
+
+  canvas { display: block; cursor: grab; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: #1a1a24;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    display: none;
+    z-index: 200;
+    max-width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  #tooltip .tt-name { font-size: 14px; font-weight: bold; color: #fff; }
+  #tooltip .tt-dir  { font-size: 11px; opacity: 0.5; }
+  #tooltip .tt-stat { color: #aaa; }
+  #tooltip .tt-stat span { color: #fff; }
+
+  #help {
+    position: fixed;
+    bottom: 12px; right: 16px;
+    font-size: 10px;
+    color: #444;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>LED Arcade Timeline</h1>
+  <button class="filter-btn active" data-dir="visuals">visuals</button>
+  <button class="filter-btn active" data-dir="games">games</button>
+  <button class="filter-btn active" data-dir="tools">tools</button>
+  <button class="filter-btn active" data-dir="site">site</button>
+  <div class="tb-spacer"></div>
+  <button class="tb-btn" id="y-axis-toggle">Y: lines</button>
+  <button class="tb-btn" id="reset-btn">reset zoom</button>
+</div>
+
+<div id="canvas-wrap"><canvas id="c"></canvas></div>
+<div id="tooltip"></div>
+<div id="help">scroll to zoom &middot; drag to pan &middot; click buttons to filter</div>
+
+<script>
+const DATA = [{"name": "__init__", "file": "__init__.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T21:34:57-08:00", "lines": 214, "commits": 20}, {"name": "agario", "file": "agario.py", "dir": "games", "created": "2026-02-05T23:49:49-08:00", "modified": "2026-02-06T20:39:39-08:00", "lines": 407, "commits": 2}, {"name": "arkanoid", "file": "arkanoid.py", "dir": "games", "created": "2026-01-27T19:58:33-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 514, "commits": 8}, {"name": "arkanoid_levels", "file": "arkanoid_levels.py", "dir": "games", "created": "2026-01-31T20:27:33-08:00", "modified": "2026-01-31T20:27:33-08:00", "lines": 580, "commits": 1}, {"name": "asteroids", "file": "asteroids.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 526, "commits": 6}, {"name": "bloons", "file": "bloons.py", "dir": "games", "created": "2026-02-07T16:37:33-08:00", "modified": "2026-02-08T22:05:10-08:00", "lines": 618, "commits": 7}, {"name": "bloonstd", "file": "bloonstd.py", "dir": "games", "created": "2026-02-07T16:37:33-08:00", "modified": "2026-02-07T16:46:59-08:00", "lines": 721, "commits": 3}, {"name": "bomberman", "file": "bomberman.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 727, "commits": 7}, {"name": "bopit", "file": "bopit.py", "dir": "games", "created": "2026-02-03T22:40:28-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 232, "commits": 5}, {"name": "bowling", "file": "bowling.py", "dir": "games", "created": "2026-01-31T19:32:31-08:00", "modified": "2026-01-31T19:50:40-08:00", "lines": 908, "commits": 2}, {"name": "breakout", "file": "breakout.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 298, "commits": 7}, {"name": "burgertime", "file": "burgertime.py", "dir": "games", "created": "2026-01-31T01:07:25-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 1094, "commits": 11}, {"name": "centipede", "file": "centipede.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 543, "commits": 8}, {"name": "checkers", "file": "checkers.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-01-28T19:38:56-08:00", "lines": 486, "commits": 4}, {"name": "chess", "file": "chess.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T19:38:56-08:00", "lines": 690, "commits": 6}, {"name": "connect4", "file": "connect4.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 289, "commits": 4}, {"name": "darts", "file": "darts.py", "dir": "games", "created": "2026-01-31T01:07:25-08:00", "modified": "2026-02-07T22:33:29-08:00", "lines": 520, "commits": 2}, {"name": "defender", "file": "defender.py", "dir": "games", "created": "2026-02-06T08:23:44-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 726, "commits": 5}, {"name": "digdug", "file": "digdug.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 615, "commits": 9}, {"name": "dnd", "file": "dnd.py", "dir": "games", "created": "2026-01-31T01:07:25-08:00", "modified": "2026-02-02T19:42:23-08:00", "lines": 817, "commits": 4}, {"name": "donkeykong", "file": "donkeykong.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 832, "commits": 10}, {"name": "drift", "file": "drift.py", "dir": "games", "created": "2026-02-09T11:11:37-08:00", "modified": "2026-02-09T19:42:37-08:00", "lines": 131, "commits": 2}, {"name": "drift_sim", "file": "drift_sim.py", "dir": "games", "created": "2026-02-09T11:11:37-08:00", "modified": "2026-02-09T11:11:37-08:00", "lines": 471, "commits": 1}, {"name": "fifteenpuzzle", "file": "fifteenpuzzle.py", "dir": "games", "created": "2026-02-03T22:40:28-08:00", "modified": "2026-02-03T22:40:28-08:00", "lines": 210, "commits": 1}, {"name": "fishing", "file": "fishing.py", "dir": "games", "created": "2026-02-14T21:34:57-08:00", "modified": "2026-02-14T21:50:23-08:00", "lines": 585, "commits": 2}, {"name": "flappy", "file": "flappy.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T22:45:59-08:00", "lines": 248, "commits": 6}, {"name": "frogger", "file": "frogger.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 467, "commits": 7}, {"name": "galaga", "file": "galaga.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 410, "commits": 8}, {"name": "game2048", "file": "game2048.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-01-28T19:38:56-08:00", "lines": 311, "commits": 3}, {"name": "geometrydash", "file": "geometrydash.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-09T08:20:41-08:00", "lines": 447, "commits": 4}, {"name": "go", "file": "go.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-01-28T19:38:56-08:00", "lines": 396, "commits": 5}, {"name": "indy500", "file": "indy500.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 463, "commits": 6}, {"name": "invaders", "file": "invaders.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-21T20:32:57-08:00", "lines": 458, "commits": 9}, {"name": "jezzball", "file": "jezzball.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 677, "commits": 7}, {"name": "lasermirrors", "file": "lasermirrors.py", "dir": "games", "created": "2026-02-08T18:54:54-08:00", "modified": "2026-02-11T20:49:06-08:00", "lines": 1597, "commits": 6}, {"name": "lightsout", "file": "lightsout.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 267, "commits": 5}, {"name": "loderunner", "file": "loderunner.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 501, "commits": 6}, {"name": "lunarlander", "file": "lunarlander.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-09T08:20:41-08:00", "lines": 436, "commits": 4}, {"name": "mancala", "file": "mancala.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-01-28T23:19:40-08:00", "lines": 395, "commits": 5}, {"name": "mastermind", "file": "mastermind.py", "dir": "games", "created": "2026-02-03T22:40:28-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 199, "commits": 2}, {"name": "monstermaze", "file": "monstermaze.py", "dir": "games", "created": "2026-02-06T22:06:21-08:00", "modified": "2026-02-15T23:47:14-08:00", "lines": 791, "commits": 4}, {"name": "mspacman", "file": "mspacman.py", "dir": "games", "created": "2026-01-31T01:07:25-08:00", "modified": "2026-03-06T14:10:25-08:00", "lines": 933, "commits": 4}, {"name": "nightdriver", "file": "nightdriver.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 757, "commits": 8}, {"name": "othello", "file": "othello.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 378, "commits": 5}, {"name": "pacman", "file": "pacman.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-03-06T14:10:25-08:00", "lines": 739, "commits": 9}, {"name": "pinball", "file": "pinball.py", "dir": "games", "created": "2026-01-31T20:52:50-08:00", "modified": "2026-01-31T21:01:06-08:00", "lines": 1022, "commits": 2}, {"name": "pipedream", "file": "pipedream.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 573, "commits": 5}, {"name": "pong", "file": "pong.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 296, "commits": 11}, {"name": "pool", "file": "pool.py", "dir": "games", "created": "2026-01-31T01:07:25-08:00", "modified": "2026-03-04T21:23:04-08:00", "lines": 712, "commits": 4}, {"name": "portal", "file": "portal.py", "dir": "games", "created": "2026-02-07T15:30:39-08:00", "modified": "2026-03-04T22:00:36-08:00", "lines": 1147, "commits": 7}, {"name": "qbert", "file": "qbert.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 587, "commits": 3}, {"name": "rushhour", "file": "rushhour.py", "dir": "games", "created": "2026-02-03T22:56:51-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 514, "commits": 3}, {"name": "sandgame", "file": "sandgame.py", "dir": "games", "created": "2026-02-08T11:13:57-08:00", "modified": "2026-02-11T20:03:38-08:00", "lines": 927, "commits": 5}, {"name": "shuffle", "file": "shuffle.py", "dir": "games", "created": "2026-01-29T00:00:46-08:00", "modified": "2026-02-09T23:25:17-08:00", "lines": 89, "commits": 5}, {"name": "shuffleboard", "file": "shuffleboard.py", "dir": "games", "created": "2026-01-31T19:32:31-08:00", "modified": "2026-01-31T19:50:40-08:00", "lines": 698, "commits": 2}, {"name": "simon", "file": "simon.py", "dir": "games", "created": "2026-02-03T22:40:28-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 207, "commits": 2}, {"name": "skifree", "file": "skifree.py", "dir": "games", "created": "2026-01-28T19:49:42-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 707, "commits": 7}, {"name": "snake", "file": "snake.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-04T14:04:53-08:00", "lines": 168, "commits": 5}, {"name": "spacecruise", "file": "spacecruise.py", "dir": "games", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T22:45:59-08:00", "lines": 667, "commits": 4}, {"name": "stack", "file": "stack.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-01-28T19:14:12-08:00", "lines": 270, "commits": 3}, {"name": "stickrunner", "file": "stickrunner.py", "dir": "games", "created": "2026-01-26T15:59:07-08:00", "modified": "2026-02-09T08:20:41-08:00", "lines": 435, "commits": 5}, {"name": "tetris", "file": "tetris.py", "dir": "games", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 396, "commits": 10}, {"name": "trashblaster", "file": "trashblaster.py", "dir": "games", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T19:38:56-08:00", "lines": 580, "commits": 4}, {"name": "windowwasher", "file": "windowwasher.py", "dir": "games", "created": "2026-02-08T18:54:54-08:00", "modified": "2026-02-09T19:58:16-08:00", "lines": 976, "commits": 4}, {"name": "audubon_atlas", "file": "audubon_atlas.json", "dir": "site", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1, "commits": 2}, {"name": "catalog", "file": "catalog.json", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-16T11:48:38-08:00", "lines": 9390, "commits": 24}, {"name": "emulator", "file": "emulator.html", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-16T11:48:38-08:00", "lines": 1808, "commits": 18}, {"name": "flags_atlas", "file": "flags_atlas.json", "dir": "site", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 1, "commits": 1}, {"name": "gallery_atlas", "file": "gallery_atlas.json", "dir": "site", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 1, "commits": 1}, {"name": "generate_catalog", "file": "generate_catalog.py", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 514, "commits": 11}, {"name": "gould_atlas", "file": "gould_atlas.json", "dir": "site", "created": "2026-02-16T19:22:14-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1, "commits": 1}, {"name": "guide", "file": "guide.html", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-15T10:10:46-08:00", "lines": 1687, "commits": 21}, {"name": "haeckel_atlas", "file": "haeckel_atlas.json", "dir": "site", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1, "commits": 2}, {"name": "history", "file": "history.html", "dir": "site", "created": "2026-02-08T18:43:52-08:00", "modified": "2026-02-08T18:43:52-08:00", "lines": 557, "commits": 1}, {"name": "index", "file": "index.html", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-09T19:00:26-08:00", "lines": 1666, "commits": 3}, {"name": "merian_atlas", "file": "merian_atlas.json", "dir": "site", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1, "commits": 2}, {"name": "order", "file": "order.html", "dir": "site", "created": "2026-02-08T18:43:52-08:00", "modified": "2026-02-09T18:30:46-08:00", "lines": 235, "commits": 2}, {"name": "paintings_atlas", "file": "paintings_atlas.json", "dir": "site", "created": "2026-02-11T08:28:29-08:00", "modified": "2026-02-16T11:55:38-08:00", "lines": 1, "commits": 6}, {"name": "redoute_atlas", "file": "redoute_atlas.json", "dir": "site", "created": "2026-02-16T11:48:38-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1, "commits": 2}, {"name": "shared", "file": "shared.css", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-07T21:53:45-08:00", "lines": 96, "commits": 1}, {"name": "shared", "file": "shared.js", "dir": "site", "created": "2026-02-07T21:53:45-08:00", "modified": "2026-02-07T21:53:45-08:00", "lines": 172, "commits": 1}, {"name": "signs_atlas", "file": "signs_atlas.json", "dir": "site", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 1, "commits": 1}, {"name": "submit-notes.php", "file": "submit-notes.php", "dir": "site", "created": "2026-02-09T21:16:28-08:00", "modified": "2026-02-09T21:16:28-08:00", "lines": 89, "commits": 1}, {"name": "submit-order.php", "file": "submit-order.php", "dir": "site", "created": "2026-02-09T18:30:46-08:00", "modified": "2026-02-09T18:37:08-08:00", "lines": 97, "commits": 2}, {"name": ".gitignore", "file": ".gitignore", "dir": "tools", "created": "2026-02-14T11:45:45-08:00", "modified": "2026-02-14T11:45:45-08:00", "lines": 1, "commits": 1}, {"name": ".gitignore", "file": ".gitignore", "dir": "tools", "created": "2026-02-10T19:34:05-08:00", "modified": "2026-02-10T19:34:05-08:00", "lines": 2, "commits": 1}, {"name": "audubon_plates", "file": "audubon_plates.json", "dir": "tools", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 1277, "commits": 2}, {"name": "build_chordchart", "file": "build_chordchart.py", "dir": "tools", "created": "2026-02-11T23:13:19-08:00", "modified": "2026-02-11T23:13:19-08:00", "lines": 497, "commits": 1}, {"name": "build_coins", "file": "build_coins.py", "dir": "tools", "created": "2026-02-20T06:13:23-08:00", "modified": "2026-02-21T19:24:26-08:00", "lines": 372, "commits": 3}, {"name": "build_constellations", "file": "build_constellations.py", "dir": "tools", "created": "2026-02-13T14:03:01-08:00", "modified": "2026-02-13T14:03:01-08:00", "lines": 432, "commits": 1}, {"name": "build_dance", "file": "build_dance.py", "dir": "tools", "created": "2026-02-17T08:45:53-08:00", "modified": "2026-02-17T08:45:53-08:00", "lines": 925, "commits": 1}, {"name": "build_dance_steps", "file": "build_dance_steps.py", "dir": "tools", "created": "2026-02-17T17:49:31-08:00", "modified": "2026-02-17T17:49:31-08:00", "lines": 507, "commits": 1}, {"name": "build_flags", "file": "build_flags.py", "dir": "tools", "created": "2026-02-14T11:45:45-08:00", "modified": "2026-02-14T11:54:59-08:00", "lines": 374, "commits": 2}, {"name": "build_flags_atlas", "file": "build_flags_atlas.py", "dir": "tools", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 46, "commits": 1}, {"name": "build_gallery_atlas", "file": "build_gallery_atlas.py", "dir": "tools", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 283, "commits": 1}, {"name": "build_paintings", "file": "build_paintings.py", "dir": "tools", "created": "2026-02-10T19:34:05-08:00", "modified": "2026-02-15T23:37:23-08:00", "lines": 341, "commits": 3}, {"name": "build_plates", "file": "build_plates.py", "dir": "tools", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 498, "commits": 4}, {"name": "build_pottery", "file": "build_pottery.py", "dir": "tools", "created": "2026-02-17T18:42:08-08:00", "modified": "2026-02-17T18:42:08-08:00", "lines": 234, "commits": 1}, {"name": "build_signs", "file": "build_signs.py", "dir": "tools", "created": "2026-02-14T16:32:06-08:00", "modified": "2026-02-14T16:32:06-08:00", "lines": 398, "commits": 1}, {"name": "build_signs_atlas", "file": "build_signs_atlas.py", "dir": "tools", "created": "2026-02-14T18:45:27-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 46, "commits": 1}, {"name": "build_walk", "file": "build_walk.py", "dir": "tools", "created": "2026-02-17T19:15:11-08:00", "modified": "2026-02-17T19:42:37-08:00", "lines": 317, "commits": 4}, {"name": "build_walk_mocap", "file": "build_walk_mocap.py", "dir": "tools", "created": "2026-02-21T19:24:32-08:00", "modified": "2026-02-21T19:24:32-08:00", "lines": 924, "commits": 1}, {"name": "coins_manifest", "file": "coins_manifest.json", "dir": "tools", "created": "2026-02-20T06:13:23-08:00", "modified": "2026-02-20T06:13:23-08:00", "lines": 33, "commits": 1}, {"name": "drum_preview", "file": "drum_preview.py", "dir": "tools", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-13T13:31:09-08:00", "lines": 346, "commits": 1}, {"name": "extract_chords", "file": "extract_chords.py", "dir": "tools", "created": "2026-02-11T23:13:19-08:00", "modified": "2026-02-11T23:13:19-08:00", "lines": 98, "commits": 1}, {"name": "extract_font_data", "file": "extract_font_data.py", "dir": "tools", "created": "2026-02-17T19:07:28-08:00", "modified": "2026-02-17T20:05:43-08:00", "lines": 1569, "commits": 2}, {"name": "extracted_scripts_data", "file": "extracted_scripts_data.py", "dir": "tools", "created": "2026-02-17T20:05:43-08:00", "modified": "2026-02-17T20:05:43-08:00", "lines": 36914, "commits": 1}, {"name": "fetch_peptides", "file": "fetch_peptides.py", "dir": "tools", "created": "2026-02-16T11:55:38-08:00", "modified": "2026-02-16T19:09:50-08:00", "lines": 548, "commits": 2}, {"name": "gould_plates", "file": "gould_plates.json", "dir": "tools", "created": "2026-02-16T11:48:38-08:00", "modified": "2026-02-16T11:48:38-08:00", "lines": 60, "commits": 1}, {"name": "haeckel_plates", "file": "haeckel_plates.json", "dir": "tools", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T08:58:20-08:00", "lines": 102, "commits": 1}, {"name": "hiragana_katakana_data", "file": "hiragana_katakana_data.py", "dir": "tools", "created": "2026-02-17T08:45:53-08:00", "modified": "2026-02-17T08:45:53-08:00", "lines": 905, "commits": 1}, {"name": "merian_plates", "file": "merian_plates.json", "dir": "tools", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T08:58:20-08:00", "lines": 62, "commits": 1}, {"name": "midi_to_pattern", "file": "midi_to_pattern.py", "dir": "tools", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-13T13:31:09-08:00", "lines": 228, "commits": 1}, {"name": "misc_scripts_data", "file": "misc_scripts_data.py", "dir": "tools", "created": "2026-02-17T17:49:31-08:00", "modified": "2026-02-17T17:49:31-08:00", "lines": 1174, "commits": 1}, {"name": "north_indian_data", "file": "north_indian_data.py", "dir": "tools", "created": "2026-02-17T17:49:31-08:00", "modified": "2026-02-17T17:49:31-08:00", "lines": 1368, "commits": 1}, {"name": "paintings", "file": "paintings.json", "dir": "tools", "created": "2026-02-10T19:34:05-08:00", "modified": "2026-02-16T11:55:38-08:00", "lines": 1895, "commits": 8}, {"name": "pottery_manifest", "file": "pottery_manifest.json", "dir": "tools", "created": "2026-02-17T18:42:08-08:00", "modified": "2026-02-17T19:22:17-08:00", "lines": 52, "commits": 2}, {"name": "preview_walk_mocap", "file": "preview_walk_mocap.py", "dir": "tools", "created": "2026-02-21T19:24:32-08:00", "modified": "2026-02-21T19:24:32-08:00", "lines": 509, "commits": 1}, {"name": "redoute_plates", "file": "redoute_plates.json", "dir": "tools", "created": "2026-02-16T11:48:38-08:00", "modified": "2026-02-16T11:48:38-08:00", "lines": 48, "commits": 1}, {"name": "se_asian_data", "file": "se_asian_data.py", "dir": "tools", "created": "2026-02-17T17:49:31-08:00", "modified": "2026-02-17T17:49:31-08:00", "lines": 1057, "commits": 1}, {"name": "south_indian_data", "file": "south_indian_data.py", "dir": "tools", "created": "2026-02-17T17:49:31-08:00", "modified": "2026-02-17T17:49:31-08:00", "lines": 1454, "commits": 1}, {"name": "__init__", "file": "__init__.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-03-06T14:10:25-08:00", "lines": 921, "commits": 111}, {"name": "about", "file": "about.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-01-29T01:02:28-08:00", "lines": 128, "commits": 9}, {"name": "agariodemo", "file": "agariodemo.py", "dir": "visuals", "created": "2026-02-05T23:49:49-08:00", "modified": "2026-02-06T20:39:39-08:00", "lines": 115, "commits": 2}, {"name": "antikythera", "file": "antikythera.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 334, "commits": 1}, {"name": "aquarium", "file": "aquarium.py", "dir": "visuals", "created": "2026-02-08T11:13:57-08:00", "modified": "2026-02-08T11:13:57-08:00", "lines": 534, "commits": 1}, {"name": "archimedes", "file": "archimedes.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 391, "commits": 1}, {"name": "arkanoid_demo", "file": "arkanoid_demo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 164, "commits": 3}, {"name": "asteroidsdemo", "file": "asteroidsdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 217, "commits": 3}, {"name": "astrolabe", "file": "astrolabe.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 326, "commits": 1}, {"name": "attractors", "file": "attractors.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 394, "commits": 5}, {"name": "aurora", "file": "aurora.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 247, "commits": 3}, {"name": "baking", "file": "baking.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-27T19:34:13-08:00", "lines": 414, "commits": 2}, {"name": "balloons", "file": "balloons.py", "dir": "visuals", "created": "2026-02-09T19:02:06-08:00", "modified": "2026-02-09T19:02:06-08:00", "lines": 232, "commits": 1}, {"name": "beamengine", "file": "beamengine.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:53:03-08:00", "lines": 404, "commits": 2}, {"name": "bloonsdemo", "file": "bloonsdemo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-08T22:05:10-08:00", "lines": 190, "commits": 4}, {"name": "bloonstddemo", "file": "bloonstddemo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-16T20:10:04-08:00", "lines": 233, "commits": 3}, {"name": "bml", "file": "bml.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T09:50:58-08:00", "lines": 125, "commits": 1}, {"name": "boids", "file": "boids.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T16:27:37-08:00", "lines": 382, "commits": 2}, {"name": "boidslab", "file": "boidslab.py", "dir": "visuals", "created": "2026-02-10T19:00:58-08:00", "modified": "2026-02-10T19:00:58-08:00", "lines": 366, "commits": 1}, {"name": "bombermandemo", "file": "bombermandemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 408, "commits": 3}, {"name": "bowlingdemo", "file": "bowlingdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 161, "commits": 2}, {"name": "breakoutdemo", "file": "breakoutdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 114, "commits": 3}, {"name": "burgertimedemo", "file": "burgertimedemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 385, "commits": 8}, {"name": "butcher", "file": "butcher.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 821, "commits": 1}, {"name": "calendars", "file": "calendars.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-16T20:29:16-08:00", "lines": 784, "commits": 1}, {"name": "camshaft", "file": "camshaft.py", "dir": "visuals", "created": "2026-02-02T01:26:36-08:00", "modified": "2026-02-02T10:34:14-08:00", "lines": 183, "commits": 3}, {"name": "cat", "file": "cat.py", "dir": "visuals", "created": "2026-01-27T19:58:33-08:00", "modified": "2026-01-28T20:51:58-08:00", "lines": 437, "commits": 4}, {"name": "cell", "file": "cell.py", "dir": "visuals", "created": "2026-02-04T23:04:17-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 1669, "commits": 7}, {"name": "centipededemo", "file": "centipededemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 202, "commits": 4}, {"name": "checkersdemo", "file": "checkersdemo.py", "dir": "visuals", "created": "2026-02-03T09:55:07-08:00", "modified": "2026-02-03T09:55:07-08:00", "lines": 363, "commits": 1}, {"name": "chessdemo", "file": "chessdemo.py", "dir": "visuals", "created": "2026-02-03T01:47:28-08:00", "modified": "2026-02-06T09:57:47-08:00", "lines": 399, "commits": 2}, {"name": "chladni", "file": "chladni.py", "dir": "visuals", "created": "2026-02-05T23:22:01-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 277, "commits": 4}, {"name": "chordchart", "file": "chordchart.py", "dir": "visuals", "created": "2026-02-11T22:50:42-08:00", "modified": "2026-02-11T23:13:19-08:00", "lines": 806, "commits": 2}, {"name": "circle5ths", "file": "circle5ths.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 274, "commits": 1}, {"name": "clock", "file": "clock.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-05T09:52:49-08:00", "lines": 193, "commits": 5}, {"name": "clouds", "file": "clouds.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 893, "commits": 1}, {"name": "coins", "file": "coins.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-20T06:13:23-08:00", "lines": 410, "commits": 2}, {"name": "colortheory", "file": "colortheory.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 567, "commits": 3}, {"name": "connect4demo", "file": "connect4demo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 373, "commits": 4}, {"name": "constellations", "file": "constellations.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 523, "commits": 3}, {"name": "controls", "file": "controls.py", "dir": "visuals", "created": "2026-01-28T23:19:40-08:00", "modified": "2026-02-11T21:03:30-08:00", "lines": 117, "commits": 4}, {"name": "convection", "file": "convection.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 425, "commits": 4}, {"name": "copperbars", "file": "copperbars.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-01-28T22:56:58-08:00", "lines": 274, "commits": 4}, {"name": "credits", "file": "credits.py", "dir": "visuals", "created": "2026-01-28T23:19:40-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 269, "commits": 15}, {"name": "crystallize", "file": "crystallize.py", "dir": "visuals", "created": "2026-02-14T16:40:03-08:00", "modified": "2026-02-14T17:53:35-08:00", "lines": 867, "commits": 5}, {"name": "curta", "file": "curta.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:53:03-08:00", "lines": 307, "commits": 2}, {"name": "cycliclab", "file": "cycliclab.py", "dir": "visuals", "created": "2026-02-09T21:32:05-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 299, "commits": 1}, {"name": "cylon", "file": "cylon.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T22:56:58-08:00", "lines": 191, "commits": 4}, {"name": "dance", "file": "dance.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-17T18:42:08-08:00", "lines": 668, "commits": 4}, {"name": "dartsdemo", "file": "dartsdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 186, "commits": 2}, {"name": "dblpendulum", "file": "dblpendulum.py", "dir": "visuals", "created": "2026-01-29T00:15:28-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 228, "commits": 4}, {"name": "defenderdemo", "file": "defenderdemo.py", "dir": "visuals", "created": "2026-02-06T08:23:44-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 210, "commits": 2}, {"name": "demonspirals", "file": "demonspirals.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 267, "commits": 5}, {"name": "digdugdemo", "file": "digdugdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 235, "commits": 3}, {"name": "dna", "file": "dna.py", "dir": "visuals", "created": "2026-02-05T23:22:01-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 903, "commits": 5}, {"name": "dnddemo", "file": "dnddemo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-08T21:22:55-08:00", "lines": 214, "commits": 2}, {"name": "donkeykongdemo", "file": "donkeykongdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 234, "commits": 5}, {"name": "drift3d", "file": "drift3d.py", "dir": "visuals", "created": "2026-02-09T19:42:37-08:00", "modified": "2026-02-09T19:42:37-08:00", "lines": 407, "commits": 1}, {"name": "drummachine", "file": "drummachine.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-17T19:40:15-08:00", "lines": 389, "commits": 3}, {"name": "dvd", "file": "dvd.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 147, "commits": 5}, {"name": "earth", "file": "earth.py", "dir": "visuals", "created": "2026-02-01T13:48:10-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 112, "commits": 3}, {"name": "ecosystem", "file": "ecosystem.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-27T21:23:29-08:00", "lines": 697, "commits": 3}, {"name": "effects", "file": "effects.py", "dir": "visuals", "created": "2026-02-02T21:54:10-08:00", "modified": "2026-02-02T21:54:10-08:00", "lines": 105, "commits": 1}, {"name": "electrons", "file": "electrons.py", "dir": "visuals", "created": "2026-02-22T23:13:07-08:00", "modified": "2026-02-22T23:13:07-08:00", "lines": 1818, "commits": 1}, {"name": "emfield", "file": "emfield.py", "dir": "visuals", "created": "2026-02-01T12:30:12-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 994, "commits": 3}, {"name": "entropy", "file": "entropy.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-21T20:46:56-08:00", "lines": 829, "commits": 3}, {"name": "epidemic", "file": "epidemic.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 275, "commits": 2}, {"name": "equalizer", "file": "equalizer.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 236, "commits": 1}, {"name": "erosion", "file": "erosion.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-21T19:23:05-08:00", "lines": 436, "commits": 1}, {"name": "evolution", "file": "evolution.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 450, "commits": 2}, {"name": "faders", "file": "faders.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 268, "commits": 4}, {"name": "fibonacci", "file": "fibonacci.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-22T12:57:19-08:00", "lines": 179, "commits": 2}, {"name": "fire", "file": "fire.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 156, "commits": 5}, {"name": "fireflies", "file": "fireflies.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-01-28T22:45:59-08:00", "lines": 351, "commits": 4}, {"name": "flags", "file": "flags.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-15T20:23:29-08:00", "lines": 391, "commits": 9}, {"name": "flappydemo", "file": "flappydemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:30:00-08:00", "lines": 122, "commits": 3}, {"name": "flavors", "file": "flavors.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-15T00:01:47-08:00", "lines": 368, "commits": 1}, {"name": "fluid", "file": "fluid.py", "dir": "visuals", "created": "2026-02-01T12:30:12-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 1276, "commits": 18}, {"name": "flux", "file": "flux.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T22:56:58-08:00", "lines": 511, "commits": 5}, {"name": "fractals", "file": "fractals.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 282, "commits": 2}, {"name": "froggerdemo", "file": "froggerdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 233, "commits": 3}, {"name": "frozen_lake", "file": "frozen_lake.py", "dir": "visuals", "created": "2026-02-14T16:19:53-08:00", "modified": "2026-02-14T16:19:53-08:00", "lines": 818, "commits": 1}, {"name": "galagademo", "file": "galagademo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 193, "commits": 3}, {"name": "gallery3d", "file": "gallery3d.py", "dir": "visuals", "created": "2026-02-06T22:06:21-08:00", "modified": "2026-02-16T17:08:55-08:00", "lines": 1875, "commits": 34}, {"name": "game2048demo", "file": "game2048demo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 154, "commits": 2}, {"name": "gametheory", "file": "gametheory.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 364, "commits": 2}, {"name": "gamma", "file": "gamma.py", "dir": "visuals", "created": "2026-02-05T09:37:58-08:00", "modified": "2026-02-05T09:40:24-08:00", "lines": 153, "commits": 2}, {"name": "geneticdrift", "file": "geneticdrift.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 395, "commits": 4}, {"name": "geometrydemo", "file": "geometrydemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 189, "commits": 2}, {"name": "gifcache", "file": "gifcache.py", "dir": "visuals", "created": "2026-01-31T23:13:36-08:00", "modified": "2026-01-31T23:13:36-08:00", "lines": 90, "commits": 1}, {"name": "gramophone", "file": "gramophone.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 370, "commits": 1}, {"name": "grandfather", "file": "grandfather.py", "dir": "visuals", "created": "2026-02-02T10:34:14-08:00", "modified": "2026-02-02T10:34:14-08:00", "lines": 446, "commits": 1}, {"name": "grayscott", "file": "grayscott.py", "dir": "visuals", "created": "2026-02-09T21:32:05-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 56, "commits": 1}, {"name": "greenwave", "file": "greenwave.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T09:50:58-08:00", "lines": 289, "commits": 1}, {"name": "gutenberg", "file": "gutenberg.py", "dir": "visuals", "created": "2026-02-02T19:11:00-08:00", "modified": "2026-02-03T22:53:03-08:00", "lines": 438, "commits": 3}, {"name": "gyre", "file": "gyre.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 351, "commits": 3}, {"name": "gyroscope", "file": "gyroscope.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 310, "commits": 1}, {"name": "highway", "file": "highway.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T09:50:58-08:00", "lines": 191, "commits": 1}, {"name": "hodge", "file": "hodge.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 244, "commits": 6}, {"name": "hodgelab", "file": "hodgelab.py", "dir": "visuals", "created": "2026-02-09T21:32:05-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 278, "commits": 1}, {"name": "hurdygurdy", "file": "hurdygurdy.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 461, "commits": 2}, {"name": "idlemix", "file": "idlemix.py", "dir": "visuals", "created": "2026-02-15T20:21:14-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 446, "commits": 6}, {"name": "indy500demo", "file": "indy500demo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 129, "commits": 5}, {"name": "interchange", "file": "interchange.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-08T18:45:55-08:00", "lines": 373, "commits": 3}, {"name": "intersection", "file": "intersection.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T09:50:58-08:00", "lines": 337, "commits": 1}, {"name": "invadersdemo", "file": "invadersdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 120, "commits": 2}, {"name": "jacquard", "file": "jacquard.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:53:03-08:00", "lines": 403, "commits": 2}, {"name": "jezzballdemo", "file": "jezzballdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 282, "commits": 4}, {"name": "jukebox", "file": "jukebox.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 438, "commits": 1}, {"name": "knife", "file": "knife.py", "dir": "visuals", "created": "2026-02-15T14:38:03-08:00", "modified": "2026-02-15T14:38:03-08:00", "lines": 1142, "commits": 1}, {"name": "knitting", "file": "knitting.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-16T20:29:16-08:00", "lines": 548, "commits": 1}, {"name": "knots", "file": "knots.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-15T21:46:21-08:00", "lines": 767, "commits": 2}, {"name": "lake", "file": "lake.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T22:45:59-08:00", "lines": 480, "commits": 4}, {"name": "language", "file": "language.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-17T19:07:28-08:00", "lines": 1414, "commits": 5}, {"name": "latindna", "file": "latindna.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-15T00:01:47-08:00", "lines": 504, "commits": 1}, {"name": "latingrooves", "file": "latingrooves.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-15T00:01:47-08:00", "lines": 342, "commits": 1}, {"name": "lattice", "file": "lattice.py", "dir": "visuals", "created": "2026-02-03T23:16:23-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 1465, "commits": 8}, {"name": "lava", "file": "lava.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 208, "commits": 4}, {"name": "lenia", "file": "lenia.py", "dir": "visuals", "created": "2026-02-09T21:32:05-08:00", "modified": "2026-02-09T22:05:11-08:00", "lines": 275, "commits": 3}, {"name": "life", "file": "life.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 173, "commits": 4}, {"name": "lightsoutdemo", "file": "lightsoutdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 213, "commits": 3}, {"name": "__init__", "file": "__init__.py", "dir": "visuals", "created": "2026-02-14T23:48:27-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 35, "commits": 2}, {"name": "locomotive", "file": "locomotive.py", "dir": "visuals", "created": "2026-02-02T10:34:14-08:00", "modified": "2026-02-02T10:34:14-08:00", "lines": 469, "commits": 1}, {"name": "loderunnerdemo", "file": "loderunnerdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 465, "commits": 3}, {"name": "loom", "file": "loom.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 505, "commits": 1}, {"name": "lunarlanderdemo", "file": "lunarlanderdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 237, "commits": 2}, {"name": "mancalademo", "file": "mancalademo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-08T21:42:56-08:00", "lines": 231, "commits": 3}, {"name": "matrix", "file": "matrix.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T16:27:37-08:00", "lines": 132, "commits": 4}, {"name": "matter", "file": "matter.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 212, "commits": 2}, {"name": "maxwell", "file": "maxwell.py", "dir": "visuals", "created": "2026-02-21T20:32:57-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 477, "commits": 2}, {"name": "merge", "file": "merge.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T22:25:33-08:00", "lines": 333, "commits": 2}, {"name": "metronome", "file": "metronome.py", "dir": "visuals", "created": "2026-02-02T01:23:51-08:00", "modified": "2026-02-11T22:50:42-08:00", "lines": 207, "commits": 3}, {"name": "microscope", "file": "microscope.py", "dir": "visuals", "created": "2026-02-04T22:41:01-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 1082, "commits": 2}, {"name": "mitosis", "file": "mitosis.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-02-06T20:50:54-08:00", "lines": 311, "commits": 5}, {"name": "mitosislab", "file": "mitosislab.py", "dir": "visuals", "created": "2026-02-10T19:00:58-08:00", "modified": "2026-02-10T19:00:58-08:00", "lines": 322, "commits": 1}, {"name": "mobius", "file": "mobius.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 256, "commits": 6}, {"name": "modelt", "file": "modelt.py", "dir": "visuals", "created": "2026-02-02T10:34:14-08:00", "modified": "2026-02-02T10:34:14-08:00", "lines": 315, "commits": 1}, {"name": "moire", "file": "moire.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 229, "commits": 3}, {"name": "molecule", "file": "molecule.py", "dir": "visuals", "created": "2026-02-02T00:16:07-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 5637, "commits": 12}, {"name": "monstermazedemo", "file": "monstermazedemo.py", "dir": "visuals", "created": "2026-02-06T22:06:21-08:00", "modified": "2026-02-16T19:48:35-08:00", "lines": 186, "commits": 3}, {"name": "moon", "file": "moon.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 216, "commits": 2}, {"name": "mspacmandemo", "file": "mspacmandemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 283, "commits": 3}, {"name": "musicbox", "file": "musicbox.py", "dir": "visuals", "created": "2026-02-02T19:11:00-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 269, "commits": 3}, {"name": "network", "file": "network.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-21T19:23:05-08:00", "lines": 562, "commits": 1}, {"name": "neurons", "file": "neurons.py", "dir": "visuals", "created": "2026-02-01T12:30:12-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 287, "commits": 3}, {"name": "newtoncradle", "file": "newtoncradle.py", "dir": "visuals", "created": "2026-01-29T00:15:28-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 176, "commits": 3}, {"name": "nightdriverdemo", "file": "nightdriverdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 152, "commits": 7}, {"name": "optics", "file": "optics.py", "dir": "visuals", "created": "2026-02-06T21:36:20-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 754, "commits": 6}, {"name": "orbitals", "file": "orbitals.py", "dir": "visuals", "created": "2026-02-22T23:13:07-08:00", "modified": "2026-02-22T23:13:07-08:00", "lines": 1009, "commits": 1}, {"name": "orbits", "file": "orbits.py", "dir": "visuals", "created": "2026-02-01T12:30:12-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 593, "commits": 5}, {"name": "orrery", "file": "orrery.py", "dir": "visuals", "created": "2026-02-03T22:46:52-08:00", "modified": "2026-02-03T22:46:52-08:00", "lines": 310, "commits": 1}, {"name": "oscilloscope", "file": "oscilloscope.py", "dir": "visuals", "created": "2026-02-05T23:22:01-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 301, "commits": 3}, {"name": "othellodemo", "file": "othellodemo.py", "dir": "visuals", "created": "2026-02-03T09:55:07-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 322, "commits": 2}, {"name": "pacmandemo", "file": "pacmandemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 283, "commits": 3}, {"name": "paint", "file": "paint.py", "dir": "visuals", "created": "2026-02-11T11:10:06-08:00", "modified": "2026-02-14T16:53:13-08:00", "lines": 633, "commits": 12}, {"name": "paint_gif", "file": "paint_gif.py", "dir": "visuals", "created": "2026-02-11T17:57:15-08:00", "modified": "2026-02-14T16:53:13-08:00", "lines": 950, "commits": 4}, {"name": "painting", "file": "painting.py", "dir": "visuals", "created": "2026-02-10T19:34:05-08:00", "modified": "2026-02-16T11:55:38-08:00", "lines": 470, "commits": 14}, {"name": "pantry", "file": "pantry.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-15T14:38:03-08:00", "lines": 481, "commits": 2}, {"name": "particlelife", "file": "particlelife.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 252, "commits": 6}, {"name": "pasta", "file": "pasta.py", "dir": "visuals", "created": "2026-02-15T00:23:21-08:00", "modified": "2026-02-15T00:23:21-08:00", "lines": 709, "commits": 1}, {"name": "peptides", "file": "peptides.py", "dir": "visuals", "created": "2026-02-16T11:55:38-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 5811, "commits": 3}, {"name": "percolation", "file": "percolation.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 310, "commits": 4}, {"name": "periodic", "file": "periodic.py", "dir": "visuals", "created": "2026-02-04T21:55:20-08:00", "modified": "2026-02-22T23:13:07-08:00", "lines": 405, "commits": 3}, {"name": "pi", "file": "pi.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-22T12:57:19-08:00", "lines": 179, "commits": 2}, {"name": "pianoroll", "file": "pianoroll.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 488, "commits": 1}, {"name": "pinballdemo", "file": "pinballdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-05T02:30:10-08:00", "lines": 161, "commits": 3}, {"name": "pipedreamdemo", "file": "pipedreamdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 415, "commits": 4}, {"name": "plasma", "file": "plasma.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 116, "commits": 4}, {"name": "plates", "file": "plates.py", "dir": "visuals", "created": "2026-02-16T08:58:20-08:00", "modified": "2026-02-16T19:22:14-08:00", "lines": 361, "commits": 3}, {"name": "polaroid", "file": "polaroid.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-08T20:28:25-08:00", "lines": 809, "commits": 8}, {"name": "pongdemo", "file": "pongdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 98, "commits": 4}, {"name": "pooldemo", "file": "pooldemo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-03-04T21:27:55-08:00", "lines": 317, "commits": 4}, {"name": "pottery", "file": "pottery.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-20T00:15:11-08:00", "lines": 336, "commits": 4}, {"name": "predprey", "file": "predprey.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 317, "commits": 2}, {"name": "primes", "file": "primes.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-15T20:23:29-08:00", "lines": 194, "commits": 1}, {"name": "projector", "file": "projector.py", "dir": "visuals", "created": "2026-02-02T10:34:14-08:00", "modified": "2026-02-11T22:45:46-08:00", "lines": 510, "commits": 2}, {"name": "proteins", "file": "proteins.py", "dir": "visuals", "created": "2026-02-03T23:54:49-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 3869, "commits": 11}, {"name": "qbertdemo", "file": "qbertdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 246, "commits": 3}, {"name": "quarks", "file": "quarks.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 303, "commits": 7}, {"name": "quarkslab", "file": "quarkslab.py", "dir": "visuals", "created": "2026-02-10T19:00:58-08:00", "modified": "2026-02-10T19:00:58-08:00", "lines": 325, "commits": 1}, {"name": "radioactive", "file": "radioactive.py", "dir": "visuals", "created": "2026-02-06T21:36:20-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 579, "commits": 2}, {"name": "rainbow", "file": "rainbow.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 185, "commits": 3}, {"name": "refresh", "file": "refresh.py", "dir": "visuals", "created": "2026-01-31T01:14:35-08:00", "modified": "2026-02-11T20:57:33-08:00", "lines": 302, "commits": 10}, {"name": "ripples", "file": "ripples.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 259, "commits": 3}, {"name": "road", "file": "road.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-05T09:50:58-08:00", "lines": 676, "commits": 4}, {"name": "rotozoom", "file": "rotozoom.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 237, "commits": 3}, {"name": "roundabout", "file": "roundabout.py", "dir": "visuals", "created": "2026-02-05T09:50:58-08:00", "modified": "2026-02-05T22:25:33-08:00", "lines": 320, "commits": 2}, {"name": "rudiments", "file": "rudiments.py", "dir": "visuals", "created": "2026-02-12T11:56:49-08:00", "modified": "2026-02-12T11:56:49-08:00", "lines": 589, "commits": 1}, {"name": "rug", "file": "rug.py", "dir": "visuals", "created": "2026-01-25T21:00:35-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 247, "commits": 7}, {"name": "ruglab", "file": "ruglab.py", "dir": "visuals", "created": "2026-02-09T21:32:05-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 286, "commits": 1}, {"name": "safety", "file": "safety.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-16T20:29:16-08:00", "lines": 123, "commits": 1}, {"name": "sandpile", "file": "sandpile.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-02-01T12:30:12-08:00", "lines": 188, "commits": 4}, {"name": "sauces", "file": "sauces.py", "dir": "visuals", "created": "2026-02-15T00:01:47-08:00", "modified": "2026-02-15T00:01:47-08:00", "lines": 495, "commits": 1}, {"name": "scales", "file": "scales.py", "dir": "visuals", "created": "2026-02-15T15:35:47-08:00", "modified": "2026-02-15T15:35:47-08:00", "lines": 412, "commits": 1}, {"name": "scripts", "file": "scripts.py", "dir": "visuals", "created": "2026-02-16T20:29:16-08:00", "modified": "2026-02-17T20:05:43-08:00", "lines": 37211, "commits": 6}, {"name": "seismic", "file": "seismic.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 706, "commits": 4}, {"name": "settings", "file": "settings.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-02-02T22:24:08-08:00", "lines": 96, "commits": 4}, {"name": "shuffleboarddemo", "file": "shuffleboarddemo.py", "dir": "visuals", "created": "2026-02-08T20:28:39-08:00", "modified": "2026-02-08T21:22:55-08:00", "lines": 123, "commits": 2}, {"name": "shutdown", "file": "shutdown.py", "dir": "visuals", "created": "2026-01-28T23:26:56-08:00", "modified": "2026-01-28T23:26:56-08:00", "lines": 98, "commits": 1}, {"name": "signs", "file": "signs.py", "dir": "visuals", "created": "2026-02-14T16:32:06-08:00", "modified": "2026-02-14T18:45:27-08:00", "lines": 323, "commits": 2}, {"name": "sinescroller", "file": "sinescroller.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 246, "commits": 3}, {"name": "singer", "file": "singer.py", "dir": "visuals", "created": "2026-02-02T10:34:14-08:00", "modified": "2026-02-03T22:53:03-08:00", "lines": 635, "commits": 2}, {"name": "skifreedemo", "file": "skifreedemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 184, "commits": 3}, {"name": "slideshow", "file": "slideshow.py", "dir": "visuals", "created": "2026-01-29T00:00:46-08:00", "modified": "2026-02-27T21:23:29-08:00", "lines": 539, "commits": 47}, {"name": "slime", "file": "slime.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T16:27:37-08:00", "lines": 342, "commits": 4}, {"name": "slimelab", "file": "slimelab.py", "dir": "visuals", "created": "2026-02-10T19:00:58-08:00", "modified": "2026-02-10T19:00:58-08:00", "lines": 330, "commits": 1}, {"name": "snakedemo", "file": "snakedemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 178, "commits": 2}, {"name": "solids", "file": "solids.py", "dir": "visuals", "created": "2026-02-15T20:36:41-08:00", "modified": "2026-02-15T20:36:41-08:00", "lines": 161, "commits": 1}, {"name": "solids_data", "file": "solids_data.py", "dir": "visuals", "created": "2026-02-15T20:36:41-08:00", "modified": "2026-02-22T12:57:19-08:00", "lines": 774, "commits": 2}, {"name": "solitaire", "file": "solitaire.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-29T10:22:38-08:00", "lines": 316, "commits": 6}, {"name": "sorting", "file": "sorting.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-21T19:23:05-08:00", "lines": 457, "commits": 1}, {"name": "spacecruisedemo", "file": "spacecruisedemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 238, "commits": 2}, {"name": "spectroscope", "file": "spectroscope.py", "dir": "visuals", "created": "2026-02-05T23:22:01-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 330, "commits": 2}, {"name": "spices", "file": "spices.py", "dir": "visuals", "created": "2026-02-15T11:56:44-08:00", "modified": "2026-02-15T14:38:03-08:00", "lines": 425, "commits": 2}, {"name": "spirograph", "file": "spirograph.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-15T20:23:29-08:00", "lines": 238, "commits": 1}, {"name": "stackdemo", "file": "stackdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 113, "commits": 2}, {"name": "starfield", "file": "starfield.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 109, "commits": 5}, {"name": "starwarsca", "file": "starwarsca.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 207, "commits": 3}, {"name": "stats", "file": "stats.py", "dir": "visuals", "created": "2026-02-14T16:53:13-08:00", "modified": "2026-02-15T22:58:56-08:00", "lines": 301, "commits": 3}, {"name": "stickrunnerdemo", "file": "stickrunnerdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 167, "commits": 2}, {"name": "synthesizer", "file": "synthesizer.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-06T09:42:21-08:00", "lines": 404, "commits": 1}, {"name": "sysinfo", "file": "sysinfo.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-01-28T23:29:04-08:00", "lines": 181, "commits": 4}, {"name": "tessellations", "file": "tessellations.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-15T20:23:29-08:00", "lines": 218, "commits": 1}, {"name": "testament", "file": "testament.py", "dir": "visuals", "created": "2026-03-06T14:10:25-08:00", "modified": "2026-03-06T14:37:21-08:00", "lines": 570, "commits": 3}, {"name": "testpattern", "file": "testpattern.py", "dir": "visuals", "created": "2026-01-28T00:20:26-08:00", "modified": "2026-02-02T19:11:00-08:00", "lines": 195, "commits": 5}, {"name": "tetrisdemo", "file": "tetrisdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 239, "commits": 3}, {"name": "theremin", "file": "theremin.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-07T23:14:21-08:00", "lines": 394, "commits": 2}, {"name": "timers", "file": "timers.py", "dir": "visuals", "created": "2026-02-05T09:47:33-08:00", "modified": "2026-02-15T23:47:14-08:00", "lines": 130, "commits": 3}, {"name": "trance", "file": "trance.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T16:27:37-08:00", "lines": 292, "commits": 2}, {"name": "trashblasterdemo", "file": "trashblasterdemo.py", "dir": "visuals", "created": "2026-02-02T22:55:05-08:00", "modified": "2026-02-03T01:10:55-08:00", "lines": 162, "commits": 2}, {"name": "truchet", "file": "truchet.py", "dir": "visuals", "created": "2026-01-28T11:37:08-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 325, "commits": 3}, {"name": "turing", "file": "turing.py", "dir": "visuals", "created": "2026-02-01T12:30:12-08:00", "modified": "2026-02-09T21:32:05-08:00", "lines": 476, "commits": 6}, {"name": "turingmachine", "file": "turingmachine.py", "dir": "visuals", "created": "2026-02-21T19:23:05-08:00", "modified": "2026-02-22T12:02:12-08:00", "lines": 609, "commits": 2}, {"name": "turntable", "file": "turntable.py", "dir": "visuals", "created": "2026-02-06T09:42:21-08:00", "modified": "2026-02-07T23:28:20-08:00", "lines": 267, "commits": 3}, {"name": "twister", "file": "twister.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 214, "commits": 3}, {"name": "typewriter", "file": "typewriter.py", "dir": "visuals", "created": "2026-02-02T19:11:00-08:00", "modified": "2026-02-02T21:43:56-08:00", "lines": 577, "commits": 4}, {"name": "walk", "file": "walk.py", "dir": "visuals", "created": "2026-02-17T19:15:11-08:00", "modified": "2026-02-17T19:42:37-08:00", "lines": 468, "commits": 4}, {"name": "watchgears", "file": "watchgears.py", "dir": "visuals", "created": "2026-02-02T01:23:51-08:00", "modified": "2026-02-02T10:32:58-08:00", "lines": 314, "commits": 2}, {"name": "watercycle", "file": "watercycle.py", "dir": "visuals", "created": "2026-02-13T13:31:09-08:00", "modified": "2026-02-15T20:23:29-08:00", "lines": 287, "commits": 3}, {"name": "wavetank", "file": "wavetank.py", "dir": "visuals", "created": "2026-02-06T21:36:20-08:00", "modified": "2026-02-22T13:40:32-08:00", "lines": 471, "commits": 4}, {"name": "weather", "file": "weather.py", "dir": "visuals", "created": "2026-01-25T17:38:37-08:00", "modified": "2026-01-28T16:27:37-08:00", "lines": 262, "commits": 3}, {"name": "weaving", "file": "weaving.py", "dir": "visuals", "created": "2026-02-15T20:23:29-08:00", "modified": "2026-02-15T20:40:22-08:00", "lines": 1049, "commits": 2}, {"name": "wifi_config", "file": "wifi_config.py", "dir": "visuals", "created": "2026-02-14T18:45:39-08:00", "modified": "2026-02-14T19:14:57-08:00", "lines": 678, "commits": 9}, {"name": "win95maze", "file": "win95maze.py", "dir": "visuals", "created": "2026-02-07T10:08:24-08:00", "modified": "2026-02-07T10:12:27-08:00", "lines": 423, "commits": 2}, {"name": "wolfram", "file": "wolfram.py", "dir": "visuals", "created": "2026-01-25T23:11:52-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 186, "commits": 3}, {"name": "wondercabinet", "file": "wondercabinet.py", "dir": "visuals", "created": "2026-02-04T22:39:10-08:00", "modified": "2026-02-14T23:48:27-08:00", "lines": 7422, "commits": 25}, {"name": "xorpattern", "file": "xorpattern.py", "dir": "visuals", "created": "2026-01-27T23:51:35-08:00", "modified": "2026-01-28T20:48:21-08:00", "lines": 207, "commits": 3}, {"name": "yoga", "file": "yoga.py", "dir": "visuals", "created": "2026-02-20T00:09:41-08:00", "modified": "2026-02-20T00:09:41-08:00", "lines": 277, "commits": 1}];
+
+const DIR_COLORS = {
+  visuals: { dot: '#4caf50', glow: '#4caf5044', label: '#6fcf73' },
+  games:   { dot: '#2196f3', glow: '#2196f344', label: '#64b5f6' },
+  tools:   { dot: '#ab47bc', glow: '#ab47bc44', label: '#ce93d8' },
+  site:    { dot: '#ff9800', glow: '#ff980044', label: '#ffb74d' },
+};
+
+let yMode = 'lines';
+let filters = { visuals: true, games: true, tools: true, site: true };
+let transform = { x: 0, y: 0, k: 1 };
+let canvas, ctx, W, H;
+let hoveredItem = null;
+let dragging = false, dragStart, dragTransformStart;
+
+let minDate, maxDate, maxLines, maxCommits;
+
+// ── init ──
+
+function init() {
+  canvas = document.getElementById('c');
+  ctx = canvas.getContext('2d');
+
+  DATA.forEach(d => {
+    d.createdMs  = new Date(d.created).getTime();
+    d.modifiedMs = new Date(d.modified).getTime();
+  });
+
+  computeBounds();
+  updateCounts();
+  resize();
+  window.addEventListener('resize', resize);
+
+  canvas.addEventListener('wheel', onWheel, { passive: false });
+  canvas.addEventListener('mousedown', onMouseDown);
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('mouseup',   onMouseUp);
+  canvas.addEventListener('mouseleave', () => {
+    dragging = false; hoveredItem = null; hideTooltip(); draw();
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filters[btn.dataset.dir] = !filters[btn.dataset.dir];
+      btn.classList.toggle('active', filters[btn.dataset.dir]);
+      updateCounts();
+      draw();
+    });
+  });
+
+  document.getElementById('y-axis-toggle').addEventListener('click', () => {
+    yMode = yMode === 'lines' ? 'commits' : 'lines';
+    document.getElementById('y-axis-toggle').textContent = 'Y: ' + yMode;
+    transform = { x: 0, y: 0, k: 1 };
+    draw();
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    transform = { x: 0, y: 0, k: 1 };
+    draw();
+  });
+}
+
+function resize() {
+  const wrap = document.getElementById('canvas-wrap');
+  W = wrap.clientWidth;
+  H = wrap.clientHeight;
+  canvas.width  = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  draw();
+}
+
+function computeBounds() {
+  minDate = Infinity; maxDate = -Infinity;
+  maxLines = 0; maxCommits = 0;
+  for (const d of DATA) {
+    if (d.createdMs < minDate) minDate = d.createdMs;
+    if (d.createdMs > maxDate) maxDate = d.createdMs;
+    if (d.lines    > maxLines)   maxLines   = d.lines;
+    if (d.commits  > maxCommits) maxCommits = d.commits;
+  }
+}
+
+function updateCounts() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+    const n = DATA.filter(d => d.dir === dir).length;
+    btn.textContent = dir + ' (' + n + ')';
+  });
+}
+
+// ── coordinate mapping ──
+
+const M = { left: 60, right: 40, top: 30, bottom: 50 };
+
+function getYVal(d) { return yMode === 'lines' ? d.lines : d.commits; }
+function getMaxY()  { return yMode === 'lines' ? maxLines : maxCommits; }
+
+function dataToScreen(dateMs, yVal) {
+  const maxY = getMaxY();
+  const pw = W - M.left - M.right;
+  const ph = H - M.top  - M.bottom;
+  const dr = maxDate - minDate || 1;
+  let sx = M.left + ((dateMs - minDate) / dr) * pw;
+  let sy = M.top  + ph - (yVal / (maxY * 1.1)) * ph;
+  return { x: sx * transform.k + transform.x,
+           y: sy * transform.k + transform.y };
+}
+
+function bubbleR(item) {
+  const r = Math.sqrt(item.lines) * 0.4;
+  return Math.max(3, Math.min(r, 40)) * Math.min(transform.k, 3);
+}
+
+// ── drawing ──
+
+function draw() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, W, H);
+  const maxY = getMaxY();
+  if (maxY === 0) return;
+  drawGrid();
+
+  const visible = DATA.filter(d => filters[d.dir]);
+  for (const item of visible) {
+    const { x, y } = dataToScreen(item.createdMs, getYVal(item));
+    if (x < -100 || x > W+100 || y < -100 || y > H+100) continue;
+
+    const r = bubbleR(item);
+    const c = DIR_COLORS[item.dir];
+    const hov = hoveredItem === item;
+
+    // glow
+    if (r > 5 || hov) {
+      ctx.beginPath();
+      ctx.arc(x, y, r + (hov ? 8 : 4), 0, Math.PI*2);
+      ctx.fillStyle = hov ? c.dot + '55' : c.glow;
+      ctx.fill();
+    }
+    // dot
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = hov ? '#fff' : c.dot;
+    ctx.globalAlpha = hov ? 1 : 0.8;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // label
+    if (hov || r * transform.k > 6 || transform.k > 1.5) {
+      const fs = Math.max(8, Math.min(11, 9 * transform.k));
+      ctx.font = fs + 'px Menlo,Monaco,monospace';
+      ctx.fillStyle = hov ? '#fff' : c.label;
+      ctx.globalAlpha = hov ? 1 : Math.min(1, 0.3 + transform.k*0.3);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(item.name, x + r + 4, y);
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+function drawGrid() {
+  const maxY = getMaxY();
+  const pw = W - M.left - M.right;
+  const ph = H - M.top  - M.bottom;
+  ctx.strokeStyle = '#ffffff08';
+  ctx.lineWidth = 1;
+  ctx.font = '10px Menlo,Monaco,monospace';
+  ctx.fillStyle = '#555';
+
+  // Y
+  for (const v of niceSteps(0, maxY*1.1, 8)) {
+    const { y } = dataToScreen(minDate, v);
+    if (y < M.top-20 || y > H-M.bottom+20) continue;
+    ctx.beginPath();
+    ctx.moveTo(M.left * transform.k + transform.x, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fmtNum(v),
+      Math.max(8, M.left * transform.k + transform.x - 8), y);
+  }
+
+  // X
+  const vdr = (maxDate - minDate) / transform.k;
+  let iv;
+  if      (vdr < 3*864e5)  iv = 6*36e5;
+  else if (vdr < 14*864e5) iv = 864e5;
+  else if (vdr < 45*864e5) iv = 3*864e5;
+  else                     iv = 7*864e5;
+  let t = Math.ceil(minDate / iv) * iv;
+  while (t <= maxDate + iv) {
+    const { x } = dataToScreen(t, 0);
+    if (x >= M.left-20 && x <= W+20) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      const label = new Date(t).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric',
+        ...(iv < 864e5 ? { hour: 'numeric' } : {})
+      });
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(label, x, Math.min(H - M.bottom + 10, H - 14));
+    }
+    t += iv;
+  }
+
+  // axis label
+  ctx.fillStyle = '#666'; ctx.font = '11px Menlo,Monaco,monospace';
+  ctx.save(); ctx.translate(14, H/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.fillText(yMode === 'lines' ? 'lines of code' : 'commits', 0, 0);
+  ctx.restore();
+}
+
+function niceSteps(lo, hi, n) {
+  const rough = (hi-lo)/n;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const f = rough/mag;
+  const step = (f<=1.5?1:f<=3.5?2:f<=7.5?5:10)*mag;
+  const out = [];
+  let v = Math.ceil(lo/step)*step;
+  while (v <= hi) { out.push(v); v += step; }
+  return out;
+}
+
+function fmtNum(n) {
+  return n >= 1000 ? (n/1000).toFixed(n>=10000?0:1)+'k' : String(Math.round(n));
+}
+
+// ── interaction ──
+
+function onWheel(e) {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const f = e.deltaY > 0 ? 0.9 : 1.1;
+  const nk = Math.max(0.5, Math.min(transform.k * f, 50));
+  transform.x = mx - (mx - transform.x) * (nk / transform.k);
+  transform.y = my - (my - transform.y) * (nk / transform.k);
+  transform.k = nk;
+  draw();
+}
+
+function onMouseDown(e) {
+  dragging = true;
+  dragStart = { x: e.clientX, y: e.clientY };
+  dragTransformStart = { x: transform.x, y: transform.y };
+  canvas.style.cursor = 'grabbing';
+}
+
+function onMouseMove(e) {
+  if (dragging) {
+    transform.x = dragTransformStart.x + (e.clientX - dragStart.x);
+    transform.y = dragTransformStart.y + (e.clientY - dragStart.y);
+    draw();
+    return;
+  }
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  let closest = null, best = Infinity;
+  for (const item of DATA.filter(d => filters[d.dir])) {
+    const { x, y } = dataToScreen(item.createdMs, getYVal(item));
+    const dist = Math.hypot(mx-x, my-y);
+    if (dist < bubbleR(item)+6 && dist < best) { closest = item; best = dist; }
+  }
+  if (closest !== hoveredItem) {
+    hoveredItem = closest;
+    canvas.style.cursor = closest ? 'pointer' : 'grab';
+    if (closest) showTooltip(closest, e.clientX, e.clientY);
+    else hideTooltip();
+    draw();
+  } else if (closest) posTooltip(e.clientX, e.clientY);
+}
+
+function onMouseUp() {
+  dragging = false;
+  canvas.style.cursor = hoveredItem ? 'pointer' : 'grab';
+}
+
+function showTooltip(item, mx, my) {
+  const tip = document.getElementById('tooltip');
+  const fmt = d => new Date(d).toLocaleDateString('en-US', {
+    weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'
+  });
+  const age = Math.round((new Date(item.modified) - new Date(item.created)) / 864e5);
+  tip.innerHTML =
+    '<div class="tt-name">' + item.name + '</div>' +
+    '<div class="tt-dir">'  + item.dir + '/' + item.file + '</div>' +
+    '<div class="tt-stat"><span>' + item.lines.toLocaleString() + '</span> lines · ' +
+        '<span>' + item.commits + '</span> commits</div>' +
+    '<div class="tt-stat">created <span>' + fmt(item.created)  + '</span></div>' +
+    '<div class="tt-stat">last touched <span>' + fmt(item.modified) + '</span></div>' +
+    (age > 0 ? '<div class="tt-stat">active span: <span>' + age + 'd</span></div>' : '');
+  tip.style.display = 'block';
+  posTooltip(mx, my);
+}
+
+function posTooltip(mx, my) {
+  const tip = document.getElementById('tooltip');
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = mx + 16, y = my - 10;
+  if (x + tw > innerWidth - 8) x = mx - tw - 16;
+  if (y + th > innerHeight - 8) y = innerHeight - th - 8;
+  if (y < 56) y = 56;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+init();
+</script>
+</body>
+</html>

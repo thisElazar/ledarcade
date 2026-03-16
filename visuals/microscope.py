@@ -987,10 +987,15 @@ class Microscope(Visual):
             mx, my = int(mol['x']), int(mol['y'])
             # Oxygen (red center)
             d.set_pixel(mx, my, (200, 50, 50))
-            # Hydrogen atoms (white, offset at ~104.5 degree angle)
+            # Hydrogen atoms (white, offset at 104.5 degree angle)
             h_angle = t * 0.5 + mol['x'] * 0.1  # Slight rotation
-            d.set_pixel(mx - 1, my - 1, (220, 220, 220))
-            d.set_pixel(mx + 1, my - 1, (220, 220, 220))
+            half_bond = 52.25 * math.pi / 180  # Half of 104.5°
+            h1x = mx + int(round(1.4 * math.sin(h_angle - half_bond)))
+            h1y = my - int(round(1.4 * math.cos(h_angle - half_bond)))
+            h2x = mx + int(round(1.4 * math.sin(h_angle + half_bond)))
+            h2y = my - int(round(1.4 * math.cos(h_angle + half_bond)))
+            d.set_pixel(h1x, h1y, (220, 220, 220))
+            d.set_pixel(h2x, h2y, (220, 220, 220))
 
         # H-bonds between nearby surface molecules (dim dotted lines)
         surface_mols = [m for m in self.state['molecules'] if m['surface']]

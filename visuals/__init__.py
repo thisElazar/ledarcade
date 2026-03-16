@@ -182,11 +182,9 @@ from .spectroscope import Spectroscope
 from .oscilloscope import Oscilloscope
 from .chladni import Chladni
 from .theremin import Theremin
-from .equalizer import Equalizer
 from .metronome import Metronome
 from .turntable import Turntable
 from .drummachine import DrumMachine
-from .jukebox import Jukebox
 from .synthesizer import Synthesizer
 from .chordchart import ChordChart
 from .rudiments import DrumRudiments
@@ -470,11 +468,9 @@ ALL_VISUALS = [
     Oscilloscope,
     Chladni,
     Theremin,
-    Equalizer,
     Metronome,
     Turntable,
     DrumMachine,
-    Jukebox,
     Synthesizer,
     ChordChart,
     DrumRudiments,
@@ -814,11 +810,9 @@ __all__ = [
     'Oscilloscope',
     'Chladni',
     'Theremin',
-    'Equalizer',
     'Metronome',
     'Turntable',
     'DrumMachine',
-    'Jukebox',
     'Synthesizer',
     'ChordChart',
     'DrumRudiments',
