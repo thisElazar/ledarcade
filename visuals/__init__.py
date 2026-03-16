@@ -91,7 +91,6 @@ from .intersection import Intersection
 from .roundabout import Roundabout
 from .interchange import Interchange
 from .greenwave import GreenWave
-from .merge import Merge
 from .painting import PAINTING_VISUALS
 from .plates import Haeckel, Audubon, Merian, Redoute, Gould
 from .mobius import Mobius
@@ -592,7 +591,6 @@ ALL_VISUALS = [
     Roundabout,
     Interchange,
     GreenWave,
-    Merge,
     MoonPhases,
     Constellations,
     Fractals,
@@ -856,7 +854,6 @@ __all__ = [
     'Roundabout',
     'Interchange',
     'GreenWave',
-    'Merge',
     'MoonPhases',
     'Constellations',
     'Fractals',
