@@ -10,8 +10,8 @@ Built on the Stam stable-fluids solver from fluid.py.
 
 Controls:
   Left/Right  - Temperature gradient (Rayleigh number)
-  Up/Down     - Cycle viz mode (TEMP / FLOW / BOTH)
-  Space       - Perturb (inject random temperature blobs)
+  Up/Down     - Cycle viz mode (TEMP / FLOW)
+  Space       - Reset simulation
 """
 
 import math
@@ -69,7 +69,7 @@ def _flow_color(vx, vy, mag):
     return (int(r * 255), int(g * 255), int(bl * 255))
 
 
-VIZ_MODES = ["TEMP", "FLOW", "BOTH"]
+VIZ_MODES = ["TEMP", "FLOW"]
 
 
 class Convection(Visual):
@@ -83,7 +83,7 @@ class Convection(Visual):
     def reset(self):
         self.time = 0.0
         self.temp_gradient = 0.8
-        self.viz_mode = 0  # 0=TEMP, 1=FLOW, 2=BOTH
+        self.viz_mode = 0  # 0=TEMP, 1=FLOW
 
         # Overlay
         self.overlay_timer = 0.0
@@ -142,9 +142,9 @@ class Convection(Visual):
             consumed = True
 
         if input_state.action_l or input_state.action_r:
-            self._perturb()
+            self.reset()
             self.overlay_timer = 2.0
-            self.overlay_lines = ["PERTURB"]
+            self.overlay_lines = ["RESET"]
             consumed = True
 
         return consumed
@@ -153,26 +153,6 @@ class Convection(Visual):
     def _rayleigh(self):
         """Effective Rayleigh number (simplified, for display)."""
         return self.temp_gradient * 10.0
-
-    def _perturb(self):
-        """Inject random temperature blobs to disrupt the flow."""
-        N = FLUID_N
-        for _ in range(8):
-            ci = np.random.randint(5, N - 4)
-            cj = np.random.randint(5, N - 4)
-            r = np.random.randint(2, 4)
-            hot = np.random.random() > 0.5
-            for di in range(-r, r + 1):
-                for dj in range(-r, r + 1):
-                    d2 = di * di + dj * dj
-                    if d2 <= r * r:
-                        pi, pj = ci + di, cj + dj
-                        if 1 <= pi <= N and 1 <= pj <= N:
-                            strength = 1.0 - math.sqrt(d2) / r
-                            if hot:
-                                self.T[pi, pj] = min(1.0, self.T[pi, pj] + 0.4 * strength)
-                            else:
-                                self.T[pi, pj] = max(0.0, self.T[pi, pj] - 0.4 * strength)
 
     # ── Physics step ─────────────────────────────────────────────
     def _step(self):
@@ -251,7 +231,7 @@ class Convection(Visual):
                     idx = max(0, min(255, idx))
                     set_pixel(px, py, lut[idx])
 
-        elif mode == 1:
+        else:
             # FLOW mode: velocity direction + magnitude
             _fc = _flow_color
             for px in range(N):
@@ -260,28 +240,6 @@ class Convection(Visual):
                     uvy = v[px + 1, py + 1]
                     mag = _sqrt(uvx * uvx + uvy * uvy)
                     set_pixel(px, py, _fc(uvx, uvy, mag))
-
-        else:
-            # BOTH mode: temperature + velocity dots
-            for px in range(N):
-                for py in range(N):
-                    val = T[px + 1, py + 1]
-                    idx = int(val * 255)
-                    idx = max(0, min(255, idx))
-                    set_pixel(px, py, lut[idx])
-
-            # Velocity dots on sparse grid
-            for si in range(2, N, 4):
-                for sj in range(2, N, 4):
-                    uvx = u[si + 1, sj + 1]
-                    uvy = v[si + 1, sj + 1]
-                    mag = _sqrt(uvx * uvx + uvy * uvy)
-                    if mag > 0.05:
-                        norm = min(2.5, mag * 4.0) / mag
-                        ex = int(si + uvx * norm * 2 + 0.5)
-                        ey = int(sj + uvy * norm * 2 + 0.5)
-                        if 0 <= ex < N and 0 <= ey < N:
-                            set_pixel(ex, ey, (255, 255, 255))
 
         # HUD overlay
         if self.overlay_timer > 0 and self.overlay_lines:

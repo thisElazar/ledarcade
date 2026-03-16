@@ -1,10 +1,14 @@
 """
 Antikythera Mechanism
 =====================
-Ancient Greek hand-powered orrery (c. 100 BC) - the first analog computer.
-Cross-section view showing interlocking bronze gears encoding astronomical
-cycles: the Metonic cycle (19 years = 235 lunar months) and the Saros
-eclipse cycle (~18 year repeat). Discovered in 1901 in an Aegean shipwreck.
+Ancient Greek hand-powered orrery (c. 100 BC) — the first analog computer.
+Dense bronze gear train in a rectangular case encoding astronomical cycles:
+the Metonic cycle (19 years = 235 lunar months) and the Saros eclipse cycle
+(~223 synodic months ≈ 18 years). Discovered in 1901 in an Aegean shipwreck.
+
+The large central drive wheel dominates, with gear trains branching to
+calendar, lunar, and eclipse sub-mechanisms — all tightly packed as in
+the original device.
 
 Controls:
   Left/Right - Adjust rotation speed
@@ -14,7 +18,7 @@ import math
 from . import Visual, Display, Colors, GRID_SIZE
 
 
-# Ancient bronze/verdigris color palette
+# Ancient bronze / verdigris palette
 BRONZE = (180, 140, 60)
 BRONZE_DARK = (140, 110, 50)
 BRONZE_LIGHT = (200, 160, 80)
@@ -26,55 +30,89 @@ VERDIGRIS_LIGHT = (100, 160, 140)
 PATINA = (90, 130, 110)
 COPPER_OLD = (160, 100, 60)
 
-# Dial and pointer colors
+# Case and plate
+CASE_EDGE = (70, 65, 50)
+CASE_CORNER = (80, 75, 55)
+PLATE_BG = (30, 28, 20)
+RIVET = (110, 100, 70)
+
+# Front dial
 DIAL_RING = (120, 100, 50)
 DIAL_MARK = (160, 140, 70)
 POINTER_COLOR = (200, 170, 80)
 POINTER_TIP = (220, 190, 100)
-
-# Background (aged bronze plate)
-BACKGROUND = (30, 28, 20)
-PLATE_EDGE = (60, 55, 40)
-
-# Hub color
+MOON_POINTER = VERDIGRIS_LIGHT
 HUB_COLOR = (70, 65, 50)
 
 
-# Gear definitions: tooth counts reference astronomical periods
-# 19 = Metonic years, 12 ≈ months/year, actual dial ratios use 235/19 and 223-month Saros
+# Gear definitions: tooth counts encode astronomical periods
+# 19 = Metonic years, 12 ≈ months/year, 15 = lunar intermediate
 GEARS = [
-    # 0: Main input/year wheel - 19 teeth (Metonic years)
-    {"teeth": 19, "r": 12, "cx": 18, "cy": 32, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
-    # 1: Sun transfer - 12 teeth (months/year)
-    {"teeth": 12, "r": 9, "cx": 32, "cy": 20, "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
-    # 2: Moon intermediate - 15 teeth
-    {"teeth": 15, "r": 10, "cx": 46, "cy": 14, "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
-    # 3: Eclipse gear - 8 teeth
-    {"teeth": 8, "r": 6, "cx": 56, "cy": 22, "body": VERDIGRIS, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
-    # 4: Metonic calendar - 19 teeth
-    {"teeth": 19, "r": 12, "cx": 36, "cy": 46, "body": PATINA, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
-    # 5: Saros train - 10 teeth
-    {"teeth": 10, "r": 7, "cx": 12, "cy": 50, "body": COPPER_OLD, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
-    # 6: Planetary display - 7 teeth
-    {"teeth": 7, "r": 5, "cx": 32, "cy": 6, "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 0: Main drive (b1) — large central gear
+    {"teeth": 19, "r": 11, "cx": 32, "cy": 30,
+     "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 1: Sun transfer — 12 teeth (months/year)
+    {"teeth": 12, "r": 6, "cx": 0, "cy": 0,
+     "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
+    # 2: Moon intermediate — 15 teeth
+    {"teeth": 15, "r": 5, "cx": 0, "cy": 0,
+     "body": BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
+    # 3: Eclipse gear — 8 teeth
+    {"teeth": 8, "r": 4, "cx": 0, "cy": 0,
+     "body": VERDIGRIS, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
+    # 4: Metonic calendar — 19 teeth
+    {"teeth": 19, "r": 8, "cx": 0, "cy": 0,
+     "body": PATINA, "dark": VERDIGRIS_DARK, "tooth": VERDIGRIS_LIGHT},
+    # 5: Saros train — 10 teeth
+    {"teeth": 10, "r": 4, "cx": 0, "cy": 0,
+     "body": COPPER_OLD, "dark": BRONZE_DARK, "tooth": BRONZE_LIGHT},
+    # 6: Planetary display — 7 teeth
+    {"teeth": 7, "r": 3, "cx": 0, "cy": 0,
+     "body": AGED_BRONZE, "dark": BRONZE_DARK, "tooth": BRONZE_TOOTH},
 ]
 
-# Mesh relationships (gear trains)
-# (driver, driven) - gears that interlock
+# Mesh relationships (gear trains — tree structure)
 MESHES = [
-    (0, 1),  # Input -> Sun
-    (1, 2),  # Sun -> Moon
-    (2, 3),  # Moon -> Eclipse
-    (0, 4),  # Input -> Calendar
-    (4, 5),  # Calendar -> Secondary moon
-    (1, 6),  # Sun -> Planetary
+    (0, 1),  # Main → Sun
+    (1, 2),  # Sun → Moon
+    (2, 3),  # Moon → Eclipse
+    (0, 4),  # Main → Calendar
+    (4, 5),  # Calendar → Saros
+    (1, 6),  # Sun → Planetary
 ]
 
-DIALS = [
-    {"cx": 10, "cy": 12, "r": 8, "marks": 12, "pointer_len": 6, "name": "sun"},
-    {"cx": 54, "cy": 8, "r": 6, "marks": 12, "pointer_len": 4, "name": "moon"},  # 12 marks for months
-    {"cx": 58, "cy": 38, "r": 7, "marks": 18, "pointer_len": 5, "name": "eclipse"},  # ~18 year cycle
-]
+# Mesh angles: direction from driver center to driven center (radians)
+MESH_ANGLES = [-1.1, 0.5, 1.3, 2.2, -2.5, -2.5]
+
+
+def _compute_positions():
+    """Position gears using mesh angles from the main drive gear."""
+    positioned = {0}
+    for _ in range(len(GEARS)):
+        for i, (di, dv) in enumerate(MESHES):
+            if di in positioned and dv not in positioned:
+                gd = GEARS[di]
+                gv = GEARS[dv]
+                dist = gd["r"] + gv["r"]
+                angle = MESH_ANGLES[i]
+                gv["cx"] = int(round(gd["cx"] + dist * math.cos(angle)))
+                gv["cy"] = int(round(gd["cy"] + dist * math.sin(angle)))
+                positioned.add(dv)
+
+
+_compute_positions()
+
+# Case bounds (computed from gear extents + padding)
+_PAD = 4
+CASE_X0 = max(0, min(g["cx"] - g["r"] for g in GEARS) - _PAD)
+CASE_X1 = min(63, max(g["cx"] + g["r"] for g in GEARS) + _PAD)
+CASE_Y0 = max(0, min(g["cy"] - g["r"] for g in GEARS) - _PAD)
+CASE_Y1 = min(63, max(g["cy"] + g["r"] for g in GEARS) + _PAD)
+
+# Front zodiac dial: concentric with main gear, slightly larger
+DIAL_CX = GEARS[0]["cx"]
+DIAL_CY = GEARS[0]["cy"]
+DIAL_R = 15
 
 # Speed levels
 SPEED_LEVELS = [0.5, 1.0, 2.0, 4.0, 6.0, 10.0]
@@ -90,50 +128,39 @@ class Antikythera(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.speed_level = 2  # Start at medium speed
-        self.base_speed = SPEED_LEVELS[self.speed_level] * 2.0 * math.pi / 60.0  # RPM to rad/s
+        self.speed_level = 2
+        self.base_speed = SPEED_LEVELS[self.speed_level] * 2.0 * math.pi / 60.0
 
-        # Calculate rotation ratios based on mesh relationships
-        # Gear ratio = -teeth_driver / teeth_driven (negative for direction reversal)
         self.ratios = [1.0] * len(GEARS)
         self._compute_ratios()
 
-        # Phase offsets for proper tooth meshing
         self.phase_offsets = [0.0] * len(GEARS)
         self._calibrate_phases()
 
-        # Accumulated rotation angles
         self.rotations = list(self.phase_offsets)
 
         # Dial pointer angles
-        self.dial_angles = [0.0] * len(DIALS)
+        self.zodiac_angle = 0.0
+        self.moon_angle = 0.0
 
     def _compute_ratios(self):
-        """Compute gear rotation ratios based on mesh relationships."""
-        # Process meshes to propagate ratios
-        processed = {0}  # Start with input gear (ratio = 1.0)
-
-        # Iterate until all gears are processed
+        """Compute rotation ratios propagated through the mesh tree."""
+        processed = {0}
         for _ in range(len(GEARS)):
             for driver_idx, driven_idx in MESHES:
                 if driver_idx in processed and driven_idx not in processed:
-                    # Driven gear rotates opposite direction, scaled by tooth ratio
                     self.ratios[driven_idx] = self.ratios[driver_idx] * (
                         -GEARS[driver_idx]["teeth"] / GEARS[driven_idx]["teeth"]
                     )
                     processed.add(driven_idx)
 
     def _calibrate_phases(self):
-        """Calculate phase offsets so gear teeth mesh properly at contact points."""
+        """Calculate phase offsets so gear teeth mesh at contact points."""
         for driver_idx, driven_idx in MESHES:
             gd = GEARS[driver_idx]
             gv = GEARS[driven_idx]
-
-            # Angle from driver center to driven center
             alpha = math.atan2(gv["cy"] - gd["cy"], gv["cx"] - gd["cx"])
-            beta = alpha + math.pi  # Opposite angle
-
-            # Calculate phase offset for proper meshing
+            beta = alpha + math.pi
             self.phase_offsets[driven_idx] = (
                 beta + (alpha - self.phase_offsets[driver_idx]) * gd["teeth"] / gv["teeth"]
             )
@@ -152,78 +179,58 @@ class Antikythera(Visual):
 
     def update(self, dt):
         self.time += dt
-
-        # Update gear rotations
         for i in range(len(GEARS)):
             self.rotations[i] += self.base_speed * self.ratios[i] * dt
 
-        # Update dial pointers - driven by input gear (gear 0) with
-        # astronomically correct ratios.
-        # Sun: 1 revolution per year (tracks the input gear directly)
-        self.dial_angles[0] = self.rotations[0]
-        # Moon: 235/19 revolutions per year (Metonic cycle)
-        self.dial_angles[1] = self.rotations[0] * (235.0 / 19.0)
-        # Eclipse: 1 revolution per Saros (223 synodic months ~= 18.03 years)
-        self.dial_angles[2] = self.rotations[0] / 18.03
+        # Zodiac pointer: tracks main gear (1 rev / year)
+        self.zodiac_angle = self.rotations[0]
+        # Moon pointer: 235/19 revolutions per year (Metonic cycle)
+        self.moon_angle = self.rotations[0] * (235.0 / 19.0)
 
     def draw(self):
         d = self.display
-        d.clear(BACKGROUND)
+        d.clear((0, 0, 0))
 
-        # Draw aged plate background with edge
-        self._draw_plate_background(d)
-
-        # Draw circular dials first (behind gears)
-        self._draw_dials(d)
-
-        # Draw all gears
+        self._draw_case(d)
         self._draw_gears(d)
-
-        # Draw dial pointers (on top of gears)
-        self._draw_pointers(d)
-
-        # Draw some verdigris/corrosion patches for authenticity
+        self._draw_front_dial(d)
         self._draw_patina(d)
 
-    def _draw_plate_background(self, d):
-        """Draw the aged bronze plate background."""
-        # Subtle edge/frame
-        for x in range(64):
-            d.set_pixel(x, 0, PLATE_EDGE)
-            d.set_pixel(x, 63, PLATE_EDGE)
-        for y in range(64):
-            d.set_pixel(0, y, PLATE_EDGE)
-            d.set_pixel(63, y, PLATE_EDGE)
+    # ── Case ──────────────────────────────────────────────────────
 
-    def _draw_dials(self, d):
-        """Draw circular dials with tick marks."""
-        for dial in DIALS:
-            cx, cy = dial["cx"], dial["cy"]
-            r = dial["r"]
-            n_marks = dial["marks"]
+    def _draw_case(self, d):
+        """Draw rectangular bronze case with rivets."""
+        x0, x1 = CASE_X0, CASE_X1
+        y0, y1 = CASE_Y0, CASE_Y1
 
-            # Draw dial ring (unfilled circle)
-            for step in range(64):
-                angle = step * 2.0 * math.pi / 64
-                px = int(round(cx + r * math.cos(angle)))
-                py = int(round(cy + r * math.sin(angle)))
-                if 0 <= px < 64 and 0 <= py < 64:
-                    d.set_pixel(px, py, DIAL_RING)
+        # Fill case interior
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                d.set_pixel(x, y, PLATE_BG)
 
-            # Draw tick marks around the dial
-            for i in range(n_marks):
-                angle = i * 2.0 * math.pi / n_marks
-                # Outer tick position
-                outer_x = int(round(cx + (r + 1) * math.cos(angle)))
-                outer_y = int(round(cy + (r + 1) * math.sin(angle)))
-                if 0 <= outer_x < 64 and 0 <= outer_y < 64:
-                    d.set_pixel(outer_x, outer_y, DIAL_MARK)
+        # Case edge border
+        for x in range(x0, x1 + 1):
+            d.set_pixel(x, y0, CASE_EDGE)
+            d.set_pixel(x, y1, CASE_EDGE)
+        for y in range(y0, y1 + 1):
+            d.set_pixel(x0, y, CASE_EDGE)
+            d.set_pixel(x1, y, CASE_EDGE)
+
+        # Brighter corners
+        for rx, ry in [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]:
+            d.set_pixel(rx, ry, CASE_CORNER)
+
+        # Corner rivets (inset 2px)
+        for rx, ry in [(x0 + 2, y0 + 2), (x1 - 2, y0 + 2),
+                       (x0 + 2, y1 - 2), (x1 - 2, y1 - 2)]:
+            d.set_pixel(rx, ry, RIVET)
+
+    # ── Gears ─────────────────────────────────────────────────────
 
     def _draw_gears(self, d):
         """Render all gear bodies and teeth."""
         TWO_PI = 2.0 * math.pi
 
-        # Pre-compute gear rendering info
         gear_info = []
         for gi, gear in enumerate(GEARS):
             r = gear["r"]
@@ -240,13 +247,11 @@ class Antikythera(Visual):
                 gear["body"], gear["dark"], gear["tooth"],
             ))
 
-        # Determine bounding box for all gears
         min_x = max(0, min(g[0] - int(g[5]) - 2 for g in gear_info))
         max_x = min(63, max(g[0] + int(g[5]) + 2 for g in gear_info))
         min_y = max(0, min(g[1] - int(g[5]) - 2 for g in gear_info))
         max_y = min(63, max(g[1] + int(g[5]) + 2 for g in gear_info))
 
-        # Render pixels
         for py in range(min_y, max_y + 1):
             for px in range(min_x, max_x + 1):
                 best_color = None
@@ -269,7 +274,6 @@ class Antikythera(Visual):
                         else:
                             color = body
                     else:
-                        # Tooth region
                         angle = math.atan2(dy, dx) - rotation
                         tooth_phase = (angle * n_teeth / TWO_PI) % 1.0
                         if tooth_phase < 0:
@@ -284,44 +288,74 @@ class Antikythera(Visual):
                 if best_color is not None:
                     d.set_pixel(px, py, best_color)
 
-    def _draw_pointers(self, d):
-        """Draw rotating pointers on the dials."""
-        for i, dial in enumerate(DIALS):
-            cx, cy = dial["cx"], dial["cy"]
-            pointer_len = dial["pointer_len"]
-            angle = self.dial_angles[i]
+    # ── Front dial ────────────────────────────────────────────────
 
-            # Draw pointer as a line from center outward
-            for t in range(pointer_len + 1):
-                frac = t / float(pointer_len)
-                px = int(round(cx + t * math.cos(angle)))
-                py = int(round(cy + t * math.sin(angle)))
+    def _draw_front_dial(self, d):
+        """Draw the zodiac/calendar dial ring with sun and moon pointers."""
+        cx, cy = DIAL_CX, DIAL_CY
+        r = DIAL_R
+
+        # Dial ring (2px wide)
+        for step in range(80):
+            a = step * 2.0 * math.pi / 80
+            for dr in range(2):
+                px = int(round(cx + (r + dr) * math.cos(a)))
+                py = int(round(cy + (r + dr) * math.sin(a)))
                 if 0 <= px < 64 and 0 <= py < 64:
-                    # Tip is brighter
-                    if frac > 0.7:
-                        d.set_pixel(px, py, POINTER_TIP)
-                    else:
-                        d.set_pixel(px, py, POINTER_COLOR)
+                    d.set_pixel(px, py, DIAL_RING)
 
-            # Draw small hub at dial center
-            d.set_pixel(cx, cy, BRONZE_LIGHT)
+        # 12 zodiac division marks (outside the ring)
+        for i in range(12):
+            a = i * math.pi / 6.0
+            for dr in range(2, 4):
+                px = int(round(cx + (r + dr) * math.cos(a)))
+                py = int(round(cy + (r + dr) * math.sin(a)))
+                if 0 <= px < 64 and 0 <= py < 64:
+                    d.set_pixel(px, py, DIAL_MARK)
+
+        pointer_len = r - 2
+
+        # Sun / zodiac pointer (gold, 1 revolution per year)
+        angle = self.zodiac_angle
+        for t in range(pointer_len + 1):
+            frac = t / float(pointer_len)
+            px = int(round(cx + t * math.cos(angle)))
+            py = int(round(cy + t * math.sin(angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, POINTER_TIP if frac > 0.7 else POINTER_COLOR)
+
+        # Moon pointer (verdigris, faster — Metonic ratio 235:19)
+        moon_len = pointer_len - 3
+        angle = self.moon_angle
+        for t in range(moon_len + 1):
+            px = int(round(cx + t * math.cos(angle)))
+            py = int(round(cy + t * math.sin(angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, MOON_POINTER)
+
+        # Hub
+        d.set_pixel(cx, cy, BRONZE_LIGHT)
+
+    # ── Patina ────────────────────────────────────────────────────
 
     def _draw_patina(self, d):
-        """Draw subtle verdigris/corrosion patches and dial labels."""
-        # Static patina spots (based on time for subtle shimmer)
-        patina_spots = [
-            (5, 28), (8, 45), (52, 52), (48, 4), (3, 58),
-            (60, 48), (25, 58), (58, 28), (2, 2),
-        ]
-
+        """Draw subtle verdigris corrosion on empty case areas."""
         pulse = 0.8 + 0.2 * math.sin(self.time * 0.5)
 
+        # Patina spots on exposed plate
+        patina_spots = [
+            (CASE_X0 + 2, CASE_Y0 + 4),
+            (CASE_X1 - 3, CASE_Y0 + 3),
+            (CASE_X0 + 3, CASE_Y1 - 3),
+            (CASE_X1 - 2, CASE_Y1 - 4),
+            (CASE_X0 + 4, (CASE_Y0 + CASE_Y1) // 2),
+            (CASE_X1 - 4, (CASE_Y0 + CASE_Y1) // 2),
+        ]
+
         for sx, sy in patina_spots:
-            # Small cluster of patina pixels
             if 0 <= sx < 64 and 0 <= sy < 64:
-                # Only draw if not already occupied by a bright gear pixel
                 existing = d.get_pixel(sx, sy)
-                if existing == BACKGROUND or sum(existing) < 150:
+                if existing == PLATE_BG or sum(existing) < 120:
                     color = (
                         int(VERDIGRIS[0] * pulse),
                         int(VERDIGRIS[1] * pulse),
@@ -329,7 +363,5 @@ class Antikythera(Visual):
                     )
                     d.set_pixel(sx, sy, color)
 
-        # Dial labels
-        d.draw_text_small(2, 4, "SUN", DIAL_MARK)
-        d.draw_text_small(44, 1, "MOON", DIAL_MARK)
-        d.draw_text_small(48, 32, "SAROS", DIAL_MARK)
+        # Small label at bottom of case
+        d.draw_text_small(CASE_X0 + 1, CASE_Y1 - 6, "100 BC", DIAL_MARK)

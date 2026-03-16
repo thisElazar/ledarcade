@@ -2,8 +2,8 @@
 Swiss Watch Movement
 ====================
 Five-gear watch train (barrel → center → third → fourth → escape)
-with balance wheel, hairspring, and clock hands.
-Gears mesh properly — teeth interleave without overlapping.
+with balance wheel, hairspring, pallet fork, and clock hands.
+Circular watch case with skeleton dial — gears visible through the face.
 
 Controls:
   Left/Right - Adjust rotation speed
@@ -34,7 +34,13 @@ JEWEL_HIGHLIGHT = (255, 80, 100)
 HUB_COLOR = (90, 90, 100)
 PLATE_COLOR = (25, 25, 30)
 
-# Balance wheel and hairspring colors
+# Watch case
+BEZEL_COLOR = (150, 145, 130)
+BEZEL_HIGHLIGHT = (180, 175, 160)
+MARKER_COLOR = (200, 195, 180)
+MARKER_BRIGHT = (240, 235, 210)
+
+# Balance wheel and hairspring
 BALANCE_RIM = (180, 180, 195)
 BALANCE_BAR = (200, 200, 215)
 HAIRSPRING_COLOR = (120, 140, 180)
@@ -42,43 +48,44 @@ HAND_MINUTE = (255, 255, 255)
 HAND_HOUR = (200, 200, 210)
 HAND_CENTER = (255, 255, 255)
 
-
-# Gear definitions: 5-gear watch train (linear chain)
-# pitch_radius = num_teeth (for rendering purposes)
-# Center distance for meshing = r1 + r2
-
-GEARS = [
-    # 0 Barrel: 10 teeth, r=10 — mainspring, slowest
-    {"teeth": 10, "r": 10, "cx": 18, "cy": 16, "body": BRASS, "dark": BRASS_DARK, "tooth": BRASS_TOOTH},
-    # 1 Center: 8 teeth, r=8 — minute hand shaft
-    {"teeth": 8, "r": 8, "cx": 25, "cy": 33, "body": STEEL, "dark": STEEL_DARK, "tooth": STEEL_TOOTH},
-    # 2 Third: 7 teeth, r=7 — intermediate
-    {"teeth": 7, "r": 7, "cx": 40, "cy": 33, "body": COPPER, "dark": COPPER_DARK, "tooth": COPPER_TOOTH},
-    # 3 Fourth: 6 teeth, r=6 — second-hand speed
-    {"teeth": 6, "r": 6, "cx": 47, "cy": 22, "body": SILVER, "dark": SILVER_DARK, "tooth": SILVER_TOOTH},
-    # 4 Escape: 5 teeth, r=5 — fastest, drives balance
-    {"teeth": 5, "r": 5, "cx": 48, "cy": 11, "body": GOLD, "dark": GOLD_DARK, "tooth": GOLD_TOOTH},
-]
-
-# Mesh relationships: linear chain (0→1→2→3→4)
-MESHES = [(0, 1), (1, 2), (2, 3), (3, 4)]
-
-# Mesh angles (radians) from driver toward driven
-MESH_ANGLES = [1.2, 0.0, -1.0, -1.5]
-
-# Balance wheel position
-BALANCE_CX = 58
-BALANCE_CY = 8
-BALANCE_R = 4
-
-# Pallet fork (lever escapement)
+# Pallet fork
 FORK_COLOR = STEEL
 FORK_DARK = STEEL_DARK
-PALLET_COLOR = JEWEL  # Ruby pallet stones
+PALLET_COLOR = JEWEL
+
+# Watch case geometry — nearly fills the 64x64 panel
+CASE_CX = 32
+CASE_CY = 32
+CASE_R = 30       # outer bezel edge
+FACE_R = 28       # inner face radius
+MARKER_R = 25     # hour marker radius
+
+# Gear definitions: 5-gear watch train
+# Barrel positioned so center wheel lands at (32, 32) = watch center
+GEARS = [
+    # 0 Barrel: mainspring, largest, slowest
+    {"teeth": 8, "r": 8, "cx": 27, "cy": 18,
+     "body": BRASS, "dark": BRASS_DARK, "tooth": BRASS_TOOTH},
+    # 1 Center: minute-hand shaft (lands at watch center)
+    {"teeth": 7, "r": 7, "cx": 32, "cy": 32,
+     "body": STEEL, "dark": STEEL_DARK, "tooth": STEEL_TOOTH},
+    # 2 Third: intermediate
+    {"teeth": 6, "r": 6, "cx": 0, "cy": 0,
+     "body": COPPER, "dark": COPPER_DARK, "tooth": COPPER_TOOTH},
+    # 3 Fourth: second-hand speed
+    {"teeth": 5, "r": 5, "cx": 0, "cy": 0,
+     "body": SILVER, "dark": SILVER_DARK, "tooth": SILVER_TOOTH},
+    # 4 Escape: fastest, drives balance wheel
+    {"teeth": 4, "r": 4, "cx": 0, "cy": 0,
+     "body": GOLD, "dark": GOLD_DARK, "tooth": GOLD_TOOTH},
+]
+
+MESHES = [(0, 1), (1, 2), (2, 3), (3, 4)]
+MESH_ANGLES = [1.2, 0.5, -0.8, -2.0]
 
 
-def _compute_center_distances():
-    """Position gears along the S-curve using mesh angles."""
+def _compute_positions():
+    """Position gears along the train using mesh angles."""
     for i, (driver_idx, driven_idx) in enumerate(MESHES):
         gd = GEARS[driver_idx]
         gv = GEARS[driven_idx]
@@ -88,7 +95,13 @@ def _compute_center_distances():
         gv["cy"] = int(round(gd["cy"] + dist * math.sin(angle)))
 
 
-_compute_center_distances()
+_compute_positions()
+
+# Balance wheel: near escape wheel
+_esc = GEARS[4]
+BALANCE_CX = _esc["cx"] + 2
+BALANCE_CY = _esc["cy"] - 6
+BALANCE_R = 4
 
 # Speed levels: barrel RPM
 SPEED_RPMS = [1, 2, 4, 6, 8, 10]
@@ -104,7 +117,7 @@ class WatchGears(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.speed_level = 3   # 1-6
+        self.speed_level = 3
         self.base_speed = SPEED_RPMS[self.speed_level - 1] * 2.0 * math.pi / 60.0
 
         # Rotation ratios: linear chain, each mesh reverses direction
@@ -115,29 +128,26 @@ class WatchGears(Visual):
                 -GEARS[driver_idx]["teeth"] / GEARS[driven_idx]["teeth"]
             )
 
-        # Phase offsets for teeth to mesh at contact points
+        # Phase offsets for proper tooth meshing
         self.phase_offsets = [0.0] * len(GEARS)
         self._calibrate_phases()
 
-        # Accumulated rotation angles
         self.rotations = list(self.phase_offsets)
 
-        # Balance wheel oscillation phase (radians)
+        # Balance wheel oscillation
         self.balance_phase = 0.0
 
-        # Clock hand angles (radians, 0 = up / 12 o'clock)
+        # Clock hands
         self.minute_angle = 0.0
         self.hour_angle = 0.0
 
     def _calibrate_phases(self):
-        """Calculate phase offsets so gear teeth mesh at each contact point."""
+        """Calculate phase offsets so gear teeth mesh at contact points."""
         for driver_idx, driven_idx in MESHES:
             gd = GEARS[driver_idx]
             gv = GEARS[driven_idx]
-
             alpha = math.atan2(gv["cy"] - gd["cy"], gv["cx"] - gd["cx"])
             beta = alpha + math.pi
-
             self.phase_offsets[driven_idx] = (
                 beta + (alpha - self.phase_offsets[driver_idx]) * gd["teeth"] / gv["teeth"]
             )
@@ -156,7 +166,6 @@ class WatchGears(Visual):
 
     def update(self, dt):
         self.time += dt
-        # Accumulate gear rotations
         for i in range(len(GEARS)):
             self.rotations[i] += self.base_speed * self.ratios[i] * dt
 
@@ -171,14 +180,90 @@ class WatchGears(Visual):
 
     def draw(self):
         d = self.display
-        d.clear(PLATE_COLOR)
+        d.clear((0, 0, 0))
 
+        self._draw_case_plate(d)
         self._draw_gears(d)
         self._draw_jewels(d)
         self._draw_pallet_fork(d)
         self._draw_hairspring(d)
         self._draw_balance_wheel(d)
+        self._draw_hour_markers(d)
         self._draw_clock_hands(d)
+        self._draw_bezel(d)
+
+    # ── Watch case ────────────────────────────────────────────────
+
+    def _draw_case_plate(self, d):
+        """Fill the watch case interior with movement plate color."""
+        cx, cy = CASE_CX, CASE_CY
+        r_sq = FACE_R * FACE_R
+        for y in range(max(0, cy - FACE_R), min(64, cy + FACE_R + 1)):
+            dy_sq = (y - cy) ** 2
+            for x in range(max(0, cx - FACE_R), min(64, cx + FACE_R + 1)):
+                if (x - cx) ** 2 + dy_sq <= r_sq:
+                    d.set_pixel(x, y, PLATE_COLOR)
+
+    def _draw_bezel(self, d):
+        """Draw the circular watch case bezel ring."""
+        cx, cy = CASE_CX, CASE_CY
+        inner_sq = FACE_R * FACE_R
+        outer_sq = CASE_R * CASE_R
+        for y in range(max(0, cy - CASE_R), min(64, cy + CASE_R + 1)):
+            dy = y - cy
+            dy_sq = dy * dy
+            for x in range(max(0, cx - CASE_R), min(64, cx + CASE_R + 1)):
+                dist_sq = (x - cx) ** 2 + dy_sq
+                if inner_sq < dist_sq <= outer_sq:
+                    # Upper half slightly brighter for dimension
+                    d.set_pixel(x, y, BEZEL_HIGHLIGHT if dy < 0 else BEZEL_COLOR)
+
+    def _draw_hour_markers(self, d):
+        """Draw 12 hour markers around the watch face."""
+        cx, cy = CASE_CX, CASE_CY
+        for h in range(12):
+            angle = h * math.pi / 6.0 - math.pi / 2.0  # 12 o'clock at top
+            # Major markers (12, 3, 6, 9) are longer
+            if h % 3 == 0:
+                r_start, r_end = MARKER_R - 2, MARKER_R + 1
+                color = MARKER_BRIGHT
+            else:
+                r_start, r_end = MARKER_R - 1, MARKER_R + 1
+                color = MARKER_COLOR
+            for r in range(r_start, r_end + 1):
+                px = int(round(cx + r * math.cos(angle)))
+                py = int(round(cy + r * math.sin(angle)))
+                if 0 <= px < 64 and 0 <= py < 64:
+                    d.set_pixel(px, py, color)
+
+    def _draw_clock_hands(self, d):
+        """Draw properly-sized minute and hour hands from watch center."""
+        cx, cy = CASE_CX, CASE_CY
+
+        # Hour hand (14px, silver)
+        h_angle = self.hour_angle - math.pi / 2.0
+        for t in range(15):
+            px = int(round(cx + t * math.cos(h_angle)))
+            py = int(round(cy + t * math.sin(h_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, HAND_HOUR)
+
+        # Minute hand (22px, bright white)
+        m_angle = self.minute_angle - math.pi / 2.0
+        for t in range(23):
+            px = int(round(cx + t * math.cos(m_angle)))
+            py = int(round(cy + t * math.sin(m_angle)))
+            if 0 <= px < 64 and 0 <= py < 64:
+                d.set_pixel(px, py, HAND_MINUTE)
+
+        # Center pip
+        d.set_pixel(cx, cy, HAND_CENTER)
+        d.set_pixel(cx - 1, cy, HAND_CENTER)
+        d.set_pixel(cx + 1, cy, HAND_CENTER)
+        d.set_pixel(cx, cy - 1, HAND_CENTER)
+        d.set_pixel(cx, cy + 1, HAND_CENTER)
+
+    # ── Gear train ────────────────────────────────────────────────
 
     def _draw_gears(self, d):
         """Render all gear bodies and teeth."""
@@ -251,43 +336,41 @@ class WatchGears(Visual):
             d.set_pixel(gcx, gcy + 1, JEWEL)
             d.set_pixel(gcx - 1, gcy - 1, JEWEL_HIGHLIGHT)
 
+    # ── Escapement ────────────────────────────────────────────────
+
     def _draw_pallet_fork(self, d):
-        """Draw the pallet fork (lever escapement) between escape and balance wheels."""
-        # Fork pivot: between escape wheel and balance wheel
+        """Draw the pallet fork between escape and balance wheels."""
         esc = GEARS[4]
         esc_cx, esc_cy = esc["cx"], esc["cy"]
 
-        # Pivot roughly midway, slightly toward balance
         fork_px = (esc_cx + BALANCE_CX) // 2 + 1
         fork_py = (esc_cy + BALANCE_CY) // 2
 
-        # Fork oscillation synchronized to balance
         swing = math.sin(self.balance_phase) * (15.0 * math.pi / 180.0)
 
-        # Fork lever arm (pointing toward escape wheel)
+        # Fork body toward escape wheel
         arm_len = 5
         arm_angle = math.atan2(esc_cy - fork_py, esc_cx - fork_px) + swing
 
-        # Draw fork body (line from pivot toward escape wheel)
         for t in range(arm_len + 1):
             px = int(round(fork_px + t * math.cos(arm_angle)))
             py = int(round(fork_py + t * math.sin(arm_angle)))
             if 0 <= px < 64 and 0 <= py < 64:
                 d.set_pixel(px, py, FORK_COLOR)
 
-        # Two pallet stones at the end of the fork (perpendicular to arm)
+        # Two ruby pallet stones at the tip
         tip_x = fork_px + arm_len * math.cos(arm_angle)
         tip_y = fork_py + arm_len * math.sin(arm_angle)
         perp_angle = arm_angle + math.pi / 2
 
         for sign in (-1, 1):
-            for t in range(1, 3):  # 2px pallet stones
+            for t in range(1, 3):
                 px = int(round(tip_x + sign * t * math.cos(perp_angle)))
                 py = int(round(tip_y + sign * t * math.sin(perp_angle)))
                 if 0 <= px < 64 and 0 <= py < 64:
                     d.set_pixel(px, py, PALLET_COLOR)
 
-        # Impulse pin: thin line from fork pivot toward balance wheel
+        # Impulse pin toward balance wheel
         imp_angle = math.atan2(BALANCE_CY - fork_py, BALANCE_CX - fork_px) + swing * 0.5
         for t in range(1, 4):
             px = int(round(fork_px + t * math.cos(imp_angle)))
@@ -295,12 +378,11 @@ class WatchGears(Visual):
             if 0 <= px < 64 and 0 <= py < 64:
                 d.set_pixel(px, py, FORK_DARK)
 
-        # Flash on "tick" - when balance phase crosses zero (pallet releases tooth)
+        # Flash on tick
         tick = abs(math.sin(self.balance_phase)) < 0.15
         if tick:
             d.set_pixel(int(tip_x), int(tip_y), JEWEL_HIGHLIGHT)
 
-        # Fork pivot jewel
         d.set_pixel(fork_px, fork_py, JEWEL)
 
     def _draw_balance_wheel(self, d):
@@ -309,7 +391,7 @@ class WatchGears(Visual):
         r = BALANCE_R
         swing = math.sin(self.balance_phase) * (75.0 * math.pi / 180.0)
 
-        # Rim circle (unfilled)
+        # Rim circle
         for a_step in range(32):
             a = a_step * 2.0 * math.pi / 32
             px = int(round(cx + r * math.cos(a)))
@@ -317,14 +399,13 @@ class WatchGears(Visual):
             if 0 <= px < 64 and 0 <= py < 64:
                 d.set_pixel(px, py, BALANCE_RIM)
 
-        # Crossbar rotates with oscillation
+        # Oscillating crossbar
         for t in range(-r, r + 1):
             px = int(round(cx + t * math.cos(swing)))
             py = int(round(cy + t * math.sin(swing)))
             if 0 <= px < 64 and 0 <= py < 64:
                 d.set_pixel(px, py, BALANCE_BAR)
 
-        # Jewel bearing at center
         d.set_pixel(cx, cy, JEWEL)
 
     def _draw_hairspring(self, d):
@@ -344,29 +425,3 @@ class WatchGears(Visual):
             py = int(round(cy + radius * math.sin(theta)))
             if 0 <= px < 64 and 0 <= py < 64:
                 d.set_pixel(px, py, HAIRSPRING_COLOR)
-
-    def _draw_clock_hands(self, d):
-        """Draw minute and hour hands on the center wheel."""
-        cx = GEARS[1]["cx"]
-        cy = GEARS[1]["cy"]
-
-        # Hour hand (4px long, dimmer)
-        h_angle = self.hour_angle - math.pi / 2.0
-        for t_int in range(5):
-            t = t_int * 0.8
-            px = int(round(cx + t * math.cos(h_angle)))
-            py = int(round(cy + t * math.sin(h_angle)))
-            if 0 <= px < 64 and 0 <= py < 64:
-                d.set_pixel(px, py, HAND_HOUR)
-
-        # Minute hand (7px long, bright white)
-        m_angle = self.minute_angle - math.pi / 2.0
-        for t_int in range(8):
-            t = t_int * 0.9
-            px = int(round(cx + t * math.cos(m_angle)))
-            py = int(round(cy + t * math.sin(m_angle)))
-            if 0 <= px < 64 and 0 <= py < 64:
-                d.set_pixel(px, py, HAND_MINUTE)
-
-        # Center pip
-        d.set_pixel(cx, cy, HAND_CENTER)
