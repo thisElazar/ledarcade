@@ -66,85 +66,83 @@ def compute_platform_segments(floor_code):
 #     burger_col 0-3, floor_idx 0-5
 
 LEVELS = [
-    # Level 1 — "Getting Started" — generous ladders, mostly connected
+    # Level 1 — "Classic" — fully connected, dense ladders everywhere
     {
-        'floors': ['XXX', 'X.X', 'XXX', '.X.', 'X.X', 'XXX'],
+        'floors': ['XXX', 'XXX', 'XXX', 'XXX', 'XXX', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  2, 3), (6,  4, 5),
-            (22, 0, 1), (22, 1, 2), (22, 3, 4),
-            (38, 1, 2), (38, 2, 3), (38, 3, 4),
-            (54, 0, 1), (54, 2, 3), (54, 4, 5),
-            (60, 1, 2), (60, 3, 4),
+            (2, 0, 1), (15, 0, 1), (26, 0, 1), (42, 0, 1), (54, 0, 1),
+            (6, 1, 2), (22, 1, 2), (31, 1, 2), (47, 1, 2), (62, 1, 2),
+            (2, 2, 3), (15, 2, 3), (38, 2, 3), (54, 2, 3),
+            (10, 3, 4), (26, 3, 4), (31, 3, 4), (47, 3, 4), (58, 3, 4),
+            (2, 4, 5), (22, 4, 5), (38, 4, 5), (54, 4, 5), (62, 4, 5),
         ],
         'ingredients': [
             (0, 0, 'bun_top'), (0, 1, 'lettuce'), (0, 2, 'meat'), (0, 3, 'bun_bottom'),
-            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'), (1, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 2, 'meat'), (1, 3, 'bun_bottom'),
             (2, 0, 'bun_top'), (2, 1, 'lettuce'), (2, 2, 'meat'), (2, 3, 'bun_bottom'),
-            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 3, 'meat'), (3, 4, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 2, 'meat'), (3, 3, 'bun_bottom'),
         ],
     },
-    # Level 2 — "Staircase" — zigzag connectivity forces ladder use
+    # Level 2 — "Zigzag" — alternating connectivity forces ladder navigation
     {
-        'floors': ['X..', '.X.', '..X', 'X..', '.X.', 'XXX'],
+        'floors': ['X.X', '.X.', 'X.X', '.X.', 'X.X', 'XXX'],
         'ladders': [
-            (6,  0, 1), (26, 0, 1), (42, 0, 1), (60, 0, 1),
-            (6,  1, 2), (26, 1, 2), (38, 1, 2), (54, 1, 2),
-            (10, 2, 3), (22, 2, 3), (38, 2, 3), (54, 2, 3),
-            (6,  3, 4), (22, 3, 4), (38, 3, 4), (54, 3, 4),
-            (6,  4, 5), (26, 4, 5), (54, 4, 5),
+            (6, 0, 1), (22, 0, 1), (38, 0, 1), (58, 0, 1),
+            (2, 1, 2), (26, 1, 2), (42, 1, 2), (54, 1, 2),
+            (10, 2, 3), (22, 2, 3), (38, 2, 3), (62, 2, 3),
+            (2, 3, 4), (26, 3, 4), (42, 3, 4), (54, 3, 4),
+            (6, 4, 5), (22, 4, 5), (38, 4, 5), (54, 4, 5), (62, 4, 5),
         ],
         'ingredients': [
-            (0, 0, 'bun_top'), (0, 1, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
-            (1, 0, 'bun_top'), (1, 2, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
-            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 4, 'meat'),    (2, 5, 'bun_bottom'),
-            (3, 1, 'bun_top'), (3, 2, 'tomato'),  (3, 3, 'meat'),    (3, 5, 'bun_bottom'),
+            (0, 0, 'bun_top'), (0, 1, 'lettuce'), (0, 2, 'meat'), (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'), (1, 4, 'bun_bottom'),
+            (2, 0, 'bun_top'), (2, 2, 'lettuce'), (2, 3, 'meat'), (2, 4, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 2, 'meat'), (3, 4, 'bun_bottom'),
         ],
     },
-    # Level 3 — "Checkerboard" — alternating center/edge connected
+    # Level 3 — "Corridors" — sweeping left-right connections with ladder bridges
     {
-        'floors': ['.X.', 'X.X', '.X.', 'X.X', '.X.', 'XXX'],
+        'floors': ['.XX', 'XX.', '.XX', 'XX.', '.XX', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  2, 3), (6,  4, 5),
-            (26, 0, 1), (26, 1, 2), (26, 2, 3), (26, 3, 4), (26, 4, 5),
-            (42, 0, 1), (42, 1, 2), (42, 2, 3), (42, 3, 4), (42, 4, 5),
-            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+            (6, 0, 1), (22, 0, 1), (38, 0, 1), (54, 0, 1),
+            (2, 1, 2), (10, 1, 2), (26, 1, 2), (42, 1, 2), (58, 1, 2),
+            (6, 2, 3), (22, 2, 3), (38, 2, 3), (54, 2, 3),
+            (2, 3, 4), (10, 3, 4), (26, 3, 4), (42, 3, 4), (58, 3, 4),
+            (6, 4, 5), (22, 4, 5), (38, 4, 5), (62, 4, 5),
         ],
         'ingredients': [
-            (0, 0, 'bun_top'), (0, 2, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
+            (0, 0, 'bun_top'), (0, 2, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
             (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
-            (2, 0, 'bun_top'), (2, 2, 'lettuce'), (2, 3, 'meat'),    (2, 4, 'bun_bottom'),
+            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 3, 'meat'),    (2, 4, 'bun_bottom'),
             (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 2, 'meat'),    (3, 4, 'bun_bottom'),
         ],
     },
-    # Level 4 — "Dense Open" — wide top, fragmented bottom, many ladders
+    # Level 4 — "Islands" — heavy fragmentation, strategic ladder placement
     {
-        'floors': ['XXX', 'XXX', '.X.', 'XXX', 'XXX', '...'],
+        'floors': ['X..', '..X', '.X.', 'X..', '..X', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  2, 3), (6,  4, 5),
-            (22, 0, 1), (22, 1, 2), (22, 3, 4),
-            (26, 2, 3), (26, 4, 5),
-            (38, 1, 2), (38, 2, 3), (38, 3, 4),
-            (42, 0, 1), (42, 4, 5),
-            (54, 1, 2), (54, 3, 4),
-            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+            (6, 0, 1), (22, 0, 1), (38, 0, 1), (54, 0, 1),
+            (2, 1, 2), (10, 1, 2), (22, 1, 2), (42, 1, 2), (58, 1, 2),
+            (6, 2, 3), (26, 2, 3), (38, 2, 3), (54, 2, 3),
+            (2, 3, 4), (10, 3, 4), (22, 3, 4), (42, 3, 4), (58, 3, 4),
+            (6, 4, 5), (26, 4, 5), (38, 4, 5), (54, 4, 5), (62, 4, 5),
         ],
         'ingredients': [
-            (0, 0, 'bun_top'), (0, 1, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
-            (1, 0, 'bun_top'), (1, 2, 'tomato'),  (1, 3, 'lettuce'), (1, 4, 'bun_bottom'),
-            (2, 0, 'bun_top'), (2, 2, 'meat'),    (2, 3, 'tomato'),  (2, 4, 'bun_bottom'),
-            (3, 0, 'bun_top'), (3, 1, 'meat'),    (3, 3, 'lettuce'), (3, 4, 'bun_bottom'),
+            (0, 0, 'bun_top'), (0, 2, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
+            (1, 0, 'bun_top'), (1, 1, 'tomato'),  (1, 3, 'meat'),    (1, 4, 'bun_bottom'),
+            (2, 1, 'bun_top'), (2, 2, 'lettuce'), (2, 4, 'meat'),    (2, 5, 'bun_bottom'),
+            (3, 0, 'bun_top'), (3, 1, 'tomato'),  (3, 2, 'meat'),    (3, 4, 'bun_bottom'),
         ],
     },
-    # Level 5 — "Most Fragmented" — isolated islands, heavy ladder reliance
+    # Level 5 — "Dense Islands" — isolated zones with rescue ladders
     {
         'floors': ['...', '.X.', '...', 'X.X', '...', 'XXX'],
         'ladders': [
-            (6,  0, 1), (6,  2, 3), (6,  4, 5),
-            (10, 1, 2), (10, 3, 4),
-            (26, 0, 1), (26, 2, 3), (26, 4, 5),
-            (42, 0, 1), (42, 1, 2), (42, 2, 3), (42, 3, 4), (42, 4, 5),
-            (54, 1, 2), (54, 3, 4),
-            (60, 0, 1), (60, 2, 3), (60, 4, 5),
+            (6, 0, 1), (22, 0, 1), (38, 0, 1), (58, 0, 1),
+            (2, 1, 2), (10, 1, 2), (26, 1, 2), (42, 1, 2), (54, 1, 2),
+            (6, 2, 3), (22, 2, 3), (38, 2, 3), (54, 2, 3), (62, 2, 3),
+            (2, 3, 4), (10, 3, 4), (26, 3, 4), (42, 3, 4), (58, 3, 4),
+            (6, 4, 5), (22, 4, 5), (38, 4, 5), (54, 4, 5),
         ],
         'ingredients': [
             (0, 0, 'bun_top'), (0, 2, 'lettuce'), (0, 3, 'meat'),    (0, 4, 'bun_bottom'),
@@ -153,15 +151,15 @@ LEVELS = [
             (3, 0, 'bun_top'), (3, 2, 'meat'),    (3, 3, 'lettuce'), (3, 4, 'bun_bottom'),
         ],
     },
-    # Level 6 — "Split Left-Right" — left on even floors, right on odd
+    # Level 6 — "Split" — left/right zigzag with crossing points
     {
-        'floors': ['X..', '..X', '...', 'X..', '..X', 'XXX'],
+        'floors': ['X..', '..X', 'X..', '..X', 'X..', 'XXX'],
         'ladders': [
-            (6,  0, 1), (22, 0, 1), (42, 0, 1), (54, 0, 1),
-            (10, 1, 2), (42, 1, 2), (60, 1, 2),
-            (6,  2, 3), (22, 2, 3), (54, 2, 3),
-            (10, 3, 4), (26, 3, 4), (42, 3, 4), (60, 3, 4),
-            (6,  4, 5), (26, 4, 5), (54, 4, 5), (60, 4, 5),
+            (6, 0, 1), (10, 0, 1), (22, 0, 1), (38, 0, 1), (54, 0, 1), (62, 0, 1),
+            (2, 1, 2), (10, 1, 2), (26, 1, 2), (38, 1, 2), (54, 1, 2),
+            (6, 2, 3), (22, 2, 3), (42, 2, 3), (58, 2, 3),
+            (2, 3, 4), (10, 3, 4), (26, 3, 4), (38, 3, 4), (54, 3, 4), (62, 3, 4),
+            (6, 4, 5), (22, 4, 5), (42, 4, 5), (58, 4, 5),
         ],
         'ingredients': [
             (0, 0, 'bun_top'), (0, 2, 'meat'),    (0, 3, 'lettuce'), (0, 4, 'bun_bottom'),
@@ -324,6 +322,7 @@ class BurgerTime(Game):
                 'ladder_target_y': None,
                 'ladder_encounter_cd': 0.0,
                 'dead': False,
+                'riding': False,
                 'respawn_timer': 0.0,
             })
 
@@ -503,7 +502,7 @@ class BurgerTime(Game):
 
             # Stun nearby enemies
             for enemy in self.enemies:
-                if enemy.get('dead'):
+                if enemy.get('dead') or enemy.get('riding'):
                     continue
                 if abs(enemy['x'] - self.pepper_x) < 10 and abs(enemy['y'] - self.pepper_y) < 8:
                     enemy['stunned'] = 3.0
@@ -555,13 +554,12 @@ class BurgerTime(Game):
         # Check for enemies riding on this ingredient
         num_riding = 0
         for enemy in self.enemies:
-            if enemy.get('dead') or enemy['stunned'] > 0:
+            if enemy.get('dead') or enemy.get('riding') or enemy['stunned'] > 0:
                 continue
             if (ingredient['x'] <= enemy['x'] <= ingredient['x'] + ingredient['width'] and
                     abs(enemy['y'] - ingredient['y'] - 2) < 5):
                 ingredient['carrying_enemies'].append(enemy)
-                enemy['dead'] = True
-                enemy['respawn_timer'] = 4.0
+                enemy['riding'] = True  # Visible & frozen until landing
                 num_riding += 1
 
         if num_riding > 0:
@@ -647,7 +645,7 @@ class BurgerTime(Game):
             for enemy in self.enemies:
                 if enemy in ing['carrying_enemies']:
                     continue
-                if enemy.get('dead') or enemy['stunned'] > 0:
+                if enemy.get('dead') or enemy.get('riding') or enemy['stunned'] > 0:
                     continue
                 if (ing['x'] - 1 <= enemy['x'] <= ing['x'] + ing['width'] + 1 and
                         abs(enemy['y'] - ing['y'] - 2) < 4):
@@ -659,6 +657,11 @@ class BurgerTime(Game):
             if ing['y'] >= ing['target_y']:
                 ing['y'] = ing['target_y']
                 ing['falling'] = False
+                # Kill carried enemies on landing
+                for enemy in ing['carrying_enemies']:
+                    enemy['riding'] = False
+                    enemy['dead'] = True
+                    enemy['respawn_timer'] = 4.0
                 ing['carrying_enemies'] = []
                 # Update floor_idx to match new y position
                 if not ing.get('at_plate'):
@@ -703,6 +706,10 @@ class BurgerTime(Game):
     def update_enemies(self, dt: float):
         """Update enemy AI — ladder-happy pathfinding with no-reverse constraint."""
         for enemy in self.enemies:
+            # Riding enemies are frozen on a falling ingredient
+            if enemy.get('riding'):
+                continue
+
             # Dead enemies respawn after a delay
             if enemy.get('dead'):
                 enemy['respawn_timer'] -= dt
@@ -908,7 +915,7 @@ class BurgerTime(Game):
     def check_enemy_collision(self):
         """Check if chef collides with any enemy."""
         for enemy in self.enemies:
-            if enemy.get('dead') or enemy['stunned'] > 0:
+            if enemy.get('dead') or enemy.get('riding') or enemy['stunned'] > 0:
                 continue
 
             if (abs(enemy['x'] - self.chef_x) < 3 and
@@ -939,6 +946,7 @@ class BurgerTime(Game):
                 enemy['ladder_target_y'] = None
                 enemy['ladder_encounter_cd'] = 0.0
                 enemy['dead'] = False
+                enemy['riding'] = False
                 enemy['respawn_timer'] = 0.0
 
     def check_win(self):
@@ -1046,8 +1054,9 @@ class BurgerTime(Game):
 
         x, y = int(enemy['x']), int(enemy['y'])
 
-        # Blink when stunned
-        if enemy['stunned'] > 0:
+        # Riding enemies draw solid (no blink) — frozen on ingredient
+        # Stunned enemies blink
+        if not enemy.get('riding') and enemy['stunned'] > 0:
             if int(enemy['stunned'] * 8) % 2 == 0:
                 return
 
