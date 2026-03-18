@@ -330,6 +330,7 @@ from .turingmachine import TuringMachine
 from .evolution import Evolution
 from .gametheory import GameTheory
 from .erosion import Erosion
+from .atlas import Atlas
 from .geneticdrift import GeneticDrift
 from .convection import Convection
 from .entropy import Entropy
@@ -619,6 +620,7 @@ ALL_VISUALS = [
     Evolution,
     GameTheory,
     Erosion,
+    Atlas,
     GeneticDrift,
     Convection,
     Entropy,
@@ -879,6 +881,7 @@ __all__ = [
     'Evolution',
     'GameTheory',
     'Erosion',
+    'Atlas',
     'GeneticDrift',
     'Convection',
     'Entropy',
