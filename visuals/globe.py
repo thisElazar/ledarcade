@@ -20,7 +20,7 @@ from .atlas import (
 MODES = ['satellite', 'terrain', 'live', 'night', 'elevation']
 
 
-def _render_globe(atlas, rot_lat, rot_lon, mode, radius=29.0):
+def _render_globe(atlas, rot_lat, rot_lon, mode, radius=25.0):
     """Render atlas data on a 3D sphere with variable radius."""
     S = GRID_SIZE
     bounds = tuple(atlas['bounds'])
@@ -52,8 +52,8 @@ def _render_globe(atlas, rot_lat, rot_lon, mode, radius=29.0):
     lat = np.degrees(np.arcsin(np.clip(y2, -1, 1)))
     lon = np.degrees(np.arctan2(x2, z2))
 
-    # Lambertian shading — mostly frontal
-    shade = np.clip(x2 * 0.15 + y2 * 0.25 + zz * 0.95, 0.15, 1.0)
+    # Lambertian shading — bright frontal lighting
+    shade = np.clip(x2 * 0.1 + y2 * 0.2 + zz * 0.85 + 0.25, 0.3, 1.3)
 
     if mode == 'terrain':
         wc = _sample_at(atlas['worldcover'], bounds, lat, lon)
@@ -154,7 +154,7 @@ class Globe(Visual):
     category = "science_macro"
 
     AUTO_SPEED = 8.0      # degrees/sec auto-rotation
-    IDLE_TIMEOUT = 4.0    # seconds before auto-rotation resumes
+    IDLE_TIMEOUT = 0.5    # seconds before auto-rotation resumes after input
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -168,7 +168,7 @@ class Globe(Visual):
         # Globe state
         self._rot_lon = -121.0   # start facing Stockton
         self._rot_lat = 20.0     # slight tilt
-        self._radius = 29.0      # default sphere size
+        self._radius = 25.0      # default sphere size (fits cleanly in frame)
         self._mode_idx = 0
 
         # Auto-rotation
@@ -224,8 +224,6 @@ class Globe(Visual):
         if self._atlas is None:
             return False
 
-        zoom_held = inp.action_r_held
-
         # Mode cycle
         if inp.action_l:
             self._mode_idx = (self._mode_idx + 1) % len(MODES)
@@ -234,8 +232,15 @@ class Globe(Visual):
             self._needs_render = True
             return True
 
-        # Zoom (action_r + up/down)
-        if zoom_held:
+        # Toggle auto-rotation
+        if inp.action_r:
+            self._auto_rotate = not self._auto_rotate
+            self._overlay_text = "SPIN ON" if self._auto_rotate else "SPIN OFF"
+            self._overlay_timer = 1.5
+            return True
+
+        # Zoom (action_r held + up/down)
+        if inp.action_r_held:
             self._zoom_dir = -inp.dy
             self._pan_dx = 0
             self._pan_dy = 0
@@ -244,12 +249,11 @@ class Globe(Visual):
             self._pan_dy = inp.dy
             self._zoom_dir = 0
 
-        # Any manual input pauses auto-rotation
-        if inp.any_direction:
-            self._auto_rotate = False
+        # Manual joystick input — auto-rotate picks back up after idle
+        if inp.any_direction and not inp.action_r_held:
             self._idle_timer = 0.0
 
-        return bool(inp.any_direction or zoom_held)
+        return bool(inp.any_direction or inp.action_r_held)
 
     def update(self, dt):
         super().update(dt)
@@ -270,14 +274,9 @@ class Globe(Visual):
                 self._radius = max(12.0, self._radius * (1 - 1.2 * dt))
             self._needs_render = True
 
-        # Resume auto-rotation after idle
-        if not self._auto_rotate:
-            self._idle_timer += dt
-            if self._idle_timer > self.IDLE_TIMEOUT:
-                self._auto_rotate = True
-
-        # Auto-rotate
-        if self._auto_rotate:
+        # Auto-rotate (pauses briefly during manual input)
+        self._idle_timer += dt
+        if self._auto_rotate and self._idle_timer > self.IDLE_TIMEOUT:
             self._rot_lon -= self._speed * dt
             self._needs_render = True
 
