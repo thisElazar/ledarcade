@@ -151,6 +151,155 @@ def _apply_water(fb, atlas, bounds, clat, clon, vdeg, wcolor):
     return
 
 
+def _sample_at(grid, bounds, lats, lons):
+    """Sample a grid at arbitrary lat/lon arrays (any shape)."""
+    min_lat, max_lat, min_lon, max_lon = bounds
+    gh, gw = grid.shape[:2]
+    res = (max_lat - min_lat) / gh
+    lon_range = max_lon - min_lon
+    if lon_range >= 359:
+        lons = ((lons - min_lon) % lon_range) + min_lon
+    rows = np.clip(((max_lat - lats) / res).astype(np.int32), 0, gh - 1)
+    cols = np.clip(((lons - min_lon) / res).astype(np.int32), 0, gw - 1)
+    return grid[rows, cols]
+
+
+# Globe threshold — switch from flat map to globe above this view angle
+GLOBE_THRESHOLD = 50.0
+
+
+def _render_globe(atlas, rot_lat, rot_lon, mode):
+    """Render atlas data on a 3D sphere."""
+    S = GRID_SIZE
+    bounds = tuple(atlas['bounds'])
+    fb = np.zeros((S, S, 3), dtype=np.uint8)
+
+    # Sphere geometry — fills most of the frame
+    radius = 29.0
+    cx, cy = S / 2, S / 2
+
+    py = np.arange(S)
+    px = np.arange(S)
+    xx, yy = np.meshgrid((px - cx + 0.5) / radius, (cy - py - 0.5) / radius)
+
+    # Ray-sphere intersection (orthographic projection)
+    zz_sq = 1.0 - xx ** 2 - yy ** 2
+    on_sphere = zz_sq > 0
+    zz = np.sqrt(np.where(on_sphere, zz_sq, 0))
+
+    # Rotate sphere: Y-axis (longitude), then X-axis (latitude tilt)
+    rlat = np.radians(rot_lat)
+    rlon = np.radians(rot_lon)
+    cos_rlon, sin_rlon = np.cos(rlon), np.sin(rlon)
+    cos_rlat, sin_rlat = np.cos(rlat), np.sin(rlat)
+
+    # Y-axis rotation (longitude)
+    x1 = xx * cos_rlon + zz * sin_rlon
+    z1 = -xx * sin_rlon + zz * cos_rlon
+    y1 = yy
+
+    # X-axis rotation (latitude tilt)
+    y2 = y1 * cos_rlat - z1 * sin_rlat
+    z2 = y1 * sin_rlat + z1 * cos_rlat
+    x2 = x1
+
+    # Sphere normals → lat/lon
+    lat = np.degrees(np.arcsin(np.clip(y2, -1, 1)))
+    lon = np.degrees(np.arctan2(x2, z2))
+
+    # Lambertian shading — mostly frontal with slight upper-right bias
+    shade = np.clip(x2 * 0.15 + y2 * 0.25 + zz * 0.95, 0.15, 1.0)
+
+    # Sample atlas at globe lat/lons
+    if mode == 'terrain':
+        wc = _sample_at(atlas['worldcover'], bounds, lat, lon)
+        colors = _WC_LUT_DAY[wc].astype(np.float32)
+        if 'blue_marble' in atlas:
+            sat = _sample_at(atlas['blue_marble'], bounds, lat, lon).astype(
+                np.float32)
+            colors = colors * 0.4 + sat * 0.6
+        globe = np.clip(colors * shade[..., None], 0, 255).astype(np.uint8)
+
+    elif mode == 'satellite':
+        sat = _sample_at(atlas['blue_marble'], bounds, lat, lon).astype(
+            np.float32) if 'blue_marble' in atlas else np.full(
+            lat.shape + (3,), 40, dtype=np.float32)
+        sat = 255.0 * (sat / 255.0) ** 0.65  # gamma lift
+        globe = np.clip(sat * shade[..., None], 0, 255).astype(np.uint8)
+
+    elif mode == 'live':
+        import datetime
+        now = datetime.datetime.now(datetime.UTC)
+        utc_hour = now.hour + now.minute / 60.0
+        doy = now.timetuple().tm_yday
+
+        sat = _sample_at(atlas['blue_marble'], bounds, lat, lon).astype(
+            np.float32) if 'blue_marble' in atlas else np.full(
+            lat.shape + (3,), 40, dtype=np.float32)
+        night_img = sat * 0.06
+
+        dec_r = np.radians(23.45 * np.sin(np.radians((284 + doy) / 365 * 360)))
+        ha = np.radians((utc_hour - 12) * 15 + lon)
+        sin_e = np.sin(np.radians(lat)) * np.sin(dec_r) + \
+                np.cos(np.radians(lat)) * np.cos(dec_r) * np.cos(ha)
+        sun_e = np.degrees(np.arcsin(np.clip(sin_e, -1, 1)))
+        t = np.clip((sun_e + 6) / 12.0, 0, 1)[..., None]
+
+        mixed = sat * t + night_img * (1 - t)
+        if 'nightlights' in atlas:
+            lights = _sample_at(atlas['nightlights'], bounds, lat, lon).astype(
+                np.float32)
+            dark = (t[..., 0] < 0.8) & (lights > 10)
+            if dark.any():
+                b = np.clip((lights - 10) / 120.0, 0, 1) * (1.0 - t[..., 0])
+                lc = np.array([255, 200, 90], dtype=np.float32)
+                for c in range(3):
+                    mixed[:, :, c] = np.where(dark,
+                        mixed[:, :, c] * (1 - b) + lc[c] * b,
+                        mixed[:, :, c])
+        globe = np.clip(mixed * shade[..., None], 0, 255).astype(np.uint8)
+
+    elif mode == 'night':
+        sat = _sample_at(atlas['blue_marble'], bounds, lat, lon).astype(
+            np.float32) if 'blue_marble' in atlas else np.zeros(
+            lat.shape + (3,), dtype=np.float32)
+        mixed = sat * 0.08
+        if 'nightlights' in atlas:
+            lights = _sample_at(atlas['nightlights'], bounds, lat, lon).astype(
+                np.float32)
+            mask = lights > 10
+            if mask.any():
+                b = np.clip((lights - 10) / 120.0, 0, 1)
+                lc = np.array([255, 200, 90], dtype=np.float32)
+                for c in range(3):
+                    mixed[:, :, c] = np.where(mask,
+                        mixed[:, :, c] * (1 - b) + lc[c] * b,
+                        mixed[:, :, c])
+        globe = np.clip(mixed * shade[..., None], 0, 255).astype(np.uint8)
+
+    elif mode == 'elevation':
+        elev = _sample_at(atlas.get('bathymetry', atlas['elevation']),
+                          bounds, lat, lon).astype(np.int32)
+        idx = np.clip(elev + 5000, 0, 12000).astype(np.int32)
+        colors = _ELEV_LUT[idx].astype(np.float32)
+        globe = np.clip(colors * shade[..., None], 0, 255).astype(np.uint8)
+
+    else:
+        globe = np.zeros((S, S, 3), dtype=np.uint8)
+
+    # Composite: globe pixels on sphere, black background
+    fb[on_sphere] = globe[on_sphere]
+
+    # Subtle atmosphere rim glow
+    edge = on_sphere & (zz_sq < 0.08)
+    if edge.any():
+        glow = np.array([30, 60, 120], dtype=np.uint8)
+        fb[edge] = np.clip(fb[edge].astype(np.int16) + glow, 0, 255).astype(
+            np.uint8)
+
+    return fb
+
+
 # ── Frame rendering ──────────────────────────────────────────────────
 
 def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
@@ -494,9 +643,9 @@ class Atlas(Visual):
         self._max_zoom_out = min(max(lat_range, lon_range), 180.0)
         is_global = lon_range >= 350
         if is_global:
-            # Start on Central Valley, CA
-            self._center_lat = 38.5
-            self._center_lon = -121.0
+            # Start on Stockton, CA
+            self._center_lat = 37.95
+            self._center_lon = -121.29
         else:
             self._center_lat = (bounds[0] + bounds[1]) / 2
             self._center_lon = (bounds[2] + bounds[3]) / 2
@@ -595,13 +744,14 @@ class Atlas(Visual):
                                      self._view_deg * (1 + 0.8 * dt))
             self._needs_render = True
 
-        # Clamp so view never extends past atlas lat bounds (-60 to 85)
-        max_vdeg_for_lat = 145.0  # 85 - (-60)
-        if self._view_deg > max_vdeg_for_lat:
-            self._view_deg = max_vdeg_for_lat
-        half_view = self._view_deg / 2
-        self._center_lat = max(-60 + half_view,
-                               min(85 - half_view, self._center_lat))
+        # In flat mode, clamp so view stays within atlas lat bounds
+        if self._view_deg < GLOBE_THRESHOLD:
+            max_vdeg_for_lat = 145.0  # 85 - (-60)
+            if self._view_deg > max_vdeg_for_lat:
+                self._view_deg = max_vdeg_for_lat
+            half_view = self._view_deg / 2
+            self._center_lat = max(-60 + half_view,
+                                   min(85 - half_view, self._center_lat))
 
         # Live mode auto-refresh every 10 seconds
         if MODES[self._mode_idx] == 'live':
@@ -626,8 +776,13 @@ class Atlas(Visual):
 
         # Re-render the map only when the view changed
         if self._needs_render:
-            self._fb = _render(self._atlas, self._center_lat,
-                               self._center_lon, self._view_deg,
+            if self._view_deg >= GLOBE_THRESHOLD:
+                self._fb = _render_globe(self._atlas, self._center_lat,
+                                         self._center_lon,
+                                         MODES[self._mode_idx])
+            else:
+                self._fb = _render(self._atlas, self._center_lat,
+                                   self._center_lon, self._view_deg,
                                MODES[self._mode_idx], self._era_idx)
             self._needs_render = False
 
