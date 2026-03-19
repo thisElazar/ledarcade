@@ -454,7 +454,6 @@ ALL_VISUALS = [
     FluidMixing,
     FluidPlay,
     FluidSculpt,
-    Earth,
     Globe,
     Molecule,
     Orbitals,

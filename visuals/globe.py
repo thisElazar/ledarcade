@@ -150,7 +150,7 @@ def _render_globe(atlas, rot_lat, rot_lon, mode, radius=27.0):
 
 
 class Globe(Visual):
-    name = "GLOBE"
+    name = "EARTH"
     description = "Rotating Earth"
     category = "science_macro"
 
@@ -186,6 +186,16 @@ class Globe(Visual):
         self._overlay_timer = 0.0
         self._overlay_text = ""
         self._live_timer = 0.0
+
+        # action_r toggle tracking
+        self._action_r_used = False  # True if speed/zoom used during hold
+        self._action_r_was_held = False
+
+        # Stars background (fixed random positions, very subtle)
+        rng = np.random.RandomState(42)
+        self._star_x = rng.randint(0, GRID_SIZE, 40)
+        self._star_y = rng.randint(0, GRID_SIZE, 40)
+        self._star_bright = rng.randint(12, 35, 40)
 
         self._load()
 
@@ -242,26 +252,32 @@ class Globe(Visual):
             self._needs_render = True
             return True
 
-        # Toggle auto-rotation
-        if inp.action_r:
-            self._auto_rotate = not self._auto_rotate
-            self._overlay_text = "SPIN ON" if self._auto_rotate else "SPIN OFF"
-            self._overlay_timer = 1.5
-            return True
-
-        # action_r held: up/down = zoom, left/right = rotation speed (continuous)
+        # action_r held: up/down = zoom, left/right = rotation speed
         if inp.action_r_held:
             self._zoom_dir = -inp.dy
             if inp.left:
                 self._speed = max(0.5, self._speed * 0.97)
+                self._action_r_used = True
             if inp.right:
                 self._speed = min(360.0, self._speed * 1.03)
+                self._action_r_used = True
+            if inp.dy:
+                self._action_r_used = True
             self._pan_dx = 0
             self._pan_dy = 0
         else:
+            # Toggle on release — only if action_r was held and not used for speed/zoom
+            if self._action_r_was_held and not self._action_r_used:
+                self._auto_rotate = not self._auto_rotate
+                self._overlay_text = "SPIN ON" if self._auto_rotate else "SPIN OFF"
+                self._overlay_timer = 1.5
+            if self._action_r_was_held:
+                self._action_r_used = False
             self._pan_dx = inp.dx
             self._pan_dy = inp.dy
             self._zoom_dir = 0
+
+        self._action_r_was_held = inp.action_r_held
 
         # Manual joystick input — auto-rotate picks back up after idle
         if inp.any_direction and not inp.action_r_held:
@@ -322,6 +338,12 @@ class Globe(Visual):
                                      self._rot_lon,
                                      MODES[self._mode_idx],
                                      self._radius)
+            # Subtle stars on black background (behind the sphere)
+            for i in range(len(self._star_x)):
+                sx, sy = int(self._star_x[i]), int(self._star_y[i])
+                if self._fb[sy, sx, 0] == 0 and self._fb[sy, sx, 1] == 0:
+                    b = int(self._star_bright[i])
+                    self._fb[sy, sx] = (b, b, b)
             self._needs_render = False
 
         # Blit
