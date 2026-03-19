@@ -26,6 +26,9 @@ _ATLAS_DIRS = [
 MODES = ['terrain', 'satellite', 'live', 'night', 'elevation']
 
 # ── Auto-download from GitHub Releases ───────────────────────────────
+# Module-level atlas cache — survives visual reset so data loads only once
+_cached_atlas = None
+
 _RELEASE_URL = 'https://github.com/thisElazar/ledarcade/releases/download/atlas-data'
 _ATLAS_FILES = [
     ('world_atlas_pi.npz', True),    # (filename, required)
@@ -436,7 +439,14 @@ class Atlas(Visual):
         return True
 
     def _load(self):
-        self._draw_loading(0.0, "SEARCHING")
+        global _cached_atlas
+
+        # Reuse cached atlas if available (instant after first load)
+        if _cached_atlas is not None:
+            self._atlas = _cached_atlas
+            return
+
+        self._draw_loading(0.0, "THE WORLD")
         self.display.render()
 
         path, directory = _find_atlas()
@@ -448,7 +458,7 @@ class Atlas(Visual):
             if path is None:
                 return
 
-        self._draw_loading(0.2, os.path.basename(path))
+        self._draw_loading(0.2, "THE WORLD")
         self.display.render()
 
         d = np.load(path, allow_pickle=True)
@@ -456,7 +466,7 @@ class Atlas(Visual):
         for key in d.files:
             atlas[key] = d[key]
 
-        self._draw_loading(0.5, "OVERLAYS")
+        self._draw_loading(0.5, "THE WORLD")
         self.display.render()
 
         # Load supplementary data from same directory
@@ -475,6 +485,7 @@ class Atlas(Visual):
         self.display.render()
 
         self._atlas = atlas
+        _cached_atlas = atlas
 
         # Set initial view
         bounds = tuple(atlas['bounds'])
