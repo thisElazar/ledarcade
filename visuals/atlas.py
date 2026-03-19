@@ -11,23 +11,34 @@ Controls:
 """
 
 import os
+import urllib.request
 import numpy as np
 from . import Visual, Display, GRID_SIZE
 
 # ── Atlas data search paths ──────────────────────────────────────────
+_PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ATLAS_DIRS = [
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                 'data', 'atlas'),
+    os.path.join(_PROJECT, 'assets', 'atlas'),
+    os.path.join(_PROJECT, 'data', 'atlas'),
     '/Users/fields/Documents/flightSim',
 ]
 
-MODES = ['terrain', 'satellite', 'night', 'elevation', 'political', 'history']
+MODES = ['terrain', 'satellite', 'live', 'night', 'elevation', 'history']
+
+# ── Auto-download from GitHub Releases ───────────────────────────────
+_RELEASE_URL = 'https://github.com/thisElazar/ledarcade/releases/download/atlas-data'
+_ATLAS_FILES = [
+    ('world_atlas_pi.npz', True),    # (filename, required)
+    ('history_pi.npz', False),
+]
+
+# Political mode removed — history mode handles it better
 
 # ── WorldCover colour LUTs ──────────────────────────────────────────
 _WC_DAY = {
     0: (15, 40, 120), 10: (25, 65, 30), 20: (75, 90, 45),
     30: (110, 130, 60), 40: (150, 155, 60), 50: (140, 130, 125),
-    60: (170, 155, 120), 70: (230, 235, 245), 80: (20, 50, 120),
+    60: (170, 155, 120), 70: (180, 185, 195), 80: (20, 50, 120),
     90: (40, 95, 70), 95: (30, 80, 55), 100: (90, 100, 75),
 }
 _WC_NIGHT = {
@@ -134,17 +145,8 @@ def _hillshade(atlas, bounds, clat, clon, vdeg):
 
 
 def _apply_water(fb, atlas, bounds, clat, clon, vdeg, wcolor):
-    if 'water' not in atlas:
-        return
-    w = _sample(atlas['water'], bounds, clat, clon, vdeg,
-                mode='average').astype(np.float32)
-    mask = w > 50
-    if vdeg < 2 and 'water_detail' in atlas:
-        d = _sample(atlas['water_detail'], bounds, clat, clon, vdeg,
-                    mode='average').astype(np.float32)
-        mask = mask | (d > 15)
-    if mask.any():
-        fb[mask] = wcolor
+    # Satellite imagery handles water at all zoom levels — disabled
+    return
 
 
 # ── Frame rendering ──────────────────────────────────────────────────
@@ -158,11 +160,15 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
     if mode == 'terrain':
         wc = _sample(atlas['worldcover'], bounds, clat, clon, vdeg,
                      mode='majority')
-        fb = _WC_LUT_DAY[wc].copy()
+        wc_colors = _WC_LUT_DAY[wc].astype(np.float32)
+        if 'blue_marble' in atlas:
+            sat = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
+                          mode='average').astype(np.float32)
+            fb = np.clip(wc_colors * 0.4 + sat * 0.6, 0, 255).astype(np.uint8)
+        else:
+            fb = wc_colors.astype(np.uint8)
         fb = np.clip(fb.astype(np.float32) * shade[..., None],
                      0, 255).astype(np.uint8)
-        _apply_water(fb, atlas, bounds, clat, clon, vdeg,
-                     np.array([20, 50, 120], np.uint8))
 
     elif mode == 'political':
         if '_countries_global' in atlas:
@@ -187,20 +193,66 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
         else:
             fb = np.zeros((S, S, 3), dtype=np.uint8)
 
-    elif mode == 'night':
-        wc = _sample(atlas['worldcover'], bounds, clat, clon, vdeg,
-                     mode='majority')
-        fb = _WC_LUT_NIGHT[wc].copy()
-        fb = np.clip(fb.astype(np.float32) * shade[..., None],
-                     0, 255).astype(np.uint8)
-        _apply_water(fb, atlas, bounds, clat, clon, vdeg,
-                     np.array([5, 15, 40], np.uint8))
+    elif mode == 'live':
+        # Real-time day/night — satellite where sun is up, city lights where down
+        import datetime, math as _math
+        fb = np.zeros((S, S, 3), dtype=np.uint8)
+        now = datetime.datetime.now(datetime.UTC)
+        utc_hour = now.hour + now.minute / 60.0
+        doy = now.timetuple().tm_yday
+        half = vdeg / 2
+
+        if 'blue_marble' in atlas:
+            day_img = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
+                              mode='average').astype(np.float32)
+        else:
+            day_img = np.full((S, S, 3), 40, dtype=np.float32)
+
+        night_img = day_img * 0.06
+        lights = None
         if 'nightlights' in atlas:
             lights = _sample(atlas['nightlights'], bounds, clat, clon, vdeg,
                              mode='average').astype(np.float32)
-            mask = lights > 20
+
+        dec_r = _math.radians(23.45 * _math.sin(_math.radians((284 + doy) / 365 * 360)))
+        for py in range(S):
+            lat = clat + half - ((py + 0.5) / S) * vdeg
+            lat_r = _math.radians(lat)
+            for px in range(S):
+                lon = clon - half + ((px + 0.5) / S) * vdeg
+                ha = _math.radians((utc_hour - 12) * 15 + lon)
+                sin_e = (_math.sin(lat_r) * _math.sin(dec_r) +
+                         _math.cos(lat_r) * _math.cos(dec_r) * _math.cos(ha))
+                sun_e = _math.degrees(_math.asin(max(-1, min(1, sin_e))))
+
+                t = max(0.0, min(1.0, (sun_e + 6) / 12.0))
+                dpx = day_img[py, px]
+                npx = night_img[py, px]
+
+                if t < 0.8 and lights is not None:
+                    lv = float(lights[py, px])
+                    if lv > 10:
+                        b = min(1.0, (lv - 10) / 120.0) * (1.0 - t)
+                        lc = np.array([255, 200, 90], dtype=np.float32)
+                        npx = npx * (1 - b) + lc * b
+
+                fb[py, px] = np.clip(dpx * t + npx * (1 - t), 0, 255).astype(np.uint8)
+
+    elif mode == 'night':
+        # Dimmed satellite as base
+        if 'blue_marble' in atlas:
+            sat = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
+                          mode='average').astype(np.float32)
+            fb = np.clip(sat * 0.08, 0, 255).astype(np.uint8)
+        else:
+            fb = np.zeros((S, S, 3), dtype=np.uint8)
+        # City lights glow
+        if 'nightlights' in atlas:
+            lights = _sample(atlas['nightlights'], bounds, clat, clon, vdeg,
+                             mode='average').astype(np.float32)
+            mask = lights > 10
             if mask.any():
-                b = np.clip((lights - 20) / 180.0, 0, 1)
+                b = np.clip((lights - 10) / 120.0, 0, 1)
                 lc = np.array([255, 200, 90], dtype=np.float32)
                 for c in range(3):
                     fb[:, :, c] = np.where(
@@ -225,27 +277,40 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
             years = atlas['_history_years']
             grids = atlas['_history_grids']
             ei = max(0, min(len(years) - 1, era_idx))
+            # Dimmed satellite as base for unclaimed land
+            if 'blue_marble' in atlas:
+                sat = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
+                              mode='average').astype(np.float32)
+                fb = np.clip(sat * 0.35, 0, 255).astype(np.uint8)
+            else:
+                fb = np.zeros((S, S, 3), dtype=np.uint8)
+            # Empire territories overlaid
             hb = tuple(atlas['_history_bounds'])
             hist = _sample(grids[ei], hb, clat, clon, vdeg, mode='majority')
-            fb = _HIST_COLORS[np.clip(hist, 0, 15)].copy()
-            fb = np.clip(fb.astype(np.float32) * shade[..., None],
-                         0, 255).astype(np.uint8)
+            claimed = hist > 0
+            empire_colors = _HIST_COLORS[np.clip(hist, 0, 15)].astype(np.float32)
+            if 'blue_marble' in atlas:
+                blended = np.clip(empire_colors * 0.6 + sat * 0.4,
+                                  0, 255).astype(np.uint8)
+            else:
+                blended = empire_colors.astype(np.uint8)
+            fb[claimed] = blended[claimed]
         else:
             fb = np.zeros((S, S, 3), dtype=np.uint8)
 
     else:
         fb = np.zeros((S, S, 3), dtype=np.uint8)
 
-    # Roads overlay (subtle, when zoomed in)
+    # Roads overlay
     if vdeg < 5 and 'roads' in atlas:
         is_night = mode == 'night'
-        rc = np.array([90, 80, 65] if not is_night else [18, 16, 12],
+        rc = np.array([90, 80, 65] if not is_night else [220, 190, 140],
                       dtype=np.uint8)
         roads = _sample(atlas['roads'], bounds, clat, clon, vdeg)
         if (roads > 0).any():
             fb[roads > 0] = rc
         if 'rails' in atlas:
-            rlc = np.array([110, 55, 45] if not is_night else [22, 12, 10],
+            rlc = np.array([110, 55, 45] if not is_night else [180, 160, 120],
                            dtype=np.uint8)
             rails = _sample(atlas['rails'], bounds, clat, clon, vdeg)
             if (rails > 0).any():
@@ -261,18 +326,16 @@ def _find_atlas():
     for d in _ATLAS_DIRS:
         if not os.path.isdir(d):
             continue
-        # Prefer world atlas
-        p = os.path.join(d, 'world_atlas.npz')
-        if os.path.exists(p):
-            return p, d
-        # Then mideast (sample atlas)
-        p = os.path.join(d, 'atlas_mideast.npz')
-        if os.path.exists(p):
-            return p, d
-        # Then norcal
-        p = os.path.join(d, 'atlas_norcal.npz')
-        if os.path.exists(p):
-            return p, d
+        # Prefer world atlas (Pi-optimised, then full)
+        for name in ('world_atlas_pi.npz', 'world_atlas.npz'):
+            p = os.path.join(d, name)
+            if os.path.exists(p):
+                return p, d
+        # Then regional fallbacks
+        for name in ('atlas_norcal.npz', 'atlas_mideast.npz'):
+            p = os.path.join(d, name)
+            if os.path.exists(p):
+                return p, d
         # Then any atlas_*.npz
         for f in sorted(os.listdir(d)):
             if f.startswith('atlas_') and f.endswith('.npz'):
@@ -285,7 +348,7 @@ def _find_atlas():
 class Atlas(Visual):
     name = "ATLAS"
     description = "World atlas viewer"
-    category = "science_macro"
+    category = "road_rail"
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -303,7 +366,7 @@ class Atlas(Visual):
         self._mode_idx = 0
         self._era_idx = 0
         self._history_years = None
-        self._max_zoom_out = 20.0
+        self._max_zoom_out = 145.0
 
         # Input state (stored for update)
         self._pan_dx = 0
@@ -313,8 +376,61 @@ class Atlas(Visual):
         # Overlay
         self._overlay_timer = 0.0
         self._overlay_text = ""
+        self._live_timer = 0.0
+        self._both_pressed_prev = False
 
         self._load()
+
+    def _download_file(self, url, dest, label=""):
+        """Download a file with progress shown on the loading screen."""
+        try:
+            req = urllib.request.Request(url)
+            resp = urllib.request.urlopen(req, timeout=30)
+            total = int(resp.headers.get('Content-Length', 0))
+            chunk_size = 64 * 1024
+            downloaded = 0
+            with open(dest + '.tmp', 'wb') as f:
+                while True:
+                    chunk = resp.read(chunk_size)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total > 0:
+                        pct = downloaded / total
+                        mb = downloaded / 1e6
+                        self._draw_loading(pct, f"{label} {mb:.0f}MB")
+                        self.display.render()
+            os.rename(dest + '.tmp', dest)
+            return True
+        except Exception:
+            # Clean up partial download
+            for p in (dest + '.tmp', dest):
+                if os.path.exists(p) and p.endswith('.tmp'):
+                    os.remove(p)
+            return False
+
+    def _ensure_atlas_data(self):
+        """Download atlas data from GitHub Releases if not present locally."""
+        # Use first writable directory (prefer assets/atlas/)
+        dest_dir = os.path.join(_PROJECT, 'assets', 'atlas')
+        os.makedirs(dest_dir, exist_ok=True)
+
+        for filename, required in _ATLAS_FILES:
+            # Already exists somewhere?
+            for d in _ATLAS_DIRS:
+                if os.path.exists(os.path.join(d, filename)):
+                    break
+            else:
+                # Not found — download it
+                url = f"{_RELEASE_URL}/{filename}"
+                dest = os.path.join(dest_dir, filename)
+                self._draw_loading(0.0, f"DOWNLOAD")
+                self.display.render()
+                if not self._download_file(url, dest, filename.split('.')[0]):
+                    if required:
+                        return False
+        return True
 
     def _load(self):
         self._draw_loading(0.0, "SEARCHING")
@@ -322,7 +438,12 @@ class Atlas(Visual):
 
         path, directory = _find_atlas()
         if path is None:
-            return
+            # Try downloading from GitHub Releases
+            if not self._ensure_atlas_data():
+                return
+            path, directory = _find_atlas()
+            if path is None:
+                return
 
         self._draw_loading(0.2, os.path.basename(path))
         self.display.render()
@@ -336,37 +457,53 @@ class Atlas(Visual):
         self.display.render()
 
         # Load supplementary data from same directory
-        cp = os.path.join(directory, 'countries_global.npz')
-        if os.path.exists(cp):
-            cd = np.load(cp)
-            atlas['_countries_global'] = cd['grid']
-            atlas['_countries_bounds'] = cd['bounds']
+        # Countries: only load separate file if atlas lacks built-in countries
+        if 'countries' not in atlas:
+            cp = os.path.join(directory, 'countries_global.npz')
+            if os.path.exists(cp):
+                cd = np.load(cp)
+                atlas['_countries_global'] = cd['grid']
+                atlas['_countries_bounds'] = cd['bounds']
 
-        hp = os.path.join(directory, 'history_global.npz')
+        self._draw_loading(0.7, "HISTORY")
+        self.display.render()
+
+        # Prefer Pi-optimised history (curated eras, downscaled)
+        hp = os.path.join(directory, 'history_pi.npz')
+        if not os.path.exists(hp):
+            hp = os.path.join(directory, 'history_global.npz')
         if os.path.exists(hp):
-            hd = np.load(hp)
-            years = hd['years']
-            grids = hd['grids']
-            order = np.argsort(years)
-            atlas['_history_grids'] = grids[order]
-            atlas['_history_years'] = years[order]
-            atlas['_history_bounds'] = hd['bounds']
-            self._history_years = atlas['_history_years']
+            try:
+                hd = np.load(hp)
+                years = hd['years']
+                grids = hd['grids']
+                order = np.argsort(years)
+                atlas['_history_grids'] = grids[order]
+                atlas['_history_years'] = years[order]
+                atlas['_history_bounds'] = hd['bounds']
+                self._history_years = atlas['_history_years']
+            except (MemoryError, Exception):
+                pass  # History too large for available RAM
 
         self._draw_loading(1.0, "READY")
         self.display.render()
 
         self._atlas = atlas
 
-        # Set initial view to atlas centre
+        # Set initial view
         bounds = tuple(atlas['bounds'])
-        self._center_lat = (bounds[0] + bounds[1]) / 2
-        self._center_lon = (bounds[2] + bounds[3]) / 2
         lat_range = bounds[1] - bounds[0]
         lon_range = bounds[3] - bounds[2]
-        self._max_zoom_out = max(lat_range, lon_range)
-        # Start at a comfortable zoom
-        self._view_deg = min(self._max_zoom_out, 5.0)
+        self._max_zoom_out = min(max(lat_range, lon_range), 180.0)
+        is_global = lon_range >= 350
+        if is_global:
+            # Start on Central Valley, CA
+            self._center_lat = 38.5
+            self._center_lon = -121.0
+        else:
+            self._center_lat = (bounds[0] + bounds[1]) / 2
+            self._center_lon = (bounds[2] + bounds[3]) / 2
+        self._view_deg = 5.0
 
         self._overlay_text = MODES[self._mode_idx].upper()
         self._overlay_timer = 2.0
@@ -375,10 +512,24 @@ class Atlas(Visual):
         if self._atlas is None:
             return False
 
+        # Antipodal flip — both buttons pressed simultaneously
+        both_now = inp.action_l_held and inp.action_r_held
+        if both_now and not self._both_pressed_prev:
+            self._center_lat = -self._center_lat
+            self._center_lon = self._center_lon + 180
+            if self._center_lon > 180:
+                self._center_lon -= 360
+            self._overlay_text = "ANTIPODE"
+            self._overlay_timer = 2.0
+            self._needs_render = True
+            self._both_pressed_prev = True
+            return True
+        self._both_pressed_prev = both_now
+
         zoom_held = inp.action_r_held
 
-        # Mode cycle
-        if inp.action_l or inp.action_r:
+        # Mode cycle (action_l only — action_r is zoom modifier)
+        if inp.action_l:
             self._mode_idx = (self._mode_idx + 1) % len(MODES)
             self._needs_render = True
             mode = MODES[self._mode_idx]
@@ -425,14 +576,17 @@ class Atlas(Visual):
 
         # Pan
         if self._pan_dx or self._pan_dy:
-            speed = self._view_deg * 0.4 * dt
+            speed = self._view_deg * 1.2 * dt
             self._center_lon += self._pan_dx * speed
             self._center_lat -= self._pan_dy * speed
-            # Wrap longitude
+            # Wrap longitude, clamp latitude
             if self._center_lon > 180:
                 self._center_lon -= 360
             elif self._center_lon < -180:
                 self._center_lon += 360
+            half_view = self._view_deg / 2
+            self._center_lat = max(-60 + half_view,
+                                   min(85 - half_view, self._center_lat))
             self._needs_render = True
 
         # Zoom
@@ -443,6 +597,15 @@ class Atlas(Visual):
                 self._view_deg = min(self._max_zoom_out,
                                      self._view_deg * (1 + 0.8 * dt))
             self._needs_render = True
+
+        # Live mode auto-refresh every 10 seconds
+        if MODES[self._mode_idx] == 'live':
+            if not hasattr(self, '_live_timer'):
+                self._live_timer = 0.0
+            self._live_timer += dt
+            if self._live_timer > 10:
+                self._live_timer = 0.0
+                self._needs_render = True
 
         # Overlay fade
         if self._overlay_timer > 0:

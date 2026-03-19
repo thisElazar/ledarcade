@@ -86,6 +86,9 @@ assets/smb3_*.png
 assets/zelda_*.png
 assets/kidicarus_*.png
 
+# Atlas data (auto-downloaded from GitHub Releases on first launch)
+assets/atlas/
+
 # Copyrighted gallery atlas files
 site/gallery_GallerySMB3.json
 site/gallery_GalleryKirby.json
