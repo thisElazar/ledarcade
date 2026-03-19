@@ -20,7 +20,7 @@ from .atlas import (
 MODES = ['satellite', 'terrain', 'live', 'night', 'elevation']
 
 
-def _render_globe(atlas, rot_lat, rot_lon, mode, radius=25.0):
+def _render_globe(atlas, rot_lat, rot_lon, mode, radius=27.0):
     """Render atlas data on a 3D sphere with variable radius."""
     S = GRID_SIZE
     bounds = tuple(atlas['bounds'])
@@ -168,7 +168,7 @@ class Globe(Visual):
         # Globe state
         self._rot_lon = -121.0   # start facing Stockton
         self._rot_lat = 20.0     # slight tilt
-        self._radius = 25.0      # default sphere size (fits cleanly in frame)
+        self._radius = 27.0      # default sphere size
         self._mode_idx = 0
 
         # Auto-rotation
@@ -239,9 +239,17 @@ class Globe(Visual):
             self._overlay_timer = 1.5
             return True
 
-        # Zoom (action_r held + up/down)
+        # action_r held: up/down = zoom, left/right = rotation speed
         if inp.action_r_held:
             self._zoom_dir = -inp.dy
+            if inp.left_pressed:
+                self._speed = max(1.0, self._speed - 2.0)
+                self._overlay_text = f"SPEED {self._speed:.0f}"
+                self._overlay_timer = 1.5
+            if inp.right_pressed:
+                self._speed = min(30.0, self._speed + 2.0)
+                self._overlay_text = f"SPEED {self._speed:.0f}"
+                self._overlay_timer = 1.5
             self._pan_dx = 0
             self._pan_dy = 0
         else:
