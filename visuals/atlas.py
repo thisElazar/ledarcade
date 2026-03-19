@@ -194,8 +194,7 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
 
     elif mode == 'live':
         # Real-time day/night — satellite where sun is up, city lights where down
-        import datetime, math as _math
-        fb = np.zeros((S, S, 3), dtype=np.uint8)
+        import datetime
         now = datetime.datetime.now(datetime.UTC)
         utc_hour = now.hour + now.minute / 60.0
         doy = now.timetuple().tm_yday
@@ -208,34 +207,36 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
             day_img = np.full((S, S, 3), 40, dtype=np.float32)
 
         night_img = day_img * 0.06
-        lights = None
+
+        # Vectorised sun elevation for all pixels
+        py = np.arange(S)
+        px = np.arange(S)
+        lats = clat + half - ((py + 0.5) / S) * vdeg
+        lons = clon - half + ((px + 0.5) / S) * vdeg
+        lat_grid, lon_grid = np.meshgrid(lats, lons, indexing='ij')
+        lat_r = np.radians(lat_grid)
+        dec_r = np.radians(23.45 * np.sin(np.radians((284 + doy) / 365 * 360)))
+        ha = np.radians((utc_hour - 12) * 15 + lon_grid)
+        sin_e = np.sin(lat_r) * np.sin(dec_r) + np.cos(lat_r) * np.cos(dec_r) * np.cos(ha)
+        sun_e = np.degrees(np.arcsin(np.clip(sin_e, -1, 1)))
+        t = np.clip((sun_e + 6) / 12.0, 0, 1)[..., np.newaxis]
+
+        fb = np.clip(day_img * t + night_img * (1 - t), 0, 255)
+
+        # City lights in dark areas
         if 'nightlights' in atlas:
             lights = _sample(atlas['nightlights'], bounds, clat, clon, vdeg,
                              mode='average').astype(np.float32)
+            dark = (t[..., 0] < 0.8) & (lights > 10)
+            if dark.any():
+                b = (np.clip((lights - 10) / 120.0, 0, 1) * (1.0 - t[..., 0]))
+                lc = np.array([255, 200, 90], dtype=np.float32)
+                for c in range(3):
+                    fb[:, :, c] = np.where(dark,
+                        fb[:, :, c] * (1 - b) + lc[c] * b,
+                        fb[:, :, c])
 
-        dec_r = _math.radians(23.45 * _math.sin(_math.radians((284 + doy) / 365 * 360)))
-        for py in range(S):
-            lat = clat + half - ((py + 0.5) / S) * vdeg
-            lat_r = _math.radians(lat)
-            for px in range(S):
-                lon = clon - half + ((px + 0.5) / S) * vdeg
-                ha = _math.radians((utc_hour - 12) * 15 + lon)
-                sin_e = (_math.sin(lat_r) * _math.sin(dec_r) +
-                         _math.cos(lat_r) * _math.cos(dec_r) * _math.cos(ha))
-                sun_e = _math.degrees(_math.asin(max(-1, min(1, sin_e))))
-
-                t = max(0.0, min(1.0, (sun_e + 6) / 12.0))
-                dpx = day_img[py, px]
-                npx = night_img[py, px]
-
-                if t < 0.8 and lights is not None:
-                    lv = float(lights[py, px])
-                    if lv > 10:
-                        b = min(1.0, (lv - 10) / 120.0) * (1.0 - t)
-                        lc = np.array([255, 200, 90], dtype=np.float32)
-                        npx = npx * (1 - b) + lc * b
-
-                fb[py, px] = np.clip(dpx * t + npx * (1 - t), 0, 255).astype(np.uint8)
+        fb = fb.astype(np.uint8)
 
     elif mode == 'night':
         # Dimmed satellite as base
