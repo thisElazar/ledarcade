@@ -187,8 +187,11 @@ def _render(atlas, clat, clon, vdeg, mode, era_idx=0):
 
     elif mode == 'satellite':
         if 'blue_marble' in atlas:
-            fb = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
-                         mode='average').astype(np.uint8)
+            sat = _sample(atlas['blue_marble'], bounds, clat, clon, vdeg,
+                          mode='average').astype(np.float32)
+            # Gamma lift to match elevation brightness
+            sat = np.clip(255.0 * (sat / 255.0) ** 0.65, 0, 255)
+            fb = sat.astype(np.uint8)
         else:
             fb = np.zeros((S, S, 3), dtype=np.uint8)
 
