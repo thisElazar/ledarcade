@@ -13,9 +13,10 @@ import os
 import numpy as np
 from . import Visual, Display, GRID_SIZE
 from .atlas import (
-    _ATLAS_DIRS, _RELEASE_URL, _ATLAS_FILES,
+    _ATLAS_DIRS, _RELEASE_URL, _ATLAS_FILES, _PROJECT,
     _WC_LUT_DAY, _ELEV_LUT, _sample_at, _find_atlas, _cached_atlas,
 )
+import urllib.request
 
 MODES = ['satellite', 'terrain', 'live', 'night', 'elevation']
 
@@ -201,7 +202,16 @@ class Globe(Visual):
 
         path, directory = _find_atlas()
         if path is None:
-            return
+            # Try downloading from GitHub Releases (same as Atlas)
+            from .atlas import Atlas
+            _downloader = Atlas.__new__(Atlas)
+            _downloader.display = self.display
+            _downloader.name = self.name
+            if not _downloader._ensure_atlas_data():
+                return
+            path, directory = _find_atlas()
+            if path is None:
+                return
 
         self._draw_loading(0.3, "THE WORLD")
         self.display.render()
