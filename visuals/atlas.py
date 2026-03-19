@@ -584,6 +584,14 @@ class Atlas(Visual):
                                      self._view_deg * (1 + 0.8 * dt))
             self._needs_render = True
 
+        # Clamp so view never extends past atlas lat bounds (-60 to 85)
+        max_vdeg_for_lat = 145.0  # 85 - (-60)
+        if self._view_deg > max_vdeg_for_lat:
+            self._view_deg = max_vdeg_for_lat
+        half_view = self._view_deg / 2
+        self._center_lat = max(-60 + half_view,
+                               min(85 - half_view, self._center_lat))
+
         # Live mode auto-refresh every 10 seconds
         if MODES[self._mode_idx] == 'live':
             if not hasattr(self, '_live_timer'):
