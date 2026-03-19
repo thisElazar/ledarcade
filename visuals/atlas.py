@@ -91,7 +91,7 @@ def _sample(grid, bounds, clat, clon, vdeg, size=GRID_SIZE, mode='nearest'):
     cell_per_px = vdeg / size / res
     half = vdeg / 2
 
-    if mode == 'nearest' or cell_per_px < 2.5:
+    if True:  # Always use fast numpy point-sampling (area avg too slow for Pi)
         py = np.arange(size)
         px = np.arange(size)
         lats = clat + half - ((py + 0.5) / size) * vdeg
