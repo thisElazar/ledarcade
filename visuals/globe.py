@@ -239,17 +239,13 @@ class Globe(Visual):
             self._overlay_timer = 1.5
             return True
 
-        # action_r held: up/down = zoom, left/right = rotation speed
+        # action_r held: up/down = zoom, left/right = rotation speed (continuous)
         if inp.action_r_held:
             self._zoom_dir = -inp.dy
-            if inp.left_pressed:
-                self._speed = max(1.0, self._speed - 2.0)
-                self._overlay_text = f"SPEED {self._speed:.0f}"
-                self._overlay_timer = 1.5
-            if inp.right_pressed:
-                self._speed = min(30.0, self._speed + 2.0)
-                self._overlay_text = f"SPEED {self._speed:.0f}"
-                self._overlay_timer = 1.5
+            if inp.left:
+                self._speed = max(0.5, self._speed * 0.97)
+            if inp.right:
+                self._speed = min(360.0, self._speed * 1.03)
             self._pan_dx = 0
             self._pan_dy = 0
         else:
