@@ -535,6 +535,8 @@ class Atlas(Visual):
         self._both_pressed_prev = False
 
         self._load()
+        if self._atlas is not None:
+            self._init_view()
 
     def _download_file(self, url, dest, label=""):
         """Download a file with progress shown on the loading screen."""
@@ -636,11 +638,12 @@ class Atlas(Visual):
         self._atlas = atlas
         _cached_atlas = atlas
 
-        # Set initial view
-        bounds = tuple(atlas['bounds'])
+    def _init_view(self):
+        """Set initial view — called after every reset, even with cache."""
+        bounds = tuple(self._atlas['bounds'])
         lat_range = bounds[1] - bounds[0]
         lon_range = bounds[3] - bounds[2]
-        self._max_zoom_out = min(max(lat_range, lon_range), 180.0)
+        self._max_zoom_out = min(max(lat_range, lon_range), 145.0)
         is_global = lon_range >= 350
         if is_global:
             # Start on Stockton, CA
@@ -776,13 +779,8 @@ class Atlas(Visual):
 
         # Re-render the map only when the view changed
         if self._needs_render:
-            if self._view_deg >= GLOBE_THRESHOLD:
-                self._fb = _render_globe(self._atlas, self._center_lat,
-                                         self._center_lon,
-                                         MODES[self._mode_idx])
-            else:
-                self._fb = _render(self._atlas, self._center_lat,
-                                   self._center_lon, self._view_deg,
+            self._fb = _render(self._atlas, self._center_lat,
+                               self._center_lon, self._view_deg,
                                MODES[self._mode_idx], self._era_idx)
             self._needs_render = False
 
