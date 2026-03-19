@@ -23,13 +23,12 @@ _ATLAS_DIRS = [
     '/Users/fields/Documents/flightSim',
 ]
 
-MODES = ['terrain', 'satellite', 'live', 'night', 'elevation', 'history']
+MODES = ['terrain', 'satellite', 'live', 'night', 'elevation']
 
 # ── Auto-download from GitHub Releases ───────────────────────────────
 _RELEASE_URL = 'https://github.com/thisElazar/ledarcade/releases/download/atlas-data'
 _ATLAS_FILES = [
     ('world_atlas_pi.npz', True),    # (filename, required)
-    ('history_pi.npz', False),
 ]
 
 # Political mode removed — history mode handles it better
@@ -465,25 +464,8 @@ class Atlas(Visual):
                 atlas['_countries_global'] = cd['grid']
                 atlas['_countries_bounds'] = cd['bounds']
 
-        self._draw_loading(0.7, "HISTORY")
-        self.display.render()
-
-        # Prefer Pi-optimised history (curated eras, downscaled)
-        hp = os.path.join(directory, 'history_pi.npz')
-        if not os.path.exists(hp):
-            hp = os.path.join(directory, 'history_global.npz')
-        if os.path.exists(hp):
-            try:
-                hd = np.load(hp)
-                years = hd['years']
-                grids = hd['grids']
-                order = np.argsort(years)
-                atlas['_history_grids'] = grids[order]
-                atlas['_history_years'] = years[order]
-                atlas['_history_bounds'] = hd['bounds']
-                self._history_years = atlas['_history_years']
-            except (MemoryError, Exception):
-                pass  # History too large for available RAM
+        # History disabled for now — grids too large for Pi's 906 MB RAM
+        # TODO: re-bake history at 8x downscale to fit in memory
 
         self._draw_loading(1.0, "READY")
         self.display.render()
