@@ -166,8 +166,8 @@ class Globe(Visual):
         self._needs_render = True
 
         # Globe state
-        self._rot_lon = -121.0   # start facing Stockton
-        self._rot_lat = 20.0     # slight tilt
+        self._rot_lon = 20.0     # start facing Europe/Africa
+        self._rot_lat = 30.0    # tilt to show populated latitudes
         self._radius = 27.0      # default sphere size
         self._mode_idx = 0
 
@@ -271,7 +271,6 @@ class Globe(Visual):
             rot_speed = 60.0 * dt
             self._rot_lon -= self._pan_dx * rot_speed
             self._rot_lat += self._pan_dy * rot_speed
-            self._rot_lat = max(-80, min(80, self._rot_lat))
             self._needs_render = True
 
         # Zoom
