@@ -137,11 +137,11 @@ def _render_globe(atlas, rot_lat, rot_lon, mode, radius=27.0):
 
     fb[on_sphere] = globe[on_sphere]
 
-    # Atmosphere rim glow (only when sphere is smaller than frame)
+    # Subtle atmosphere rim glow (only when sphere is smaller than frame)
     if radius < 40:
-        edge = on_sphere & (zz_sq < 0.08)
+        edge = on_sphere & (zz_sq < 0.05)
         if edge.any():
-            glow = np.array([30, 60, 120], dtype=np.uint8)
+            glow = np.array([10, 20, 45], dtype=np.uint8)
             fb[edge] = np.clip(fb[edge].astype(np.int16) + glow,
                                0, 255).astype(np.uint8)
 
