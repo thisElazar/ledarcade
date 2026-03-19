@@ -728,14 +728,6 @@ class Atlas(Visual):
             speed = self._view_deg * 1.2 * dt
             self._center_lon += self._pan_dx * speed
             self._center_lat -= self._pan_dy * speed
-            # Wrap longitude, clamp latitude
-            if self._center_lon > 180:
-                self._center_lon -= 360
-            elif self._center_lon < -180:
-                self._center_lon += 360
-            half_view = self._view_deg / 2
-            self._center_lat = max(-60 + half_view,
-                                   min(85 - half_view, self._center_lat))
             self._needs_render = True
 
         # Zoom
@@ -747,14 +739,17 @@ class Atlas(Visual):
                                      self._view_deg * (1 + 0.8 * dt))
             self._needs_render = True
 
-        # In flat mode, clamp so view stays within atlas lat bounds
-        if self._view_deg < GLOBE_THRESHOLD:
-            max_vdeg_for_lat = 145.0  # 85 - (-60)
-            if self._view_deg > max_vdeg_for_lat:
-                self._view_deg = max_vdeg_for_lat
-            half_view = self._view_deg / 2
-            self._center_lat = max(-60 + half_view,
-                                   min(85 - half_view, self._center_lat))
+        # Always clamp view within atlas bounds (-60S to 85N)
+        self._view_deg = min(self._view_deg, 145.0)
+        # Wrap longitude
+        if self._center_lon > 180:
+            self._center_lon -= 360
+        elif self._center_lon < -180:
+            self._center_lon += 360
+        # Clamp latitude so view window never extends past data
+        half_view = self._view_deg / 2
+        self._center_lat = max(-60 + half_view,
+                               min(85 - half_view, self._center_lat))
 
         # Live mode auto-refresh every 10 seconds
         if MODES[self._mode_idx] == 'live':
