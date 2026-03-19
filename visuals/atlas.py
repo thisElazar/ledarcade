@@ -91,7 +91,7 @@ def _sample(grid, bounds, clat, clon, vdeg, size=GRID_SIZE, mode='nearest'):
     cell_per_px = vdeg / size / res
     half = vdeg / 2
 
-    if mode == 'nearest' or cell_per_px < 1.5:
+    if mode == 'nearest' or cell_per_px < 2.5:
         py = np.arange(size)
         px = np.arange(size)
         lats = clat + half - ((py + 0.5) / size) * vdeg
@@ -610,11 +610,17 @@ class Atlas(Visual):
 
         # Blit numpy framebuffer → display
         fb = self._fb
-        set_px = self.display.set_pixel
-        for y in range(GRID_SIZE):
-            for x in range(GRID_SIZE):
-                px = fb[y, x]
-                set_px(x, y, (int(px[0]), int(px[1]), int(px[2])))
+        if hasattr(self.display, '_fb'):
+            # Hardware: single memcpy into flat bytearray
+            self.display._fb[:] = fb.tobytes()
+        else:
+            # Emulator: write to 2D buffer list
+            buf = self.display.buffer
+            for y in range(GRID_SIZE):
+                row = buf[y]
+                for x in range(GRID_SIZE):
+                    px = fb[y, x]
+                    row[x] = (int(px[0]), int(px[1]), int(px[2]))
 
         # Year label (history mode)
         if MODES[self._mode_idx] == 'history' and self._history_years is not None:
