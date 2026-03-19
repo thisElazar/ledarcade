@@ -331,6 +331,7 @@ from .evolution import Evolution
 from .gametheory import GameTheory
 from .erosion import Erosion
 from .atlas import Atlas
+from .globe import Globe
 from .geneticdrift import GeneticDrift
 from .convection import Convection
 from .entropy import Entropy
@@ -454,6 +455,7 @@ ALL_VISUALS = [
     FluidPlay,
     FluidSculpt,
     Earth,
+    Globe,
     Molecule,
     Orbitals,
     Electrons,
@@ -796,6 +798,7 @@ __all__ = [
     'FluidPlay',
     'FluidSculpt',
     'Earth',
+    'Globe',
     'Molecule',
     'Orbitals',
     'Electrons',
