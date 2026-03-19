@@ -608,14 +608,13 @@ class Atlas(Visual):
                                MODES[self._mode_idx], self._era_idx)
             self._needs_render = False
 
-        # Blit numpy framebuffer → display buffer
+        # Blit numpy framebuffer → display
         fb = self._fb
-        buf = self.display.buffer
+        set_px = self.display.set_pixel
         for y in range(GRID_SIZE):
-            row = buf[y]
             for x in range(GRID_SIZE):
                 px = fb[y, x]
-                row[x] = (int(px[0]), int(px[1]), int(px[2]))
+                set_px(x, y, (int(px[0]), int(px[1]), int(px[2])))
 
         # Year label (history mode)
         if MODES[self._mode_idx] == 'history' and self._history_years is not None:
