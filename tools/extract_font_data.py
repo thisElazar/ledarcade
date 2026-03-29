@@ -1421,7 +1421,10 @@ def render_text_bitmap(text, font_path, font_number=None, max_width=60, max_heig
             continue
 
         # Get text dimensions
-        bbox = font.getbbox(text)
+        try:
+            bbox = font.getbbox(text)
+        except OSError:
+            continue
         if bbox is None:
             continue
         tw = bbox[2] - bbox[0]
