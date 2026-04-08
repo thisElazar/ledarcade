@@ -3,7 +3,7 @@
 # Pulls latest code then launches the arcade.
 # Used by the led-arcade.service systemd unit.
 
-cd /home/thiselazar/led-arcade
+cd "$(dirname "$(readlink -f "$0")")"
 
 # Pull latest code (ignore errors if no network)
 git pull --ff-only 2>/dev/null

@@ -49,14 +49,9 @@ GRID_SIZE = 64
 # These match the "led-arcade" hardware mapping we added to the library
 
 # Button GPIO pins (directly connect button between GPIO and GND)
-BUTTON_PINS = {
-    'up': 19,         # Joystick wired normally on v2
-    'down': 25,
-    'left': 24,
-    'right': 8,
-    'action_l': 9,    # Buttons wired reversed: physical right = left
-    'action_r': 7,    # physical left = right
-}
+# Loaded from cabinet_config.json; defaults match dev cabinet wiring.
+from cabinet_config import get_button_pins
+BUTTON_PINS = get_button_pins()
 
 
 # =============================================================================
@@ -194,7 +189,8 @@ class HardwareDisplay:
         options = RGBMatrixOptions()
         options.rows = 64
         options.cols = 64
-        options.hardware_mapping = 'led-arcade'
+        from cabinet_config import get_hardware_mapping
+        options.hardware_mapping = get_hardware_mapping()
         options.gpio_slowdown = gpio_slowdown
         options.brightness = brightness
         options.drop_privileges = False

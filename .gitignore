@@ -26,6 +26,9 @@ build/
 # User settings (persistent across restarts)
 user_settings.json
 
+# Per-cabinet hardware config (GPIO mapping, button pins)
+cabinet_config.json
+
 # Claude Code
 CLAUDE.md
 

@@ -538,7 +538,9 @@ def main():
     saved_brightness = persistent.get_brightness()
     saved_gamma = persistent.get_gamma()
     saved_toe = persistent.get_toe()
-    display = HardwareDisplay(brightness=saved_brightness, gpio_slowdown=4,
+    from cabinet_config import get_gpio_slowdown
+    display = HardwareDisplay(brightness=saved_brightness,
+                              gpio_slowdown=get_gpio_slowdown(),
                               gamma=saved_gamma, toe=saved_toe)
     # Load persisted safety settings
     display.set_safety(

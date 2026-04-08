@@ -37,11 +37,12 @@ except ImportError:
     cleanup()
 
 # Minimal matrix init — match hardware settings
+from cabinet_config import get_hardware_mapping, get_gpio_slowdown
 options = RGBMatrixOptions()
 options.rows = 64
 options.cols = 64
-options.hardware_mapping = 'led-arcade'
-options.gpio_slowdown = 4
+options.hardware_mapping = get_hardware_mapping()
+options.gpio_slowdown = get_gpio_slowdown()
 options.brightness = 80
 options.drop_privileges = False
 
