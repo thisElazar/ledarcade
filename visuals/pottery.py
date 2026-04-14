@@ -36,7 +36,7 @@ except NameError:
 
 _CHAR_W = 4
 _VISIBLE_W = GRID_SIZE - 4       # usable text width (2px margin each side)
-_SCROLL_SPEED = 24                # pixels per second
+_SCROLL_SPEED = 14                # pixels per second
 _SCROLL_PAUSE = 0.6              # seconds before scroll starts
 
 _DISPLAY_DURATION = 8.0          # seconds before auto-advance

@@ -279,7 +279,7 @@ except NameError:
 _MAX_CHARS = 15
 _CHAR_W = 4
 _VISIBLE_W = GRID_SIZE - 4   # usable text width (2px margin each side)
-_SCROLL_SPEED = 24            # pixels per second
+_SCROLL_SPEED = 14            # pixels per second
 _SCROLL_PAUSE = 0.6           # seconds before scroll starts
 _OVERLAY_DURATION = 4.0       # seconds total
 _FADE_TIME = 0.5              # fade-out duration

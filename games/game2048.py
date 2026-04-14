@@ -30,19 +30,18 @@ class Game2048(Game):
         0: (20, 20, 30),       # Empty (dark)
         2: (80, 80, 100),      # Cool gray
         4: (60, 100, 140),     # Steel blue
-        8: (220, 140, 30),     # Orange
-        16: (240, 100, 30),    # Dark orange
+        8: (180, 100, 10),     # Deep orange
+        16: (190, 60, 10),     # Burnt orange
         32: (220, 50, 50),     # Red
         64: (200, 30, 30),     # Deep red
-        128: (240, 220, 50),   # Bright yellow
-        256: (50, 200, 50),    # Green
+        128: (180, 150, 20),   # Amber
+        256: (30, 150, 30),    # Forest green
         512: (30, 160, 220),   # Sky blue
         1024: (180, 50, 220),  # Purple
-        2048: (255, 255, 100), # Gold
+        2048: (200, 170, 20),  # Rich gold
     }
 
-    TEXT_DARK = (20, 20, 30)       # Dark text for bright tiles
-    TEXT_LIGHT = (255, 255, 255)   # White text for dark tiles
+    TEXT_COLOR = (255, 255, 255)
     BOARD_BG = (40, 40, 50)
 
     def __init__(self, display: Display):
@@ -279,12 +278,9 @@ class Game2048(Game):
         # Draw tile background
         self.display.draw_rect(x, y, self.CELL_SIZE, self.CELL_SIZE, color)
 
-        # Draw value — pick text color by tile brightness
+        # Draw value
         if value > 0:
-            r, g, b = color
-            luminance = 0.299 * r + 0.587 * g + 0.114 * b
-            text_color = self.TEXT_DARK if luminance > 130 else self.TEXT_LIGHT
-            self.draw_tile_value(x, y, value, text_color)
+            self.draw_tile_value(x, y, value, self.TEXT_COLOR)
 
     def draw_tile_value(self, x: int, y: int, value: int, color: tuple):
         """Draw the numeric value on a tile."""
