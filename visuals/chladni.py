@@ -4,13 +4,17 @@ Chladni Plates – Vibrating Plate Nodal Patterns
 Sand settles at nodal lines on a vibrating plate,
 revealing standing wave patterns.
 
-Square plate uses the classic Ritz approximation:
-  cos(nπx)cos(mπy) − cos(mπx)cos(nπy)
-Circular plate uses Bessel functions J_m(k·r)·cos(mθ).
+Six plate geometries, each with its own physics:
+  Square    — Ritz antisymmetric: cos(nπx)cos(mπy) − cos(mπx)cos(nπy)
+  Circle    — Bessel functions J_m(k·r)·cos(mθ)
+  Rectangle — 3:2 aspect Ritz formula
+  Hexagon   — three-axis plane-wave superposition at 120° intervals
+  Triangle  — barycentric eigenmodes on equilateral triangle
+  Annular   — radial sin modes on a ring with angular cos(mθ)
 
 Controls:
   Left/Right (held) - Sweep frequency continuously
-  Up/Down (pressed) - Cycle plate shape (square, circle, rectangle)
+  Up/Down (pressed) - Cycle plate shape
   Action            - Scatter sand
 """
 
@@ -22,6 +26,9 @@ SHAPES = [
     ('SQUARE', 'square'),
     ('CIRCLE', 'circle'),
     ('RECTANGLE', 'rect'),
+    ('HEXAGON', 'hex'),
+    ('TRIANGLE', 'tri'),
+    ('ANNULAR', 'ring'),
 ]
 
 # Sand color palette — slight per-pixel variation for texture
@@ -42,6 +49,34 @@ DRAW_OFFSET_Y = 8
 # Gaussian width controlling sand line thickness in amplitude space
 LINE_SIGMA = 0.10
 
+# ── Geometry constants ────────────────────────────────────────────
+_S3 = math.sqrt(3)
+_S3_2 = _S3 / 2.0
+
+# Hexagon (flat-top, circumradius)
+_HEX_R = 0.46
+_HEX_HALF_H = _HEX_R * _S3_2   # half-height
+_HEX_EDGE = _S3_2 * _HEX_R     # for angled-facet test
+
+# Equilateral triangle (apex up, circumradius)
+_TRI_R = 0.46
+_TRI_V1 = (0.5, 0.5 - _TRI_R)                          # top
+_TRI_V2 = (0.5 - _TRI_R * _S3_2, 0.5 + _TRI_R * 0.5)  # bottom-left
+_TRI_V3 = (0.5 + _TRI_R * _S3_2, 0.5 + _TRI_R * 0.5)  # bottom-right
+_TRI_DENOM = ((_TRI_V2[1] - _TRI_V3[1]) * (_TRI_V1[0] - _TRI_V3[0])
+              + (_TRI_V3[0] - _TRI_V2[0]) * (_TRI_V1[1] - _TRI_V3[1]))
+# Precompute coefficients for barycentric lambda calc
+_TRI_A1 = _TRI_V2[1] - _TRI_V3[1]
+_TRI_B1 = _TRI_V3[0] - _TRI_V2[0]
+_TRI_A2 = _TRI_V3[1] - _TRI_V1[1]
+_TRI_B2 = _TRI_V1[0] - _TRI_V3[0]
+_TRI_INV_D = 1.0 / _TRI_DENOM
+
+# Annular plate (ring) — radii in the r ∈ [0,1] space used by circle
+_RING_INNER = 0.30
+_RING_SPAN = 1.0 - _RING_INNER    # width of ring
+_RING_INNER2 = (_RING_INNER * 0.5) ** 2  # squared inner radius in (cx,cy) space
+
 
 class Chladni(Visual):
     name = "CHLADNI"
@@ -52,21 +87,29 @@ class Chladni(Visual):
     # For a ~20 cm square brass plate, f ≈ 28·(n² + m²) Hz.
     FREQ_CONST = 28.0
     MODES = [
-        (1, 2),  #  140 Hz   n²+m²= 5
-        (1, 3),  #  280 Hz   n²+m²=10
-        (2, 3),  #  364 Hz   n²+m²=13
-        (1, 4),  #  476 Hz   n²+m²=17
-        (2, 4),  #  560 Hz   n²+m²=20
-        (3, 4),  #  700 Hz   n²+m²=25
-        (1, 5),  #  728 Hz   n²+m²=26
-        (2, 5),  #  812 Hz   n²+m²=29
-        (3, 5),  #  952 Hz   n²+m²=34
-        (4, 5),  # 1148 Hz   n²+m²=41
-        (3, 7),  # 1624 Hz   n²+m²=58
-        (5, 6),  # 1708 Hz   n²+m²=61
-        (4, 7),  # 1820 Hz   n²+m²=65
-        (6, 7),  # 2380 Hz   n²+m²=85
-        (5, 8),  # 2492 Hz   n²+m²=89
+        (1, 2),  #  140 Hz   n²+m²=  5
+        (1, 3),  #  280 Hz   n²+m²= 10
+        (2, 3),  #  364 Hz   n²+m²= 13
+        (1, 4),  #  476 Hz   n²+m²= 17
+        (2, 4),  #  560 Hz   n²+m²= 20
+        (3, 4),  #  700 Hz   n²+m²= 25
+        (1, 5),  #  728 Hz   n²+m²= 26
+        (2, 5),  #  812 Hz   n²+m²= 29
+        (3, 5),  #  952 Hz   n²+m²= 34
+        (4, 5),  # 1148 Hz   n²+m²= 41
+        (3, 7),  # 1624 Hz   n²+m²= 58
+        (5, 6),  # 1708 Hz   n²+m²= 61
+        (4, 7),  # 1820 Hz   n²+m²= 65
+        (6, 7),  # 2380 Hz   n²+m²= 85
+        (5, 8),  # 2492 Hz   n²+m²= 89
+        (6, 8),  # 2800 Hz   n²+m²=100
+        (5, 9),  # 2968 Hz   n²+m²=106
+        (7, 8),  # 3164 Hz   n²+m²=113
+        (6, 9),  # 3276 Hz   n²+m²=117
+        (7, 9),  # 3640 Hz   n²+m²=130
+        (8, 9),  # 4060 Hz   n²+m²=145
+        (7,10),  # 4172 Hz   n²+m²=149
+        (9,10),  # 5068 Hz   n²+m²=181
     ]
 
     # Zeros of J_m(x) — Abramowitz & Stegun Table 9.5
@@ -140,16 +183,43 @@ class Chladni(Visual):
             if r > 1.0:
                 return 1.0
             theta = math.atan2(cy, cx)
-            # Map mode numbers to circular: angular order + radial index
             ang = min(n, m)
             rad = max(n, m) - ang + 1
             k = self._j_zero(ang, rad)
             return self._bessel_j(ang, k * r) * math.cos(ang * theta)
 
         if shape == 'rect':
-            # 3:2 aspect ratio rectangle
             return (math.cos(n * math.pi * x) * math.cos(m * math.pi * y * 1.5)
                     - math.cos(m * math.pi * x) * math.cos(n * math.pi * y * 1.5))
+
+        if shape == 'hex':
+            cx, cy = x - 0.5, y - 0.5
+            # Three axis projections at 120° intervals
+            d1 = cx
+            d2 = -0.5 * cx + _S3_2 * cy
+            d3 = -0.5 * cx - _S3_2 * cy
+            s = 3.0  # density scale
+            return (math.cos(n * math.pi * d1 * s) * math.cos(m * math.pi * d2 * s)
+                    - math.cos(m * math.pi * d1 * s) * math.cos(n * math.pi * d3 * s))
+
+        if shape == 'tri':
+            # Barycentric coordinates on equilateral triangle
+            px, py = x - _TRI_V3[0], y - _TRI_V3[1]
+            l1 = (_TRI_A1 * px + _TRI_B1 * py) * _TRI_INV_D
+            l2 = (_TRI_A2 * px + _TRI_B2 * py) * _TRI_INV_D
+            _sin = math.sin
+            _pi = math.pi
+            return (_sin(n * _pi * l1) * _sin(m * _pi * l2)
+                    - _sin(m * _pi * l1) * _sin(n * _pi * l2))
+
+        if shape == 'ring':
+            cx, cy = x - 0.5, y - 0.5
+            r = math.sqrt(cx * cx + cy * cy) * 2.0
+            if r < _RING_INNER or r > 1.0:
+                return 1.0
+            theta = math.atan2(cy, cx)
+            ring_r = (r - _RING_INNER) / _RING_SPAN
+            return math.sin(n * math.pi * ring_r) * math.cos(m * theta)
 
         # Square — classic Chladni (Ritz antisymmetric combination)
         return (math.cos(n * math.pi * x) * math.cos(m * math.pi * y)
@@ -161,11 +231,17 @@ class Chladni(Visual):
             ang = min(n, m)
             rad = max(n, m) - ang + 1
             k = self._j_zero(ang, rad)
-            # Scaled so lowest mode ≈ 140 Hz (matching square plate range)
             return 2.85 * k * k
         if shape == 'rect':
-            # f ∝ (n/a)² + (m/b)² with 3:2 aspect
             return self.FREQ_CONST * (n * n + m * m * 2.25)
+        if shape == 'hex':
+            # Hexagonal eigenvalues ∝ n² + nm + m²
+            return self.FREQ_CONST * (n * n + n * m + m * m) * 0.8
+        if shape == 'tri':
+            return self.FREQ_CONST * (n * n + n * m + m * m)
+        if shape == 'ring':
+            # Radial modes spaced more tightly due to narrower domain
+            return self.FREQ_CONST * (n * n * 4 + m * m)
         return self.FREQ_CONST * (n * n + m * m)
 
     # ── input ─────────────────────────────────────────────────────
@@ -253,6 +329,24 @@ class Chladni(Visual):
                     cx = nx_base - 0.5
                     cy = ny_base - 0.5
                     if cx * cx + cy * cy > 0.25:
+                        continue
+                elif shape_key == 'hex':
+                    ax = abs(nx_base - 0.5)
+                    ay = abs(ny_base - 0.5)
+                    if ax > _HEX_R or ay > _HEX_HALF_H or _S3_2 * ax + 0.5 * ay > _HEX_EDGE:
+                        continue
+                elif shape_key == 'tri':
+                    tpx = nx_base - _TRI_V3[0]
+                    tpy = ny_base - _TRI_V3[1]
+                    tl1 = (_TRI_A1 * tpx + _TRI_B1 * tpy) * _TRI_INV_D
+                    tl2 = (_TRI_A2 * tpx + _TRI_B2 * tpy) * _TRI_INV_D
+                    if tl1 < 0 or tl2 < 0 or tl1 + tl2 > 1.0:
+                        continue
+                elif shape_key == 'ring':
+                    cx = nx_base - 0.5
+                    cy = ny_base - 0.5
+                    r2 = cx * cx + cy * cy
+                    if r2 > 0.25 or r2 < _RING_INNER2:
                         continue
 
                 # Apply scatter displacement
