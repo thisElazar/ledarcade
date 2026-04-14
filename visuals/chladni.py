@@ -54,12 +54,12 @@ _S3 = math.sqrt(3)
 _S3_2 = _S3 / 2.0
 
 # Hexagon (flat-top, circumradius)
-_HEX_R = 0.46
+_HEX_R = 0.49
 _HEX_HALF_H = _HEX_R * _S3_2   # half-height
 _HEX_EDGE = _S3_2 * _HEX_R     # for angled-facet test
 
 # Equilateral triangle (apex up, circumradius)
-_TRI_R = 0.46
+_TRI_R = 0.49
 _TRI_V1 = (0.5, 0.5 - _TRI_R)                          # top
 _TRI_V2 = (0.5 - _TRI_R * _S3_2, 0.5 + _TRI_R * 0.5)  # bottom-left
 _TRI_V3 = (0.5 + _TRI_R * _S3_2, 0.5 + _TRI_R * 0.5)  # bottom-right
