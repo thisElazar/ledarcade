@@ -205,7 +205,11 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
             display.draw_text_small(2, y, ">", cat_color)
             name_w = _text_width(item_class.name)
             if name_w > MAX_NAME_W:
-                display.draw_text_small(NAME_X - int(name_scroll_x), y, item_class.name, cat_color)
+                gap = 24
+                total = name_w + gap
+                offset = int(name_scroll_x) % total
+                display.draw_text_small(NAME_X - offset, y, item_class.name, cat_color)
+                display.draw_text_small(NAME_X - offset + total, y, item_class.name, cat_color)
             else:
                 display.draw_text_small(NAME_X, y, item_class.name, cat_color)
         else:
@@ -574,7 +578,6 @@ def main():
     prev_item_index = -1
     NAME_SCROLL_DELAY = 0.8
     NAME_SCROLL_SPEED = 20.0
-    NAME_SCROLL_PAUSE = 1.0
 
     # Idle screen state
     idle_timer = 0.0
@@ -870,19 +873,7 @@ def main():
                         else:
                             name_scroll_timer += dt
                             if name_scroll_timer > NAME_SCROLL_DELAY:
-                                items = categories[cat_index].items
-                                if items:
-                                    name = items[item_index].name
-                                    name_w = _text_width(name)
-                                    max_name_w = 58
-                                    if name_w > max_name_w:
-                                        max_scroll = name_w - max_name_w
-                                        if name_scroll_x < max_scroll:
-                                            name_scroll_x += NAME_SCROLL_SPEED * dt
-                                            name_scroll_x = min(name_scroll_x, max_scroll)
-                                        elif name_scroll_timer > NAME_SCROLL_DELAY + max_scroll / NAME_SCROLL_SPEED + NAME_SCROLL_PAUSE:
-                                            name_scroll_x = 0.0
-                                            name_scroll_timer = 0.0
+                                name_scroll_x += NAME_SCROLL_SPEED * dt
 
                         draw_menu(display, categories, cat_index, item_index, name_scroll_x)
 

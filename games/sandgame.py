@@ -779,11 +779,16 @@ class SandGame(Game):
         # Unified button handling: either button counts the same
         btn_now = input_state.action_l_held or input_state.action_r_held
         if btn_now:
-            self.btn_hold_time += dt
-            if self.btn_hold_time >= 0.15:
-                self.painting = True
+            if not self.btn_was_held:
+                # First frame of press — reset timer, don't accumulate yet
+                # (avoids large-dt frames eating the short-press window)
+                self.btn_hold_time = 0.0
+            else:
+                self.btn_hold_time += dt
+                if self.btn_hold_time >= 0.15:
+                    self.painting = True
         else:
-            if self.btn_was_held and self.btn_hold_time < 0.15:
+            if self.btn_was_held and not self.painting:
                 self.mode = MODE_SELECT if self.mode == MODE_PLAY else MODE_PLAY
             self.btn_hold_time = 0.0
             self.painting = False

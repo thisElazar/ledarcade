@@ -41,8 +41,8 @@ class Game2048(Game):
         2048: (255, 255, 100), # Gold
     }
 
-    TEXT_DARK = (255, 255, 255)
-    TEXT_LIGHT = (255, 255, 255)
+    TEXT_DARK = (20, 20, 30)       # Dark text for bright tiles
+    TEXT_LIGHT = (255, 255, 255)   # White text for dark tiles
     BOARD_BG = (40, 40, 50)
 
     def __init__(self, display: Display):
@@ -279,9 +279,11 @@ class Game2048(Game):
         # Draw tile background
         self.display.draw_rect(x, y, self.CELL_SIZE, self.CELL_SIZE, color)
 
-        # Draw value
+        # Draw value — pick text color by tile brightness
         if value > 0:
-            text_color = self.TEXT_DARK if value < 8 else self.TEXT_LIGHT
+            r, g, b = color
+            luminance = 0.299 * r + 0.587 * g + 0.114 * b
+            text_color = self.TEXT_DARK if luminance > 130 else self.TEXT_LIGHT
             self.draw_tile_value(x, y, value, text_color)
 
     def draw_tile_value(self, x: int, y: int, value: int, color: tuple):
@@ -289,8 +291,8 @@ class Game2048(Game):
         # Center the text in the tile
         text = str(value)
 
-        # Calculate text width (approximately 4 pixels per character)
-        text_width = len(text) * 4
+        # Each glyph is 3px wide + 1px gap; no trailing gap after last char
+        text_width = len(text) * 4 - 1
         text_x = x + (self.CELL_SIZE - text_width) // 2
         text_y = y + (self.CELL_SIZE - 5) // 2  # 5 is font height
 
@@ -299,7 +301,7 @@ class Game2048(Game):
             # Draw abbreviated
             if value >= 1024:
                 text = "1K" if value == 1024 else "2K"
-            text_width = len(text) * 4
+            text_width = len(text) * 4 - 1
             text_x = x + (self.CELL_SIZE - text_width) // 2
 
         self.display.draw_text_small(text_x, text_y, text, color)

@@ -222,26 +222,16 @@ class Pottery(Visual):
             self._overlay_time += dt
 
     def _scroll_text(self, y, text, color):
-        """Draw text with bounce-scroll for long strings."""
+        """Draw text with continuous marquee scroll for long strings."""
         text_w = len(text) * _CHAR_W
         if text_w <= _VISIBLE_W:
             self.display.draw_text_small(2, y, text, color)
             return
-        max_offset = text_w - _VISIBLE_W
-        scroll_time = max_offset / _SCROLL_SPEED
-        cycle = _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE + scroll_time
-        t = self._overlay_time % cycle
-        if t < _SCROLL_PAUSE:
-            offset = 0
-        elif t < _SCROLL_PAUSE + scroll_time:
-            offset = int((t - _SCROLL_PAUSE) * _SCROLL_SPEED)
-        elif t < _SCROLL_PAUSE + scroll_time + _SCROLL_PAUSE:
-            offset = max_offset
-        else:
-            offset = max_offset - int(
-                (t - 2 * _SCROLL_PAUSE - scroll_time) * _SCROLL_SPEED)
-        offset = max(0, min(int(max_offset), offset))
+        gap = 24
+        total = text_w + gap
+        offset = int(self._overlay_time * _SCROLL_SPEED) % total
         self.display.draw_text_small(2 - offset, y, text, color)
+        self.display.draw_text_small(2 - offset + total, y, text, color)
 
     def _split_medium(self, medium):
         """Split medium string into two lines that fit the display."""

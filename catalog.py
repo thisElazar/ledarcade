@@ -49,7 +49,7 @@ GAME_CATEGORIES = [
     Category("RETRO GAMES",    (230, 132, 35),   "retro"),     # 30° orange
     Category("MODERN GAMES",   (230, 197, 35),   "modern"),    # 50° yellow
     Category("TOYS",           (35, 230, 35),    "toys"),      # 120° green
-    Category("BAR GAMES",      (35, 116, 230),   "bar"),       # 215° blue
+    Category("ALLEY GAMES",    (35, 116, 230),   "bar"),       # 215° blue
     Category("2 PLAYER GAMES", (132, 35, 230),   "2_player"),  # 270° purple
     Category("UNIQUE GAMES",   (230, 35, 132),   "unique"),    # 330° pink
     Category("GAME MIX",       (195, 195, 210),  "game_mix"),  # desaturated

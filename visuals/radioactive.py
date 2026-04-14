@@ -560,8 +560,8 @@ class Radioactive(Visual):
                 if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
                     self.display.set_pixel(ix, iy, color)
 
-        # -- HUD for HALF-LIFE scenario --
-        if scenario == 'HALF-LIFE':
+        # -- HUD for HALF-LIFE scenario (hidden during overlay) --
+        if scenario == 'HALF-LIFE' and self.overlay_timer <= 0:
             count = self._count_unstable()
             half_lives = self.elapsed / self.half_life if self.half_life > 0 else 0
             self.display.draw_text_small(2, 2,

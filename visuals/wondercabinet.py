@@ -7420,3 +7420,678 @@ class WonderGhostbusters(Visual):
         tp2 = 0.6 + 0.4 * math.sin(t * 1.5 + 0.5)
         d.draw_text_small(CABINET_X, CABINET_Y + 20, "CABINET",
                           (int(230 * tp2), int(40 * tp2), int(20 * tp2)))
+
+
+# =========================================================================
+# WonderFireworks - Fireworks bursting above title text
+# =========================================================================
+
+class WonderFireworks(Visual):
+    name = "WONDER FIREWORKS"
+    description = "Fireworks display"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.rockets = []
+        self.sparks = []
+        self._next_launch = 0.3
+
+    def update(self, dt: float):
+        self.time += dt
+        # Launch new rockets
+        self._next_launch -= dt
+        if self._next_launch <= 0:
+            self._next_launch = random.uniform(0.6, 1.4)
+            self.rockets.append({
+                'x': random.uniform(10, 54),
+                'y': 58.0,
+                'vy': -random.uniform(35, 55),
+                'burst_y': random.uniform(8, 28),
+                'hue': random.random(),
+            })
+        # Update rockets
+        for r in self.rockets[:]:
+            r['y'] += r['vy'] * dt
+            if r['y'] <= r['burst_y']:
+                # Burst into sparks
+                hue = r['hue']
+                color = _hue_to_rgb(hue)
+                num = random.randint(12, 20)
+                for i in range(num):
+                    angle = i * 2 * math.pi / num + random.uniform(-0.2, 0.2)
+                    speed = random.uniform(15, 35)
+                    self.sparks.append({
+                        'x': r['x'], 'y': r['y'],
+                        'vx': math.cos(angle) * speed,
+                        'vy': math.sin(angle) * speed,
+                        'color': color, 'life': 1.0,
+                    })
+                self.rockets.remove(r)
+        # Update sparks
+        for s in self.sparks[:]:
+            s['x'] += s['vx'] * dt
+            s['y'] += s['vy'] * dt
+            s['vy'] += 15 * dt  # gravity
+            s['life'] -= dt * 1.2
+            if s['life'] <= 0:
+                self.sparks.remove(s)
+
+    def draw(self):
+        d = self.display
+        d.clear((2, 2, 8))
+        # Sparks
+        for s in self.sparks:
+            ix, iy = int(s['x']), int(s['y'])
+            if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                fade = max(0.0, s['life'])
+                c = s['color']
+                d.set_pixel(ix, iy, (int(c[0] * fade), int(c[1] * fade), int(c[2] * fade)))
+        # Rising rockets
+        for r in self.rockets:
+            ix, iy = int(r['x']), int(r['y'])
+            if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                d.set_pixel(ix, iy, (255, 200, 100))
+                if iy + 1 < GRID_SIZE:
+                    d.set_pixel(ix, iy + 1, (180, 100, 30))
+        # Title text
+        t = self.time
+        pulse = 0.7 + 0.3 * math.sin(t * 2.0)
+        c1 = (int(255 * pulse), int(220 * pulse), int(100 * pulse))
+        c2 = (int(255 * pulse), int(180 * pulse), int(60 * pulse))
+        d.draw_text_small(WONDER_X, 48, "WONDER", c1)
+        d.draw_text_small(CABINET_X, 55, "CABINET", c2)
+
+
+# =========================================================================
+# WonderLava - Lava lamp blobs rising behind text
+# =========================================================================
+
+class WonderLava(Visual):
+    name = "WONDER LAVA"
+    description = "Lava lamp title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.blobs = []
+        for _ in range(8):
+            self.blobs.append({
+                'x': random.uniform(5, 59),
+                'y': random.uniform(0, 64),
+                'r': random.uniform(4, 8),
+                'vx': random.uniform(-3, 3),
+                'vy': random.uniform(-8, -3),
+                'phase': random.random() * math.pi * 2,
+            })
+
+    def update(self, dt: float):
+        self.time += dt
+        for b in self.blobs:
+            b['y'] += b['vy'] * dt
+            b['x'] += math.sin(self.time * 0.8 + b['phase']) * 8 * dt
+            # Wrap around vertically
+            if b['y'] < -b['r']:
+                b['y'] = GRID_SIZE + b['r']
+                b['x'] = random.uniform(5, 59)
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        # Dark warm background
+        d.clear((15, 5, 5))
+        # Draw lava blobs as soft circles
+        for b in self.blobs:
+            bx, by, br = b['x'], b['y'], b['r']
+            pulse = 0.7 + 0.3 * math.sin(t * 1.5 + b['phase'])
+            ir = int(br * pulse)
+            for dy in range(-ir, ir + 1):
+                for dx in range(-ir, ir + 1):
+                    dist = math.sqrt(dx * dx + dy * dy)
+                    if dist <= ir:
+                        px, py = int(bx + dx), int(by + dy)
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            glow = max(0, 1.0 - dist / ir)
+                            r = int(220 * glow * pulse)
+                            g = int(60 * glow * pulse)
+                            bl = int(10 * glow * pulse)
+                            d.set_pixel(px, py, (r, g, bl))
+        # Title
+        text_pulse = 0.8 + 0.2 * math.sin(t * 1.2)
+        d.draw_text_small(WONDER_X, WONDER_Y, "WONDER",
+                          (int(255 * text_pulse), int(200 * text_pulse), int(80 * text_pulse)))
+        d.draw_text_small(CABINET_X, CABINET_Y, "CABINET",
+                          (int(255 * text_pulse), int(160 * text_pulse), int(50 * text_pulse)))
+
+
+# =========================================================================
+# WonderDisco - Disco ball with rotating light beams
+# =========================================================================
+
+class WonderDisco(Visual):
+    name = "WONDER DISCO"
+    description = "Disco ball lights"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        d.clear(Colors.BLACK)
+
+        # Disco ball at top center
+        ball_cx, ball_cy = 32, 10
+        ball_r = 5
+        for dy in range(-ball_r, ball_r + 1):
+            for dx in range(-ball_r, ball_r + 1):
+                if dx * dx + dy * dy <= ball_r * ball_r:
+                    px, py = ball_cx + dx, ball_cy + dy
+                    # Mirror facets
+                    facet = ((dx + int(t * 3)) % 3 + (dy + int(t * 2)) % 3) % 3
+                    if facet == 0:
+                        d.set_pixel(px, py, (200, 200, 220))
+                    elif facet == 1:
+                        d.set_pixel(px, py, (150, 150, 170))
+                    else:
+                        d.set_pixel(px, py, (100, 100, 120))
+
+        # Rotating light beams from ball
+        num_beams = 6
+        for i in range(num_beams):
+            angle = t * 1.5 + i * math.pi * 2 / num_beams
+            hue = (i / num_beams + t * 0.1) % 1.0
+            color = _hue_to_rgb(hue)
+            for dist in range(8, 40):
+                bx = int(ball_cx + math.cos(angle) * dist)
+                by = int(ball_cy + math.sin(angle) * dist * 0.8)
+                if 0 <= bx < GRID_SIZE and 0 <= by < GRID_SIZE:
+                    fade = max(0.1, 1.0 - dist / 45.0)
+                    d.set_pixel(bx, by, (int(color[0] * fade),
+                                          int(color[1] * fade),
+                                          int(color[2] * fade)))
+
+        # Floor tiles
+        for x in range(0, GRID_SIZE, 4):
+            for fx in range(4):
+                tile_hue = ((x // 4 + int(t * 2)) % 6) / 6.0
+                tc = _hue_to_rgb(tile_hue)
+                dim = 0.15
+                px = x + fx
+                if 0 <= px < GRID_SIZE:
+                    d.set_pixel(px, 63, (int(tc[0] * dim), int(tc[1] * dim), int(tc[2] * dim)))
+
+        # Title
+        pulse = 0.7 + 0.3 * math.sin(t * 3.0)
+        hue_w = (t * 0.3) % 1.0
+        cw = _hue_to_rgb(hue_w)
+        cw = (int(cw[0] * pulse), int(cw[1] * pulse), int(cw[2] * pulse))
+        hue_c = (hue_w + 0.2) % 1.0
+        cc = _hue_to_rgb(hue_c)
+        cc = (int(cc[0] * pulse), int(cc[1] * pulse), int(cc[2] * pulse))
+        d.draw_text_small(WONDER_X, 42, "WONDER", cw)
+        d.draw_text_small(CABINET_X, 50, "CABINET", cc)
+
+
+# =========================================================================
+# WonderRacer - Racing car zooms across, revealing text
+# =========================================================================
+
+class WonderRacer(Visual):
+    name = "WONDER RACER"
+    description = "Racing car reveal"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        d.clear((20, 25, 30))
+
+        cycle = 6.0
+        ct = t % cycle
+
+        # Road
+        road_y = 38
+        d.draw_rect(0, road_y, 64, 12, (50, 50, 50))
+        # Road lines (moving)
+        line_offset = int(t * 60) % 12
+        for x in range(-line_offset, GRID_SIZE, 12):
+            for dx in range(6):
+                px = x + dx
+                if 0 <= px < GRID_SIZE:
+                    d.set_pixel(px, road_y + 5, (180, 180, 50))
+                    d.set_pixel(px, road_y + 6, (180, 180, 50))
+
+        # Car position
+        if ct < 3.0:
+            # Car zooms left to right
+            car_x = int(-10 + (ct / 3.0) * 80)
+        elif ct < 3.5:
+            car_x = 70  # off screen
+        else:
+            car_x = 70  # stays off
+
+        # Draw car (simple side view)
+        if -8 <= car_x < GRID_SIZE + 5:
+            # Body
+            body_color = (220, 30, 30)
+            for dx in range(8):
+                for dy in range(3):
+                    px = car_x + dx
+                    py = road_y + 2 + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, body_color)
+            # Roof
+            for dx in range(1, 5):
+                px = car_x + dx
+                py = road_y + 1
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, body_color)
+            # Window
+            px = car_x + 2
+            py = road_y + 1
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                d.set_pixel(px, py, (100, 180, 255))
+            px = car_x + 3
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                d.set_pixel(px, py, (100, 180, 255))
+            # Wheels
+            for wx in [1, 6]:
+                px = car_x + wx
+                py = road_y + 5
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (30, 30, 30))
+
+            # Speed lines behind car
+            for i in range(3):
+                lx = car_x - 2 - i * 4
+                ly = road_y + 2 + i
+                if 0 <= lx < GRID_SIZE and 0 <= ly < GRID_SIZE:
+                    d.set_pixel(lx, ly, (150, 150, 150))
+
+        # Text above road - appears after car passes or stays visible
+        reveal = min(1.0, max(0.0, (ct - 0.5) / 2.0)) if ct < 3.5 else 1.0
+        if reveal > 0:
+            # Reveal text character by character as car passes
+            w_chars = int(reveal * 6)
+            c_chars = int(max(0, reveal - 0.3) / 0.7 * 7)
+            if w_chars > 0:
+                d.draw_text_small(WONDER_X, 16, "WONDER"[:w_chars],
+                                  (int(255 * reveal), int(255 * reveal), int(255 * reveal)))
+            if c_chars > 0:
+                d.draw_text_small(CABINET_X, CABINET_Y - 8, "CABINET"[:c_chars],
+                                  (int(200 * reveal), int(200 * reveal), int(255 * reveal)))
+
+        # Checkered flag bottom
+        for x in range(GRID_SIZE):
+            for y in range(52, 54):
+                if (x // 2 + y) % 2 == 0:
+                    d.set_pixel(x, y, Colors.WHITE)
+                else:
+                    d.set_pixel(x, y, Colors.BLACK)
+
+
+# =========================================================================
+# WonderPinball - Pinball bouncing between bumpers
+# =========================================================================
+
+class WonderPinball(Visual):
+    name = "WONDER PINBALL"
+    description = "Pinball machine title"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.ball_x = 32.0
+        self.ball_y = 10.0
+        self.ball_vx = 25.0
+        self.ball_vy = 15.0
+        self.bumpers = [
+            (15, 20, 4), (48, 18, 4), (30, 35, 5),
+            (12, 45, 3), (52, 42, 3),
+        ]
+        self.flash_timers = [0.0] * len(self.bumpers)
+
+    def update(self, dt: float):
+        self.time += dt
+        # Move ball
+        self.ball_x += self.ball_vx * dt
+        self.ball_y += self.ball_vy * dt
+        self.ball_vy += 30 * dt  # gravity
+
+        # Bounce off walls
+        if self.ball_x < 2:
+            self.ball_x = 2
+            self.ball_vx = abs(self.ball_vx)
+        elif self.ball_x > 61:
+            self.ball_x = 61
+            self.ball_vx = -abs(self.ball_vx)
+        if self.ball_y < 2:
+            self.ball_y = 2
+            self.ball_vy = abs(self.ball_vy)
+        elif self.ball_y > 58:
+            # Reset ball from top
+            self.ball_y = 5
+            self.ball_vy = random.uniform(10, 25)
+            self.ball_vx = random.uniform(-30, 30)
+
+        # Bumper collisions
+        for i, (bx, by, br) in enumerate(self.bumpers):
+            dx = self.ball_x - bx
+            dy = self.ball_y - by
+            dist = math.sqrt(dx * dx + dy * dy)
+            if dist < br + 2:
+                # Bounce away from bumper
+                if dist > 0:
+                    nx, ny = dx / dist, dy / dist
+                else:
+                    nx, ny = 0, -1
+                speed = math.sqrt(self.ball_vx ** 2 + self.ball_vy ** 2)
+                self.ball_vx = nx * max(speed, 40)
+                self.ball_vy = ny * max(speed, 40)
+                self.ball_x = bx + nx * (br + 3)
+                self.ball_y = by + ny * (br + 3)
+                self.flash_timers[i] = 0.3
+
+        # Update flashes
+        for i in range(len(self.flash_timers)):
+            if self.flash_timers[i] > 0:
+                self.flash_timers[i] -= dt
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        d.clear((5, 5, 20))
+
+        # Side rails
+        for y in range(GRID_SIZE):
+            d.set_pixel(0, y, (60, 60, 80))
+            d.set_pixel(63, y, (60, 60, 80))
+
+        # Bumpers
+        for i, (bx, by, br) in enumerate(self.bumpers):
+            flash = self.flash_timers[i] > 0
+            for dy in range(-br, br + 1):
+                for dx in range(-br, br + 1):
+                    if dx * dx + dy * dy <= br * br:
+                        px, py = bx + dx, by + dy
+                        if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                            if flash:
+                                hue = (i * 0.2 + t * 0.5) % 1.0
+                                d.set_pixel(px, py, _hue_to_rgb(hue))
+                            else:
+                                d.set_pixel(px, py, (80, 40, 120))
+            # Bumper ring
+            for angle_i in range(20):
+                a = angle_i * math.pi * 2 / 20
+                px = int(bx + math.cos(a) * br)
+                py = int(by + math.sin(a) * br)
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    if flash:
+                        d.set_pixel(px, py, (255, 255, 255))
+                    else:
+                        d.set_pixel(px, py, (120, 80, 180))
+
+        # Ball (bright silver)
+        bx, by = int(self.ball_x), int(self.ball_y)
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                px, py = bx + dx, by + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    if dx == 0 and dy == 0:
+                        d.set_pixel(px, py, (255, 255, 255))
+                    else:
+                        d.set_pixel(px, py, (180, 180, 200))
+
+        # Title at very top and bottom
+        tp = 0.7 + 0.3 * math.sin(t * 2.0)
+        d.draw_text_small(WONDER_X, 1, "WONDER",
+                          (int(200 * tp), int(150 * tp), int(255 * tp)))
+        d.draw_text_small(CABINET_X, 57, "CABINET",
+                          (int(200 * tp), int(150 * tp), int(255 * tp)))
+
+        # Flippers at bottom
+        for side in range(2):
+            fx = 18 if side == 0 else 46
+            angle = 0.3 * math.sin(t * 4 + side * math.pi)
+            for seg in range(8):
+                direction = 1 if side == 0 else -1
+                px = int(fx + direction * seg * math.cos(angle))
+                py = int(54 + seg * math.sin(angle))
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (200, 200, 220))
+
+
+# =========================================================================
+# WonderAqua - Underwater scene with fish and bubbles
+# =========================================================================
+
+class WonderAqua(Visual):
+    name = "WONDER AQUA"
+    description = "Underwater aquarium"
+    category = "titles"
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+        self.fish = []
+        for _ in range(5):
+            self.fish.append({
+                'x': random.uniform(0, 64),
+                'y': random.uniform(10, 50),
+                'vx': random.choice([-1, 1]) * random.uniform(8, 18),
+                'color': _hue_to_rgb(random.uniform(0.0, 0.15)),  # warm fish colors
+                'size': random.choice([1, 2]),
+            })
+        self.bubbles = []
+
+    def update(self, dt: float):
+        self.time += dt
+        # Move fish
+        for f in self.fish:
+            f['x'] += f['vx'] * dt
+            f['y'] += math.sin(self.time * 2 + f['y'] * 0.1) * 3 * dt
+            # Wrap
+            if f['vx'] > 0 and f['x'] > 68:
+                f['x'] = -5
+                f['y'] = random.uniform(10, 50)
+            elif f['vx'] < 0 and f['x'] < -5:
+                f['x'] = 68
+                f['y'] = random.uniform(10, 50)
+
+        # Spawn bubbles
+        if random.random() < dt * 3:
+            self.bubbles.append({
+                'x': random.uniform(5, 59),
+                'y': 60.0,
+                'speed': random.uniform(10, 20),
+            })
+        # Update bubbles
+        for b in self.bubbles[:]:
+            b['y'] -= b['speed'] * dt
+            b['x'] += math.sin(self.time * 3 + b['x'] * 0.2) * 5 * dt
+            if b['y'] < -2:
+                self.bubbles.remove(b)
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        # Ocean gradient background
+        for y in range(GRID_SIZE):
+            depth = y / GRID_SIZE
+            r = int(5 + 15 * (1 - depth))
+            g = int(20 + 40 * (1 - depth))
+            b = int(60 + 80 * (1 - depth))
+            for x in range(GRID_SIZE):
+                d.set_pixel(x, y, (r, g, b))
+
+        # Seaweed on bottom
+        for i in range(4):
+            base_x = 8 + i * 16
+            for seg in range(8):
+                sway = math.sin(t * 1.5 + seg * 0.5 + i) * 3
+                px = int(base_x + sway * (seg / 8))
+                py = 63 - seg
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    green = 80 + seg * 15
+                    d.set_pixel(px, py, (0, min(255, green), 20))
+
+        # Bubbles
+        for b in self.bubbles:
+            ix, iy = int(b['x']), int(b['y'])
+            if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                d.set_pixel(ix, iy, (150, 200, 255))
+
+        # Fish
+        for f in self.fish:
+            fx, fy = int(f['x']), int(f['y'])
+            facing_right = f['vx'] > 0
+            c = f['color']
+            # Body
+            body_len = 3 if f['size'] == 1 else 5
+            for dx in range(body_len):
+                for dy in range(-f['size'], f['size'] + 1):
+                    px, py = fx + dx, fy + dy
+                    if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                        d.set_pixel(px, py, c)
+            # Tail
+            tail_x = fx - 1 if facing_right else fx + body_len
+            for dy in range(-f['size'], f['size'] + 1):
+                px, py = tail_x, fy + dy
+                if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                    d.set_pixel(px, py, (c[0] // 2, c[1] // 2, c[2] // 2))
+            # Eye
+            eye_x = fx + body_len - 1 if facing_right else fx
+            if 0 <= eye_x < GRID_SIZE and 0 <= fy - (f['size'] - 1) < GRID_SIZE:
+                d.set_pixel(eye_x, fy - (f['size'] - 1), (255, 255, 255))
+
+        # Title text with wavy effect
+        for ci, ch in enumerate("WONDER"):
+            wave = int(math.sin(t * 3 + ci * 0.8) * 2)
+            cx = WONDER_X + ci * 4
+            cy = 3 + wave
+            d.draw_text_small(cx, cy, ch, (200, 230, 255))
+        for ci, ch in enumerate("CABINET"):
+            wave = int(math.sin(t * 3 + ci * 0.8 + 2) * 2)
+            cx = CABINET_X + ci * 4
+            cy = 10 + wave
+            d.draw_text_small(cx, cy, ch, (150, 200, 255))
+
+
+# =========================================================================
+# WonderSlotMachine - Spinning reels land on WONDER CABINET
+# =========================================================================
+
+class WonderSlotMachine(Visual):
+    name = "WONDER SLOTS"
+    description = "Slot machine reels"
+    category = "titles"
+
+    SYMBOLS = ['W', 'O', 'N', 'D', 'E', 'R', '*', 'C', 'A', 'B', 'I', 'T']
+
+    def __init__(self, display: Display):
+        super().__init__(display)
+
+    def reset(self):
+        self.time = 0.0
+
+    def update(self, dt: float):
+        self.time += dt
+
+    def draw(self):
+        d = self.display
+        t = self.time
+        d.clear(Colors.BLACK)
+
+        cycle = 8.0
+        ct = t % cycle
+
+        # Machine frame
+        frame = (120, 80, 20)
+        d.draw_rect(0, 0, 64, 4, frame)
+        d.draw_rect(0, 60, 64, 4, frame)
+        for y in range(4, 60):
+            d.set_pixel(0, y, frame)
+            d.set_pixel(1, y, frame)
+            d.set_pixel(62, y, frame)
+            d.set_pixel(63, y, frame)
+
+        # Title at top
+        d.draw_text_small(12, 1, "JACKPOT", (255, 255, 100))
+
+        # Three reels (each shows one symbol)
+        reel_positions = [14, 28, 42]
+        target = ['W', 'C', '!']
+        symbols = self.SYMBOLS
+
+        for ri, rx in enumerate(reel_positions):
+            # Reel stops at different times
+            stop_time = 2.0 + ri * 1.5
+
+            if ct < stop_time:
+                # Spinning - show cycling symbols
+                speed = max(1, 20 - (ct / stop_time) * 15)
+                idx = int(ct * speed) % len(symbols)
+                sym = symbols[idx]
+                color = (180, 180, 180)
+            else:
+                sym = target[ri]
+                # Flash on landing
+                flash = (ct - stop_time) < 0.3
+                if sym == '!':
+                    color = (255, 50, 50) if not flash else (255, 255, 255)
+                else:
+                    color = (255, 255, 100) if not flash else (255, 255, 255)
+
+            # Draw symbol large (centered in reel area)
+            d.draw_text_small(rx + 2, 28, sym, color)
+
+            # Reel borders
+            for y in range(20, 40):
+                d.set_pixel(rx, y, (80, 80, 100))
+                d.set_pixel(rx + 13, y, (80, 80, 100))
+            for x in range(rx, rx + 14):
+                d.set_pixel(x, 20, (80, 80, 100))
+                d.set_pixel(x, 39, (80, 80, 100))
+
+        # After all reels stop, show full text
+        if ct > 6.5:
+            fade = min(1.0, (ct - 6.5) / 0.5)
+            d.draw_text_small(WONDER_X, 45, "WONDER",
+                              (int(255 * fade), int(255 * fade), int(100 * fade)))
+            d.draw_text_small(CABINET_X, 52, "CABINET",
+                              (int(255 * fade), int(200 * fade), int(50 * fade)))
+
+        # Lever on right side
+        lever_y = 30 + int(max(0, min(1, ct / 0.5)) * 10)
+        d.set_pixel(61, lever_y, (200, 50, 50))
+        d.set_pixel(61, lever_y - 1, (200, 50, 50))
+        for y in range(20, lever_y):
+            d.set_pixel(61, y, (150, 150, 150))

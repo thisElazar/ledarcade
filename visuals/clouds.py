@@ -665,12 +665,9 @@ class Clouds(Visual):
         label_x = max(1, (64 - label_px) // 2)
         d.draw_text_small(label_x, 59, label, band_color)
 
-        # Speed indicator (top-right)
+        # Speed indicator (top-right) / overlay
         speed_label = self.TIME_LABELS[self._speed_idx]
         spd_px = len(speed_label) * 4
-        d.draw_text_small(63 - spd_px, 1, speed_label, (80, 100, 80))
-
-        # Overlay
         if self.overlay_timer > 0:
             alpha = min(1.0, self.overlay_timer / 0.5)
             if self.overlay_timer > 0.8:
@@ -683,6 +680,8 @@ class Clouds(Visual):
                 # Speed change overlay
                 oc = (int(120 * alpha), int(160 * alpha), int(120 * alpha))
                 d.draw_text_small(2, 1, speed_label, oc)
+        else:
+            d.draw_text_small(63 - spd_px, 1, speed_label, (80, 100, 80))
 
     def _get_sprite(self, cloud):
         """Get the current animation frame for a cloud."""

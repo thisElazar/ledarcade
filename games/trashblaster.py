@@ -4,7 +4,7 @@ TrashBlaster - Zap floating trash from your spaceship!
 Inspired by MathBlasters. You're piloting an alien vessel through a debris
 field. Look through your cockpit window and use your targeting crosshair
 to blast floating trash. Move the crosshair with the joystick and fire
-with the action button! Score as many points as you can in 2 minutes!
+with the action button! Score as many points as you can in 1 minute!
 
 Controls:
   Arrow Keys - Move targeting crosshair
@@ -182,8 +182,8 @@ class TrashBlaster(Game):
     def reset(self):
         self.state = GameState.PLAYING
         self.time = 0.0
-        self.time_limit = 120.0
-        self.time_remaining = 120.0
+        self.time_limit = 60.0
+        self.time_remaining = 60.0
         self.score = 0
         self.trash = []
         self.explosions = []
