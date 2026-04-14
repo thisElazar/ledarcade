@@ -18,6 +18,7 @@ import math
 import random
 from enum import Enum, auto
 from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState
+import update_checker
 from catalog import (
     register_games, register_visuals, get_all_categories,
     GAME_CATEGORIES, VISUAL_CATEGORIES
@@ -214,7 +215,8 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
         color = Colors.WHITE if i == cat_index else Colors.DARK_GRAY
         display.set_pixel(x, 9, color)
 
-    display.draw_line(0, 11, 63, 11, Colors.DARK_GRAY)
+    sep_color = (80, 60, 0) if update_checker.available else Colors.DARK_GRAY
+    display.draw_line(0, 11, 63, 11, sep_color)
 
     # Item list
     items = category.items
@@ -258,7 +260,7 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
         display.draw_text_small(58, 14 + (visible - 1) * 8, "v", Colors.GRAY)
 
     # Instructions
-    display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
+    display.draw_line(0, 56, 63, 56, sep_color)
     display.draw_text_small(2, 58, "SPACE:GO", Colors.GRAY)
     display.draw_text_small(34, 58, "HOLD:EXIT", Colors.GRAY)
 
@@ -567,6 +569,8 @@ def main():
     input_handler = InputHandler()
     clock = pygame.time.Clock()
 
+    update_checker.start()
+
     # State
     in_menu = True
     cat_index = 0
@@ -589,7 +593,7 @@ def main():
     prev_cat_index = -1
     prev_item_index = -1
     NAME_SCROLL_DELAY = 0.8   # seconds before scrolling starts
-    NAME_SCROLL_SPEED = 20.0  # pixels per second
+    NAME_SCROLL_SPEED = 14.0  # pixels per second
 
     # Idle transition manager
     from transitions import TransitionManager

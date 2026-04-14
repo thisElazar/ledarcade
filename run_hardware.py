@@ -18,6 +18,7 @@ from enum import Enum, auto
 
 # Hardware display and input
 from hardware import HardwareDisplay, HardwareInput, Colors, GRID_SIZE
+import update_checker
 
 # Game/visual catalogs
 from catalog import register_games, register_visuals, get_all_categories
@@ -181,7 +182,8 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
         color = Colors.WHITE if i == cat_index else Colors.DARK_GRAY
         display.set_pixel(x, 9, color)
 
-    display.draw_line(0, 11, 63, 11, Colors.DARK_GRAY)
+    sep_color = (80, 60, 0) if update_checker.available else Colors.DARK_GRAY
+    display.draw_line(0, 11, 63, 11, sep_color)
 
     items = category.items
     if not items:
@@ -220,7 +222,7 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
     if start_idx + visible < len(items):
         display.draw_text_small(58, 14 + (visible - 1) * 8, "v", Colors.GRAY)
 
-    display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
+    display.draw_line(0, 56, 63, 56, sep_color)
     display.draw_text_small(8, 58, "PRESS TO PLAY", Colors.GRAY)
 
 
@@ -562,6 +564,8 @@ def main():
     print("READY!")
     print("=" * 50)
 
+    update_checker.start()
+
     # State
     in_menu = True
     cat_index = 0
@@ -577,7 +581,7 @@ def main():
     prev_cat_index = -1
     prev_item_index = -1
     NAME_SCROLL_DELAY = 0.8
-    NAME_SCROLL_SPEED = 20.0
+    NAME_SCROLL_SPEED = 14.0
 
     # Idle screen state
     idle_timer = 0.0
