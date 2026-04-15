@@ -338,6 +338,7 @@ from .entropy import Entropy
 from .maxwell import MaxwellDemon
 from .network import Network
 from .seismic import Seismic
+from .tectonic import Tectonic
 from .ecosystem import Ecosystem
 from .slideshow import (
     Slideshow, AllVisuals, Chill, Energy, ArtGallery,
@@ -626,6 +627,7 @@ ALL_VISUALS = [
     MaxwellDemon,
     Network,
     Seismic,
+    Tectonic,
     Ecosystem,
     # Slideshows (visual playlists)
     Title,

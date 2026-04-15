@@ -197,14 +197,14 @@ SUN_MASS = 50.0  # Heavy so circular velocity formula works cleanly
 _PLANET_NAMES = ["MERCURY", "VENUS", "EARTH", "MARS",
                  "JUPITER", "SATURN", "URANUS", "NEPTUNE"]
 _PLANET_FACTS = [
-    "88 DAY ORBIT",   # Mercury
-    "HOTTEST WORLD",  # Venus
-    "365 DAY ORBIT",  # Earth
-    "THE RED PLANET", # Mars (13 chars)
-    "GAS GIANT",      # Jupiter
-    "RING SYSTEM",    # Saturn
-    "ICE GIANT",      # Uranus
-    "8TH PLANET",     # Neptune
+    ["88 DAY ORBIT",  "SMALLEST"],          # Mercury
+    ["225 DAY ORBIT", "HOTTEST WORLD"],      # Venus
+    ["365 DAY ORBIT", "HOME", "HELLO WORLD"],# Earth
+    ["687 DAY ORBIT", "THE RED PLANET"],     # Mars
+    ["12 YEAR ORBIT", "GAS GIANT"],          # Jupiter
+    ["29 YEAR ORBIT", "RING SYSTEM"],        # Saturn
+    ["84 YEAR ORBIT", "ICE GIANT"],          # Uranus
+    ["165 YR ORBIT",  "FARTHEST PLANET"],    # Neptune
 ]
 
 # View modes
@@ -654,16 +654,18 @@ class OrbitsSolar(Visual):
             self.display.set_pixel(hx, hy, (255, 255, 255))
 
     def _draw_planet_label(self):
-        """Show planet name or fact at bottom in FOLLOW mode."""
+        """Cycle planet name then facts at bottom in FOLLOW mode."""
         idx = self.follow_planet_idx
         if idx < 0 or idx >= len(_PLANET_NAMES):
             return
-        # Toggle between name and fact every 4 seconds
-        show_fact = (int(self.label_timer / 4.0) % 2) == 1
-        if show_fact:
-            text = _PLANET_FACTS[idx]
-        else:
+        facts = _PLANET_FACTS[idx]
+        # Cycle: name, fact0, fact1, ... every 3 seconds
+        n_labels = 1 + len(facts)
+        which = int(self.label_timer / 3.0) % n_labels
+        if which == 0:
             text = _PLANET_NAMES[idx]
+        else:
+            text = facts[which - 1]
         self.display.draw_text_small(2, 58, text, (180, 180, 180))
 
 
