@@ -1140,7 +1140,7 @@ class FluidSculpt(Visual):
 
     _VIZ_MODES = (
         [('vel', name) for name in VEL_PALETTE_NAMES] +
-        [('dir', 'DIRECTION')] +
+        [('dir', name) for name in DIR_PALETTE_NAMES] +
         [('vort', name) for name in VORT_PALETTE_NAMES]
     )
     _N_VIZ_MODES = len(_VIZ_MODES)
