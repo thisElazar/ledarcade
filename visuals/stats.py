@@ -262,8 +262,8 @@ class Stats(Visual):
 
         # Header: title centered
         title = section['title']
-        # draw_text_small uses 4px wide chars + 1px gap = 5px per char
-        tw = len(title) * 5 - 1
+        # draw_text_small uses 3px wide chars + 1px gap = 4px per char
+        tw = len(title) * 4 - 1
         tx = max(0, (GRID_SIZE - tw) // 2)
         d.draw_text_small(tx, 0, title, Colors.WHITE)
 

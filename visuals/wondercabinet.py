@@ -464,7 +464,7 @@ class WonderPacMan(Visual):
                 if 0 <= dx < GRID_SIZE:
                     self.display.set_pixel(dx, dot_y1, (255, 184, 151))
             # WONDER revealed behind pac
-            chars_revealed = max(0, min(6, int((pac_x - WONDER_X) / 5) + 1))
+            chars_revealed = max(0, min(6, int((pac_x - WONDER_X) / 4) + 1))
             if chars_revealed > 0:
                 revealed = "WONDER"[:chars_revealed]
                 self.display.draw_text_small(WONDER_X, WONDER_Y, revealed, Colors.WHITE)
@@ -483,12 +483,12 @@ class WonderPacMan(Visual):
             self.display.draw_text_small(WONDER_X, WONDER_Y, "WONDER", Colors.WHITE)
             # CABINET revealed behind pac (right to left)
             right_edge = CABINET_X + CABINET_W
-            chars_revealed = max(0, min(7, int((right_edge - pac_x) / 5) + 1))
+            chars_revealed = max(0, min(7, int((right_edge - pac_x) / 4) + 1))
             if chars_revealed > 0:
                 # Reveal from right side
                 start = 7 - chars_revealed
                 revealed = "CABINET"[start:]
-                rx = CABINET_X + start * 5
+                rx = CABINET_X + start * 4
                 self.display.draw_text_small(rx, CABINET_Y, revealed, Colors.WHITE)
 
         # Phase 3 (6-8s): Both words shown, gentle color cycle
@@ -759,7 +759,7 @@ class WonderNeon(Visual):
         for i, ch in enumerate("WONDER"):
             if i >= letters_on:
                 break
-            x = WONDER_X + i * 5
+            x = WONDER_X + i * 4
             # Flicker effect: newly lit letters flicker more
             age = ct - i * 0.3
             if age < 0.6:
@@ -783,7 +783,7 @@ class WonderNeon(Visual):
             li = i + 6  # letter index in full sequence
             if li >= letters_on:
                 break
-            x = CABINET_X + i * 5
+            x = CABINET_X + i * 4
             age = ct - li * 0.3
             if age < 0.6:
                 flick = math.sin(age * 30 + self.flicker_seeds[li]) > -0.3
@@ -2502,7 +2502,7 @@ class WonderInsertCoin(Visual):
                 bounce = _ease_out_bounce(min(1.0, drop_t / 0.5))
                 y = int(-8 + bounce * (14 + 8))
                 ch = text[i]
-                self.display.draw_text_small(gx + i * 5, y, ch, (255, 40, 40))
+                self.display.draw_text_small(gx + i * 4, y, ch, (255, 40, 40))
 
             text2 = "OVER"
             chars2 = max(0, min(4, int((t - 1.5) / 0.3) + 1))
@@ -2514,7 +2514,7 @@ class WonderInsertCoin(Visual):
                 bounce = _ease_out_bounce(min(1.0, drop_t / 0.5))
                 y = int(-8 + bounce * (24 + 8))
                 ch = text2[i]
-                self.display.draw_text_small(ox + i * 5, y, ch, (255, 40, 40))
+                self.display.draw_text_small(ox + i * 4, y, ch, (255, 40, 40))
 
         elif t < 14.0:
             # Show GAME OVER steady + blinking INSERT COIN + countdown
@@ -2967,9 +2967,9 @@ class WonderDOS(Visual):
                 blink = int(t * 2) % 2 == 0
                 if blink:
                     if type_t > 0:
-                        cx = 2 + min(len("WONDER"), int(type_t * 8) + 1) * 5
+                        cx = 2 + min(len("WONDER"), int(type_t * 8) + 1) * 4
                     else:
-                        cx = 22
+                        cx = 2
                     for dy in range(5):
                         if 0 <= cx < GRID_SIZE:
                             self.display.set_pixel(cx, 10 + dy, white)
@@ -3118,7 +3118,7 @@ class WonderLoading(Visual):
                                          "LOADING", white)
             if dots:
                 self.display.draw_text_small(
-                    _center_x("LOADING") + 7 * 5, 18, dots, white)
+                    _center_x("LOADING") + 7 * 4, 18, dots, white)
 
             # Progress bar outline
             for x in range(bar_x - 1, bar_x + bar_w + 1):
@@ -3951,9 +3951,15 @@ class WonderAsteroids(Visual):
                 # Converge to home positions
                 frac = min(1.0, (self.time - 4.0) / 2.0)
                 ease = frac * frac * (3 - 2 * frac)
-                chunk['x'] += (chunk['home_x'] - chunk['x']) * ease * dt * 3
-                chunk['y'] += (chunk['home_y'] - chunk['y']) * ease * dt * 3
-                chunk['angle'] *= (1.0 - ease * dt * 3)
+                if ease > 0.99:
+                    # Snap to final position
+                    chunk['x'] = chunk['home_x']
+                    chunk['y'] = chunk['home_y']
+                    chunk['angle'] = 0.0
+                else:
+                    chunk['x'] += (chunk['home_x'] - chunk['x']) * ease * dt * 3
+                    chunk['y'] += (chunk['home_y'] - chunk['y']) * ease * dt * 3
+                    chunk['angle'] *= (1.0 - ease * dt * 3)
 
     def draw(self):
         self.display.clear(Colors.BLACK)

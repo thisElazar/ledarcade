@@ -49,8 +49,8 @@ class GameOverState(Enum):
 # =============================================================================
 
 def center_x(text):
-    """Calculate x position to center text (4px per char + 1px spacing)."""
-    width = len(text) * 5 - 1
+    """Calculate x position to center text (3px glyph + 1px gap per char)."""
+    width = len(text) * 4 - 1
     return max(0, (GRID_SIZE - width) // 2)
 
 
@@ -379,17 +379,17 @@ def _show_splash(display, input_handler=None):
             brightness = min(1.0, progress)
             c = int(255 * brightness)
             color = (c, c, c)
-            wx = center_x("WONDER") + 1
+            wx = center_x("WONDER")
             display.draw_text_small(wx, 24, "WONDER", color)
         elif t < 1.7:
             # "WONDER" stays, "CABINET" fades in
-            wx = center_x("WONDER") + 1
+            wx = center_x("WONDER")
             display.draw_text_small(wx, 24, "WONDER", Colors.WHITE)
             progress = (t - 1.0) / 0.7
             brightness = min(1.0, progress)
             c = int(255 * brightness)
             color = (c, c, c)
-            cx = center_x("CABINET") + 1
+            cx = center_x("CABINET")
             display.draw_text_small(cx, 34, "CABINET", color)
         else:
             # Rainbow glow + sparkles
@@ -406,7 +406,7 @@ def _show_splash(display, input_handler=None):
                 display.set_pixel(sx, sy, _hue_to_rgb((hue + random.random() * 0.5) % 1.0))
 
             # "WONDER" with glow
-            wx = center_x("WONDER") + 1
+            wx = center_x("WONDER")
             for ox in [-1, 0, 1]:
                 for oy in [-1, 0, 1]:
                     if ox == 0 and oy == 0:
@@ -419,7 +419,7 @@ def _show_splash(display, input_handler=None):
             hue2 = (hue + 0.15) % 1.0
             color2 = _hue_to_rgb(hue2)
             color2 = (int(color2[0] * pulse), int(color2[1] * pulse), int(color2[2] * pulse))
-            cx = center_x("CABINET") + 1
+            cx = center_x("CABINET")
             for ox in [-1, 0, 1]:
                 for oy in [-1, 0, 1]:
                     if ox == 0 and oy == 0:
