@@ -54,8 +54,8 @@ PALETTES = [
     },
     {
         'name': 'FIRE',
-        'neg': (0, 10, 80),     'zero': (0, 0, 0),    'pos': (255, 160, 0),
-        'energy': (255, 180, 0),
+        'neg': (0, 10, 80),     'zero': (0, 0, 0),    'pos': (255, 120, 0),
+        'energy': (255, 120, 0),
     },
     {
         'name': 'MONO',
@@ -454,7 +454,7 @@ class WaveTank(Visual):
             for x in range(N):
                 if self.walls[y, x]:
                     continue
-                val = float(self.u[y, x])
+                val = float(self.u[y, x]) * 2.0
                 color = _bipolar_color(val, pal)
                 d.set_pixel(x, y, color)
 
@@ -466,6 +466,6 @@ class WaveTank(Visual):
             for x in range(N):
                 if self.walls[y, x]:
                     continue
-                val = float(energy[y, x])
+                val = float(energy[y, x]) * 4.0
                 color = _energy_color(val, pal)
                 d.set_pixel(x, y, color)

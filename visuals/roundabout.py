@@ -154,10 +154,10 @@ class Roundabout(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.up_pressed:
+        if input_state.right_pressed:
             self.spawn_rate = min(4.0, self.spawn_rate + 0.3)
             consumed = True
-        if input_state.down_pressed:
+        if input_state.left_pressed:
             self.spawn_rate = max(0.3, self.spawn_rate - 0.3)
             consumed = True
         return consumed

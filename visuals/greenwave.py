@@ -96,11 +96,11 @@ class GreenWave(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        if input_state.up_pressed:
+        if input_state.right_pressed:
             self.speed = min(50.0, self.speed + 4.0)
             self._compute_offsets()
             consumed = True
-        if input_state.down_pressed:
+        if input_state.left_pressed:
             self.speed = max(8.0, self.speed - 4.0)
             self._compute_offsets()
             consumed = True

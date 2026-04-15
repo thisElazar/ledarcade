@@ -240,10 +240,10 @@ class Interchange(Visual):
             self._build()
             self.vehicles = []
             consumed = True
-        if input_state.up_pressed:
+        if input_state.right_pressed:
             self.spawn_rate = min(6.0, self.spawn_rate + 0.5)
             consumed = True
-        if input_state.down_pressed:
+        if input_state.left_pressed:
             self.spawn_rate = max(0.5, self.spawn_rate - 0.5)
             consumed = True
         return consumed

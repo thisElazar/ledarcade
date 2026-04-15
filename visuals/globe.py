@@ -1,4 +1,4 @@
-"""Globe — real-data rotating Earth on a 64×64 LED matrix.
+"""Earth — real-data rotating Earth on a 64×64 LED matrix.
 
 Replaces the old GIF-based Earth visual with live Blue Marble satellite
 imagery, terrain, city lights, and real-time day/night terminator.
@@ -149,7 +149,7 @@ def _render_globe(atlas, rot_lat, rot_lon, mode, radius=27.0):
     return fb
 
 
-class Globe(Visual):
+class Earth(Visual):
     name = "EARTH"
     description = "Rotating Earth"
     category = "science_macro"
@@ -166,7 +166,7 @@ class Globe(Visual):
         self._fb = None
         self._needs_render = True
 
-        # Globe state
+        # Earth state
         self._rot_lon = 20.0     # start facing Europe/Africa
         self._rot_lat = 30.0    # tilt to show populated latitudes
         self._radius = 27.0      # default sphere size

@@ -230,11 +230,11 @@ VORT_PALETTE_NAMES = list(VORT_PALETTES.keys())
 _VORT_PALETTE = VORT_PALETTES['FIRE-ICE']  # default for legacy callers
 
 
-def _draw_velocity(display, u, v, palette=None):
+def _draw_velocity(display, u, v, palette=None, scale=0.3):
     """Map velocity magnitude to palette and draw."""
     pal = palette if palette is not None else _VEL_PALETTE
     mag = np.sqrt(u[1:N+1, 1:N+1]**2 + v[1:N+1, 1:N+1]**2)
-    t = np.clip(mag * 0.3, 0.0, 1.0)
+    t = np.clip(mag * scale, 0.0, 1.0)
     np.sqrt(t, out=t)
     n_colors = len(pal)
     idx_f = t * (n_colors - 1)
@@ -250,13 +250,13 @@ def _draw_velocity(display, u, v, palette=None):
             display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
 
 
-def _draw_velocity_direction(display, u, v, palette=None):
+def _draw_velocity_direction(display, u, v, palette=None, scale=0.4):
     """Map velocity direction to hue, magnitude to brightness."""
     pal = palette if palette is not None else DIR_PALETTES['RAINBOW']
     uu = u[1:N+1, 1:N+1]
     vv = v[1:N+1, 1:N+1]
     mag = np.sqrt(uu**2 + vv**2)
-    brightness = np.clip(mag * 0.4, 0.0, 1.0)
+    brightness = np.clip(mag * scale, 0.0, 1.0)
     np.sqrt(brightness, out=brightness)
 
     # Angle → 0..1 mapped to hue wheel
@@ -278,7 +278,7 @@ def _draw_velocity_direction(display, u, v, palette=None):
             display.set_pixel(i, j, (int(p[0]), int(p[1]), int(p[2])))
 
 
-def _draw_vorticity(display, u, v, palette=None):
+def _draw_vorticity(display, u, v, palette=None, scale=0.5):
     """Map vorticity (curl) to diverging palette and draw."""
     pal = palette if palette is not None else _VORT_PALETTE
     # curl = dv/dx - du/dy (central differences on interior)
@@ -286,7 +286,7 @@ def _draw_vorticity(display, u, v, palette=None):
     dudy = (u[1:N+1, 2:N+2] - u[1:N+1, 0:N]) * 0.5
     curl = dvdx - dudy
     # Map to 0..1 with 0.5 = zero curl
-    t = np.clip(curl * 0.5 + 0.5, 0.0, 1.0)
+    t = np.clip(curl * scale + 0.5, 0.0, 1.0)
     n_colors = len(pal)
     idx_f = t * (n_colors - 1)
     lo = idx_f.astype(np.intp)
@@ -1066,13 +1066,13 @@ class FluidPlay(Visual):
         kind, name = self._VIZ_MODES[self.viz_mode]
         if kind == 'vel':
             _draw_velocity(self.display, self.u, self.v,
-                           VEL_PALETTES[name])
+                           VEL_PALETTES[name], scale=0.8)
         elif kind == 'dir':
             _draw_velocity_direction(self.display, self.u, self.v,
-                                     DIR_PALETTES[name])
+                                     DIR_PALETTES[name], scale=1.0)
         else:
             _draw_vorticity(self.display, self.u, self.v,
-                            VORT_PALETTES[name])
+                            VORT_PALETTES[name], scale=1.5)
 
         # Draw cursor as bright dot
         ci = max(0, min(N - 1, int(self.cx) - 1))

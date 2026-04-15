@@ -40,7 +40,7 @@ RIVER_PATH = [(52, 50), (46, 52), (40, 54), (35, 55)]
 LABELS = [
     ('EVAPORATION',   4, 42),
     ('CONDENSATION', 14, 10),
-    ('PRECIPITATION', 28, 30),
+    ('PRECIPITATION',  7, 30),
     ('COLLECTION',   10, 52),
 ]
 
@@ -75,11 +75,11 @@ class WaterCycle(Visual):
 
     def handle_input(self, input_state):
         consumed = False
-        if input_state.up_pressed:
+        if input_state.right_pressed:
             self.speed = min(2.0, self.speed + 0.25)
             self.overlay_timer = 2.0
             consumed = True
-        if input_state.down_pressed:
+        if input_state.left_pressed:
             self.speed = max(0.5, self.speed - 0.25)
             self.overlay_timer = 2.0
             consumed = True

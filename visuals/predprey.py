@@ -12,6 +12,7 @@ Controls:
   Space       - Reseed
 """
 
+import math
 import random
 from . import Visual, Display, Colors, GRID_SIZE
 
@@ -54,6 +55,26 @@ class PredPrey(Visual):
         # Grids
         self.grid = [[EMPTY] * GRID_SIZE for _ in range(GRID_SIZE)]
         self.energy = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
+
+        # Textured ground noise (static per reset)
+        self.ground_noise = [
+            [random.random() for _ in range(GRID_SIZE)]
+            for _ in range(GRID_SIZE)
+        ]
+
+        # Kill flash events: list of (x, y, age)  -- age in seconds
+        self.kill_flashes = []
+        # Fox birth glow events: list of (x, y, age)
+        self.birth_glows = []
+
+        # Fox head direction cache: (dx, dy) per cell, assigned on spawn
+        self.fox_head_dir = [
+            [random.choice(NEIGHBORS) for _ in range(GRID_SIZE)]
+            for _ in range(GRID_SIZE)
+        ]
+
+        # Rolling population history for strip chart (last 64 entries)
+        self.pop_history = []
 
         # Overlay
         self.overlay_timer = 0.0
@@ -114,6 +135,9 @@ class PredPrey(Visual):
             self.energy = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
             self._seed()
             self.reseed_delay = 0.0
+            self.kill_flashes.clear()
+            self.birth_glows.clear()
+            self.pop_history.clear()
             self.overlay_text = "RESEED"
             self.overlay_timer = 1.5
             consumed = True
@@ -163,8 +187,24 @@ class PredPrey(Visual):
                 self.energy = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
                 self._seed()
                 self.reseed_delay = 0.0
+                self.kill_flashes.clear()
+                self.birth_glows.clear()
+                self.pop_history.clear()
         else:
             self.reseed_delay = 0.0
+
+        # Age and prune kill flashes (0.2s lifetime)
+        self.kill_flashes = [
+            (kx, ky, age + dt)
+            for kx, ky, age in self.kill_flashes
+            if age + dt < 0.2
+        ]
+        # Age and prune birth glows (0.15s lifetime)
+        self.birth_glows = [
+            (bx, by, age + dt)
+            for bx, by, age in self.birth_glows
+            if age + dt < 0.15
+        ]
 
         # Step simulation on timer
         self.step_timer += dt
@@ -186,6 +226,10 @@ class PredPrey(Visual):
         # Track which cells have already been written this step
         # to avoid conflicts (e.g. two rabbits reproducing into same cell)
         claimed = [[False] * N for _ in range(N)]
+
+        # Event lists for this step
+        step_kills = []
+        step_births = []
 
         for x, y in coords:
             state = self.grid[y][x]
@@ -223,6 +267,8 @@ class PredPrey(Visual):
                             if e > self.max_energy:
                                 e = self.max_energy
                             ate = True
+                            # Record kill event
+                            step_kills.append((nx, ny))
                             break
 
                 # Death check
@@ -245,42 +291,85 @@ class PredPrey(Visual):
                             new_energy[ny][nx] = baby_energy
                             new_energy[y][x] = e - baby_energy
                             claimed[ny][nx] = True
+                            # Record fox birth event and assign random head dir
+                            step_births.append((nx, ny))
+                            self.fox_head_dir[ny][nx] = random.choice(NEIGHBORS)
                             break
 
         self.grid = new_grid
         self.energy = new_energy
         self._count_populations()
 
+        # Append flash events (age starts at 0.0)
+        for kx, ky in step_kills:
+            self.kill_flashes.append((kx, ky, 0.0))
+        # Cap kill flashes
+        if len(self.kill_flashes) > 50:
+            self.kill_flashes = self.kill_flashes[-50:]
+
+        for bx, by in step_births:
+            self.birth_glows.append((bx, by, 0.0))
+        # Cap birth glows
+        if len(self.birth_glows) > 50:
+            self.birth_glows = self.birth_glows[-50:]
+
+        # Record population history (one entry per sim step)
+        total_cells = N * N
+        self.pop_history.append((
+            self.rabbit_count / total_cells,
+            self.fox_count / total_cells,
+        ))
+        if len(self.pop_history) > 64:
+            self.pop_history = self.pop_history[-64:]
+
     def draw(self):
         N = GRID_SIZE
+        sim_rows = 58  # rows 0-57 for simulation; 58 = separator; 59-63 = chart
 
-        for y in range(N):
+        # -- Main grid rendering (rows 0-57) --
+        for y in range(sim_rows):
             row_grid = self.grid[y]
             row_energy = self.energy[y]
             for x in range(N):
                 state = row_grid[x]
 
                 if state == EMPTY:
-                    self.display.set_pixel(x, y, (5, 8, 5))
+                    # Textured ground
+                    noise = self.ground_noise[y][x]
+                    # Blend between dark earth and faint grass
+                    shimmer = math.sin(self.time * 0.5 + x * 0.3 + y * 0.2) * 3
+                    er = int(8 + (5 - 8) * noise)      # 8 -> 5
+                    eg = int(12 + (18 - 12) * noise)    # 12 -> 18
+                    eb = int(5 + (8 - 5) * noise)       # 5 -> 8
+                    eg = max(0, min(255, eg + int(shimmer)))
+                    self.display.set_pixel(x, y, (er, eg, eb))
 
                 elif state == RABBIT:
-                    # Green; slightly dimmer in dense clusters
-                    # Count local rabbit density for visual variation
+                    # Wavefront-aware coloring based on neighbor count
                     density = 0
                     for dx, dy in NEIGHBORS:
                         nx = (x + dx) % N
                         ny = (y + dy) % N
                         if self.grid[ny][nx] == RABBIT:
                             density += 1
-                    # 0 neighbors = bright, 4 = slightly dimmer
-                    t = density / 4.0
-                    r = int(40 - 20 * t)
-                    g = int(220 - 50 * t)
-                    b = int(60 - 30 * t)
+                    # Isolated (0-1): bright (50, 230, 70)
+                    # Clustered (3-4): dim (35, 160, 40)
+                    if density <= 1:
+                        t = density / 1.0 if density > 0 else 0.0
+                        # 0 neighbors: (50,230,70), 1 neighbor: blend toward mid
+                        r = int(50 - 5 * t)
+                        g = int(230 - 23 * t)
+                        b = int(70 - 10 * t)
+                    else:
+                        # 2-4: blend from mid toward dim
+                        t = (density - 2) / 2.0
+                        r = int(42 - 7 * t)
+                        g = int(195 - 35 * t)
+                        b = int(55 - 15 * t)
                     self.display.set_pixel(x, y, (r, g, b))
 
                 elif state == FOX:
-                    # Orange gradient based on energy
+                    # Orange gradient based on energy (body pixel)
                     e = row_energy[x]
                     t = max(0.0, min(1.0, e / self.max_energy))
                     # Starving (t=0): dark red (180,40,20)
@@ -290,19 +379,110 @@ class PredPrey(Visual):
                     b = int(20 + 20 * t)
                     self.display.set_pixel(x, y, (r, g, b))
 
-        # Population bar at y=63 (bottom row)
-        total = self.rabbit_count + self.fox_count
-        if total > 0:
-            rabbit_px = max(0, int(N * self.rabbit_count / total))
-            for bx in range(N):
-                if bx < rabbit_px:
-                    self.display.set_pixel(bx, N - 1, (30, 180, 50))
-                else:
-                    self.display.set_pixel(bx, N - 1, (220, 130, 30))
+                    # Head pixel in direction of prey (brighter/yellower)
+                    nbs = self._get_neighbors(x, y)
+                    head_dx, head_dy = 0, 0
+                    for nx, ny in nbs:
+                        if ny < sim_rows and self.grid[ny][nx] == RABBIT:
+                            head_dx = nx - x
+                            head_dy = ny - y
+                            if head_dx > 1:
+                                head_dx = -1
+                            elif head_dx < -1:
+                                head_dx = 1
+                            if head_dy > 1:
+                                head_dy = -1
+                            elif head_dy < -1:
+                                head_dy = 1
+                            break
+                    if head_dx == 0 and head_dy == 0:
+                        head_dx, head_dy = self.fox_head_dir[y][x]
+                    hx = (x + head_dx) % N
+                    hy = (y + head_dy) % N
+                    # Only draw head if target cell is not another fox body
+                    if hy < sim_rows and self.grid[hy][hx] != FOX:
+                        hr = min(255, r + 30)
+                        hg = min(255, g + 50)
+                        hb = min(255, b + 10)
+                        self.display.set_pixel(hx, hy, (hr, hg, hb))
+
+        # -- Kill flashes (white sparks) --
+        for kx, ky, age in self.kill_flashes:
+            if ky >= sim_rows:
+                continue
+            fade = 1.0 - age / 0.2  # 1.0 -> 0.0 over 0.2s
+            # Center pixel: white-yellow
+            cr = int(255 * fade)
+            cg = int(255 * fade)
+            cb = int(200 * fade)
+            self.display.set_pixel(kx, ky, (cr, cg, cb))
+            # Cardinal neighbors at half brightness on first frame only
+            if age < 0.06:
+                hr = cr // 2
+                hg = cg // 2
+                hb = cb // 2
+                for dx, dy in NEIGHBORS:
+                    nx = (kx + dx) % N
+                    ny = (ky + dy) % N
+                    if ny < sim_rows:
+                        self.display.set_pixel(nx, ny, (hr, hg, hb))
+
+        # -- Fox birth glows (warm single pixel) --
+        for bx, by, age in self.birth_glows:
+            if by >= sim_rows:
+                continue
+            fade = 1.0 - age / 0.15
+            br = int(255 * fade)
+            bg = int(200 * fade)
+            bb = int(100 * fade)
+            self.display.set_pixel(bx, by, (br, bg, bb))
+
+        # -- Separator line at row 58 --
+        for sx in range(N):
+            self.display.set_pixel(sx, 58, (25, 25, 25))
+
+        # -- Rolling population strip chart (rows 59-63, 5 rows) --
+        chart_top = 59
+        chart_rows = 5
+        if self.pop_history:
+            # Find peak for normalization
+            peak = 0.0
+            for rf, ff in self.pop_history:
+                peak = max(peak, rf + ff)
+            if peak < 0.001:
+                peak = 0.001
+            # Scale so peak fills the chart
+            scale = chart_rows / peak
+
+            hist_len = len(self.pop_history)
+            for col in range(N):
+                # Map column to history index
+                idx = col - (N - hist_len)
+                if idx < 0 or idx >= hist_len:
+                    # No data yet for this column -- dim
+                    for row in range(chart_rows):
+                        self.display.set_pixel(col, chart_top + row, (3, 3, 3))
+                    continue
+
+                rf, ff = self.pop_history[idx]
+                rabbit_px = max(0, min(chart_rows, int(rf * scale + 0.5)))
+                fox_px = max(0, min(chart_rows - rabbit_px,
+                                    int(ff * scale + 0.5)))
+
+                # Draw from bottom up: rabbits green, then foxes orange, rest dark
+                for row in range(chart_rows):
+                    py = chart_top + (chart_rows - 1 - row)  # bottom-up
+                    if row < rabbit_px:
+                        self.display.set_pixel(col, py, (30, 180, 50))
+                    elif row < rabbit_px + fox_px:
+                        self.display.set_pixel(col, py, (220, 130, 30))
+                    else:
+                        self.display.set_pixel(col, py, (3, 3, 3))
         else:
-            # All empty -- dim bar
-            for bx in range(N):
-                self.display.set_pixel(bx, N - 1, (15, 15, 15))
+            # No history yet
+            for col in range(N):
+                for row in range(chart_rows):
+                    self.display.set_pixel(col, chart_top + row, (3, 3, 3))
 
         # Overlay text (parameter changes, reseed)
         if self.overlay_timer > 0:
@@ -311,7 +491,6 @@ class PredPrey(Visual):
             oc = (brightness, brightness, brightness)
             self.display.draw_text_small(2, 1, self.overlay_text, oc)
 
-        # Population HUD -- show briefly after reseed or always faintly
+        # Population HUD -- faint counter above the chart
         pop_text = f"R:{self.rabbit_count} F:{self.fox_count}"
-        # Show faint population counter in corner
-        self.display.draw_text_small(2, 57, pop_text, (80, 80, 80))
+        self.display.draw_text_small(2, 52, pop_text, (80, 80, 80))

@@ -5,10 +5,9 @@ Bodies orbit, slingshot, and merge under Newtonian gravity.
 Velocity Verlet integration with softened potential prevents
 singularities. Trails fade behind each body.
 
-Three standalone visuals:
+Two standalone visuals:
   Solar System   - Sun + planets in near-circular orbits
   N-Body         - Equal-mass bodies in gravitational dance
-  Asteroid Belt  - Star + planet + 40-50 asteroids in a ring
 
 Controls:
   Up/Down    - Cycle color palette
@@ -194,6 +193,26 @@ SOLAR_PLANETS = [
 SUN_COLOR = (255, 220, 50)
 SUN_MASS = 50.0  # Heavy so circular velocity formula works cleanly
 
+# Planet names and short facts for FOLLOW mode labels
+_PLANET_NAMES = ["MERCURY", "VENUS", "EARTH", "MARS",
+                 "JUPITER", "SATURN", "URANUS", "NEPTUNE"]
+_PLANET_FACTS = [
+    "88 DAY ORBIT",   # Mercury
+    "HOTTEST WORLD",  # Venus
+    "365 DAY ORBIT",  # Earth
+    "THE RED PLANET", # Mars (13 chars)
+    "GAS GIANT",      # Jupiter
+    "RING SYSTEM",    # Saturn
+    "ICE GIANT",      # Uranus
+    "8TH PLANET",     # Neptune
+]
+
+# View modes
+_VIEW_FULL = 0
+_VIEW_INNER = 1
+_VIEW_FOLLOW = 2
+_VIEW_COUNT = 3
+
 
 class OrbitsSolar(Visual):
     name = "SOLAR SYSTEM"
@@ -213,11 +232,42 @@ class OrbitsSolar(Visual):
         self.palette_idx = 0
         self.dt_sim = 0.0005
         self.steps_per_frame = 8
+
+        # Camera state
+        self.cx, self.cy = GRID_SIZE / 2, GRID_SIZE / 2
+        self.cam_x = self.cx
+        self.cam_y = self.cy
+        self.cam_scale = 1.0
+        self.target_cam_x = self.cx
+        self.target_cam_y = self.cy
+        self.target_cam_scale = 1.0
+
+        # View cycling
+        self.view_mode = _VIEW_FULL
+        self.view_timer = 0.0        # time spent in current view
+        self.view_cycle_delay = 8.0  # seconds per auto-cycle
+        self.auto_pause_timer = 0.0  # >0 means auto-cycle paused
+        self.follow_planet_idx = 0   # which planet to follow (0=Mercury)
+        self.label_timer = 0.0       # toggles name vs fact
+
+        # Background stars
+        self.stars = []
+        for _ in range(40):
+            self.stars.append((
+                random.randint(0, GRID_SIZE - 1),
+                random.randint(0, GRID_SIZE - 1),
+                random.randint(15, 50),
+                random.uniform(0, 2 * math.pi),  # twinkle phase
+            ))
+
+        # Comet state
+        self.comet = None             # active comet dict or None
+        self.comet_cooldown = random.uniform(30.0, 45.0)
+
         self._init_bodies()
 
     def _init_bodies(self):
         self.bodies = []
-        self.cx, self.cy = GRID_SIZE / 2, GRID_SIZE / 2
 
         # Sun (index 0)
         sun = Body(self.cx, self.cy, 0, 0, SUN_MASS, 0)
@@ -248,6 +298,51 @@ class OrbitsSolar(Visual):
         sun.vx = 0.0
         sun.vy = 0.0
 
+    # ── Camera ───────────────────────────────────────────────────
+
+    def _world_to_screen(self, wx, wy):
+        """Transform world coordinates to screen pixel coordinates."""
+        sx = (wx - self.cam_x) * self.cam_scale + GRID_SIZE / 2
+        sy = (wy - self.cam_y) * self.cam_scale + GRID_SIZE / 2
+        return sx, sy
+
+    def _set_view_targets(self):
+        """Set target camera position and scale for the current view mode."""
+        if self.view_mode == _VIEW_FULL:
+            self.target_cam_x = self.cx
+            self.target_cam_y = self.cy
+            self.target_cam_scale = 1.0
+        elif self.view_mode == _VIEW_INNER:
+            self.target_cam_x = self.cx
+            self.target_cam_y = self.cy
+            self.target_cam_scale = 2.5
+        elif self.view_mode == _VIEW_FOLLOW:
+            # Follow a specific planet (body index = planet_idx + 1)
+            body_idx = self.follow_planet_idx + 1
+            if body_idx < len(self.bodies):
+                b = self.bodies[body_idx]
+                self.target_cam_x = b.x
+                self.target_cam_y = b.y
+            self.target_cam_scale = 3.5
+
+    def _advance_view(self):
+        """Move to the next view mode."""
+        if self.view_mode == _VIEW_FOLLOW:
+            # Cycle to next planet, or wrap to FULL view
+            self.follow_planet_idx += 1
+            if self.follow_planet_idx >= len(SOLAR_PLANETS):
+                self.follow_planet_idx = 0
+                self.view_mode = _VIEW_FULL
+        else:
+            self.view_mode = (self.view_mode + 1) % _VIEW_COUNT
+            if self.view_mode == _VIEW_FOLLOW:
+                self.follow_planet_idx = 0
+        self.view_timer = 0.0
+        self.label_timer = 0.0
+        self._set_view_targets()
+
+    # ── Input ────────────────────────────────────────────────────
+
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.up_pressed:
@@ -263,7 +358,8 @@ class OrbitsSolar(Visual):
             self.speed = min(3.0, self.speed + 0.1)
             consumed = True
         if input_state.action_l or input_state.action_r:
-            self._init_bodies()
+            self._advance_view()
+            self.auto_pause_timer = 15.0  # pause auto-cycle for 15s
             consumed = True
         return consumed
 
@@ -274,41 +370,180 @@ class OrbitsSolar(Visual):
         pal = PALETTES[self.palette_idx - 1]
         return pal[idx % len(pal)]
 
+    # ── Update ───────────────────────────────────────────────────
+
     def update(self, dt: float):
         self.time += dt
+
+        # Physics
         h = self.dt_sim * self.speed
         _verlet_step(self.bodies, h, self.steps_per_frame)
         self._pin_sun()
         _record_trails(self.bodies, self.TRAIL_LENGTH)
 
+        # View auto-cycling
+        self.view_timer += dt
+        if self.auto_pause_timer > 0:
+            self.auto_pause_timer -= dt
+        elif self.view_timer >= self.view_cycle_delay:
+            self._advance_view()
+
+        # Keep follow-mode camera locked on moving planet
+        if self.view_mode == _VIEW_FOLLOW:
+            body_idx = self.follow_planet_idx + 1
+            if body_idx < len(self.bodies):
+                b = self.bodies[body_idx]
+                self.target_cam_x = b.x
+                self.target_cam_y = b.y
+
+        # Label timer (name vs fact toggle every 4s)
+        self.label_timer += dt
+
+        # Smooth camera interpolation
+        lerp_f = min(1.0, 3.0 * dt)
+        self.cam_x += (self.target_cam_x - self.cam_x) * lerp_f
+        self.cam_y += (self.target_cam_y - self.cam_y) * lerp_f
+        self.cam_scale += (self.target_cam_scale - self.cam_scale) * lerp_f
+
+        # Comet update
+        self._update_comet(dt)
+
+    def _update_comet(self, dt):
+        """Spawn and move cosmetic comet."""
+        if self.comet is None:
+            self.comet_cooldown -= dt
+            if self.comet_cooldown <= 0:
+                self._spawn_comet()
+        else:
+            c = self.comet
+            c['life'] -= dt
+            if c['life'] <= 0:
+                self.comet = None
+                self.comet_cooldown = random.uniform(30.0, 45.0)
+                return
+            c['x'] += c['vx'] * dt
+            c['y'] += c['vy'] * dt
+            # Record trail
+            c['trail'].append((c['x'], c['y']))
+            if len(c['trail']) > 6:
+                c['trail'].pop(0)
+
+    def _spawn_comet(self):
+        """Spawn a comet from a random screen edge."""
+        edge = random.randint(0, 3)
+        if edge == 0:    # top
+            x, y = random.uniform(0, 63), -2.0
+            vx = random.uniform(-8, 8)
+            vy = random.uniform(15, 25)
+        elif edge == 1:  # bottom
+            x, y = random.uniform(0, 63), 65.0
+            vx = random.uniform(-8, 8)
+            vy = random.uniform(-25, -15)
+        elif edge == 2:  # left
+            x, y = -2.0, random.uniform(0, 63)
+            vx = random.uniform(15, 25)
+            vy = random.uniform(-8, 8)
+        else:            # right
+            x, y = 65.0, random.uniform(0, 63)
+            vx = random.uniform(-25, -15)
+            vy = random.uniform(-8, 8)
+        self.comet = {
+            'x': x, 'y': y, 'vx': vx, 'vy': vy,
+            'life': 3.0, 'trail': [],
+        }
+
+    # ── Draw ─────────────────────────────────────────────────────
+
     def draw(self):
         self.display.clear(Colors.BLACK)
 
+        self._draw_stars()
+        self._draw_orbital_paths()
+        self._draw_trails()
+        self._draw_bodies_solar()
+        self._draw_comet()
+        if self.view_mode == _VIEW_FOLLOW:
+            self._draw_planet_label()
+
+    def _draw_stars(self):
+        """Background star field at fixed screen positions (no camera)."""
+        t = self.time
+        for sx, sy, brightness, phase in self.stars:
+            b = brightness * (0.5 + 0.5 * math.sin(t * 1.5 + phase))
+            bv = int(max(0, min(255, b)))
+            self.display.set_pixel(sx, sy, (bv, bv, bv))
+
+    def _draw_orbital_paths(self):
+        """Faint dotted circles showing orbital paths."""
+        n_dots = 20
+        dim = (15, 15, 25)
+        for orbit_r, _color, _dr, _mass in SOLAR_PLANETS:
+            for k in range(n_dots):
+                angle = 2 * math.pi * k / n_dots
+                wx = self.cx + orbit_r * math.cos(angle)
+                wy = self.cy + orbit_r * math.sin(angle)
+                sx, sy = self._world_to_screen(wx, wy)
+                ix, iy = int(sx), int(sy)
+                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                    self.display.set_pixel(ix, iy, dim)
+
+    def _draw_trails(self):
+        """Draw body trails through camera transform."""
         for idx, b in enumerate(self.bodies):
             color = self._get_body_color(idx)
-            draw_r = self.body_draw_radii[idx]
-
-            # Draw trail
             trail_len = len(b.trail)
-            if trail_len > 0:
-                for i, (tx, ty) in enumerate(b.trail):
-                    ix, iy = int(tx), int(ty)
-                    if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
-                        t = (i + 1) / trail_len
-                        dim = (
-                            int(color[0] * t * 0.35),
-                            int(color[1] * t * 0.35),
-                            int(color[2] * t * 0.35),
-                        )
-                        self.display.set_pixel(ix, iy, dim)
+            if trail_len == 0:
+                continue
+            for i, (tx, ty) in enumerate(b.trail):
+                sx, sy = self._world_to_screen(tx, ty)
+                ix, iy = int(sx), int(sy)
+                if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                    t = (i + 1) / trail_len
+                    dim = (
+                        int(color[0] * t * 0.35),
+                        int(color[1] * t * 0.35),
+                        int(color[2] * t * 0.35),
+                    )
+                    self.display.set_pixel(ix, iy, dim)
 
-            # Draw body
-            ix, iy = int(b.x), int(b.y)
-            if draw_r <= 1:
+    def _draw_bodies_solar(self):
+        """Draw sun and planets with enhanced zoom rendering."""
+        for idx, b in enumerate(self.bodies):
+            color = self._get_body_color(idx)
+            base_r = self.body_draw_radii[idx]
+            effective_r = max(1, int(base_r * self.cam_scale))
+
+            sx, sy = self._world_to_screen(b.x, b.y)
+            ix, iy = int(sx), int(sy)
+
+            # Skip if completely off-screen (with margin for large bodies)
+            margin = effective_r + 3
+            if ix < -margin or ix >= GRID_SIZE + margin:
+                continue
+            if iy < -margin or iy >= GRID_SIZE + margin:
+                continue
+
+            # Sun (index 0): pulsing glow
+            if idx == 0:
+                self._draw_sun(ix, iy, effective_r, color)
+                continue
+
+            # Saturn (planet index 5, body index 6): rings
+            if idx == 6 and effective_r >= 2:
+                self._draw_saturn(ix, iy, effective_r, color)
+                continue
+
+            # Jupiter (planet index 4, body index 5): banding
+            if idx == 5 and effective_r >= 3:
+                self._draw_jupiter(ix, iy, effective_r, color)
+                continue
+
+            # Normal planet rendering
+            if effective_r <= 1:
                 if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
                     self.display.set_pixel(ix, iy, color)
             else:
-                self.display.draw_circle(ix, iy, draw_r, color, filled=True)
+                self.display.draw_circle(ix, iy, effective_r, color, filled=True)
                 if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
                     bright = (
                         min(255, color[0] + 60),
@@ -316,6 +551,120 @@ class OrbitsSolar(Visual):
                         min(255, color[2] + 60),
                     )
                     self.display.set_pixel(ix, iy, bright)
+
+    def _draw_sun(self, ix, iy, effective_r, color):
+        """Draw the sun with a pulsing glow ring."""
+        # Core
+        self.display.draw_circle(ix, iy, effective_r, color, filled=True)
+        if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+            bright = (
+                min(255, color[0] + 60),
+                min(255, color[1] + 60),
+                min(255, color[2] + 60),
+            )
+            self.display.set_pixel(ix, iy, bright)
+
+        # Pulsing glow ring when zoomed enough
+        if effective_r >= 3:
+            pulse = 0.7 + 0.3 * math.sin(self.time * 3.0)
+            glow_r = effective_r + 1
+            # Draw ring pixels (unfilled circle approximation)
+            for angle_step in range(max(16, glow_r * 8)):
+                a = 2 * math.pi * angle_step / max(16, glow_r * 8)
+                gx = ix + int(round(glow_r * math.cos(a)))
+                gy = iy + int(round(glow_r * math.sin(a)))
+                if 0 <= gx < GRID_SIZE and 0 <= gy < GRID_SIZE:
+                    gv = int(color[0] * 0.4 * pulse)
+                    gc = (gv, int(gv * 0.85), int(gv * 0.2))
+                    self.display.set_pixel(gx, gy, gc)
+            # Second glow ring slightly further out
+            glow_r2 = effective_r + 2
+            for angle_step in range(max(16, glow_r2 * 8)):
+                a = 2 * math.pi * angle_step / max(16, glow_r2 * 8)
+                gx = ix + int(round(glow_r2 * math.cos(a)))
+                gy = iy + int(round(glow_r2 * math.sin(a)))
+                if 0 <= gx < GRID_SIZE and 0 <= gy < GRID_SIZE:
+                    gv = int(color[0] * 0.2 * pulse)
+                    gc = (gv, int(gv * 0.85), int(gv * 0.15))
+                    self.display.set_pixel(gx, gy, gc)
+
+    def _draw_saturn(self, ix, iy, effective_r, color):
+        """Draw Saturn with horizontal ring line."""
+        # Body
+        self.display.draw_circle(ix, iy, effective_r, color, filled=True)
+        if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+            bright = (
+                min(255, color[0] + 60),
+                min(255, color[1] + 60),
+                min(255, color[2] + 60),
+            )
+            self.display.set_pixel(ix, iy, bright)
+        # Ring: horizontal line through center, extending 2px beyond body
+        ring_color = (
+            min(255, color[0] + 30),
+            min(255, color[1] + 30),
+            min(255, color[2] + 20),
+        )
+        ring_ext = effective_r + 2
+        for rx in range(ix - ring_ext, ix + ring_ext + 1):
+            if 0 <= rx < GRID_SIZE and 0 <= iy < GRID_SIZE:
+                # Only draw ring pixels outside the body circle
+                if abs(rx - ix) > effective_r:
+                    self.display.set_pixel(rx, iy, ring_color)
+
+    def _draw_jupiter(self, ix, iy, effective_r, color):
+        """Draw Jupiter with alternating tan/brown banding."""
+        tan = (210, 180, 130)
+        brown = (160, 110, 60)
+        # Draw filled circle with banding: alternate rows
+        for dy in range(-effective_r, effective_r + 1):
+            # Horizontal extent at this y
+            dx_max = int(math.sqrt(max(0, effective_r * effective_r - dy * dy)))
+            row_color = tan if (dy % 2 == 0) else brown
+            py = iy + dy
+            if py < 0 or py >= GRID_SIZE:
+                continue
+            for dx in range(-dx_max, dx_max + 1):
+                px = ix + dx
+                if 0 <= px < GRID_SIZE:
+                    self.display.set_pixel(px, py, row_color)
+        # Bright center
+        if 0 <= ix < GRID_SIZE and 0 <= iy < GRID_SIZE:
+            self.display.set_pixel(ix, iy, (230, 200, 150))
+
+    def _draw_comet(self):
+        """Draw cosmetic comet with fading blue-white trail."""
+        if self.comet is None:
+            return
+        c = self.comet
+        # Trail (screen-space, not camera-transformed — comets are foreground)
+        trail_len = len(c['trail'])
+        for i, (tx, ty) in enumerate(c['trail']):
+            px, py = int(tx), int(ty)
+            if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
+                t = (i + 1) / max(1, trail_len)
+                # Blue-white fade
+                r = int(100 * t)
+                g = int(140 * t)
+                b = int(200 * t)
+                self.display.set_pixel(px, py, (r, g, b))
+        # Head: bright white
+        hx, hy = int(c['x']), int(c['y'])
+        if 0 <= hx < GRID_SIZE and 0 <= hy < GRID_SIZE:
+            self.display.set_pixel(hx, hy, (255, 255, 255))
+
+    def _draw_planet_label(self):
+        """Show planet name or fact at bottom in FOLLOW mode."""
+        idx = self.follow_planet_idx
+        if idx < 0 or idx >= len(_PLANET_NAMES):
+            return
+        # Toggle between name and fact every 4 seconds
+        show_fact = (int(self.label_timer / 4.0) % 2) == 1
+        if show_fact:
+            text = _PLANET_FACTS[idx]
+        else:
+            text = _PLANET_NAMES[idx]
+        self.display.draw_text_small(2, 58, text, (180, 180, 180))
 
 
 # ── OrbitsMulti ──────────────────────────────────────────────────
@@ -506,88 +855,3 @@ class OrbitsMulti(Visual):
                 color = (int(c[0] * t), int(c[1] * t), int(c[2] * t))
                 self.display.set_pixel(ix, iy, color)
 
-
-# ── OrbitsBelt ───────────────────────────────────────────────────
-
-class OrbitsBelt(Visual):
-    name = "SPACE DUST"
-    description = "Planets and asteroids"
-    category = "science_macro"
-    TRAIL_LENGTH = 30
-
-    def __init__(self, display: Display):
-        super().__init__(display)
-
-    def reset(self):
-        self.time = 0.0
-        self.speed = 1.0
-        self.palette_idx = 0
-        self.dt_sim = 0.0005
-        self.steps_per_frame = 8
-        self._init_bodies()
-
-    def _init_bodies(self):
-        self.bodies = []
-        cx, cy = GRID_SIZE / 2, GRID_SIZE / 2
-
-        # 2-3 large planets scattered around center
-        n_planets = random.randint(2, 3)
-        for p in range(n_planets):
-            r = random.uniform(8, 16)
-            angle = 2 * math.pi * p / n_planets + random.uniform(-0.3, 0.3)
-            px = cx + r * math.cos(angle)
-            py = cy + r * math.sin(angle)
-            # Give planets some orbital velocity around the center of mass
-            v_mag = random.uniform(8, 15)
-            pvx = -v_mag * math.sin(angle) + random.uniform(-1, 1)
-            pvy = v_mag * math.cos(angle) + random.uniform(-1, 1)
-            self.bodies.append(Body(px, py, pvx, pvy, 5.0, p))
-
-        # Asteroid belt: 40-50 small bodies in a ring band
-        n_asteroids = random.randint(40, 50)
-        belt_inner = 18
-        belt_outer = 27
-        for i in range(n_asteroids):
-            r = random.uniform(belt_inner, belt_outer)
-            angle = random.uniform(0, 2 * math.pi)
-            x = cx + r * math.cos(angle)
-            y = cy + r * math.sin(angle)
-            # Gentle orbital velocity
-            v_mag = random.uniform(4, 10)
-            vx = -v_mag * math.sin(angle) + random.uniform(-1, 1)
-            vy = v_mag * math.cos(angle) + random.uniform(-1, 1)
-            mass = random.uniform(0.05, 0.2)
-            self.bodies.append(Body(x, y, vx, vy, mass, (i % 4) + 2))
-
-    def handle_input(self, input_state) -> bool:
-        consumed = False
-        if input_state.up_pressed:
-            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
-            consumed = True
-        if input_state.down_pressed:
-            self.palette_idx = (self.palette_idx - 1) % len(PALETTES)
-            consumed = True
-        if input_state.left:
-            self.speed = max(0.2, self.speed - 0.1)
-            consumed = True
-        if input_state.right:
-            self.speed = min(3.0, self.speed + 0.1)
-            consumed = True
-        if input_state.action_l or input_state.action_r:
-            self._init_bodies()
-            consumed = True
-        return consumed
-
-    def update(self, dt: float):
-        self.time += dt
-        h = self.dt_sim * self.speed
-        _verlet_step(self.bodies, h, self.steps_per_frame)
-        _merge_bodies(self.bodies)
-        _record_trails(self.bodies, self.TRAIL_LENGTH)
-        # Respawn if too few bodies remain
-        if len(self.bodies) < 5:
-            self._init_bodies()
-
-    def draw(self):
-        self.display.clear(Colors.BLACK)
-        _draw_bodies(self.display, self.bodies, self.palette_idx)

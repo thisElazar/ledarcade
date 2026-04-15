@@ -152,7 +152,7 @@ from .paint import Paint
 from .paint_gif import PaintGif
 from .newtoncradle import NewtonCradle
 from .dblpendulum import DblPendulum
-from .orbits import OrbitsSolar, OrbitsMulti, OrbitsBelt
+from .orbits import OrbitsSolar, OrbitsMulti
 from .emfield import Coulomb
 from .wavetank import WaveTank
 from .optics import Optics
@@ -166,7 +166,7 @@ from .quarkslab import QuarksLab
 from .lenia import Lenia, LeniaLab
 from .neurons import Neurons
 from .fluid import FluidTunnel, FluidInk, FluidMixing, FluidPlay, FluidSculpt
-from .earth import Earth
+from .globe import Earth
 from .molecule import Molecule
 from .orbitals import Orbitals
 from .electrons import Electrons
@@ -321,7 +321,7 @@ from .scripts import Scripts
 from .weaving import Weaving
 from .signs import Signs
 from .matter import MatterPhases
-from .epidemic import Epidemic
+# epidemic.py removed
 from .walk import Walk
 from .yoga import Yoga
 from .sorting import Sorting
@@ -331,7 +331,7 @@ from .evolution import Evolution
 from .gametheory import GameTheory
 from .erosion import Erosion
 from .atlas import Atlas
-from .globe import Globe
+# globe.py class renamed to Earth (old GIF-based earth.py deleted)
 from .geneticdrift import GeneticDrift
 from .convection import Convection
 from .entropy import Entropy
@@ -436,7 +436,6 @@ ALL_VISUALS = [
     DblPendulum,
     OrbitsSolar,
     OrbitsMulti,
-    OrbitsBelt,
     Coulomb,
     WaveTank,
     Optics,
@@ -454,7 +453,7 @@ ALL_VISUALS = [
     FluidMixing,
     FluidPlay,
     FluidSculpt,
-    Globe,
+    Earth,
     Molecule,
     Orbitals,
     Electrons,
@@ -612,7 +611,6 @@ ALL_VISUALS = [
     Weaving,
     Signs,
     MatterPhases,
-    Epidemic,
     Walk,
     Yoga,
     Sorting,
@@ -778,7 +776,6 @@ __all__ = [
     'DblPendulum',
     'OrbitsSolar',
     'OrbitsMulti',
-    'OrbitsBelt',
     'Coulomb',
     'WaveTank',
     'Optics',
@@ -797,7 +794,6 @@ __all__ = [
     'FluidPlay',
     'FluidSculpt',
     'Earth',
-    'Globe',
     'Molecule',
     'Orbitals',
     'Electrons',
@@ -876,7 +872,6 @@ __all__ = [
     'Scripts',
     'Signs',
     'MatterPhases',
-    'Epidemic',
     'Sorting',
     'PredPrey',
     'TuringMachine',
