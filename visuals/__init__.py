@@ -227,7 +227,6 @@ from .archimedes import Archimedes
 from .frozen_lake import FrozenLake
 from .crystallize import Crystallize
 from .drift3d import Drift3D
-from .testament import Testament
 from .wondercabinet import (WonderGlow, WonderMarquee, WonderCrawl,
                             WonderSlide, WonderDrop, WonderSpin,
                             WonderPacMan, WonderInvaders, WonderTetris,
@@ -513,7 +512,6 @@ ALL_VISUALS = [
     Astrolabe,
     Archimedes,
     Drift3D,
-    Testament,
     WonderGlow,
     WonderMarquee,
     WonderCrawl,
@@ -851,7 +849,6 @@ __all__ = [
     'Archimedes',
     'Crystallize',
     'Drift3D',
-    'Testament',
     'BML',
     'Highway',
     'Intersection',
