@@ -383,13 +383,20 @@ class Mancala(Game):
         if count >= 8:
             self.display.draw_text_small(x, y, str(count), Colors.WHITE)
 
-    def draw_game_over(self):
+    def draw_game_over(self, selection: int = 0):
         self.display.clear(Colors.BLACK)
         if self.winner == PLAYER_1:
-            self.display.draw_text_small(2, 20, "P1 WINS!", Colors.WHITE)
+            self.display.draw_text_small(12, 6, "P1 WINS!", Colors.WHITE)
         elif self.winner == PLAYER_2:
-            self.display.draw_text_small(2, 20, "P2 WINS!", Colors.WHITE)
+            self.display.draw_text_small(12, 6, "P2 WINS!", Colors.WHITE)
         else:
-            self.display.draw_text_small(2, 20, "TIE!", Colors.YELLOW)
+            self.display.draw_text_small(24, 6, "TIE!", Colors.YELLOW)
 
-        self.display.draw_text_small(2, 35, f"P1:{self.store1} P2:{self.store2}", Colors.GRAY)
+        self.display.draw_text_small(8, 18, f"P1:{self.store1} P2:{self.store2}", Colors.GRAY)
+
+        if selection == 0:
+            self.display.draw_text_small(4, 38, ">PLAY AGAIN", Colors.YELLOW)
+            self.display.draw_text_small(4, 48, " MENU", Colors.GRAY)
+        else:
+            self.display.draw_text_small(4, 38, " PLAY AGAIN", Colors.GRAY)
+            self.display.draw_text_small(4, 48, ">MENU", Colors.YELLOW)
