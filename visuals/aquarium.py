@@ -299,7 +299,7 @@ class Aquarium(Visual):
             self.scheme_idx = (self.scheme_idx - 1) % len(COLOR_SCHEMES)
             self._update_plant_colors()
             consumed = True
-        if input_state.action_l:
+        if input_state.action_l or input_state.action_r:
             # Spawn burst of bubbles
             for _ in range(random.randint(3, 5)):
                 bx = random.randint(5, W - 5)
