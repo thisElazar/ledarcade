@@ -1,13 +1,17 @@
 """
-Testament - Biblical Scenes
+Testament - Sacred Scenes
 =============================
-Ambient looping scenes from the Bible on 64x64 LED matrix.
+Ambient looping scenes from the world's sacred stories on 64x64 LED matrix.
 Each scene is a stable, gently animated symbol.
 
 Scenes:
-  1. Burning Bush    - Fire that does not consume, sandals set aside
-  2. Noah's Ark      - Ark on calm waters after the flood, rainbow above
-  3. Star of Bethlehem - Brilliant star over a quiet stable
+  1. Burning Bush       - Fire that does not consume, sandals set aside
+  2. Noah's Ark         - Ark on calm waters after the flood, rainbow above
+  3. Star of Bethlehem  - Brilliant star over a quiet stable
+  4. Hanuman's Mountain - Hanuman carries the Himalayan peak (Ramayana)
+  5. The Bodhi Tree     - Siddhartha's night of enlightenment (Buddhism)
+  6. Cave of Hira       - First revelation, light flooding the cave (Islam)
+  7. The River          - Guru Nanak emerges from the river (Sikhism)
 
 Controls:
   Up/Down     - Switch scene
@@ -20,7 +24,7 @@ import math
 import random
 from . import Visual, Display, Colors, GRID_SIZE
 
-NUM_SCENES = 3
+NUM_SCENES = 7
 
 
 # ── Helpers ──────────────────────────────────────────────────────────
@@ -133,6 +137,265 @@ def _make_ark():
 ARK_PIXELS = _make_ark()
 
 
+# ── Hanuman silhouette ──────────────────────────────────────────────
+
+def _make_hanuman():
+    """Hanuman flying silhouette — carrying mountain in raised right hand."""
+    pixels = set()
+    cx, cy = 30, 36  # body center
+
+    # Head (round, ~4px)
+    for dy in range(-2, 2):
+        for dx in range(-2, 2):
+            if dx * dx + dy * dy <= 4:
+                pixels.add((cx + 6 + dx, cy - 6 + dy))
+
+    # Crown / crest on head
+    pixels.add((cx + 6, cy - 9))
+    pixels.add((cx + 7, cy - 9))
+    pixels.add((cx + 6, cy - 10))
+
+    # Torso (angled, flying forward-right)
+    for i in range(10):
+        tx = cx + 4 - i
+        ty = cy - 4 + i // 2
+        for w in range(-1, 2):
+            pixels.add((tx, ty + w))
+
+    # Right arm — reaching UP to hold mountain
+    for i in range(10):
+        pixels.add((cx + 7 + i // 3, cy - 7 - i))
+        pixels.add((cx + 8 + i // 3, cy - 7 - i))
+
+    # Left arm — trailing back
+    for i in range(7):
+        pixels.add((cx - 2 - i, cy - 2 + i // 3))
+
+    # Legs trailing behind and down
+    for i in range(8):
+        pixels.add((cx - 3 - i, cy + 2 + i // 2))
+        pixels.add((cx - 2 - i, cy + 4 + i // 2))
+
+    # Tail — long, curving upward behind
+    tail_pts = []
+    for i in range(14):
+        tx = cx - 5 - i
+        ty = cy + 1 - int(2.5 * math.sin(i * 0.35))
+        tail_pts.append((tx, ty))
+    for tx, ty in tail_pts:
+        pixels.add((tx, ty))
+
+    return pixels
+
+
+HANUMAN_PIXELS = _make_hanuman()
+
+
+def _make_mountain_chunk():
+    """Irregular mountain chunk with trees/herbs on top, carried by Hanuman."""
+    pixels = []
+    rock = (120, 110, 95)
+    rock_dark = (80, 72, 60)
+    herb_glow = (80, 200, 80)
+    tree_green = (30, 100, 30)
+
+    mcx, mcy = 34, 14  # mountain center
+
+    # Rocky mass — irregular ellipse
+    for dy in range(-6, 5):
+        for dx in range(-8, 9):
+            dist = (dx / 8.0) ** 2 + (dy / 5.0) ** 2
+            noise = math.sin(dx * 1.3 + dy * 0.7) * 0.15
+            if dist + noise < 0.85:
+                edge = dist > 0.6
+                pixels.append((mcx + dx, mcy + dy,
+                               rock_dark if edge else rock))
+
+    # Trees on top of the mountain
+    for tx_off in [-5, -2, 1, 4, 6]:
+        tree_x = mcx + tx_off
+        tree_top = mcy - 5 + int(abs(tx_off) * 0.3)
+        # Trunk
+        pixels.append((tree_x, tree_top + 2, (80, 55, 30)))
+        pixels.append((tree_x, tree_top + 3, (80, 55, 30)))
+        # Canopy
+        for ddy in range(-1, 2):
+            for ddx in range(-1, 2):
+                if abs(ddx) + abs(ddy) <= 1:
+                    pixels.append((tree_x + ddx, tree_top + ddy, tree_green))
+
+    # Glowing herbs (sanjeevani) — a few bright spots
+    for hx, hy in [(-3, -4), (2, -3), (5, -5), (-6, -3), (0, -5)]:
+        pixels.append((mcx + hx, mcy + hy, herb_glow))
+
+    return pixels
+
+
+MOUNTAIN_PIXELS = _make_mountain_chunk()
+
+
+# ── Bodhi Tree ──────────────────────────────────────────────────────
+
+def _make_bodhi_tree():
+    """Large Bodhi tree with spreading canopy."""
+    pixels = []
+    trunk_color = (90, 60, 30)
+    trunk_dark = (60, 40, 20)
+    tcx = 32  # tree center x
+    trunk_base_y = 52
+
+    # Trunk — thick, gnarled
+    for y in range(35, trunk_base_y + 1):
+        width = 2 + (y - 35) // 6
+        for dx in range(-width, width + 1):
+            wobble = int(1.5 * math.sin(y * 0.4))
+            edge = abs(dx) >= width
+            pixels.append((tcx + dx + wobble, y,
+                           trunk_dark if edge else trunk_color))
+
+    # Major roots spreading at base
+    for side in [-1, 1]:
+        for i in range(6):
+            rx = tcx + side * (3 + i)
+            ry = trunk_base_y + i // 3
+            pixels.append((rx, ry, trunk_dark))
+            pixels.append((rx, ry + 1, trunk_dark))
+
+    # Branches — radiating outward from crown
+    branches = [
+        (-12, -4), (-9, -8), (-6, -12), (-3, -15),
+        (0, -17), (3, -15), (6, -12), (9, -8), (12, -4),
+        (-8, -12), (8, -12), (-4, -16), (4, -16),
+    ]
+    for bx, by in branches:
+        # Draw branch line from trunk top to branch end
+        steps = max(abs(bx), abs(by))
+        for s in range(steps):
+            t = s / max(1, steps)
+            px = int(tcx + bx * t)
+            py = int(35 + by * t)
+            pixels.append((px, py, trunk_dark))
+
+    # Canopy — large, spreading, heart-shaped leaves implied by density
+    for y in range(16, 37):
+        for x in range(14, 51):
+            dx = (x - tcx) / 17.0
+            dy = (y - 26) / 10.0
+            # Rounded canopy shape — wider at middle, tapered at top and bottom
+            dist = dx * dx + dy * dy
+            noise = math.sin(x * 1.1 + y * 0.8) * 0.12 + math.sin(x * 2.3 - y * 1.5) * 0.08
+            if dist + noise < 0.9:
+                pixels.append((x, y, None))  # None = filled at draw time with leaf color
+
+    return pixels
+
+
+BODHI_TREE = _make_bodhi_tree()
+
+
+def _make_seated_figure():
+    """Small seated meditation figure, ~8px tall."""
+    pixels = set()
+    cx, cy = 32, 49  # sitting at base of tree
+
+    # Head
+    for dy in range(-1, 1):
+        for dx in range(-1, 1):
+            pixels.add((cx + dx, cy - 7 + dy))
+
+    # Shoulders and torso
+    for dx in range(-3, 4):
+        pixels.add((cx + dx, cy - 5))
+    for dy in range(-4, -1):
+        for dx in range(-2, 3):
+            pixels.add((cx + dx, cy + dy))
+
+    # Crossed legs
+    for dx in range(-4, 5):
+        pixels.add((cx + dx, cy - 1))
+        pixels.add((cx + dx, cy))
+    for dx in range(-3, 4):
+        pixels.add((cx + dx, cy + 1))
+
+    return pixels
+
+
+SEATED_FIGURE = _make_seated_figure()
+
+
+# ── Cave of Hira ────────────────────────────────────────────────────
+
+def _make_hira_mountain():
+    """Mountain silhouette with cave opening."""
+    pixels = []
+    rock = (50, 42, 35)
+    rock_light = (70, 60, 48)
+
+    # Mountain shape — large, fills bottom 2/3
+    peak_x, peak_y = 32, 12
+    for y in range(peak_y, GRID_SIZE):
+        # Mountain widens as y increases
+        progress = (y - peak_y) / (GRID_SIZE - peak_y)
+        half_w = int(4 + 28 * progress)
+        for x in range(peak_x - half_w, peak_x + half_w + 1):
+            if 0 <= x < GRID_SIZE:
+                noise = math.sin(x * 0.5 + y * 0.3) * 0.1
+                edge_dist = abs(x - peak_x) / max(1, half_w)
+                is_light = noise > 0 and edge_dist < 0.7
+                # Cave opening — don't draw rock here
+                cave_cx, cave_cy = 32, 38
+                cave_dx = (x - cave_cx) / 7.0
+                cave_dy = (y - cave_cy) / 6.0
+                in_cave = cave_dx * cave_dx + (cave_dy * 1.2) ** 2 < 1.0 and y >= cave_cy - 5
+                if not in_cave:
+                    pixels.append((x, y, rock_light if is_light else rock))
+
+    return pixels
+
+
+HIRA_MOUNTAIN = _make_hira_mountain()
+
+
+# ── Guru Nanak figure ───────────────────────────────────────────────
+
+def _make_nanak_figure():
+    """Standing figure in the river, ~14px tall."""
+    pixels = set()
+    cx, cy = 32, 34  # chest center, standing in river (legs submerged)
+
+    # Head with turban
+    for dy in range(-3, 0):
+        for dx in range(-2, 3):
+            if dx * dx + dy * dy <= 5:
+                pixels.add((cx + dx, cy - 10 + dy))
+    # Turban top
+    for dx in range(-2, 3):
+        pixels.add((cx + dx, cy - 13))
+        pixels.add((cx + dx, cy - 14))
+    pixels.add((cx - 1, cy - 15))
+    pixels.add((cx, cy - 15))
+    pixels.add((cx + 1, cy - 15))
+
+    # Neck
+    pixels.add((cx, cy - 7))
+
+    # Torso / robes — wider, flowing
+    for dy in range(-6, 6):
+        width = 3 + abs(dy) // 3
+        for dx in range(-width, width + 1):
+            pixels.add((cx + dx, cy + dy))
+
+    # Arms slightly out to sides (palms up gesture)
+    for i in range(4):
+        pixels.add((cx - 4 - i, cy - 3 + i))
+        pixels.add((cx + 4 + i, cy - 3 + i))
+
+    return pixels
+
+
+NANAK_FIGURE = _make_nanak_figure()
+
+
 # ── Fire particle ────────────────────────────────────────────────────
 
 class _Particle:
@@ -154,7 +417,7 @@ class _Particle:
 
 class Testament(Visual):
     name = "TESTAMENT"
-    description = "Biblical scenes"
+    description = "Sacred scenes"
     category = "culture"
 
     MAX_PARTICLES = 300
@@ -207,6 +470,44 @@ class Testament(Visual):
                            for x in range(GRID_SIZE)]
         random.seed()
 
+        # -- Hanuman's Mountain --
+        random.seed(42)
+        self.hanu_stars = [(random.randint(0, 63), random.randint(0, 28),
+                            random.random() * math.pi * 2,
+                            0.3 + random.random() * 1.5)
+                           for _ in range(35)]
+        random.seed()
+        self.hanu_wind = []  # wind trail particles
+        self.hanu_herb_phase = 0.0
+
+        # -- Bodhi Tree --
+        random.seed(108)
+        self.bodhi_leaves = []  # falling leaf particles
+        self.bodhi_leaf_timer = 0.0
+        self.bodhi_dawn = 0.0  # dawn light progression, cycles slowly
+        random.seed()
+
+        # -- Cave of Hira --
+        random.seed(99)
+        self.hira_stars = [(random.randint(0, 63), random.randint(0, 20),
+                            random.random() * math.pi * 2,
+                            0.3 + random.random() * 1.2)
+                           for _ in range(30)]
+        random.seed()
+        self.hira_light_particles = []
+        self.hira_pulse = 0.0
+
+        # -- Guru Nanak --
+        random.seed(52)
+        self.nanak_stars = [(random.randint(0, 63), random.randint(0, 22),
+                             random.random() * math.pi * 2,
+                             0.3 + random.random() * 1.0)
+                            for _ in range(25)]
+        random.seed()
+        self.nanak_ripples = []  # (cx, cy, radius, life)
+        self.nanak_ripple_timer = 0.0
+        self.nanak_glow = 0.0
+
 
     # ── Input ────────────────────────────────────────────────────────
 
@@ -242,6 +543,14 @@ class Testament(Visual):
 
         if self.scene == 0:
             self._update_bush(scaled_dt)
+        elif self.scene == 3:
+            self._update_hanuman(scaled_dt)
+        elif self.scene == 4:
+            self._update_bodhi(scaled_dt)
+        elif self.scene == 5:
+            self._update_hira(scaled_dt)
+        elif self.scene == 6:
+            self._update_nanak(scaled_dt)
 
     def _update_bush(self, scaled_dt):
         if self.divine_flash > 0:
@@ -294,6 +603,14 @@ class Testament(Visual):
             self._draw_ark(display, t)
         elif self.scene == 2:
             self._draw_bethlehem(display, t)
+        elif self.scene == 3:
+            self._draw_hanuman(display, t)
+        elif self.scene == 4:
+            self._draw_bodhi(display, t)
+        elif self.scene == 5:
+            self._draw_hira(display, t)
+        elif self.scene == 6:
+            self._draw_nanak(display, t)
 
     # ═════════════════════════════════════════════════════════════════
     # SCENE 0: BURNING BUSH
@@ -566,5 +883,494 @@ class Testament(Visual):
                 glow_i = glow_pulse * (0.3 - dy * 0.08)
                 gc = (int(255 * glow_i), int(200 * glow_i), int(100 * glow_i))
                 display.set_pixel(sx + dx, sy_base - dy, _add_color(display.get_pixel(sx + dx, sy_base - dy), gc))
+
+    # ═════════════════════════════════════════════════════════════════
+    # SCENE 3: HANUMAN CARRYING THE MOUNTAIN (Ramayana)
+    # ═════════════════════════════════════════════════════════════════
+
+    def _update_hanuman(self, scaled_dt):
+        self.hanu_herb_phase += scaled_dt
+
+        # Wind trail particles streaming behind Hanuman
+        if random.random() < 0.6:
+            # Spawn from behind the figure
+            wx = random.randint(10, 22)
+            wy = random.randint(30, 42)
+            self.hanu_wind.append([wx, wy, 0.5 + random.random() * 0.6])
+
+        alive = []
+        for w in self.hanu_wind:
+            w[0] -= 12.0 * scaled_dt  # stream leftward
+            w[1] += random.gauss(0, 0.5) * scaled_dt
+            w[2] -= scaled_dt
+            if w[2] > 0 and w[0] > -2:
+                alive.append(w)
+        self.hanu_wind = alive[-150:]
+
+    def _draw_hanuman(self, display, t):
+        # Night sky — deep indigo
+        for y in range(GRID_SIZE):
+            depth = y / GRID_SIZE
+            r = int(8 + 10 * (1 - depth))
+            g = int(5 + 8 * (1 - depth))
+            b = int(30 + 25 * (1 - depth))
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, y, (r, g, b))
+
+        # Stars
+        for sx, sy, phase, spd in self.hanu_stars:
+            brightness = 0.2 + 0.8 * max(0, math.sin(t * spd + phase))
+            gray = int(130 * brightness)
+            display.set_pixel(sx, sy, (gray, gray, int(gray * 0.9)))
+
+        # Ocean below — dark, distant
+        for y in range(50, GRID_SIZE):
+            for x in range(GRID_SIZE):
+                wave = math.sin(x * 0.2 + t * 0.5 + y * 0.3) * 0.1
+                depth = (y - 50) / 14.0
+                b_val = max(0, int(60 * (0.5 - depth * 0.3 + wave)))
+                g_val = max(0, int(30 * (0.5 - depth * 0.3 + wave)))
+                display.set_pixel(x, y, (0, g_val, b_val))
+
+        # Clouds — a few wisps drifting
+        for ci, (cloud_y, cloud_phase) in enumerate([(44, 0), (47, 1.5), (52, 3.0)]):
+            cloud_x = (t * 3 + cloud_phase * 20) % 80 - 10
+            for dx in range(12):
+                for dy in range(-1, 2):
+                    cx_pos = int(cloud_x + dx)
+                    cy_pos = cloud_y + dy
+                    if 0 <= cx_pos < 64 and 0 <= cy_pos < 64:
+                        dist = abs(dx - 6) / 6.0 + abs(dy) / 2.0
+                        if dist < 1.0:
+                            alpha = (1.0 - dist) * 0.15
+                            existing = display.get_pixel(cx_pos, cy_pos)
+                            cloud_c = (int(80 * alpha), int(80 * alpha), int(100 * alpha))
+                            display.set_pixel(cx_pos, cy_pos, _add_color(existing, cloud_c))
+
+        # Wind trails
+        for wx, wy, life in self.hanu_wind:
+            px, py = int(wx), int(wy)
+            if 0 <= px < 64 and 0 <= py < 64:
+                alpha = life * 0.4
+                wc = (int(100 * alpha), int(80 * alpha), int(50 * alpha))
+                display.set_pixel(px, py, _add_color(display.get_pixel(px, py), wc))
+
+        # Mountain chunk with herbs
+        herb_phase = self.hanu_herb_phase
+        for mx, my, mc in MOUNTAIN_PIXELS:
+            if 0 <= mx < 64 and 0 <= my < 64:
+                if mc == (80, 200, 80):  # herb — pulsing glow
+                    pulse = 0.6 + 0.4 * math.sin(herb_phase * 3.0 + mx * 0.5)
+                    gc = _scale_color(mc, pulse)
+                    display.set_pixel(mx, my, gc)
+                else:
+                    display.set_pixel(mx, my, mc)
+
+        # Hanuman silhouette — warm amber/golden
+        for hx, hy in HANUMAN_PIXELS:
+            if 0 <= hx < 64 and 0 <= hy < 64:
+                display.set_pixel(hx, hy, (180, 120, 40))
+
+        # Divine glow around Hanuman
+        glow_cx, glow_cy = 30, 34
+        for dy in range(-8, 9):
+            for dx in range(-8, 9):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist < 8:
+                    gx, gy = glow_cx + dx, glow_cy + dy
+                    if 0 <= gx < 64 and 0 <= gy < 64:
+                        intensity = (1.0 - dist / 8) ** 2 * 0.2
+                        pulse = 0.8 + 0.2 * math.sin(t * 2.0)
+                        gc = (int(200 * intensity * pulse),
+                              int(130 * intensity * pulse),
+                              int(40 * intensity * pulse))
+                        display.set_pixel(gx, gy, _add_color(display.get_pixel(gx, gy), gc))
+
+    # ═════════════════════════════════════════════════════════════════
+    # SCENE 4: SIDDHARTHA UNDER THE BODHI TREE (Buddhism)
+    # ═════════════════════════════════════════════════════════════════
+
+    def _update_bodhi(self, scaled_dt):
+        self.bodhi_dawn += scaled_dt * 0.03  # very slow dawn cycle
+
+        # Spawn falling leaves
+        self.bodhi_leaf_timer += scaled_dt
+        if self.bodhi_leaf_timer > 0.3:
+            self.bodhi_leaf_timer = 0.0
+            lx = random.randint(16, 48)
+            ly = random.randint(16, 30)
+            self.bodhi_leaves.append([
+                float(lx), float(ly),
+                random.gauss(0, 0.3),  # vx — gentle drift
+                0.8 + random.random() * 0.6,  # vy — falling
+                2.0 + random.random() * 3.0,  # life
+                random.random() * math.pi * 2,  # sway phase
+            ])
+
+        alive = []
+        for lf in self.bodhi_leaves:
+            lf[4] -= scaled_dt
+            if lf[4] <= 0:
+                continue
+            lf[0] += (lf[2] + 0.4 * math.sin(lf[5] + self.time * 1.5)) * scaled_dt
+            lf[1] += lf[3] * scaled_dt
+            alive.append(lf)
+        self.bodhi_leaves = alive[-80:]
+
+    def _draw_bodhi(self, display, t):
+        # Sky — pre-dawn gradient, slowly cycling
+        dawn = 0.3 + 0.2 * math.sin(self.bodhi_dawn)
+        for y in range(GRID_SIZE):
+            sky_t = y / GRID_SIZE
+            r = int((10 + 50 * dawn) * (1 - sky_t * 0.5))
+            g = int((8 + 30 * dawn) * (1 - sky_t * 0.3))
+            b = int((30 + 15 * dawn) * (1 - sky_t * 0.2))
+            # Warm horizon glow
+            horizon_glow = max(0, 1.0 - abs(y - 55) / 12.0) * dawn * 0.6
+            r = min(255, r + int(180 * horizon_glow))
+            g = min(255, g + int(100 * horizon_glow))
+            b = min(255, b + int(40 * horizon_glow))
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, y, (r, g, b))
+
+        # Morning star (Venus)
+        star_x, star_y = 48, 14
+        pulse = 0.7 + 0.3 * math.sin(t * 1.8)
+        for dy in range(-2, 3):
+            for dx in range(-2, 3):
+                dist = abs(dx) + abs(dy)
+                if dist <= 2:
+                    intensity = (1.0 - dist / 3.0) * pulse
+                    sc = (int(255 * intensity), int(250 * intensity), int(200 * intensity))
+                    px, py = star_x + dx, star_y + dy
+                    if 0 <= px < 64 and 0 <= py < 64:
+                        display.set_pixel(px, py, _add_color(display.get_pixel(px, py), sc))
+
+        # Ground
+        for y in range(53, GRID_SIZE):
+            depth = (y - 53) / 11.0
+            for x in range(GRID_SIZE):
+                r = max(0, int(45 - 15 * depth))
+                g = max(0, int(55 - 20 * depth))
+                b = max(0, int(25 - 10 * depth))
+                display.set_pixel(x, y, (r, g, b))
+
+        # Bodhi tree — canopy, trunk, roots
+        leaf_green_base = (25, 80, 20)
+        leaf_green_light = (50, 120, 35)
+        for bx, by, bc in BODHI_TREE:
+            if 0 <= bx < 64 and 0 <= by < 64:
+                if bc is None:
+                    # Leaf pixel — vary color with noise
+                    noise = math.sin(bx * 0.9 + by * 0.7 + t * 0.3) * 0.5
+                    if noise > 0:
+                        display.set_pixel(bx, by, leaf_green_light)
+                    else:
+                        display.set_pixel(bx, by, leaf_green_base)
+                else:
+                    display.set_pixel(bx, by, bc)
+
+        # Falling leaves
+        for lf in self.bodhi_leaves:
+            lx, ly = int(lf[0]), int(lf[1])
+            if 0 <= lx < 64 and 0 <= ly < 64:
+                fade = min(1.0, lf[4] / 1.0)
+                lc = (int(60 * fade), int(130 * fade), int(30 * fade))
+                display.set_pixel(lx, ly, lc)
+
+        # Seated figure — dark silhouette
+        for fx, fy in SEATED_FIGURE:
+            if 0 <= fx < 64 and 0 <= fy < 64:
+                display.set_pixel(fx, fy, (30, 25, 20))
+
+        # Soft enlightenment glow around the figure
+        glow_cx, glow_cy = 32, 47
+        pulse = 0.7 + 0.3 * math.sin(t * 0.8)
+        for dy in range(-10, 11):
+            for dx in range(-10, 11):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist < 10:
+                    gx, gy = glow_cx + dx, glow_cy + dy
+                    if 0 <= gx < 64 and 0 <= gy < 64:
+                        intensity = (1.0 - dist / 10) ** 2 * 0.18 * pulse
+                        gc = (int(255 * intensity), int(220 * intensity), int(120 * intensity))
+                        display.set_pixel(gx, gy, _add_color(display.get_pixel(gx, gy), gc))
+
+    # ═════════════════════════════════════════════════════════════════
+    # SCENE 5: CAVE OF HIRA (Islam — First Revelation)
+    # ═════════════════════════════════════════════════════════════════
+
+    def _update_hira(self, scaled_dt):
+        self.hira_pulse += scaled_dt
+
+        # Light particles emanating from cave
+        cave_cx, cave_cy = 32, 38
+        if random.random() < 0.4:
+            angle = random.gauss(0, 0.8) - math.pi / 2  # mostly upward
+            speed = 1.5 + random.random() * 2.0
+            self.hira_light_particles.append([
+                float(cave_cx + random.gauss(0, 2)),
+                float(cave_cy - 2),
+                math.cos(angle) * speed,
+                math.sin(angle) * speed,
+                1.0 + random.random() * 1.5,  # life
+            ])
+
+        alive = []
+        for p in self.hira_light_particles:
+            p[4] -= scaled_dt
+            if p[4] <= 0:
+                continue
+            p[0] += p[2] * scaled_dt
+            p[1] += p[3] * scaled_dt
+            alive.append(p)
+        self.hira_light_particles = alive[-100:]
+
+    def _draw_hira(self, display, t):
+        # Deep desert night sky
+        for y in range(GRID_SIZE):
+            depth = y / GRID_SIZE
+            r = int(6 + 6 * (1 - depth))
+            g = int(4 + 6 * (1 - depth))
+            b = int(18 + 22 * (1 - depth))
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, y, (r, g, b))
+
+        # Stars
+        for sx, sy, phase, spd in self.hira_stars:
+            brightness = 0.2 + 0.8 * max(0, math.sin(t * spd + phase))
+            gray = int(120 * brightness)
+            display.set_pixel(sx, sy, (gray, gray, int(gray * 0.9)))
+
+        # Crescent moon
+        moon_x, moon_y = 50, 10
+        for dy in range(-5, 6):
+            for dx in range(-5, 6):
+                dist = math.sqrt(dx * dx + dy * dy)
+                # Outer circle minus inner offset circle = crescent
+                inner_dist = math.sqrt((dx - 2) ** 2 + dy * dy)
+                if dist <= 5 and inner_dist > 4.5:
+                    px, py = moon_x + dx, moon_y + dy
+                    if 0 <= px < 64 and 0 <= py < 64:
+                        intensity = (1.0 - dist / 6.0) * 0.9
+                        mc = (int(240 * intensity), int(230 * intensity), int(190 * intensity))
+                        display.set_pixel(px, py, mc)
+
+        # Moon glow
+        for dy in range(-8, 9):
+            for dx in range(-8, 9):
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist < 8:
+                    px, py = moon_x + dx, moon_y + dy
+                    if 0 <= px < 64 and 0 <= py < 64:
+                        intensity = (1.0 - dist / 8) ** 2 * 0.08
+                        gc = (int(200 * intensity), int(190 * intensity), int(150 * intensity))
+                        display.set_pixel(px, py, _add_color(display.get_pixel(px, py), gc))
+
+        # Desert floor
+        for y in range(56, GRID_SIZE):
+            depth = (y - 56) / 8.0
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, y, (max(0, int(50 - 20 * depth)),
+                                         max(0, int(40 - 15 * depth)),
+                                         max(0, int(25 - 10 * depth))))
+
+        # Mountain with cave
+        for mx, my, mc in HIRA_MOUNTAIN:
+            if 0 <= mx < 64 and 0 <= my < 64:
+                display.set_pixel(mx, my, mc)
+
+        # Cave interior — dark
+        cave_cx, cave_cy = 32, 38
+        for dy in range(-5, 6):
+            for dx in range(-6, 7):
+                cave_dx = dx / 7.0
+                cave_dy = dy / 6.0
+                if cave_dx ** 2 + (cave_dy * 1.2) ** 2 < 1.0 and cave_cy + dy >= 33:
+                    px, py = cave_cx + dx, cave_cy + dy
+                    if 0 <= px < 64 and 0 <= py < 64:
+                        display.set_pixel(px, py, (4, 3, 8))
+
+        # Divine light flooding the cave — pulsing, golden-white
+        light_pulse = 0.6 + 0.4 * math.sin(self.hira_pulse * 1.2)
+        # Light source from above/within
+        light_cx, light_cy = 32, 34
+        for dy in range(-8, 12):
+            for dx in range(-10, 11):
+                px, py = light_cx + dx, light_cy + dy
+                if 0 <= px < 64 and 0 <= py < 64:
+                    dist = math.sqrt(dx * dx + (dy * 1.3) ** 2)
+                    if dist < 10:
+                        # Check if inside or near cave area
+                        cave_dx = dx / 7.0
+                        cave_dy = (py - cave_cy) / 6.0
+                        in_cave = cave_dx ** 2 + (cave_dy * 1.2) ** 2 < 1.2
+                        if in_cave or dy < -2:
+                            intensity = (1.0 - dist / 10) ** 1.5 * 0.5 * light_pulse
+                            lc = (int(255 * intensity),
+                                  int(240 * intensity),
+                                  int(180 * intensity))
+                            display.set_pixel(px, py,
+                                              _add_color(display.get_pixel(px, py), lc))
+
+        # Light particles rising from cave
+        for p in self.hira_light_particles:
+            px, py = int(p[0]), int(p[1])
+            if 0 <= px < 64 and 0 <= py < 64:
+                fade = min(1.0, p[4] / 0.5)
+                lc = (int(255 * fade * 0.5), int(240 * fade * 0.5), int(180 * fade * 0.4))
+                display.set_pixel(px, py, _add_color(display.get_pixel(px, py), lc))
+
+        # Rim light on cave edges
+        for angle_deg in range(-60, 61, 5):
+            angle = math.radians(angle_deg)
+            for r_off in range(1, 3):
+                rim_x = int(cave_cx + math.cos(angle) * (6 + r_off * 0.5))
+                rim_y = int(cave_cy - 3 + math.sin(angle) * 5)
+                if 0 <= rim_x < 64 and 0 <= rim_y < 64:
+                    rim_i = 0.15 * light_pulse
+                    rc = (int(200 * rim_i), int(180 * rim_i), int(120 * rim_i))
+                    display.set_pixel(rim_x, rim_y,
+                                      _add_color(display.get_pixel(rim_x, rim_y), rc))
+
+    # ═════════════════════════════════════════════════════════════════
+    # SCENE 6: GURU NANAK AT THE RIVER (Sikhism)
+    # ═════════════════════════════════════════════════════════════════
+
+    def _update_nanak(self, scaled_dt):
+        self.nanak_glow += scaled_dt
+
+        # Spawn ripples periodically from the figure
+        self.nanak_ripple_timer += scaled_dt
+        if self.nanak_ripple_timer > 0.8:
+            self.nanak_ripple_timer = 0.0
+            self.nanak_ripples.append([32.0, 42.0, 0.0, 3.5])  # cx, cy, radius, life
+
+        alive = []
+        for rip in self.nanak_ripples:
+            rip[2] += 4.0 * scaled_dt  # expand
+            rip[3] -= scaled_dt  # fade
+            if rip[3] > 0:
+                alive.append(rip)
+        self.nanak_ripples = alive
+
+    def _draw_nanak(self, display, t):
+        # Dawn sky — warm, golden hour
+        for y in range(GRID_SIZE):
+            sky_t = y / GRID_SIZE
+            r = int(30 + 60 * (1 - sky_t))
+            g = int(20 + 40 * (1 - sky_t))
+            b = int(50 + 30 * (1 - sky_t))
+            # Horizon warmth
+            horizon = max(0, 1.0 - abs(y - 30) / 15.0) * 0.5
+            r = min(255, r + int(150 * horizon))
+            g = min(255, g + int(80 * horizon))
+            b = min(255, b + int(30 * horizon))
+            for x in range(GRID_SIZE):
+                display.set_pixel(x, y, (r, g, b))
+
+        # Stars (fading with dawn)
+        dawn_fade = 0.4
+        for sx, sy, phase, spd in self.nanak_stars:
+            brightness = (0.2 + 0.8 * max(0, math.sin(t * spd + phase))) * dawn_fade
+            gray = int(100 * brightness)
+            if gray > 5:
+                display.set_pixel(sx, sy, (gray, gray, int(gray * 0.9)))
+
+        # Riverbanks — earth tones
+        for y in range(36, GRID_SIZE):
+            for x in list(range(0, 10)) + list(range(54, 64)):
+                depth = (y - 36) / 28.0
+                bank_noise = math.sin(x * 0.5 + y * 0.3) * 0.1
+                r = max(0, int((60 - 20 * depth) * (1 + bank_noise)))
+                g = max(0, int((70 - 25 * depth) * (1 + bank_noise)))
+                b = max(0, int((30 - 10 * depth) * (1 + bank_noise)))
+                display.set_pixel(x, y, (r, g, b))
+
+        # Trees on banks
+        for tree_x, bank_side in [(4, -1), (7, -1), (57, 1), (61, 1)]:
+            trunk_y_base = 38
+            # Trunk
+            for ty in range(trunk_y_base, trunk_y_base + 6):
+                display.set_pixel(tree_x, ty, (60, 40, 20))
+            # Canopy
+            for cdy in range(-4, 1):
+                for cdx in range(-2, 3):
+                    cx_p = tree_x + cdx
+                    cy_p = trunk_y_base + cdy
+                    if 0 <= cx_p < 64 and 0 <= cy_p < 64:
+                        if abs(cdx) + abs(cdy) <= 3:
+                            noise = math.sin(cx_p + cy_p * 1.5) * 0.3
+                            g_val = int(70 + 30 * noise)
+                            display.set_pixel(cx_p, cy_p, (20, g_val, 15))
+
+        # River water
+        for y in range(36, GRID_SIZE):
+            for x in range(10, 54):
+                wave1 = math.sin(x * 0.2 + t * 0.8 + y * 0.15) * 0.1
+                wave2 = math.sin(x * 0.5 - t * 0.5 + y * 0.1) * 0.05
+                depth = (y - 36) / 28.0
+                brightness = max(0, min(1, 0.5 - 0.15 * depth + wave1 + wave2))
+                r = int(20 * brightness)
+                g = int(60 * brightness)
+                b = int(130 * brightness)
+                display.set_pixel(x, y, (r, g, b))
+
+        # Ripples expanding from figure
+        for rip in self.nanak_ripples:
+            rcx, rcy, radius, life = rip
+            if radius < 1:
+                continue
+            alpha = (life / 3.5) * 0.3
+            for angle_step in range(60):
+                a = angle_step * math.pi * 2 / 60
+                rx = int(rcx + math.cos(a) * radius)
+                ry = int(rcy + math.sin(a) * radius * 0.4)  # flatten vertically
+                if 10 <= rx < 54 and 36 <= ry < 64:
+                    rc = (int(180 * alpha), int(200 * alpha), int(255 * alpha))
+                    display.set_pixel(rx, ry, _add_color(display.get_pixel(rx, ry), rc))
+
+        # Nanak figure — warm white/cream robes
+        robe_color = (200, 190, 170)
+        turban_color = (180, 160, 130)
+        skin_color = (170, 130, 90)
+        cx, cy = 32, 34
+        for fx, fy in NANAK_FIGURE:
+            if 0 <= fx < 64 and 0 <= fy < 64:
+                if fy <= cy - 13:
+                    display.set_pixel(fx, fy, turban_color)
+                elif fy <= cy - 7:
+                    display.set_pixel(fx, fy, skin_color)
+                else:
+                    display.set_pixel(fx, fy, robe_color)
+
+        # Divine glow around Nanak
+        glow_pulse = 0.7 + 0.3 * math.sin(self.nanak_glow * 1.0)
+        for dy in range(-14, 15):
+            for dx in range(-10, 11):
+                dist = math.sqrt(dx * dx + (dy * 0.7) ** 2)
+                if dist < 12:
+                    gx, gy = cx + dx, cy + dy
+                    if 0 <= gx < 64 and 0 <= gy < 64:
+                        intensity = (1.0 - dist / 12) ** 2 * 0.2 * glow_pulse
+                        gc = (int(255 * intensity),
+                              int(230 * intensity),
+                              int(180 * intensity))
+                        display.set_pixel(gx, gy,
+                                          _add_color(display.get_pixel(gx, gy), gc))
+
+        # Water glow — reflection of the divine light in the river
+        for y in range(40, 56):
+            for x in range(20, 44):
+                dx = x - 32
+                dy = y - 42
+                dist = math.sqrt(dx * dx + dy * dy)
+                if dist < 14:
+                    wave = math.sin(x * 0.3 + t * 1.2 + y * 0.2) * 0.3
+                    intensity = (1.0 - dist / 14) ** 2 * 0.15 * glow_pulse * (0.7 + wave)
+                    if intensity > 0:
+                        gc = (int(200 * intensity), int(180 * intensity), int(120 * intensity))
+                        display.set_pixel(x, y,
+                                          _add_color(display.get_pixel(x, y), gc))
 
 
