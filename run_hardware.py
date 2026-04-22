@@ -21,7 +21,7 @@ from hardware import HardwareDisplay, HardwareInput, Colors, GRID_SIZE
 import update_checker
 
 # Game/visual catalogs
-from catalog import register_games, register_visuals, get_all_categories
+from catalog import register_games, register_visuals, get_all_categories, VISUAL_CATEGORY_MAP
 from games import ALL_GAMES
 from visuals import ALL_VISUALS
 
@@ -1049,6 +1049,22 @@ def main():
                                 exit_hold = 0.0
 
                         if current_item:
+                            # Titles: Left/Right cycles between title visuals (like ART paintings)
+                            if getattr(current_item, 'category', None) == 'titles' and (
+                                input_state.left_pressed or input_state.right_pressed
+                            ):
+                                titles_cat = VISUAL_CATEGORY_MAP.get('titles')
+                                if titles_cat and titles_cat.items:
+                                    items = titles_cat.items
+                                    try:
+                                        idx = items.index(type(current_item))
+                                    except ValueError:
+                                        idx = 0
+                                    step = 1 if input_state.right_pressed else -1
+                                    current_item = items[(idx + step) % len(items)](display)
+                                    current_item.reset()
+                                    idle_timer = 0.0
+
                             current_item.handle_input(input_state)
                             if getattr(current_item, 'wants_exit', False):
                                 in_menu = True
