@@ -8,9 +8,10 @@ Metropolitan Museum of Art Open Access API (CC0).
 Images are pre-built by tools/build_coins.py.
 
 Controls:
-  Up/Down    - Cycle eras (ANCIENT / MEDIEVAL / MODERN)
-  Left/Right - Cycle coins within era
-  Action     - Toggle info overlay
+  Left/Right      - Cycle coins within era
+  Up/Down         - Toggle info overlay
+  Action L or R   - Toggle auto-cycle (slideshow) on/off
+  Action L + R    - Cycle eras (ANCIENT / MEDIEVAL / MODERN)
 """
 
 import json
@@ -93,6 +94,15 @@ class Coins(Visual):
 
         # Era overlay (brief flash when switching eras)
         self._era_overlay_timer = 0.0
+
+        # Auto-cycle state (Action button toggles)
+        self._auto_cycle = True
+        self._auto_feedback_timer = 0.0
+        self._auto_feedback_text = ""
+
+        # Action gesture tracking (single vs both-button)
+        self._any_action_prev = False
+        self._gesture_had_both = False
 
         # Edge detection
         self._prev_left = False
@@ -193,21 +203,6 @@ class Coins(Visual):
         self._prev_left = input_state.left
         self._prev_right = input_state.right
 
-        # Up/Down: cycle eras
-        if up_edge or down_edge:
-            d = -1 if up_edge else 1
-            self._era_idx = (self._era_idx + d) % len(ERAS)
-            self._coin_idx = 0
-            self._load_coin()
-            self._timer = 0.0
-            self._era_overlay_timer = 1.5
-            self._idle_overlay_timer = 0.0
-            if self._show_overlay:
-                self._overlay_time = 0.0
-            return True
-        if input_state.up or input_state.down:
-            return True
-
         # Left/Right: cycle coins within era
         if left_edge or right_edge:
             era = ERAS[self._era_idx]
@@ -226,11 +221,48 @@ class Coins(Visual):
         if input_state.left or input_state.right:
             return True
 
-        # Action: toggle overlay
-        if input_state.action_l or input_state.action_r:
+        # Up/Down: toggle info overlay
+        if up_edge or down_edge:
             self._show_overlay = not self._show_overlay
             if self._show_overlay:
                 self._overlay_time = 0.0
+            return True
+        if input_state.up or input_state.down:
+            return True
+
+        # Action: single = toggle auto-cycle, both = cycle era.
+        # Resolve on full release so a both-press isn't misread as single.
+        any_now = input_state.action_l_held or input_state.action_r_held
+        both_now = input_state.action_l_held and input_state.action_r_held
+        gesture_start = any_now and not self._any_action_prev
+        gesture_end = self._any_action_prev and not any_now
+        if gesture_start:
+            self._gesture_had_both = False
+        if both_now:
+            self._gesture_had_both = True
+        self._any_action_prev = any_now
+
+        if gesture_end:
+            if self._gesture_had_both:
+                # Cycle era forward
+                self._era_idx = (self._era_idx + 1) % len(ERAS)
+                self._coin_idx = 0
+                self._load_coin()
+                self._timer = 0.0
+                self._era_overlay_timer = 1.5
+                self._idle_overlay_timer = 0.0
+                if self._show_overlay:
+                    self._overlay_time = 0.0
+            else:
+                # Toggle auto-cycle
+                self._auto_cycle = not self._auto_cycle
+                self._auto_feedback_text = (
+                    "AUTO ON" if self._auto_cycle else "AUTO OFF")
+                self._auto_feedback_timer = 1.5
+                if self._auto_cycle:
+                    self._timer = 0.0
+            return True
+        if any_now:
             return True
 
         return False
@@ -246,10 +278,14 @@ class Coins(Visual):
         if self._era_overlay_timer > 0:
             self._era_overlay_timer = max(0.0, self._era_overlay_timer - dt)
 
+        # AUTO ON/OFF feedback countdown
+        if self._auto_feedback_timer > 0:
+            self._auto_feedback_timer = max(0.0, self._auto_feedback_timer - dt)
+
         # Auto-advance within era
         era = ERAS[self._era_idx]
         era_coins = self._era_coins.get(era, [])
-        if len(era_coins) > 1:
+        if self._auto_cycle and len(era_coins) > 1:
             self._timer += dt
             if self._timer >= _DISPLAY_DURATION:
                 self._coin_idx = (self._coin_idx + 1) % len(era_coins)
@@ -341,6 +377,14 @@ class Coins(Visual):
             ew = len(era_name) * 5
             ex = max(0, (GRID_SIZE - ew) // 2)
             d.draw_text_small(ex, 27, era_name, oc)
+
+        # AUTO ON/OFF feedback (drawn over image, independent of info overlay)
+        if self._auto_feedback_timer > 0 and self._auto_feedback_text:
+            fa = min(1.0, self._auto_feedback_timer / 0.5)
+            c = int(220 * fa)
+            tw = len(self._auto_feedback_text) * _CHAR_W
+            tx = max(0, (GRID_SIZE - tw) // 2)
+            d.draw_text_small(tx, 28, self._auto_feedback_text, (c, c, c))
 
         # Info overlay
         alpha = self._overlay_alpha

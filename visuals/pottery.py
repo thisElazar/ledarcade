@@ -9,7 +9,8 @@ Images are pre-built by tools/build_pottery.py from the Met's API.
 
 Controls:
   Left/Right - Cycle vessels
-  Action     - Toggle info overlay
+  Up/Down    - Toggle info overlay
+  Action     - Toggle auto-cycle (slideshow) on/off
 """
 
 import json
@@ -80,9 +81,16 @@ class Pottery(Visual):
         self._overlay_time = 0.0
         self._idle_overlay_timer = 0.0  # countdown for idle fade
 
-        # Edge detection for L/R
+        # Auto-cycle state (Action button toggles)
+        self._auto_cycle = True
+        self._auto_feedback_timer = 0.0
+        self._auto_feedback_text = ""
+
+        # Edge detection
         self._prev_left = False
         self._prev_right = False
+        self._prev_up = False
+        self._prev_down = False
 
         self._load_manifest()
         if self._vessels:
@@ -144,9 +152,14 @@ class Pottery(Visual):
     def handle_input(self, input_state):
         left_edge = input_state.left and not self._prev_left
         right_edge = input_state.right and not self._prev_right
+        up_edge = input_state.up and not self._prev_up
+        down_edge = input_state.down and not self._prev_down
         self._prev_left = input_state.left
         self._prev_right = input_state.right
+        self._prev_up = input_state.up
+        self._prev_down = input_state.down
 
+        # Left/Right: cycle vessels
         if left_edge or right_edge:
             if self._vessels:
                 if right_edge:
@@ -162,10 +175,22 @@ class Pottery(Visual):
         if input_state.left or input_state.right:
             return True
 
-        if input_state.action_l or input_state.action_r:
+        # Up/Down: toggle info overlay
+        if up_edge or down_edge:
             self._show_overlay = not self._show_overlay
             if self._show_overlay:
                 self._overlay_time = 0.0
+            return True
+        if input_state.up or input_state.down:
+            return True
+
+        # Action: toggle auto-cycle
+        if input_state.action_l or input_state.action_r:
+            self._auto_cycle = not self._auto_cycle
+            self._auto_feedback_text = "AUTO ON" if self._auto_cycle else "AUTO OFF"
+            self._auto_feedback_timer = 1.5
+            if self._auto_cycle:
+                self._timer = 0.0  # restart slideshow countdown fresh
             return True
 
         return False
@@ -177,8 +202,12 @@ class Pottery(Visual):
         if self._fade < 1.0:
             self._fade = min(1.0, self._fade + dt / _CROSSFADE_TIME)
 
+        # AUTO ON/OFF feedback countdown
+        if self._auto_feedback_timer > 0:
+            self._auto_feedback_timer = max(0.0, self._auto_feedback_timer - dt)
+
         # Auto-advance (idle slideshow)
-        if self._vessels and len(self._vessels) > 1:
+        if self._auto_cycle and self._vessels and len(self._vessels) > 1:
             self._timer += dt
             if self._timer >= _DISPLAY_DURATION:
                 self._idx = (self._idx + 1) % len(self._vessels)
@@ -266,6 +295,14 @@ class Pottery(Visual):
                     g = int(pg + (g - pg) * f)
                     b = int(pb + (b - pb) * f)
                 d.set_pixel(x, y, (r, g, b))
+
+        # AUTO ON/OFF feedback (drawn over image, independent of info overlay)
+        if self._auto_feedback_timer > 0 and self._auto_feedback_text:
+            fa = min(1.0, self._auto_feedback_timer / 0.5)
+            c = int(220 * fa)
+            tw = len(self._auto_feedback_text) * _CHAR_W
+            tx = max(0, (GRID_SIZE - tw) // 2)
+            d.draw_text_small(tx, 28, self._auto_feedback_text, (c, c, c))
 
         # Info overlay
         alpha = self._overlay_alpha
