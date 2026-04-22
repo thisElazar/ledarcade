@@ -1,6 +1,6 @@
 """
-MOVE - Human Motion
-====================
+MOVEMENT - Human Motion
+========================
 A stick figure performs various movements, rendered from procedural
 biomechanical gait models. 14 joints, 15 bones, with hysteresis
 rendering to prevent pixel jitter.
@@ -9,7 +9,7 @@ Vitruvian proportions: 8-head figure (48px tall, 6px per head unit).
 
 Controls:
   Left/Right   - Slow down / speed up playback
-  Action       - Cycle movement (WALK, RUN, SNEAK, IDLE)
+  Action       - Cycle movement (WALK, RUN, SNEAK)
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -167,68 +167,6 @@ SNEAK_FRAMES = [
     {'head':(32,13), 'neck':(32,16), 'l_shoulder':(28,19), 'r_shoulder':(36,19), 'l_elbow':(27,28), 'r_elbow':(36,28), 'l_hand':(33,33), 'r_hand':(42,32), 'l_hip':(29,34), 'r_hip':(35,34), 'l_knee':(29,46), 'r_knee':(39,45), 'l_foot':(25,57), 'r_foot':(40,57)},
     {'head':(32,13), 'neck':(32,16), 'l_shoulder':(28,19), 'r_shoulder':(36,19), 'l_elbow':(28,28), 'r_elbow':(36,28), 'l_hand':(33,33), 'r_hand':(42,33), 'l_hip':(29,34), 'r_hip':(35,34), 'l_knee':(29,46), 'r_knee':(39,45), 'l_foot':(24,57), 'r_foot':(41,57)},
 ]
-IDLE_FRAMES = [
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(30,33), 'r_hand':(39,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(30,33), 'r_hand':(39,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,33), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,34), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,34), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(37,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,34), 'r_hand':(39,33), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,34), 'r_hand':(39,34), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(29,34), 'r_hand':(39,34), 'l_hip':(30,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(30,34), 'r_hand':(39,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(30,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(37,26), 'l_hand':(30,34), 'r_hand':(39,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,34), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,34), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(29,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(29,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(29,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(29,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(29,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(37,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(28,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(27,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(34,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(35,56)},
-    {'head':(32,11), 'neck':(32,14), 'l_shoulder':(28,17), 'r_shoulder':(36,17), 'l_elbow':(28,26), 'r_elbow':(36,26), 'l_hand':(30,33), 'r_hand':(38,33), 'l_hip':(29,32), 'r_hip':(35,32), 'l_knee':(30,44), 'r_knee':(35,44), 'l_foot':(29,56), 'r_foot':(34,56)},
-]
 # fmt: on
 
 # Movement definitions: (name, frame_data, base_fps)
@@ -236,8 +174,6 @@ MOTION_LIST = [
     ('WALK',  WALK_FRAMES,  30.0),
     ('RUN',   RUN_FRAMES,   30.0),
     ('SNEAK', SNEAK_FRAMES, 30.0),
-
-    ('IDLE',  IDLE_FRAMES,  30.0),
 ]
 
 # Joint names for iteration
@@ -305,9 +241,9 @@ def _color_scale(color, scale):
 
 
 class Walk(Visual):
-    name = "MOVE"
+    name = "MOVEMENT"
     description = "Human motion"
-    category = "digital"
+    category = "science_macro"
 
     def reset(self):
         self.time = 0.0
