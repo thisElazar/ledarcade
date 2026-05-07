@@ -5440,6 +5440,10 @@ class Peptides(Visual):
         self.nmr_pause = 1.0
         self.nmr_morphing = False
         self.nmr_speed = 1.0 / 2.5  # 2.5 seconds per transition
+        self._both_held_prev = False
+        self._l_was_held = False
+        self._r_was_held = False
+        self._zoom_used = False
         self._prepare_peptide()
 
     def _prepare_peptide(self):
@@ -5472,9 +5476,9 @@ class Peptides(Visual):
             max_r = max(max_r, dist)
 
         # Scale to fit in upper 48 rows with margin
-        # Beads have radius ~2-3, so leave room
         target_radius = 16.0
         self.scale = target_radius / max_r if max_r > 0 else 1.0
+        self._base_scale = self.scale
 
         # Reset NMR morph state
         self.nmr_t = 0.0
@@ -5502,6 +5506,9 @@ class Peptides(Visual):
         consumed = False
         rotation_speed = 2.0
         tilt_speed = 1.5
+        zoom_speed = self._base_scale * 1.0
+
+        any_held = input_state.action_l_held or input_state.action_r_held
 
         if input_state.left:
             self.rotation_y -= rotation_speed * 0.016
@@ -5511,32 +5518,54 @@ class Peptides(Visual):
             self.rotation_y += rotation_speed * 0.016
             self.auto_cycle = False
             consumed = True
-        if input_state.up:
-            self.tilt_x -= tilt_speed * 0.016
-            self.auto_cycle = False
-            consumed = True
-        if input_state.down:
-            self.tilt_x += tilt_speed * 0.016
-            self.auto_cycle = False
-            consumed = True
 
-        # Z+X together: cycle color mode
-        if input_state.action_l and input_state.action_r:
+        if any_held and (input_state.up or input_state.down):
+            if input_state.up:
+                self.scale = min(self._base_scale * 2.5, self.scale + zoom_speed * 0.016)
+            if input_state.down:
+                self.scale = max(self._base_scale * 0.3, self.scale - zoom_speed * 0.016)
+            self._zoom_used = True
+            self.auto_cycle = False
+            consumed = True
+        else:
+            if input_state.up:
+                self.tilt_x -= tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
+            if input_state.down:
+                self.tilt_x += tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
+
+        both_held = input_state.action_l_held and input_state.action_r_held
+        both_released = self._both_held_prev and not both_held
+
+        if both_released and not self._zoom_used:
             self.color_mode_idx = (self.color_mode_idx + 1) % len(COLOR_MODES)
-            self.color_mode_overlay = 3.0  # Show legend for 3 seconds
+            self.color_mode_overlay = 3.0
             consumed = True
-        elif input_state.action_l:
-            self.peptide_idx = (self.peptide_idx - 1) % len(PEPTIDES)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_peptide()
-            consumed = True
-        elif input_state.action_r:
-            self.peptide_idx = (self.peptide_idx + 1) % len(PEPTIDES)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_peptide()
-            consumed = True
+        elif not both_held and not self._zoom_used:
+            l_released = self._l_was_held and not input_state.action_l_held
+            r_released = self._r_was_held and not input_state.action_r_held
+            if l_released and not self._r_was_held:
+                self.peptide_idx = (self.peptide_idx - 1) % len(PEPTIDES)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_peptide()
+                consumed = True
+            elif r_released and not self._l_was_held:
+                self.peptide_idx = (self.peptide_idx + 1) % len(PEPTIDES)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_peptide()
+                consumed = True
+
+        if not any_held:
+            self._zoom_used = False
+
+        self._both_held_prev = both_held
+        self._l_was_held = input_state.action_l_held
+        self._r_was_held = input_state.action_r_held
 
         return consumed
 

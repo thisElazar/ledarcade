@@ -1125,6 +1125,10 @@ class Lattice(Visual):
         self.label_timer = 0.0
         self.scroll_offset = 0.0
         self.overlay_timer = 0.0
+        self._both_held_prev = False
+        self._l_was_held = False
+        self._r_was_held = False
+        self._zoom_used = False
         self._prepare_crystal()
 
     def _current_crystal_list(self):
@@ -1192,6 +1196,7 @@ class Lattice(Visual):
 
         target_radius = 22.0
         self.scale = target_radius / max_r if max_r > 0 else 10.0
+        self._base_scale = self.scale
 
         self._generate_bonds(crystal)
         self.label_timer = 0.0
@@ -1220,8 +1225,10 @@ class Lattice(Visual):
         consumed = False
         rotation_speed = 2.0
         tilt_speed = 1.5
+        zoom_speed = self._base_scale * 1.0
 
-        # Joystick controls rotation
+        any_held = input_state.action_l_held or input_state.action_r_held
+
         if input_state.left:
             self.rotation_y -= rotation_speed * 0.016
             self.auto_cycle = False
@@ -1230,17 +1237,29 @@ class Lattice(Visual):
             self.rotation_y += rotation_speed * 0.016
             self.auto_cycle = False
             consumed = True
-        if input_state.up:
-            self.tilt_x -= tilt_speed * 0.016
-            self.auto_cycle = False
-            consumed = True
-        if input_state.down:
-            self.tilt_x += tilt_speed * 0.016
-            self.auto_cycle = False
-            consumed = True
 
-        # Two-button press cycles through categories
-        if input_state.action_l and input_state.action_r:
+        if any_held and (input_state.up or input_state.down):
+            if input_state.up:
+                self.scale = min(self._base_scale * 2.5, self.scale + zoom_speed * 0.016)
+            if input_state.down:
+                self.scale = max(self._base_scale * 0.3, self.scale - zoom_speed * 0.016)
+            self._zoom_used = True
+            self.auto_cycle = False
+            consumed = True
+        else:
+            if input_state.up:
+                self.tilt_x -= tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
+            if input_state.down:
+                self.tilt_x += tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
+
+        both_held = input_state.action_l_held and input_state.action_r_held
+        both_released = self._both_held_prev and not both_held
+
+        if both_released and not self._zoom_used:
             self.category_idx = (self.category_idx + 1) % len(CATEGORIES)
             self.crystal_pos = 0
             self.cycle_timer = 0.0
@@ -1248,23 +1267,32 @@ class Lattice(Visual):
             self.overlay_timer = 2.5
             self._prepare_crystal()
             consumed = True
-        # Single button cycles crystals in current category
-        elif input_state.action_l:
-            crystal_list = self._current_crystal_list()
-            if crystal_list:
-                self.crystal_pos = (self.crystal_pos - 1) % len(crystal_list)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_crystal()
-            consumed = True
-        elif input_state.action_r:
-            crystal_list = self._current_crystal_list()
-            if crystal_list:
-                self.crystal_pos = (self.crystal_pos + 1) % len(crystal_list)
-            self.cycle_timer = 0.0
-            self.auto_cycle = True
-            self._prepare_crystal()
-            consumed = True
+        elif not both_held and not self._zoom_used:
+            l_released = self._l_was_held and not input_state.action_l_held
+            r_released = self._r_was_held and not input_state.action_r_held
+            if l_released and not self._r_was_held:
+                crystal_list = self._current_crystal_list()
+                if crystal_list:
+                    self.crystal_pos = (self.crystal_pos - 1) % len(crystal_list)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_crystal()
+                consumed = True
+            elif r_released and not self._l_was_held:
+                crystal_list = self._current_crystal_list()
+                if crystal_list:
+                    self.crystal_pos = (self.crystal_pos + 1) % len(crystal_list)
+                self.cycle_timer = 0.0
+                self.auto_cycle = True
+                self._prepare_crystal()
+                consumed = True
+
+        if not any_held:
+            self._zoom_used = False
+
+        self._both_held_prev = both_held
+        self._l_was_held = input_state.action_l_held
+        self._r_was_held = input_state.action_r_held
 
         return consumed
 

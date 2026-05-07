@@ -28,6 +28,7 @@ CPK_COLORS = {
     'Fe': (224, 102, 51),
     'Si': (240, 200, 160),
     'Se': (255, 160, 0),
+    'Ca': (61, 255, 0),
 }
 
 CPK_RADIUS = {
@@ -42,6 +43,7 @@ CPK_RADIUS = {
     'Fe': 3,
     'Si': 3,
     'Se': 3,
+    'Ca': 4,
 }
 
 BOND_COLORS = {
@@ -4225,308 +4227,6 @@ MOLECULES = [
             (11, 23, 1), (11, 24, 1), (11, 25, 1),
         ],
     },
-
-    # ── THC & LSD ──
-    {
-    'name': 'THC',
-    'formula': 'C21H30O2',
-    'groups': ['plant'],
-    'atoms': [
-        # ============================================================
-        # Delta-9-THC  (C21H30O2)  --  53 atoms
-        # Tricyclic dibenzo[b,d]pyran:
-        #   Ring A (aromatic phenol): C4a(0)-C4(1)-C3(2)-C2(3)-C1(4)-C8a(5)
-        #   Ring B (pyran): C4a(0)-C6(9)-C6a(8)-C10a(7)-O(6)-C8a(5)
-        #   Ring C (cyclohexene): C6a(8)-C7(13)-C8(12)-C9(11)=C10(10)-C10a(7)
-        # Substituents: C1-OH, C3-pentyl, C6 gem-dimethyl, C9-methyl
-        # Heavy: 21C + 2O = 23  |  H: 30  |  Total: 53
-        # ============================================================
-
-        # --- Ring A: aromatic phenol, flat in xy-plane ---
-        ('C',  0.00,  0.00,  0.00),   # 0  C4a (junction A/B)
-        ('C',  1.21,  0.70,  0.00),   # 1  C4  (has H)
-        ('C',  1.21,  2.10,  0.00),   # 2  C3  (has pentyl)
-        ('C',  0.00,  2.80,  0.00),   # 3  C2  (has H)
-        ('C', -1.21,  2.10,  0.00),   # 4  C1  (has OH)
-        ('C', -1.21,  0.70,  0.00),   # 5  C8a (junction A/B, bonded to O)
-
-        # --- Ring B: pyran, slightly puckered ---
-        ('O',  -2.40,  0.00,  0.30),  # 6  O   (pyran oxygen)
-        ('C',  -2.40, -1.40,  0.50),  # 7  C10a (junction B/C, has H)
-        ('C',  -1.21, -2.10,  0.40),  # 8  C6a  (junction B/C, has H)
-        ('C',   0.00, -1.50,  0.20),  # 9  C6   (quaternary, gem-dimethyl)
-
-        # --- Ring C: cyclohexene, puckered ---
-        ('C',  -3.60, -2.10,  0.70),  # 10 C10  (has H, =C9)
-        ('C',  -3.60, -3.50,  0.60),  # 11 C9   (=C10, has CH3)
-        ('C',  -2.40, -4.20,  0.30),  # 12 C8   (has 2H)
-        ('C',  -1.21, -3.50,  0.20),  # 13 C7   (has 2H)
-
-        # --- Substituent heteroatom ---
-        ('O',  -1.21,  3.53,  0.00),  # 14 OH on C1(4)
-
-        # --- gem-dimethyl on C6(9) ---
-        ('C',   0.00, -1.50, -1.30),  # 15 gem-Me1
-        ('C',   1.30, -2.10,  0.50),  # 16 gem-Me2
-
-        # --- C9-methyl on C9(11) ---
-        ('C',  -4.90, -4.10,  0.80),  # 17 C9-methyl
-
-        # --- Pentyl chain on C3(2) ---
-        ('C',   2.50,  2.70,  0.00),  # 18 pentyl C1
-        ('C',   3.80,  1.95,  0.00),  # 19 pentyl C2
-        ('C',   5.10,  2.65,  0.00),  # 20 pentyl C3
-        ('C',   6.40,  1.90,  0.00),  # 21 pentyl C4
-        ('C',   7.70,  2.60,  0.00),  # 22 pentyl C5
-
-        # --- Hydrogens (30H, indices 23-52) ---
-        # Ring A aromatic H
-        ('H',  2.16,  0.25,  0.00),   # 23 H on C4(1)
-        ('H',  0.00,  3.89,  0.00),   # 24 H on C2(3)
-        # Phenol OH hydrogen
-        ('H', -1.21,  4.49,  0.00),   # 25 H on OH(14)
-        # Ring C: H on C6a(8)
-        ('H', -1.21, -2.10,  1.49),   # 26 H on C6a(8)
-        # Ring C: H on C10a(7)
-        ('H', -2.40, -1.40,  1.59),   # 27 H on C10a(7)
-        # Ring C: H on C10(10)
-        ('H', -4.55, -1.60,  0.90),   # 28 H on C10(10)
-        # Ring C: C8(12) 2H
-        ('H', -2.40, -5.25,  0.60),   # 29 H on C8(12)
-        ('H', -2.40, -4.40, -0.77),   # 30 H on C8(12)
-        # Ring C: C7(13) 2H
-        ('H', -0.30, -4.05,  0.55),   # 31 H on C7(13)
-        ('H', -1.21, -3.70, -0.87),   # 32 H on C7(13)
-        # gem-Me1(15) 3H
-        ('H',  0.90, -1.05, -1.70),   # 33 H
-        ('H', -0.90, -1.05, -1.70),   # 34 H
-        ('H',  0.00, -2.50, -1.70),   # 35 H
-        # gem-Me2(16) 3H
-        ('H',  1.30, -3.18,  0.30),   # 36 H
-        ('H',  2.20, -1.65,  0.10),   # 37 H
-        ('H',  1.30, -1.95,  1.57),   # 38 H
-        # C9-methyl(17) 3H
-        ('H', -4.90, -5.15,  0.50),   # 39 H
-        ('H', -5.80, -3.60,  0.45),   # 40 H
-        ('H', -4.90, -4.00,  1.87),   # 41 H
-        # Pentyl C1(18) 2H
-        ('H',  2.50,  3.40,  0.85),   # 42 H
-        ('H',  2.50,  3.30, -0.88),   # 43 H
-        # Pentyl C2(19) 2H
-        ('H',  3.80,  1.25,  0.85),   # 44 H
-        ('H',  3.80,  1.30, -0.88),   # 45 H
-        # Pentyl C3(20) 2H
-        ('H',  5.10,  3.35,  0.85),   # 46 H
-        ('H',  5.10,  3.30, -0.88),   # 47 H
-        # Pentyl C4(21) 2H
-        ('H',  6.40,  1.20,  0.85),   # 48 H
-        ('H',  6.40,  1.25, -0.88),   # 49 H
-        # Pentyl C5(22) 3H
-        ('H',  7.70,  3.30,  0.85),   # 50 H
-        ('H',  7.70,  3.25, -0.88),   # 51 H
-        ('H',  8.63,  2.05,  0.00),   # 52 H
-    ],
-    'bonds': [
-        # Ring A aromatic (alternating for display)
-        (0, 1, 2), (1, 2, 1), (2, 3, 2), (3, 4, 1), (4, 5, 2), (5, 0, 1),
-        # Ring B pyran: C4a(0)-C6(9)-C6a(8)-C10a(7)-O(6)-C8a(5)
-        (0, 9, 1), (9, 8, 1), (8, 7, 1), (7, 6, 1), (6, 5, 1),
-        # Ring C cyclohexene: C6a(8)-C7(13)-C8(12)-C9(11)=C10(10)-C10a(7)
-        (8, 13, 1), (13, 12, 1), (12, 11, 1), (11, 10, 2), (10, 7, 1),
-        # Substituents
-        (4, 14, 1),    # C1--OH
-        (9, 15, 1),    # C6--gem-Me1
-        (9, 16, 1),    # C6--gem-Me2
-        (11, 17, 1),   # C9--methyl
-        (2, 18, 1),    # C3--pentyl C1
-        (18, 19, 1),   # pentyl C1--C2
-        (19, 20, 1),   # pentyl C2--C3
-        (20, 21, 1),   # pentyl C3--C4
-        (21, 22, 1),   # pentyl C4--C5
-        # Hydrogens
-        (1, 23, 1),                                    # C4 H
-        (3, 24, 1),                                    # C2 H
-        (14, 25, 1),                                   # OH H
-        (8, 26, 1),                                    # C6a H
-        (7, 27, 1),                                    # C10a H
-        (10, 28, 1),                                   # C10 H
-        (12, 29, 1), (12, 30, 1),                      # C8 2H
-        (13, 31, 1), (13, 32, 1),                      # C7 2H
-        (15, 33, 1), (15, 34, 1), (15, 35, 1),        # gem-Me1 3H
-        (16, 36, 1), (16, 37, 1), (16, 38, 1),        # gem-Me2 3H
-        (17, 39, 1), (17, 40, 1), (17, 41, 1),        # C9-Me 3H
-        (18, 42, 1), (18, 43, 1),                      # pentyl C1 2H
-        (19, 44, 1), (19, 45, 1),                      # pentyl C2 2H
-        (20, 46, 1), (20, 47, 1),                      # pentyl C3 2H
-        (21, 48, 1), (21, 49, 1),                      # pentyl C4 2H
-        (22, 50, 1), (22, 51, 1), (22, 52, 1),        # pentyl C5 3H
-    ],
-},
-    {
-    'name': 'LSD',
-    'formula': 'C20H25N3O',
-    'groups': ['neuro'],
-    'atoms': [
-        # --- Ring A: Benzene (aromatic) ---
-        ('C',  0.00,  0.00,  0.00),  # 0
-        ('C',  1.21, -0.70,  0.00),  # 1
-        ('C',  2.42,  0.00,  0.00),  # 2
-        ('C',  2.42,  1.40,  0.00),  # 3
-        ('C',  1.21,  2.10,  0.00),  # 4  (A-B junction)
-        ('C',  0.00,  1.40,  0.00),  # 5  (A-B junction)
-
-        # --- Ring B: Pyrrole (5-ring, indole) ---
-        ('C',  1.60,  3.50,  0.00),  # 6  (B-C-D triple junction)
-        ('C',  0.36,  3.90,  0.00),  # 7  (B-C junction)
-        ('N', -0.68,  2.78,  0.00),  # 8  N1 (indole NH)
-
-        # --- Ring C: Cyclohexene (6-ring, C9=C10 double bond) ---
-        ('C',  0.10,  5.32,  0.30),  # 9  (C=C with 10)
-        ('C',  1.40,  5.95,  0.30),  # 10 (C=C with 9)
-        ('C',  2.80,  5.10,  0.15),  # 11 (C-D junction)
-        ('C',  2.50,  6.70,  0.35),  # 12 (C-D junction)
-
-        # --- Ring D: Piperidine (6-ring) ---
-        ('N',  3.95,  5.70,  0.15),  # 13 N6 (tertiary, gets CH3)
-        ('C',  3.95,  4.25,  0.05),  # 14
-        ('C',  3.75,  7.55,  0.40),  # 15 C8 (amide attachment point)
-
-        # --- N-CH3 on N6 (atom 13) ---
-        ('C',  4.75,  5.70, -1.20),  # 16
-
-        # --- Amide: -C(=O)-N(Et)2 on C8 (atom 15) ---
-        ('C',  4.00,  9.00,  0.45),  # 17 carbonyl C
-        ('O',  3.10,  9.90,  0.35),  # 18 carbonyl O
-        ('N',  5.30,  9.40,  0.60),  # 19 amide N
-
-        # --- Ethyl group 1 on amide N ---
-        ('C',  6.30,  8.40,  0.55),  # 20 CH2
-        ('C',  7.75,  8.90,  0.65),  # 21 CH3
-
-        # --- Ethyl group 2 on amide N ---
-        ('C',  5.65, 10.80,  0.70),  # 22 CH2
-        ('C',  7.10, 11.20,  0.80),  # 23 CH3
-
-        # --- Hydrogens (25 total, atoms 24-48) ---
-        # Ring A: 4H on C0, C1, C2, C3
-        ('H', -0.94, -0.54,  0.00),  # 24 H-C0
-        ('H',  1.21, -1.79,  0.00),  # 25 H-C1
-        ('H',  3.36, -0.54,  0.00),  # 26 H-C2
-        ('H',  3.36,  1.94,  0.00),  # 27 H-C3
-
-        # Ring B: 1H on N1 (atom 8)
-        ('H', -1.63,  2.95,  0.00),  # 28 H-N8
-
-        # Ring C: 1H each on C9(atom 9), C10(atom 10) = 2H
-        ('H', -0.82,  5.85,  0.40),  # 29 H-C9
-        ('H',  1.55,  7.02,  0.40),  # 30 H-C10
-
-        # Ring C/D junctions: 1H on C11 (atom 11), 1H on C12 (atom 12) = 2H
-        ('H',  2.90,  5.00, -0.85),  # 31 H-C11
-        ('H', -0.55,  4.55,  0.00),  # 32 H-C7
-
-        # Ring D: 2H on C14 (atom 14), 1H on C15 (atom 15) = 3H
-        ('H',  4.20,  3.70,  0.92),  # 33 H-C14a
-        ('H',  4.65,  3.70, -0.75),  # 34 H-C14b
-        ('H',  3.10,  7.70,  1.30),  # 35 H-C15
-
-        # N-CH3 (atom 16): 3H
-        ('H',  5.83,  5.70, -1.10),  # 36 H-C16a
-        ('H',  4.45,  6.52, -1.80),  # 37 H-C16b
-        ('H',  4.45,  4.88, -1.80),  # 38 H-C16c
-
-        # Ethyl 1 CH2 (atom 20): 2H
-        ('H',  6.15,  7.75,  1.40),  # 39 H-C20a
-        ('H',  6.15,  7.75, -0.35),  # 40 H-C20b
-
-        # Ethyl 1 CH3 (atom 21): 3H
-        ('H',  8.45,  8.05,  0.65),  # 41 H-C21a
-        ('H',  7.95,  9.50,  1.55),  # 42 H-C21b
-        ('H',  7.95,  9.50, -0.25),  # 43 H-C21c
-
-        # Ethyl 2 CH2 (atom 22): 2H
-        ('H',  5.10, 11.35,  1.50),  # 44 H-C22a
-        ('H',  5.40, 11.30, -0.15),  # 45 H-C22b
-
-        # Ethyl 2 CH3 (atom 23): 3H
-        ('H',  7.80, 10.35,  0.80),  # 46 H-C23a
-        ('H',  7.30, 11.80,  1.70),  # 47 H-C23b
-        ('H',  7.30, 11.80, -0.10),  # 48 H-C23c
-    ],
-
-    'bonds': [
-        # --- Ring A: benzene (Kekule alternating) ---
-        (0, 1, 2),    # C0=C1
-        (1, 2, 1),    # C1-C2
-        (2, 3, 2),    # C2=C3
-        (3, 4, 1),    # C3-C4
-        (4, 5, 2),    # C4=C5
-        (5, 0, 1),    # C5-C0
-
-        # --- Ring B: pyrrole ---
-        (4, 6, 1),    # C4-C6
-        (6, 7, 1),    # C6-C7 (single, C6 is sp3 junction)
-        (7, 8, 1),    # C7-N8
-        (8, 5, 1),    # N8-C5
-
-        # --- Ring C: cyclohexene ---
-        (7, 9, 1),    # C7-C9
-        (9, 10, 2),   # C9=C10
-        (10, 12, 1),  # C10-C12
-        (12, 11, 1),  # C12-C11
-        (11, 6, 1),   # C11-C6
-
-        # --- Ring D: piperidine ---
-        (6, 12, 1),   # C6-C12  (Ring D edge, closes D via shared atoms)
-        (11, 14, 1),  # C11-C14
-        (14, 13, 1),  # C14-N13
-        (13, 15, 1),  # N13-C15
-        (15, 12, 1),  # C15-C12
-
-        # --- N-CH3 ---
-        (13, 16, 1),  # N13-C16
-
-        # --- Amide chain ---
-        (15, 17, 1),  # C15-C17
-        (17, 18, 2),  # C17=O18
-        (17, 19, 1),  # C17-N19
-
-        # --- Ethyl 1 ---
-        (19, 20, 1),  # N19-C20
-        (20, 21, 1),  # C20-C21
-
-        # --- Ethyl 2 ---
-        (19, 22, 1),  # N19-C22
-        (22, 23, 1),  # C22-C23
-
-        # --- C-H bonds ---
-        (0, 24, 1),   # C0-H
-        (1, 25, 1),   # C1-H
-        (2, 26, 1),   # C2-H
-        (3, 27, 1),   # C3-H
-        (8, 28, 1),   # N8-H (indole NH)
-        (9, 29, 1),   # C9-H
-        (10, 30, 1),  # C10-H
-        (11, 31, 1),  # C11-H
-        (7, 32, 1),   # C7-H
-        (14, 33, 1),  # C14-Ha
-        (14, 34, 1),  # C14-Hb
-        (15, 35, 1),  # C15-H
-        (16, 36, 1),  # C16-Ha (N-CH3)
-        (16, 37, 1),  # C16-Hb
-        (16, 38, 1),  # C16-Hc
-        (20, 39, 1),  # C20-Ha (ethyl 1 CH2)
-        (20, 40, 1),  # C20-Hb
-        (21, 41, 1),  # C21-Ha (ethyl 1 CH3)
-        (21, 42, 1),  # C21-Hb
-        (21, 43, 1),  # C21-Hc
-        (22, 44, 1),  # C22-Ha (ethyl 2 CH2)
-        (22, 45, 1),  # C22-Hb
-        (23, 46, 1),  # C23-Ha (ethyl 2 CH3)
-        (23, 47, 1),  # C23-Hb
-        (23, 48, 1),  # C23-Hc
-    ],
-},
     # ── Egg nutrients / Neuro ────────────────────────────────────
     {
         'name': 'CHOLINE',
@@ -5331,6 +5031,206 @@ MOLECULES = [
             (2, 4, 1),              # O-H
         ],
     },
+
+    # ── Fun smells, tastes & everyday ──────────────────────────────
+    {
+        'name': 'MENTHOL',
+        'formula': 'C10H20O',
+        'groups': ['plant', 'kitchen'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),  # 0  C1 (OH)
+            ('C',  1.52,  0.00,  0.00),  # 1  C2
+            ('C',  2.25,  1.26,  0.00),  # 2  C3 (isopropyl)
+            ('C',  1.52,  2.52,  0.00),  # 3  C4
+            ('C',  0.00,  2.52,  0.00),  # 4  C5 (methyl)
+            ('C', -0.73,  1.26,  0.00),  # 5  C6
+            ('O', -0.52, -0.70,  1.20),  # 6  OH
+            ('C', -0.73,  3.78,  0.00),  # 7  C5-methyl
+            ('C',  3.00,  1.26,  1.30),  # 8  isopropyl CH
+            ('C',  4.50,  1.26,  1.00),  # 9  iPr Me1
+            ('C',  2.50,  1.26,  2.70),  # 10 iPr Me2
+            ('H', -0.36, -0.55, -0.90),  # 11
+            ('H',  1.88, -0.55, -0.90),  # 12
+            ('H',  2.25,  1.26, -1.00),  # 13
+            ('H',  1.88,  3.07, -0.90),  # 14
+            ('H',  0.00,  2.52, -1.00),  # 15
+            ('H', -1.80,  1.26,  0.00),  # 16
+            ('H', -0.52, -1.68,  1.10),  # 17
+            ('H', -1.80,  3.78,  0.00),  # 18
+            ('H', -0.37,  4.33,  0.90),  # 19
+            ('H', -0.37,  4.33, -0.90),  # 20
+            ('H',  3.00,  0.20,  1.60),  # 21
+            ('H',  5.00,  0.35,  1.30),  # 22
+            ('H',  5.00,  2.17,  1.30),  # 23
+            ('H',  4.70,  1.26, -0.07),  # 24
+            ('H',  3.00,  0.35,  3.10),  # 25
+            ('H',  1.43,  1.26,  2.80),  # 26
+            ('H',  3.00,  2.17,  3.10),  # 27
+            ('H', -0.73,  1.26,  1.07),  # 28
+            ('H',  1.52,  3.07,  0.90),  # 29
+            ('H',  1.88, -0.55,  0.90),  # 30
+        ],
+        'bonds': [
+            (0, 1, 1), (1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 0, 1),
+            (0, 6, 1), (4, 7, 1), (2, 8, 1), (8, 9, 1), (8, 10, 1),
+            (0, 11, 1), (1, 12, 1), (2, 13, 1), (3, 14, 1), (4, 15, 1),
+            (5, 16, 1), (6, 17, 1), (7, 18, 1), (7, 19, 1), (7, 20, 1),
+            (8, 21, 1), (9, 22, 1), (9, 23, 1), (9, 24, 1),
+            (10, 25, 1), (10, 26, 1), (10, 27, 1),
+            (5, 28, 1), (3, 29, 1), (1, 30, 1),
+        ],
+    },
+    {
+        'name': 'CINNAMON',
+        'formula': 'C9H8O',
+        'groups': ['plant', 'kitchen'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),  # 0  C1 ring
+            ('C',  1.21,  0.70,  0.00),  # 1  C2
+            ('C',  1.21,  2.10,  0.00),  # 2  C3
+            ('C',  0.00,  2.80,  0.00),  # 3  C4
+            ('C', -1.21,  2.10,  0.00),  # 4  C5
+            ('C', -1.21,  0.70,  0.00),  # 5  C6
+            ('C', -2.42,  0.00,  0.00),  # 6  vinyl C7
+            ('C', -3.63,  0.70,  0.00),  # 7  vinyl C8
+            ('O', -4.84,  0.00,  0.00),  # 8  aldehyde O
+            ('H',  0.00, -1.09,  0.00),  # 9
+            ('H',  2.15,  0.16,  0.00),  # 10
+            ('H',  2.15,  2.64,  0.00),  # 11
+            ('H',  0.00,  3.89,  0.00),  # 12
+            ('H', -2.15,  2.64,  0.00),  # 13
+            ('H', -2.42, -1.09,  0.00),  # 14
+            ('H', -3.63,  1.79,  0.00),  # 15
+        ],
+        'bonds': [
+            (0, 1, 2), (1, 2, 1), (2, 3, 2), (3, 4, 1), (4, 5, 2), (5, 0, 1),
+            (5, 6, 1), (6, 7, 2), (7, 8, 2),
+            (0, 9, 1), (1, 10, 1), (2, 11, 1), (3, 12, 1), (4, 13, 1),
+            (6, 14, 1), (7, 15, 1),
+        ],
+    },
+    {
+        'name': 'CHALK',
+        'formula': 'CaCO3',
+        'groups': ['basics', 'kitchen'],
+        'atoms': [
+            ('C',   0.00,  0.00,  0.00),  # 0  C
+            ('O',   1.26,  0.00,  0.00),  # 1  O (=C)
+            ('O',  -0.63,  1.09,  0.00),  # 2  O (=C)
+            ('O',  -0.63, -1.09,  0.00),  # 3  O-
+            ('Ca',  1.50, -2.00,  0.50),  # 4  Ca2+
+        ],
+        'bonds': [
+            (0, 1, 2), (0, 2, 2), (0, 3, 1),
+            (3, 4, 1),
+        ],
+    },
+    {
+        'name': 'LACTOSE',
+        'formula': 'C12H22O11',
+        'groups': ['kitchen'],
+        'atoms': [
+            ('C',  0.00,  0.00,  0.00),  # 0  Gal C1
+            ('C',  1.52,  0.00,  0.00),  # 1  Gal C2
+            ('C',  2.10,  1.40,  0.00),  # 2  Gal C3
+            ('C',  1.30,  2.50,  0.00),  # 3  Gal C4
+            ('C', -0.20,  2.50,  0.00),  # 4  Gal C5
+            ('O', -0.75,  1.20,  0.00),  # 5  Gal ring O
+            ('C', -1.10,  3.60,  0.50),  # 6  Gal C6 (CH2OH)
+            ('O',  1.80,  3.80,  0.00),  # 7  glycosidic O
+            ('C',  3.20,  3.80,  0.00),  # 8  Glc C1
+            ('C',  3.80,  5.20,  0.00),  # 9  Glc C2
+            ('C',  5.30,  5.20,  0.00),  # 10 Glc C3
+            ('C',  6.10,  3.80,  0.00),  # 11 Glc C4
+            ('C',  5.50,  2.50,  0.00),  # 12 Glc C5
+            ('O',  4.00,  2.70,  0.00),  # 13 Glc ring O
+            ('C',  6.20,  1.20,  0.40),  # 14 Glc C6 (CH2OH)
+            ('O', -0.50, -1.10,  0.60),  # 15 Gal C1-OH
+            ('O',  2.10, -1.10, -0.50),  # 16 Gal C2-OH
+            ('O',  3.50,  1.40,  0.00),  # 17 Gal C3-OH
+            ('O', -2.40,  3.30,  0.20),  # 18 Gal C6-OH
+            ('O',  3.20,  6.30,  0.50),  # 19 Glc C2-OH
+            ('O',  5.80,  6.30, -0.50),  # 20 Glc C3-OH
+            ('O',  7.50,  3.80,  0.00),  # 21 Glc C4-OH
+            ('O',  7.50,  1.00,  0.10),  # 22 Glc C6-OH
+            ('H', -0.30,  0.00, -1.07),  # 23
+            ('H',  1.82,  0.00,  1.07),  # 24
+            ('H',  2.10,  1.40, -1.07),  # 25
+            ('H',  1.30,  2.50,  1.07),  # 26
+            ('H', -0.20,  2.50, -1.07),  # 27
+            ('H', -0.80,  4.55,  0.05),  # 28
+            ('H', -0.95,  3.70,  1.57),  # 29
+            ('H',  3.50,  3.80, -1.07),  # 30
+            ('H',  3.50,  5.20,  1.07),  # 31
+            ('H',  5.60,  5.20, -1.07),  # 32
+            ('H',  6.10,  3.80,  1.07),  # 33
+            ('H',  5.50,  2.50, -1.07),  # 34
+            ('H',  5.90,  0.35, -0.10),  # 35
+            ('H',  5.95,  1.10,  1.47),  # 36
+            ('H', -0.10, -1.90,  0.30),  # 37
+            ('H',  1.70, -1.90, -0.30),  # 38
+            ('H',  3.80,  1.40,  0.90),  # 39
+            ('H', -2.90,  4.10,  0.40),  # 40
+            ('H',  2.50,  6.90,  0.30),  # 41
+            ('H',  6.70,  6.30, -0.30),  # 42
+            ('H',  7.80,  3.00,  0.40),  # 43
+            ('H',  7.80,  0.10,  0.30),  # 44
+        ],
+        'bonds': [
+            (0, 1, 1), (1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 0, 1),
+            (4, 6, 1), (3, 7, 1), (7, 8, 1),
+            (8, 9, 1), (9, 10, 1), (10, 11, 1), (11, 12, 1), (12, 13, 1), (13, 8, 1),
+            (12, 14, 1),
+            (0, 15, 1), (1, 16, 1), (2, 17, 1), (6, 18, 1),
+            (9, 19, 1), (10, 20, 1), (11, 21, 1), (14, 22, 1),
+            (0, 23, 1), (1, 24, 1), (2, 25, 1), (3, 26, 1), (4, 27, 1),
+            (6, 28, 1), (6, 29, 1),
+            (8, 30, 1), (9, 31, 1), (10, 32, 1), (11, 33, 1), (12, 34, 1),
+            (14, 35, 1), (14, 36, 1),
+            (15, 37, 1), (16, 38, 1), (17, 39, 1), (18, 40, 1),
+            (19, 41, 1), (20, 42, 1), (21, 43, 1), (22, 44, 1),
+        ],
+    },
+    {
+        'name': 'SOAP',
+        'formula': 'C12H25NaO2S',
+        'groups': ['kitchen', 'basics'],
+        'atoms': [
+            ('S',   0.00,  0.00,  0.00),  # 0  S (sulfate head)
+            ('O',   1.20,  0.70,  0.00),  # 1  S=O
+            ('O',  -1.20,  0.70,  0.00),  # 2  S=O
+            ('O',   0.00, -1.00,  1.10),  # 3  S-O (ester to chain)
+            ('O',   0.00, -1.00, -1.10),  # 4  S-O-Na
+            ('Na',  0.00, -2.50, -1.80),  # 5  Na+
+            ('C',   0.00, -2.30,  1.50),  # 6  C1 (tail start)
+            ('C',   0.00, -3.60,  0.70),  # 7  C2
+            ('C',   0.00, -4.90,  1.50),  # 8  C3
+            ('C',   0.00, -6.20,  0.70),  # 9  C4
+            ('C',   0.00, -7.50,  1.50),  # 10 C5
+            ('C',   0.00, -8.80,  0.70),  # 11 C6
+            ('H',   0.90, -2.30,  2.10),  # 12
+            ('H',  -0.90, -2.30,  2.10),  # 13
+            ('H',   0.90, -3.60,  0.10),  # 14
+            ('H',  -0.90, -3.60,  0.10),  # 15
+            ('H',   0.90, -4.90,  2.10),  # 16
+            ('H',  -0.90, -4.90,  2.10),  # 17
+            ('H',   0.90, -6.20,  0.10),  # 18
+            ('H',  -0.90, -6.20,  0.10),  # 19
+            ('H',   0.90, -7.50,  2.10),  # 20
+            ('H',  -0.90, -7.50,  2.10),  # 21
+            ('H',   0.00, -9.40,  1.60),  # 22
+            ('H',   0.90, -8.80,  0.10),  # 23
+            ('H',  -0.90, -8.80,  0.10),  # 24
+        ],
+        'bonds': [
+            (0, 1, 2), (0, 2, 2), (0, 3, 1), (0, 4, 1),
+            (4, 5, 1),
+            (3, 6, 1), (6, 7, 1), (7, 8, 1), (8, 9, 1), (9, 10, 1), (10, 11, 1),
+            (6, 12, 1), (6, 13, 1), (7, 14, 1), (7, 15, 1),
+            (8, 16, 1), (8, 17, 1), (9, 18, 1), (9, 19, 1),
+            (10, 20, 1), (10, 21, 1), (11, 22, 1), (11, 23, 1), (11, 24, 1),
+        ],
+    },
 ]
 
 
@@ -5375,6 +5275,7 @@ class Molecule(Visual):
         self._both_held_prev = False
         self._l_was_held = False
         self._r_was_held = False
+        self._zoom_used = False
         self._prepare_molecule()
 
     def _current_mol_list(self):
@@ -5410,8 +5311,8 @@ class Molecule(Visual):
             r = math.sqrt(dx * dx + dy * dy + dz * dz)
             max_r = max(max_r, r)
 
-        # Fixed scale: ~6 pixels per Ångström, no cap - big molecules extend off screen
         self.scale = 6.0
+        self._base_scale = 6.0
         self.large = False
         self.label_timer = 0.0
 
@@ -5420,11 +5321,12 @@ class Molecule(Visual):
 
     def handle_input(self, input_state) -> bool:
         consumed = False
-        rotation_speed = 2.0  # Radians per second for manual control
+        rotation_speed = 2.0
         tilt_speed = 1.5
+        zoom_speed = 6.0
 
-        # Joystick controls rotation (Y and X axes)
-        # Any manual rotation pauses auto-cycle until button press
+        any_held = input_state.action_l_held or input_state.action_r_held
+
         if input_state.left:
             self.rotation_y -= rotation_speed * 0.016
             self.auto_cycle = False
@@ -5433,20 +5335,29 @@ class Molecule(Visual):
             self.rotation_y += rotation_speed * 0.016
             self.auto_cycle = False
             consumed = True
-        if input_state.up:
-            self.tilt_x -= tilt_speed * 0.016
+
+        if any_held and (input_state.up or input_state.down):
+            if input_state.up:
+                self.scale = min(15.0, self.scale + zoom_speed * 0.016)
+            if input_state.down:
+                self.scale = max(2.0, self.scale - zoom_speed * 0.016)
+            self._zoom_used = True
             self.auto_cycle = False
             consumed = True
-        if input_state.down:
-            self.tilt_x += tilt_speed * 0.016
-            self.auto_cycle = False
-            consumed = True
+        else:
+            if input_state.up:
+                self.tilt_x -= tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
+            if input_state.down:
+                self.tilt_x += tilt_speed * 0.016
+                self.auto_cycle = False
+                consumed = True
 
         both_held = input_state.action_l_held and input_state.action_r_held
         both_released = self._both_held_prev and not both_held
 
-        # Both-button release (short tap): cycle category
-        if both_released:
+        if both_released and not self._zoom_used:
             self.group_idx = (self.group_idx + 1) % len(GROUPS)
             self.mol_pos = 0
             self.cycle_timer = 0.0
@@ -5454,8 +5365,7 @@ class Molecule(Visual):
             self.overlay_timer = 2.5
             self._prepare_molecule()
             consumed = True
-        # Single button release (wasn't a both-hold) cycles molecules
-        elif not both_held:
+        elif not both_held and not self._zoom_used:
             l_released = self._l_was_held and not input_state.action_l_held
             r_released = self._r_was_held and not input_state.action_r_held
             if l_released and not self._r_was_held:
@@ -5474,6 +5384,9 @@ class Molecule(Visual):
                 self.auto_cycle = True
                 self._prepare_molecule()
                 consumed = True
+
+        if not any_held:
+            self._zoom_used = False
 
         self._both_held_prev = both_held
         self._l_was_held = input_state.action_l_held
