@@ -86,7 +86,7 @@ AMINO_COLORS = {
 # ── Scenarios ──────────────────────────────────────────────────
 
 _SCENARIOS = ['DOUBLE HELIX', 'REPLICATION', 'TRANSCRIPTION',
-              'CODONS', 'MUTATION', 'CHROMATIN']
+              'CODONS', 'MUTATION', 'CHROMATIN', 'CRISPR']
 
 # ── Helix geometry ─────────────────────────────────────────────
 
@@ -176,13 +176,21 @@ class DNA(Visual):
                 ("SOME MUTATIONS ESCAPE REPAIR", mid),
                 ("EVOLUTION DEPENDS ON RARE ERRORS", mid),
             ]
-        else:  # CHROMATIN
+        elif scenario == 'CHROMATIN':
             return [
                 ("CHROMATIN PACKAGING", (255, 255, 255)),
                 ("2 METERS OF DNA PER HUMAN CELL", mid),
                 ("DNA WRAPS AROUND HISTONE PROTEINS", mid),
                 ("NUCLEOSOMES FORM CHROMATIN LOOPS", mid),
                 ("FIBERS CONDENSE INTO CHROMOSOMES", mid),
+            ]
+        else:  # CRISPR
+            return [
+                ("CRISPR-CAS9 GENE EDITING", (255, 255, 255)),
+                ("GUIDE RNA FINDS A TARGET SEQUENCE", mid),
+                ("CAS9 PROTEIN CUTS BOTH DNA STRANDS", mid),
+                ("CELL REPAIRS THE BREAK", mid),
+                ("DOUDNA AND CHARPENTIER 2020 NOBEL", (255, 255, 255)),
             ]
 
     def _build_notes_segments(self):
@@ -296,12 +304,22 @@ class DNA(Visual):
         self._both_pressed_prev = False
         self._build_notes_segments()
 
+        # CRISPR state
+        self.crispr_scan_pos = 0.0
+        self.crispr_phase = 'scan'
+        self.crispr_cut_timer = 0.0
+        self.crispr_target = random.randint(8, 14)
+
         self._setup_scenario()
 
     def _setup_scenario(self):
         self.rotation_y = 0.0
         self.mutations = {}
         self.mutation_timer = 0.0
+        self.crispr_scan_pos = 0.0
+        self.crispr_phase = 'scan'
+        self.crispr_cut_timer = 0.0
+        self.crispr_target = random.randint(8, 14)
         if self.show_notes:
             self._build_notes_segments()
             self.notes_scroll_offset = 0.0
@@ -355,11 +373,14 @@ class DNA(Visual):
         self.time += dt
         scenario = _SCENARIOS[self.scenario_idx]
 
-        if scenario in ('DOUBLE HELIX', 'MUTATION'):
+        if scenario in ('DOUBLE HELIX', 'MUTATION', 'CRISPR'):
             self.rotation_y += 0.5 * self.speed * dt
 
         if scenario == 'MUTATION':
             self._update_mutations(dt)
+
+        if scenario == 'CRISPR':
+            self._update_crispr(dt)
 
         if self.overlay_timer > 0:
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
@@ -394,6 +415,31 @@ class DNA(Visual):
         for idx in to_remove:
             del self.mutations[idx]
 
+    def _update_crispr(self, dt):
+        spd = self.speed
+        if self.crispr_phase == 'scan':
+            self.crispr_scan_pos += 3.0 * spd * dt
+            if self.crispr_scan_pos >= self.crispr_target:
+                self.crispr_scan_pos = float(self.crispr_target)
+                self.crispr_phase = 'bind'
+                self.crispr_cut_timer = 0.0
+        elif self.crispr_phase == 'bind':
+            self.crispr_cut_timer += spd * dt
+            if self.crispr_cut_timer >= 1.5:
+                self.crispr_phase = 'cut'
+                self.crispr_cut_timer = 0.0
+        elif self.crispr_phase == 'cut':
+            self.crispr_cut_timer += spd * dt
+            if self.crispr_cut_timer >= 2.0:
+                self.crispr_phase = 'repair'
+                self.crispr_cut_timer = 0.0
+        elif self.crispr_phase == 'repair':
+            self.crispr_cut_timer += spd * dt
+            if self.crispr_cut_timer >= 2.5:
+                self.crispr_phase = 'scan'
+                self.crispr_scan_pos = 0.0
+                self.crispr_target = random.randint(8, 14)
+
     # ── draw ──────────────────────────────────────────────────
 
     def draw(self):
@@ -413,6 +459,8 @@ class DNA(Visual):
             self._draw_mutation(pal)
         elif scenario == 'CHROMATIN':
             self._draw_chromatin(pal)
+        elif scenario == 'CRISPR':
+            self._draw_crispr(pal)
 
         if self.show_notes:
             self._draw_notes()
@@ -873,6 +921,96 @@ class DNA(Visual):
             if prev:
                 d.draw_line(prev[0], prev[1], cx, cy, pal['dim'])
             prev = (cx, cy)
+
+    # ── CRISPR ───────────────────────────────────────────────
+
+    def _draw_crispr(self, pal):
+        d = self.display
+        draw_list = []
+        center_y = (NUM_BASES * HELIX_PITCH) / 2
+        scan_i = int(self.crispr_scan_pos)
+        phase = self.crispr_phase
+        target = self.crispr_target
+        cut_t = self.crispr_cut_timer
+
+        cas9_color = self._tint((0, 200, 255), pal)
+        grna_color = self._tint((255, 150, 50), pal)
+        cut_color = (255, 80, 80)
+        repair_color = (80, 255, 120)
+
+        for i in range(NUM_BASES):
+            seq_i = i % len(self.sequence)
+            base = self.sequence[seq_i]
+            comp = COMPLEMENT[base]
+            y_pos = (i * HELIX_PITCH - center_y) * 0.8
+            angle = i * HELIX_TWIST
+
+            x1 = HELIX_RADIUS * math.cos(angle)
+            z1 = HELIX_RADIUS * math.sin(angle)
+            x2 = HELIX_RADIUS * math.cos(angle + math.pi)
+            z2 = HELIX_RADIUS * math.sin(angle + math.pi)
+
+            sx1, sy1, sz1 = self._transform_point(x1, y_pos, z1)
+            sx2, sy2, sz2 = self._transform_point(x2, y_pos, z2)
+
+            # Cut phase: split the strands at target
+            if phase == 'cut' and abs(i - target) <= 1:
+                gap = min(4.0, cut_t * 3.0)
+                sx1 -= gap
+                sx2 += gap
+
+            # Repair phase: close the gap back
+            if phase == 'repair' and abs(i - target) <= 1:
+                gap = max(0.0, 4.0 - cut_t * 2.0)
+                sx1 -= gap
+                sx2 += gap
+
+            bc1 = self._tint(BASE_COLORS[base], pal)
+            bc2 = self._tint(BASE_COLORS[comp], pal)
+
+            # Highlight scanned region
+            if phase == 'scan' and i <= scan_i and i >= max(0, scan_i - 2):
+                bc1 = grna_color
+            if phase in ('bind', 'cut') and abs(i - target) <= 1:
+                bc1 = cas9_color
+                bc2 = cas9_color
+            if phase == 'repair' and abs(i - target) <= 1:
+                bc1 = repair_color
+                bc2 = repair_color
+
+            draw_list.append(('base', sz1, sx1, sy1, bc1))
+            draw_list.append(('base', sz2, sx2, sy2, bc2))
+
+            rc = pal['dim']
+            if phase == 'cut' and abs(i - target) <= 1:
+                rc = cut_color
+            elif phase == 'repair' and abs(i - target) <= 1:
+                rc = repair_color
+            draw_list.append(('rung', (sz1 + sz2) / 2, sx1, sy1, sx2, sy2, rc))
+
+            if i < NUM_BASES - 1:
+                na = (i + 1) * HELIX_TWIST
+                ny = ((i + 1) * HELIX_PITCH - center_y) * 0.8
+                for xr, zr, sz in [(x1, z1, sz1), (x2, z2, sz2)]:
+                    offset = math.pi if xr == x2 else 0
+                    nxr = HELIX_RADIUS * math.cos(na + offset)
+                    nzr = HELIX_RADIUS * math.sin(na + offset)
+                    snx, sny, snz = self._transform_point(nxr, ny, nzr)
+                    sx_c = sx1 if xr == x1 else sx2
+                    sy_c = sy1 if xr == x1 else sy2
+                    draw_list.append(('bb', (sz + snz) / 2, sx_c, sy_c,
+                                      snx, sny, sz))
+
+        self._render_helix_list(draw_list, pal)
+
+        labels = {
+            'scan': ('SCANNING', grna_color),
+            'bind': ('CAS9 BOUND', cas9_color),
+            'cut': ('CUTTING', cut_color),
+            'repair': ('REPAIRING', repair_color),
+        }
+        label, lc = labels.get(phase, ('CRISPR', cas9_color))
+        d.draw_text_small(2, 2, label, lc)
 
     def _draw_chromosome(self, pal):
         """Condensed metaphase chromosome (X shape)."""

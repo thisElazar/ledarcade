@@ -3995,7 +3995,7 @@ class WonderAsteroids(Visual):
 # =========================================================================
 
 class WonderDoom(Visual):
-    name = "WONDER HELLFIRE"
+    name = "WONDER INFERNO"
     description = "Fire engulfed title"
     category = "titles"
 

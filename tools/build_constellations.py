@@ -29,6 +29,7 @@ import sys
 #    Stellarium abbreviation → (display name, season, zodiac)
 
 META = {
+    # ── Zodiac (12) ──
     'Ari': ('ARIES',           'AUTUMN', True),
     'Tau': ('TAURUS',          'WINTER', True),
     'Gem': ('GEMINI',          'WINTER', True),
@@ -41,22 +42,87 @@ META = {
     'Cap': ('CAPRICORNUS',     'AUTUMN', True),
     'Aqr': ('AQUARIUS',        'AUTUMN', True),
     'Psc': ('PISCES',          'AUTUMN', True),
+    # ── Non-zodiac (76) ──
+    # WINTER (RA ~4h-8h)
     'Ori': ('ORION',           'WINTER', False),
-    'UMa': ('URSA MAJOR',      'SPRING', False),
-    'UMi': ('URSA MINOR',      'SUMMER', False),
-    'Cas': ('CASSIOPEIA',      'AUTUMN', False),
-    'Cyg': ('CYGNUS',          'SUMMER', False),
-    'Lyr': ('LYRA',            'SUMMER', False),
-    'Aql': ('AQUILA',          'SUMMER', False),
     'CMa': ('CANIS MAJOR',     'WINTER', False),
-    'Peg': ('PEGASUS',         'AUTUMN', False),
-    'And': ('ANDROMEDA',       'AUTUMN', False),
+    'CMi': ('CANIS MINOR',     'WINTER', False),
     'Per': ('PERSEUS',         'WINTER', False),
-    'Dra': ('DRACO',           'SUMMER', False),
-    'CrB': ('CORONA BOREALIS', 'SUMMER', False),
+    'Aur': ('AURIGA',          'WINTER', False),
+    'Mon': ('MONOCEROS',       'WINTER', False),
+    'Lep': ('LEPUS',           'WINTER', False),
+    'Col': ('COLUMBA',         'WINTER', False),
+    'Cae': ('CAELUM',          'WINTER', False),
+    'Car': ('CARINA',          'WINTER', False),
+    'Pup': ('PUPPIS',          'WINTER', False),
+    'Pic': ('PICTOR',          'WINTER', False),
+    'Dor': ('DORADO',          'WINTER', False),
+    'Eri': ('ERIDANUS',        'WINTER', False),
+    'Lyn': ('LYNX',            'WINTER', False),
+    'Cam': ('CAMELOPARDALIS',  'WINTER', False),
+    'Vol': ('VOLANS',          'WINTER', False),
+    'Men': ('MENSA',           'WINTER', False),
+    'Ret': ('RETICULUM',       'WINTER', False),
+    'Hor': ('HOROLOGIUM',      'WINTER', False),
+    'Pyx': ('PYXIS',           'WINTER', False),
+    # SPRING (RA ~8h-14h)
+    'UMa': ('URSA MAJOR',      'SPRING', False),
     'Crv': ('CORVUS',          'SPRING', False),
     'Cru': ('CRUX',            'SPRING', False),
     'Cen': ('CENTAURUS',       'SPRING', False),
+    'Boo': ('BOOTES',          'SPRING', False),
+    'Hya': ('HYDRA',           'SPRING', False),
+    'CVn': ('CANES VENATICI',  'SPRING', False),
+    'Com': ('COMA BERENICES',  'SPRING', False),
+    'LMi': ('LEO MINOR',       'SPRING', False),
+    'Crt': ('CRATER',          'SPRING', False),
+    'Sex': ('SEXTANS',         'SPRING', False),
+    'Ant': ('ANTLIA',          'SPRING', False),
+    'Vel': ('VELA',            'SPRING', False),
+    'Mus': ('MUSCA',           'SPRING', False),
+    'Cha': ('CHAMAELEON',      'SPRING', False),
+    # SUMMER (RA ~14h-20h)
+    'UMi': ('URSA MINOR',      'SUMMER', False),
+    'Cyg': ('CYGNUS',          'SUMMER', False),
+    'Lyr': ('LYRA',            'SUMMER', False),
+    'Aql': ('AQUILA',          'SUMMER', False),
+    'Dra': ('DRACO',           'SUMMER', False),
+    'CrB': ('CORONA BOREALIS', 'SUMMER', False),
+    'Her': ('HERCULES',        'SUMMER', False),
+    'Oph': ('OPHIUCHUS',       'SUMMER', False),
+    'Ser': ('SERPENS',          'SUMMER', False),
+    'Sct': ('SCUTUM',          'SUMMER', False),
+    'Sge': ('SAGITTA',         'SUMMER', False),
+    'Lup': ('LUPUS',           'SUMMER', False),
+    'Nor': ('NORMA',           'SUMMER', False),
+    'CrA': ('CORONA AUSTRALIS','SUMMER', False),
+    'Ara': ('ARA',             'SUMMER', False),
+    'TrA': ('TRIANGULUM AUSTRALE', 'SUMMER', False),
+    'Cir': ('CIRCINUS',        'SUMMER', False),
+    'Cep': ('CEPHEUS',         'SUMMER', False),
+    'Del': ('DELPHINUS',       'SUMMER', False),
+    'Equ': ('EQUULEUS',        'SUMMER', False),
+    'Vul': ('VULPECULA',       'SUMMER', False),
+    'Tel': ('TELESCOPIUM',     'SUMMER', False),
+    'Pav': ('PAVO',            'SUMMER', False),
+    'Aps': ('APUS',            'SUMMER', False),
+    'Lac': ('LACERTA',         'SUMMER', False),
+    # AUTUMN (RA ~20h-4h)
+    'Cas': ('CASSIOPEIA',      'AUTUMN', False),
+    'Peg': ('PEGASUS',         'AUTUMN', False),
+    'And': ('ANDROMEDA',       'AUTUMN', False),
+    'Cet': ('CETUS',           'AUTUMN', False),
+    'Tri': ('TRIANGULUM',      'AUTUMN', False),
+    'For': ('FORNAX',          'AUTUMN', False),
+    'Scl': ('SCULPTOR',        'AUTUMN', False),
+    'PsA': ('PISCIS AUSTRINUS','AUTUMN', False),
+    'Gru': ('GRUS',            'AUTUMN', False),
+    'Phe': ('PHOENIX',         'AUTUMN', False),
+    'Tuc': ('TUCANA',          'AUTUMN', False),
+    'Ind': ('INDUS',           'AUTUMN', False),
+    'Mic': ('MICROSCOPIUM',    'AUTUMN', False),
+    'Oct': ('OCTANS',          'AUTUMN', False),
+    'Hyi': ('HYDRUS',          'AUTUMN', False),
 }
 
 ZODIAC_ORDER = [
@@ -64,8 +130,23 @@ ZODIAC_ORDER = [
     'Lib', 'Sco', 'Sgr', 'Cap', 'Aqr', 'Psc',
 ]
 OTHER_ORDER = [
+    # Original 16 (preserved order)
     'Ori', 'UMa', 'UMi', 'Cas', 'Cyg', 'Lyr', 'Aql', 'CMa',
     'Peg', 'And', 'Per', 'Dra', 'CrB', 'Crv', 'Cru', 'Cen',
+    # NEW — Winter
+    'CMi', 'Aur', 'Mon', 'Lep', 'Col', 'Cae', 'Car', 'Pup',
+    'Pic', 'Dor', 'Eri', 'Lyn', 'Cam', 'Vol', 'Men', 'Ret',
+    'Hor', 'Pyx',
+    # NEW — Spring
+    'Boo', 'Hya', 'CVn', 'Com', 'LMi', 'Crt', 'Sex', 'Ant',
+    'Vel', 'Mus', 'Cha',
+    # NEW — Summer
+    'Her', 'Oph', 'Ser', 'Sct', 'Sge', 'Lup', 'Nor', 'CrA',
+    'Ara', 'TrA', 'Cir', 'Cep', 'Del', 'Equ', 'Vul', 'Tel',
+    'Pav', 'Aps', 'Lac',
+    # NEW — Autumn
+    'Cet', 'Tri', 'For', 'Scl', 'PsA', 'Gru', 'Phe', 'Tuc',
+    'Ind', 'Mic', 'Oct', 'Hyi',
 ]
 
 
@@ -419,7 +500,7 @@ def main():
         if entry['zodiac'] and prev_zodiac is not True:
             print("    # ==================== ZODIAC (12) ====================")
         elif not entry['zodiac'] and prev_zodiac is not False:
-            print("\n    # ==================== NON-ZODIAC (16) ====================")
+            print("\n    # ==================== NON-ZODIAC (76) ====================")
         prev_zodiac = entry['zodiac']
         for line in format_entry(entry):
             print(line)
