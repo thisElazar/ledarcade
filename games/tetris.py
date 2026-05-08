@@ -70,6 +70,17 @@ TETROMINO_COLORS = {
     'L': Colors.ORANGE,
 }
 
+# NES NTSC gravity table: seconds per drop at 60fps (from ROM address $898E)
+NES_GRAVITY = [
+    0.800, 0.717, 0.633, 0.550, 0.467,  # 0-4
+    0.383, 0.300, 0.217, 0.133, 0.100,  # 5-9
+    0.083, 0.083, 0.083,                 # 10-12
+    0.067, 0.067, 0.067,                 # 13-15
+    0.050, 0.050, 0.050,                 # 16-18
+    0.033, 0.033, 0.033, 0.033, 0.033,  # 19-23
+    0.033, 0.033, 0.033, 0.033, 0.033,  # 24-28
+]
+
 
 class Tetris(Game):
     name = "TETROMINOS"
@@ -115,15 +126,15 @@ class Tetris(Game):
         
         # Timing
         self.fall_timer = 0
-        self.fall_delay = 0.8  # Seconds per drop
+        self.fall_delay = NES_GRAVITY[0]
         self.move_timer = 0
-        self.move_delay = 0.1  # Seconds between auto-repeat moves
+        self.move_delay = 0.1
         self.lock_timer = 0
-        self.lock_delay = 0.5  # Seconds before locking
-        
+        self.lock_delay = 0.0  # NES: instant lock, no delay
+
         # Input handling
-        self.das_timer = 0  # Delayed auto-shift
-        self.das_delay = 0.15
+        self.das_timer = 0
+        self.das_delay = 0.267  # NES: 16 frames at 60fps
         self.das_direction = 0
         
         # Effects
@@ -204,7 +215,8 @@ class Tetris(Game):
             
             # Level up every 10 lines
             self.level = self.lines // 10 + 1
-            self.fall_delay = max(0.1, 0.8 - (self.level - 1) * 0.07)
+            idx = min(self.level - 1, len(NES_GRAVITY) - 1)
+            self.fall_delay = NES_GRAVITY[idx] if self.level <= len(NES_GRAVITY) else 0.017
     
     def clear_lines(self):
         """Actually remove the cleared lines."""

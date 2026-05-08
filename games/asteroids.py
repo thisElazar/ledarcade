@@ -60,8 +60,8 @@ class Asteroids(Game):
         base_speed_min = 6 + (self.level - 1) * 1.5
         base_speed_max = 12 + (self.level - 1) * 2.5
         # Cap maximum speed to keep game playable
-        base_speed_min = min(base_speed_min, 15)
-        base_speed_max = min(base_speed_max, 28)
+        base_speed_min = min(base_speed_min, 25)
+        base_speed_max = min(base_speed_max, 45)
 
         for _ in range(count):
             # Spawn away from center
@@ -224,8 +224,8 @@ class Asteroids(Game):
                         # Child asteroids are faster, and scale with level
                         child_speed_min = 9 + (self.level - 1) * 2
                         child_speed_max = 18 + (self.level - 1) * 3
-                        child_speed_min = min(child_speed_min, 22)
-                        child_speed_max = min(child_speed_max, 34)
+                        child_speed_min = min(child_speed_min, 35)
+                        child_speed_max = min(child_speed_max, 55)
                         # Bullet travel direction
                         bullet_angle = math.atan2(bullet['dy'], bullet['dx'])
                         # Two children deflect to opposite sides (60-120° off bullet path)

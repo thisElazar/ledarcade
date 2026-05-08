@@ -205,7 +205,7 @@ class Breakout(Game):
             self.paddle_x - 1 <= ball_ix <= self.paddle_x + self.paddle_width):
 
             hit_pos = (self.ball_x - self.paddle_x) / self.paddle_width
-            angle = (hit_pos - 0.5) * 1.2
+            angle = (hit_pos - 0.5) * 2.0
 
             self.ball_dx = math.sin(angle) * self.ball_speed
             self.ball_dy = -abs(math.cos(angle) * self.ball_speed)
