@@ -50,7 +50,7 @@ def _add_color(c1, c2):
 
 # ── Scene constants ────────────────────────────────────────────────
 
-SCENES = ["DIVERGENT", "CONVERGENT", "TRANSFORM"]
+SCENES = ["DIVERGENT", "CONVERGENT", "TRANSFORM", "HOTSPOT", "TSUNAMI", "MOUNTAIN"]
 SCENE_DURATION = 10.0          # seconds per scene before auto-cycle
 FADE_DURATION = 0.5            # fade transition
 MANUAL_PAUSE = 15.0            # seconds to pause auto-cycle after manual input
@@ -117,6 +117,21 @@ class Tectonic(Visual):
         self._trn_ripple = []          # transform ripple particles
         self._trn_offset_shift = 0.0   # animated offset for plates
 
+        # Hotspot
+        self._hot_plume = []
+        self._hot_plate_offset = 0.0
+        self._hot_eruption = []
+
+        # Tsunami
+        self._tsu_wave_x = -5.0
+        self._tsu_active = False
+        self._tsu_timer = 2.0
+        self._tsu_rupture_flash = 0.0
+
+        # Mountain
+        self._mtn_compression = 0.0
+        self._mtn_fold_heights = [0.0] * 20
+
         self._init_scene(self.scene_idx)
         self._build_notes_segments()
         self._show_overlay("DIVERGENT")
@@ -131,6 +146,12 @@ class Tectonic(Visual):
             self._init_convergent()
         elif idx == 2:
             self._init_transform()
+        elif idx == 3:
+            self._init_hotspot()
+        elif idx == 4:
+            self._init_tsunami()
+        elif idx == 5:
+            self._init_mountain()
 
     def _init_divergent(self):
         """Magma particles rising through rift, convection particles."""
@@ -164,6 +185,26 @@ class Tectonic(Visual):
         self._trn_ripple = []
         self._trn_offset_shift = 0.0
 
+    def _init_hotspot(self):
+        self._hot_plume = []
+        for _ in range(25):
+            x = 24 + random.uniform(-3, 3)
+            y = random.uniform(25, 52)
+            heat = random.uniform(0.4, 1.0)
+            self._hot_plume.append([x, y, heat])
+        self._hot_plate_offset = 0.0
+        self._hot_eruption = []
+
+    def _init_tsunami(self):
+        self._tsu_wave_x = -5.0
+        self._tsu_active = False
+        self._tsu_timer = 2.0
+        self._tsu_rupture_flash = 0.0
+
+    def _init_mountain(self):
+        self._mtn_compression = 0.0
+        self._mtn_fold_heights = [0.0] * 20
+
     # ── notes ──────────────────────────────────────────────────────
 
     def _build_notes_segments(self):
@@ -174,6 +215,9 @@ class Tectonic(Visual):
             ("DIVERGENT: RIFT", (255, 160, 40)),
             ("CONVERGENT: TRENCH", (80, 200, 220)),
             ("TRANSFORM: FAULT", (255, 255, 80)),
+            ("HOTSPOT: PLUME", (255, 100, 50)),
+            ("TSUNAMI: WAVE", (80, 180, 255)),
+            ("MOUNTAIN: OROGENY", (180, 200, 140)),
             ("WEGENER 1912", (255, 255, 255)),
         ]
         segments = []
@@ -287,6 +331,16 @@ class Tectonic(Visual):
             # Transform: earthquake
             self._trn_quake_flash = 0.3
             self._spawn_ripple()
+        elif self.scene_idx == 3:
+            for mp in self._hot_plume:
+                mp[2] = 1.0
+            for _ in range(6):
+                self._hot_eruption.append([24.0, 8.0, random.uniform(-8, 8),
+                                           random.uniform(-15, -25), 1.0])
+        elif self.scene_idx == 4:
+            self._tsu_active = True
+            self._tsu_wave_x = 20.0
+            self._tsu_rupture_flash = 0.3
 
     # ── update ─────────────────────────────────────────────────────
 
@@ -336,6 +390,12 @@ class Tectonic(Visual):
             self._update_convergent(dt)
         elif idx == 2:
             self._update_transform(dt)
+        elif idx == 3:
+            self._update_hotspot(dt)
+        elif idx == 4:
+            self._update_tsunami(dt)
+        elif idx == 5:
+            self._update_mountain(dt)
 
     # ── divergent update ───────────────────────────────────────────
 
@@ -494,6 +554,12 @@ class Tectonic(Visual):
             self._draw_convergent(brightness)
         elif idx == 2:
             self._draw_transform(brightness)
+        elif idx == 3:
+            self._draw_hotspot(brightness)
+        elif idx == 4:
+            self._draw_tsunami(brightness)
+        elif idx == 5:
+            self._draw_mountain(brightness)
 
     # ── shared drawing helpers ─────────────────────────────────────
 
@@ -942,3 +1008,293 @@ class Tectonic(Visual):
 
         # -- Label --
         self._draw_label("TRANSFORM", br)
+
+    # ================================================================
+    #  SCENE 4: HOTSPOT (Mantle Plume / Hawaii)
+    # ================================================================
+
+    def _update_hotspot(self, dt):
+        for mp in self._hot_plume:
+            mp[1] -= dt * random.uniform(2.0, 4.0)
+            mp[0] += random.uniform(-0.1, 0.1)
+            mp[2] -= dt * 0.05
+            if mp[1] < 10 or mp[2] <= 0:
+                mp[0] = 24 + random.uniform(-3, 3)
+                mp[1] = random.uniform(35, 52)
+                mp[2] = random.uniform(0.4, 1.0)
+        self._hot_plume = self._hot_plume[:30]
+        self._hot_plate_offset += dt * 1.5
+        alive = []
+        for ep in self._hot_eruption:
+            ep[0] += ep[2] * dt
+            ep[1] += ep[3] * dt
+            ep[3] += 20.0 * dt
+            ep[4] -= dt * 0.8
+            if ep[4] > 0:
+                alive.append(ep)
+        self._hot_eruption = alive
+
+    def _draw_hotspot(self, br):
+        d = self.display
+        crust_y = 12
+
+        self._draw_mantle_bg(crust_y, br)
+
+        # Plume channel glow
+        for y in range(crust_y, 53):
+            dist = abs(y - 30) / 20.0
+            glow = max(0, 1.0 - dist) * 0.3
+            for dx in range(-4, 5):
+                x = 24 + dx
+                if 0 <= x < 64:
+                    g = glow * (1.0 - abs(dx) / 5.0)
+                    cur = d.get_pixel(x, y)
+                    add = _scale_color((255, 100, 20), br * g)
+                    d.set_pixel(x, y, _add_color(cur, add))
+
+        # Plume particles
+        for mp in self._hot_plume:
+            ix, iy = int(mp[0]), int(mp[1])
+            if 0 <= ix < 64 and crust_y <= iy < 55:
+                heat = mp[2]
+                c = _lerp_color((80, 20, 10), (255, 200, 50), heat)
+                c = _scale_color(c, br)
+                d.set_pixel(ix, iy, c)
+
+        # Crust / plate with island chain
+        plate_off = self._hot_plate_offset % 50
+        for x in range(64):
+            c = _scale_color((90, 70, 50), br)
+            for y in range(crust_y, crust_y + 3):
+                d.set_pixel(x, y, c)
+
+        # Island chain: volcanoes drift right as plate moves
+        plume_x = 24
+        for i in range(5):
+            island_x = int(plume_x + (i * 10) + plate_off) % 80 - 8
+            age = i
+            if age == 0:
+                # Active volcano over plume
+                peak_h = 6
+                color = _scale_color((200, 80, 30), br)
+                lava = _scale_color((255, 150, 30), br)
+            elif age == 1:
+                peak_h = 5
+                color = _scale_color((140, 100, 60), br)
+                lava = None
+            elif age == 2:
+                peak_h = 4
+                color = _scale_color((100, 90, 70), br)
+                lava = None
+            else:
+                peak_h = 3
+                color = _scale_color((80, 80, 70), br)
+                lava = None
+
+            for dy in range(peak_h):
+                w = 1 + dy
+                ty = crust_y - peak_h + dy
+                for dx in range(-w, w + 1):
+                    px = island_x + dx
+                    if 0 <= px < 64 and 0 <= ty < 64:
+                        d.set_pixel(px, ty, color)
+            if lava:
+                if 0 <= island_x < 64 and crust_y - peak_h - 1 >= 0:
+                    d.set_pixel(island_x, crust_y - peak_h - 1, lava)
+
+        # Eruption particles
+        for ep in self._hot_eruption:
+            ix, iy = int(ep[0]), int(ep[1])
+            if 0 <= ix < 64 and 0 <= iy < 64:
+                c = _scale_color((255, 200, 50), br * ep[4])
+                d.set_pixel(ix, iy, c)
+
+        # Plate arrow (rightward drift)
+        self._draw_arrow_right(8, crust_y + 1, br)
+        self._draw_arrow_right(45, crust_y + 1, br)
+
+        self._draw_label("HOTSPOT", br)
+
+    # ================================================================
+    #  SCENE 5: TSUNAMI (Seafloor Displacement)
+    # ================================================================
+
+    def _update_tsunami(self, dt):
+        self._tsu_timer -= dt
+        if self._tsu_timer <= 0 and not self._tsu_active:
+            self._tsu_active = True
+            self._tsu_wave_x = 20.0
+            self._tsu_rupture_flash = 0.2
+            self._tsu_timer = 0.0
+        if self._tsu_active:
+            self._tsu_wave_x += dt * 12.0
+            if self._tsu_wave_x > 75:
+                self._tsu_active = False
+                self._tsu_timer = random.uniform(4.0, 7.0)
+        if self._tsu_rupture_flash > 0:
+            self._tsu_rupture_flash -= dt
+
+    def _draw_tsunami(self, br):
+        d = self.display
+        sea_y = 20
+        floor_y = 45
+        shelf_x = 50
+
+        # Sky
+        for y in range(sea_y):
+            c = _scale_color(_lerp_color((20, 30, 60), (40, 60, 100), y / sea_y), br)
+            for x in range(64):
+                d.set_pixel(x, y, c)
+
+        # Ocean body
+        for y in range(sea_y, floor_y):
+            depth_t = (y - sea_y) / (floor_y - sea_y)
+            c = _scale_color(_lerp_color((20, 60, 140), (10, 25, 70), depth_t), br)
+            for x in range(64):
+                d.set_pixel(x, y, c)
+
+        # Seafloor
+        for y in range(floor_y, 58):
+            c = _scale_color((60, 50, 40), br)
+            for x in range(64):
+                d.set_pixel(x, y, c)
+
+        # Continental shelf (right side rises)
+        for x in range(shelf_x, 64):
+            shelf_top = floor_y - int((x - shelf_x) * (floor_y - sea_y - 4) / (64 - shelf_x))
+            c = _scale_color((80, 65, 45), br)
+            for y in range(shelf_top, floor_y):
+                d.set_pixel(x, y, c)
+            # Beach/land above water
+            if shelf_top <= sea_y:
+                land_c = _scale_color((60, 120, 40), br)
+                for y in range(max(0, shelf_top - 2), sea_y):
+                    d.set_pixel(x, y, land_c)
+
+        # Rupture zone marker
+        rupture_x = 20
+        if self._tsu_rupture_flash > 0:
+            flash = self._tsu_rupture_flash / 0.2
+            fc = _scale_color((255, 255, 180), br * flash)
+            for dy in range(-2, 3):
+                y = floor_y + dy
+                if 0 <= y < 64:
+                    for dx in range(-1, 2):
+                        px = rupture_x + dx
+                        if 0 <= px < 64:
+                            d.set_pixel(px, y, fc)
+
+        # Wave
+        if self._tsu_active:
+            wx = self._tsu_wave_x
+            # Wave height grows as water gets shallower near shelf
+            if wx < shelf_x:
+                wave_h = 2
+            else:
+                approach = min(1.0, (wx - shelf_x) / 12.0)
+                wave_h = int(2 + 8 * approach)
+
+            wix = int(wx)
+            for dx in range(-3, 4):
+                px = wix + dx
+                if 0 <= px < 64:
+                    h = max(1, wave_h - abs(dx))
+                    for dy in range(h):
+                        py = sea_y - dy
+                        if 0 <= py < 64:
+                            c = _scale_color((100, 180, 255), br * (1.0 - abs(dx) / 4.0))
+                            d.set_pixel(px, py, c)
+
+        # Fault line on seafloor
+        c = _scale_color((200, 80, 60), br * 0.6)
+        for dy in range(-1, 2):
+            y = floor_y + dy
+            if 0 <= y < 64 and 0 <= rupture_x < 64:
+                d.set_pixel(rupture_x, y, c)
+
+        self._draw_label("TSUNAMI", br)
+
+    # ================================================================
+    #  SCENE 6: MOUNTAIN (Continental Collision / Orogeny)
+    # ================================================================
+
+    def _update_mountain(self, dt):
+        self._mtn_compression = min(1.0, self._mtn_compression + dt * 0.06)
+        comp = self._mtn_compression
+        for i in range(len(self._mtn_fold_heights)):
+            cx = i / (len(self._mtn_fold_heights) - 1) - 0.5
+            envelope = max(0, 1.0 - abs(cx) * 3.0)
+            fold = math.sin(i * 1.8 + comp * 2) * 0.5 + 0.5
+            self._mtn_fold_heights[i] = envelope * fold * comp * 18
+
+    def _draw_mountain(self, br):
+        d = self.display
+        crust_y = 30
+
+        self._draw_mantle_bg(crust_y + 8, br)
+
+        # Crust layers (two plates converging)
+        gap = int(20 * (1.0 - self._mtn_compression))
+
+        # Left plate
+        left_edge = 32 - gap // 2
+        for x in range(0, left_edge):
+            for dy in range(8):
+                y = crust_y + dy
+                t = dy / 7.0
+                c = _scale_color(_lerp_color((120, 100, 70), (80, 60, 50), t), br)
+                if 0 <= y < 64:
+                    d.set_pixel(x, y, c)
+
+        # Right plate
+        right_edge = 32 + gap // 2
+        for x in range(right_edge, 64):
+            for dy in range(8):
+                y = crust_y + dy
+                t = dy / 7.0
+                c = _scale_color(_lerp_color((100, 90, 75), (70, 55, 50), t), br)
+                if 0 <= y < 64:
+                    d.set_pixel(x, y, c)
+
+        # Mountain fold belt
+        n = len(self._mtn_fold_heights)
+        for i in range(n):
+            x_center = int(12 + i * (40 / (n - 1)))
+            h = int(self._mtn_fold_heights[i])
+            if h < 1:
+                continue
+            for dx in range(-2, 3):
+                px = x_center + dx
+                if not (0 <= px < 64):
+                    continue
+                col_h = max(0, h - abs(dx) * 2)
+                for dy in range(col_h):
+                    py = crust_y - dy
+                    if 0 <= py < 64:
+                        t = dy / max(1, col_h)
+                        base = _lerp_color((140, 120, 80), (200, 190, 170), t)
+                        # Snow cap
+                        if dy > col_h - 3 and col_h > 8:
+                            base = (230, 235, 240)
+                        d.set_pixel(px, py, _scale_color(base, br))
+
+        # Sky
+        for y in range(0, crust_y):
+            has_mountain = False
+            for x in range(64):
+                cur = d.get_pixel(x, y)
+                if cur != (0, 0, 0):
+                    has_mountain = True
+                    break
+            if not has_mountain:
+                t = y / crust_y
+                sky = _scale_color(_lerp_color((30, 50, 100), (60, 80, 130), t), br)
+                for x in range(64):
+                    if d.get_pixel(x, y) == (0, 0, 0):
+                        d.set_pixel(x, y, sky)
+
+        # Plate arrows (converging)
+        self._draw_arrow_right(4, crust_y + 4, br)
+        self._draw_arrow_left(53, crust_y + 4, br)
+
+        self._draw_label("MOUNTAIN", br)
