@@ -9,9 +9,14 @@ Controls:
   Escape - Exit
 """
 
+import os
 import socket
+import platform
+import subprocess
 import time as time_module
 from . import Visual, Display, Colors, GRID_SIZE
+
+_REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class SysInfo(Visual):
@@ -30,7 +35,21 @@ class SysInfo(Visual):
         self.ip_address = "N/A"
         self.uptime_str = "N/A"
         self.mem_percent = "N/A"
+        # Static for the session — read once, not on every refresh.
+        self.py_version = platform.python_version()
+        self.git_rev = self._read_git_rev()
         self._refresh_stats()
+
+    def _read_git_rev(self) -> str:
+        """Short commit of the deployed code, so the running version is visible on-screen."""
+        try:
+            rev = subprocess.check_output(
+                ["git", "rev-parse", "--short", "HEAD"],
+                cwd=_REPO_DIR, stderr=subprocess.DEVNULL, timeout=2,
+            )
+            return rev.decode().strip() or "N/A"
+        except (OSError, subprocess.SubprocessError):
+            return "N/A"
 
     def _read_cpu_temp(self) -> str:
         """Read CPU temperature from thermal zone."""
@@ -175,6 +194,14 @@ class SysInfo(Visual):
             except ValueError:
                 pass
         self.display.draw_text_small(22, 41, self.mem_percent, mem_color)
+
+        # Python version (so the deployed runtime is visible on the cabinet)
+        self.display.draw_text_small(2, 50, "PY:", Colors.WHITE)
+        self.display.draw_text_small(17, 50, self.py_version, Colors.CYAN)
+
+        # Deployed code version (git short commit)
+        self.display.draw_text_small(2, 59, "VER:", Colors.WHITE)
+        self.display.draw_text_small(20, 59, self.git_rev, Colors.CYAN)
 
         # Refresh indicator (small dot that blinks)
         if int(self.time * 2) % 2 == 0:

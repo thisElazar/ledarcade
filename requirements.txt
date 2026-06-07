@@ -1,1 +1,4 @@
+# Runtime dependencies — installed on every cabinet.
 pygame>=2.0.0
+numpy>=1.21.0          # used by visuals/crystallize.py, visuals/globe.py
+Pillow>=9.0.0          # used by hardware.py for bulk pixel transfer to the LED matrix
