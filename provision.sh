@@ -13,7 +13,7 @@
 #   1. Installs system packages
 #   2. Disables onboard audio (conflicts with LED matrix timing)
 #   3. Builds the rpi-rgb-led-matrix library + Python bindings
-#   4. Clones the LED Arcade repo from the stable branch
+#   4. Clones the LED Arcade repo and checks out the latest release tag
 #   5. Writes cabinet_config.json with standard HUB75 wiring
 #   6. Installs systemd services
 #   7. Reboots
@@ -41,9 +41,13 @@ echo "========================================"
 echo ""
 
 # --- System packages ---
+# Runtime Python deps are installed as system packages here (prebuilt for the Pi,
+# much faster than pip building from source). These must stay in sync with the
+# runtime entries in requirements.txt — that file is the canonical list:
+#   pygame -> python3-pygame, numpy -> python3-numpy, Pillow -> python3-pil
 echo "[1/6] Installing system packages..."
 apt update && apt upgrade -y
-apt install -y git python3-pip python3-dev python3-numpy python3-pil cython3
+apt install -y git python3-pip python3-dev python3-numpy python3-pil python3-pygame cython3
 
 # --- Disable onboard audio ---
 echo "[2/6] Disabling onboard audio..."
@@ -64,7 +68,14 @@ pip install . --break-system-packages
 echo "[4/6] Cloning LED Arcade..."
 REPO_DIR="$REAL_HOME/led-arcade"
 if [ ! -d "$REPO_DIR" ]; then
-    sudo -u "$REAL_USER" git clone -b stable https://github.com/thisElazar/ledarcade.git "$REPO_DIR"
+    sudo -u "$REAL_USER" git clone https://github.com/thisElazar/ledarcade.git "$REPO_DIR"
+fi
+# Distribution cabinets run the latest release tag, not main's tip.
+# (start.sh keeps them on the newest tag on every boot.)
+cd "$REPO_DIR"
+latest=$(sudo -u "$REAL_USER" git tag -l 'v*' | sort -V | tail -1)
+if [ -n "$latest" ]; then
+    sudo -u "$REAL_USER" git checkout -q "$latest"
 fi
 
 # --- Write cabinet config ---
