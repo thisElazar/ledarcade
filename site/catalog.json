@@ -1085,8 +1085,20 @@
           "is_game": false
         },
         {
+          "name": "BEAT THE WHITES WITH THE RED WEDGE",
+          "cls": "PaintingLissitzkyWedge",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "BERLIN STREET SCENE",
           "cls": "PaintingBerlinStreet",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "BIB\u00c9MUS QUARRIES",
+          "cls": "PaintingCezanneBibemus",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1127,6 +1139,12 @@
           "is_game": false
         },
         {
+          "name": "BOY WITH A BASKET OF FRUIT",
+          "cls": "PaintingCaravaggioFruit",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "BROADWAY BOOGIE WOOGIE",
           "cls": "PaintingBroadwayBoogie",
           "module": "visuals/painting.py",
@@ -1147,6 +1165,12 @@
         {
           "name": "CARPET PAGE",
           "cls": "PaintingLindisfarneGospels",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "CASTLE AND SUN",
+          "cls": "PaintingKleeCastleSun",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1175,8 +1199,32 @@
           "is_game": false
         },
         {
+          "name": "COLOR STUDY: SQUARES WITH CONCENTRIC CIRCLES",
+          "cls": "PaintingKandinskyColorStudy",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "COMPOSITION VII",
+          "cls": "PaintingCompositionVii",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "COMPOSITION VIII",
           "cls": "PaintingCompositionViii",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "CONTRAST OF FORMS",
+          "cls": "PaintingLegerContrast",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "COTTAGE GARDEN",
+          "cls": "PaintingKlimtFlowerGarden",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1219,6 +1267,12 @@
         {
           "name": "EVENING ON KARL JOHAN",
           "cls": "PaintingMunchKarlJohan",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "FARM GARDEN WITH SUNFLOWERS",
+          "cls": "PaintingKlimtFarmGarden",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1271,6 +1325,12 @@
           "is_game": false
         },
         {
+          "name": "HIGHWAY AND BYWAYS",
+          "cls": "PaintingKleeHighway",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "HUNTERS IN THE SNOW",
           "cls": "PaintingHuntersSnow",
           "module": "visuals/painting.py",
@@ -1279,6 +1339,12 @@
         {
           "name": "IMPRESSION, SUNRISE",
           "cls": "PaintingImpressionSunrise",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "IMPROVISATION 28",
+          "cls": "PaintingKandinskyImprovisation",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1309,6 +1375,12 @@
         {
           "name": "JOB (CIGARETTES)",
           "cls": "PaintingMuchaJob",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "LA GRENOUILL\u00c8RE",
+          "cls": "PaintingRenoirGrenouillere",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1457,6 +1529,18 @@
           "is_game": false
         },
         {
+          "name": "NORHAM CASTLE, SUNRISE",
+          "cls": "PaintingTurnerNorham",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "OPEN WINDOW, COLLIOURE",
+          "cls": "PaintingMatisseOpenWindow",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "OPHELIA",
           "cls": "PaintingOphelia",
           "module": "visuals/painting.py",
@@ -1519,6 +1603,24 @@
         {
           "name": "PORTRAIT OF ADELE BLOCH-BAUER I",
           "cls": "PaintingKlimtAdele",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PORTRAIT OF EDITH",
+          "cls": "PaintingSchieleEdith",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PORTRAIT OF JACQUES NAYRAL",
+          "cls": "PaintingGleizesNayral",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "PORTRAIT OF PICASSO",
+          "cls": "PaintingGrisPortraitPicasso",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1619,6 +1721,12 @@
           "is_game": false
         },
         {
+          "name": "SENECIO",
+          "cls": "PaintingKleeSenecio",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "SEVERAL CIRCLES",
           "cls": "PaintingSeveralCircles",
           "module": "visuals/painting.py",
@@ -1637,6 +1745,12 @@
           "is_game": false
         },
         {
+          "name": "SNOW STORM: STEAM-BOAT OFF A HARBOUR'S MOUTH",
+          "cls": "PaintingTurnerSnowstorm",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "SPLASHED-INK LANDSCAPE",
           "cls": "PaintingSesshuHaboku",
           "module": "visuals/painting.py",
@@ -1651,6 +1765,30 @@
         {
           "name": "ST. JEROME IN HIS STUDY",
           "cls": "PaintingDurerJerome",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "STATES OF MIND: THE FAREWELLS",
+          "cls": "PaintingBoccioniFarewells",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "STILL LIFE (VIOLIN AND INKWELL)",
+          "cls": "PaintingGrisViolin",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "STILL LIFE WITH A CURTAIN",
+          "cls": "PaintingCezanneCurtain",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "STILL LIFE WITH CHECKED TABLECLOTH",
+          "cls": "PaintingGrisTablecloth",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1679,8 +1817,20 @@
           "is_game": false
         },
         {
+          "name": "SYNDICS OF THE DRAPERS' GUILD",
+          "cls": "PaintingRembrandtSyndics",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE AMBASSADORS",
           "cls": "PaintingHolbeinAmbassadors",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE AMIDA FALLS",
+          "cls": "PaintingHokusaiWaterfall",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1715,6 +1865,12 @@
           "is_game": false
         },
         {
+          "name": "THE BASKET OF APPLES",
+          "cls": "PaintingCezanneApples",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE BEDROOM",
           "cls": "PaintingTheBedroom",
           "module": "visuals/painting.py",
@@ -1723,6 +1879,12 @@
         {
           "name": "THE BIRTH OF VENUS",
           "cls": "PaintingBirthOfVenus",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE BOY IN THE RED VEST",
+          "cls": "PaintingCezanneRedVest",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1759,6 +1921,18 @@
         {
           "name": "THE CHILD'S BATH",
           "cls": "PaintingCassattBath",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CITY",
+          "cls": "PaintingLegerCity",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE CITY RISES",
+          "cls": "PaintingBoccioniCityRises",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1859,8 +2033,20 @@
           "is_game": false
         },
         {
+          "name": "THE JEWISH BRIDE",
+          "cls": "PaintingRembrandtJewishBride",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE KISS",
           "cls": "PaintingTheKissKlimt",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE LACEMAKER",
+          "cls": "PaintingVermeerLacemaker",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1903,6 +2089,12 @@
         {
           "name": "THE MILKMAID",
           "cls": "PaintingTheMilkmaid",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE MUSICIANS",
+          "cls": "PaintingCaravaggioMusicians",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1951,6 +2143,12 @@
         {
           "name": "THE RAFT OF THE MEDUSA",
           "cls": "PaintingRaftOfMedusa",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE RED STUDIO",
+          "cls": "PaintingMatisseRedStudio",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2009,6 +2207,18 @@
           "is_game": false
         },
         {
+          "name": "THE TEN LARGEST, NO. 3, YOUTH",
+          "cls": "PaintingAfKlintYouth",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "THE TEN LARGEST, NO. 7, ADULTHOOD",
+          "cls": "PaintingAfKlintAdulthood",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "THE TOWER OF BABEL",
           "cls": "PaintingTowerOfBabel",
           "module": "visuals/painting.py",
@@ -2057,8 +2267,20 @@
           "is_game": false
         },
         {
+          "name": "TWITTERING MACHINE",
+          "cls": "PaintingKleeTwittering",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "TWO LOVERS",
           "cls": "PaintingRezaAbbasiLovers",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "TWO SISTERS (ON THE TERRACE)",
+          "cls": "PaintingRenoirTwoSisters",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2141,8 +2363,26 @@
           "is_game": false
         },
         {
+          "name": "WOMAN WITH A HAT",
+          "cls": "PaintingMatisseWomanHat",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
           "name": "WOMAN WITH A PARASOL",
           "cls": "PaintingWomanParasol",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "YELLOW-RED-BLUE",
+          "cls": "PaintingKandinskyYellowRedBlue",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "YOUNG HARE",
+          "cls": "PaintingDurerHare",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2169,12 +2409,6 @@
       ],
       "key": "automata",
       "items": [
-        {
-          "name": "RUCKER PAINT",
-          "cls": "Aurora",
-          "module": "visuals/aurora.py",
-          "is_game": false
-        },
         {
           "name": "BOIDS",
           "cls": "Boids",
@@ -2241,6 +2475,12 @@
           "is_game": false
         },
         {
+          "name": "JELLYFISH",
+          "cls": "ParticleLife",
+          "module": "visuals/particlelife.py",
+          "is_game": false
+        },
+        {
           "name": "LENIA",
           "cls": "Lenia",
           "module": "visuals/lenia.py",
@@ -2288,6 +2528,12 @@
           "name": "QUARKS LAB",
           "cls": "QuarksLab",
           "module": "visuals/quarkslab.py",
+          "is_game": false
+        },
+        {
+          "name": "RUCKER PAINT",
+          "cls": "Aurora",
+          "module": "visuals/aurora.py",
           "is_game": false
         },
         {
@@ -2403,9 +2649,45 @@
       "key": "culture",
       "items": [
         {
+          "name": "COINS",
+          "cls": "Coins",
+          "module": "visuals/coins.py",
+          "is_game": false
+        },
+        {
           "name": "FLAGS",
           "cls": "Flags",
           "module": "visuals/flags.py",
+          "is_game": false
+        },
+        {
+          "name": "KNITTING",
+          "cls": "Knitting",
+          "module": "visuals/knitting.py",
+          "is_game": false
+        },
+        {
+          "name": "LANGUAGE",
+          "cls": "Language",
+          "module": "visuals/language.py",
+          "is_game": false
+        },
+        {
+          "name": "POTTERY",
+          "cls": "Pottery",
+          "module": "visuals/pottery.py",
+          "is_game": false
+        },
+        {
+          "name": "SCRIPTS",
+          "cls": "Scripts",
+          "module": "visuals/scripts.py",
+          "is_game": false
+        },
+        {
+          "name": "TESTAMENT",
+          "cls": "Testament",
+          "module": "visuals/testament.py",
           "is_game": false
         },
         {
@@ -2440,7 +2722,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -2758,7 +3042,7 @@
               ]
             },
             {
-              "name": "3D MAZE",
+              "name": "3D MONSTR MAZE",
               "cls": "MonsterMazeDemo",
               "module": "visuals/monstermazedemo.py",
               "deps": [
@@ -3310,7 +3594,7 @@
           ]
         },
         {
-          "name": "3D MAZE",
+          "name": "3D MONSTR MAZE",
           "cls": "MonsterMazeDemo",
           "module": "visuals/monstermazedemo.py",
           "is_game": false,
@@ -3341,6 +3625,12 @@
           "module": "visuals/crystallize.py",
           "is_game": false,
           "needs_numpy": true
+        },
+        {
+          "name": "FIRE",
+          "cls": "Fire",
+          "module": "visuals/fire.py",
+          "is_game": false
         },
         {
           "name": "FLUX",
@@ -3379,6 +3669,12 @@
           "is_game": false
         },
         {
+          "name": "PLASMA",
+          "cls": "Plasma",
+          "module": "visuals/plasma.py",
+          "is_game": false
+        },
+        {
           "name": "RAINBOW",
           "cls": "Rainbow",
           "module": "visuals/rainbow.py",
@@ -3394,6 +3690,12 @@
           "name": "SINESCROLL",
           "cls": "SineScroller",
           "module": "visuals/sinescroller.py",
+          "is_game": false
+        },
+        {
+          "name": "STARFIELD",
+          "cls": "Starfield",
+          "module": "visuals/starfield.py",
           "is_game": false
         },
         {
@@ -3431,6 +3733,15 @@
       ],
       "key": "gallery",
       "items": [
+        {
+          "name": "GRAND MUSEUM",
+          "cls": "GalleryMuseum",
+          "module": "visuals/gallery3d.py",
+          "is_game": false,
+          "deps": [
+            "visuals/painting.py"
+          ]
+        },
         {
           "name": "SALON",
           "cls": "GallerySalon",
@@ -3494,12 +3805,6 @@
           "is_game": false
         },
         {
-          "name": "NEWTON",
-          "cls": "NewtonCradle",
-          "module": "visuals/newtoncradle.py",
-          "is_game": false
-        },
-        {
           "name": "POLAROID",
           "cls": "Polaroid",
           "module": "visuals/polaroid.py",
@@ -3509,6 +3814,12 @@
           "name": "SOLITAIRE",
           "cls": "Solitaire",
           "module": "visuals/solitaire.py",
+          "is_game": false
+        },
+        {
+          "name": "YOGA",
+          "cls": "Yoga",
+          "module": "visuals/yoga.py",
           "is_game": false
         }
       ]
@@ -3535,6 +3846,12 @@
           "is_game": false
         },
         {
+          "name": "ENTROPY",
+          "cls": "Entropy",
+          "module": "visuals/entropy.py",
+          "is_game": false
+        },
+        {
           "name": "FIBONACCI",
           "cls": "Fibonacci",
           "module": "visuals/fibonacci.py",
@@ -3547,9 +3864,27 @@
           "is_game": false
         },
         {
+          "name": "GAME THEORY",
+          "cls": "GameTheory",
+          "module": "visuals/gametheory.py",
+          "is_game": false
+        },
+        {
           "name": "MOBIUS",
           "cls": "Mobius",
           "module": "visuals/mobius.py",
+          "is_game": false
+        },
+        {
+          "name": "NETWORK",
+          "cls": "Network",
+          "module": "visuals/network.py",
+          "is_game": false
+        },
+        {
+          "name": "PERCOLATION",
+          "cls": "Percolation",
+          "module": "visuals/percolation.py",
           "is_game": false
         },
         {
@@ -3572,6 +3907,12 @@
           "deps": [
             "visuals/solids_data.py"
           ]
+        },
+        {
+          "name": "SORTING",
+          "cls": "Sorting",
+          "module": "visuals/sorting.py",
+          "is_game": false
         },
         {
           "name": "SPIROGRAPH",
@@ -3669,9 +4010,9 @@
           "is_game": false
         },
         {
-          "name": "4-STROKE",
-          "cls": "ModelT",
-          "module": "visuals/modelt.py",
+          "name": "NEWTON",
+          "cls": "NewtonCradle",
+          "module": "visuals/newtoncradle.py",
           "is_game": false
         },
         {
@@ -3693,6 +4034,12 @@
           "is_game": false
         },
         {
+          "name": "TURING MACHINE",
+          "cls": "TuringMachine",
+          "module": "visuals/turingmachine.py",
+          "is_game": false
+        },
+        {
           "name": "TYPEWRITER",
           "cls": "Typewriter",
           "module": "visuals/typewriter.py",
@@ -3702,6 +4049,12 @@
           "name": "WATCH",
           "cls": "WatchGears",
           "module": "visuals/watchgears.py",
+          "is_game": false
+        },
+        {
+          "name": "4-STROKE",
+          "cls": "ModelT",
+          "module": "visuals/modelt.py",
           "is_game": false
         }
       ]
@@ -3829,15 +4182,6 @@
           "is_game": false
         },
         {
-          "name": "DRIFT",
-          "cls": "DriftVisual",
-          "module": "visuals/drift.py",
-          "is_game": false,
-          "deps": [
-            "games/drift_sim.py"
-          ]
-        },
-        {
           "name": "DRIFT 3D",
           "cls": "Drift3D",
           "module": "visuals/drift3d.py",
@@ -3847,9 +4191,9 @@
           ]
         },
         {
-          "name": "FIRE",
-          "cls": "Fire",
-          "module": "visuals/fire.py",
+          "name": "EROSION",
+          "cls": "Erosion",
+          "module": "visuals/erosion.py",
           "is_game": false
         },
         {
@@ -3871,12 +4215,6 @@
           "is_game": false
         },
         {
-          "name": "JELLYFISH",
-          "cls": "ParticleLife",
-          "module": "visuals/particlelife.py",
-          "is_game": false
-        },
-        {
           "name": "LAKE",
           "cls": "Lake",
           "module": "visuals/lake.py",
@@ -3889,12 +4227,6 @@
           "is_game": false
         },
         {
-          "name": "PLASMA",
-          "cls": "Plasma",
-          "module": "visuals/plasma.py",
-          "is_game": false
-        },
-        {
           "name": "REDOUTE",
           "cls": "Redoute",
           "module": "visuals/plates.py",
@@ -3904,18 +4236,6 @@
           "name": "RIPPLES",
           "cls": "Ripples",
           "module": "visuals/ripples.py",
-          "is_game": false
-        },
-        {
-          "name": "SEBA",
-          "cls": "Seba",
-          "module": "visuals/plates.py",
-          "is_game": false
-        },
-        {
-          "name": "STARFIELD",
-          "cls": "Starfield",
-          "module": "visuals/starfield.py",
           "is_game": false
         },
         {
@@ -3942,6 +4262,13 @@
       "key": "road_rail",
       "items": [
         {
+          "name": "ATLAS",
+          "cls": "Atlas",
+          "module": "visuals/atlas.py",
+          "is_game": false,
+          "needs_numpy": true
+        },
+        {
           "name": "CLOVERLEAF",
           "cls": "Interchange",
           "module": "visuals/interchange.py",
@@ -3963,12 +4290,6 @@
           "name": "HIGHWAY",
           "cls": "Highway",
           "module": "visuals/highway.py",
-          "is_game": false
-        },
-        {
-          "name": "ONRAMP",
-          "cls": "Merge",
-          "module": "visuals/merge.py",
           "is_game": false
         },
         {
@@ -3998,13 +4319,13 @@
       ]
     },
     {
-      "name": "SCIENCE",
+      "name": "SCIENCE MICRO",
       "color": [
         75,
         45,
         224
       ],
-      "key": "science",
+      "key": "science_micro",
       "items": [
         {
           "name": "BRAIN",
@@ -4018,6 +4339,98 @@
           "module": "visuals/cell.py",
           "is_game": false
         },
+        {
+          "name": "DNA",
+          "cls": "DNA",
+          "module": "visuals/dna.py",
+          "is_game": false
+        },
+        {
+          "name": "ELECTRONS",
+          "cls": "Electrons",
+          "module": "visuals/electrons.py",
+          "is_game": false
+        },
+        {
+          "name": "ELEMENTS",
+          "cls": "Periodic",
+          "module": "visuals/periodic.py",
+          "is_game": false
+        },
+        {
+          "name": "LATTICES",
+          "cls": "Lattice",
+          "module": "visuals/lattice.py",
+          "is_game": false,
+          "deps": [
+            "visuals/molecule.py"
+          ]
+        },
+        {
+          "name": "MATTER",
+          "cls": "MatterPhases",
+          "module": "visuals/matter.py",
+          "is_game": false
+        },
+        {
+          "name": "Maxwell's Demon",
+          "cls": "MaxwellDemon",
+          "module": "visuals/maxwell.py",
+          "is_game": false
+        },
+        {
+          "name": "MICROSCOPE",
+          "cls": "Microscope",
+          "module": "visuals/microscope.py",
+          "is_game": false
+        },
+        {
+          "name": "MOLECULES",
+          "cls": "Molecule",
+          "module": "visuals/molecule.py",
+          "is_game": false
+        },
+        {
+          "name": "ORBITALS",
+          "cls": "Orbitals",
+          "module": "visuals/orbitals.py",
+          "is_game": false
+        },
+        {
+          "name": "PEPTIDES",
+          "cls": "Peptides",
+          "module": "visuals/peptides.py",
+          "is_game": false
+        },
+        {
+          "name": "PROTEINS",
+          "cls": "Proteins",
+          "module": "visuals/proteins.py",
+          "is_game": false
+        },
+        {
+          "name": "RADIOACTIVE",
+          "cls": "Radioactive",
+          "module": "visuals/radioactive.py",
+          "is_game": false
+        },
+        {
+          "name": "SPECTROSCOPE",
+          "cls": "Spectroscope",
+          "module": "visuals/spectroscope.py",
+          "is_game": false
+        }
+      ]
+    },
+    {
+      "name": "SCIENCE BENCH",
+      "color": [
+        75,
+        45,
+        224
+      ],
+      "key": "science_bench",
+      "items": [
         {
           "name": "CHLADNI",
           "cls": "Chladni",
@@ -4038,10 +4451,14 @@
           "is_game": false
         },
         {
-          "name": "CONSTELLATIONS",
-          "cls": "Constellations",
-          "module": "visuals/constellations.py",
-          "is_game": false
+          "name": "CONVECTION",
+          "cls": "Convection",
+          "module": "visuals/convection.py",
+          "is_game": false,
+          "deps": [
+            "visuals/fluid.py"
+          ],
+          "needs_numpy": true
         },
         {
           "name": "COULOMB",
@@ -4050,19 +4467,11 @@
           "is_game": false
         },
         {
-          "name": "DNA",
-          "cls": "DNA",
-          "module": "visuals/dna.py",
-          "is_game": false
-        },
-        {
-          "name": "EARTH",
-          "cls": "Earth",
-          "module": "visuals/earth.py",
+          "name": "FLUID PLAY",
+          "cls": "FluidPlay",
+          "module": "visuals/fluid.py",
           "is_game": false,
-          "deps": [
-            "visuals/gifcache.py"
-          ]
+          "needs_numpy": true
         },
         {
           "name": "INK DROPS",
@@ -4070,39 +4479,6 @@
           "module": "visuals/fluid.py",
           "is_game": false,
           "needs_numpy": true
-        },
-        {
-          "name": "LATTICES",
-          "cls": "Lattice",
-          "module": "visuals/lattice.py",
-          "is_game": false,
-          "deps": [
-            "visuals/molecule.py"
-          ]
-        },
-        {
-          "name": "MATTER",
-          "cls": "MatterPhases",
-          "module": "visuals/matter.py",
-          "is_game": false
-        },
-        {
-          "name": "MICROSCOPE",
-          "cls": "Microscope",
-          "module": "visuals/microscope.py",
-          "is_game": false
-        },
-        {
-          "name": "MOLECULES",
-          "cls": "Molecule",
-          "module": "visuals/molecule.py",
-          "is_game": false
-        },
-        {
-          "name": "MOON PHASES",
-          "cls": "MoonPhases",
-          "module": "visuals/moon.py",
-          "is_game": false
         },
         {
           "name": "OPTICS",
@@ -4114,48 +4490,6 @@
           "name": "OSCILLOSCOPE",
           "cls": "Oscilloscope",
           "module": "visuals/oscilloscope.py",
-          "is_game": false
-        },
-        {
-          "name": "PERIODIC",
-          "cls": "Periodic",
-          "module": "visuals/periodic.py",
-          "is_game": false
-        },
-        {
-          "name": "PROTEINS",
-          "cls": "Proteins",
-          "module": "visuals/proteins.py",
-          "is_game": false
-        },
-        {
-          "name": "PEPTIDES",
-          "cls": "Peptides",
-          "module": "visuals/peptides.py",
-          "is_game": false
-        },
-        {
-          "name": "RADIOACTIVE",
-          "cls": "Radioactive",
-          "module": "visuals/radioactive.py",
-          "is_game": false
-        },
-        {
-          "name": "SOLAR SYSTEM",
-          "cls": "OrbitsSolar",
-          "module": "visuals/orbits.py",
-          "is_game": false
-        },
-        {
-          "name": "SPACE DUST",
-          "cls": "OrbitsBelt",
-          "module": "visuals/orbits.py",
-          "is_game": false
-        },
-        {
-          "name": "SPECTROSCOPE",
-          "cls": "Spectroscope",
-          "module": "visuals/spectroscope.py",
           "is_game": false
         },
         {
@@ -4171,6 +4505,94 @@
           "module": "visuals/fluid.py",
           "is_game": false,
           "needs_numpy": true
+        },
+        {
+          "name": "WIND TUNNEL LAB",
+          "cls": "FluidSculpt",
+          "module": "visuals/fluid.py",
+          "is_game": false,
+          "needs_numpy": true
+        }
+      ]
+    },
+    {
+      "name": "SCIENCE MACRO",
+      "color": [
+        75,
+        45,
+        224
+      ],
+      "key": "science_macro",
+      "items": [
+        {
+          "name": "CONSTELLATIONS",
+          "cls": "Constellations",
+          "module": "visuals/constellations.py",
+          "is_game": false
+        },
+        {
+          "name": "EARTH",
+          "cls": "Earth",
+          "module": "visuals/globe.py",
+          "is_game": false,
+          "deps": [
+            "visuals/atlas.py"
+          ],
+          "needs_numpy": true
+        },
+        {
+          "name": "ECOSYSTEM",
+          "cls": "Ecosystem",
+          "module": "visuals/ecosystem.py",
+          "is_game": false
+        },
+        {
+          "name": "EVOLUTION",
+          "cls": "Evolution",
+          "module": "visuals/evolution.py",
+          "is_game": false
+        },
+        {
+          "name": "GENETIC DRIFT",
+          "cls": "GeneticDrift",
+          "module": "visuals/geneticdrift.py",
+          "is_game": false
+        },
+        {
+          "name": "MOON PHASES",
+          "cls": "MoonPhases",
+          "module": "visuals/moon.py",
+          "is_game": false
+        },
+        {
+          "name": "MOVEMENT",
+          "cls": "Walk",
+          "module": "visuals/walk.py",
+          "is_game": false
+        },
+        {
+          "name": "PREDATOR-PREY",
+          "cls": "PredPrey",
+          "module": "visuals/predprey.py",
+          "is_game": false
+        },
+        {
+          "name": "SEISMIC",
+          "cls": "Seismic",
+          "module": "visuals/seismic.py",
+          "is_game": false
+        },
+        {
+          "name": "SOLAR SYSTEM",
+          "cls": "OrbitsSolar",
+          "module": "visuals/orbits.py",
+          "is_game": false
+        },
+        {
+          "name": "TECTONIC",
+          "cls": "Tectonic",
+          "module": "visuals/tectonic.py",
+          "is_game": false
         },
         {
           "name": "3 BODY PROBLEM",
@@ -4238,20 +4660,8 @@
           "is_game": false
         },
         {
-          "name": "WONDER CHROME",
-          "cls": "WonderTerminator",
-          "module": "visuals/wondercabinet.py",
-          "is_game": false
-        },
-        {
           "name": "WONDER COIN",
           "cls": "WonderInsertCoin",
-          "module": "visuals/wondercabinet.py",
-          "is_game": false
-        },
-        {
-          "name": "WONDER CORRIDOR",
-          "cls": "WonderShining",
           "module": "visuals/wondercabinet.py",
           "is_game": false
         },
@@ -4376,12 +4786,6 @@
           "is_game": false
         },
         {
-          "name": "WONDER HELLFIRE",
-          "cls": "WonderDoom",
-          "module": "visuals/wondercabinet.py",
-          "is_game": false
-        },
-        {
           "name": "WONDER HILLSIDE",
           "cls": "WonderWinXP",
           "module": "visuals/wondercabinet.py",
@@ -4390,6 +4794,12 @@
         {
           "name": "WONDER HODGE",
           "cls": "WonderHodge",
+          "module": "visuals/wondercabinet.py",
+          "is_game": false
+        },
+        {
+          "name": "WONDER INFERNO",
+          "cls": "WonderDoom",
           "module": "visuals/wondercabinet.py",
           "is_game": false
         },
@@ -4504,12 +4914,6 @@
         {
           "name": "WONDER SAND",
           "cls": "WonderSand",
-          "module": "visuals/wondercabinet.py",
-          "is_game": false
-        },
-        {
-          "name": "WONDER SHADOW",
-          "cls": "WonderNosferatu",
           "module": "visuals/wondercabinet.py",
           "is_game": false
         },
@@ -4644,7 +5048,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -4962,7 +5368,7 @@
               ]
             },
             {
-              "name": "3D MAZE",
+              "name": "3D MONSTR MAZE",
               "cls": "MonsterMazeDemo",
               "module": "visuals/monstermazedemo.py",
               "deps": [
@@ -5062,7 +5468,9 @@
               "cls": "Demos",
               "module": "visuals/slideshow.py",
               "deps": [
+                "visuals/gifcache.py",
                 "visuals/painting.py",
+                "visuals/plates.py",
                 "visuals/pacmandemo.py",
                 "visuals/tetrisdemo.py",
                 "visuals/snakedemo.py",
@@ -5260,6 +5668,11 @@
               "module": "visuals/modelt.py"
             },
             {
+              "name": "NEWTON",
+              "cls": "NewtonCradle",
+              "module": "visuals/newtoncradle.py"
+            },
+            {
               "name": "ORRERY",
               "cls": "Orrery",
               "module": "visuals/orrery.py"
@@ -5273,6 +5686,11 @@
               "name": "SINGER",
               "cls": "Singer",
               "module": "visuals/singer.py"
+            },
+            {
+              "name": "TURING MACHINE",
+              "cls": "TuringMachine",
+              "module": "visuals/turingmachine.py"
             },
             {
               "name": "TYPEWRITER",
@@ -5320,11 +5738,6 @@
               "module": "visuals/lava.py"
             },
             {
-              "name": "NEWTON",
-              "cls": "NewtonCradle",
-              "module": "visuals/newtoncradle.py"
-            },
-            {
               "name": "POLAROID",
               "cls": "Polaroid",
               "module": "visuals/polaroid.py"
@@ -5333,6 +5746,57 @@
               "name": "SOLITAIRE",
               "cls": "Solitaire",
               "module": "visuals/solitaire.py"
+            },
+            {
+              "name": "YOGA",
+              "cls": "Yoga",
+              "module": "visuals/yoga.py"
+            },
+            {
+              "name": "ATLAS",
+              "cls": "Atlas",
+              "module": "visuals/atlas.py",
+              "needs_numpy": true
+            },
+            {
+              "name": "GRIDLOCK",
+              "cls": "BML",
+              "module": "visuals/bml.py"
+            },
+            {
+              "name": "GREENWAVE",
+              "cls": "GreenWave",
+              "module": "visuals/greenwave.py"
+            },
+            {
+              "name": "HIGHWAY",
+              "cls": "Highway",
+              "module": "visuals/highway.py"
+            },
+            {
+              "name": "CLOVERLEAF",
+              "cls": "Interchange",
+              "module": "visuals/interchange.py"
+            },
+            {
+              "name": "SIGNALS",
+              "cls": "Intersection",
+              "module": "visuals/intersection.py"
+            },
+            {
+              "name": "ROAD",
+              "cls": "Road",
+              "module": "visuals/road.py"
+            },
+            {
+              "name": "ROTARY",
+              "cls": "Roundabout",
+              "module": "visuals/roundabout.py"
+            },
+            {
+              "name": "SIGNS",
+              "cls": "Signs",
+              "module": "visuals/signs.py"
             },
             {
               "name": "ATTRACTORS",
@@ -5345,6 +5809,11 @@
               "module": "visuals/dblpendulum.py"
             },
             {
+              "name": "ENTROPY",
+              "cls": "Entropy",
+              "module": "visuals/entropy.py"
+            },
+            {
               "name": "FIBONACCI",
               "cls": "Fibonacci",
               "module": "visuals/fibonacci.py"
@@ -5355,9 +5824,24 @@
               "module": "visuals/fractals.py"
             },
             {
+              "name": "GAME THEORY",
+              "cls": "GameTheory",
+              "module": "visuals/gametheory.py"
+            },
+            {
               "name": "MOBIUS",
               "cls": "Mobius",
               "module": "visuals/mobius.py"
+            },
+            {
+              "name": "NETWORK",
+              "cls": "Network",
+              "module": "visuals/network.py"
+            },
+            {
+              "name": "PERCOLATION",
+              "cls": "Percolation",
+              "module": "visuals/percolation.py"
             },
             {
               "name": "PI",
@@ -5376,6 +5860,11 @@
               "deps": [
                 "visuals/solids_data.py"
               ]
+            },
+            {
+              "name": "SORTING",
+              "cls": "Sorting",
+              "module": "visuals/sorting.py"
             },
             {
               "name": "SPIROGRAPH",
@@ -5475,6 +5964,11 @@
               "module": "visuals/mitosislab.py"
             },
             {
+              "name": "JELLYFISH",
+              "cls": "ParticleLife",
+              "module": "visuals/particlelife.py"
+            },
+            {
               "name": "QUARKS",
               "cls": "Quarks",
               "module": "visuals/quarks.py"
@@ -5566,54 +6060,82 @@
               "module": "visuals/spices.py"
             },
             {
-              "name": "GRIDLOCK",
-              "cls": "BML",
-              "module": "visuals/bml.py"
-            },
-            {
-              "name": "GREENWAVE",
-              "cls": "GreenWave",
-              "module": "visuals/greenwave.py"
-            },
-            {
-              "name": "HIGHWAY",
-              "cls": "Highway",
-              "module": "visuals/highway.py"
-            },
-            {
-              "name": "CLOVERLEAF",
-              "cls": "Interchange",
-              "module": "visuals/interchange.py"
-            },
-            {
-              "name": "SIGNALS",
-              "cls": "Intersection",
-              "module": "visuals/intersection.py"
-            },
-            {
-              "name": "ONRAMP",
-              "cls": "Merge",
-              "module": "visuals/merge.py"
-            },
-            {
-              "name": "ROAD",
-              "cls": "Road",
-              "module": "visuals/road.py"
-            },
-            {
-              "name": "ROTARY",
-              "cls": "Roundabout",
-              "module": "visuals/roundabout.py"
-            },
-            {
-              "name": "SIGNS",
-              "cls": "Signs",
-              "module": "visuals/signs.py"
-            },
-            {
               "name": "CELL",
               "cls": "Cell",
               "module": "visuals/cell.py"
+            },
+            {
+              "name": "DNA",
+              "cls": "DNA",
+              "module": "visuals/dna.py"
+            },
+            {
+              "name": "ELECTRONS",
+              "cls": "Electrons",
+              "module": "visuals/electrons.py"
+            },
+            {
+              "name": "LATTICES",
+              "cls": "Lattice",
+              "module": "visuals/lattice.py",
+              "deps": [
+                "visuals/molecule.py"
+              ]
+            },
+            {
+              "name": "MATTER",
+              "cls": "MatterPhases",
+              "module": "visuals/matter.py"
+            },
+            {
+              "name": "Maxwell's Demon",
+              "cls": "MaxwellDemon",
+              "module": "visuals/maxwell.py"
+            },
+            {
+              "name": "MICROSCOPE",
+              "cls": "Microscope",
+              "module": "visuals/microscope.py"
+            },
+            {
+              "name": "MOLECULES",
+              "cls": "Molecule",
+              "module": "visuals/molecule.py"
+            },
+            {
+              "name": "BRAIN",
+              "cls": "Neurons",
+              "module": "visuals/neurons.py"
+            },
+            {
+              "name": "ORBITALS",
+              "cls": "Orbitals",
+              "module": "visuals/orbitals.py"
+            },
+            {
+              "name": "PEPTIDES",
+              "cls": "Peptides",
+              "module": "visuals/peptides.py"
+            },
+            {
+              "name": "ELEMENTS",
+              "cls": "Periodic",
+              "module": "visuals/periodic.py"
+            },
+            {
+              "name": "PROTEINS",
+              "cls": "Proteins",
+              "module": "visuals/proteins.py"
+            },
+            {
+              "name": "RADIOACTIVE",
+              "cls": "Radioactive",
+              "module": "visuals/radioactive.py"
+            },
+            {
+              "name": "SPECTROSCOPE",
+              "cls": "Spectroscope",
+              "module": "visuals/spectroscope.py"
             },
             {
               "name": "CHLADNI",
@@ -5626,22 +6148,13 @@
               "module": "visuals/colortheory.py"
             },
             {
-              "name": "CONSTELLATIONS",
-              "cls": "Constellations",
-              "module": "visuals/constellations.py"
-            },
-            {
-              "name": "DNA",
-              "cls": "DNA",
-              "module": "visuals/dna.py"
-            },
-            {
-              "name": "EARTH",
-              "cls": "Earth",
-              "module": "visuals/earth.py",
+              "name": "CONVECTION",
+              "cls": "Convection",
+              "module": "visuals/convection.py",
               "deps": [
-                "visuals/gifcache.py"
-              ]
+                "visuals/fluid.py"
+              ],
+              "needs_numpy": true
             },
             {
               "name": "COULOMB",
@@ -5667,37 +6180,16 @@
               "needs_numpy": true
             },
             {
-              "name": "LATTICES",
-              "cls": "Lattice",
-              "module": "visuals/lattice.py",
-              "deps": [
-                "visuals/molecule.py"
-              ]
+              "name": "FLUID PLAY",
+              "cls": "FluidPlay",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
             },
             {
-              "name": "MATTER",
-              "cls": "MatterPhases",
-              "module": "visuals/matter.py"
-            },
-            {
-              "name": "MICROSCOPE",
-              "cls": "Microscope",
-              "module": "visuals/microscope.py"
-            },
-            {
-              "name": "MOLECULES",
-              "cls": "Molecule",
-              "module": "visuals/molecule.py"
-            },
-            {
-              "name": "MOON PHASES",
-              "cls": "MoonPhases",
-              "module": "visuals/moon.py"
-            },
-            {
-              "name": "BRAIN",
-              "cls": "Neurons",
-              "module": "visuals/neurons.py"
+              "name": "WIND TUNNEL LAB",
+              "cls": "FluidSculpt",
+              "module": "visuals/fluid.py",
+              "needs_numpy": true
             },
             {
               "name": "OPTICS",
@@ -5705,44 +6197,9 @@
               "module": "visuals/optics.py"
             },
             {
-              "name": "SOLAR SYSTEM",
-              "cls": "OrbitsSolar",
-              "module": "visuals/orbits.py"
-            },
-            {
-              "name": "3 BODY PROBLEM",
-              "cls": "OrbitsMulti",
-              "module": "visuals/orbits.py"
-            },
-            {
-              "name": "SPACE DUST",
-              "cls": "OrbitsBelt",
-              "module": "visuals/orbits.py"
-            },
-            {
               "name": "OSCILLOSCOPE",
               "cls": "Oscilloscope",
               "module": "visuals/oscilloscope.py"
-            },
-            {
-              "name": "PERIODIC",
-              "cls": "Periodic",
-              "module": "visuals/periodic.py"
-            },
-            {
-              "name": "PROTEINS",
-              "cls": "Proteins",
-              "module": "visuals/proteins.py"
-            },
-            {
-              "name": "RADIOACTIVE",
-              "cls": "Radioactive",
-              "module": "visuals/radioactive.py"
-            },
-            {
-              "name": "SPECTROSCOPE",
-              "cls": "Spectroscope",
-              "module": "visuals/spectroscope.py"
             },
             {
               "name": "WAVE TANK",
@@ -5831,14 +6288,6 @@
               "module": "visuals/clouds.py"
             },
             {
-              "name": "DRIFT",
-              "cls": "DriftVisual",
-              "module": "visuals/drift.py",
-              "deps": [
-                "games/drift_sim.py"
-              ]
-            },
-            {
               "name": "DRIFT 3D",
               "cls": "Drift3D",
               "module": "visuals/drift3d.py",
@@ -5847,9 +6296,9 @@
               ]
             },
             {
-              "name": "FIRE",
-              "cls": "Fire",
-              "module": "visuals/fire.py"
+              "name": "EROSION",
+              "cls": "Erosion",
+              "module": "visuals/erosion.py"
             },
             {
               "name": "FIREFLIES",
@@ -5860,16 +6309,6 @@
               "name": "LAKE",
               "cls": "Lake",
               "module": "visuals/lake.py"
-            },
-            {
-              "name": "JELLYFISH",
-              "cls": "ParticleLife",
-              "module": "visuals/particlelife.py"
-            },
-            {
-              "name": "PLASMA",
-              "cls": "Plasma",
-              "module": "visuals/plasma.py"
             },
             {
               "name": "HAECKEL",
@@ -5892,11 +6331,6 @@
               "module": "visuals/plates.py"
             },
             {
-              "name": "SEBA",
-              "cls": "Seba",
-              "module": "visuals/plates.py"
-            },
-            {
               "name": "GOULD",
               "cls": "Gould",
               "module": "visuals/plates.py"
@@ -5907,11 +6341,6 @@
               "module": "visuals/ripples.py"
             },
             {
-              "name": "STARFIELD",
-              "cls": "Starfield",
-              "module": "visuals/starfield.py"
-            },
-            {
               "name": "WATER CYCLE",
               "cls": "WaterCycle",
               "module": "visuals/watercycle.py"
@@ -5920,6 +6349,110 @@
               "name": "WEATHER",
               "cls": "Weather",
               "module": "visuals/weather.py"
+            },
+            {
+              "name": "COINS",
+              "cls": "Coins",
+              "module": "visuals/coins.py"
+            },
+            {
+              "name": "FLAGS",
+              "cls": "Flags",
+              "module": "visuals/flags.py"
+            },
+            {
+              "name": "KNITTING",
+              "cls": "Knitting",
+              "module": "visuals/knitting.py"
+            },
+            {
+              "name": "LANGUAGE",
+              "cls": "Language",
+              "module": "visuals/language.py"
+            },
+            {
+              "name": "POTTERY",
+              "cls": "Pottery",
+              "module": "visuals/pottery.py"
+            },
+            {
+              "name": "SCRIPTS",
+              "cls": "Scripts",
+              "module": "visuals/scripts.py"
+            },
+            {
+              "name": "TESTAMENT",
+              "cls": "Testament",
+              "module": "visuals/testament.py"
+            },
+            {
+              "name": "WEAVING",
+              "cls": "Weaving",
+              "module": "visuals/weaving.py"
+            },
+            {
+              "name": "CONSTELLATIONS",
+              "cls": "Constellations",
+              "module": "visuals/constellations.py"
+            },
+            {
+              "name": "ECOSYSTEM",
+              "cls": "Ecosystem",
+              "module": "visuals/ecosystem.py"
+            },
+            {
+              "name": "EVOLUTION",
+              "cls": "Evolution",
+              "module": "visuals/evolution.py"
+            },
+            {
+              "name": "GENETIC DRIFT",
+              "cls": "GeneticDrift",
+              "module": "visuals/geneticdrift.py"
+            },
+            {
+              "name": "EARTH",
+              "cls": "Earth",
+              "module": "visuals/globe.py",
+              "deps": [
+                "visuals/atlas.py"
+              ],
+              "needs_numpy": true
+            },
+            {
+              "name": "MOON PHASES",
+              "cls": "MoonPhases",
+              "module": "visuals/moon.py"
+            },
+            {
+              "name": "SOLAR SYSTEM",
+              "cls": "OrbitsSolar",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "3 BODY PROBLEM",
+              "cls": "OrbitsMulti",
+              "module": "visuals/orbits.py"
+            },
+            {
+              "name": "PREDATOR-PREY",
+              "cls": "PredPrey",
+              "module": "visuals/predprey.py"
+            },
+            {
+              "name": "SEISMIC",
+              "cls": "Seismic",
+              "module": "visuals/seismic.py"
+            },
+            {
+              "name": "TECTONIC",
+              "cls": "Tectonic",
+              "module": "visuals/tectonic.py"
+            },
+            {
+              "name": "MOVEMENT",
+              "cls": "Walk",
+              "module": "visuals/walk.py"
             },
             {
               "name": "AMIGA BARS",
@@ -5936,6 +6469,11 @@
               "name": "LARSON SCAN",
               "cls": "Cylon",
               "module": "visuals/cylon.py"
+            },
+            {
+              "name": "FIRE",
+              "cls": "Fire",
+              "module": "visuals/fire.py"
             },
             {
               "name": "FLUX",
@@ -5958,6 +6496,11 @@
               "module": "visuals/moire.py"
             },
             {
+              "name": "PLASMA",
+              "cls": "Plasma",
+              "module": "visuals/plasma.py"
+            },
+            {
               "name": "RAINBOW",
               "cls": "Rainbow",
               "module": "visuals/rainbow.py"
@@ -5971,6 +6514,11 @@
               "name": "SINESCROLL",
               "cls": "SineScroller",
               "module": "visuals/sinescroller.py"
+            },
+            {
+              "name": "STARFIELD",
+              "cls": "Starfield",
+              "module": "visuals/starfield.py"
             },
             {
               "name": "TRANCE",
@@ -5998,18 +6546,16 @@
               "module": "visuals/xorpattern.py"
             },
             {
-              "name": "FLAGS",
-              "cls": "Flags",
-              "module": "visuals/flags.py"
-            },
-            {
-              "name": "WEAVING",
-              "cls": "Weaving",
-              "module": "visuals/weaving.py"
-            },
-            {
               "name": "SALON",
               "cls": "GallerySalon",
+              "module": "visuals/gallery3d.py",
+              "deps": [
+                "visuals/painting.py"
+              ]
+            },
+            {
+              "name": "GRAND MUSEUM",
+              "cls": "GalleryMuseum",
               "module": "visuals/gallery3d.py",
               "deps": [
                 "visuals/painting.py"
@@ -6236,7 +6782,7 @@
               "module": "visuals/wondercabinet.py"
             },
             {
-              "name": "WONDER HELLFIRE",
+              "name": "WONDER INFERNO",
               "cls": "WonderDoom",
               "module": "visuals/wondercabinet.py"
             },
@@ -6296,18 +6842,8 @@
               "module": "visuals/wondercabinet.py"
             },
             {
-              "name": "WONDER SHADOW",
-              "cls": "WonderNosferatu",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
               "name": "WONDER DEPTHS",
               "cls": "WonderJaws",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
-              "name": "WONDER CORRIDOR",
-              "cls": "WonderShining",
               "module": "visuals/wondercabinet.py"
             },
             {
@@ -6323,11 +6859,6 @@
             {
               "name": "WONDER WINDOW",
               "cls": "WonderExorcist",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
-              "name": "WONDER CHROME",
-              "cls": "WonderTerminator",
               "module": "visuals/wondercabinet.py"
             },
             {
@@ -6451,6 +6982,11 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "YOUNG HARE",
+              "cls": "PaintingDurerHare",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "THE ARNOLFINI PORTRAIT",
               "cls": "PaintingArnolfiniPortrait",
               "module": "visuals/painting.py"
@@ -6481,8 +7017,23 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "BOY WITH A BASKET OF FRUIT",
+              "cls": "PaintingCaravaggioFruit",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE MUSICIANS",
+              "cls": "PaintingCaravaggioMusicians",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "SELF-PORTRAIT AS ALLEGORY OF PAINTING",
               "cls": "PaintingGentileschiSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE LACEMAKER",
+              "cls": "PaintingVermeerLacemaker",
               "module": "visuals/painting.py"
             },
             {
@@ -6523,6 +7074,16 @@
             {
               "name": "SELF-PORTRAIT",
               "cls": "PaintingRembrandtSelfPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE JEWISH BRIDE",
+              "cls": "PaintingRembrandtJewishBride",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SYNDICS OF THE DRAPERS' GUILD",
+              "cls": "PaintingRembrandtSyndics",
               "module": "visuals/painting.py"
             },
             {
@@ -6586,6 +7147,16 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "SNOW STORM: STEAM-BOAT OFF A HARBOUR'S MOUTH",
+              "cls": "PaintingTurnerSnowstorm",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "NORHAM CASTLE, SUNRISE",
+              "cls": "PaintingTurnerNorham",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "THE HAY WAIN",
               "cls": "PaintingHayWain",
               "module": "visuals/painting.py"
@@ -6618,6 +7189,11 @@
             {
               "name": "BULLFINCH AND WEEPING CHERRY",
               "cls": "PaintingHokusaiBullfinch",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE AMIDA FALLS",
+              "cls": "PaintingHokusaiWaterfall",
               "module": "visuals/painting.py"
             },
             {
@@ -6708,6 +7284,16 @@
             {
               "name": "A GIRL WITH A WATERING CAN",
               "cls": "PaintingGirlWateringCan",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "TWO SISTERS (ON THE TERRACE)",
+              "cls": "PaintingRenoirTwoSisters",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "LA GRENOUILL\u00c8RE",
+              "cls": "PaintingRenoirGrenouillere",
               "module": "visuals/painting.py"
             },
             {
@@ -6816,6 +7402,26 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "THE BASKET OF APPLES",
+              "cls": "PaintingCezanneApples",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "STILL LIFE WITH A CURTAIN",
+              "cls": "PaintingCezanneCurtain",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE BOY IN THE RED VEST",
+              "cls": "PaintingCezanneRedVest",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BIB\u00c9MUS QUARRIES",
+              "cls": "PaintingCezanneBibemus",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "VISION AFTER THE SERMON",
               "cls": "PaintingVisionSermon",
               "module": "visuals/painting.py"
@@ -6866,6 +7472,16 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "COTTAGE GARDEN",
+              "cls": "PaintingKlimtFlowerGarden",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "FARM GARDEN WITH SUNFLOWERS",
+              "cls": "PaintingKlimtFarmGarden",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "JOB (CIGARETTES)",
               "cls": "PaintingMuchaJob",
               "module": "visuals/painting.py"
@@ -6886,6 +7502,21 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "THE RED STUDIO",
+              "cls": "PaintingMatisseRedStudio",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "OPEN WINDOW, COLLIOURE",
+              "cls": "PaintingMatisseOpenWindow",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "WOMAN WITH A HAT",
+              "cls": "PaintingMatisseWomanHat",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "BLUE HORSE I",
               "cls": "PaintingBlueHorse",
               "module": "visuals/painting.py"
@@ -6901,8 +7532,18 @@
               "module": "visuals/painting.py"
             },
             {
+              "name": "PORTRAIT OF EDITH",
+              "cls": "PaintingSchieleEdith",
+              "module": "visuals/painting.py"
+            },
+            {
               "name": "JEANNE H\u00c9BUTERNE",
               "cls": "PaintingModiglianiPortrait",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "COMPOSITION VII",
+              "cls": "PaintingCompositionVii",
               "module": "visuals/painting.py"
             },
             {
@@ -6913,6 +7554,21 @@
             {
               "name": "SEVERAL CIRCLES",
               "cls": "PaintingSeveralCircles",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "YELLOW-RED-BLUE",
+              "cls": "PaintingKandinskyYellowRedBlue",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "COLOR STUDY: SQUARES WITH CONCENTRIC CIRCLES",
+              "cls": "PaintingKandinskyColorStudy",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "IMPROVISATION 28",
+              "cls": "PaintingKandinskyImprovisation",
               "module": "visuals/painting.py"
             },
             {
@@ -6928,6 +7584,81 @@
             {
               "name": "WHITE ON WHITE",
               "cls": "PaintingWhiteOnWhite",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "SENECIO",
+              "cls": "PaintingKleeSenecio",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "CASTLE AND SUN",
+              "cls": "PaintingKleeCastleSun",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "HIGHWAY AND BYWAYS",
+              "cls": "PaintingKleeHighway",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "TWITTERING MACHINE",
+              "cls": "PaintingKleeTwittering",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PORTRAIT OF PICASSO",
+              "cls": "PaintingGrisPortraitPicasso",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "STILL LIFE WITH CHECKED TABLECLOTH",
+              "cls": "PaintingGrisTablecloth",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "STILL LIFE (VIOLIN AND INKWELL)",
+              "cls": "PaintingGrisViolin",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CITY",
+              "cls": "PaintingLegerCity",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "CONTRAST OF FORMS",
+              "cls": "PaintingLegerContrast",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "PORTRAIT OF JACQUES NAYRAL",
+              "cls": "PaintingGleizesNayral",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE TEN LARGEST, NO. 7, ADULTHOOD",
+              "cls": "PaintingAfKlintAdulthood",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE TEN LARGEST, NO. 3, YOUTH",
+              "cls": "PaintingAfKlintYouth",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "THE CITY RISES",
+              "cls": "PaintingBoccioniCityRises",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "STATES OF MIND: THE FAREWELLS",
+              "cls": "PaintingBoccioniFarewells",
+              "module": "visuals/painting.py"
+            },
+            {
+              "name": "BEAT THE WHITES WITH THE RED WEDGE",
+              "cls": "PaintingLissitzkyWedge",
               "module": "visuals/painting.py"
             },
             {
@@ -7368,7 +8099,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -7458,7 +8191,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -7600,7 +8335,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -7762,7 +8499,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -7852,7 +8591,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -7994,7 +8735,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -8124,7 +8867,7 @@
               "module": "visuals/dna.py"
             },
             {
-              "name": "PERIODIC",
+              "name": "ELEMENTS",
               "cls": "Periodic",
               "module": "visuals/periodic.py"
             },
@@ -8208,7 +8951,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -8350,7 +9095,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -8492,7 +9239,117 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
-            "visuals/plates.py"
+            "visuals/gifcache.py",
+            "visuals/painting.py",
+            "visuals/plates.py",
+            "visuals/pacmandemo.py",
+            "visuals/tetrisdemo.py",
+            "visuals/snakedemo.py",
+            "visuals/invadersdemo.py",
+            "visuals/froggerdemo.py",
+            "visuals/breakoutdemo.py",
+            "visuals/galagademo.py",
+            "visuals/defenderdemo.py",
+            "visuals/centipededemo.py",
+            "visuals/donkeykongdemo.py",
+            "visuals/qbertdemo.py",
+            "visuals/asteroidsdemo.py",
+            "visuals/flappydemo.py",
+            "visuals/pongdemo.py",
+            "visuals/mspacmandemo.py",
+            "visuals/digdugdemo.py",
+            "visuals/bombermandemo.py",
+            "visuals/arkanoid_demo.py",
+            "visuals/game2048demo.py",
+            "visuals/geometrydemo.py",
+            "visuals/lunarlanderdemo.py",
+            "visuals/skifreedemo.py",
+            "visuals/burgertimedemo.py",
+            "visuals/loderunnerdemo.py",
+            "visuals/nightdriverdemo.py",
+            "visuals/pinballdemo.py",
+            "visuals/stackdemo.py",
+            "visuals/jezzballdemo.py",
+            "visuals/indy500demo.py",
+            "visuals/spacecruisedemo.py",
+            "visuals/trashblasterdemo.py",
+            "visuals/stickrunnerdemo.py",
+            "visuals/pipedreamdemo.py",
+            "visuals/lightsoutdemo.py",
+            "visuals/bowlingdemo.py",
+            "visuals/dartsdemo.py",
+            "visuals/chessdemo.py",
+            "visuals/checkersdemo.py",
+            "visuals/othellodemo.py",
+            "visuals/agariodemo.py",
+            "games/pacman.py",
+            "games/tetris.py",
+            "games/snake.py",
+            "games/invaders.py",
+            "games/frogger.py",
+            "games/breakout.py",
+            "games/galaga.py",
+            "games/defender.py",
+            "games/centipede.py",
+            "games/donkeykong.py",
+            "games/qbert.py",
+            "games/asteroids.py",
+            "games/flappy.py",
+            "games/pong.py",
+            "games/mspacman.py",
+            "games/digdug.py",
+            "games/bomberman.py",
+            "games/arkanoid.py",
+            "games/arkanoid_levels.py",
+            "games/game2048.py",
+            "games/geometrydash.py",
+            "games/lunarlander.py",
+            "games/skifree.py",
+            "games/burgertime.py",
+            "games/loderunner.py",
+            "games/nightdriver.py",
+            "games/pinball.py",
+            "games/stack.py",
+            "games/jezzball.py",
+            "games/indy500.py",
+            "games/spacecruise.py",
+            "games/trashblaster.py",
+            "games/stickrunner.py",
+            "games/pipedream.py",
+            "games/lightsout.py",
+            "games/bowling.py",
+            "games/darts.py",
+            "games/chess.py",
+            "games/checkers.py",
+            "games/othello.py",
+            "games/agario.py"
+          ],
+          "playlist": [
+            {
+              "name": "HAECKEL",
+              "cls": "Haeckel",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "AUDUBON",
+              "cls": "Audubon",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "MERIAN",
+              "cls": "Merian",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "REDOUTE",
+              "cls": "Redoute",
+              "module": "visuals/plates.py"
+            },
+            {
+              "name": "GOULD",
+              "cls": "Gould",
+              "module": "visuals/plates.py"
+            }
           ]
         },
         {
@@ -8501,7 +9358,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -8611,11 +9470,6 @@
               "module": "visuals/orbits.py"
             },
             {
-              "name": "SPACE DUST",
-              "cls": "OrbitsBelt",
-              "module": "visuals/orbits.py"
-            },
-            {
               "name": "COULOMB",
               "cls": "Coulomb",
               "module": "visuals/emfield.py"
@@ -8668,10 +9522,11 @@
             {
               "name": "EARTH",
               "cls": "Earth",
-              "module": "visuals/earth.py",
+              "module": "visuals/globe.py",
               "deps": [
-                "visuals/gifcache.py"
-              ]
+                "visuals/atlas.py"
+              ],
+              "needs_numpy": true
             },
             {
               "name": "MOLECULES",
@@ -8706,7 +9561,9 @@
           "module": "visuals/slideshow.py",
           "is_game": false,
           "deps": [
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -9011,7 +9868,7 @@
               "module": "visuals/wondercabinet.py"
             },
             {
-              "name": "WONDER HELLFIRE",
+              "name": "WONDER INFERNO",
               "cls": "WonderDoom",
               "module": "visuals/wondercabinet.py"
             },
@@ -9071,18 +9928,8 @@
               "module": "visuals/wondercabinet.py"
             },
             {
-              "name": "WONDER SHADOW",
-              "cls": "WonderNosferatu",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
               "name": "WONDER DEPTHS",
               "cls": "WonderJaws",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
-              "name": "WONDER CORRIDOR",
-              "cls": "WonderShining",
               "module": "visuals/wondercabinet.py"
             },
             {
@@ -9098,11 +9945,6 @@
             {
               "name": "WONDER WINDOW",
               "cls": "WonderExorcist",
-              "module": "visuals/wondercabinet.py"
-            },
-            {
-              "name": "WONDER CHROME",
-              "cls": "WonderTerminator",
               "module": "visuals/wondercabinet.py"
             },
             {
@@ -9211,7 +10053,9 @@
           "is_game": false,
           "deps": [
             "visuals/slideshow.py",
+            "visuals/gifcache.py",
             "visuals/painting.py",
+            "visuals/plates.py",
             "visuals/pacmandemo.py",
             "visuals/tetrisdemo.py",
             "visuals/snakedemo.py",
@@ -9332,6 +10176,12 @@
           "name": "PIXEL TEST",
           "cls": "TestPattern",
           "module": "visuals/testpattern.py",
+          "is_game": false
+        },
+        {
+          "name": "SAFETY",
+          "cls": "Safety",
+          "module": "visuals/safety.py",
           "is_game": false
         },
         {

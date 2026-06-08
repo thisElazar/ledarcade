@@ -1,270 +1,134 @@
 # LED Arcade
 
-A collection of **35 classic arcade games** and **44 visual effects** designed for a **64x64 RGB LED matrix**, with a desktop emulator for prototyping.
+A self-contained **64×64 RGB LED arcade cabinet** — **60+ playable games** and **590+ visual scenes** running on a Raspberry Pi, with a full desktop emulator for development.
 
-![64x64 resolution](https://img.shields.io/badge/resolution-64x64-blue)
-![Python 3.7+](https://img.shields.io/badge/python-3.7+-green)
-![PyGame](https://img.shields.io/badge/pygame-2.0+-orange)
+![resolution 64x64](https://img.shields.io/badge/resolution-64%C3%9764-blue)
+![python 3.11–3.13](https://img.shields.io/badge/python-3.11–3.13-green)
+![pygame 2.x](https://img.shields.io/badge/pygame-2.x-orange)
+
+The same code runs two ways: on a desktop via PyGame (a 640×640 window, 10× scale) for development, and on real hardware via an HUB75 LED matrix and arcade controls. Games and visuals are written once against a shared display interface; `arcade.py` backs it with PyGame, `hardware.py` backs it with the LED matrix — neither the games nor the visuals know the difference.
 
 ---
 
-## Quick Start
+## Quick Start (desktop)
 
 ```bash
-# Clone or download the project
 cd led-arcade
+pip install -r requirements.txt      # pygame, numpy, Pillow
 
-# Install dependencies
-pip install pygame
-
-# Run the unified arcade (games + visuals)
-python run_arcade.py
-
-# Or run games only
-python main.py
-
-# Or run visuals only
-python run_visuals.py
+python run_arcade.py                 # unified launcher — games + visuals
+# or:
+python main.py                       # games only
+python run_visuals.py                # visuals only
 ```
 
-A 640x640 window opens (10x scale of the 64x64 display).
+> **Python version:** use **3.11–3.13**. Python 3.14 currently trips a circular-import bug in `pygame.font`.
+
+On real hardware, `run_hardware.py` is the entry point (launched by a systemd service). See **[HARDWARE.md](HARDWARE.md)** for the build and **[DEPLOYMENT.md](DEPLOYMENT.md)** for how cabinets are provisioned and updated.
 
 ---
 
 ## Controls
 
-| Key | Action |
-|-----|--------|
-| **Arrow Keys** | Move / Navigate menu |
-| **Space** | Action (fire, select, jump, place bomb) |
-| **Z** | Secondary action (rarely used) |
-| **Escape** | Return to menu |
+The cabinet has a **4-way joystick** and **two action buttons**. By convention the two buttons are unified — either button performs the action — so anyone can play without thinking about which button to press. (A few games that genuinely need two distinct actions, like pinball flippers, are the exception.)
 
-**In unified launcher (`run_arcade.py`):**
-- **Left/Right** - Switch category
-- **Up/Down** - Select item
-- **Space** - Launch
+| Input | Cabinet | Desktop |
+|-------|---------|---------|
+| Navigate / move | Joystick | Arrow keys |
+| Action / select | Either button | Space or Z |
+| Switch category | Joystick left / right | Left / Right |
+| Select item | Joystick up / down | Up / Down |
+| Back to menu | Hold both buttons | Hold both / Escape |
 
 ---
 
-## Games (35 Total)
+## What's inside
 
-Games are organized into categories in the menu:
+Content is organized into categories you page through in the menu. **The in-app menu is the source of truth** — the counts below are a snapshot as of **v1.0**.
 
-### Arcade (17 games)
-Classic coin-op arcade machines.
+### Games — 60+ across 7 categories
 
-| Game | Description | Controls |
-|------|-------------|----------|
-| **Astroids** | Destroy asteroids in space | Arrows rotate/thrust, Space fires |
-| **Bombman** | Place bombs, destroy enemies | Arrows move, Space places bomb |
-| **Break Out** | Break all bricks with the ball | Left/Right moves paddle, Space launches |
-| **Centipeed** | Shoot the descending centipede | Arrows move, Space fires |
-| **Dig Dig** | Dig tunnels, pump up enemies | Arrows dig/move, Space pumps |
-| **Monkey Kong** | Climb ladders, jump barrels | Arrows move/climb, Space jumps |
-| **Froggy** | Cross traffic and river | Arrows hop |
-| **Galaxa** | Formation-based shooter | Left/Right moves, Space fires |
-| **Invaders** | Defend Earth from aliens | Left/Right moves, Space fires |
-| **Gold Runner** | Collect gold, trap enemies | Arrows move/climb, Space digs |
-| **Lunar Lander** | Land safely on the pad | Arrows thrust |
-| **Nite Driver** | First-person night racing | Left/Right steers |
-| **Pak-Man** | Eat dots, avoid ghosts | Arrows set direction |
-| **Ping** | Classic paddle game vs AI | Up/Down moves paddle |
-| **Q*Bit** | Hop on cubes to change color | Arrows hop diagonally |
-| **Snake** | Eat food, grow longer | Arrows change direction |
-| **Tetrominos** | Stack blocks, clear lines | Arrows move, Up rotates, Space drops |
+In-app names are lightly genericized takes on the classics (no trademarked titles), e.g. `ASTROIDS`, `PAK-MAN`, `MONKEY KONG`.
 
-### Retro (6 games)
-Classic computer and console games.
+| Category | Count | Examples (as shown in the menu) |
+|----------|-------|----------|
+| Arcade   | 20 | SNAKE, PING, BREAK OUT, INVADERS, TETROMINOS, ASTROIDS, PAK-MAN, GALAXA, FROGGY, MONKEY KONG, DIG DIG, CENTIPEED |
+| Modern   | 10 | 2048, FLAPPY BIRD, GEODASH, STACK, AGAR.IO, PORTAL, BLOONS, BLOONS TD, POWDER GAME |
+| Retro    | 9  | ARCANOID, INDIE 500, JAZZBALL, PIPE MAZE, SPACE CRUISE, 3D MONSTR MAZE, SKI RUN, DND |
+| 2-Player | 6  | CHESS, CHECKERS, CONNECT FOUR, GO, REVERSI, MANCALA |
+| Toys     | 6  | 15 PUZZLE, LITE OUT, MASTER CODE, RUSH HR, SAIMON, TAP IT |
+| Bar      | 5  | POOL, DARTS, BOWLING, SHUFFLEBOARD, PINBALL |
+| Unique   | 4  | DRIFT, FISHING, LASER MIRRORS, WINDOW WASHER |
 
-| Game | Description | Controls |
-|------|-------------|----------|
-| **Arcanoid** | 1986 brick breaker | Left/Right moves paddle |
-| **Indie 500** | Top-down racing | Arrows steer, Space gas |
-| **Jazzball** | Trap bouncing atoms | Arrows + Space builds walls |
-| **Pipe Maze** | Connect pipes before flood | Arrows move, Space places |
-| **Space Cruise** | Space exploration | Arrows move |
-| **Trash Blaster** | Shoot trash | Arrows aim, Space fires |
+Plus curated **playlists** (All Games, Arcade Mix, Quick Play, …) that shuffle through a themed set.
 
-### Modern (6 games)
-Mobile-era and puzzle games.
+### Visuals — 590+ scenes across 20+ categories
 
-| Game | Description | Controls |
-|------|-------------|----------|
-| **2048** | Slide tiles to combine | Arrows slide all tiles |
-| **Flappy** | Tap to fly through pipes | Space flaps |
-| **Geometry Dash** | Jump over obstacles | Space jumps |
-| **Lite Out** | Toggle all lights off | Arrows select, Space toggles |
-| **Stack** | Stack blocks perfectly | Space drops block |
-| **Stick Runner** | Endless runner | Space jumps |
+Ambient art, simulations, and demos. Many "visuals" are whole collections of scenes, which is why the scene count is large. Headline categories:
 
-### 2-Player (6 games)
-Turn-based multiplayer with shared controller.
+| Category | Scenes | What it is |
+|----------|--------|------------|
+| Art | 236 | Painting and generative-art galleries |
+| Titles | 71 | Wonder-cabinet title screens |
+| Demos | 48 | Demoscene-style effects |
+| Automata | 26 | Cellular automata, flocking, slime mold |
+| Mechanics | 20 | Machines, engines, linkages |
+| Digital | 18 | Plasma, Matrix rain, attractors, moiré |
+| Science (micro/macro/bench) | ~40 | Cells, DNA, orbits, tectonics, lab instruments |
+| Math · Music · Nature · Household · Gallery · Culture · Cooking · Sprites · Superheroes · … | the rest | |
 
-| Game | Description | Controls |
-|------|-------------|----------|
-| **Checkers** | Classic checkers | Arrows select, Space moves |
-| **Chess** | Full chess game | Arrows select, Space confirms |
-| **Connect Four** | Get 4 in a row | Left/Right selects, Space drops |
-| **Go** | 9x9 Go board | Arrows place, Space confirms |
-| **Mancala** | Sow seeds, capture | Arrows select, Space sows |
-| **Reversi** | Flip opponent's discs | Arrows place, Space confirms |
+Utility screens live here too — including **SYSTEM INFO**, which shows the cabinet's IP, temperature, Python version, and deployed release (e.g. `VER: v1.0`).
 
 ---
 
-## Visuals (44 Total)
+## Development & deployment
 
-Ambient visual effects organized by category:
+This repo follows a simple, enforced workflow:
 
-### Automata (11)
-Cellular automata and agent simulations.
+- **`main`** is the always-green trunk. All work lands via pull requests; **CI** (GitHub Actions) runs a headless smoke test that constructs and animates every visual and game, plus a sim↔hardware interface-parity check. Don't commit directly to `main`.
+- **Releases are version tags** (`vMAJOR.MINOR`). A tag is cut from a `main` commit after it's verified on the dev cabinet. Distribution cabinets run the latest `v*` tag — never `main`'s tip.
 
-| Visual | Description |
-|--------|-------------|
-| **Aurora** | Northern lights patterns |
-| **Boids** | Flocking bird simulation |
-| **Faders** | Color gradient transitions |
-| **Gyre** | Spiral vortex patterns |
-| **Hodge** | Hodgepodge machine |
-| **Life** | Conway's Game of Life |
-| **Mitosis** | Cell division patterns |
-| **Quarks** | Particle physics sim |
-| **Rug** | Rug-like CA patterns |
-| **Slime** | Physarum slime mold |
-| **Wolfram** | 1D elementary CA |
+Run the test suite locally the same way CI does:
 
-### Nature (7)
-Natural phenomena.
-
-| Visual | Description |
-|--------|-------------|
-| **Fire** | Realistic fire effect |
-| **Lake** | Calm water reflections |
-| **Plasma** | Classic plasma effect |
-| **Ripples** | Water ripple effects |
-| **Road** | Endless road journey |
-| **Starfield** | 3D starfield flythrough |
-| **Weather** | Rain, snow, storms |
-
-### Digital (13)
-Mathematical and computer visualizations.
-
-| Visual | Description |
-|--------|-------------|
-| **Attractors** | Strange attractor trajectories |
-| **Copper Bars** | Amiga raster bars |
-| **Cylon** | Larson scanner |
-| **Flux** | Flowing energy patterns |
-| **Matrix** | Falling green code |
-| **Mobius** | Twisting surface |
-| **Moire** | Interference patterns |
-| **Rainbow** | Color wheel cycle |
-| **Rotozoom** | Rotating zoom |
-| **Sine Scroller** | Wavy scroller |
-| **Trance** | Hypnotic patterns |
-| **Twister** | Rotating bars |
-| **XOR Pattern** | Fractal patterns |
-
-### Art (3)
-Famous painting interpretations.
-
-| Visual | Description |
-|--------|-------------|
-| **Mondrian** | Geometric composition |
-| **Starry Night** | Van Gogh's masterpiece |
-| **Water Lilies** | Monet's garden |
-
-### Household (5)
-Domestic nostalgia.
-
-| Visual | Description |
-|--------|-------------|
-| **Cat** | Stretching on pillow |
-| **DVD** | Bouncing DVD logo |
-| **Lava Lamp** | Flowing lava lamp |
-| **Polaroid** | Photo slideshow |
-| **Solitaire** | Win card cascade |
-
-### Utility (5)
-Functional displays.
-
-| Visual | Description |
-|--------|-------------|
-| **About** | Credits |
-| **Clock** | Time display |
-| **Settings** | Display settings |
-| **Sysinfo** | System info |
-| **Test Pattern** | Test all pixels |
-
----
-
-## Project Structure
-
-```
-led-arcade/
-├── run_arcade.py        # Unified launcher (games + visuals)
-├── run_visuals.py       # Visual-only launcher
-├── run_hardware.py      # Hardware launcher for Raspberry Pi
-├── main.py              # Games-only launcher
-├── arcade.py            # Core framework
-├── hardware.py          # LED matrix driver
-├── catalog.py           # Category system
-├── highscores.py        # High score persistence
-├── requirements.txt     # Dependencies
-├── README.md            # This file
-├── ROADMAP.md           # Development roadmap
-├── HARDWARE.md          # Hardware build guide
-├── GAME_ROADMAP.md      # Game implementation tracker
-├── VISUAL_RESOURCES.md  # Visual effect references
-├── games/               # All game implementations
-│   ├── __init__.py
-│   ├── snake.py
-│   ├── pacman.py
-│   ├── donkeykong.py
-│   └── ... (35 games)
-└── visuals/             # All visual effects
-    ├── __init__.py
-    ├── plasma.py
-    ├── fire.py
-    └── ... (44 visuals)
+```bash
+pip install -r requirements-dev.txt
+SDL_VIDEODRIVER=dummy pytest -q tests/
 ```
 
+The full workflow — branching, cutting a release, how cabinets update, and rollback — is documented in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
 ---
 
-## Adding New Content
+## Adding content
 
-### Creating a Game
+### A game
 
 ```python
 # games/mygame.py
 from arcade import Game, GameState, Colors
 
 class MyGame(Game):
-    name = "MYGAME"           # Menu display name (keep short)
-    description = "Fun game!" # Short description
-    category = "arcade"       # arcade, retro, modern, or 2_player
+    name = "MYGAME"            # short menu name
+    description = "Fun game!"
+    category = "arcade"        # arcade, modern, retro, 2_player, toys, bar, unique
 
     def reset(self):
         self.state = GameState.PLAYING
         self.score = 0
 
     def update(self, input_state, dt):
+        # Unify both buttons unless the game truly needs two actions.
         if input_state.action_l or input_state.action_r:
-            # Handle button press (either button)
-            pass
+            ...
 
     def draw(self):
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(10, 30, "HELLO!", Colors.GREEN)
 ```
 
-Register in `games/__init__.py`:
-```python
-from .mygame import MyGame
-ALL_GAMES.append(MyGame)
-```
+Register it in `games/__init__.py` (import the class and add it to `ALL_GAMES`).
 
-### Creating a Visual
+### A visual
 
 ```python
 # visuals/myvisual.py
@@ -273,76 +137,79 @@ from visuals import Visual, Colors
 class MyVisual(Visual):
     name = "MYVISUAL"
     description = "Cool effect"
-    category = "digital"  # automata, nature, digital, art, household, utility
+    category = "digital"
 
     def reset(self):
-        pass
+        ...
 
     def update(self, dt):
         self.time += dt
 
     def draw(self):
         self.display.clear(Colors.BLACK)
-        # Draw something cool
+        ...
 ```
+
+Register it in `visuals/__init__.py` (import the class and add it to `ALL_VISUALS`).
+
+> The CI smoke test will construct and run your new game/visual headless — if it crashes on creation or in its first frames, the PR goes red before it can reach a cabinet.
 
 ---
 
 ## Display API
 
 ```python
-display.clear(color)                    # Fill screen
-display.set_pixel(x, y, color)          # Single pixel
-display.draw_rect(x, y, w, h, color)    # Rectangle
-display.draw_line(x0, y0, x1, y1, color)# Line
-display.draw_circle(x, y, r, color)     # Circle
-display.draw_text_small(x, y, text, color)  # 3x5 pixel font
+display.clear(color)                        # fill screen
+display.set_pixel(x, y, color)              # single pixel
+display.get_pixel(x, y)                     # read a pixel
+display.draw_rect(x, y, w, h, color)        # rectangle
+display.draw_line(x0, y0, x1, y1, color)    # line
+display.draw_circle(x, y, r, color)         # circle
+display.draw_text_small(x, y, text, color)  # 3×5 pixel font (left-align at x=2)
 ```
 
-**Colors available:** `Colors.BLACK`, `WHITE`, `RED`, `GREEN`, `BLUE`, `YELLOW`, `CYAN`, `MAGENTA`, `ORANGE`, `PINK`, `GRAY`, `DARK_GRAY`
+**General-purpose colors:** `Colors.BLACK`, `WHITE`, `RED`, `GREEN`, `BLUE`, `YELLOW`, `CYAN`, `MAGENTA`, `ORANGE`, `PINK`, `PURPLE`, `LIME`, `GRAY`, `DARK_GRAY` (plus semantic ones like `PLAYER`, `ENEMY`, `FOOD`).
 
 ---
 
-## Hardware Porting
+## Project structure
 
-The framework abstracts display and input for easy hardware migration:
-
-### Components Needed
-- **64x64 RGB LED Matrix** (HUB75) - ~$40
-- **Controller**: Raspberry Pi 3 (development) or Pi Zero 2 W (deployment)
-- **5V 4A+ Power Supply**
-- **Arcade controls** (joystick + 3 buttons)
-
-### Porting Steps
-See [HARDWARE.md](HARDWARE.md) for complete wiring guide and Pi setup instructions.
+```
+led-arcade/
+├── run_arcade.py        # desktop unified launcher (games + visuals)
+├── run_visuals.py       # desktop visuals-only launcher
+├── main.py              # desktop games-only launcher
+├── run_hardware.py      # hardware entry point (Raspberry Pi)
+├── arcade.py            # core framework + PyGame display/input (the shared interface)
+├── hardware.py          # LED matrix + GPIO driver (same interface as arcade.py)
+├── catalog.py           # menu categories / registration
+├── settings.py          # persisted user settings (brightness, timers, …)
+├── highscores.py        # high-score persistence
+├── cabinet_config.py    # per-cabinet hardware config (gitignored JSON)
+├── provision.sh         # one-command setup for a fresh cabinet
+├── start.sh             # boot-time updater + launcher (systemd)
+├── requirements.txt     # runtime deps   ·  requirements-dev.txt  # + test/build deps
+├── DEPLOYMENT.md        # branch/release/deploy workflow
+├── HARDWARE.md          # wiring + Pi build guide
+├── tests/               # headless smoke + interface-parity tests
+├── games/               # 60+ game implementations + playlists
+└── visuals/             # 590+ visual scenes
+```
 
 ---
 
-## Design Principles
+## Design principles
 
-### 64x64 Constraints
-- **Every pixel matters** - Bold, readable shapes
-- **High contrast** - Bright colors work best on LED
-- **HUD space** - Reserve top 6-8 rows for score/status
-- **Sprites** - 3x8 pixel characters work well
-- **Text** - 3x5 pixel font (uppercase, numbers, punctuation)
+**64×64 constraints**
+- Every pixel matters — bold, readable shapes; high contrast reads best on LED.
+- Reserve the top rows for HUD/score; the 3×5 font is uppercase + numbers + punctuation.
 
-### Performance
-- Target **30 FPS**
-- Use delta time (`dt`) for consistent speed
-- LED matrices handle 60+ FPS but 30 is smooth enough
+**Performance**
+- Target **30 FPS**; drive motion with delta time (`dt`) so speed is frame-rate independent.
+- The Pi is far weaker than a dev machine — if something is smooth on desktop, still check it on the cabinet.
 
 ---
 
 ## License
 
-MIT License - do whatever you want with it!
-
----
-
-## Stats
-
-- **35 Games** across 4 categories
-- **44 Visuals** across 6 categories
-- **~18,000 lines** of Python
-- **79 total items** to explore!
+MIT — do whatever you want with it.
