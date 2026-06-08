@@ -61,8 +61,12 @@ class SysInfo(Visual):
         except OSError:
             pass
         try:
+            # safe.directory=* trusts the checkout even though the service runs as
+            # root over a user-owned repo (same workaround as visuals/refresh.py);
+            # without it git's dubious-ownership guard returned N/A.
             rev = subprocess.check_output(
-                ["git", "describe", "--tags", "--match", "v*", "--always"],
+                ["git", "-c", "safe.directory=*",
+                 "describe", "--tags", "--match", "v*", "--always"],
                 cwd=_REPO_DIR, stderr=subprocess.DEVNULL, timeout=5,
             )
             return rev.decode().strip() or "N/A"
