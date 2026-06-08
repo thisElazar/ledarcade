@@ -46,11 +46,24 @@ class SysInfo(Visual):
         Distribution cabinets sit on a release tag, so this shows e.g. "v1.4".
         The dev cabinet follows main, so it shows the nearest tag plus offset
         (e.g. "v1.4-3-gabc123"), or a bare short commit before the first tag.
+
+        start.sh writes the resolved version to a .version file every time it
+        updates the cabinet. We read that first: calling git from the running
+        service is slow on a Pi (and can fail), which showed up as "N/A". Fall
+        back to asking git directly when running from a dev checkout with no
+        .version file.
         """
+        try:
+            with open(os.path.join(_REPO_DIR, ".version")) as f:
+                version = f.read().strip()
+            if version:
+                return version
+        except OSError:
+            pass
         try:
             rev = subprocess.check_output(
                 ["git", "describe", "--tags", "--match", "v*", "--always"],
-                cwd=_REPO_DIR, stderr=subprocess.DEVNULL, timeout=2,
+                cwd=_REPO_DIR, stderr=subprocess.DEVNULL, timeout=5,
             )
             return rev.decode().strip() or "N/A"
         except (OSError, subprocess.SubprocessError):

@@ -23,4 +23,9 @@ else
     fi
 fi
 
+# Record the deployed version for the SYSTEM INFO panel. We resolve it here,
+# where git runs reliably, rather than from the service process (calling git
+# there is slow on a Pi and was showing up as "N/A").
+git describe --tags --match 'v*' --always > .version 2>/dev/null || echo "unknown" > .version
+
 exec python3 run_hardware.py
