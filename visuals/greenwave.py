@@ -94,6 +94,21 @@ class GreenWave(Visual):
         else:
             return 'red'
 
+    def _cross_go(self, signal_idx):
+        """Whether the cross street has a green at this signal.
+
+        The cross street runs only while the main corridor is red, minus a
+        clearance interval at the end of the red so cross cars finish leaving
+        the intersection before the main platoon gets its green wave.
+        """
+        offset = self.offsets[signal_idx]
+        phase = (self.time - offset) % self.cycle_length
+        green_dur = self.cycle_length * self.green_fraction
+        yellow_dur = 0.5
+        red_start = green_dur + yellow_dur
+        clearance = 1.0
+        return red_start <= phase < (self.cycle_length - clearance)
+
     def handle_input(self, input_state) -> bool:
         consumed = False
         if input_state.right_pressed:
@@ -133,56 +148,100 @@ class GreenWave(Visual):
                     'color': (200, 220, 255),
                 })
 
-        # Update platoon
+        # Update platoon. Each car computes the furthest y it may advance to
+        # (its "limit") and is clamped to it, so it can never overshoot a red
+        # signal or tailgate the car ahead. Snapshot positions first so the
+        # result is independent of iteration order.
+        FOLLOW_GAP = 3       # min px between cars in the same lane
+        STOP_LINE = 3        # stop this many px before a signal's intersection
+        positions = [(c['x'], c['y']) for c in self.platoon]
+
         for car in self.platoon:
-            # Check if should stop at red signal
-            stopped = False
+            limit = GRID_SIZE + 10.0  # open road by default
+
+            # Nearest signal the car hasn't yet committed to crossing.
+            # signal_ys is sorted top-to-bottom, so the first one whose stop
+            # line is still ahead of the car is the relevant one.
             for i, sy in enumerate(self.signal_ys):
-                state = self._signal_state(i)
-                if state in ('red', 'yellow'):
-                    # Stop if approaching signal (up to the signal line itself)
-                    if sy - 8 < car['y'] < sy:
-                        stopped = True
-                        break
-            # Lane-aware following distance (within ±1 pixel x = same lane)
-            if not stopped:
-                for other in self.platoon:
-                    if other is car:
-                        continue
-                    if (abs(other['x'] - car['x']) <= 1 and
-                            other['y'] > car['y'] and other['y'] - car['y'] < 5):
-                        stopped = True
-                        break
-            # Cross-traffic: only stop if cross car is directly ahead
-            if not stopped:
-                for cc in self.cross_cars:
-                    if abs(cc['y'] - car['y']) < 2 and abs(cc['x'] - car['x']) < 2:
-                        stopped = True
-                        break
-            if not stopped:
-                car['y'] += car['speed'] * dt
+                stop_y = sy - STOP_LINE
+                if stop_y < car['y']:
+                    continue  # already past this signal's stop line
+                if self._signal_state(i) in ('red', 'yellow'):
+                    limit = stop_y
+                break
+
+            # Lane-aware following distance (within ±1 px x = same lane).
+            for ox, oy in positions:
+                if oy > car['y'] and abs(ox - car['x']) <= 1:
+                    limit = min(limit, oy - FOLLOW_GAP)
+
+            # Don't drive into a cross car still clearing the intersection.
+            for cc in self.cross_cars:
+                if cc['y'] > car['y'] and abs(cc['x'] - car['x']) < 2 and \
+                        cc['y'] - car['y'] < 6:
+                    limit = min(limit, cc['y'] - 2)
+
+            # Advance toward the limit; never reverse, never overshoot it.
+            new_y = min(car['y'] + car['speed'] * dt, limit)
+            if new_y > car['y']:
+                car['y'] = new_y
 
         self.platoon = [c for c in self.platoon if c['y'] < GRID_SIZE + 5]
 
-        # Cross traffic
+        # Cross traffic. Cars approach from off-screen, queue at the corridor
+        # when their cross signal is red, and cross only on their green —
+        # mirroring the stop-line + clamp model used for the main platoon.
+        LEFT_EDGE = ROAD_X - ROAD_W // 2     # corridor entry from the left
+        RIGHT_EDGE = ROAD_X + ROAD_W // 2    # corridor entry from the right
+        CROSS_GAP = 3                        # min px between queued cross cars
+
         self.cross_timer += dt
         if self.cross_timer >= 0.8:
             self.cross_timer = 0
             sig_idx = random.randint(0, NUM_SIGNALS - 1)
-            state = self._signal_state(sig_idx)
-            if state == 'red':  # Cross traffic goes on main-red
-                sy = self.signal_ys[sig_idx]
-                direction = random.choice([-1, 1])
+            sy = self.signal_ys[sig_idx]
+            direction = random.choice([-1, 1])
+            # Two lanes: right-bound on the lower row, left-bound on the upper.
+            lane_y = sy + 1 if direction > 0 else sy - 1
+            entrance_x = -2.0 if direction > 0 else GRID_SIZE + 2.0
+            # Don't pile a new car onto one still sitting at the entrance.
+            crowded = any(
+                c['sig'] == sig_idx and c['dx'] == direction and
+                abs(c['x'] - entrance_x) < 4
+                for c in self.cross_cars
+            )
+            if not crowded:
                 self.cross_cars.append({
-                    'x': -2.0 if direction > 0 else GRID_SIZE + 2.0,
-                    'y': sy,
-                    'dx': direction,
-                    'speed': random.uniform(15, 25),
-                    'color': (255, 160, 80),
+                    'x': entrance_x, 'y': lane_y, 'dx': direction, 'sig': sig_idx,
+                    'speed': random.uniform(15, 25), 'color': (255, 160, 80),
                 })
 
+        snapshot = [(c['sig'], c['dx'], c['x']) for c in self.cross_cars]
         for car in self.cross_cars:
-            car['x'] += car['dx'] * car['speed'] * dt
+            go = self._cross_go(car['sig'])
+            vel = car['dx'] * car['speed']
+            new_x = car['x'] + vel * dt
+            if car['dx'] > 0:
+                # Moving right: limit is the furthest x allowed.
+                limit = GRID_SIZE + 10.0
+                stop_x = LEFT_EDGE - 2
+                if not go and car['x'] <= stop_x:
+                    limit = stop_x
+                for sig, dx, ox in snapshot:
+                    if sig == car['sig'] and dx > 0 and ox > car['x']:
+                        limit = min(limit, ox - CROSS_GAP)
+                car['x'] = max(car['x'], min(new_x, limit))
+            else:
+                # Moving left: limit is the lowest x allowed.
+                limit = -10.0
+                stop_x = RIGHT_EDGE + 1
+                if not go and car['x'] >= stop_x:
+                    limit = stop_x
+                for sig, dx, ox in snapshot:
+                    if sig == car['sig'] and dx < 0 and ox < car['x']:
+                        limit = max(limit, ox + CROSS_GAP)
+                car['x'] = min(car['x'], max(new_x, limit))
+
         self.cross_cars = [c for c in self.cross_cars if -5 < c['x'] < GRID_SIZE + 5]
 
         # Record time-space data
@@ -233,13 +292,16 @@ class GreenWave(Visual):
         for i, sy in enumerate(self.signal_ys):
             state = self._signal_state(i)
 
-            # Cross street
+            # Cross street (two lanes split by a dashed divider down row sy)
             for x in range(GRID_SIZE):
+                if ROAD_X - ROAD_W // 2 <= x < ROAD_X + ROAD_W // 2:
+                    continue  # corridor itself is drawn above
                 for dy in range(-CROSS_W // 2, CROSS_W // 2):
                     y = sy + dy
                     if 0 <= y < GRID_SIZE:
-                        if not (ROAD_X - ROAD_W // 2 <= x < ROAD_X + ROAD_W // 2):
-                            self.display.set_pixel(x, y, self.CROSS_COLOR)
+                        self.display.set_pixel(x, y, self.CROSS_COLOR)
+                if x % 4 < 2 and 0 <= sy < GRID_SIZE:
+                    self.display.set_pixel(x, sy, self.LANE_DASH)
 
             # Signal heads on both sides of corridor
             if state == 'green':
