@@ -98,3 +98,6 @@ site/gallery_GalleryKirby.json
 site/gallery_GalleryZelda.json
 site/gallery_GalleryKidIcarus.json
 site/gallery_GalleryAdventureTime.json
+
+# Per-cabinet runtime state — deployed version, written by start.sh on each update
+.version
