@@ -10,22 +10,27 @@
 
 cd "$(dirname "$(readlink -f "$0")")"
 
+# The systemd service runs as root (the LED matrix needs it), but the checkout is
+# owned by the cabinet user. Git's "dubious ownership" guard would otherwise block
+# every command here — silently breaking auto-update AND the version readout. Trust
+# this repo, the same way the in-app updater (visuals/refresh.py) does.
+git_safe() { git -c safe.directory="$PWD" "$@"; }
+
 # Update code (ignore errors if there's no network — run last-known code).
 if [ -f .dev ]; then
     # Dev cabinet: always the latest main.
-    git pull --ff-only 2>/dev/null
+    git_safe pull --ff-only 2>/dev/null
 else
     # Distribution cabinet: check out the highest version tag.
-    git fetch --tags --force origin 2>/dev/null
-    latest=$(git tag -l 'v*' | sort -V | tail -1)
+    git_safe fetch --tags --force origin 2>/dev/null
+    latest=$(git_safe tag -l 'v*' | sort -V | tail -1)
     if [ -n "$latest" ]; then
-        git checkout -q "$latest" 2>/dev/null
+        git_safe checkout -q "$latest" 2>/dev/null
     fi
 fi
 
-# Record the deployed version for the SYSTEM INFO panel. We resolve it here,
-# where git runs reliably, rather than from the service process (calling git
-# there is slow on a Pi and was showing up as "N/A").
-git describe --tags --match 'v*' --always > .version 2>/dev/null || echo "unknown" > .version
+# Record the deployed version for the SYSTEM INFO panel (resolved here, where git
+# runs reliably, rather than from the service process where it was showing N/A).
+git_safe describe --tags --match 'v*' --always > .version 2>/dev/null || echo "unknown" > .version
 
 exec python3 run_hardware.py
