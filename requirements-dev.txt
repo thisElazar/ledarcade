@@ -1,0 +1,6 @@
+# Development / CI / asset-build dependencies — NOT needed on cabinets.
+-r requirements.txt
+
+pytest>=7.0.0          # smoke + interface-parity tests
+fontTools>=4.0.0       # tools/extract_font_data.py
+mido>=1.2.0            # tools/midi_to_pattern.py
