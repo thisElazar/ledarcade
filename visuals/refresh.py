@@ -11,6 +11,7 @@ Controls:
 """
 
 import os
+import re
 import sys
 import subprocess
 import threading
@@ -20,7 +21,12 @@ from . import Visual, Display, Colors, GRID_SIZE
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLLBACK_FILE = os.path.join(REPO_DIR, ".rollback_ref")
 DEV_FLAG = os.path.join(REPO_DIR, ".dev")
-BRANCH = "main" if os.path.exists(DEV_FLAG) else "stable"
+
+# Dev cabinet follows the tip of main; distribution cabinets follow the latest
+# release tag (vMAJOR.MINOR) — mirroring start.sh, so the menu update and the
+# boot updater agree.
+DEV = os.path.exists(DEV_FLAG)
+TRACK_LABEL = "main" if DEV else "release"
 
 
 def _git(*args, timeout=15):
@@ -46,6 +52,43 @@ def _short_hash(ref="HEAD"):
 def _commit_date(ref="HEAD"):
     ok, out = _git("log", "-1", "--format=%Y-%m-%d", ref)
     return out if ok else "?"
+
+
+def _latest_tag():
+    """Highest vMAJOR.MINOR release tag known locally (matches start.sh)."""
+    ok, out = _git("tag", "-l", "v*")
+    if not ok or not out:
+        return ""
+    return max(out.split(), key=lambda t: [int(n) for n in re.findall(r"\d+", t)])
+
+
+def _fetch_target():
+    """Fetch from origin; return the short hash of the update target."""
+    if DEV:
+        _git("fetch", "origin", "main", timeout=10)
+        return _short_hash("origin/main")
+    _git("fetch", "--tags", "--force", "origin", timeout=10)
+    tag = _latest_tag()
+    return _short_hash(tag) if tag else "?"
+
+
+def _apply_update():
+    """Move the checkout to the latest target. Returns (ok, message)."""
+    if DEV:
+        ok, output = _git("pull", "origin", "main")
+        if not ok:
+            return False, "FAILED"
+        return True, "UP TO DATE" if "Already up to date" in output else "UPDATED"
+    # Distribution: check out the latest release tag (detached HEAD).
+    _git("fetch", "--tags", "--force", "origin")
+    tag = _latest_tag()
+    if not tag:
+        return False, "NO RELEASE"
+    before = _short_hash("HEAD")
+    ok, _ = _git("checkout", tag)
+    if not ok:
+        return False, "FAILED"
+    return True, "UP TO DATE" if before == _short_hash(tag) else "UPDATED"
 
 
 class Refresh(Visual):
@@ -105,9 +148,8 @@ class Refresh(Visual):
                 pass
 
     def _fetch_remote(self):
-        """Background thread: fetch remote and resolve remote hash."""
-        _git("fetch", "origin", BRANCH, timeout=10)
-        self.remote_hash = _short_hash("origin/" + BRANCH)
+        """Background thread: fetch remote and resolve the target hash."""
+        self.remote_hash = _fetch_target()
         self.is_latest = (self.version_hash == self.remote_hash)
         self._fetch_done = True
 
@@ -164,14 +206,7 @@ class Refresh(Visual):
                 except Exception:
                     pass
 
-            ok, output = _git("pull", "origin", BRANCH)
-            if ok:
-                if "Already up to date" in output:
-                    self.pull_msg = "UP TO DATE"
-                else:
-                    self.pull_msg = "PULLED"
-            else:
-                self.pull_msg = "PULL FAILED"
+            ok, self.pull_msg = _apply_update()
 
             self.pull_done = True
             self.restart_timer = 0.0
@@ -221,7 +256,7 @@ class Refresh(Visual):
                 dots = int(self.time * 3) % 4
                 self.display.draw_text_small(2, 38, "." * dots, Colors.GRAY)
             else:
-                msg_color = Colors.GREEN if self.pull_msg == "PULLED" else Colors.YELLOW
+                msg_color = Colors.RED if self.pull_msg in ("FAILED", "NO RELEASE") else Colors.GREEN
                 self.display.draw_text_small(2, 14, self.pull_msg, msg_color)
                 self.display.draw_text_small(2, 28, "RESTARTING", Colors.CYAN)
                 dots = int(self.restart_timer * 3) % 4
@@ -232,8 +267,8 @@ class Refresh(Visual):
         self._draw_tabs()
 
         # Version info
-        branch_color = Colors.YELLOW if BRANCH == "main" else Colors.GREEN
-        self.display.draw_text_small(2, 12, BRANCH, branch_color)
+        track_color = Colors.YELLOW if DEV else Colors.GREEN
+        self.display.draw_text_small(2, 12, TRACK_LABEL, track_color)
         self.display.draw_text_small(2, 20, "NOW:" + self.version_hash, Colors.GRAY)
         if not self._fetch_done:
             self.display.draw_text_small(2, 28, "CHECKING...", Colors.GRAY)
