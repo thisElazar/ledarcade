@@ -41,10 +41,15 @@ class SysInfo(Visual):
         self._refresh_stats()
 
     def _read_git_rev(self) -> str:
-        """Short commit of the deployed code, so the running version is visible on-screen."""
+        """Deployed version, so it's visible on-screen for fleet tracking.
+
+        Distribution cabinets sit on a release tag, so this shows e.g. "v1.4".
+        The dev cabinet follows main, so it shows the nearest tag plus offset
+        (e.g. "v1.4-3-gabc123"), or a bare short commit before the first tag.
+        """
         try:
             rev = subprocess.check_output(
-                ["git", "rev-parse", "--short", "HEAD"],
+                ["git", "describe", "--tags", "--match", "v*", "--always"],
                 cwd=_REPO_DIR, stderr=subprocess.DEVNULL, timeout=2,
             )
             return rev.decode().strip() or "N/A"
