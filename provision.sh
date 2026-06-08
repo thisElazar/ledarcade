@@ -41,9 +41,13 @@ echo "========================================"
 echo ""
 
 # --- System packages ---
+# Runtime Python deps are installed as system packages here (prebuilt for the Pi,
+# much faster than pip building from source). These must stay in sync with the
+# runtime entries in requirements.txt — that file is the canonical list:
+#   pygame -> python3-pygame, numpy -> python3-numpy, Pillow -> python3-pil
 echo "[1/6] Installing system packages..."
 apt update && apt upgrade -y
-apt install -y git python3-pip python3-dev python3-numpy python3-pil cython3
+apt install -y git python3-pip python3-dev python3-numpy python3-pil python3-pygame cython3
 
 # --- Disable onboard audio ---
 echo "[2/6] Disabling onboard audio..."
