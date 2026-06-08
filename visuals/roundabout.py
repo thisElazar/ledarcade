@@ -16,10 +16,14 @@ from . import Visual, Display, Colors, GRID_SIZE
 
 CX = 32
 CY = 32
-ISLAND_R = 8       # Central island radius
-ROAD_R = 14        # Outer edge of circulatory road
-RING_R = 11        # Center of ring road (where cars drive)
-APPROACH_W = 6     # Approach road width
+ISLAND_R = 7       # Central island radius
+ROAD_R = 15        # Outer edge of circulatory road
+RING_R_OUT = 13    # Outer circulating lane (where cars drive)
+RING_R_IN = 10     # Inner circulating lane
+LANE_DIV_R = 11.5  # Divider between the two ring lanes
+APPROACH_W = 6     # Approach road width (two lanes)
+LANE_OFF = 1.5     # Perpendicular offset of each approach/exit lane
+ENTRY_EXIT_SPLIT = 14   # Degrees the entry gore sits downstream of the exit gore
 
 # Entry/exit angles in degrees (screen coords: 0=east, 90=south)
 # In a roundabout, cars circulate CCW (in screen y-down, that means
@@ -77,6 +81,7 @@ class Roundabout(Visual):
     APPROACH_COLOR = (50, 50, 55)
     GROUND = (35, 50, 35)
     YIELD_COLOR = (255, 255, 200)
+    LANE_DASH = (70, 65, 30)
 
     CAR_COLORS = [
         (255, 60, 60), (60, 120, 255), (255, 255, 80),
@@ -99,53 +104,74 @@ class Roundabout(Visual):
         self.vehicles = []
 
     def _build_paths(self):
-        """Build all 12 OD paths: 4 origins x 3 exits (no U-turns)."""
+        """Build all OD paths: 4 origins x 3 exits x 2 lanes (no U-turns)."""
         self.paths = {}
         self.yield_indices = {}  # path_key -> index where ring arc starts
+        self.path_ring_r = {}    # path_key -> circulating radius (its lane)
 
         for origin in LEG_ORDER:
             for dest in LEG_ORDER:
                 if dest == origin:
                     continue
-                key = f'{origin}_{dest}'
-                path, yield_idx = self._make_od_path(origin, dest)
-                self.paths[key] = path
-                self.yield_indices[key] = yield_idx
+                for lane, ring_r in ((0, RING_R_OUT), (1, RING_R_IN)):
+                    key = f'{origin}_{dest}_{lane}'
+                    path, yield_idx = self._make_od_path(origin, dest, ring_r, lane)
+                    self.paths[key] = path
+                    self.yield_indices[key] = yield_idx
+                    self.path_ring_r[key] = ring_r
 
-    def _make_od_path(self, origin, dest):
-        """Build a complete path: approach -> ring arc (CCW) -> departure."""
+    def _make_od_path(self, origin, dest, ring_r, lane):
+        """Build a complete path: approach -> ring arc (CCW) -> departure.
+
+        ``lane`` 0 = outer, 1 = inner; the lane is realised purely by the
+        circulating radius ``ring_r``. Each leg is a two-way road: inbound
+        traffic uses one side, outbound the other (drive-on-right), so an
+        arriving car and a departing car never share a line head-on.
+        """
         origin_deg = LEGS[origin]
         dest_deg = LEGS[dest]
 
-        # Approach: straight from screen edge to just outside the ring
+        # Approach (inbound side of the origin leg) -> this lane's ring radius.
+        # Drive-on-the-right (North America): inbound keeps to the right of its
+        # travel direction. Inbound travels toward the centre (-dv), so its
+        # right-hand side is the perpendicular (dvy, -dvx).
         dvx, dvy = APPROACH_VEC[origin]
-        # Start point: far from center along approach direction
-        start = (CX + dvx * 34, CY + dvy * 34)
-        # Yield point: just outside ring
-        yield_pt = (CX + dvx * (ROAD_R + 2), CY + dvy * (ROAD_R + 2))
-        # Ring entry point
-        entry_a = math.radians(origin_deg)
-        entry_pt = (CX + RING_R * math.cos(entry_a), CY + RING_R * math.sin(entry_a))
+        ix, iy = dvy * LANE_OFF, -dvx * LANE_OFF        # inbound lane (right side)
+        start = (CX + dvx * 34 + ix, CY + dvy * 34 + iy)
+        yield_pt = (CX + dvx * (ROAD_R + 2) + ix, CY + dvy * (ROAD_R + 2) + iy)
+        # Splitter-island geometry: a leg's entry joins the ring DOWNSTREAM
+        # (CCW = decreasing angle) of where its exit leaves, so merging and
+        # diverging traffic never meet at the same gore point.
+        entry_deg = origin_deg - ENTRY_EXIT_SPLIT
+        entry_a = math.radians(entry_deg)
+        entry_pt = (CX + ring_r * math.cos(entry_a), CY + ring_r * math.sin(entry_a))
 
-        approach = _lerp_pts([start, yield_pt, entry_pt])
-        yield_idx = len(approach) - 1  # Last point of approach = ring entry
+        # The yield line sits at ``yield_pt``, OUTSIDE the ring, so a car
+        # waiting for a gap holds clear of the circulating lane rather than
+        # stopping on top of it. The short merge segment then leads onto the
+        # ring once the car accepts a gap.
+        to_yield = _lerp_pts([start, yield_pt])
+        merge = _lerp_pts([yield_pt, entry_pt])
+        approach = to_yield + merge[1:]
+        yield_idx = len(to_yield) - 1  # Index of the yield point (off the ring)
 
-        # Ring arc (CCW = negative sweep in our coord system)
-        # How far around the ring? CCW from origin to dest
-        # CCW means decreasing angle in screen coords
-        sweep = origin_deg - dest_deg
+        # Ring arc (CCW = negative sweep in our coord system), from this lane's
+        # entry gore round to its exit gore.
+        exit_deg = dest_deg + ENTRY_EXIT_SPLIT
+        sweep = (entry_deg - exit_deg) % 360
         if sweep <= 0:
             sweep += 360
-        # Negative sweep for CCW direction
-        ring_arc = _arc_pts(CX, CY, RING_R, origin_deg, -sweep, max(10, int(sweep / 6)))
+        ring_arc = _arc_pts(CX, CY, ring_r, entry_deg, -sweep, max(8, int(sweep / 6)))
 
-        # Departure: from ring exit to screen edge
-        exit_a = math.radians(dest_deg)
-        exit_pt = (CX + RING_R * math.cos(exit_a), CY + RING_R * math.sin(exit_a))
-        depart_outer = (CX + APPROACH_VEC[dest][0] * (ROAD_R + 2),
-                        CY + APPROACH_VEC[dest][1] * (ROAD_R + 2))
-        depart_end = (CX + APPROACH_VEC[dest][0] * 34,
-                      CY + APPROACH_VEC[dest][1] * 34)
+        # Departure (outbound side of the dest leg) -> screen edge. Outbound
+        # travels away from centre (+dv), so its right-hand side is (-dvy, dvx)
+        # — the opposite side of the road from the inbound lane.
+        exit_a = math.radians(exit_deg)
+        exit_pt = (CX + ring_r * math.cos(exit_a), CY + ring_r * math.sin(exit_a))
+        ddvx, ddvy = APPROACH_VEC[dest]
+        ox, oy = -ddvy * LANE_OFF, ddvx * LANE_OFF      # outbound lane (right side)
+        depart_outer = (CX + ddvx * (ROAD_R + 2) + ox, CY + ddvy * (ROAD_R + 2) + oy)
+        depart_end = (CX + ddvx * 34 + ox, CY + ddvy * 34 + oy)
         departure = _lerp_pts([exit_pt, depart_outer, depart_end])
 
         # Combine (skip duplicate junction points)
@@ -199,12 +225,28 @@ class Roundabout(Visual):
         origin = random.choice(LEG_ORDER)
         dest_choices = [d for d in LEG_ORDER if d != origin]
         dest = random.choice(dest_choices)
-        key = f'{origin}_{dest}'
 
-        # Don't spawn if another vehicle on the same approach is near the start
+        # North American lane discipline by how far around the car travels
+        # (CCW): first exit (right turn) keeps the outer lane, the third exit
+        # (left turn) takes the inner lane, a through movement may use either.
+        sweep = (LEGS[origin] - LEGS[dest]) % 360
+        if sweep <= 90:
+            lane = 0           # right turn -> outer
+        elif sweep >= 270:
+            lane = 1           # left turn  -> inner
+        else:
+            lane = random.choice((0, 1))   # through -> either
+        key = f'{origin}_{dest}_{lane}'
+
+        # Don't spawn if another vehicle on the same approach lane is near the
+        # start, or if the sibling lane on this leg is occupied at its start
+        # (the two approach lanes are only ~3px apart at the screen edge).
         for other in self.vehicles:
-            if other['key'] == key and other['progress'] < 10:
-                return
+            if other['progress'] < 10 and other['key'].startswith(f'{origin}_'):
+                ox, oy = self._vehicle_pos(other)
+                sx, sy = self._vehicle_pos({'key': key, 'progress': 0.0})
+                if math.hypot(ox - sx, oy - sy) < 4:
+                    return
 
         color = random.choice(self.CAR_COLORS)
         self.vehicles.append({
@@ -213,53 +255,99 @@ class Roundabout(Visual):
             'speed': random.uniform(16, 24),
             'color': color,
             'past_yield': False,
+            'lane': lane,
+            'ring_r': self.path_ring_r[key],
         })
 
     def _gap_ok(self, entering):
-        """Check if there's room on the ring for this vehicle to enter."""
-        yi = self.yield_indices[entering['key']]
-        entry_path = self.paths[entering['key']]
-        if yi >= len(entry_path):
-            return True
-        ex, ey = entry_path[yi]
+        """Gap acceptance: enter only when this car's target ring lane has a
+        real gap. Reject if a circulating car sits on the entry point or is
+        approaching it from upstream — and, for the inner lane, if either is
+        true of the outer lane it must cross. Metering entry this way keeps the
+        ring below jam density, so circulation never gridlocks."""
+        enter_r = entering['ring_r']
+        origin = entering['key'].split('_')[0]
+        a_entry = math.radians(LEGS[origin] - ENTRY_EXIT_SPLIT)
+        ex = CX + enter_r * math.cos(a_entry)
+        ey = CY + enter_r * math.sin(a_entry)
+        crit_ang = 11.0 / enter_r         # ~11px of upstream clearance on the ring
 
-        # Check vehicles on the ring near our entry point
         for other in self.vehicles:
-            if other is entering:
-                continue
-            o_yi = self.yield_indices[other['key']]
-            # Only check vehicles past yield (on ring or exiting)
-            if other['progress'] < o_yi:
+            if other is entering or not other['past_yield']:
                 continue
             ox, oy = self._vehicle_pos(other)
-            if math.hypot(ox - ex, oy - ey) < 5:
+            orr = math.hypot(ox - CX, oy - CY)
+            if orr > ROAD_R + 1:          # already leaving the ring outward
+                continue
+            # Conflicts come from my own lane and any lane outside it that I
+            # cross on the way in; a car strictly inside my radius can't block.
+            if orr < enter_r - 1.5:
+                continue
+            # Keep a clear merge zone right around the entry point (a car just
+            # downstream as well as one sitting on it) so the entering car
+            # never materialises on top of circulating traffic.
+            if math.hypot(ox - ex, oy - ey) < 6.0:
+                return False
+            # Approaching from upstream (CCW circulates with decreasing angle,
+            # so an upstream car sits at a slightly larger angle than entry)?
+            oa = math.atan2(oy - CY, ox - CX)
+            if (oa - a_entry) % (2 * math.pi) < crit_ang:
                 return False
         return True
 
+    def _heading(self, v):
+        """Unit vector of the vehicle's current direction of travel."""
+        path = self.paths[v['key']]
+        i = int(min(v['progress'], len(path) - 2))
+        x0, y0 = path[i]
+        x1, y1 = path[i + 1]
+        dx, dy = x1 - x0, y1 - y0
+        d = math.hypot(dx, dy) or 1.0
+        return dx / d, dy / d
+
     def _too_close(self, v):
-        """Following distance: same-path + ring-aware cross-path."""
+        """Decide whether vehicle ``v`` must hold position this frame.
+
+        Two distinct rules, chosen to prevent both rear-end overlaps and the
+        circular gridlock a fully rigid ring would suffer:
+
+        * Same path: a forward cone (directly ahead, narrow laterally) gives
+          firm car-following. Same-path chains always lead to an exit, so they
+          drain and never lock.
+        * Different path (merges, lane crossings): non-blocking priority — yield
+          only to a conflicting car that is further along the ring. The
+          higher-priority car keeps moving, so no closed rigid loop can form.
+        """
         vx, vy = self._vehicle_pos(v)
-        v_yi = self.yield_indices[v['key']]
-        v_on_ring = v['past_yield']
+        hx, hy = self._heading(v)
+        v_ring = v['progress'] - self.yield_indices[v['key']]
+        v_circ = math.hypot(vx - CX, vy - CY) <= ROAD_R + 0.5
 
         for other in self.vehicles:
             if other is v:
                 continue
             ox, oy = self._vehicle_pos(other)
-            dist = math.hypot(ox - vx, oy - vy)
-            if dist >= 4:
-                continue
+            rx, ry = ox - vx, oy - vy
+            both_circ = v_circ and math.hypot(ox - CX, oy - CY) <= ROAD_R + 0.5
+            same_lane = abs(v['ring_r'] - other['ring_r']) < 1.5
 
-            if other['key'] == v['key']:
-                # Same path: yield to vehicle ahead
-                if other['progress'] > v['progress']:
-                    return True
-            elif v_on_ring and other['past_yield']:
-                # Both on ring: vehicle that's been on ring longer has priority
-                o_yi = self.yield_indices[other['key']]
-                v_ring_dist = v['progress'] - v_yi
-                o_ring_dist = other['progress'] - o_yi
-                if o_ring_dist > v_ring_dist:
+            if both_circ and other['key'] != v['key']:
+                # Two different paths both circulating the ring (merges and
+                # lane crossings): non-blocking priority — yield only to a
+                # nearby car already further round the ring. The higher-priority
+                # car keeps moving, so no rigid loop (gridlock) can form.
+                if math.hypot(rx, ry) < (4.0 if same_lane else 2.2):
+                    o_ring = other['progress'] - self.yield_indices[other['key']]
+                    if o_ring > v_ring:
+                        return True
+            else:
+                # Same path, or a car on the approach/exit legs (which queue
+                # two ring-lanes into one inbound/outbound lane): firm
+                # car-following on whoever is directly ahead in my lane. These
+                # cases are linear and can never form a circular deadlock.
+                ahead = rx * hx + ry * hy
+                lateral = abs(rx * -hy + ry * hx)
+                if 0 < ahead < 4.5 and lateral < 1.6:
                     return True
         return False
 
@@ -295,6 +383,19 @@ class Roundabout(Visual):
                         if 0 <= x < GRID_SIZE:
                             self.display.set_pixel(x, y, self.APPROACH_COLOR)
 
+        # Dashed lane divider down the centre of each approach road
+        for leg, (dvx, dvy) in APPROACH_VEC.items():
+            if dvx != 0:
+                rng = range(CX + ROAD_R, GRID_SIZE) if dvx > 0 else range(0, CX - ROAD_R)
+                for x in rng:
+                    if x % 4 < 2:
+                        self.display.set_pixel(x, CY, self.LANE_DASH)
+            else:
+                rng = range(CY + ROAD_R, GRID_SIZE) if dvy > 0 else range(0, CY - ROAD_R)
+                for y in rng:
+                    if y % 4 < 2:
+                        self.display.set_pixel(CX, y, self.LANE_DASH)
+
         # Draw circulatory road
         for y in range(GRID_SIZE):
             for x in range(GRID_SIZE):
@@ -303,6 +404,11 @@ class Roundabout(Visual):
                 dist = math.sqrt(dx * dx + dy * dy)
                 if ISLAND_R < dist <= ROAD_R:
                     self.display.set_pixel(x, y, self.ROAD_COLOR)
+                    # Dashed divider between the inner and outer ring lanes
+                    if abs(dist - LANE_DIV_R) < 0.6:
+                        ang = math.degrees(math.atan2(dy, dx))
+                        if int(ang) % 24 < 12:
+                            self.display.set_pixel(x, y, self.LANE_DASH)
                 elif abs(dist - ISLAND_R) < 0.8 or abs(dist - ROAD_R) < 0.8:
                     self.display.set_pixel(x, y, self.CURB_COLOR)
 
