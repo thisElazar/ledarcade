@@ -909,3 +909,16 @@ try:
     ALL_VISUALS.extend(LOCAL_VISUALS)
 except Exception:
     pass
+
+# Religious / devotional content (Testament) ships only to the dev / personal
+# cabinet, never to distribution cabinets. Gated on the .dev flag — the same flag
+# start.sh and refresh.py use to choose the update track (main vs. release tag).
+# Rationale carried over from the retired "Remove Testament from stable" commit:
+# do not surface sacred scenes on distribution units without an explicit decision
+# on cultural scope. The import stays so the dev cabinet keeps Testament.
+_DEV_CABINET = os.path.exists(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.dev')
+)
+if not _DEV_CABINET:
+    ALL_VISUALS = [_v for _v in ALL_VISUALS if _v is not Testament]
+    __all__ = [_n for _n in __all__ if _n != 'Testament']
