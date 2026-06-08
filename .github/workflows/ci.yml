@@ -17,9 +17,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Cabinets' actual Python is shown on the SYSTEM INFO panel (PY: line).
-        # Once confirmed, narrow this to the single matching version.
-        python-version: ["3.11", "3.13"]
+        # Matches the cabinets, which run Python 3.13 (confirmed off the
+        # SYSTEM INFO panel's PY: line — 3.13.5).
+        python-version: ["3.13"]
     steps:
       - uses: actions/checkout@v4
 
