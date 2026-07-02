@@ -5250,6 +5250,9 @@ class Molecule(Visual):
     name = "MOLECULES"
     description = "3D ball-and-stick molecular models"
     category = "science_micro"
+    GUIDE = {
+        'desc': '3D ball-and-stick models with CPK coloring (carbon black, oxygen red, nitrogen blue). Real molecules rotating in space: amino acids, sugars, neurotransmitters.',
+    }
 
     _saved_group_idx = None
     _saved_mol_pos = None

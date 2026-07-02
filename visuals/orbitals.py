@@ -527,6 +527,9 @@ class Orbitals(Visual):
     name = "ORBITALS"
     description = "Quantum probability density clouds"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'The shapes electrons take around atoms. Hydrogen-like s, p, d, and f orbitals, sigma and pi bonds, sp/sp²/sp³ hybrids, and the delocalized clouds of benzene and metals — rendered from real wavefunctions.',
+    }
 
     _saved_group_idx = None
     _saved_scene_pos = None

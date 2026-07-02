@@ -38,6 +38,9 @@ class Tessellations(Visual):
     name = "TESSELLATIONS"
     description = "Mathematical tilings"
     category = "math"
+    GUIDE = {
+        'desc': 'Tile patterns that cover the plane without gaps or overlaps. Regular, semi-regular, and Penrose tilings — from Islamic geometry to aperiodic order.',
+    }
 
     def reset(self):
         self.time = 0.0

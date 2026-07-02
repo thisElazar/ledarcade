@@ -168,6 +168,10 @@ class TuringMachine(Visual):
     name = "TURING MACHINE"
     description = "Universal computation"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A working Turing machine running real programs on a tape. The read/write head shuttles back and forth, writing symbols and switching states — the abstract foundation of all computation, made mechanical.',
+        'credit': 'Alan Turing, 1936',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

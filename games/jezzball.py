@@ -68,6 +68,9 @@ class JezzBall(Game):
     name = "JAZZBALL"
     description = "Trap the bouncing atoms!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Trap bouncing balls by building walls. Claim 75% of the area to advance. Don’t let a ball hit a wall while it’s forming.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

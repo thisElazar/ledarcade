@@ -29,6 +29,10 @@ class PredPrey(Visual):
     name = "PREDATOR-PREY"
     description = "Lotka-Volterra ecology"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation — more prey means more predators, more predators means fewer prey, and the cycle repeats.',
+        'credit': 'Alfred Lotka, 1910',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

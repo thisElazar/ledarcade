@@ -16,6 +16,9 @@ class QBert(Game):
     name = "Q*BIT"
     description = "Hop & Color!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Hop on cubes in an isometric pyramid to change their colors. Change every cube to advance. Avoid Coily the snake and other enemies. Don’t fall off the edges.',
+    }
 
     # Pyramid dimensions
     PYRAMID_ROWS = 7  # 7 rows = 28 cubes total

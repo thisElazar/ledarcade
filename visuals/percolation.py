@@ -64,6 +64,10 @@ class Percolation(Visual):
     name = "PERCOLATION"
     description = "Critical threshold"
     category = "math"
+    GUIDE = {
+        'desc': 'A phase transition in connectivity. Below a critical threshold, clusters stay isolated. Above it, a spanning cluster suddenly connects the entire grid.',
+        'credit': 'Broadbent & Hammersley, 1957',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

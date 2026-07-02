@@ -283,6 +283,14 @@ class Flags(Visual):
     name = "FLAGS"
     description = "Flags of the world"
     category = "culture"
+    GUIDE = {
+        'desc': 'National flags of the world rendered on the LED matrix. 200+ flags loaded from PNG bitmaps. Joystick to browse; overlay shows country name. Data from flagcdn.com.',
+        'controls': {
+            'Up/Down': 'Switch region',
+            'Left/Right': 'Browse flags',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

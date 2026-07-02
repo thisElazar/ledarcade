@@ -19,6 +19,9 @@ class Rainbow(Visual):
     name = "RAINBOW"
     description = "Color wheel cycle"
     category = "digital"
+    GUIDE = {
+        'desc': 'Cycling HSV color gradients sweeping across the panel.',
+    }
 
     # Pattern mode names
     MODE_NAMES = [

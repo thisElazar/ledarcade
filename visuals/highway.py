@@ -50,6 +50,9 @@ class Highway(Visual):
     name = "HIGHWAY"
     description = "Nagel-Schreckenberg model"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'Multi-lane highway traffic with lane changes, speed differences, and phantom traffic jams. Congestion waves propagate backward through the flow — the accordion effect made visible.',
+    }
 
     V_MAX = 5
     LANE_HEIGHT = 8

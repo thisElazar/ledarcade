@@ -73,6 +73,9 @@ class Fibonacci(Visual):
     name = "FIBONACCI"
     description = "Sunflower phyllotaxis"
     category = "math"
+    GUIDE = {
+        'desc': 'The Fibonacci sequence visualized. Golden spirals, phyllotaxis patterns, and the golden ratio — the mathematics that appears everywhere in nature.',
+    }
 
     def reset(self):
         self.time = 0.0

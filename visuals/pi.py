@@ -66,6 +66,9 @@ class Pi(Visual):
     name = "PI"
     description = "Irrational beauty"
     category = "math"
+    GUIDE = {
+        'desc': 'Visualizations of π — its digits mapped to colors, its geometric definition as circumference over diameter, and Monte Carlo estimation by random points in a circle.',
+    }
 
     def reset(self):
         self.time = 0.0

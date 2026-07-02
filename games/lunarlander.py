@@ -24,6 +24,9 @@ class LunarLander(Game):
     name = "LUNAR LANDER"
     description = "Moon Landing"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Manage thrust and rotation to soft-land on a lunar surface. Land gently on a flat pad to score. Too much speed and you crash.',
+    }
 
     # Base physics (modified by level)
     BASE_GRAVITY = 8.0           # Pixels per second squared

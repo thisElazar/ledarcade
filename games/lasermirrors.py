@@ -639,6 +639,9 @@ class LaserMirrors(Game):
     name = "LASER MIRRORS"
     description = "Redirect the beam"
     category = "unique"
+    GUIDE = {
+        'desc': 'Rotate and place mirrors to redirect the laser beam to its target. A puzzle of angles and reflection.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -66,6 +66,9 @@ class Camshaft(Visual):
     name = "CAMSHAFT"
     description = "Engine camshaft"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A rotating camshaft with eccentric lobes operating valve followers. Converts rotation into precisely timed reciprocating motion — the basis of internal combustion valve timing.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

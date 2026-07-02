@@ -170,6 +170,9 @@ class LatinGrooves(Visual):
     name = "LATIN GROOVES"
     description = "Latin percussion sequencer"
     category = "music"
+    GUIDE = {
+        'desc': 'Latin dance rhythms animated as layered percussion parts. Salsa, samba, bossa nova, cumbia, and more — each groove broken into its component instruments.',
+    }
 
     PAD_COLS = 16
     PAD_ROWS = 8

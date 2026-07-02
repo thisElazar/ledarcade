@@ -34,6 +34,9 @@ class GreenWave(Visual):
     name = "GREENWAVE"
     description = "Signal coordination"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'Traffic signals timed so that a car traveling at the speed limit hits green lights all the way down a corridor.',
+    }
 
     ROAD_COLOR = (50, 50, 55)
     CROSS_COLOR = (45, 45, 50)

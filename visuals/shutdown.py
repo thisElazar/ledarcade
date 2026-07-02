@@ -16,6 +16,9 @@ class Shutdown(Visual):
     name = "SHUTDOWN"
     description = "Power off"
     category = "utility"
+    GUIDE = {
+        'desc': 'Safely powers down the Raspberry Pi so you can unplug the cabinet without corrupting its storage. Always shut down here before pulling the plug.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

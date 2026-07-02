@@ -156,6 +156,9 @@ class Optics(Visual):
     name = "OPTICS"
     description = "Geometric ray tracing"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Geometric ray tracing from first principles. Light enters a prism and splits into spectral colors at their correct refractive indices. Other scenarios show lenses, mirrors, and kaleidoscopes.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

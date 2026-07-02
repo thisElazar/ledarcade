@@ -44,6 +44,9 @@ class Mitosis(Visual):
     name = "MITOSIS"
     description = "Cell division"
     category = "automata"
+    GUIDE = {
+        'desc': 'A simulation of cell division. Cells grow, duplicate their contents, pinch in half, and separate.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

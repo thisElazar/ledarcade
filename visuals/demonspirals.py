@@ -21,6 +21,9 @@ class DemonSpirals(Visual):
     name = "CYCLIC"
     description = "Cyclic CA spirals"
     category = "automata"
+    GUIDE = {
+        'desc': 'Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures. Also known as Demon Spirals.',
+    }
 
     # Moore neighborhood offsets (8 surrounding cells)
     NEIGHBORS = [

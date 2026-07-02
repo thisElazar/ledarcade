@@ -44,6 +44,9 @@ class PipeDream(Game):
     name = "PIPE MAZE"
     description = "Build Pipes"
     category = "retro"
+    GUIDE = {
+        'desc': 'Place pipe segments before the water arrives. Build a path long enough to pass the level.',
+    }
 
     # Grid layout
     GRID_CELLS = 6

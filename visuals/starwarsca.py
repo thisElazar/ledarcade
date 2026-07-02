@@ -20,6 +20,9 @@ class StarWarsCA(Visual):
     name = "STARWARS"
     description = "Generations 345/2/4"
     category = "automata"
+    GUIDE = {
+        'desc': 'A totalistic cellular automaton with birth/survival rules. Produces long-lived oscillating structures and traveling sparks.',
+    }
 
     # Generations rule 345/2/4
     NUM_STATES = 4          # 0=dead, 1=alive, 2=dying-1, 3=dying-2

@@ -33,6 +33,9 @@ class Drift(Game):
     name = "DRIFT"
     description = "Terrain sandbox"
     category = "unique"
+    GUIDE = {
+        'desc': 'Procedurally generated terrain with water, sand, grass, and snow. A landscape sandbox with day/night cycle.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

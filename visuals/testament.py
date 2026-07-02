@@ -419,6 +419,9 @@ class Testament(Visual):
     name = "TESTAMENT"
     description = "Sacred scenes"
     category = "culture"
+    GUIDE = {
+        'desc': 'Biblical narratives visualized as animated LED scenes. Key moments from Genesis through Revelation rendered in pixel art.',
+    }
 
     MAX_PARTICLES = 300
 

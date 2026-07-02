@@ -39,6 +39,10 @@ class ParticleLife(Visual):
     name = "JELLYFISH"
     description = "Emergent particles"
     category = "automata"
+    GUIDE = {
+        'desc': 'Particle Life variant tuned for drifting, pulsing jellyfish motion. Multiple species with asymmetric attraction and repulsion forces produce bell shapes trailing tentacles.',
+        'credit': 'Jeffrey Ventrella, 2007',
+    }
 
     # Bright, saturated species colors
     SPECIES_COLORS = [

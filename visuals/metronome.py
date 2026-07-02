@@ -31,6 +31,9 @@ class Metronome(Visual):
     name = "METRONOME"
     description = "Mechanical metronome"
     category = "music"
+    GUIDE = {
+        'desc': 'A mechanical metronome with swinging pendulum and sliding weight. Sets the tempo for practice and performance.',
+    }
 
     # Layout
     PIVOT_X = 32

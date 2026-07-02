@@ -401,6 +401,9 @@ class Knitting(Visual):
     name = "KNITTING"
     description = "World knitting traditions"
     category = "culture"
+    GUIDE = {
+        'desc': 'Stranded-knitting stitch charts rendered as pixel grids. Each two-color pattern tiles across the panel and animates row by row, a knitting needle tracking the active line.',
+    }
 
     def reset(self):
         self.time = 0.0

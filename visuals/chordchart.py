@@ -434,6 +434,16 @@ class ChordChart(Visual):
     name = "CHORD CHART"
     description = "Guitar & ukulele chords"
     category = "music"
+    GUIDE = {
+        'desc': 'Guitar and ukulele chord reference. Browse chord voicings with fingering diagrams. Joystick selects chord and variant; button switches instrument. Data from tombatossals/chords-db.',
+        'controls': {
+            'Up/Down': 'Cycle chord type',
+            'Left/Right': 'Cycle voicing',
+            'Action L': 'Previous key (root)',
+            'Action R': 'Next key (root)',
+            'Both': 'Switch instrument',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

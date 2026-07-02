@@ -3568,6 +3568,9 @@ class Proteins(Visual):
     name = "PROTEINS"
     description = "3D protein backbone structures"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'Real protein backbone structures from the RCSB Protein Data Bank. Cα coordinates with color-coded secondary structure: helices in red, sheets in yellow, coils in gray.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

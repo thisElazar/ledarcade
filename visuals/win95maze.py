@@ -33,6 +33,13 @@ class Win95Maze(Visual):
     name = "MAZE"
     description = "3D maze screensaver"
     category = "digital"
+    GUIDE = {
+        'desc': 'First-person maze navigation in the style of a classic screensaver. The camera auto-navigates through corridors and intersections.',
+        'controls': {
+            'Joystick': 'Take manual control (auto-walk resumes after idle)',
+            'Button': 'Regenerate the maze',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

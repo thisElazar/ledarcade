@@ -16,6 +16,9 @@ class Controls(Visual):
     name = "CONTROLS"
     description = "Button guide"
     category = "utility"
+    GUIDE = {
+        'desc': "A live map of the panel's controls. Press any button or push the joystick and watch it light up — the quickest way to check the inputs are working and learn the layout.",
+    }
     custom_exit = True
 
     def __init__(self, display: Display):

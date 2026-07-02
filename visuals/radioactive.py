@@ -109,6 +109,9 @@ class Radioactive(Visual):
     name = "RADIOACTIVE"
     description = "Nuclear decay simulation"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'A grid of atoms spontaneously decays, emitting alpha, beta, and gamma particles. Five scenarios demonstrate different decay modes. Each event is probabilistic — quantum randomness made visible.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

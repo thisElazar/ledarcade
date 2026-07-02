@@ -88,6 +88,10 @@ class Gramophone(Visual):
     name = "GRAMOPHONE"
     description = "Vintage gramophone"
     category = "music"
+    GUIDE = {
+        'desc': 'A spinning disc, a tonearm, and a brass horn. The platter turns, the arm traces the groove.',
+        'credit': '1887, Emile Berliner',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

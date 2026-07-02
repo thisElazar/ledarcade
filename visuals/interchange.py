@@ -68,6 +68,9 @@ class Interchange(Visual):
     name = "CLOVERLEAF"
     description = "Highway interchanges"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'A highway interchange with looping ramps. Cars flow through the cloverleaf pattern, merging and diverging without stopping.',
+    }
 
     TYPES = ['cloverleaf', 'diamond', 'turbine']
 

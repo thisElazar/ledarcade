@@ -105,6 +105,9 @@ class Solitaire(Visual):
     name = "SOLITAIRE"
     description = "Card cascade"
     category = "household"
+    GUIDE = {
+        'desc': 'The classic solitaire victory cascade. Cards tumble and bounce across the screen in arcing trails.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

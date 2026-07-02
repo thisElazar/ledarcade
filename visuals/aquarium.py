@@ -237,6 +237,9 @@ class Aquarium(Visual):
     name = "AQUARIUM"
     description = "Tropical fish aquarium"
     category = "household"
+    GUIDE = {
+        'desc': 'A tropical fish tank. Eight species school through swaying plants with rising bubbles. Three color schemes: Tropical, Moonlight, and Sunset.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

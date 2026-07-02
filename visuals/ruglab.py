@@ -38,6 +38,9 @@ class RugLab(Visual):
     name = "RUG LAB"
     description = "Explore Rug CA parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': "The averaging 'rug' automaton, made adjustable. Sweep the increment and state count to weave different symmetric, textile-like patterns.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

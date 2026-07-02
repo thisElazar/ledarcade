@@ -30,6 +30,10 @@ class Slime(Visual):
     name = "SLIME"
     description = "Competing colonies"
     category = "automata"
+    GUIDE = {
+        'desc': 'Agents deposit and follow chemical trails, mimicking slime mold (Physarum polycephalum). Simple deposit-sense-turn rules produce networks similar to real transport systems.',
+        'credit': 'Jeff Jones, 2010',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

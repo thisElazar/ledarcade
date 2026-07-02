@@ -33,6 +33,9 @@ class CopperBars(Visual):
     name = "AMIGA BARS"
     description = "Amiga raster bars"
     category = "digital"
+    GUIDE = {
+        'desc': 'Metallic gradient bars bouncing on sine waves. Uses the Amiga copper chip technique — changing colors mid-scanline. A signature effect of late-80s demos.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

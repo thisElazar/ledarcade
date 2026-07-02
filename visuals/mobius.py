@@ -18,6 +18,9 @@ class Mobius(Visual):
     name = "MOBIUS"
     description = "Rotating Mobius strip"
     category = "math"
+    GUIDE = {
+        'desc': 'A rotating Möbius strip — the one-sided surface discovered in 1858. 3D wireframe or shaded projection spinning in space.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

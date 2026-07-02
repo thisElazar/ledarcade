@@ -22,6 +22,9 @@ class Safety(Visual):
     name = "SAFETY"
     description = "Accessibility settings"
     category = "utility"
+    GUIDE = {
+        'desc': 'Accessibility settings in one place: reduce flashing for photosensitivity, switch on colorblind-friendly palettes, and other display-comfort options.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

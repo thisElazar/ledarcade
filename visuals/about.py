@@ -17,6 +17,9 @@ class About(Visual):
     name = "ABOUT"
     description = "System info"
     category = "utility"
+    GUIDE = {
+        'desc': "Hardware and build details for the cabinet — what's inside and who made it. A second page hides a retro terminal HELLO WORLD easter egg.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

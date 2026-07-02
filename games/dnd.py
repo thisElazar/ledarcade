@@ -18,6 +18,9 @@ class DnD(Game):
     name = "DND"
     description = "Dungeon Crawler!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Explore rooms, fight monsters, collect treasure. Turn-based grid combat in a dungeon-crawling adventure.',
+    }
 
     # Display layout
     HUD_HEIGHT = 8

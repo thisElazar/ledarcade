@@ -43,6 +43,9 @@ class Erosion(Visual):
     name = "EROSION"
     description = "Hydraulic landscape"
     category = "nature"
+    GUIDE = {
+        'desc': 'Hydraulic erosion simulation. Water droplets carve channels through procedural terrain, depositing sediment in valleys and deltas.',
+    }
 
     TERRAIN_COLORS = [
         (0.80, (200, 200, 200)),

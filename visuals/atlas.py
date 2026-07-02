@@ -504,6 +504,9 @@ class Atlas(Visual):
     name = "ATLAS"
     description = "World atlas viewer"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'A browsable world atlas on the LED grid. Pan across terrain, satellite imagery, night lights, political borders, elevation, and historical empire overlays, all baked from real map data.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

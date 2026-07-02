@@ -218,6 +218,15 @@ class DrumRudiments(Visual):
     name = "RUDIMENTS"
     description = "PAS 40 drum rudiments"
     category = "music"
+    GUIDE = {
+        'desc': 'All 40 international drum rudiments. Animated sticking patterns with R/L hand indicators and accent marks. The fundamental vocabulary of percussion.',
+        'credit': 'PAS, Percussive Arts Society',
+        'controls': {
+            'Up/Down': 'Change rudiment',
+            'Left/Right': 'Adjust tempo (BPM)',
+            'Button': 'Play / pause',
+        },
+    }
 
     # Auto-scroll: initial delay before repeat, then repeat interval
     SCROLL_DELAY = 0.4   # seconds before auto-scroll kicks in

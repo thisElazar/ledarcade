@@ -207,6 +207,14 @@ class Sauces(Visual):
     name = "SAUCES"
     description = "Culinary sauce reference"
     category = "cooking"
+    GUIDE = {
+        'desc': 'Mother sauce reference guide. 38 sauces organized into 7 families, each showing its parent sauce and the ingredient you add to create it. From béchamel to hollandaise and beyond.',
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

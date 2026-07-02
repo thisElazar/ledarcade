@@ -48,6 +48,9 @@ class Network(Visual):
     name = "NETWORK"
     description = "Small-world graphs"
     category = "math"
+    GUIDE = {
+        'desc': 'Graph theory and network dynamics. Nodes connect, signals propagate, and emergent structure forms from simple connection rules.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

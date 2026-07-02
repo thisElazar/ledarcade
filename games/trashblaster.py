@@ -165,6 +165,9 @@ class TrashBlaster(Game):
     name = "TRASHBLASTER"
     description = "Blast the trash!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Shoot upward to blast falling garbage before it stacks to the top.',
+    }
 
     TRASH_COLORS = [
         (180, 180, 180),  # Bright gray (tin can)

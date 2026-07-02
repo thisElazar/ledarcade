@@ -38,6 +38,9 @@ class QuarksLab(Visual):
     name = "QUARKS LAB"
     description = "Explore Quarks parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': "Explore the Quarks automaton's parameter space. The joystick sets particle count and interaction radius, tuning how charge-like cells bond and break.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

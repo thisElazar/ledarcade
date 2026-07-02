@@ -143,6 +143,14 @@ class Baking(Visual):
     name = "BAKING"
     description = "Baking ratios and formulas"
     category = "cooking"
+    GUIDE = {
+        'desc': 'Baking ratios and formulas displayed as baker’s percentages with proportional ingredient bars. 14 recipes across 4 families: bread, pizza, pastry, and quick breads.',
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

@@ -46,6 +46,9 @@ class Arkanoid(Game):
     name = "ARCANOID"
     description = "1986 Taito classic"
     category = "retro"
+    GUIDE = {
+        'desc': 'Brick-breaking with power-ups: laser paddle, catch ball, multi-ball, warp gates. Clear all bricks per level. Enemies and a storyline.',
+    }
 
     # Brick types
     BRICK_NORMAL = 0     # One hit to destroy

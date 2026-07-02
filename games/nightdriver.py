@@ -17,6 +17,9 @@ class NightDriver(Game):
     name = "NITE DRIVER"
     description = "Night Racing"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Steer between roadside posts against a black background. Stay on the road at increasing speeds. Inspired by one of the earliest first-person driving games.',
+    }
 
     # Road parameters
     HORIZON_Y = 20          # Y position of vanishing point

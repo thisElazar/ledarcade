@@ -16,6 +16,9 @@ class Invaders(Game):
     name = "INVADERS"
     description = "Defend Earth!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Shoot rows of aliens before they reach the bottom. They speed up as you destroy them. Inspired by the 1978 classic.',
+    }
     
     def __init__(self, display: Display):
         super().__init__(display)

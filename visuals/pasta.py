@@ -436,6 +436,14 @@ class Pasta(Visual):
     name = "PASTA"
     description = "Pasta shapes reference"
     category = "cooking"
+    GUIDE = {
+        'desc': 'Pixel art pasta shape reference. 20 shapes, each rendered as a small illustration with name, Italian meaning, region of origin, and sauce pairings. 5 families: long, tube, shaped, filled, and sheet.',
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

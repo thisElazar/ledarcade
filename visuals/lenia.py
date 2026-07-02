@@ -120,6 +120,14 @@ class Lenia(Visual):
     name = "LENIA"
     description = "Continuous cellular automaton"
     category = "automata"
+    GUIDE = {
+        'desc': 'Continuous cellular automaton that produces lifelike self-organizing patterns. Smooth kernel functions replace discrete neighbor counts. Creatures emerge, move, interact, and die — artificial life from pure math.',
+        'credit': 'Bert Chan, 2018',
+        'controls': {
+            'Up/Down': 'Cycle color palette',
+            'Button': 'Re-seed grid',
+        },
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -172,6 +180,16 @@ class LeniaLab(Visual):
     name = "LENIA LAB"
     description = "Explore Lenia parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': "Steer Lenia's continuous life forms directly. The joystick moves the growth center and width, morphing the smooth kernel so creatures grow, dissolve, or hold their shape.",
+        'credit': 'Bert Chan, 2018',
+        'controls': {
+            'Left/Right': 'Adjust mu (growth center)',
+            'Up/Down': 'Adjust sigma (growth width)',
+            'Button': 'Cycle palette + reseed',
+            'Both': 'Commit params to settings',
+        },
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

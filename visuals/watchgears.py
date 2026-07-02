@@ -111,6 +111,9 @@ class WatchGears(Visual):
     name = "WATCH"
     description = "Swiss watch movement"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A five-gear train: barrel → center → third → fourth → escapement. Balance wheel with hairspring, proper gear meshing, and clock hands. Mechanical timekeeping in miniature.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

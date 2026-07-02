@@ -17,6 +17,9 @@ class PacMan(Game):
     name = "PAK-MAN"
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Each ghost has unique AI: Blinky chases, Pinky ambushes, Inky flanks, Clyde wanders.',
+    }
 
     # Simplified maze for 64x64 display (21x19 tiles at 3px each = 63x57)
     # 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house door

@@ -16,6 +16,9 @@ class LodeRunner(Game):
     name = "GOLD RUNNER"
     description = "Dig & Escape!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Collect all gold on each level, then escape to the top. Dig holes to trap guards. 150 levels.',
+    }
 
     # Tile types
     EMPTY = 0

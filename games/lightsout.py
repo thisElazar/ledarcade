@@ -17,6 +17,9 @@ class LightsOut(Game):
     name = "LITE OUT"
     description = "1995 Tiger Electronics"
     category = "toys"
+    GUIDE = {
+        'desc': 'Press a light and its neighbors toggle. Turn all lights off to win. Solvable with linear algebra over GF(2), but trial and error works too.',
+    }
 
     # Grid layout
     GRID_CELLS = 5

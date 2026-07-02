@@ -19,6 +19,9 @@ class Mancala(Game):
     name = "MANCALA"
     description = "Sow & Capture"
     category = "2_player"
+    GUIDE = {
+        'desc': 'Sow seeds around pits, capture your opponent’s. The player with the most seeds wins. One of the oldest known games.',
+    }
 
     # Layout constants
     PIT_WIDTH = 8

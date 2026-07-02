@@ -118,6 +118,9 @@ class Singer(Visual):
     name = "SINGER"
     description = "Sewing machine"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A sewing machine with needle, bobbin, and feed dog. The needle plunges, the thread loops, the fabric advances.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

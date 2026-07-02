@@ -65,6 +65,10 @@ class GeneticDrift(Visual):
     name = "GENETIC DRIFT"
     description = "Population genetics"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Allele frequencies shift through random sampling in finite populations. Watch genetic diversity rise and fall without selection pressure — pure chance shaping evolution.',
+        'credit': 'Hardy & Weinberg, 1908',
+    }
 
     # Population bounds
     POP_MIN = 10

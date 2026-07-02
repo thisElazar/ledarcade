@@ -57,6 +57,9 @@ class MitosisLab(Visual):
     name = "MITOSIS LAB"
     description = "Explore Mitosis parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': 'The cell-division simulation opened up for tinkering. Trade growth rate against competition strength and watch colonies bloom, crowd, and pinch apart.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

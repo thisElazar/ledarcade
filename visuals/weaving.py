@@ -922,6 +922,9 @@ class Weaving(Visual):
     name = "WEAVING"
     description = "World textile traditions"
     category = "culture"
+    GUIDE = {
+        'desc': 'How cloth is actually made. A top-down view of warp and weft threads interlacing, weft rows building the weave from the top down. 46 structures spanning 7,000 years and every inhabited continent, in 18 traditional palettes.',
+    }
 
     def reset(self):
         self.time = 0.0

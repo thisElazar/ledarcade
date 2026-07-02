@@ -86,6 +86,9 @@ class Tetris(Game):
     name = "TETROMINOS"
     description = "Clear lines!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Stack falling tetrominoes, clear complete lines. Game ends when pieces reach the top.',
+    }
 
     # Playfield dimensions (standard Tetris is 10 wide, 20 tall)
     BOARD_WIDTH = 10

@@ -17,6 +17,9 @@ class Fire(Visual):
     name = "FIRE"
     description = "Classic fire effect"
     category = "digital"
+    GUIDE = {
+        'desc': 'Classic fire simulation with a heat source at the bottom, upward propagation, and cooling. The algorithm dates back to the demoscene of the early 1990s.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

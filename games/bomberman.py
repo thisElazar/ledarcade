@@ -16,6 +16,9 @@ class Bomberman(Game):
     name = "BOMBMAN"
     description = "Bomb & Blast!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Place bombs on a grid to destroy walls and enemies. Collect power-ups for range, speed, and extra bombs. Bombs chain-react. Clear all enemies to advance.',
+    }
 
     # Grid dimensions
     GRID_WIDTH = 15   # Odd number for proper wall pattern

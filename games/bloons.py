@@ -185,6 +185,9 @@ class Bloons(Game):
     name = "BLOONS"
     description = "Pop balloons with darts"
     category = "modern"
+    GUIDE = {
+        'desc': 'Pop waves of balloons by throwing darts. Aim and time your throws to clear each round.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

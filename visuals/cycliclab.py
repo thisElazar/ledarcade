@@ -122,6 +122,10 @@ class CyclicLab(Visual):
     name = "CYCLIC LAB"
     description = "Explore cyclic CA parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': 'Explore the cyclic cellular automaton by hand. The joystick adjusts the number of states and the neighbor threshold, tuning between still noise and sweeping demon spirals.',
+        'credit': 'David Griffeath',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

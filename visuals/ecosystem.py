@@ -45,6 +45,9 @@ class Ecosystem(Visual):
     name = "ECOSYSTEM"
     description = "Multi-trophic food web"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'A food web with an energy budget. Five trophic levels — soil, grass, herbivore, predator, apex — each eat, move, reproduce, and die. The 10% rule emerges on its own: always far fewer apex predators than herbivores.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

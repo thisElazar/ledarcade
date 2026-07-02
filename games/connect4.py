@@ -20,6 +20,9 @@ class Connect4(Game):
     name = "CONNECT FOUR"
     description = "2P Strategy"
     category = "2_player"
+    GUIDE = {
+        'desc': 'Drop colored discs into columns. Connect four in a row (horizontal, vertical, or diagonal) to win. Solved in 1988 — first player wins with perfect play.',
+    }
 
     # Board dimensions
     COLS = 7

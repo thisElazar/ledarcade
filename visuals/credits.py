@@ -16,6 +16,9 @@ class Credits(Visual):
     name = "CREDITS"
     description = "Project credits"
     category = "utility"
+    GUIDE = {
+        'desc': "A scrolling roll of every source, inspiration, and attribution behind the cabinet's games and visuals.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

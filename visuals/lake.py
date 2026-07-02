@@ -20,6 +20,9 @@ class Lake(Visual):
     name = "LAKE"
     description = "Flow field lake"
     category = "nature"
+    GUIDE = {
+        'desc': 'A lake surface with ripples, reflections, and gentle wave motion. Pixels shimmer as if catching light on water.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

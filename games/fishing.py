@@ -122,6 +122,9 @@ class Fishing(Game):
     name = "FISHING"
     description = "Catch as much as you can in 90 seconds!"
     category = "unique"
+    GUIDE = {
+        'desc': 'Drop your line and reel in as many fish as you can before the 90-second timer runs out.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

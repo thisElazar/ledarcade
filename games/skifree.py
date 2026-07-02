@@ -19,6 +19,9 @@ class SkiFree(Game):
     name = "SKI RUN"
     description = "Ski the slopes!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Ski downhill, dodging trees, rocks, and dogs. The Abominable Snowman chases you eventually.',
+    }
 
     # Player constants
     PLAYER_Y_MIN = 20          # Highest screen position (skiing fast)

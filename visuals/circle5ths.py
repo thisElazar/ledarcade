@@ -117,6 +117,9 @@ class CircleOfFifths(Visual):
     name = "CIRCLE OF 5THS"
     description = "Interactive circle of fifths"
     category = "music"
+    GUIDE = {
+        'desc': 'The circle of fifths as an interactive wheel. Rotate to any key to see its name, sharps and flats, relative minor, and the chords that live in it — the map every musician keeps in their head.',
+    }
 
     def reset(self):
         self.time = 0.0

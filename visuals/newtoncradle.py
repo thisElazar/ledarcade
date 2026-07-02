@@ -24,6 +24,9 @@ class NewtonCradle(Visual):
     name = "NEWTON"
     description = "Newton's cradle"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Five suspended steel balls transferring momentum. Pull one back, release, and watch the energy pass through.',
+    }
 
     BALL_RADIUS = 4
     STRING_LEN = 30

@@ -19,6 +19,14 @@ class BopIt(Game):
     name = "TAP IT"
     description = "Reaction toy game"
     category = "toys"
+    GUIDE = {
+        'desc': 'Follow commands (bop, twist, pull) using button presses and directional inputs. Commands get faster each round. Miss one and you’re out.',
+        'controls': {
+            'Button': 'Bop It',
+            'Left/Right': 'Twist It (L→R or R→L)',
+            'Up/Down': 'Pull It (U→D or D→U)',
+        },
+    }
 
     # Commands
     CMD_BOP = 'BOP'

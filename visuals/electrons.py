@@ -221,6 +221,9 @@ class Electrons(Visual):
     name = "ELECTRONS"
     description = "What electrons do: experiments, transitions, reactions"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'What electrons actually do. A tour of physics experiments, energy transitions, chemical reactions, quantum phenomena, and semiconductor devices — each a looping scene with electrons and photons in motion.',
+    }
 
     _saved_group_idx = None
     _saved_scene_pos = None

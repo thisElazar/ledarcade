@@ -5415,6 +5415,9 @@ class Peptides(Visual):
     name = "PEPTIDES"
     description = "Peptide bead models + calculator"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'Amino acids and peptides as rotating 3D bead-on-chain models. Each residue is a shaded sphere linked by backbone bonds, with disulfide bridges and ring closures, alongside a calculator-style info panel.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

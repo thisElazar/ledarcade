@@ -100,6 +100,15 @@ class MaxwellDemon(Visual):
     name = "Maxwell's Demon"
     description = "Thermodynamic thought experiment — a demon sorts hot and cold gas"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'A thought experiment made visible. A demon sorts fast and slow gas particles between two chambers, seemingly violating the second law of thermodynamics.',
+        'credit': 'James Clerk Maxwell, 1867',
+        'controls': {
+            'Button': 'Toggle the demon on / off',
+            'Up/Down': 'Adjust the demon’s selectivity',
+            'Left/Right': 'Slow down / speed up the simulation',
+        },
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

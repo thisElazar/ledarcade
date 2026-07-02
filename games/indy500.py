@@ -107,6 +107,9 @@ class Indy500(Game):
     name = "INDIE 500"
     description = "5 tracks!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Top-down racing on an oval track. Steer and accelerate to complete laps.',
+    }
 
     TRACK_WIDTH = 12
     LAPS_TO_ADVANCE = 7  # must get more than 6 laps in 60s

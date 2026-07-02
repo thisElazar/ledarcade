@@ -115,6 +115,9 @@ class Shuffleboard(Game):
     name = "SHUFFLEBOARD"
     description = "Slide pucks into scoring zones"
     category = "bar"
+    GUIDE = {
+        'desc': 'Slide pucks down a board to land in the highest-scoring zone. Set angle and power. Knock opponents off if you can.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

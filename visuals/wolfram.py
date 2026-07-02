@@ -25,6 +25,10 @@ class Wolfram(Visual):
     name = "WOLFRAM"
     description = "1D cellular automata"
     category = "automata"
+    GUIDE = {
+        'desc': '256 elementary 1D cellular automata, each defined by a single number. Rule 30 generates randomness; Rule 110 is Turing-complete.',
+        'credit': 'Stephen Wolfram, 1983',
+    }
 
     # Preset rules for easy cycling - notable/interesting rules
     PRESET_RULES = [30, 90, 110, 184, 45, 73, 105, 150]

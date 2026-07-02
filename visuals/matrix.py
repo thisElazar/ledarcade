@@ -31,6 +31,9 @@ class Matrix(Visual):
     name = "MATRIX"
     description = "Digital rain"
     category = "digital"
+    GUIDE = {
+        'desc': 'Falling green characters with trail fading, from the film’s “digital rain” effect. Designed by Simon Whiteley using characters scanned from a Japanese cookbook.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

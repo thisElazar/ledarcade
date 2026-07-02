@@ -27,6 +27,10 @@ class BML(Visual):
     name = "GRIDLOCK"
     description = "BML traffic model"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'The BML traffic model. Cars move east or north on alternating steps. Below a critical density, traffic flows. Above it, the system jams completely. A phase transition you can see.',
+        'credit': 'Biham, Middleton & Levine, 1992',
+    }
 
     RED_COLOR = (255, 60, 60)
     BLUE_COLOR = (80, 120, 255)

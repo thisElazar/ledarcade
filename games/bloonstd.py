@@ -160,6 +160,9 @@ class BloonsTD(Game):
     name = "BLOONS TD"
     description = "Tower defense with bloons"
     category = "modern"
+    GUIDE = {
+        'desc': 'Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

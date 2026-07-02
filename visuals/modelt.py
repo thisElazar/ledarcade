@@ -68,6 +68,10 @@ class ModelT(Visual):
     name = "4-STROKE"
     description = "4-stroke engine cutaway"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.',
+        'credit': '1908, Henry Ford',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

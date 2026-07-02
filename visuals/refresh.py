@@ -95,6 +95,9 @@ class Refresh(Visual):
     name = "UPDATE"
     description = "Restart arcade"
     category = "utility"
+    GUIDE = {
+        'desc': 'Update the cabinet to the latest software over the internet and restart, or roll back to the version it ran before the last update if something goes wrong.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

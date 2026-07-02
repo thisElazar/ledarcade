@@ -19,6 +19,9 @@ class Go(Game):
     name = "GO"
     description = "9x9 Territory"
     category = "2_player"
+    GUIDE = {
+        'desc': 'Place black or white stones to surround territory. The player controlling more territory wins. Simple rules, deep strategy.',
+    }
 
     # Board layout
     BOARD_SIZE = 9

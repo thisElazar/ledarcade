@@ -27,6 +27,9 @@ class Rotozoom(Visual):
     name = "ROTOZOOM"
     description = "Rotating zoom"
     category = "digital"
+    GUIDE = {
+        'desc': 'Simultaneous rotation and zoom of a procedural texture using rotation matrix math. A staple of Amiga and Atari ST demos.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

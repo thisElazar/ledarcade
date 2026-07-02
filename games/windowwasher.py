@@ -564,6 +564,9 @@ class WindowWasher(Game):
     name = "WINDOW WASHER"
     description = "Clean all windows"
     category = "unique"
+    GUIDE = {
+        'desc': 'Clean every window on the building before time runs out. Ride the scaffold and scrub.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

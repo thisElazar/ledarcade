@@ -25,6 +25,9 @@ class Gyre(Visual):
     name = "GYRE"
     description = "Swirling vortex"
     category = "automata"
+    GUIDE = {
+        'desc': 'Rotating vortex patterns driven by simple agent rules. Particles orbit local centers of rotation, forming spirals that merge and split.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

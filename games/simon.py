@@ -21,6 +21,9 @@ class Simon(Game):
     name = "SAIMON"
     description = "1978 Milton Bradley"
     category = "toys"
+    GUIDE = {
+        'desc': 'Four colored quadrants flash in sequence. Repeat the pattern. Each round adds one step. Game ends when you get the sequence wrong.',
+    }
 
     # Colors for the four buttons (dim and lit versions)
     COLORS = {

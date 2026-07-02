@@ -22,6 +22,9 @@ class Aurora(Visual):
     name = "RUCKER PAINT"
     description = "CelLab flowing paint CA"
     category = "automata"
+    GUIDE = {
+        'desc': 'CelLab flowing paint cellular automaton by Rudy Rucker and John Walker. Globby streams of color flow and merge on a ring topology.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -118,6 +118,10 @@ class GutenbergPress(Visual):
     name = "GUTENBERG"
     description = "Printing press"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.',
+        'credit': 'c. 1440',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

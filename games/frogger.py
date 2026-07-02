@@ -17,6 +17,9 @@ class Frogger(Game):
     name = "FROGGY"
     description = "Cross the road and river!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Cross five lanes of traffic, then hop across logs and turtles to reach home. Guide all five frogs home to clear the level. Don’t get hit or fall in the water.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

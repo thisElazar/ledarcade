@@ -20,6 +20,10 @@ class Life(Visual):
     name = "LIFE"
     description = "Conway's Game of Life"
     category = "automata"
+    GUIDE = {
+        'desc': 'Four rules about birth, survival, and death produce gliders, oscillators, and self-replicating structures. Proven Turing-complete. The most famous cellular automaton.',
+        'credit': 'John Conway, 1970',
+    }
 
     MAX_HISTORY = 100  # How many states to remember for rewinding
 

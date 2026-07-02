@@ -76,6 +76,10 @@ class Convection(Visual):
     name = "CONVECTION"
     description = "Rayleigh-Benard cells"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Rayleigh-Bénard convection cells. Heated fluid rises, cool fluid sinks, forming rolling convection cells with characteristic aspect ratios.',
+        'credit': 'Lord Rayleigh, 1916',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -155,6 +155,14 @@ class Knife(Visual):
     name = "KNIFE CUTS"
     description = "Knife cut reference"
     category = "cooking"
+    GUIDE = {
+        'desc': 'A knife-skills flipbook. Each cut animates on the cutting board and holds on the finished result, with dimensions and best uses. Nine cuts across three families: strips, dice, and special.',
+        'controls': {
+            'Left/Right': 'Cycle through cuts',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

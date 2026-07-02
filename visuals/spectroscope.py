@@ -171,6 +171,9 @@ class Spectroscope(Visual):
     name = "SPECTROSCOPE"
     description = "Element emission spectra"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'Real element emission spectra at their correct wavelengths. Each element has a unique fingerprint of spectral lines — this is how we know what distant stars are made of.',
+    }
 
     def reset(self):
         self.time = 0.0

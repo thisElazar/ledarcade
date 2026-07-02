@@ -53,6 +53,10 @@ class GameTheory(Visual):
     name = "GAME THEORY"
     description = "Prisoner's Dilemma"
     category = "math"
+    GUIDE = {
+        'desc': 'Iterated Prisoner’s Dilemma tournament on a spatial grid. Strategies — cooperate, defect, tit-for-tat — compete and evolve. Cooperation can emerge from selfishness.',
+        'credit': 'Robert Axelrod, 1984',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)
