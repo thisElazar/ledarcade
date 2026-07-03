@@ -64,6 +64,10 @@ class Astrolabe(Visual):
     name = "ASTROLABE"
     description = "Medieval astronomical instrument"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A brass instrument for telling time, finding latitude, predicting sunrise/sunset, and locating stars. Used by astronomers and navigators for over a thousand years.',
+        'credit': 'c. 200 BC – 1600s',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

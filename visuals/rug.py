@@ -26,6 +26,9 @@ class Rug(Visual):
     name = "RUG"
     description = "Carpet fractals"
     category = "automata"
+    GUIDE = {
+        'desc': 'An averaging cellular automaton. Each cell becomes the average of its neighbors, then saturates, producing symmetric patterns that look like woven rugs.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

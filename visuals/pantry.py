@@ -100,6 +100,14 @@ class Pantry(Visual):
     name = "PANTRY"
     description = "Cooking building blocks"
     category = "cooking"
+    GUIDE = {
+        'desc': 'Cooking building blocks — aromatics, roux, stocks, and herb bundles with ratio blocks showing component proportions. 14 items across 4 families with method and use descriptions.',
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

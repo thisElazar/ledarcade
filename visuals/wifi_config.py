@@ -57,6 +57,9 @@ class WiFiConfig(Visual):
     name = "INTERNET"
     description = "Configure WiFi"
     category = "utility"
+    GUIDE = {
+        'desc': 'Join a WiFi network using only the joystick and buttons. Scan for networks, enter the password on a scroll-wheel keyboard, and connect — no keyboard needed.',
+    }
 
     def __init__(self, display: Display):
         self._has_nmcli = shutil.which('nmcli') is not None

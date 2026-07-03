@@ -119,6 +119,9 @@ class Yoga(Visual):
     name = "YOGA"
     description = "Yoga flows"
     category = "household"
+    GUIDE = {
+        'desc': 'Yoga pose sequences. Animated figures flowing through asanas — sun salutations, warrior poses, and balancing sequences.',
+    }
 
     def reset(self):
         self.time = 0.0

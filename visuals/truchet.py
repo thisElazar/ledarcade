@@ -21,6 +21,10 @@ class Truchet(Visual):
     name = "TRUCHET"
     description = "Flowing arc tiles"
     category = "digital"
+    GUIDE = {
+        'desc': 'Quarter-circle tiles placed randomly create flowing organic curves. Discovered by a Dominican priest over 300 years ago.',
+        'credit': 'Sébastien Truchet, 1704',
+    }
 
     # Available tile sizes (in pixels)
     TILE_SIZES = [4, 8, 16]

@@ -74,6 +74,9 @@ class Roundabout(Visual):
     name = "ROTARY"
     description = "Roundabout gap acceptance"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'A traffic roundabout with entering and circulating vehicles. Yield-on-entry dynamics create a self-regulating flow. The European alternative to the four-way stop.',
+    }
 
     ISLAND_COLOR = (30, 70, 30)
     ROAD_COLOR = (55, 55, 60)

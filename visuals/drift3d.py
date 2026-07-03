@@ -174,6 +174,14 @@ class Drift3D:
     name = "DRIFT 3D"
     description = "Terrain flyover"
     category = "nature"
+    GUIDE = {
+        'desc': 'Comanche-style voxel space terrain flyover. Height maps and color maps rendered with ray marching to produce rolling landscapes, water, and atmospheric fog.',
+        'controls': {
+            'Button': 'Cycle terrain preset',
+            'Left/Right': 'Adjust time speed',
+            'Up/Down': 'Change camera view',
+        },
+    }
 
     def __init__(self, display):
         self.display = display

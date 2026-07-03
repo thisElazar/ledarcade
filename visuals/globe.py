@@ -153,6 +153,9 @@ class Earth(Visual):
     name = "EARTH"
     description = "Rotating Earth"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'A rotating globe showing continents, oceans, and the terminator (day/night boundary). The planet as seen from space, rendered on a 64×64 pixel sphere.',
+    }
 
     AUTO_SPEED = 8.0      # degrees/sec auto-rotation
     IDLE_TIMEOUT = 0.5    # seconds before auto-rotation resumes after input

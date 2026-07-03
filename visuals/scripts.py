@@ -36987,6 +36987,14 @@ class Scripts(Visual):
     name = "SCRIPTS"
     description = "World writing systems"
     category = "culture"
+    GUIDE = {
+        'desc': 'Writing systems from around the world — Latin, Arabic, Devanagari, Chinese, Japanese, Korean, and more. Rendered using fontTools. Each script shown with sample glyphs and stroke animations.',
+        'controls': {
+            'Up/Down': 'Switch writing system',
+            'Left/Right': 'Step through glyphs',
+            'Button': 'Next glyph (resume auto-advance)',
+        },
+    }
 
     def reset(self):
         self.char_idx = 0

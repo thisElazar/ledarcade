@@ -18,6 +18,9 @@ class Plasma(Visual):
     name = "PLASMA"
     description = "Classic plasma waves"
     category = "digital"
+    GUIDE = {
+        'desc': 'Four overlapping sine functions create smoothly animated color fields. One of the quintessential demoscene effects.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

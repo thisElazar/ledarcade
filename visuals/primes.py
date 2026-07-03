@@ -71,6 +71,9 @@ class Primes(Visual):
     name = "PRIMES"
     description = "Prime number patterns"
     category = "math"
+    GUIDE = {
+        'desc': 'Prime number sieves and distributions. The Sieve of Eratosthenes animates as composites are eliminated, revealing the primes that remain.',
+    }
 
     def reset(self):
         self.time = 0.0

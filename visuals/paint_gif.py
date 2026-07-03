@@ -89,6 +89,9 @@ class PaintGif(Visual):
     name = "PAINT GIF"
     description = "Frame-by-frame animation editor"
     category = "utility"
+    GUIDE = {
+        'desc': 'A frame-by-frame animation studio. Draw 64×64 pixel art with per-frame undo, onion-skinning, and live preview, then export an animated GIF. Your creations show up in the CUSTOMS mix.',
+    }
     custom_exit = True
 
     def __init__(self, display: Display):

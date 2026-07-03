@@ -27,6 +27,9 @@ class Flux(Visual):
     name = "FLUX"
     description = "Curl noise flow"
     category = "digital"
+    GUIDE = {
+        'desc': 'Particle streams guided by time-varying vector fields. Particles trace smooth curves, creating ribbons of color.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

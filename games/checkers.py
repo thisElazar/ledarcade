@@ -28,6 +28,9 @@ class Checkers(Game):
     name = "CHECKERS"
     description = "2P Strategy"
     category = "2_player"
+    GUIDE = {
+        'desc': 'Jump and capture diagonally. Reach the far side to king a piece. Capture all opponent pieces or block all their moves to win. Solved in 2007 — perfect play always draws.',
+    }
 
     # Board layout
     BOARD_SIZE = 8

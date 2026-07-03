@@ -18,6 +18,10 @@ class GrayScott(Visual):
     name = "GRAY-SCOTT"
     description = "Reaction-diffusion patterns"
     category = "automata"
+    GUIDE = {
+        'desc': 'Turing proposed that reaction-diffusion could explain biological pattern formation. The Gray-Scott model uses two parameters: F (feed rate, how fast chemical U is replenished) and K (kill rate, how fast chemical V is removed). Different F/K combinations produce distinct pattern families — spots, stripes, coral, and worms. The joystick explores the Pearson parameter space; overlay labels show the Greek-letter classification (Alpha, Beta, etc.) from Pearson’s 1993 taxonomy.',
+        'credit': 'Alan Turing, 1952',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

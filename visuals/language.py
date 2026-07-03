@@ -1223,6 +1223,14 @@ class Language(Visual):
     name = "LANGUAGE"
     description = "Hello in every language"
     category = "culture"
+    GUIDE = {
+        'desc': 'World languages and their relationships. Script samples, language family trees, and translation comparisons.',
+        'controls': {
+            'Left/Right': 'Previous / next language',
+            'Up/Down': 'Jump five at a time',
+            'Button': 'Toggle auto-advance',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

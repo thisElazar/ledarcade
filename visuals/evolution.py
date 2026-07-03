@@ -138,6 +138,9 @@ class Evolution(Visual):
     name = "EVOLUTION"
     description = "Fitness landscapes"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Natural selection in action. Organisms compete for resources, reproduce with mutation, and adapt over generations. Fitness landscapes shift as populations explore genetic space.',
+    }
 
     def __init__(self, display: Display):
         self._rugged = _RuggedLandscape()

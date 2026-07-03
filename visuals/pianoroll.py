@@ -215,6 +215,9 @@ class PianoRoll(Visual):
     name = "PIANO ROLL"
     description = "Player piano"
     category = "music"
+    GUIDE = {
+        'desc': 'A scrolling piano roll showing notes in time. Colored bars descend onto a keyboard. The format dates back to player pianos of the 1900s and is still used in MIDI editors.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

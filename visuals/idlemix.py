@@ -64,6 +64,9 @@ class IdleMix(Visual):
     name = "IDLE MIX"
     description = "Configure idle playlist"
     category = "utility"
+    GUIDE = {
+        'desc': 'Curate what the idle screensaver shows. Set how heavily each category is weighted, and mark individual visuals as favorites or blacklist them entirely.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

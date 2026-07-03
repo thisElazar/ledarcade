@@ -127,6 +127,9 @@ class DNA(Visual):
     name = "DNA"
     description = "Molecular biology explorer"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'The central dogma of molecular biology, animated. Six scenarios: double helix structure, replication, transcription, codon reading, mutation, and chromatin packing.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

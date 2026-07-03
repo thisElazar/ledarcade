@@ -64,6 +64,10 @@ class Pottery(Visual):
     name = "POTTERY"
     description = "World ceramic traditions"
     category = "culture"
+    GUIDE = {
+        'desc': "World ceramic traditions photographed from the Metropolitan Museum of Art's Open Access collection. Real vessels shown at 64×64 with their culture, date, and technique.",
+        'credit': 'Met Museum Open Access (CC0)',
+    }
 
     def reset(self):
         self.time = 0.0

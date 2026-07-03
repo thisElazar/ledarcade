@@ -34,6 +34,9 @@ class Gyroscope(Visual):
     name = "GYROSCOPE"
     description = "Gimbal mechanism"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A spinning rotor that resists changes to its orientation. Demonstrates precession, nutation, and conservation of angular momentum.',
+    }
 
     # Layout
     CENTER_X = 32

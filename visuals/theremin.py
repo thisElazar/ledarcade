@@ -41,6 +41,10 @@ class Theremin(Visual):
     name = "THEREMIN"
     description = "Electronic theremin instrument"
     category = "music"
+    GUIDE = {
+        'desc': 'The only instrument you play without touching. Side view with pitch antenna, volume loop, and electromagnetic field arcs. Waveform display shows the output.',
+        'credit': 'Léon Theremin, 1920',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

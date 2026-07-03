@@ -42,6 +42,10 @@ class Boids(Visual):
     name = "BOIDS"
     description = "Flocking swarm"
     category = "automata"
+    GUIDE = {
+        'desc': 'Three rules per agent: stay close, match heading, don’t collide. Flocking behavior emerges with no central control. The same algorithm is used in film VFX, robotics, and crowd simulation.',
+        'credit': 'Craig Reynolds, 1987',
+    }
 
     # Flocking parameters
     NUM_BOIDS = 80

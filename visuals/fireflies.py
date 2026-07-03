@@ -83,6 +83,9 @@ class Fireflies(Visual):
     name = "FIREFLIES"
     description = "Synchronized flashing"
     category = "nature"
+    GUIDE = {
+        'desc': 'Kuramoto model of coupled oscillators. Each firefly has its own internal clock but synchronizes with visible neighbors — the same behavior seen in real firefly swarms.',
+    }
 
     # Population
     NUM_FIREFLIES = 300

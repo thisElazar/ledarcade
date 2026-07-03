@@ -61,6 +61,9 @@ class Turntable(Visual):
     name = "TURNTABLE"
     description = "Spinning vinyl"
     category = "music"
+    GUIDE = {
+        'desc': 'A vinyl record spinning with a tonearm tracking the groove. The platter rotates at 33 RPM, the stylus rides the spiral.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

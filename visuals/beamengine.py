@@ -95,6 +95,10 @@ class BeamEngine(Visual):
     name = "BEAM ENGINE"
     description = "Watt steam engine"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Watt’s separate condenser transformed Newcomen’s earlier engine into the workhorse of the Industrial Revolution. The rocking beam links piston to flywheel.',
+        'credit': '1769',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

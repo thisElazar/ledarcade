@@ -20,6 +20,9 @@ class Othello(Game):
     name = "REVERSI"
     description = "2P Strategy"
     category = "2_player"
+    GUIDE = {
+        'desc': 'Place discs to outflank your opponent’s and flip them to your color. The player with the most discs when the board is full wins. Corner control is key.',
+    }
 
     # Board layout
     BOARD_SIZE = 8

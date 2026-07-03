@@ -23,6 +23,9 @@ class Faders(Visual):
     name = "FADERS"
     description = "Fading trails"
     category = "automata"
+    GUIDE = {
+        'desc': "Cells glow, fade, and reactivate based on their neighbors' brightness. Produces cascading pulses and traveling waves of light.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

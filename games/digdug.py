@@ -16,6 +16,9 @@ class DigDug(Game):
     name = "DIG DIG"
     description = "Pump 'em up!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Dig tunnels underground and inflate enemies with your pump until they pop, or lure them under falling rocks. Clear all enemies to advance.',
+    }
 
     # Colors
     DIRT_COLOR = (139, 90, 43)

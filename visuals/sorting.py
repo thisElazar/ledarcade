@@ -230,6 +230,9 @@ class Sorting(Visual):
     name = "SORTING"
     description = "Algorithm races"
     category = "math"
+    GUIDE = {
+        'desc': 'Sorting algorithms visualized. Bubble sort, quicksort, merge sort, and more — each algorithm’s strategy made visible as bars rearrange themselves.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

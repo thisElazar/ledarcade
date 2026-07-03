@@ -124,6 +124,9 @@ class Paint(Visual):
     name = "PAINT"
     description = "Pixel art editor"
     category = "utility"
+    GUIDE = {
+        'desc': 'A digital painting canvas. Move the cursor to paint with light. Brush color and size cycle through palettes.',
+    }
     custom_exit = True
 
     def __init__(self, display: Display):

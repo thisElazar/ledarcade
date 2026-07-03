@@ -320,6 +320,10 @@ class _PlatesBase(Visual):
 class Haeckel(_PlatesBase):
     name = "HAECKEL"
     description = "Kunstformen der Natur"
+    GUIDE = {
+        'desc': "Ernst Haeckel's Art Forms of Nature: radiolarians, jellyfish, and diatoms drawn with symmetric precision. The plates that fused biology and Art Nouveau.",
+        'credit': 'Ernst Haeckel, 1904',
+    }
     _collection = "haeckel"
     _manifest_file = "haeckel_plates.json"
 
@@ -327,6 +331,10 @@ class Haeckel(_PlatesBase):
 class Audubon(_PlatesBase):
     name = "AUDUBON"
     description = "Birds of America"
+    GUIDE = {
+        'desc': "Plates from John James Audubon's Birds of America, panning slowly across the panel. Life-size hand-colored engravings of American birds.",
+        'credit': 'John James Audubon, 1827–1838',
+    }
     _collection = "audubon"
     _manifest_file = "audubon_plates.json"
 
@@ -334,6 +342,10 @@ class Audubon(_PlatesBase):
 class Merian(_PlatesBase):
     name = "MERIAN"
     description = "Metamorphosis Insectorum"
+    GUIDE = {
+        'desc': "Maria Sibylla Merian's metamorphosis studies — caterpillars, butterflies, and their host plants — from her groundbreaking Surinam fieldwork.",
+        'credit': 'Maria Sibylla Merian, 1705',
+    }
     _collection = "merian"
     _manifest_file = "merian_plates.json"
 
@@ -341,6 +353,10 @@ class Merian(_PlatesBase):
 class Redoute(_PlatesBase):
     name = "REDOUTE"
     description = "Les Roses"
+    GUIDE = {
+        'desc': "Pierre-Joseph Redouté's botanical watercolors — the roses and lilies painted for Empress Joséphine's garden at Malmaison.",
+        'credit': 'Pierre-Joseph Redouté, early 19th c.',
+    }
     _collection = "redoute"
     _manifest_file = "redoute_plates.json"
 
@@ -348,5 +364,9 @@ class Redoute(_PlatesBase):
 class Gould(_PlatesBase):
     name = "GOULD"
     description = "Hummingbirds"
+    GUIDE = {
+        'desc': "Plates from John Gould's ornithological folios — hummingbirds, toucans, and the birds of Australia — auto-panning across the grid.",
+        'credit': 'John Gould, 19th c.',
+    }
     _collection = "gould"
     _manifest_file = "gould_plates.json"

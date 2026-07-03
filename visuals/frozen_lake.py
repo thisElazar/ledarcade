@@ -149,6 +149,9 @@ class FrozenLake(Visual):
     name = "FROZEN LAKE"
     description = "Black ice, hairline cracks, something moving below"
     category = "digital"
+    GUIDE = {
+        'desc': 'A frozen black lake under a dark sky. Derived from convergent imagery that emerged independently across multiple AI imagination experiments.',
+    }
 
     # Presence timing
     PRESENCE_PER_PRESS = 4.0

@@ -152,6 +152,14 @@ class Spices(Visual):
     name = "SPICES"
     description = "Spice blend recipes"
     category = "cooking"
+    GUIDE = {
+        'desc': "The recipes behind the world's great spice blends. Each shows its origin, meaning, component spices, and the dishes it belongs in — the micro view of what's actually inside ras el hanout, garam masala, and more.",
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

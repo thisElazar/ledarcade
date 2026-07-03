@@ -17,6 +17,9 @@ class Clock(Visual):
     name = "CLOCK"
     description = "Animated clock"
     category = "household"
+    GUIDE = {
+        'desc': 'A working digital clock. Hours, minutes, and seconds on the LED matrix.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

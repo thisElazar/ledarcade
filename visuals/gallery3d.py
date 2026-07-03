@@ -1000,6 +1000,9 @@ class GallerySalon(_Gallery3DBase):
     name = "SALON"
     description = "Wall-to-wall paintings"
     category = "gallery"
+    GUIDE = {
+        'desc': 'A walkable 3D gallery housing 116 classical paintings — Van Gogh, Monet, Hokusai, Vermeer, Klimt, and more. Four connected rooms with paintings stacked floor to ceiling. Joystick to walk; button for title plate.',
+    }
 
     _WALL_SCALE = 5  # paintings stacked 5 panels high
 
@@ -1455,6 +1458,9 @@ class GalleryMuseum(_Gallery3DBase):
     name = "GRAND MUSEUM"
     description = "Paintings by period"
     category = "gallery"
+    GUIDE = {
+        'desc': 'A walkable 3D museum in the style of early raycast games. Six themed galleries hang paintings, sprites, and animated rooms on their walls. Use the joystick to wander; the button reads the title plate.',
+    }
 
     _WALL_SCALE = 2  # Normal-height walls: painting on bottom, plaster above
 

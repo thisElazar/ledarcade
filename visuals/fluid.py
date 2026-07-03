@@ -372,6 +372,10 @@ class FluidTunnel(Visual):
     name = "WIND TUNNEL"
     description = "Flow past obstacle"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Computational fluid dynamics with obstacles. Semi-Lagrangian advection shows vortex shedding, turbulence, and flow separation around objects. Real aerodynamics at 64×64.',
+        'credit': 'Jos Stam, SIGGRAPH 1999',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -504,6 +508,9 @@ class FluidInk(Visual):
     name = "INK DROPS"
     description = "Swirling ink drops"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Drops of colored ink falling into a fluid simulation. The ink spreads, curls, and diffuses according to Navier-Stokes equations.',
+    }
 
     _N_VIZ_MODES = len(PALETTES) + 2
 
@@ -621,6 +628,9 @@ class FluidMixing(Visual):
     name = "COLOR MIX"
     description = "Paint colors mixing"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Computational fluid dynamics with colored dyes mixing in a flow field. Pigments swirl, fold, and blend according to Navier-Stokes equations.',
+    }
 
     _N_VIZ_MODES = len(PAINT_PALETTES)
 
@@ -853,6 +863,10 @@ class FluidPlay(Visual):
     name = "FLUID PLAY"
     description = "Drag through fluid"
     category = "science_bench"
+    GUIDE = {
+        'desc': "Stir a real fluid with the joystick. Jos Stam's Stable Fluids solver runs live — drag the cursor and colored density swirls, folds, and diffuses behind it.",
+        'credit': 'Jos Stam, SIGGRAPH 1999',
+    }
 
     # Viz modes: 3 velocity, 3 direction, 3 vorticity
     _VIZ_MODES = (
@@ -1137,6 +1151,10 @@ class FluidSculpt(Visual):
     name = "WIND TUNNEL LAB"
     description = "Move obstacle in flow"
     category = "science_bench"
+    GUIDE = {
+        'desc': "Move a solid obstacle through a flowing wind tunnel and watch the wake respond — vortices shed and reattach as you reshape the flow. Powered by Stam's Stable Fluids solver.",
+        'credit': 'Jos Stam, SIGGRAPH 1999',
+    }
 
     _VIZ_MODES = (
         [('vel', name) for name in VEL_PALETTE_NAMES] +

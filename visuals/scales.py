@@ -228,6 +228,9 @@ class Scales(Visual):
     name = "SCALES"
     description = "Piano scale reference"
     category = "music"
+    GUIDE = {
+        'desc': 'A scale reference over a piano keyboard. Cycle through scales and modes, transpose to any root, and toggle between note names, interval numbers, and scale degrees.',
+    }
 
     def reset(self):
         self.time = 0.0

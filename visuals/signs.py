@@ -189,6 +189,14 @@ class Signs(Visual):
     name = "SIGNS"
     description = "Street signs of the world"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'Street signs from around the world — stop signs, speed limits, yield signs, and highway markers from 6 continents. 63 signs across 6 categories.',
+        'controls': {
+            'Up/Down': 'Switch category',
+            'Left/Right': 'Browse signs',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

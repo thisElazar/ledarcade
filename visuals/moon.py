@@ -167,6 +167,14 @@ class MoonPhases(Visual):
     name = "MOON PHASES"
     description = "Lunar phase cycle with realistic shadows"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'The lunar cycle animated with astronomically correct illumination. The terminator sweeps across the Moon’s surface from new to full and back.',
+        'controls': {
+            'Button': 'Toggle live / manual mode',
+            'Left/Right': 'Step phase (manual mode)',
+            'Up/Down': 'Cycle palette',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

@@ -386,6 +386,10 @@ class TuringPatterns(_TuringBase):
     name = "GRAY-SCOTT LAB"
     description = "Explore the full Gray-Scott parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': 'Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.',
+        'credit': 'Alan Turing, 1952',
+    }
     _f_center = 0.035
     _k_center = 0.065
     _f_min = 0.010

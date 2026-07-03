@@ -357,6 +357,14 @@ class Knots(Visual):
     name = "KNOTS"
     description = "Knot-tying reference"
     category = "household"
+    GUIDE = {
+        'desc': 'Animated knot tying. Step-by-step demonstrations of bowline, cleat hitch, figure-eight, and more — rendered as colored rope on the LED grid.',
+        'controls': {
+            'Up/Down': 'Previous / next knot',
+            'Left/Right': 'Slow down / speed up',
+            'Button': 'Restart the tie',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

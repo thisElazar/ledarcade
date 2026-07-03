@@ -16,6 +16,9 @@ class Gamma(Visual):
     name = "GAMMA"
     description = "Adjust gamma curve"
     category = "utility"
+    GUIDE = {
+        'desc': "Fine-tune the panel's gamma curve and toe-lift so dark tones read correctly, with a live before/after preview. A calibration control, not a toy.",
+    }
     custom_exit = True  # We handle our own exit via wants_exit
 
     def __init__(self, display: Display):

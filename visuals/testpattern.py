@@ -37,6 +37,9 @@ class TestPattern(Visual):
     name = "PIXEL TEST"
     description = "Test all pixels"
     category = "utility"
+    GUIDE = {
+        'desc': 'A diagnostic that exercises every one of the 4,096 LEDs across all primary colors — a marching cursor, quadrant tests, and full-field fills — to catch dead or miswired pixels.',
+    }
     custom_exit = True  # handle own exit via hold-both-buttons
 
     # Total pixels in the grid

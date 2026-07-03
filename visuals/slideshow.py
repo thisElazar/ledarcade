@@ -101,6 +101,9 @@ class Slideshow(Visual):
 class AllVisuals(Slideshow):
     name = "ALL VISUALS"
     description = "Every non-utility visual, shuffled"
+    GUIDE = {
+        'desc': 'Every non-utility visual in the collection, auto-cycling in a shuffled stream. The catch-all screensaver.',
+    }
 
     # Category weights: higher = more frequent in rotation
     CATEGORY_WEIGHTS = {
@@ -136,6 +139,9 @@ class AllVisuals(Slideshow):
 class Chill(Slideshow):
     name = "CHILL"
     description = "Relaxing, ambient visuals"
+    GUIDE = {
+        'desc': 'Relaxing, ambient visuals that drift slowly — the calm end of the collection.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (Lake, Aurora, Starfield, Fireflies, Ripples,
@@ -147,6 +153,9 @@ class Chill(Slideshow):
 class Energy(Slideshow):
     name = "ENERGY"
     description = "High-energy, intense visuals"
+    GUIDE = {
+        'desc': 'High-energy, intense visuals — strobing color, fast motion, maximum activity.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (Fire, Plasma, Trance, Rotozoom, Matrix,
@@ -158,6 +167,9 @@ class Energy(Slideshow):
 class ArtGallery(Slideshow):
     name = "ART GALLERY"
     description = "Famous paintings slideshow"
+    GUIDE = {
+        'desc': 'A slideshow of the famous paintings, cycling through five centuries of art history.',
+    }
 
     def reset(self):
         self._show_nameplate = False  # user-controlled, persists across paintings
@@ -205,6 +217,9 @@ class Naturalist(Slideshow):
     name = "NATURALIST"
     description = "Scientific illustrations shuffled"
     category = "visual_mix"
+    GUIDE = {
+        'desc': 'The scientific-illustration plates shuffled together — Audubon, Haeckel, Merian, and more.',
+    }
     cycle_interval = 25.0
 
     def reset(self):
@@ -251,6 +266,9 @@ class Naturalist(Slideshow):
 class Demoscene(Slideshow):
     name = "DEMOSCENE"
     description = "Old-school demo effects"
+    GUIDE = {
+        'desc': 'Old-school demo effects back to back — plasma, twisters, rotozoom, and the rest of the demoscene canon.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (Fire, Plasma, Rotozoom, SineScroller, Twister,
@@ -262,6 +280,9 @@ class Demoscene(Slideshow):
 class Complexity(Slideshow):
     name = "COMPLEXITY"
     description = "Complex systems and emergent behavior"
+    GUIDE = {
+        'desc': 'Complex systems and emergent behavior — automata, flocks, reaction-diffusion, and self-organizing patterns.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (Rug, Quarks, Hodge, Ripples, Flux, Slime,
@@ -275,6 +296,9 @@ class Complexity(Slideshow):
 class ScienceLab(Slideshow):
     name = "SCIENCE LAB"
     description = "Physics and biology simulations"
+    GUIDE = {
+        'desc': 'The physics and biology simulations, auto-cycling — fluids, fields, orbits, and cells.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (Attractors, DblPendulum, Neurons,
@@ -295,6 +319,9 @@ class Title(Slideshow):
     name = "TITLE"
     description = "Wonder Cabinet title screens"
     category = "visual_mix"
+    GUIDE = {
+        'desc': 'A parade of the Wonder Cabinet title screens — 70+ boot cards and marquees.',
+    }
 
     def _get_visual_classes(self):
         import inspect
@@ -307,6 +334,9 @@ class MusicMix(Slideshow):
     name = "MUSIC MIX"
     description = "All music visuals"
     category = "visual_mix"
+    GUIDE = {
+        'desc': 'Every music visual in one stream — instruments, sequencers, and rhythm charts.',
+    }
 
     def _get_visual_classes(self):
         from visuals import (MusicBox, Metronome, HurdyGurdy,
@@ -484,6 +514,9 @@ class Customs(Slideshow):
     name = "CUSTOMS"
     description = "Your exported GIF animations"
     category = "visual_mix"
+    GUIDE = {
+        'desc': 'Your own exported GIF animations, played back as a slideshow. Make them in PAINT GIF.',
+    }
     cycle_interval = 15.0  # shorter cycle for user art
 
     def _get_visual_classes(self):
@@ -520,6 +553,9 @@ class Education(Slideshow):
     name = "EDUCATION"
     description = "School-friendly educational visuals"
     category = "visual_mix"
+    GUIDE = {
+        'desc': 'School-friendly educational visuals gathered for classroom use — science, math, and culture.',
+    }
     cycle_interval = 30.0
 
     def _get_visual_classes(self):

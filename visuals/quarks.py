@@ -24,6 +24,9 @@ class Quarks(Visual):
     name = "QUARKS"
     description = "Flowing mandalas"
     category = "automata"
+    GUIDE = {
+        'desc': 'Particles with charge-like properties that attract and repel, forming fleeting bonds and structures. Simple local rules produce behavior reminiscent of particle physics.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

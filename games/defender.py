@@ -40,6 +40,9 @@ class Defender(Game):
     name = "DEFENDR"
     description = "Protect humans from aliens!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Side-scrolling shooter. Fly left or right, shoot aliens, rescue humanoids from abduction. Radar shows the full map. Hold both buttons for a smart bomb.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

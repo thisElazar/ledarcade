@@ -19,6 +19,9 @@ class XORPattern(Visual):
     name = "XOR"
     description = "Fractal patterns"
     category = "digital"
+    GUIDE = {
+        'desc': 'XOR the x and y coordinates of each pixel, map the result to color. A single bitwise operation produces Sierpinski-like recursive patterns.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -122,6 +122,10 @@ class Antikythera(Visual):
     name = "ANTIKYTHERA"
     description = "Ancient Greek analog computer"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Ancient Greek analog computer with interlocking bronze gears that predicted astronomical positions and eclipses. Nothing comparable was built for 1,500 years.',
+        'credit': 'c. 100 BC',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

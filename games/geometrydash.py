@@ -16,6 +16,9 @@ class GeometryDash(Game):
     name = "GEODASH"
     description = "Jump the spikes!"
     category = "modern"
+    GUIDE = {
+        'desc': 'One-button platformer. Hold the button to jump; the level scrolls at a fixed speed. Hit any obstacle and you restart.',
+    }
 
     # Physics
     GRAVITY = 250.0

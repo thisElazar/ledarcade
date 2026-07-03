@@ -19,6 +19,9 @@ class Mastermind(Game):
     name = "MASTER CODE"
     description = "Break the code"
     category = "toys"
+    GUIDE = {
+        'desc': 'Guess a hidden color code in limited tries. Each guess gets feedback: right color in right place, or right color in wrong place. Deduce the code before your guesses run out.',
+    }
 
     # Available colors (6 colors like the original)
     PEG_COLORS = [

@@ -22,6 +22,9 @@ class Trance(Visual):
     name = "TRANCE"
     description = "Flying through"
     category = "digital"
+    GUIDE = {
+        'desc': 'Pulsing concentric shapes and strobing color patterns forming an expanding/contracting tunnel effect.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

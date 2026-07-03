@@ -225,6 +225,14 @@ class Periodic(Visual):
     name = "ELEMENTS"
     description = "Bohr model atomic orbitals"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'Animated Bohr models for all 118 elements. Electrons orbit on shells, nuclei pulse. Element categories color-coded: alkali metals, noble gases, transition metals, lanthanides.',
+        'controls': {
+            'Up/Down': 'Switch element category',
+            'Left/Right': 'Step through elements',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

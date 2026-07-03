@@ -18,6 +18,9 @@ class MsPacMan(Game):
     name = "MS. PAK-MAN"
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes and semi-random ghost AI.',
+    }
 
     # 4 cycling maze layouts (21x19 tiles at 3px each = 63x57)
     # 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house door

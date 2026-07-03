@@ -40,6 +40,9 @@ class DblPendulum(Visual):
     name = "DBL PENDULUM"
     description = "Chaotic double pendulum"
     category = "math"
+    GUIDE = {
+        'desc': 'Two arms, two masses, deterministic equations — yet the trajectory never repeats. The simplest physical system that produces chaos.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

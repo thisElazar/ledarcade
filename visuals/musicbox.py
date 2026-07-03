@@ -87,6 +87,9 @@ class MusicBox(Visual):
     name = "MUSIC BOX"
     description = "Cylinder music box"
     category = "music"
+    GUIDE = {
+        'desc': 'A rotating cylinder with pins plucking a metal comb. Each pin triggers a note as the barrel turns. The original mechanical music player.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

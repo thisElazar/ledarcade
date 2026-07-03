@@ -17,6 +17,9 @@ class Effects(Visual):
     name = "EFFECTS"
     description = "Transition settings"
     category = "utility"
+    GUIDE = {
+        'desc': "Choose which transition effects the idle screensaver uses when it cross-fades between visuals. Toggle any you don't like off.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

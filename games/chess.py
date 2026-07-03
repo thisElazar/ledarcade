@@ -88,6 +88,9 @@ class Chess(Game):
     name = "CHESS"
     description = "2P Strategy"
     category = "2_player"
+    GUIDE = {
+        'desc': '64 squares, 32 pieces. Checkmate the opponent’s king to win. Each piece type rendered as a recognizable sprite on the LED grid.',
+    }
 
     # Board layout
     BOARD_SIZE = 8

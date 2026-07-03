@@ -16,6 +16,9 @@ class Centipede(Game):
     name = "CENTIPEED"
     description = "Blast the bugs!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Clear the centipede to advance.',
+    }
 
     # Player constants
     PLAYER_AREA_TOP = 48  # Player can only move in bottom area

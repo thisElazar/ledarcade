@@ -39,6 +39,9 @@ class Cat(Visual):
     name = "CAT"
     description = "Stretching on pillow"
     category = "household"
+    GUIDE = {
+        'desc': 'A pixel cat walking, sitting, sleeping, and chasing a laser dot.',
+    }
 
     # Animation states
     STATE_SLEEPING = 0

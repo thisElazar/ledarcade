@@ -49,6 +49,13 @@ class WaterCycle(Visual):
     name = "WATER CYCLE"
     description = "Animated hydrological cycle"
     category = "nature"
+    GUIDE = {
+        'desc': 'The hydrological cycle animated: evaporation, cloud formation, precipitation, runoff, and groundwater flow. A continuous loop of water moving through the Earth system.',
+        'controls': {
+            'Left/Right': 'Slow down / speed up',
+            'Button': 'Toggle labels',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

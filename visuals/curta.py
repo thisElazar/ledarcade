@@ -62,6 +62,10 @@ class Curta(Visual):
     name = "CURTA"
     description = "Mechanical calculator"
     category = "mechanics"
+    GUIDE = {
+        'desc': "Curt Herzstark's handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing.",
+        'credit': '1948',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

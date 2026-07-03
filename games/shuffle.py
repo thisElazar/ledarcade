@@ -18,6 +18,9 @@ class GamePlaylist:
 class AllGames(GamePlaylist):
     name = "ALL GAMES"
     description = "Every single-player game, shuffled"
+    GUIDE = {
+        'desc': 'Every single-player game in the cabinet, shuffled into one endless pick-and-play stream.',
+    }
     # Populated dynamically in games/__init__.py after ALL_GAMES is built
     games = []
 
@@ -25,6 +28,9 @@ class AllGames(GamePlaylist):
 class ArcadeMix(GamePlaylist):
     name = "ARCADE MIX"
     description = "Classic arcade cabinet games"
+    GUIDE = {
+        'desc': 'A shuffled run through the classic arcade cabinet games — the quarter-eaters of the golden age.',
+    }
 
     @classmethod
     def _init_games(cls):
@@ -41,6 +47,9 @@ class ArcadeMix(GamePlaylist):
 class QuickPlay(GamePlaylist):
     name = "QUICK PLAY"
     description = "Fast, pick-up-and-play games"
+    GUIDE = {
+        'desc': 'Fast, pick-up-and-play games for a spare minute — short loops, instant restarts.',
+    }
 
     @classmethod
     def _init_games(cls):
@@ -51,6 +60,9 @@ class QuickPlay(GamePlaylist):
 class Shooters(GamePlaylist):
     name = "SHOOTERS"
     description = "Space shooters and blasters"
+    GUIDE = {
+        'desc': 'A mix of the space shooters and blasters — everything with a fire button.',
+    }
 
     @classmethod
     def _init_games(cls):
@@ -61,6 +73,9 @@ class Shooters(GamePlaylist):
 class Puzzle(GamePlaylist):
     name = "PUZZLE"
     description = "Brain teasers and puzzle games"
+    GUIDE = {
+        'desc': 'A shuffle of the brain-teasers and puzzle games — slower, thinkier play.',
+    }
 
     @classmethod
     def _init_games(cls):
@@ -71,6 +86,9 @@ class Puzzle(GamePlaylist):
 class Classics(GamePlaylist):
     name = "CLASSICS"
     description = "All-time classic games"
+    GUIDE = {
+        'desc': 'A shuffle of the all-time greats, drawn from across the eras.',
+    }
 
     @classmethod
     def _init_games(cls):

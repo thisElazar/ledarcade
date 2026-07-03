@@ -64,6 +64,14 @@ class MatterPhases(Visual):
     name = "MATTER"
     description = "States of matter: solid, liquid, gas"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'The three phases of matter — solid, liquid, and gas — simulated with interacting particles. Temperature controls phase transitions: melting, boiling, condensation, and freezing made visible.',
+        'controls': {
+            'Left/Right': 'Lower / raise temperature',
+            'Up/Down': 'Cycle palette',
+            'Button': 'Toggle labels',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

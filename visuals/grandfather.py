@@ -42,6 +42,10 @@ class GrandfatherClock(Visual):
     name = "GRANDFATHER"
     description = "Escapement clock"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Longcase pendulum clock with escapement mechanism. The pendulum swings, the escape wheel ticks, the hands turn.',
+        'credit': 'Christiaan Huygens, 1656',
+    }
 
     # Layout
     PIVOT_X = 32

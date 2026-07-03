@@ -58,6 +58,14 @@ class Fractals(Visual):
     name = "FRACTALS"
     description = "Interactive fractal explorer"
     category = "math"
+    GUIDE = {
+        'desc': 'Classic fractals rendered in real time: Mandelbrot set, Julia sets, Sierpinski triangle, Koch snowflake, and fractal trees. Joystick to pan and zoom into infinite self-similar detail.',
+        'controls': {
+            'Left/Right': 'Change fractal',
+            'Up/Down': 'Cycle color palette',
+            'Button': 'Animate (Julia set)',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

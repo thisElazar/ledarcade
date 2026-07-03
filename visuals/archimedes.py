@@ -49,6 +49,10 @@ class Archimedes(Visual):
     name = "ARCHIMEDES"
     description = "Ancient water screw"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A helical surface inside a cylinder, turned by hand to raise water. Still used today for irrigation and wastewater.',
+        'credit': 'c. 250 BC',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

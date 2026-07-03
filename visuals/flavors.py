@@ -100,6 +100,14 @@ class Flavors(Visual):
     name = "FLAVORS"
     description = "Regional flavor profiles"
     category = "cooking"
+    GUIDE = {
+        'desc': 'Regional cuisine flavor profiles showing key ingredients and five intensity bars (sweet, sour, salty, spicy, umami). 13 cuisines across 6 regions from East Asia to the Middle East.',
+        'controls': {
+            'Left/Right': 'Cycle through entries',
+            'Up/Down': 'Jump between families',
+            'Button': 'Reset scrolling to start',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

@@ -165,6 +165,10 @@ class Entropy(Visual):
     name = "ENTROPY"
     description = "Information theory"
     category = "math"
+    GUIDE = {
+        'desc': 'Shannon entropy visualized. Measures the information content and disorder of a system — the foundation of information theory.',
+        'credit': 'Claude Shannon, 1948',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

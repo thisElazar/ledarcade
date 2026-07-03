@@ -32,6 +32,9 @@ class Breakout(Game):
     name = "BREAK OUT"
     description = "Classic 1976 Atari"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Move a paddle to bounce a ball into rows of bricks. Clear all bricks to win. Ball speeds up; paddle shrinks after hitting the ceiling.',
+    }
 
     # Authentic color scheme (bottom to top): Yellow, Green, Orange, Red
     BRICK_ROWS = [

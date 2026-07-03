@@ -175,6 +175,9 @@ class BurgerTime(Game):
     name = "BURGER TIME"
     description = "Stack the burgers!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Walk across burger ingredients to drop them down platforms. Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Assemble all burgers to clear the level.',
+    }
 
     # Colors
     CHEF_COLOR = Colors.WHITE

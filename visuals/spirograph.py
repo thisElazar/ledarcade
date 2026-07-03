@@ -83,6 +83,10 @@ class Spirograph(Visual):
     name = "SPIROGRAPH"
     description = "Hypotrochoid curves"
     category = "math"
+    GUIDE = {
+        'desc': 'Hypotrochoid and epitrochoid curves from rolling circles. The plastic drawing toy that taught a generation about roulette curves.',
+        'credit': 'Denys Fischer, 1965',
+    }
 
     def reset(self):
         self.time = 0.0

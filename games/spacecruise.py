@@ -130,6 +130,9 @@ class SpaceCruise(Game):
     name = "SPACE CRUISE"
     description = "Math shooter!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Side-scrolling starship game. Navigate asteroid fields, manage shields, fire lasers. Survive as long as possible.',
+    }
 
     # Colors
     SPACE_BLACK = (5, 5, 15)

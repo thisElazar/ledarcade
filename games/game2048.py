@@ -16,6 +16,9 @@ class Game2048(Game):
     name = "2048"
     description = "Slide & Merge"
     category = "modern"
+    GUIDE = {
+        'desc': 'Slide numbered tiles on a 4×4 grid. Matching tiles merge and double. Reach the 2048 tile to win. Game ends when the board fills with no moves left.',
+    }
 
     # Grid layout - sized to fit 64x64 with HUD
     GRID_SIZE_TILES = 4

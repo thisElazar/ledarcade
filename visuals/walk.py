@@ -244,6 +244,9 @@ class Walk(Visual):
     name = "MOVEMENT"
     description = "Human motion"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'The mechanics of how a body moves. A stick figure built on Vitruvian proportions cycles through walk, run, and sneak gaits, driven by procedural biomechanical models — 14 joints and 15 bones in motion.',
+    }
 
     def reset(self):
         self.time = 0.0

@@ -97,6 +97,10 @@ class Jacquard(Visual):
     name = "JACQUARD"
     description = "Punch card loom"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'Punch cards controlling a weaving loom — the direct ancestor of computer programming. Babbage modeled his Analytical Engine on its logic; Lovelace saw the deeper computational implications.',
+        'credit': '1804',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

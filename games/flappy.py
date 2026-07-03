@@ -16,6 +16,9 @@ class Flappy(Game):
     name = "FLAPPY BIRD"
     description = "Tap to flap through pipes!"
     category = "modern"
+    GUIDE = {
+        'desc': 'Press a button to flap, thread through pipes. One hit and you’re done.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

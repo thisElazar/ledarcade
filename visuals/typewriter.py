@@ -165,6 +165,9 @@ class Typewriter(Visual):
     name = "TYPEWRITER"
     description = "Remington typewriter"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A mechanical typewriter with type bars striking an inked ribbon against paper. The carriage advances, the bell rings at the margin, the return lever sweeps back.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

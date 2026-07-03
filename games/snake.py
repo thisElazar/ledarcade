@@ -16,6 +16,9 @@ class Snake(Game):
     name = "SNAKE"
     description = "Eat food, grow longer!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Eat food, grow longer, don’t hit yourself or the walls. One of the most widely played games ever made.',
+    }
 
     # Scale factor - each game unit is 2x2 pixels
     SCALE = 2

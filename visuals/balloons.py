@@ -64,6 +64,14 @@ class Balloons(Visual):
     name = "BALLOONS"
     description = "Colorful balloons floating as a bundle"
     category = "household"
+    GUIDE = {
+        'desc': 'Colorful balloons rising and drifting. Pop them or watch them float away.',
+        'controls': {
+            'Button': 'Puff of wind',
+            'Left/Right': 'Remove / add a balloon',
+            'Up/Down': 'Cycle palette',
+        },
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

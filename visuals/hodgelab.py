@@ -38,6 +38,10 @@ class HodgeLab(Visual):
     name = "HODGE LAB"
     description = "Explore Hodgepodge parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': 'A hands-on version of the Hodgepodge Machine. Adjust the growth rate and maximum state count to steer the Belousov-Zhabotinsky spiral waves between calm and chaotic.',
+        'credit': 'Gerhardt & Schuster',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

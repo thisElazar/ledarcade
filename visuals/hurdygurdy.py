@@ -121,6 +121,9 @@ class HurdyGurdy(Visual):
     name = "HURDY GURDY"
     description = "Crank string instrument"
     category = "music"
+    GUIDE = {
+        'desc': 'Medieval string instrument where a rosined wheel acts as a continuous bow. Keys press tangents against the strings. Drone notes sustain while the melody plays above.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -17,6 +17,9 @@ class Galaga(Game):
     name = "GALAXA"
     description = "Shoot the aliens!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Fixed-position shooter. Move left/right and fire at alien formations. Let a boss alien capture your ship, then rescue it for double firepower. Survive waves of diving attacks.',
+    }
 
     # Player constants
     PLAYER_Y = 58

@@ -18,6 +18,9 @@ class Asteroids(Game):
     name = "ASTROIDS"
     description = "Destroy the rocks!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Rotate and thrust your ship, shoot asteroids that split into smaller pieces. Screen wraps. Survive and score. Inspired by the 1979 vector arcade classic.',
+    }
     
     def __init__(self, display: Display):
         super().__init__(display)

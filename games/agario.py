@@ -57,6 +57,9 @@ class Agario(Game):
     name = "AGAR.IO"
     description = "Eat cells to grow, avoid bigger ones!"
     category = "modern"
+    GUIDE = {
+        'desc': 'Absorb smaller cells, avoid bigger ones. L button boosts speed, R button ejects mass. Based on the browser game that launched the .io genre.',
+    }
 
     NUM_FOOD = 120
     NUM_AI = 12

@@ -17,6 +17,9 @@ class Pong(Game):
     name = "PING"
     description = "Beat the AI!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Two paddles, one ball. First to 11 wins. The simplest game that’s still fun.',
+    }
     
     def __init__(self, display: Display):
         super().__init__(display)

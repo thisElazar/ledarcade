@@ -20,6 +20,9 @@ class Twister(Visual):
     name = "TWISTER"
     description = "Rotating bars"
     category = "digital"
+    GUIDE = {
+        'desc': 'Vertical bars twist as if wrapped around a spinning cylinder. A demoscene staple creating depth from 2D math.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -110,6 +110,9 @@ class Loom(Visual):
     name = "LOOM"
     description = "Power loom"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A working weaving loom. The shuttle passes through the warp threads, the heddles lift, the beater presses. Cloth forms row by row.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

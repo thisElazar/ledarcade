@@ -20,6 +20,9 @@ class SineScroller(Visual):
     name = "SINESCROLL"
     description = "Wavy scroller"
     category = "digital"
+    GUIDE = {
+        'desc': 'Text scrolling along a sine wave — the classic demoscene intro effect. Each character bobs independently on a sinusoidal path.',
+    }
 
     # Pattern types
     PATTERN_SOLID = 0

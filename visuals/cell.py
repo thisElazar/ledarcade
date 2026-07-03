@@ -1222,6 +1222,14 @@ class Cell(Visual):
     name = "CELL"
     description = "Cellular pathways"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'A data-driven cross-section of a living cell. 14 real biochemical pathways: ATP synthase spinning, ribosomes translating mRNA, protein complexes cycling through conformational states.',
+        'controls': {
+            'Up/Down': 'Switch pathway group',
+            'Left/Right': 'Step through pathways',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

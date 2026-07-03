@@ -337,6 +337,9 @@ class Seismic(Visual):
     name = "SEISMIC"
     description = "Earthquake wave propagation"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Seismic wave propagation through layered earth. P-waves compress, S-waves shear, surface waves roll. Wavefronts refract at layer boundaries following Snell’s law.',
+    }
 
     # Source positions: angles around the crust (in radians)
     SOURCE_ANGLES = [

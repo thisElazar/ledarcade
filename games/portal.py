@@ -288,6 +288,9 @@ class Portal(Game):
     name = "PORTAL"
     description = "Aperture Science"
     category = "modern"
+    GUIDE = {
+        'desc': 'Navigate puzzle rooms using portals. L button places a blue portal, R button places an orange one. Walk into one, emerge from the other. Reach the exit to clear each room.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

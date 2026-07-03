@@ -478,6 +478,14 @@ class Clouds(Visual):
     name = "CLOUDS"
     description = "Cloud type reference"
     category = "nature"
+    GUIDE = {
+        'desc': 'Procedurally generated clouds drifting across the sky. Perlin noise fields produce layered formations that shift and dissolve.',
+        'controls': {
+            'Button': 'Toggle sky / detail view',
+            'Up/Down': 'Cycle cloud type',
+            'Left/Right': 'Adjust time speed',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

@@ -16,6 +16,9 @@ class Settings(Visual):
     name = "BRIGHTNESS"
     description = "Adjust brightness"
     category = "utility"
+    GUIDE = {
+        'desc': "Adjust the LED panel's overall brightness, with a live preview. Turn it down for a dim room or up to fill a bright one.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

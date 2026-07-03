@@ -774,6 +774,14 @@ class Constellations(Visual):
     name = "CONSTELLATIONS"
     description = "Night sky star map"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Real star positions from the Hipparcos catalog (ESA, 1997) with constellation lines from Stellarium. Stars rendered at correct relative brightness. Joystick to rotate the sky.',
+        'controls': {
+            'Up/Down': 'Switch group',
+            'Left/Right': 'Step through constellations',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

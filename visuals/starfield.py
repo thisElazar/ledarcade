@@ -31,6 +31,9 @@ class Starfield(Visual):
     name = "STARFIELD"
     description = "3D star tunnel"
     category = "digital"
+    GUIDE = {
+        'desc': '3D stars rushing toward you with perspective projection. Dots start small in the center and streak outward as they approach.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

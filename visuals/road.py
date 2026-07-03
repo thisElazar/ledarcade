@@ -20,6 +20,9 @@ class Road(Visual):
     name = "ROAD"
     description = "Desert drive"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'A single road with cars following each other. Car-following models produce stop-and-go waves from nothing — no accident, no bottleneck, just the physics of human reaction times.',
+    }
 
     # Color palette - beautiful desert day
     SKY_TOP = (135, 206, 235)      # Light sky blue

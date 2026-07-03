@@ -38,6 +38,9 @@ class Weather(Visual):
     name = "WEATHER"
     description = "Weather effects"
     category = "nature"
+    GUIDE = {
+        'desc': 'Animated weather scenes: rain, snow, thunderstorms, sunshine. Particles fall with realistic physics, lightning flashes illuminate the grid.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

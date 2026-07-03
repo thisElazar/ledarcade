@@ -80,6 +80,14 @@ class Microscope(Visual):
     name = "MICROSCOPE"
     description = "Biological specimens"
     category = "science_micro"
+    GUIDE = {
+        'desc': 'Scenes viewed through a virtual microscope: microorganisms, cell structures, and crystal formations.',
+        'controls': {
+            'Up/Down': 'Switch category',
+            'Left/Right': 'Step through items',
+            'Button': 'Toggle auto-cycle',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

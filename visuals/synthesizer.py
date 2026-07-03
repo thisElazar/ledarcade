@@ -100,6 +100,9 @@ class Synthesizer(Visual):
     name = "SYNTHESIZER"
     description = "Modular synth panel"
     category = "music"
+    GUIDE = {
+        'desc': 'A modular synthesizer with oscillators, filters, and patch cables. Waveforms morph on screen as parameters change.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

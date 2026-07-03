@@ -19,6 +19,9 @@ class Moire(Visual):
     name = "MOIRE"
     description = "Interference patterns"
     category = "digital"
+    GUIDE = {
+        'desc': 'Two overlapping grids, slightly offset and rotating, produce shimmering moiré interference patterns.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

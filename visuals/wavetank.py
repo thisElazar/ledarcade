@@ -102,6 +102,9 @@ class WaveTank(Visual):
     name = "WAVE TANK"
     description = "2D wave equation simulation"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'The 2D wave equation solved with leapfrog integration. Point sources, double-slit diffraction, two-source interference, ripples, and reflection. Real wave physics on a grid.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

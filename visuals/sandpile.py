@@ -30,6 +30,10 @@ class Sandpile(Visual):
     name = "SANDPILE"
     description = "Fractal avalanches"
     category = "automata"
+    GUIDE = {
+        'desc': 'The Abelian Sandpile Model. Drop grains one at a time; chain-reaction avalanches form fractal patterns. Demonstrates self-organized criticality — the mechanism behind power laws in earthquakes and markets.',
+        'credit': 'Bak, Tang & Wiesenfeld, 1987',
+    }
 
     # Color palettes: each maps grain counts 0-3 plus overflow (4+)
     PALETTES = [

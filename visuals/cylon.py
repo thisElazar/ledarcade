@@ -18,6 +18,9 @@ class Cylon(Visual):
     name = "LARSON SCAN"
     description = "Larson scanner"
     category = "digital"
+    GUIDE = {
+        'desc': 'A bright dot sweeping back and forth with a fading trail — the Cylon eye from Battlestar Galactica (and Kit from Knight Rider). Named after producer Glen A. Larson.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

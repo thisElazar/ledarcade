@@ -22,6 +22,9 @@ class Ripples(Visual):
     name = "RIPPLES"
     description = "Rippling waves"
     category = "nature"
+    GUIDE = {
+        'desc': 'Concentric rings expand from random drop points, interact, and fade. A rain-on-water simulation using the 2D wave equation with damping. Interference patterns form where rings collide.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

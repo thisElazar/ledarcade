@@ -20,6 +20,9 @@ class RushHour(Game):
     name = "RUSH HR"
     description = "Sliding block puzzle"
     category = "toys"
+    GUIDE = {
+        'desc': 'Slide cars and trucks on a grid to free the red car through the exit. Vehicles only move along their length. Puzzles range from easy to very hard.',
+    }
 
     # Board is 6x6, exit is on right side at row 2 (0-indexed)
     BOARD_SIZE = 6

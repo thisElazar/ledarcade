@@ -40,6 +40,10 @@ class Lava(Visual):
     name = "LAVALAMP"
     description = "Lava lamp blobs"
     category = "household"
+    GUIDE = {
+        'desc': 'Wax blobs rise and fall through heated liquid. Metaballs simulate the organic splitting and merging.',
+        'credit': 'Edward Craven Walker, 1963',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

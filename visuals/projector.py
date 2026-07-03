@@ -130,6 +130,9 @@ class Projector(Visual):
     name = "PROJECTOR"
     description = "Film projector"
     category = "mechanics"
+    GUIDE = {
+        'desc': 'A film projector with spinning reels, film threading through the gate, and a beam of light. 24 still images per second creating the illusion of motion.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

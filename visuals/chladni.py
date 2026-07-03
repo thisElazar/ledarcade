@@ -82,6 +82,10 @@ class Chladni(Visual):
     name = "CHLADNI"
     description = "Vibrating plate nodal patterns"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Sand on a vibrating plate collects at the nodes, revealing standing wave patterns. Each frequency produces a unique geometric figure.',
+        'credit': 'Ernst Chladni, 1787',
+    }
 
     # Square/rect modes sorted by ascending frequency f ∝ (n² + m²).
     # For a ~20 cm square brass plate, f ≈ 28·(n² + m²) Hz.

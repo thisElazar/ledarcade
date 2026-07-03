@@ -48,6 +48,10 @@ class BoidsLab(Visual):
     name = "BOIDS LAB"
     description = "Explore Boids parameter space"
     category = "automata"
+    GUIDE = {
+        'desc': 'The Boids flocking model turned into an explorable parameter space. The joystick sweeps separation against cohesion; watch tight schools loosen into scattered wandering and back.',
+        'credit': 'Craig Reynolds, 1987',
+    }
 
     NUM_BOIDS = 80
     PERCEPTION_RADIUS = 10.0

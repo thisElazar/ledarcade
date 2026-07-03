@@ -625,6 +625,9 @@ class Coulomb(Visual):
     name = "COULOMB"
     description = "Electrostatics sandbox"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Coulomb electrostatics with field-line tracing and equipotential rendering. Five scenarios — dipole, quadrupole, motor, circuit, and random — all governed by the inverse-square law.',
+    }
 
     NUM_STATOR = 8
     NUM_ROTOR = 4

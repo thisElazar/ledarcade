@@ -16,6 +16,9 @@ class Timers(Visual):
     name = "IDLE TIMERS"
     description = "Idle, cycle, sleep timers"
     category = "utility"
+    GUIDE = {
+        'desc': "Set the cabinet's timing: how long before the idle screensaver kicks in, how fast idle visuals cycle, and when the panel sleeps.",
+    }
     custom_exit = True
 
     PARAMS = [

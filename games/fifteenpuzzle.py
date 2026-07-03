@@ -17,6 +17,9 @@ class FifteenPuzzle(Game):
     name = "15 PUZZLE"
     description = "1880s sliding puzzle"
     category = "toys"
+    GUIDE = {
+        'desc': 'Slide 15 numbered tiles into order using the single empty space. The “14-15” variant is mathematically impossible.',
+    }
 
     # Board layout (matching demo style)
     BOARD_SIZE = 4

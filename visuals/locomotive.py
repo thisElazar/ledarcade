@@ -142,6 +142,9 @@ class Locomotive(Visual):
     name = "LOCOMOTIVE"
     description = "Steam locomotive"
     category = "mechanics"
+    GUIDE = {
+        'desc': "Side-view cutaway with driving wheels, coupling rods, and crankshaft. The crank-slider mechanism converts the piston's linear motion into rotary motion.",
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

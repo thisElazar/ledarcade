@@ -16,6 +16,9 @@ class Stack(Game):
     name = "STACK"
     description = "Build the tower!"
     category = "modern"
+    GUIDE = {
+        'desc': 'Press the button to drop a sliding block onto the stack. Misalignment shrinks the next platform. Game ends when the block gets too small. Score by stacking as high as possible.',
+    }
 
     # Game constants
     BASE_Y = 58  # Bottom of tower

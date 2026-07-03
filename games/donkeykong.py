@@ -16,6 +16,9 @@ class DonkeyKong(Game):
     name = "MONKEY KONG"
     description = "Climb & Rescue!"
     category = "arcade"
+    GUIDE = {
+        'desc': 'Climb platforms, jump over barrels, and reach the top. Inspired by the game that started the platformer genre.',
+    }
 
     # Colors
     GIRDER_COLOR = (255, 100, 50)      # Orange-red

@@ -32,6 +32,10 @@ class DVD(Visual):
     name = "DVD"
     description = "Bouncing logo"
     category = "household"
+    GUIDE = {
+        'desc': 'The bouncing DVD logo screensaver. Changes color on every wall hit. The screen flashes when it hits the corner.',
+        'credit': 'c. 2000',
+    }
 
     LOGO_W = 12
     LOGO_H = 8

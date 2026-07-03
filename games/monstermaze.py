@@ -193,6 +193,9 @@ class MonsterMaze(Game):
     name = "3D MONSTR MAZE"
     description = "Escape the T-Rex!"
     category = "retro"
+    GUIDE = {
+        'desc': 'Escape a T-Rex stalking you through a first-person 3D maze. Based on one of the earliest survival horror games.',
+    }
 
     STEP_COOLDOWN = 0.2
 

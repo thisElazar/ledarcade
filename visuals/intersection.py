@@ -36,6 +36,9 @@ class Intersection(Visual):
     name = "SIGNALS"
     description = "NEMA signal phasing"
     category = "road_rail"
+    GUIDE = {
+        'desc': 'A signalized intersection with timed red/green phases. Cars queue, the light changes, the queue discharges.',
+    }
 
     ROAD_COLOR = (50, 50, 55)
     LANE_DASH = (80, 70, 20)

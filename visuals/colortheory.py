@@ -89,6 +89,14 @@ class ColorTheory(Visual):
     name = "COLOR THEORY"
     description = "Color theory reference"
     category = "science_bench"
+    GUIDE = {
+        'desc': 'Color wheel, complementary colors, and color mixing. Additive and subtractive models side by side on the LED grid.',
+        'controls': {
+            'Up/Down': 'Switch page',
+            'Left/Right': 'Adjust the current page',
+            'Button': 'Toggle related view',
+        },
+    }
 
     def reset(self):
         self.time = 0.0

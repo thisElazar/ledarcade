@@ -375,6 +375,9 @@ class Pinball(Game):
     name = "PINBALL"
     description = "Scrolling pinball with flippers and bumpers"
     category = "bar"
+    GUIDE = {
+        'desc': 'Pinball with flippers, bumpers, ramps, and a plunger. L button controls the left flipper, R button the right. Hit targets to score; don’t let the ball drain.',
+    }
 
     def __init__(self, display: Display):
         super().__init__(display)

@@ -218,6 +218,9 @@ class OrbitsSolar(Visual):
     name = "SOLAR SYSTEM"
     description = "Sun and planets"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Newtonian gravity with Velocity Verlet integration. Planets orbit at correct relative speeds around a central star.',
+    }
     TRAIL_LENGTH = 80
 
     def __init__(self, display: Display):
@@ -675,6 +678,9 @@ class OrbitsMulti(Visual):
     name = "3 BODY PROBLEM"
     description = "Gravitational dance"
     category = "science_macro"
+    GUIDE = {
+        'desc': 'Three bodies orbiting under mutual gravitational attraction. No closed-form solution exists — the system is inherently chaotic. Watch them dance, fling each other away, and sometimes find temporary stability.',
+    }
     TRAIL_LENGTH = 120
     SOFT2 = 25.0       # Higher softening → gentler close passes
     MIN_MASS = 3.0     # Below this, full merge

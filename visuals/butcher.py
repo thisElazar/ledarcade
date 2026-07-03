@@ -540,6 +540,13 @@ class Butcher(Visual):
     name = "BUTCHER"
     description = "Butcher cut charts"
     category = "cooking"
+    GUIDE = {
+        'desc': "Primal-cut charts for beef, pork, lamb, and chicken. Each animal is a pixel-art silhouette with its butcher's regions shaded in; drill into any primal to see the retail cuts and how to cook them.",
+        'controls': {
+            'Up/Down': 'Switch animal',
+            'Left/Right': 'Cycle primal cut',
+        },
+    }
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12

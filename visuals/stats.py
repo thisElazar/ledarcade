@@ -18,6 +18,9 @@ class Stats(Visual):
     name = "STATS"
     description = "Play statistics"
     category = "utility"
+    GUIDE = {
+        'desc': "A scrolling record of play history and high scores across the cabinet's games.",
+    }
 
     HEADER_H = 8
     SEP_Y = 7
