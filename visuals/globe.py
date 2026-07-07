@@ -229,10 +229,12 @@ class Earth(Visual):
         self._draw_loading(0.3, "THE WORLD")
         self.display.render()
 
-        d = np.load(path, allow_pickle=True)
-        atlas = {}
-        for key in d.files:
-            atlas[key] = d[key]
+        def _progress(pct, label):
+            self._draw_loading(pct, label)
+            self.display.render()
+
+        from .atlas import _load_atlas_arrays
+        atlas = _load_atlas_arrays(path, _progress)
 
         self._draw_loading(1.0, "READY")
         self.display.render()
