@@ -2823,7 +2823,7 @@
      "desc": "Regional cuisine flavor profiles showing key ingredients and five intensity bars (sweet, sour, salty, spicy, umami). 13 cuisines across 6 regions from East Asia to the Middle East.",
      "controls": {
       "Left/Right": "Cycle through entries",
-      "Up/Down": "Jump between families",
+      "Up/Down": "Jump between regions",
       "Button": "Reset scrolling to start"
      }
     },
@@ -2878,7 +2878,7 @@
      "desc": "The recipes behind the world's great spice blends. Each shows its origin, meaning, component spices, and the dishes it belongs in \u2014 the micro view of what's actually inside ras el hanout, garam masala, and more.",
      "controls": {
       "Left/Right": "Cycle through entries",
-      "Up/Down": "Jump between families",
+      "Up/Down": "Jump between regions",
       "Button": "Reset scrolling to start"
      }
     }

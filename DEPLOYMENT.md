@@ -11,7 +11,7 @@ feature/x ──PR──▶ main ──(verify on dev cabinet)──▶ git tag 
 ```
 
 - **`main`** is the trunk: always green, CI-gated, deployable in principle. All work lands here via pull requests. **Never commit directly to `main`.**
-- **A release is a tag**, not a branch. When a commit on `main` is verified on the dev cabinet, tag it `vMAJOR.MINOR` (e.g. `v1.4`).
+- **A release is a tag**, not a branch. When a commit on `main` is verified on the dev cabinet, tag it `vMAJOR.MINOR` (e.g. `v1.4`), or `vMAJOR.MINOR.PATCH` (e.g. `v1.4.1`) for a small fix release. Both `start.sh` and the update checker pick the highest tag by version sort, so patch releases work everywhere.
 - **Distribution cabinets run the latest tag.** They never run `main`'s tip.
 - **The dev cabinet runs `main`.** It is the test bed — the only place "works on real hardware" is ever checked.
 
@@ -42,7 +42,7 @@ After the change is merged to `main` and verified on the dev cabinet:
 
 ```bash
 git checkout main && git pull
-git tag v1.4            # next version, vMAJOR.MINOR
+git tag v1.4            # next version, vMAJOR.MINOR (or vX.Y.Z for a patch)
 git push origin v1.4
 ```
 

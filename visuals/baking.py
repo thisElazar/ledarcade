@@ -178,7 +178,6 @@ class Baking(Visual):
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0
 
     def _current(self):
         return RECIPES[self.idx % len(RECIPES)]
@@ -188,7 +187,6 @@ class Baking(Visual):
         self._name_scroll_x = 0.0
         self._ratio_scroll_x = 0.0
         self._note_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def _jump_family(self, direction):
         cur = self._current()['family']
@@ -198,7 +196,6 @@ class Baking(Visual):
         self._name_scroll_x = 0.0
         self._ratio_scroll_x = 0.0
         self._note_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -245,8 +242,6 @@ class Baking(Visual):
                     self._scroll_accum -= self.SCROLL_RATE
                     self._step(self._scroll_dir)
 
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         r = self._current()
         self._name_scroll_x = self._advance_scroll(
@@ -300,8 +295,15 @@ class Baking(Visual):
         max_bar_w = 38  # max pixel width for widest bar
         label_w = 22    # 5 chars * 4px + 2px pad
 
+        # Compress row spacing when needed so every bar fits above SEP3_Y
+        # (only NEW YORK's 6 bars need it; <=5 bars keep the default step)
+        step = self.BAR_H + self.BAR_GAP
+        if len(bars) > 1:
+            avail = self.SEP3_Y - self.BARS_Y - self.BAR_H
+            step = min(step, avail // (len(bars) - 1))
+
         for i, (label, val, color) in enumerate(bars):
-            y = self.BARS_Y + i * (self.BAR_H + self.BAR_GAP)
+            y = self.BARS_Y + i * step
             if y + self.BAR_H > self.SEP3_Y:
                 break
 
