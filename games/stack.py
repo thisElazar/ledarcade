@@ -143,14 +143,13 @@ class Stack(Game):
 
         # Check for perfect placement (within 2 pixels - more forgiving)
         if abs(self.current_x - top_block['x']) < 2 and abs(self.current_width - top_block['width']) < 2:
-            # Perfect!
+            # Perfect! Keep the same width
             self.perfect_streak += 1
+            overlap = top_block['width']
+            new_left = top_block['x']
             # Bonus: grow block slightly on perfect streak
             if self.perfect_streak >= 2:
                 overlap = min(overlap + 1, self.INITIAL_WIDTH)
-            # Keep the same width on perfect
-            overlap = top_block['width']
-            new_left = top_block['x']
         else:
             self.perfect_streak = 0
 

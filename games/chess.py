@@ -454,9 +454,9 @@ class Chess(Game):
         if self.promoting_pawn:
             promotion_pieces = [QUEEN, ROOK, BISHOP, KNIGHT]
 
-            if input_state.left:
+            if input_state.left_pressed:
                 self.promotion_choice = (self.promotion_choice - 1) % 4
-            elif input_state.right:
+            elif input_state.right_pressed:
                 self.promotion_choice = (self.promotion_choice + 1) % 4
             elif (input_state.action_l or input_state.action_r):
                 self.promote_pawn(promotion_pieces[self.promotion_choice])
