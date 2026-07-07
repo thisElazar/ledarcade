@@ -26,7 +26,6 @@ _CK = (55, 120, 35)      # carrot dark green
 _PO = (210, 190, 130)    # base
 _PL = (230, 215, 165)    # highlight
 _PD = (170, 150, 95)     # shadow
-_PI = (240, 230, 190)    # interior
 
 # Basil
 _BA = (60, 150, 45)      # base green
@@ -63,7 +62,7 @@ TEXT_DIM = (100, 100, 120)
 SEP_COLOR = (50, 50, 70)
 LABEL_DIM = (70, 70, 90)
 
-# ── Families (for future cuts) ─────────────────────────────────────
+# ── Families ───────────────────────────────────────────────────────
 FAMILIES = ["STRIPS", "DICE", "SPECIAL"]
 FAMILY_COLORS = [
     (200, 160, 60),     # STRIPS = golden
@@ -187,7 +186,6 @@ class Knife(Visual):
     SURFACE_Y = 29     # where things rest (just above board)
 
     def reset(self):
-        self.time = 0.0
         self.cut_idx = 0
         self.frame = 0
         self.frame_timer = 0.0
@@ -255,7 +253,6 @@ class Knife(Visual):
         return consumed
 
     def update(self, dt: float):
-        self.time += dt
 
         # Auto-scroll nav
         if self._scroll_dir != 0:

@@ -104,7 +104,7 @@ class Flavors(Visual):
         'desc': 'Regional cuisine flavor profiles showing key ingredients and five intensity bars (sweet, sour, salty, spicy, umami). 13 cuisines across 6 regions from East Asia to the Middle East.',
         'controls': {
             'Left/Right': 'Cycle through entries',
-            'Up/Down': 'Jump between families',
+            'Up/Down': 'Jump between regions',
             'Button': 'Reset scrolling to start',
         },
     }
@@ -133,7 +133,6 @@ class Flavors(Visual):
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0
 
     def _current(self):
         return CUISINES[self.idx % len(CUISINES)]
@@ -142,7 +141,6 @@ class Flavors(Visual):
         self.idx = (self.idx + direction) % len(CUISINES)
         self._name_scroll_x = 0.0
         self._ingr_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def _jump_region(self, direction):
         cur = self._current()['region']
@@ -151,7 +149,6 @@ class Flavors(Visual):
             self.idx = _REGION_CUISINES[target][0]
         self._name_scroll_x = 0.0
         self._ingr_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -197,8 +194,6 @@ class Flavors(Visual):
                     self._scroll_accum -= self.SCROLL_RATE
                     self._step(self._scroll_dir)
 
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         c = self._current()
         self._name_scroll_x = self._advance_scroll(

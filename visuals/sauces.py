@@ -218,6 +218,7 @@ class Sauces(Visual):
 
     SCROLL_DELAY = 0.4
     SCROLL_RATE = 0.12
+    SCROLL_LEAD_IN = 30  # px of empty space before text starts scrolling
 
     # Layout Y positions
     NAME_Y = 1       # sauce name
@@ -242,7 +243,6 @@ class Sauces(Visual):
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0  # brief flash on sauce change
 
     def _current(self):
         return SAUCES[self.sauce_idx % len(SAUCES)]
@@ -252,7 +252,6 @@ class Sauces(Visual):
         self._name_scroll_x = 0.0
         self._add_scroll_x = 0.0
         self._serve_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def _jump_family(self, direction):
         """Jump to next/prev family."""
@@ -263,7 +262,6 @@ class Sauces(Visual):
         self._name_scroll_x = 0.0
         self._add_scroll_x = 0.0
         self._serve_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -315,8 +313,6 @@ class Sauces(Visual):
                     self._step_sauce(self._scroll_dir)
 
         # Decay switch flash
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         sauce = self._current()
 
@@ -332,7 +328,6 @@ class Sauces(Visual):
         self._serve_scroll_x = self._advance_scroll(
             self._serve_scroll_x, sauce['serve'], 60, dt, 16)
 
-    SCROLL_LEAD_IN = 30  # px of empty space before text starts scrolling
 
     def _advance_scroll(self, scroll_x, text, avail_px, dt, speed):
         """Advance scroll position if text is wider than available pixels."""

@@ -2,8 +2,8 @@
 
 Four animals (Beef, Pork, Lamb, Chicken) with primal cut regions shown as
 colored zones on pixel-art silhouettes.  Up/Down cycles animals, Left/Right
-cycles primal cuts (highlighting the region), action button toggles between
-primal name and retail cuts / cooking info.
+cycles primal cuts (highlighting the region); the selected primal's retail
+cuts and cooking info are shown alongside.
 """
 
 from . import Visual
@@ -12,7 +12,6 @@ from . import Visual
 HEADER_BG = (20, 20, 30)
 TEXT_DIM = (100, 100, 120)
 SEP_COLOR = (50, 50, 70)
-HIGHLIGHT_COLOR = (255, 255, 255)
 
 # ── Animal accent colors ──────────────────────────────────────────
 ANIMAL_COLORS = [
@@ -145,10 +144,6 @@ def _beef_regions():
     for y in range(21, 26):
         for x in range(33, 39):
             r.add((x, y))
-    for y in range(21, 26):
-        for x in range(7, 13):
-            # rear shank already in round, only add non-overlapping
-            pass
     regions['SHANK'] = r
 
     # Also add body top row pixels to chuck
@@ -215,7 +210,7 @@ def _pork_regions():
             r.add((x, y))
     regions['LOIN'] = r
 
-    # Belly: x 12-30, y 15-19
+    # Belly: x 8-30, y 15-19
     r = set()
     for y in range(15, 20):
         for x in range(8, 30):
@@ -232,7 +227,7 @@ def _pork_regions():
             r.add((x, y))
     regions['LEG/HAM'] = r
 
-    # Spare Ribs: x 20-30, y 15-19
+    # Spare Ribs: x 30-40, y 15-19
     r = set()
     for y in range(15, 20):
         for x in range(30, 40):
@@ -527,15 +522,6 @@ def _dim(color, factor=0.4):
     return (int(color[0] * factor), int(color[1] * factor), int(color[2] * factor))
 
 
-def _blend(c1, c2, t):
-    """Blend c1 toward c2 by factor t (0=c1, 1=c2)."""
-    return (
-        int(c1[0] + (c2[0] - c1[0]) * t),
-        int(c1[1] + (c2[1] - c1[1]) * t),
-        int(c1[2] + (c2[2] - c1[2]) * t),
-    )
-
-
 class Butcher(Visual):
     name = "BUTCHER"
     description = "Butcher cut charts"
@@ -565,7 +551,6 @@ class Butcher(Visual):
     FOOT_Y = 59
 
     def reset(self):
-        self.time = 0.0
         self.animal_idx = 0
         self.cut_idx = 0
         self._cut_scroll_x = 0.0
@@ -611,7 +596,6 @@ class Butcher(Visual):
         return consumed
 
     def update(self, dt: float):
-        self.time += dt
         self._blink_timer += dt
 
         cut = self._cut()

@@ -156,7 +156,7 @@ class Spices(Visual):
         'desc': "The recipes behind the world's great spice blends. Each shows its origin, meaning, component spices, and the dishes it belongs in — the micro view of what's actually inside ras el hanout, garam masala, and more.",
         'controls': {
             'Left/Right': 'Cycle through entries',
-            'Up/Down': 'Jump between families',
+            'Up/Down': 'Jump between regions',
             'Button': 'Reset scrolling to start',
         },
     }
@@ -189,7 +189,6 @@ class Spices(Visual):
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0
 
     def _current(self):
         return BLENDS[self.idx % len(BLENDS)]
@@ -200,7 +199,6 @@ class Spices(Visual):
         self._comp_scroll_x = 0.0
         self._mean_scroll_x = 0.0
         self._use_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def _jump_region(self, direction):
         cur = self._current()['region']
@@ -211,7 +209,6 @@ class Spices(Visual):
         self._comp_scroll_x = 0.0
         self._mean_scroll_x = 0.0
         self._use_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -259,8 +256,6 @@ class Spices(Visual):
                     self._scroll_accum -= self.SCROLL_RATE
                     self._step(self._scroll_dir)
 
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         b = self._current()
         self._name_scroll_x = self._advance_scroll(
@@ -343,7 +338,6 @@ class Spices(Visual):
         d.draw_text_small(1, self.FOOT_Y, pos_str, TEXT_DIM)
 
         # Region position right-aligned
-        reg_name = REGIONS[region]
         reg_list = _REGION_BLENDS[region]
         reg_pos = reg_list.index(self.idx) + 1 if self.idx in reg_list else 1
         reg_str = f'{reg_pos}/{len(reg_list)}'

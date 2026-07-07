@@ -139,7 +139,6 @@ class Pantry(Visual):
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0
 
     def _current(self):
         return ITEMS[self.idx % len(ITEMS)]
@@ -150,7 +149,6 @@ class Pantry(Visual):
         self._legend_scroll_x = 0.0
         self._method_scroll_x = 0.0
         self._use_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def _jump_family(self, direction):
         cur = self._current()['family']
@@ -161,7 +159,6 @@ class Pantry(Visual):
         self._legend_scroll_x = 0.0
         self._method_scroll_x = 0.0
         self._use_scroll_x = 0.0
-        self._switch_flash = 0.15
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -209,8 +206,6 @@ class Pantry(Visual):
                     self._scroll_accum -= self.SCROLL_RATE
                     self._step(self._scroll_dir)
 
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         item = self._current()
         self._name_scroll_x = self._advance_scroll(
@@ -243,17 +238,6 @@ class Pantry(Visual):
         for name, count, _color in parts:
             segs.append(f'  {name} {count}')
         return '  '.join(segs)
-
-    def _build_legend_segments(self, parts):
-        """Build list of (text, color) for multi-color legend drawing."""
-        segments = []
-        for i, (name, count, color) in enumerate(parts):
-            if i > 0:
-                segments.append(('  ', TEXT_DIM))   # spacer
-            # Dot char will be drawn as a filled square in _draw_legend
-            segments.append(('\x00', color))        # sentinel for color swatch
-            segments.append((f'{name} {count}', color))
-        return segments
 
     def draw(self):
         d = self.display

@@ -469,10 +469,10 @@ class Pasta(Visual):
         self._name_scroll_x = 0.0
         self._meaning_scroll_x = 0.0
         self._sauce_scroll_x = 0.0
+        self._region_scroll_x = 0.0
         self._scroll_dir = 0
         self._scroll_hold = 0.0
         self._scroll_accum = 0.0
-        self._switch_flash = 0.0
 
     def _current(self):
         return PASTAS[self.pasta_idx % len(PASTAS)]
@@ -482,7 +482,7 @@ class Pasta(Visual):
         self._name_scroll_x = 0.0
         self._meaning_scroll_x = 0.0
         self._sauce_scroll_x = 0.0
-        self._switch_flash = 0.15
+        self._region_scroll_x = 0.0
 
     def _jump_family(self, direction):
         cur = self._current()['family']
@@ -492,7 +492,7 @@ class Pasta(Visual):
         self._name_scroll_x = 0.0
         self._meaning_scroll_x = 0.0
         self._sauce_scroll_x = 0.0
-        self._switch_flash = 0.15
+        self._region_scroll_x = 0.0
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -524,6 +524,7 @@ class Pasta(Visual):
             self._name_scroll_x = 0.0
             self._meaning_scroll_x = 0.0
             self._sauce_scroll_x = 0.0
+            self._region_scroll_x = 0.0
             consumed = True
 
         return consumed
@@ -539,8 +540,6 @@ class Pasta(Visual):
                     self._scroll_accum -= self.SCROLL_RATE
                     self._step_pasta(self._scroll_dir)
 
-        if self._switch_flash > 0:
-            self._switch_flash = max(0.0, self._switch_flash - dt)
 
         pasta = self._current()
         self._name_scroll_x = self._advance_scroll(
@@ -549,6 +548,9 @@ class Pasta(Visual):
             self._meaning_scroll_x, pasta['meaning'], 60, dt, 16)
         self._sauce_scroll_x = self._advance_scroll(
             self._sauce_scroll_x, pasta['sauces'], 60, dt, 16)
+        region_fam = f'{pasta["region"]}  {FAMILIES[pasta["family"]]}'
+        self._region_scroll_x = self._advance_scroll(
+            self._region_scroll_x, region_fam, 60, dt, 16)
 
     def _advance_scroll(self, scroll_x, text, avail_px, dt, speed):
         text_px = len(text) * 4
@@ -615,12 +617,17 @@ class Pasta(Visual):
         # ── Sep 4 ──
         self._draw_sep(d, self.SEP4_Y)
 
-        # ── Region + family name (centered, dimmed) ──
+        # ── Region + family name (centered, dimmed; scrolls if too wide) ──
         region_fam = f'{pasta["region"]}  {FAMILIES[fam]}'
         region_color = _dim(fam_color, 0.35)
         region_px = len(region_fam) * 4
-        region_x = max(1, (64 - region_px) // 2)
-        d.draw_text_small(region_x, self.REGION_Y, region_fam, region_color)
+        if region_px > 60:
+            self._draw_scrolling_text(d, 2, self.REGION_Y,
+                                      region_fam, region_color,
+                                      self._region_scroll_x, 60)
+        else:
+            region_x = max(1, (64 - region_px) // 2)
+            d.draw_text_small(region_x, self.REGION_Y, region_fam, region_color)
 
         # ── Footer ──
         self._draw_sep(d, self.FOOT_SEP_Y)
