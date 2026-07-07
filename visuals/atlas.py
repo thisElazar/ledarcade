@@ -11,7 +11,9 @@ Controls:
 """
 
 import os
+import shutil
 import urllib.request
+import zipfile
 import numpy as np
 from . import Visual, Display, GRID_SIZE
 
@@ -498,6 +500,96 @@ def _find_atlas():
     return None, None
 
 
+# ── Atlas loading ────────────────────────────────────────────────────
+#
+# The world atlas npz decompresses to ~1.3 GB (roads/rails alone are two
+# 522 MB dense masks), which cannot live in a Pi's 906 MB of RAM and takes
+# a long time to inflate every launch. Instead, stream the npz members out
+# to raw .npy files once, then memory-map them: every later load is
+# near-instant and only the pages a view actually touches stay resident.
+
+def _unpack_dir_for(path):
+    return path[:-len('.npz')] + '_unpacked'
+
+
+def _member_unpacked(unpack_dir, info):
+    """True if this npz member is already fully extracted (size matches)."""
+    dest = os.path.join(unpack_dir, info.filename)
+    return os.path.exists(dest) and os.path.getsize(dest) == info.file_size
+
+
+def _unpack_atlas(path, unpack_dir, progress=None):
+    """Stream npz members to raw .npy files. Returns True when complete.
+
+    Resumable: members whose size already matches are skipped, and each
+    member lands via a .tmp + os.replace so a power cut mid-unpack never
+    leaves a truncated file that passes the size check.
+    """
+    with zipfile.ZipFile(path) as z:
+        infos = z.infolist()
+        need = sum(i.file_size for i in infos
+                   if not _member_unpacked(unpack_dir, i))
+        if need == 0:
+            return True
+        # Refuse if the disk can't hold the remaining data plus headroom
+        free = shutil.disk_usage(os.path.dirname(path)).free
+        if free < need + 200 * 1024 * 1024:
+            return False
+        os.makedirs(unpack_dir, exist_ok=True)
+        total = sum(i.file_size for i in infos) or 1
+        done = sum(i.file_size for i in infos
+                   if _member_unpacked(unpack_dir, i))
+        for info in infos:
+            if _member_unpacked(unpack_dir, info):
+                continue
+            dest = os.path.join(unpack_dir, info.filename)
+            tmp = dest + '.tmp'
+            with z.open(info) as src, open(tmp, 'wb') as out:
+                while True:
+                    chunk = src.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    out.write(chunk)
+                    done += len(chunk)
+                    if progress:
+                        progress(done / total, f"UNPACK {done // 1000000}MB")
+            os.replace(tmp, dest)
+    return True
+
+
+def _load_atlas_arrays(path, progress=None):
+    """Load an atlas .npz as a dict of arrays, memory-mapped where possible.
+
+    Falls back to the old eager decompress when unpacking isn't possible
+    (read-only or full disk) — that path needs enough RAM for the whole
+    atlas and is what the memory-mapping exists to avoid.
+    """
+    try:
+        unpacked = _unpack_atlas(path, _unpack_dir_for(path), progress)
+    except OSError:
+        unpacked = False
+
+    atlas = {}
+    if unpacked:
+        unpack_dir = _unpack_dir_for(path)
+        with zipfile.ZipFile(path) as z:
+            names = z.namelist()
+        for fname in names:
+            key = fname[:-4] if fname.endswith('.npy') else fname
+            fpath = os.path.join(unpack_dir, fname)
+            try:
+                atlas[key] = np.load(fpath, mmap_mode='r')
+            except Exception:
+                # Object arrays (place/airport names) can't be memory-mapped
+                atlas[key] = np.load(fpath, allow_pickle=True)
+        return atlas
+
+    d = np.load(path, allow_pickle=True)
+    for key in d.files:
+        atlas[key] = d[key]
+    return atlas
+
+
 # ── Visual class ─────────────────────────────────────────────────────
 
 class Atlas(Visual):
@@ -615,12 +707,13 @@ class Atlas(Visual):
         self._draw_loading(0.2, "THE WORLD")
         self.display.render()
 
-        d = np.load(path, allow_pickle=True)
-        atlas = {}
-        for key in d.files:
-            atlas[key] = d[key]
+        def _progress(pct, label):
+            self._draw_loading(pct, label)
+            self.display.render()
 
-        self._draw_loading(0.5, "THE WORLD")
+        atlas = _load_atlas_arrays(path, _progress)
+
+        self._draw_loading(0.9, "THE WORLD")
         self.display.render()
 
         # Load supplementary data from same directory
