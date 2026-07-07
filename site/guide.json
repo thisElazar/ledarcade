@@ -103,7 +103,7 @@
      "name": "GALAXA",
      "cls": "Galaga",
      "module": "games/galaga.py",
-     "desc": "Fixed-position shooter. Move left/right and fire at alien formations. Let a boss alien capture your ship, then rescue it for double firepower. Survive waves of diving attacks.",
+     "desc": "Fixed-position shooter. Move left/right and fire at alien formations. Survive waves of diving attacks.",
      "controls": {
       "Left/Right": "Move ship",
       "Space": "Fire"
@@ -183,7 +183,7 @@
      "name": "PING",
      "cls": "Pong",
      "module": "games/pong.py",
-     "desc": "Two paddles, one ball. First to 11 wins. The simplest game that\u2019s still fun.",
+     "desc": "Two paddles, one ball. First to 7 wins. The simplest game that\u2019s still fun.",
      "controls": {
       "Up/Down": "Move paddle",
       "Space": "Start game / Restart"
@@ -236,7 +236,7 @@
      "name": "ARCANOID",
      "cls": "Arkanoid",
      "module": "games/arkanoid.py",
-     "desc": "Brick-breaking with power-ups: laser paddle, catch ball, multi-ball, warp gates. Clear all bricks per level. Enemies and a storyline.",
+     "desc": "Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, extra lives. Clear all the bricks to advance through the levels.",
      "controls": {
       "Left/Right": "Move paddle (Vaus)",
       "Space": "Launch ball / Fire laser"
@@ -246,7 +246,7 @@
      "name": "DND",
      "cls": "DnD",
      "module": "games/dnd.py",
-     "desc": "Explore rooms, fight monsters, collect treasure. Turn-based grid combat in a dungeon-crawling adventure.",
+     "desc": "Explore rooms, fight monsters, collect treasure. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.",
      "controls": {
       "Arrow Keys": "Move through dungeon",
       "Space": "Shoot arrow in facing direction"
@@ -256,7 +256,7 @@
      "name": "INDIE 500",
      "cls": "Indy500",
      "module": "games/indy500.py",
-     "desc": "Top-down racing on an oval track. Steer and accelerate to complete laps.",
+     "desc": "Top-down time-attack racing on an oval track. Complete 7 laps before the 60-second timer runs out - drift off the track and you grind to a halt.",
      "controls": {
       "Left/Right": "Steer",
       "Space": "Gas"
@@ -277,7 +277,7 @@
      "name": "PIPE MAZE",
      "cls": "PipeDream",
      "module": "games/pipedream.py",
-     "desc": "Place pipe segments before the water arrives. Build a path long enough to pass the level.",
+     "desc": "Place pipe segments before the water arrives. Keep the flow going as long as you can - every pipe the water passes through scores.",
      "controls": {
       "Arrow Keys": "Move cursor",
       "Space": "Place pipe piece"
@@ -424,7 +424,7 @@
      "name": "STICK RUN",
      "cls": "StickRunner",
      "module": "games/stickrunner.py",
-     "desc": "Endless runner with a stick figure. Press the button to jump over obstacles. Hold longer to jump higher. Score by distance. Procedurally generated levels.",
+     "desc": "Endless runner with a stick figure. Press the button to jump over obstacles. Score by distance. Procedurally generated levels.",
      "controls": {
       "Space": "Jump",
       "Escape": "Return to menu"
@@ -541,7 +541,7 @@
      "name": "DARTS",
      "cls": "Darts",
      "module": "games/darts.py",
-     "desc": "501-style darts with a timing-based throw mechanic. Count down from 501; finish on a double-out. Aim with the joystick, throw with the button.",
+     "desc": "Timing-based darts: press the button to lock the sweeping aim, first across then down. Five rounds, highest total wins - hit double and triple tiles for bonus points.",
      "controls": {
       "Space": "Lock aim axis / confirm selection",
       "Joystick": "Cancel Y-aim back to X-aim / navigate mode select"
@@ -666,7 +666,7 @@
      "name": "DRIFT",
      "cls": "Drift",
      "module": "games/drift.py",
-     "desc": "Procedurally generated terrain with water, sand, grass, and snow. A landscape sandbox with day/night cycle.",
+     "desc": "Terrain-sculpting sandbox. One button cycles the tool - raise, lower, smooth, spring, water - and the other applies it at the cursor. Watch the water find its level.",
      "controls": {
       "Joystick": "Move cursor",
       "Space": "Cycle tool: Raise / Lower / Smooth / Spring / Water",

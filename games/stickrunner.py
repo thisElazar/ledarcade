@@ -17,7 +17,7 @@ class StickRunner(Game):
     description = "Jump the rooftops!"
     category = "modern"
     GUIDE = {
-        'desc': 'Endless runner with a stick figure. Press the button to jump over obstacles. Hold longer to jump higher. Score by distance. Procedurally generated levels.',
+        'desc': 'Endless runner with a stick figure. Press the button to jump over obstacles. Score by distance. Procedurally generated levels.',
     }
 
     # Physics constants

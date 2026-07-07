@@ -45,7 +45,7 @@ class PipeDream(Game):
     description = "Build Pipes"
     category = "retro"
     GUIDE = {
-        'desc': 'Place pipe segments before the water arrives. Build a path long enough to pass the level.',
+        'desc': 'Place pipe segments before the water arrives. Keep the flow going as long as you can - every pipe the water passes through scores.',
     }
 
     # Grid layout

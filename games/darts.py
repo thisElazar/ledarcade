@@ -71,7 +71,7 @@ class Darts(Game):
     description = "Arcade darts with doubles, triples, bullseye"
     category = "bar"
     GUIDE = {
-        'desc': '501-style darts with a timing-based throw mechanic. Count down from 501; finish on a double-out. Aim with the joystick, throw with the button.',
+        'desc': 'Timing-based darts: press the button to lock the sweeping aim, first across then down. Five rounds, highest total wins - hit double and triple tiles for bonus points.',
     }
 
     def __init__(self, display: Display):
