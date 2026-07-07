@@ -423,6 +423,12 @@ class GameState(Enum):
     WIN = auto()
 
 
+# States that end a run: the shell takes over (game-over screen, high scores).
+# Shells must check membership here, never GAME_OVER alone — games that can be
+# beaten (pong, breakout, arkanoid, bloonstd) end in WIN.
+TERMINAL_STATES = (GameState.GAME_OVER, GameState.WIN)
+
+
 class Game(ABC):
     """Base class for all arcade games."""
     
@@ -573,7 +579,7 @@ class Arcade:
                     exit_hold = 0.0
 
                 if self.current_game:
-                    if self.current_game.state == GameState.GAME_OVER:
+                    if self.current_game.state in TERMINAL_STATES:
                         # Handle game over menu selection
                         if input_state.up_pressed or input_state.down_pressed:
                             self.game_over_selection = 1 - self.game_over_selection
