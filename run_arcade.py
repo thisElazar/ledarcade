@@ -17,7 +17,7 @@ import time
 import math
 import random
 from enum import Enum, auto
-from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState
+from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState, TERMINAL_STATES
 import update_checker
 from catalog import (
     register_games, register_visuals, get_all_categories,
@@ -44,10 +44,12 @@ def center_x(text):
     return max(0, (GRID_SIZE - width) // 2)
 
 
-def draw_game_over_score(display, score):
-    """Draw the GAME OVER screen with player's score."""
+def draw_game_over_score(display, score, won=False):
+    """Draw the GAME OVER (or YOU WIN) screen with player's score."""
     display.clear(Colors.BLACK)
-    display.draw_text_small(center_x("GAME OVER"), 20, "GAME OVER", Colors.RED)
+    header = "YOU WIN!" if won else "GAME OVER"
+    color = Colors.GREEN if won else Colors.RED
+    display.draw_text_small(center_x(header), 20, header, color)
     score_text = f"SCORE:{score}"
     display.draw_text_small(center_x(score_text), 32, score_text, Colors.WHITE)
 
@@ -124,7 +126,7 @@ def draw_initials_entry(display, initials, cursor_pos, score):
     display.draw_text_small(4, 58, "BTN:NEXT", Colors.GRAY)
 
 
-def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1, first_option="PLAY AGAIN"):
+def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1, first_option="PLAY AGAIN", won=False):
     """Draw the PLAY AGAIN / MENU selection.
 
     Args:
@@ -134,6 +136,7 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         made_leaderboard: Whether player made the leaderboard
         rank: Player's rank if they made leaderboard
         first_option: Text for the first option (default "PLAY AGAIN")
+        won: True when the run ended in a win rather than a loss
     """
     display.clear(Colors.BLACK)
 
@@ -143,7 +146,9 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         score_text = f"SCORE:{score}"
         display.draw_text_small(center_x(score_text), 18, score_text, Colors.WHITE)
     else:
-        display.draw_text_small(center_x("GAME OVER"), 12, "GAME OVER", Colors.RED)
+        header = "YOU WIN!" if won else "GAME OVER"
+        color = Colors.GREEN if won else Colors.RED
+        display.draw_text_small(center_x(header), 12, header, color)
         score_text = f"SCORE:{score}"
         display.draw_text_small(center_x(score_text), 22, score_text, Colors.WHITE)
 
@@ -625,6 +630,7 @@ def main():
     player_rank = -1
     final_score = 0  # Store score when game ends
     game_over_initialized = False  # Track if game over has been processed
+    game_won = False  # True when the run ended in GameState.WIN
     game_over_lockout = 0.0  # Input lockout when entering game over
     milestone_timer = 0.0  # Timer for milestone celebration
 
@@ -889,10 +895,11 @@ def main():
             if current_item:
                 if is_game:
                     # Game logic
-                    if current_item.state == GameState.GAME_OVER:
+                    if current_item.state in TERMINAL_STATES:
                         # First time entering game over
                         if not game_over_initialized:
                             game_over_initialized = True
+                            game_won = current_item.state == GameState.WIN
                             final_score = current_item.score
                             hsm.log_play(current_item.name, final_score)
                             game_over_lockout = 1.5  # Ignore inputs for 1.5 seconds
@@ -947,7 +954,7 @@ def main():
                             if flash_show_leaderboard:
                                 draw_leaderboard(display, current_item.name, player_rank)
                             else:
-                                draw_game_over_score(display, final_score)
+                                draw_game_over_score(display, final_score, won=game_won)
 
                         elif game_over_state == GameOverState.ENTER_INITIALS:
                             if input_cooldown <= 0 and game_over_lockout <= 0:
@@ -1003,6 +1010,7 @@ def main():
                                             current_item.reset()
                                         final_score = 0
                                         game_over_initialized = False
+                                        game_won = False
                                         player_made_leaderboard = False
                                         player_rank = -1
                                     else:
@@ -1011,6 +1019,7 @@ def main():
                                         current_item = None
                                         final_score = 0
                                         game_over_initialized = False
+                                        game_won = False
                                         player_made_leaderboard = False
                                         player_rank = -1
                                         in_shuffle_mode = False
@@ -1033,7 +1042,7 @@ def main():
                                     first_opt = "NEXT GAME" if in_shuffle_mode else "PLAY AGAIN"
                                     draw_action_selection(display, game_over_selection, final_score,
                                                           player_made_leaderboard, player_rank,
-                                                          first_option=first_opt)
+                                                          first_option=first_opt, won=game_won)
                     else:
                         current_item.update(input_state, dt)
                         current_item.draw()

@@ -3,7 +3,7 @@
 LED Arcade - Games Launcher
 ===========================
 
-34 classic arcade games for a 64x64 LED matrix display.
+Classic arcade games for a 64x64 LED matrix display.
 Desktop emulator via PyGame for prototyping.
 
 Controls:
