@@ -11,6 +11,7 @@ Controls:
 """
 
 import sys
+import traceback
 import time
 import math
 import random
@@ -663,429 +664,449 @@ def main():
             # Update input
             input_state = input_handler.update()
 
-            # Sleep timer — blank display after inactivity, wake on any input
-            if has_any_input(input_state):
-                uptime = 0.0
-            else:
-                uptime += dt
-            if sleep_minutes > 0 and uptime >= sleep_minutes * 60:
-                display.clear()
-                display.render()
-                # Wait for any input to wake
-                while True:
-                    time.sleep(0.05)
-                    wake_input = input_handler.update()
-                    if has_any_input(wake_input):
-                        break
-                _show_splash(display, input_handler)
-                uptime = 0.0
-                last_time = time.time()
-                idle_timer = 0.0
-                in_idle = False
-                idle_visual = None
-
-            if in_menu:
-                # Idle screen logic
-                if in_idle:
-                    if has_any_input(input_state):
-                        in_idle = False
-                        idle_visual = None
-                        idle_timer = 0.0
-                        idle_transition.transitioning = False
-                    else:
-                        # Handle ongoing transition
-                        if idle_transition.transitioning:
-                            idle_transition.update(dt)
-                            idle_transition.draw(display)
-                            # Also update new visual during transition
-                            if idle_visual:
-                                idle_visual.update(dt)
-                        else:
-                            idle_cycle_timer += dt
-                            _cur_cycle = titles_cycle_duration if (idle_visual and getattr(idle_visual, 'category', '') == 'titles') else cycle_duration
-                            if idle_cycle_timer >= _cur_cycle:
-                                # Start transition to new visual
-                                old_visual = idle_visual
-                                new_visual = _pick_idle_visual(display)
-                                if old_visual and new_visual:
-                                    idle_transition.start(old_visual, new_visual)
-                                    # Draw first transition frame to mask preload flash
-                                    idle_transition.draw(display)
-                                idle_visual = new_visual
-                                idle_cycle_timer = 0.0
-                            if idle_visual and not idle_transition.transitioning:
-                                idle_visual.update(dt)
-                                idle_visual.draw()
-                elif konami_active:
-                    konami_timer += dt
-                    if konami_timer >= 2.0:
-                        konami_active = False
-                        idle_timer = 0.0
-                    else:
-                        draw_konami_egg(display, konami_timer)
-                elif spin_active:
-                    spin_timer += dt
-                    if spin_timer >= 2.0:
-                        spin_active = False
-                        idle_timer = 0.0
-                    else:
-                        draw_spin_egg(display, spin_timer)
+            try:
+                # Sleep timer — blank display after inactivity, wake on any input
+                if has_any_input(input_state):
+                    uptime = 0.0
                 else:
-                    # Track idle time
-                    if has_any_input(input_state):
-                        idle_timer = 0.0
-                    else:
-                        idle_timer += dt
-                        if idle_timer >= idle_timeout:
-                            in_idle = True
-                            idle_visual = _pick_idle_visual(display)
-                            idle_cycle_timer = 0.0
+                    uptime += dt
+                if sleep_minutes > 0 and uptime >= sleep_minutes * 60:
+                    display.clear()
+                    display.render()
+                    # Wait for any input to wake
+                    while True:
+                        time.sleep(0.05)
+                        wake_input = input_handler.update()
+                        if has_any_input(wake_input):
+                            break
+                    _show_splash(display, input_handler)
+                    uptime = 0.0
+                    last_time = time.time()
+                    idle_timer = 0.0
+                    in_idle = False
+                    idle_visual = None
 
-                    # Konami code tracking
-                    _ki = None
-                    if input_state.up_pressed: _ki = 'U'
-                    elif input_state.down_pressed: _ki = 'D'
-                    elif input_state.left_pressed: _ki = 'L'
-                    elif input_state.right_pressed: _ki = 'R'
-                    elif input_state.action_l: _ki = 'A'
-                    elif input_state.action_r: _ki = 'B'
-                    if _ki:
-                        konami_buffer.append(_ki)
-                        konami_buffer = konami_buffer[-10:]
-                    konami_match = konami_buffer == KONAMI_CODE
-                    if konami_match:
-                        konami_active = True
-                        konami_timer = 0.0
-                        konami_buffer = []
-                    # Intercept button presses mid-sequence (9th input is A)
-                    konami_intercept = (len(konami_buffer) >= 9 and
-                                        konami_buffer[-9:] == KONAMI_CODE[:9])
-
-                    # Spin easter egg tracking (directional only, independent of konami)
-                    _si = None
-                    if input_state.left_pressed: _si = 'L'
-                    elif input_state.down_pressed: _si = 'D'
-                    elif input_state.right_pressed: _si = 'R'
-                    elif input_state.up_pressed: _si = 'U'
-                    if _si:
-                        spin_buffer.append(_si)
-                        spin_buffer = spin_buffer[-4:]
-                        if spin_buffer == ['L', 'D', 'R', 'U'] or spin_buffer == ['R', 'D', 'L', 'U']:
-                            spin_circle_times.append(time.time())
-                            spin_buffer = []
-                            # Keep only recent circles
-                            now_t = time.time()
-                            spin_circle_times = [t for t in spin_circle_times if now_t - t <= 2.5]
-                            if len(spin_circle_times) >= 3:
-                                spin_active = True
-                                spin_timer = 0.0
-                                spin_circle_times = []
-                                spin_buffer = []
-
-                    if not categories:
-                        draw_menu(display, categories, 0, 0)
-                    elif not konami_match:
-                        category = categories[cat_index]
-
-                        # Category navigation (left/right) with scroll acceleration
-                        if len(categories) > 1:
-                            if input_state.left_pressed:
-                                cat_index = (cat_index - 1) % len(categories)
-                                item_index = 0
-                                cat_scroll_dir = -1
-                                cat_scroll_held_time = 0.0
-                                cat_scroll_accum = 0.0
-                                scroll_held_time = 0.0
-                                scroll_accum = 0.0
-                                scroll_dir = 0
-                            elif input_state.right_pressed:
-                                cat_index = (cat_index + 1) % len(categories)
-                                item_index = 0
-                                cat_scroll_dir = 1
-                                cat_scroll_held_time = 0.0
-                                cat_scroll_accum = 0.0
-                                scroll_held_time = 0.0
-                                scroll_accum = 0.0
-                                scroll_dir = 0
-                            elif cat_scroll_dir != 0 and ((cat_scroll_dir == -1 and input_state.left) or (cat_scroll_dir == 1 and input_state.right)):
-                                cat_scroll_held_time += dt
-                                if cat_scroll_held_time >= 0.4:
-                                    t_accel = min(cat_scroll_held_time - 0.4, 1.5)
-                                    interval = 0.18 - (0.12 * t_accel / 1.5)
-                                    cat_scroll_accum += dt
-                                    while cat_scroll_accum >= interval:
-                                        cat_scroll_accum -= interval
-                                        cat_index = (cat_index + cat_scroll_dir) % len(categories)
-                                        item_index = 0
-                            else:
-                                cat_scroll_dir = 0
-                                cat_scroll_held_time = 0.0
-                                cat_scroll_accum = 0.0
-
-                        if category.items:
-                            n_items = len(category.items)
-                            if input_state.up_pressed:
-                                item_index = (item_index - 1) % n_items
-                                scroll_dir = -1
-                                scroll_held_time = 0.0
-                                scroll_accum = 0.0
-                            elif input_state.down_pressed:
-                                item_index = (item_index + 1) % n_items
-                                scroll_dir = 1
-                                scroll_held_time = 0.0
-                                scroll_accum = 0.0
-                            elif scroll_dir != 0 and ((scroll_dir == -1 and input_state.up) or (scroll_dir == 1 and input_state.down)):
-                                scroll_held_time += dt
-                                if scroll_held_time >= 0.4:
-                                    t_accel = min(scroll_held_time - 0.4, 1.5)
-                                    interval = 0.18 - (0.12 * t_accel / 1.5)
-                                    scroll_accum += dt
-                                    while scroll_accum >= interval:
-                                        scroll_accum -= interval
-                                        item_index = (item_index + scroll_dir) % n_items
-                            else:
-                                scroll_dir = 0
-                                scroll_held_time = 0.0
-                                scroll_accum = 0.0
-
-                            # Launch item (skip if mid-konami intercept)
-                            if not konami_intercept and (input_state.action_l or input_state.action_r):
-                                item_class = category.items[item_index]
-
-                                # Game playlist (shuffle mode)
-                                if hasattr(item_class, 'games'):
-                                    shuffle_playlist = item_class
-                                    game_class = random.choice(item_class.games)
-                                    current_item = game_class(display)
-                                    current_item.reset()
-                                    is_game = True
-                                    is_two_player = False
-                                    in_shuffle_mode = True
-                                    in_menu = False
-                                    exit_hold = 0.0
-                                else:
-                                    current_item = item_class(display)
-                                    current_item.reset()
-                                    is_game = hasattr(current_item, 'state') and isinstance(current_item.state, GameState)
-                                    is_two_player = getattr(current_item, 'category', '') == '2_player'
-                                    in_shuffle_mode = False
-                                    shuffle_playlist = None
-                                    in_menu = False
-                                    exit_hold = 0.0
-
-                        # Update name scroll for selected item
-                        if cat_index != prev_cat_index or item_index != prev_item_index:
-                            name_scroll_x = 0.0
-                            name_scroll_timer = 0.0
-                            prev_cat_index = cat_index
-                            prev_item_index = item_index
-                        else:
-                            name_scroll_timer += dt
-                            if name_scroll_timer > NAME_SCROLL_DELAY:
-                                name_scroll_x += NAME_SCROLL_SPEED * dt
-
-                        draw_menu(display, categories, cat_index, item_index, name_scroll_x)
-
-            else:
-                # Running game or visual
-                # Games: hold BOTH buttons 2 sec to return to menu
-                # Visuals: handled by their own exit check below (either button)
-                if is_game:
-                    if input_state.action_l_held and input_state.action_r_held:
-                        exit_hold += dt
-                        if exit_hold >= 2.0:
-                            in_menu = True
-                            current_item = None
-                            game_over_initialized = False
-                            in_shuffle_mode = False
-                            shuffle_playlist = None
+                if in_menu:
+                    # Idle screen logic
+                    if in_idle:
+                        if has_any_input(input_state):
+                            in_idle = False
+                            idle_visual = None
                             idle_timer = 0.0
-                            exit_hold = 0.0
-                    else:
-                        exit_hold = 0.0
-
-                if current_item:
-                    if is_game:
-                        if current_item.state in TERMINAL_STATES:
-                            if not game_over_initialized:
-                                game_over_initialized = True
-                                game_won = current_item.state == GameState.WIN
-                                final_score = current_item.score
-                                hsm.log_play(current_item.name, final_score)
-                                game_over_lockout = 1.5
-
-                                if is_two_player:
-                                    # 2-player games: skip high scores
-                                    game_over_state = GameOverState.CHOOSE_ACTION
-                                    game_over_selection = 0
-                                    player_made_leaderboard = False
-                                else:
-                                    # Single player: check for high score
-                                    player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
-                                    if player_made_leaderboard:
-                                        # Check if this beats the current #1 (milestone)
-                                        existing = hsm.get_top_scores(current_item.name)
-                                        if existing and final_score > existing[0][1]:
-                                            game_over_state = GameOverState.MILESTONE
-                                            milestone_timer = 0.0
-                                        else:
-                                            game_over_state = GameOverState.ENTER_INITIALS
-                                        player_initials = ['A', 'A', 'A']
-                                        initials_cursor = 0
-                                    else:
-                                        game_over_state = GameOverState.FLASHING
-                                        flash_timer = 0.0
-                                        flash_show_leaderboard = False
-
-                            if game_over_lockout > 0:
-                                game_over_lockout -= dt
-
-                            if game_over_state == GameOverState.MILESTONE:
-                                milestone_timer += dt
-                                draw_milestone_celebration(display, milestone_timer)
-                                if milestone_timer >= 3.0:
-                                    game_over_state = GameOverState.ENTER_INITIALS
-
-                            elif game_over_state == GameOverState.FLASHING:
-                                flash_timer += dt
-                                if flash_timer >= 2.0:
-                                    flash_timer = 0.0
-                                    flash_show_leaderboard = not flash_show_leaderboard
-
-                                if game_over_lockout <= 0:
-                                    if input_state.action_l or input_state.action_r or input_state.up_pressed or input_state.down_pressed:
-                                        game_over_state = GameOverState.CHOOSE_ACTION
-                                        game_over_selection = 0
-
-                                if flash_show_leaderboard:
-                                    draw_leaderboard(display, current_item.name, player_rank)
-                                else:
-                                    draw_game_over_score(display, final_score, won=game_won)
-
-                            elif game_over_state == GameOverState.ENTER_INITIALS:
-                                if input_cooldown <= 0 and game_over_lockout <= 0:
-                                    if input_state.up_pressed:
-                                        letter = player_initials[initials_cursor]
-                                        player_initials[initials_cursor] = 'Z' if letter == 'A' else chr(ord(letter) - 1)
-                                        input_cooldown = 0.15
-                                    elif input_state.down_pressed:
-                                        letter = player_initials[initials_cursor]
-                                        player_initials[initials_cursor] = 'A' if letter == 'Z' else chr(ord(letter) + 1)
-                                        input_cooldown = 0.15
-                                    elif input_state.left_pressed:
-                                        if initials_cursor > 0:
-                                            initials_cursor -= 1
-                                        input_cooldown = 0.2
-                                    elif input_state.right_pressed or input_state.action_l or input_state.action_r:
-                                        if initials_cursor < 2:
-                                            initials_cursor += 1
-                                        else:
-                                            # Last letter — submit, then show flashing with highlight
-                                            initials_str = ''.join(player_initials)
-                                            player_rank = hsm.add_score(current_item.name, initials_str, final_score)
-                                            game_over_state = GameOverState.FLASHING
-                                            flash_timer = 0.0
-                                            flash_show_leaderboard = True
-                                            game_over_lockout = 1.0
-                                        input_cooldown = 0.2
-
-                                draw_initials_entry(display, player_initials, initials_cursor, final_score)
-
-                            elif game_over_state == GameOverState.CHOOSE_ACTION:
-                                if game_over_lockout <= 0:
-                                    if input_state.up_pressed or input_state.down_pressed:
-                                        game_over_selection = 1 - game_over_selection
-                                    elif input_state.action_l or input_state.action_r:
-                                        if game_over_selection == 0:
-                                            if in_shuffle_mode and shuffle_playlist:
-                                                # Next game from playlist
-                                                game_class = random.choice(shuffle_playlist.games)
-                                                current_item = game_class(display)
-                                                current_item.reset()
-                                            else:
-                                                # Play again
-                                                current_item.reset()
-                                            final_score = 0
-                                            game_over_initialized = False
-                                            game_won = False
-                                            player_made_leaderboard = False
-                                            player_rank = -1
-                                        else:
-                                            in_menu = True
-                                            current_item = None
-                                            final_score = 0
-                                            game_over_initialized = False
-                                            game_won = False
-                                            player_made_leaderboard = False
-                                            player_rank = -1
-                                            in_shuffle_mode = False
-                                            shuffle_playlist = None
-                                            idle_timer = 0.0
-                                        game_over_selection = 0
-
-                                if current_item:
-                                    if is_two_player:
-                                        # Use game's own draw_game_over (shows winner)
-                                        current_item.draw_game_over()
-                                        # Add play again / menu options at bottom
-                                        if game_over_selection == 0:
-                                            display.draw_text_small(4, 50, ">AGAIN", Colors.YELLOW)
-                                            display.draw_text_small(32, 50, " MENU", Colors.GRAY)
-                                        else:
-                                            display.draw_text_small(4, 50, " AGAIN", Colors.GRAY)
-                                            display.draw_text_small(32, 50, ">MENU", Colors.YELLOW)
-                                    else:
-                                        first_opt = "NEXT GAME" if in_shuffle_mode else "PLAY AGAIN"
-                                        draw_action_selection(display, game_over_selection, final_score,
-                                                              player_made_leaderboard, player_rank,
-                                                              first_option=first_opt, won=game_won)
+                            idle_transition.transitioning = False
                         else:
-                            current_item.update(input_state, dt)
-                            current_item.draw()
-                    else:
-                        # Visual — hold both buttons 2s to return to menu
-                        # Skip for visuals that handle their own exit (e.g. Controls)
-                        if not getattr(current_item, 'custom_exit', False):
-                            if input_state.action_l_held and input_state.action_r_held:
-                                exit_hold += dt
-                                if exit_hold >= 2.0:
-                                    in_menu = True
-                                    current_item = None
-                                    exit_hold = 0.0
-                                    idle_timer = 0.0
+                            # Handle ongoing transition
+                            if idle_transition.transitioning:
+                                idle_transition.update(dt)
+                                idle_transition.draw(display)
+                                # Also update new visual during transition
+                                if idle_visual:
+                                    idle_visual.update(dt)
                             else:
-                                exit_hold = 0.0
+                                idle_cycle_timer += dt
+                                _cur_cycle = titles_cycle_duration if (idle_visual and getattr(idle_visual, 'category', '') == 'titles') else cycle_duration
+                                if idle_cycle_timer >= _cur_cycle:
+                                    # Start transition to new visual
+                                    old_visual = idle_visual
+                                    new_visual = _pick_idle_visual(display)
+                                    if old_visual and new_visual:
+                                        idle_transition.start(old_visual, new_visual)
+                                        # Draw first transition frame to mask preload flash
+                                        idle_transition.draw(display)
+                                    idle_visual = new_visual
+                                    idle_cycle_timer = 0.0
+                                if idle_visual and not idle_transition.transitioning:
+                                    idle_visual.update(dt)
+                                    idle_visual.draw()
+                    elif konami_active:
+                        konami_timer += dt
+                        if konami_timer >= 2.0:
+                            konami_active = False
+                            idle_timer = 0.0
+                        else:
+                            draw_konami_egg(display, konami_timer)
+                    elif spin_active:
+                        spin_timer += dt
+                        if spin_timer >= 2.0:
+                            spin_active = False
+                            idle_timer = 0.0
+                        else:
+                            draw_spin_egg(display, spin_timer)
+                    else:
+                        # Track idle time
+                        if has_any_input(input_state):
+                            idle_timer = 0.0
+                        else:
+                            idle_timer += dt
+                            if idle_timer >= idle_timeout:
+                                in_idle = True
+                                idle_visual = _pick_idle_visual(display)
+                                idle_cycle_timer = 0.0
 
-                        if current_item:
-                            # Titles: Left/Right cycles between title visuals (like ART paintings)
-                            if getattr(current_item, 'category', None) == 'titles' and (
-                                input_state.left_pressed or input_state.right_pressed
-                            ):
-                                titles_cat = VISUAL_CATEGORY_MAP.get('titles')
-                                if titles_cat and titles_cat.items:
-                                    items = titles_cat.items
-                                    try:
-                                        idx = items.index(type(current_item))
-                                    except ValueError:
-                                        idx = 0
-                                    step = 1 if input_state.right_pressed else -1
-                                    current_item = items[(idx + step) % len(items)](display)
-                                    current_item.reset()
-                                    idle_timer = 0.0
+                        # Konami code tracking
+                        _ki = None
+                        if input_state.up_pressed: _ki = 'U'
+                        elif input_state.down_pressed: _ki = 'D'
+                        elif input_state.left_pressed: _ki = 'L'
+                        elif input_state.right_pressed: _ki = 'R'
+                        elif input_state.action_l: _ki = 'A'
+                        elif input_state.action_r: _ki = 'B'
+                        if _ki:
+                            konami_buffer.append(_ki)
+                            konami_buffer = konami_buffer[-10:]
+                        konami_match = konami_buffer == KONAMI_CODE
+                        if konami_match:
+                            konami_active = True
+                            konami_timer = 0.0
+                            konami_buffer = []
+                        # Intercept button presses mid-sequence (9th input is A)
+                        konami_intercept = (len(konami_buffer) >= 9 and
+                                            konami_buffer[-9:] == KONAMI_CODE[:9])
 
-                            current_item.handle_input(input_state)
-                            if getattr(current_item, 'wants_exit', False):
+                        # Spin easter egg tracking (directional only, independent of konami)
+                        _si = None
+                        if input_state.left_pressed: _si = 'L'
+                        elif input_state.down_pressed: _si = 'D'
+                        elif input_state.right_pressed: _si = 'R'
+                        elif input_state.up_pressed: _si = 'U'
+                        if _si:
+                            spin_buffer.append(_si)
+                            spin_buffer = spin_buffer[-4:]
+                            if spin_buffer == ['L', 'D', 'R', 'U'] or spin_buffer == ['R', 'D', 'L', 'U']:
+                                spin_circle_times.append(time.time())
+                                spin_buffer = []
+                                # Keep only recent circles
+                                now_t = time.time()
+                                spin_circle_times = [t for t in spin_circle_times if now_t - t <= 2.5]
+                                if len(spin_circle_times) >= 3:
+                                    spin_active = True
+                                    spin_timer = 0.0
+                                    spin_circle_times = []
+                                    spin_buffer = []
+
+                        if not categories:
+                            draw_menu(display, categories, 0, 0)
+                        elif not konami_match:
+                            category = categories[cat_index]
+
+                            # Category navigation (left/right) with scroll acceleration
+                            if len(categories) > 1:
+                                if input_state.left_pressed:
+                                    cat_index = (cat_index - 1) % len(categories)
+                                    item_index = 0
+                                    cat_scroll_dir = -1
+                                    cat_scroll_held_time = 0.0
+                                    cat_scroll_accum = 0.0
+                                    scroll_held_time = 0.0
+                                    scroll_accum = 0.0
+                                    scroll_dir = 0
+                                elif input_state.right_pressed:
+                                    cat_index = (cat_index + 1) % len(categories)
+                                    item_index = 0
+                                    cat_scroll_dir = 1
+                                    cat_scroll_held_time = 0.0
+                                    cat_scroll_accum = 0.0
+                                    scroll_held_time = 0.0
+                                    scroll_accum = 0.0
+                                    scroll_dir = 0
+                                elif cat_scroll_dir != 0 and ((cat_scroll_dir == -1 and input_state.left) or (cat_scroll_dir == 1 and input_state.right)):
+                                    cat_scroll_held_time += dt
+                                    if cat_scroll_held_time >= 0.4:
+                                        t_accel = min(cat_scroll_held_time - 0.4, 1.5)
+                                        interval = 0.18 - (0.12 * t_accel / 1.5)
+                                        cat_scroll_accum += dt
+                                        while cat_scroll_accum >= interval:
+                                            cat_scroll_accum -= interval
+                                            cat_index = (cat_index + cat_scroll_dir) % len(categories)
+                                            item_index = 0
+                                else:
+                                    cat_scroll_dir = 0
+                                    cat_scroll_held_time = 0.0
+                                    cat_scroll_accum = 0.0
+
+                            if category.items:
+                                n_items = len(category.items)
+                                if input_state.up_pressed:
+                                    item_index = (item_index - 1) % n_items
+                                    scroll_dir = -1
+                                    scroll_held_time = 0.0
+                                    scroll_accum = 0.0
+                                elif input_state.down_pressed:
+                                    item_index = (item_index + 1) % n_items
+                                    scroll_dir = 1
+                                    scroll_held_time = 0.0
+                                    scroll_accum = 0.0
+                                elif scroll_dir != 0 and ((scroll_dir == -1 and input_state.up) or (scroll_dir == 1 and input_state.down)):
+                                    scroll_held_time += dt
+                                    if scroll_held_time >= 0.4:
+                                        t_accel = min(scroll_held_time - 0.4, 1.5)
+                                        interval = 0.18 - (0.12 * t_accel / 1.5)
+                                        scroll_accum += dt
+                                        while scroll_accum >= interval:
+                                            scroll_accum -= interval
+                                            item_index = (item_index + scroll_dir) % n_items
+                                else:
+                                    scroll_dir = 0
+                                    scroll_held_time = 0.0
+                                    scroll_accum = 0.0
+
+                                # Launch item (skip if mid-konami intercept)
+                                if not konami_intercept and (input_state.action_l or input_state.action_r):
+                                    item_class = category.items[item_index]
+
+                                    # Game playlist (shuffle mode)
+                                    if hasattr(item_class, 'games'):
+                                        shuffle_playlist = item_class
+                                        game_class = random.choice(item_class.games)
+                                        current_item = game_class(display)
+                                        current_item.reset()
+                                        is_game = True
+                                        is_two_player = False
+                                        in_shuffle_mode = True
+                                        in_menu = False
+                                        exit_hold = 0.0
+                                    else:
+                                        current_item = item_class(display)
+                                        current_item.reset()
+                                        is_game = hasattr(current_item, 'state') and isinstance(current_item.state, GameState)
+                                        is_two_player = getattr(current_item, 'category', '') == '2_player'
+                                        in_shuffle_mode = False
+                                        shuffle_playlist = None
+                                        in_menu = False
+                                        exit_hold = 0.0
+
+                            # Update name scroll for selected item
+                            if cat_index != prev_cat_index or item_index != prev_item_index:
+                                name_scroll_x = 0.0
+                                name_scroll_timer = 0.0
+                                prev_cat_index = cat_index
+                                prev_item_index = item_index
+                            else:
+                                name_scroll_timer += dt
+                                if name_scroll_timer > NAME_SCROLL_DELAY:
+                                    name_scroll_x += NAME_SCROLL_SPEED * dt
+
+                            draw_menu(display, categories, cat_index, item_index, name_scroll_x)
+
+                else:
+                    # Running game or visual
+                    # Games: hold BOTH buttons 2 sec to return to menu
+                    # Visuals: handled by their own exit check below (either button)
+                    if is_game:
+                        if input_state.action_l_held and input_state.action_r_held:
+                            exit_hold += dt
+                            if exit_hold >= 2.0:
                                 in_menu = True
                                 current_item = None
+                                game_over_initialized = False
+                                in_shuffle_mode = False
+                                shuffle_playlist = None
                                 idle_timer = 0.0
-                                # Reload timer settings (may have changed)
-                                idle_timeout = persistent.get_idle_timeout()
-                                cycle_duration = persistent.get_cycle_duration()
-                                titles_cycle_duration = persistent.get_titles_cycle_duration()
-                                sleep_minutes = persistent.get_sleep_timer()
+                                exit_hold = 0.0
+                        else:
+                            exit_hold = 0.0
+
+                    if current_item:
+                        if is_game:
+                            if current_item.state in TERMINAL_STATES:
+                                if not game_over_initialized:
+                                    game_over_initialized = True
+                                    game_won = current_item.state == GameState.WIN
+                                    final_score = current_item.score
+                                    hsm.log_play(current_item.name, final_score)
+                                    game_over_lockout = 1.5
+
+                                    if is_two_player:
+                                        # 2-player games: skip high scores
+                                        game_over_state = GameOverState.CHOOSE_ACTION
+                                        game_over_selection = 0
+                                        player_made_leaderboard = False
+                                    else:
+                                        # Single player: check for high score
+                                        player_made_leaderboard = hsm.is_high_score(current_item.name, final_score)
+                                        if player_made_leaderboard:
+                                            # Check if this beats the current #1 (milestone)
+                                            existing = hsm.get_top_scores(current_item.name)
+                                            if existing and final_score > existing[0][1]:
+                                                game_over_state = GameOverState.MILESTONE
+                                                milestone_timer = 0.0
+                                            else:
+                                                game_over_state = GameOverState.ENTER_INITIALS
+                                            player_initials = ['A', 'A', 'A']
+                                            initials_cursor = 0
+                                        else:
+                                            game_over_state = GameOverState.FLASHING
+                                            flash_timer = 0.0
+                                            flash_show_leaderboard = False
+
+                                if game_over_lockout > 0:
+                                    game_over_lockout -= dt
+
+                                if game_over_state == GameOverState.MILESTONE:
+                                    milestone_timer += dt
+                                    draw_milestone_celebration(display, milestone_timer)
+                                    if milestone_timer >= 3.0:
+                                        game_over_state = GameOverState.ENTER_INITIALS
+
+                                elif game_over_state == GameOverState.FLASHING:
+                                    flash_timer += dt
+                                    if flash_timer >= 2.0:
+                                        flash_timer = 0.0
+                                        flash_show_leaderboard = not flash_show_leaderboard
+
+                                    if game_over_lockout <= 0:
+                                        if input_state.action_l or input_state.action_r or input_state.up_pressed or input_state.down_pressed:
+                                            game_over_state = GameOverState.CHOOSE_ACTION
+                                            game_over_selection = 0
+
+                                    if flash_show_leaderboard:
+                                        draw_leaderboard(display, current_item.name, player_rank)
+                                    else:
+                                        draw_game_over_score(display, final_score, won=game_won)
+
+                                elif game_over_state == GameOverState.ENTER_INITIALS:
+                                    if input_cooldown <= 0 and game_over_lockout <= 0:
+                                        if input_state.up_pressed:
+                                            letter = player_initials[initials_cursor]
+                                            player_initials[initials_cursor] = 'Z' if letter == 'A' else chr(ord(letter) - 1)
+                                            input_cooldown = 0.15
+                                        elif input_state.down_pressed:
+                                            letter = player_initials[initials_cursor]
+                                            player_initials[initials_cursor] = 'A' if letter == 'Z' else chr(ord(letter) + 1)
+                                            input_cooldown = 0.15
+                                        elif input_state.left_pressed:
+                                            if initials_cursor > 0:
+                                                initials_cursor -= 1
+                                            input_cooldown = 0.2
+                                        elif input_state.right_pressed or input_state.action_l or input_state.action_r:
+                                            if initials_cursor < 2:
+                                                initials_cursor += 1
+                                            else:
+                                                # Last letter — submit, then show flashing with highlight
+                                                initials_str = ''.join(player_initials)
+                                                player_rank = hsm.add_score(current_item.name, initials_str, final_score)
+                                                game_over_state = GameOverState.FLASHING
+                                                flash_timer = 0.0
+                                                flash_show_leaderboard = True
+                                                game_over_lockout = 1.0
+                                            input_cooldown = 0.2
+
+                                    draw_initials_entry(display, player_initials, initials_cursor, final_score)
+
+                                elif game_over_state == GameOverState.CHOOSE_ACTION:
+                                    if game_over_lockout <= 0:
+                                        if input_state.up_pressed or input_state.down_pressed:
+                                            game_over_selection = 1 - game_over_selection
+                                        elif input_state.action_l or input_state.action_r:
+                                            if game_over_selection == 0:
+                                                if in_shuffle_mode and shuffle_playlist:
+                                                    # Next game from playlist
+                                                    game_class = random.choice(shuffle_playlist.games)
+                                                    current_item = game_class(display)
+                                                    current_item.reset()
+                                                else:
+                                                    # Play again
+                                                    current_item.reset()
+                                                final_score = 0
+                                                game_over_initialized = False
+                                                game_won = False
+                                                player_made_leaderboard = False
+                                                player_rank = -1
+                                            else:
+                                                in_menu = True
+                                                current_item = None
+                                                final_score = 0
+                                                game_over_initialized = False
+                                                game_won = False
+                                                player_made_leaderboard = False
+                                                player_rank = -1
+                                                in_shuffle_mode = False
+                                                shuffle_playlist = None
+                                                idle_timer = 0.0
+                                            game_over_selection = 0
+
+                                    if current_item:
+                                        if is_two_player:
+                                            # Use game's own draw_game_over (shows winner)
+                                            current_item.draw_game_over()
+                                            # Add play again / menu options at bottom
+                                            if game_over_selection == 0:
+                                                display.draw_text_small(4, 50, ">AGAIN", Colors.YELLOW)
+                                                display.draw_text_small(32, 50, " MENU", Colors.GRAY)
+                                            else:
+                                                display.draw_text_small(4, 50, " AGAIN", Colors.GRAY)
+                                                display.draw_text_small(32, 50, ">MENU", Colors.YELLOW)
+                                        else:
+                                            first_opt = "NEXT GAME" if in_shuffle_mode else "PLAY AGAIN"
+                                            draw_action_selection(display, game_over_selection, final_score,
+                                                                  player_made_leaderboard, player_rank,
+                                                                  first_option=first_opt, won=game_won)
                             else:
-                                current_item.update(dt)
+                                current_item.update(input_state, dt)
                                 current_item.draw()
+                        else:
+                            # Visual — hold both buttons 2s to return to menu
+                            # Skip for visuals that handle their own exit (e.g. Controls)
+                            if not getattr(current_item, 'custom_exit', False):
+                                if input_state.action_l_held and input_state.action_r_held:
+                                    exit_hold += dt
+                                    if exit_hold >= 2.0:
+                                        in_menu = True
+                                        current_item = None
+                                        exit_hold = 0.0
+                                        idle_timer = 0.0
+                                else:
+                                    exit_hold = 0.0
+
+                            if current_item:
+                                # Titles: Left/Right cycles between title visuals (like ART paintings)
+                                if getattr(current_item, 'category', None) == 'titles' and (
+                                    input_state.left_pressed or input_state.right_pressed
+                                ):
+                                    titles_cat = VISUAL_CATEGORY_MAP.get('titles')
+                                    if titles_cat and titles_cat.items:
+                                        items = titles_cat.items
+                                        try:
+                                            idx = items.index(type(current_item))
+                                        except ValueError:
+                                            idx = 0
+                                        step = 1 if input_state.right_pressed else -1
+                                        current_item = items[(idx + step) % len(items)](display)
+                                        current_item.reset()
+                                        idle_timer = 0.0
+
+                                current_item.handle_input(input_state)
+                                if getattr(current_item, 'wants_exit', False):
+                                    in_menu = True
+                                    current_item = None
+                                    idle_timer = 0.0
+                                    # Reload timer settings (may have changed)
+                                    idle_timeout = persistent.get_idle_timeout()
+                                    cycle_duration = persistent.get_cycle_duration()
+                                    titles_cycle_duration = persistent.get_titles_cycle_duration()
+                                    sleep_minutes = persistent.get_sleep_timer()
+                                else:
+                                    current_item.update(dt)
+                                    current_item.draw()
+            except Exception:
+                # A visual or game raised — contain the crash instead of
+                # letting it exit the process and take the whole cabinet
+                # down. Log for journald, drop back to the menu, and clear
+                # current_item so we don't just re-crash on it next frame.
+                traceback.print_exc()
+                try:
+                    display.clear()
+                except Exception:
+                    pass
+                in_menu = True
+                current_item = None
+                game_over_initialized = False
+                in_idle = False
+                idle_visual = None
+                in_shuffle_mode = False
+                shuffle_playlist = None
+                exit_hold = 0.0
+                idle_timer = 0.0
 
             display.render()
 

@@ -8,6 +8,9 @@ name: CI
 on:
   push:
     branches: [main, stable]
+    # Also gate release tags: a `v*` tag is the deploy pointer for the fleet,
+    # so verify the tagged commit is green before cabinets pull it.
+    tags: ['v*']
   pull_request:
     branches: [main]
 
@@ -39,3 +42,35 @@ jobs:
           SDL_VIDEODRIVER: dummy
           SDL_AUDIODRIVER: dummy
         run: pytest -q tests/
+
+  # Guard against guide/catalog drift. The generators are the single source of
+  # truth; the committed JSON must match what they produce. test_guide_controls
+  # only validates entries already IN the JSON — it can't notice a new module
+  # that was never regenerated in. This step re-runs the generators and fails if
+  # the committed files differ, closing that hole.
+  data-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Regenerate guide + catalog and check for drift
+        run: |
+          # catalog.json first — generate_guide.py reads it as input.
+          python3 site/generate_catalog.py
+          python3 site/generate_guide.py
+          if ! git diff --exit-code -- site/catalog.json site/guide.json; then
+            echo "::error::site/catalog.json or site/guide.json is stale."
+            echo "Run 'python3 site/generate_catalog.py && python3 site/generate_guide.py' and commit the result."
+            exit 1
+          fi

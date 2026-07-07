@@ -8,6 +8,8 @@ Settings persist across restarts.
 import os
 import json
 
+from atomic_io import write_json_atomic
+
 # Settings file location (same directory as this script)
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SETTINGS_FILE = os.path.join(_SCRIPT_DIR, "user_settings.json")
@@ -51,8 +53,7 @@ def _save():
     if _settings is None:
         return
     try:
-        with open(SETTINGS_FILE, 'w') as f:
-            json.dump(_settings, f, indent=2)
+        write_json_atomic(SETTINGS_FILE, _settings)
     except Exception:
         pass
 
