@@ -53,6 +53,8 @@ class LightsOut(Game):
         self.cursor_y = 2
         self.moves = 0
         self.level = 1
+        self.solved = False       # Puzzle cleared, waiting for button
+        self.solved_lockout = 0.0  # Brief pause so CLEAR! screen registers
 
         # Generate a solvable puzzle by working backwards
         self.generate_puzzle()
@@ -119,6 +121,7 @@ class LightsOut(Game):
         """Advance to next level."""
         self.level += 1
         self.moves = 0
+        self.solved = False
         self.generate_puzzle()
 
     def update(self, input_state: InputState, dt: float):
@@ -128,11 +131,13 @@ class LightsOut(Game):
             if self.toggle_flash <= 0:
                 self.flash_cells = []
 
-        if self.state == GameState.GAME_OVER:
-            # Won - press space for next level
-            if (input_state.action_l or input_state.action_r):
+        if self.solved:
+            # Won - press a button for the next level. Kept internal (not
+            # GameState.GAME_OVER) so the shell doesn't end the run on a win.
+            if self.solved_lockout > 0:
+                self.solved_lockout -= dt
+            elif input_state.action_l or input_state.action_r:
                 self.next_level()
-                self.state = GameState.PLAYING
             return
 
         # Cursor movement
@@ -163,7 +168,8 @@ class LightsOut(Game):
                 self.score += max(1, 100 - self.moves * 5)  # Bonus for fewer moves
                 self.high_score = max(self.high_score, self.score)
                 self.best_level = max(self.best_level, self.level)
-                self.state = GameState.GAME_OVER
+                self.solved = True
+                self.solved_lockout = 0.4
 
     def draw(self):
         self.display.clear(Colors.BLACK)
@@ -187,7 +193,7 @@ class LightsOut(Game):
         self.draw_cursor()
 
         # Win message
-        if self.state == GameState.GAME_OVER:
+        if self.solved:
             self.draw_win()
 
     def draw_hud(self):

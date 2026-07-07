@@ -53,6 +53,7 @@ class Defender(Game):
         self.score = 0
         self.lives = 3
         self.smart_bombs = 3
+        self._both_held_prev = False
         self.wave = 1
         self.wave_clear_timer = 0
 
@@ -248,10 +249,14 @@ class Defender(Game):
             })
             self.fire_cooldown = FIRE_COOLDOWN
 
-        # Smart bomb (both buttons)
-        if input_state.action_l_held and input_state.action_r_held and self.smart_bombs > 0:
+        # Smart bomb (both buttons) — edge-triggered so one press fires one
+        # bomb, and holding both toward the shell's exit gesture doesn't
+        # drain the rest
+        both_held = input_state.action_l_held and input_state.action_r_held
+        if both_held and not self._both_held_prev and self.smart_bombs > 0:
             self.smart_bombs -= 1
             self._smart_bomb()
+        self._both_held_prev = both_held
 
         # Update bullets
         for b in self.bullets:
