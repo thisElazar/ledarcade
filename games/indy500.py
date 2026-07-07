@@ -108,7 +108,7 @@ class Indy500(Game):
     description = "5 tracks!"
     category = "retro"
     GUIDE = {
-        'desc': 'Top-down racing on an oval track. Steer and accelerate to complete laps.',
+        'desc': 'Top-down time-attack racing on an oval track. Complete 7 laps before the 60-second timer runs out - drift off the track and you grind to a halt.',
     }
 
     TRACK_WIDTH = 12
