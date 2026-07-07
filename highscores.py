@@ -12,6 +12,8 @@ import time
 from typing import List, Tuple, Optional
 from pathlib import Path
 
+from atomic_io import write_json_atomic
+
 
 class HighScoreManager:
     """Manages high scores for all games with JSON persistence."""
@@ -126,9 +128,8 @@ class HighScoreManager:
     def save_scores(self):
         """Save scores to JSON file."""
         try:
-            with open(self.filepath, 'w') as f:
-                json.dump(self.scores, f, indent=2)
-        except IOError:
+            write_json_atomic(self.filepath, self.scores)
+        except (IOError, OSError):
             # Can't save, fail silently (scores still work in memory)
             pass
 

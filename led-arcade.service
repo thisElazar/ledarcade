@@ -2,6 +2,13 @@
 Description=LED Arcade
 After=network-online.target
 Wants=network-online.target
+# Bound the crash-loop. Without this, Restart=always + RestartSec=3 means a
+# genuinely fatal boot (import error, bad release) restarts every 3s forever,
+# re-running git fetch and hammering the SD card — the #1 field failure mode.
+# After 5 failures in 2 min systemd stops trying; a power-cycle resets the count
+# and retries (which is also the user's chance to pull the last-good SD image).
+StartLimitIntervalSec=120
+StartLimitBurst=5
 
 [Service]
 Type=simple

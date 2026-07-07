@@ -22,7 +22,11 @@ if [ -f .dev ]; then
     git_safe pull --ff-only 2>/dev/null
 else
     # Distribution cabinet: check out the highest version tag.
-    git_safe fetch --tags --force origin 2>/dev/null
+    # --prune --prune-tags is essential: without it, a tag deleted on GitHub
+    # (the documented rollback path in DEPLOYMENT.md) stays on the cabinet
+    # forever and gets re-checked-out every boot. Pruning lets tag deletion
+    # actually roll the fleet back.
+    git_safe fetch --tags --force --prune --prune-tags origin 2>/dev/null
     latest=$(git_safe tag -l 'v*' | sort -V | tail -1)
     if [ -n "$latest" ]; then
         git_safe checkout -q "$latest" 2>/dev/null
