@@ -6,6 +6,7 @@ Destroy the asteroids before they destroy you!
 Controls:
   Left/Right - Rotate ship
   Up         - Thrust forward
+  Down       - Hyperspace (risky teleport)
   Space      - Fire
 """
 
@@ -19,9 +20,12 @@ class Asteroids(Game):
     description = "Destroy the rocks!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Rotate and thrust your ship, shoot asteroids that split into smaller pieces. Screen wraps. Survive and score. Inspired by the 1979 vector arcade classic.',
+        'desc': 'Rotate and thrust your ship, shoot asteroids that split large-medium-small — the small ones score the most (20/50/100). Down triggers hyperspace: a random teleport with a death risk that grows with rock count. Extra ship every 10,000 points. Screen wraps. Inspired by the 1979 vector arcade classic.',
     }
-    
+
+    # Authentic 1979 scoring — small rocks are worth the most
+    ROCK_SCORES = {3: 20, 2: 50, 1: 100}
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
@@ -40,6 +44,9 @@ class Asteroids(Game):
         self.ship_dy = 0.0
         self.ship_visible = True
         self.invulnerable_timer = 2.0  # Start invulnerable
+        self.hyperspace_timer = 0.0  # Ship is dematerialized while > 0
+        self.hyperspace_death = False
+        self.next_extra_life = 10000  # Extra ship every 10,000 points
         
         # Bullets
         self.bullets = []
@@ -85,11 +92,79 @@ class Asteroids(Game):
                 'y': y,
                 'dx': math.cos(angle) * speed,
                 'dy': math.sin(angle) * speed,
-                'size': 2,  # Large asteroid (scaled down for 64x64)
+                'size': 3,  # Large asteroid (splits 3 -> 2 -> 1)
                 'rotation': random.uniform(0, 2 * math.pi),
                 'rot_speed': random.uniform(-2, 2),
             })
-    
+
+    def split_asteroid(self, asteroid, impact_angle):
+        """Destroy a rock: score it, split it into two children, spawn debris."""
+        self.asteroids.remove(asteroid)
+        self.score += self.ROCK_SCORES[asteroid['size']]
+
+        # Split asteroid - children deflect sideways from the impact path
+        if asteroid['size'] > 1:
+            # Child asteroids are faster, and scale with level
+            child_speed_min = 9 + (self.level - 1) * 2
+            child_speed_max = 18 + (self.level - 1) * 3
+            child_speed_min = min(child_speed_min, 35)
+            child_speed_max = min(child_speed_max, 55)
+            # Two children deflect to opposite sides (60-120° off impact path)
+            for side in (-1, 1):
+                spread = random.uniform(math.pi / 3, 2 * math.pi / 3)
+                angle = impact_angle + side * spread
+                speed = random.uniform(child_speed_min, child_speed_max)
+                self.asteroids.append({
+                    'x': asteroid['x'],
+                    'y': asteroid['y'],
+                    'dx': math.cos(angle) * speed,
+                    'dy': math.sin(angle) * speed,
+                    'size': asteroid['size'] - 1,
+                    'rotation': random.uniform(0, 2 * math.pi),
+                    'rot_speed': random.uniform(-3, 3),
+                })
+
+        # Explosion particles
+        for _ in range(8):
+            angle = random.uniform(0, 2 * math.pi)
+            speed = random.uniform(20, 50)
+            self.particles.append({
+                'x': asteroid['x'],
+                'y': asteroid['y'],
+                'dx': math.cos(angle) * speed,
+                'dy': math.sin(angle) * speed,
+                'life': 0.4,
+                'color': Colors.WHITE,
+            })
+
+    def destroy_ship(self):
+        """Lose a ship: explosion, then respawn or game over."""
+        self.lives -= 1
+
+        # Explosion
+        for _ in range(15):
+            angle = random.uniform(0, 2 * math.pi)
+            speed = random.uniform(30, 60)
+            self.particles.append({
+                'x': self.ship_x,
+                'y': self.ship_y,
+                'dx': math.cos(angle) * speed,
+                'dy': math.sin(angle) * speed,
+                'life': 0.5,
+                'color': Colors.CYAN,
+            })
+
+        if self.lives <= 0:
+            self.state = GameState.GAME_OVER
+        else:
+            # Respawn
+            self.ship_x = GRID_SIZE // 2
+            self.ship_y = GRID_SIZE // 2
+            self.ship_dx = 0
+            self.ship_dy = 0
+            self.ship_angle = -math.pi / 2
+            self.invulnerable_timer = 2.0
+
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
             return
@@ -97,7 +172,16 @@ class Asteroids(Game):
         # Update invulnerability
         if self.invulnerable_timer > 0:
             self.invulnerable_timer -= dt
-        
+
+        # Hyperspace re-entry (ship is dematerialized while timer runs)
+        if self.hyperspace_timer > 0:
+            self.hyperspace_timer -= dt
+            if self.hyperspace_timer <= 0:
+                self.hyperspace_timer = 0.0
+                if self.hyperspace_death:
+                    self.hyperspace_death = False
+                    self.destroy_ship()
+
         # Ship rotation
         rotation_speed = 4.0
         if input_state.left:
@@ -106,7 +190,7 @@ class Asteroids(Game):
             self.ship_angle += rotation_speed * dt
         
         # Ship thrust (forward)
-        if input_state.up:
+        if input_state.up and self.hyperspace_timer <= 0:
             thrust = 50.0
             self.ship_dx += math.cos(self.ship_angle) * thrust * dt
             self.ship_dy += math.sin(self.ship_angle) * thrust * dt
@@ -122,22 +206,28 @@ class Asteroids(Game):
                     'color': Colors.ORANGE,
                 })
 
-        # Ship thrust (backward/reverse)
-        if input_state.down:
-            thrust = 35.0  # Slightly weaker reverse thrust
-            self.ship_dx -= math.cos(self.ship_angle) * thrust * dt
-            self.ship_dy -= math.sin(self.ship_angle) * thrust * dt
-
-            # Reverse thrust particles (from front)
-            if random.random() < 0.5:
+        # Hyperspace (down) — random teleport, like the original.
+        # Death chance rises with the number of rocks on screen.
+        if input_state.down_pressed and self.hyperspace_timer <= 0:
+            # Departure sparkle at the old position
+            for _ in range(6):
+                angle = random.uniform(0, 2 * math.pi)
+                speed = random.uniform(10, 25)
                 self.particles.append({
-                    'x': self.ship_x + math.cos(self.ship_angle) * 2,
-                    'y': self.ship_y + math.sin(self.ship_angle) * 2,
-                    'dx': math.cos(self.ship_angle) * 25 + random.uniform(-8, 8),
-                    'dy': math.sin(self.ship_angle) * 25 + random.uniform(-8, 8),
-                    'life': 0.25,
+                    'x': self.ship_x,
+                    'y': self.ship_y,
+                    'dx': math.cos(angle) * speed,
+                    'dy': math.sin(angle) * speed,
+                    'life': 0.3,
                     'color': Colors.CYAN,
                 })
+            self.ship_x = random.uniform(4, GRID_SIZE - 4)
+            self.ship_y = random.uniform(12, GRID_SIZE - 4)
+            self.ship_dx = 0.0
+            self.ship_dy = 0.0
+            self.hyperspace_timer = 0.6
+            self.hyperspace_death = (
+                random.random() < min(0.05 + 0.02 * len(self.asteroids), 0.3))
         
         # Limit speed
         max_speed = 60.0
@@ -154,14 +244,15 @@ class Asteroids(Game):
         self.ship_x = self.ship_x % GRID_SIZE
         self.ship_y = 8 + (self.ship_y - 8) % (GRID_SIZE - 8)
         
-        # Drag (space friction)
-        drag = 0.98
+        # Light drag, frame-rate independent — the original coasts a long way
+        drag = 0.66 ** dt
         self.ship_dx *= drag
         self.ship_dy *= drag
         
         # Fire bullets
         self.fire_cooldown = max(0, self.fire_cooldown - dt)
-        if (input_state.action_l or input_state.action_r) and self.fire_cooldown <= 0:
+        if (input_state.action_l or input_state.action_r) and self.fire_cooldown <= 0 \
+                and self.hyperspace_timer <= 0:
             self.fire_cooldown = 0.2
             
             bullet_speed = 80.0
@@ -216,92 +307,33 @@ class Asteroids(Game):
                     # Hit!
                     if bullet in self.bullets:
                         self.bullets.remove(bullet)
-                    
-                    self.asteroids.remove(asteroid)
-                    
-                    # Score based on size
-                    self.score += (4 - asteroid['size']) * 20
-                    
-                    # Split asteroid - children deflect sideways from bullet path
-                    if asteroid['size'] > 1:
-                        # Child asteroids are faster, and scale with level
-                        child_speed_min = 9 + (self.level - 1) * 2
-                        child_speed_max = 18 + (self.level - 1) * 3
-                        child_speed_min = min(child_speed_min, 35)
-                        child_speed_max = min(child_speed_max, 55)
-                        # Bullet travel direction
-                        bullet_angle = math.atan2(bullet['dy'], bullet['dx'])
-                        # Two children deflect to opposite sides (60-120° off bullet path)
-                        for side in (-1, 1):
-                            spread = random.uniform(math.pi / 3, 2 * math.pi / 3)
-                            angle = bullet_angle + side * spread
-                            speed = random.uniform(child_speed_min, child_speed_max)
-                            self.asteroids.append({
-                                'x': asteroid['x'],
-                                'y': asteroid['y'],
-                                'dx': math.cos(angle) * speed,
-                                'dy': math.sin(angle) * speed,
-                                'size': asteroid['size'] - 1,
-                                'rotation': random.uniform(0, 2 * math.pi),
-                                'rot_speed': random.uniform(-3, 3),
-                            })
-                    
-                    # Explosion particles
-                    for _ in range(8):
-                        angle = random.uniform(0, 2 * math.pi)
-                        speed = random.uniform(20, 50)
-                        self.particles.append({
-                            'x': asteroid['x'],
-                            'y': asteroid['y'],
-                            'dx': math.cos(angle) * speed,
-                            'dy': math.sin(angle) * speed,
-                            'life': 0.4,
-                            'color': Colors.WHITE,
-                        })
-                    
+
+                    # Children deflect sideways from the bullet path
+                    bullet_angle = math.atan2(bullet['dy'], bullet['dx'])
+                    self.split_asteroid(asteroid, bullet_angle)
                     break
         
-        # Ship-asteroid collisions (if not invulnerable)
-        if self.invulnerable_timer <= 0:
+        # Ship-asteroid collisions (if not invulnerable or in hyperspace)
+        if self.invulnerable_timer <= 0 and self.hyperspace_timer <= 0:
             for asteroid in self.asteroids:
                 radius = asteroid['size'] * 2 + 3
-                dist = math.sqrt((self.ship_x - asteroid['x'])**2 + 
+                dist = math.sqrt((self.ship_x - asteroid['x'])**2 +
                                (self.ship_y - asteroid['y'])**2)
-                
+
                 if dist < radius:
-                    self.lives -= 1
-                    
-                    # Explosion
-                    for _ in range(15):
-                        angle = random.uniform(0, 2 * math.pi)
-                        speed = random.uniform(30, 60)
-                        self.particles.append({
-                            'x': self.ship_x,
-                            'y': self.ship_y,
-                            'dx': math.cos(angle) * speed,
-                            'dy': math.sin(angle) * speed,
-                            'life': 0.5,
-                            'color': Colors.CYAN,
-                        })
-                    
-                    if self.lives <= 0:
-                        self.state = GameState.GAME_OVER
-                    else:
-                        # Respawn
-                        self.ship_x = GRID_SIZE // 2
-                        self.ship_y = GRID_SIZE // 2
-                        self.ship_dx = 0
-                        self.ship_dy = 0
-                        self.ship_angle = -math.pi / 2
-                        self.invulnerable_timer = 2.0
+                    # Ramming a rock splits and scores it too (like the original)
+                    impact_angle = math.atan2(asteroid['dy'], asteroid['dx'])
+                    self.split_asteroid(asteroid, impact_angle)
+                    self.destroy_ship()
                     break
         
         # UFO logic (like original 1979 Asteroids)
         if self.ufo is None:
             self.ufo_spawn_timer -= dt
             if self.ufo_spawn_timer <= 0:
-                # Spawn UFO - small UFO is more likely at higher levels
-                is_small = random.random() < min(0.2 + self.level * 0.1, 0.7)
+                # Spawn UFO - small saucer probability rises with score
+                # (like the original); mostly small above ~4000 points
+                is_small = random.random() < min(0.2 + self.score / 8000.0, 0.85)
                 # UFO enters from left or right edge
                 from_left = random.random() < 0.5
                 self.ufo = {
@@ -342,10 +374,11 @@ class Asteroids(Game):
                 if self.ufo['fire_timer'] <= 0:
                     # Small UFO aims more accurately (like original)
                     if self.ufo['small']:
-                        # Accurate shot with small random offset
+                        # Aim error tightens with score — near-perfect above ~4000
+                        aim_error = max(0.05, 0.35 - self.score * (0.30 / 4000.0))
                         aim_angle = math.atan2(self.ship_y - self.ufo['y'],
                                                self.ship_x - self.ufo['x'])
-                        aim_angle += random.uniform(-0.2, 0.2)
+                        aim_angle += random.uniform(-aim_error, aim_error)
                     else:
                         # Large UFO shoots more randomly
                         aim_angle = math.atan2(self.ship_y - self.ufo['y'],
@@ -401,37 +434,20 @@ class Asteroids(Game):
                     self.ufo = None
                     break
 
-        # UFO bullet hits player (if not invulnerable)
-        if self.invulnerable_timer <= 0:
+        # UFO bullet hits player (if not invulnerable or in hyperspace)
+        if self.invulnerable_timer <= 0 and self.hyperspace_timer <= 0:
             for bullet in self.ufo_bullets[:]:
                 dist = math.sqrt((bullet['x'] - self.ship_x)**2 +
                                  (bullet['y'] - self.ship_y)**2)
                 if dist < 3:
                     self.ufo_bullets.remove(bullet)
-                    self.lives -= 1
-                    # Explosion
-                    for _ in range(15):
-                        angle = random.uniform(0, 2 * math.pi)
-                        speed = random.uniform(30, 60)
-                        self.particles.append({
-                            'x': self.ship_x,
-                            'y': self.ship_y,
-                            'dx': math.cos(angle) * speed,
-                            'dy': math.sin(angle) * speed,
-                            'life': 0.5,
-                            'color': Colors.CYAN,
-                        })
-                    if self.lives <= 0:
-                        self.state = GameState.GAME_OVER
-                    else:
-                        # Respawn
-                        self.ship_x = GRID_SIZE // 2
-                        self.ship_y = GRID_SIZE // 2
-                        self.ship_dx = 0
-                        self.ship_dy = 0
-                        self.ship_angle = -math.pi / 2
-                        self.invulnerable_timer = 2.0
+                    self.destroy_ship()
                     break
+
+        # Extra ship every 10,000 points (like the original)
+        if self.score >= self.next_extra_life:
+            self.lives += 1
+            self.next_extra_life += 10000
 
         # Check if all asteroids destroyed
         if not self.asteroids:
@@ -513,8 +529,9 @@ class Asteroids(Game):
             )
             self.display.set_pixel(px, py, dim_color)
         
-        # Draw ship (blink if invulnerable)
-        if self.invulnerable_timer <= 0 or int(self.invulnerable_timer * 10) % 2 == 0:
+        # Draw ship (hidden during hyperspace, blink if invulnerable)
+        if self.hyperspace_timer <= 0 and \
+                (self.invulnerable_timer <= 0 or int(self.invulnerable_timer * 10) % 2 == 0):
             sx, sy = int(self.ship_x), int(self.ship_y)
 
             # Ship as smaller triangle

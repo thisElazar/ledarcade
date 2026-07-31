@@ -17,7 +17,7 @@ class DigDug(Game):
     description = "Pump 'em up!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Dig tunnels underground and inflate enemies with your pump until they pop, or lure them under falling rocks. Clear all enemies to advance.',
+        'desc': 'Dig tunnels underground and inflate enemies with your pump until they pop — each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; Fygars pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.',
     }
 
     # Colors
@@ -48,6 +48,7 @@ class DigDug(Game):
         self.pump_timer = 0
         self.pump_phase = 'extend'  # 'extend' or 'retract'
         self.pump_extend_timer = 0  # Time spent in extend phase
+        self.pump_hit_this_cycle = False  # One inflate per extend/retract cycle
 
         # Tunnel map (True = dug out)
         self.tunnels = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
@@ -71,6 +72,10 @@ class DigDug(Game):
         # Rocks
         self.rocks = []
         self.spawn_rocks()
+        self.rocks_dropped = 0
+
+        # Bonus vegetable (appears after the 2nd rock drops)
+        self.vegetable = None
 
         # Invincibility
         self.invincible = 0
@@ -104,6 +109,7 @@ class DigDug(Game):
                 'type': enemy_type,
                 'dir': random.choice([(1, 0), (-1, 0), (0, 1), (0, -1)]),
                 'inflate': 0,  # 0-4, pops at 4
+                'deflate_timer': 0,  # Deflates one stage per ~0.8s
                 'move_timer': 0,
                 'ghost_mode': False,
                 'ghost_timer': ghost_offset,  # Stagger by spawn index
@@ -137,6 +143,8 @@ class DigDug(Game):
                 'y': ry,
                 'falling': False,
                 'fall_timer': 0,
+                'primed': False,  # Player must pass beneath before it can fall
+                'crushed': 0,     # Enemies crushed by this rock
             })
 
     def update(self, input_state: InputState, dt: float):
@@ -182,12 +190,13 @@ class DigDug(Game):
                 self.pump_timer = 0
                 self.pump_phase = 'extend'
                 self.pump_extend_timer = 0
+                self.pump_hit_this_cycle = False
 
             self.pump_timer += dt
             self.pump_extend_timer += dt
 
             if self.pump_phase == 'extend':
-                if self.pump_timer >= 0.1:
+                if self.pump_timer >= 0.05:
                     self.pump_timer = 0
                     self.pump_length = min(self.pump_length + 1, 8)
 
@@ -197,7 +206,7 @@ class DigDug(Game):
                     self.pump_timer = 0
 
             elif self.pump_phase == 'retract':
-                if self.pump_timer >= 0.08:
+                if self.pump_timer >= 0.04:
                     self.pump_timer = 0
                     self.pump_length -= 1
                     if self.pump_length <= 0:
@@ -205,34 +214,49 @@ class DigDug(Game):
                         # Reset for next pump cycle
                         self.pump_phase = 'extend'
                         self.pump_extend_timer = 0
+                        self.pump_hit_this_cycle = False
 
-            # Check if pump hits enemy (during both extend and retract)
-            if self.pump_length > 0:
+            # One inflate per cycle: the tip must connect during extend,
+            # then the hose fully retracts before the next increment
+            if self.pump_phase == 'extend' and self.pump_length > 0 \
+                    and not self.pump_hit_this_cycle:
                 pump_x = self.player_x + self.player_dir[0] * self.pump_length
                 pump_y = self.player_y + self.player_dir[1] * self.pump_length
 
                 for enemy in self.enemies:
                     if abs(enemy['x'] - pump_x) <= 2 and abs(enemy['y'] - pump_y) <= 2:
                         enemy['inflate'] += 1
+                        enemy['deflate_timer'] = 0
+                        self.pump_hit_this_cycle = True
+                        # Hose lets go and reels back in
+                        self.pump_phase = 'retract'
+                        self.pump_timer = 0
                         if enemy['inflate'] >= 4:
                             self.enemies.remove(enemy)
-                            self.score += 200 if enemy['type'] == 'pooka' else 400
+                            self.score += self.pop_score(enemy)
                         break
         else:
             self.pump_active = False
             self.pump_length = 0
             self.pump_phase = 'extend'
             self.pump_extend_timer = 0
-            # Enemies deflate when not being pumped
-            for enemy in self.enemies:
-                if enemy['inflate'] > 0:
-                    enemy['inflate'] = max(0, enemy['inflate'] - 1)
+            self.pump_hit_this_cycle = False
 
         # Update enemies
         self.update_enemies(dt)
 
         # Update rocks
         self.update_rocks(dt)
+
+        # Update bonus vegetable (walk over it to collect)
+        if self.vegetable:
+            self.vegetable['timer'] -= dt
+            if self.vegetable['timer'] <= 0:
+                self.vegetable = None
+            elif abs(self.player_x - self.vegetable['x']) <= 2 and \
+                    abs(self.player_y - self.vegetable['y']) <= 2:
+                self.score += self.vegetable['value']
+                self.vegetable = None
 
         # Check player-enemy collision
         if self.invincible <= 0:
@@ -245,6 +269,21 @@ class DigDug(Game):
         # Check level complete
         if len(self.enemies) == 0:
             self.next_level()
+
+    def pop_score(self, enemy: dict) -> int:
+        """Depth-scaled pop score, like the original.
+
+        Layer = depth quartile (matches the dirt stripe bands). Pooka pays
+        200/300/400/500 by depth; Fygar double; doubled again when pumped
+        horizontally (dragon side-on is the dangerous approach).
+        """
+        layer = min(3, max(0, (enemy['y'] - 8) // 12))
+        pts = 200 + layer * 100
+        if enemy['type'] == 'fygar':
+            pts *= 2
+            if self.player_dir[1] == 0:  # Pumped horizontally
+                pts *= 2
+        return pts
 
     def get_enemy_speed(self, ghost_mode: bool) -> float:
         """Calculate enemy speed based on level. Lower value = faster movement."""
@@ -261,8 +300,19 @@ class DigDug(Game):
 
     def update_enemies(self, dt: float):
         """Update enemy movement and behavior."""
-        for enemy in self.enemies:
+        # Last enemy flees: it ghosts toward the top-left surface and leaves
+        if len(self.enemies) == 1 and not self.enemies[0].get('fleeing'):
+            self.enemies[0]['fleeing'] = True
+            self.enemies[0]['ghost_mode'] = True
+
+        for enemy in self.enemies[:]:
             if enemy['inflate'] > 0:
+                # Deflate one stage per ~1.0s when not being pumped — slower
+                # than a full max-range pump cycle, so pumping always gains
+                enemy['deflate_timer'] += dt
+                if enemy['deflate_timer'] >= 1.0:
+                    enemy['deflate_timer'] = 0
+                    enemy['inflate'] -= 1
                 continue  # Inflated enemies don't move
 
             enemy['move_timer'] += dt
@@ -275,7 +325,7 @@ class DigDug(Game):
                     enemy['ghost_mode'] = True
                     enemy['ghost_timer'] = 0
             else:
-                if enemy['ghost_timer'] > 3.0:
+                if enemy['ghost_timer'] > 3.0 and not enemy.get('fleeing'):
                     # Only exit ghost mode if currently in a tunnel,
                     # otherwise stay ghost until we reach one
                     ex, ey = enemy['x'], enemy['y']
@@ -283,8 +333,8 @@ class DigDug(Game):
                         enemy['ghost_mode'] = False
                         enemy['ghost_timer'] = 0
 
-            # Fygar fire breath logic
-            if enemy['type'] == 'fygar':
+            # Fygar fire breath logic (a fleeing Fygar just runs)
+            if enemy['type'] == 'fygar' and not enemy.get('fleeing'):
                 self.update_fygar_fire(enemy, dt)
 
             move_speed = self.get_enemy_speed(enemy['ghost_mode'])
@@ -293,9 +343,14 @@ class DigDug(Game):
                 enemy['move_timer'] = 0
 
                 if enemy['ghost_mode']:
-                    # Move toward player through dirt
-                    dx = 1 if self.player_x > enemy['x'] else -1 if self.player_x < enemy['x'] else 0
-                    dy = 1 if self.player_y > enemy['y'] else -1 if self.player_y < enemy['y'] else 0
+                    # Move toward player through dirt (a fleeing enemy heads
+                    # for the top-left surface instead)
+                    if enemy.get('fleeing'):
+                        tx, ty = 0, 8
+                    else:
+                        tx, ty = self.player_x, self.player_y
+                    dx = 1 if tx > enemy['x'] else -1 if tx < enemy['x'] else 0
+                    dy = 1 if ty > enemy['y'] else -1 if ty < enemy['y'] else 0
 
                     if random.random() < 0.5:
                         dx = 0
@@ -345,6 +400,10 @@ class DigDug(Game):
                 if 0 <= new_x < GRID_SIZE and 8 <= new_y < GRID_SIZE:
                     enemy['x'] = new_x
                     enemy['y'] = new_y
+
+                # Fleeing enemy walks off the top-left edge — no score
+                if enemy.get('fleeing') and enemy['x'] <= 0 and enemy['y'] <= 9:
+                    self.enemies.remove(enemy)
 
     def update_fygar_fire(self, enemy: dict, dt: float):
         """Update Fygar's horizontal fire breath attack."""
@@ -405,8 +464,14 @@ class DigDug(Game):
         for rock in self.rocks[:]:
             # Check if rock should start falling
             if not rock['falling']:
-                # Check if tunnel below
-                if rock['y'] + 3 < GRID_SIZE and self.tunnels[rock['y'] + 3][rock['x']]:
+                # Player passing beneath primes the rock (the lure setup)
+                if not rock['primed'] and abs(self.player_x - rock['x']) <= 2 \
+                        and self.player_y > rock['y']:
+                    rock['primed'] = True
+
+                # Falls only once primed and undermined
+                if rock['primed'] and rock['y'] + 3 < GRID_SIZE \
+                        and self.tunnels[rock['y'] + 3][rock['x']]:
                     rock['fall_timer'] += dt
                     if rock['fall_timer'] > 0.5:
                         rock['falling'] = True
@@ -425,11 +490,13 @@ class DigDug(Game):
                         if 0 <= rock['x'] + dx < GRID_SIZE and rock['y'] < GRID_SIZE:
                             self.tunnels[rock['y']][rock['x'] + dx] = True
 
-                    # Check if hit enemy
+                    # Check if hit enemy — multi-crush escalates
+                    # (1000 for one, 2500 total for two under one rock)
                     for enemy in self.enemies[:]:
                         if abs(enemy['x'] - rock['x']) <= 2 and abs(enemy['y'] - rock['y']) <= 2:
                             self.enemies.remove(enemy)
-                            self.score += 500
+                            rock['crushed'] += 1
+                            self.score += 1000 if rock['crushed'] == 1 else 1500
 
                     # Check if hit player
                     if abs(self.player_x - rock['x']) <= 2 and abs(self.player_y - rock['y']) <= 2:
@@ -441,6 +508,15 @@ class DigDug(Game):
                         rock['y'] + 1 < GRID_SIZE and not self.tunnels[rock['y'] + 1][rock['x']]
                     ):
                         self.rocks.remove(rock)
+                        self.rocks_dropped += 1
+                        # Second rock down: a bonus vegetable appears
+                        if self.rocks_dropped == 2 and self.vegetable is None:
+                            self.vegetable = {
+                                'x': 32,
+                                'y': 32,
+                                'timer': 8.0,
+                                'value': 300 + self.level * 300,
+                            }
 
     def player_hit(self):
         """Handle player death."""
@@ -471,6 +547,8 @@ class DigDug(Game):
 
         self.spawn_enemies()
         self.spawn_rocks()
+        self.rocks_dropped = 0
+        self.vegetable = None
 
     def draw(self):
         self.display.clear(self.DIRT_COLOR)
@@ -494,6 +572,10 @@ class DigDug(Game):
         # Draw rocks
         for rock in self.rocks:
             self.draw_rock(rock['x'], rock['y'])
+
+        # Draw bonus vegetable
+        if self.vegetable:
+            self.draw_vegetable(self.vegetable['x'], self.vegetable['y'])
 
         # Draw enemies
         for enemy in self.enemies:
@@ -564,6 +646,15 @@ class DigDug(Game):
                     px, py = x + dx, y + dy
                     if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                         self.display.set_pixel(px, py, self.ROCK_COLOR)
+
+    def draw_vegetable(self, x: int, y: int):
+        """Draw the bonus vegetable (a little turnip)."""
+        self.display.set_pixel(x, y - 2, Colors.GREEN)  # Leaves
+        self.display.set_pixel(x - 1, y - 1, Colors.GREEN)
+        self.display.set_pixel(x + 1, y - 1, Colors.GREEN)
+        for dy in range(0, 2):
+            for dx in range(-1, 2):
+                self.display.set_pixel(x + dx, y + dy, Colors.ORANGE)
 
     def draw_pump(self):
         """Draw the pump hose."""
