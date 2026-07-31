@@ -18,7 +18,7 @@ class PacMan(Game):
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Each ghost has unique AI: Blinky chases, Pinky ambushes, Inky flanks, Clyde wanders.',
+        'desc': 'Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.',
     }
 
     # Simplified maze for 64x64 display (21x19 tiles at 3px each = 63x57)
@@ -45,6 +45,11 @@ class PacMan(Game):
         "122222222222222222221",  # R17: Open corridor
         "111111111111111111111",  # R18: Bottom border
     ]
+
+    # Scatter/chase phase durations in seconds (Pac-Man Dossier).
+    # Even indices are scatter, odd are chase; the final chase never ends.
+    # Levels 5+ shorten scatter phases to 5 seconds.
+    MODE_SCHEDULE = [7.0, 20.0, 7.0, 20.0, 5.0, 20.0, 5.0, float('inf')]
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -76,6 +81,7 @@ class PacMan(Game):
                 if cell == 2 or cell == 3:
                     self.dots_remaining += 1
             self.maze.append(maze_row)
+        self.dots_total = self.dots_remaining
 
         # Pac-Man position (tile coordinates, float for smooth movement)
         self.pac_x = 10.0
@@ -83,6 +89,7 @@ class PacMan(Game):
         self.pac_dir = (0, 0)  # Current direction
         self.pac_next_dir = (0, 0)  # Queued direction
         self.pac_speed = 6.0  # Tiles per second
+        self.pac_slow_timer = 0  # Brief slowdown after eating a dot
         self.mouth_open = True
         self.mouth_timer = 0
 
@@ -90,13 +97,17 @@ class PacMan(Game):
         # Scatter targets must be in passable tiles (row 0 and 18 are walls)
         self.ghosts = [
             {'name': 'blinky', 'x': 10.0, 'y': 7.0, 'dir': (-1, 0), 'color': Colors.RED,
-             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
             {'name': 'pinky', 'x': 10.0, 'y': 9.0, 'dir': (0, 1), 'color': Colors.PINK,
-             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
             {'name': 'inky', 'x': 9.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.CYAN,
-             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
             {'name': 'clyde', 'x': 11.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.ORANGE,
-             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
         ]
         # Base speeds (will be modified by level)
         self.base_ghost_speed = 4.5
@@ -104,25 +115,28 @@ class PacMan(Game):
         self.ghost_speed = self.base_ghost_speed
         self.frightened_speed = self.base_frightened_speed
         self.frightened_timer = 0
-        self.ghost_release_timer = 0
+        self.ghost_release_timer = 0  # Time since last dot eaten (no-dot fallback release)
         self.ghosts_released = 1  # Blinky starts outside
 
         # Level-based difficulty settings (based on original 1980 Pac-Man)
         # Frightened duration decreases each level: 6s at level 1, down to 0s at level 19+
         # Ghost speed increases each level
-        # Ghost release from pen gets faster each level
+        # Ghosts leave the pen on per-ghost dot counters (with a no-dot fallback timer)
         self._apply_level_difficulty()
 
-        # Mode switching (scatter/chase)
-        self.chase_mode = True
+        # Mode switching (scatter/chase) - arcade phase schedule, starts in scatter
+        self.mode_phase = 0
         self.mode_timer = 0
-        self.mode_duration = 20.0
+        self.chase_mode = False
 
         # Power pellet flashing
         self.pellet_flash = 0
 
         # Eaten ghost points
         self.ghost_points = 200
+
+        # One extra life awarded at 10,000 points
+        self.extra_life_awarded = False
 
     def get_tile(self, x, y):
         """Get tile at position, handling wrapping."""
@@ -179,11 +193,17 @@ class PacMan(Game):
         elif input_state.right:
             self.pac_next_dir = (1, 0)
 
-        # Update mode timer
-        self.mode_timer += dt
-        if self.mode_timer >= self.mode_duration:
-            self.mode_timer = 0
-            self.chase_mode = not self.chase_mode
+        # Advance scatter/chase phase (timer pauses while ghosts are frightened)
+        if self.frightened_timer <= 0 and self.mode_phase < len(self.MODE_SCHEDULE) - 1:
+            self.mode_timer += dt
+            if self.mode_timer >= self._mode_phase_duration(self.mode_phase):
+                self.mode_timer = 0
+                self.mode_phase += 1
+                self.chase_mode = (self.mode_phase % 2 == 1)
+                # Mode flips force ghosts to reverse direction
+                for ghost in self.ghosts:
+                    if not ghost['eaten'] and not ghost['in_house']:
+                        ghost['dir'] = (-ghost['dir'][0], -ghost['dir'][1])
 
         # Update frightened timer
         if self.frightened_timer > 0:
@@ -193,19 +213,21 @@ class PacMan(Game):
                     ghost['frightened'] = False
                 self.ghost_points = 200
 
-        # Release ghosts from house (faster at higher levels)
-        self.ghost_release_timer += dt
-        ghost_release_interval = self._get_ghost_release_interval()
-        if self.ghost_release_timer >= ghost_release_interval and self.ghosts_released < 4:
+        # Dot slowdown wears off
+        if self.pac_slow_timer > 0:
+            self.pac_slow_timer -= dt
+
+        # Dot-counter house exits (house order: Pinky, Inky, Clyde)
+        if self.ghosts_released < 4:
             for ghost in self.ghosts:
                 if ghost['in_house']:
-                    ghost['in_house'] = False
-                    ghost['x'] = 10.0  # Exit through door
-                    ghost['y'] = 7.0
-                    ghost['dir'] = (-1, 0)
-                    self.ghosts_released += 1
-                    self.ghost_release_timer = 0
+                    if ghost['dot_counter'] >= self._ghost_dot_limit(ghost['name']):
+                        self._release_next_ghost()
                     break
+            # Fallback: if no dot eaten for 4 seconds, release the next ghost anyway
+            self.ghost_release_timer += dt
+            if self.ghost_release_timer >= 4.0:
+                self._release_next_ghost()
 
         # Move Pac-Man
         self.move_pacman(dt)
@@ -224,11 +246,20 @@ class PacMan(Game):
                 self.maze[ty][tx] = 0
                 self.score += 10
                 self.dots_remaining -= 1
+                self.pac_slow_timer = 0.05  # Chewing slows Pac-Man briefly
+                self._count_dot_for_house()
             elif tile == 3:  # Power pellet
                 self.maze[ty][tx] = 0
                 self.score += 50
                 self.dots_remaining -= 1
+                self.pac_slow_timer = 0.15
+                self._count_dot_for_house()
                 self.activate_power()
+
+        # Extra life at 10,000 points (awarded once)
+        if not self.extra_life_awarded and self.score >= 10000:
+            self.extra_life_awarded = True
+            self.lives += 1
 
         # Check win condition
         if self.dots_remaining <= 0:
@@ -310,11 +341,12 @@ class PacMan(Game):
 
             # If we couldn't turn, keep the queued direction for later
 
-        # Move in current direction
+        # Move in current direction (slower for a moment after eating a dot)
         if self.pac_dir != (0, 0):
             dx, dy = self.pac_dir
-            new_x = self.pac_x + dx * self.pac_speed * dt
-            new_y = self.pac_y + dy * self.pac_speed * dt
+            speed = self.pac_speed * (0.8 if self.pac_slow_timer > 0 else 1.0)
+            new_x = self.pac_x + dx * speed * dt
+            new_y = self.pac_y + dy * speed * dt
 
             # Get the tile Pac-Man would be in after moving
             new_tile_x = int(round(new_x))
@@ -393,10 +425,20 @@ class PacMan(Game):
             speed = self.frightened_speed
         else:
             speed = self.ghost_speed
+            # Cruise Elroy: Blinky speeds up as the dots run out
+            if ghost['name'] == 'blinky':
+                if self.dots_remaining <= self._elroy_threshold() // 2:
+                    speed *= 1.10
+                elif self.dots_remaining <= self._elroy_threshold():
+                    speed *= 1.05
 
         # Get current tile position
         gx, gy = ghost['x'], ghost['y']
         tile_x, tile_y = int(round(gx)), int(round(gy))
+
+        # Ghosts slow down in the tunnel mouths (row 9)
+        if not ghost['eaten'] and tile_y == 9 and (tile_x <= 2 or tile_x >= 18):
+            speed *= 0.55
 
         # Check if at tile center (for direction decisions)
         at_center = abs(gx - tile_x) < 0.1 and abs(gy - tile_y) < 0.1
@@ -499,16 +541,27 @@ class PacMan(Game):
             return (10.0, 8.0)  # Ghost house door
 
         if not self.chase_mode:
+            # Cruise Elroy Blinky ignores scatter and keeps chasing
+            if ghost['name'] == 'blinky' and self.dots_remaining <= self._elroy_threshold():
+                return (self.pac_x, self.pac_y)
             return ghost['scatter_target']
 
         name = ghost['name']
         if name == 'blinky':
             return (self.pac_x, self.pac_y)
         elif name == 'pinky':
+            # Original overflow bug: facing up also shifts the target 4 tiles left
+            if self.pac_dir == (0, -1):
+                return (self.pac_x - 4, self.pac_y - 4)
             return (self.pac_x + self.pac_dir[0] * 4, self.pac_y + self.pac_dir[1] * 4)
         elif name == 'inky':
-            px = self.pac_x + self.pac_dir[0] * 2
-            py = self.pac_y + self.pac_dir[1] * 2
+            # Same overflow bug shifts Inky's pivot point up-left when facing up
+            if self.pac_dir == (0, -1):
+                px = self.pac_x - 2
+                py = self.pac_y - 2
+            else:
+                px = self.pac_x + self.pac_dir[0] * 2
+                py = self.pac_y + self.pac_dir[1] * 2
             blinky = self.ghosts[0]
             return (px + (px - blinky['x']), py + (py - blinky['y']))
         elif name == 'clyde':
@@ -578,15 +631,48 @@ class PacMan(Game):
         multiplier = 1.0 + (self.level - 1) * 0.05
         return min(multiplier, 1.4)  # Cap at 40% speed increase
 
-    def _get_ghost_release_interval(self):
-        """Get interval between ghost releases from the pen.
+    def _mode_phase_duration(self, phase):
+        """Duration of a scatter/chase phase; levels 5+ shorten scatters to 5s."""
+        duration = self.MODE_SCHEDULE[phase]
+        if self.level >= 5 and phase % 2 == 0:
+            return min(duration, 5.0)
+        return duration
 
-        Original Pac-Man released ghosts faster at higher levels.
-        Returns time in seconds between ghost releases.
-        """
-        # Start at 4 seconds, decrease by 0.3 per level, minimum 1 second
-        interval = 4.0 - (self.level - 1) * 0.3
-        return max(interval, 1.0)
+    def _elroy_threshold(self):
+        """Dots-remaining count at which Blinky becomes 'Cruise Elroy'."""
+        return min(20 + (self.level - 1) * 10, self.dots_total // 3)
+
+    def _ghost_dot_limit(self, name):
+        """Personal dot-counter limit before a ghost leaves the house."""
+        if name == 'inky':
+            return 30 if self.level == 1 else 0
+        if name == 'clyde':
+            if self.level == 1:
+                return 60
+            if self.level == 2:
+                return 50
+            return 0
+        return 0  # Pinky (and returned Blinky) leave immediately
+
+    def _count_dot_for_house(self):
+        """Credit an eaten dot to the preferred waiting ghost's counter."""
+        self.ghost_release_timer = 0
+        for ghost in self.ghosts:
+            if ghost['in_house']:
+                ghost['dot_counter'] += 1
+                break
+
+    def _release_next_ghost(self):
+        """Release the next waiting ghost (house order: Pinky, Inky, Clyde)."""
+        for ghost in self.ghosts:
+            if ghost['in_house']:
+                ghost['in_house'] = False
+                ghost['x'] = 10.0  # Exit through door
+                ghost['y'] = 7.0
+                ghost['dir'] = (-1, 0)
+                self.ghosts_released += 1
+                self.ghost_release_timer = 0
+                return
 
     def _apply_level_difficulty(self):
         """Apply difficulty settings based on current level."""
@@ -628,10 +714,16 @@ class PacMan(Game):
         for ghost in self.ghosts:
             ghost['frightened'] = False
             ghost['eaten'] = False
+            ghost['dot_counter'] = 0
 
         self.ghosts_released = 1
         self.ghost_release_timer = 0
         self.frightened_timer = 0
+
+        # Scatter/chase schedule restarts on death and new level
+        self.mode_phase = 0
+        self.mode_timer = 0
+        self.chase_mode = False
 
     def next_level(self):
         """Start next level."""
@@ -645,6 +737,7 @@ class PacMan(Game):
                 if cell == 2 or cell == 3:
                     self.dots_remaining += 1
             self.maze.append(maze_row)
+        self.dots_total = self.dots_remaining
 
         self.respawn()
         # Apply level-based difficulty scaling

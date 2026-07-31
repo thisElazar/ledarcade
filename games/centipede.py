@@ -17,7 +17,7 @@ class Centipede(Game):
     description = "Blast the bugs!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Clear the centipede to advance.',
+        'desc': 'Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Scorpions poison mushrooms — a segment that touches one dives straight down at you. Spiders score more the closer you shoot them (300/600/900). Losing a life repairs the field at +5 a mushroom. Extra life every 12,000. Clear the wave to advance.',
     }
 
     # Player constants
@@ -49,6 +49,7 @@ class Centipede(Game):
 
         # Mushrooms: set of (x, y) with health
         self.mushrooms = {}
+        self.poisoned = set()  # (x, y) of scorpion-poisoned mushrooms
         self.spawn_mushrooms()
 
         # Centipede segments: list of {x, y, dir_x, is_head}
@@ -67,6 +68,12 @@ class Centipede(Game):
         self.scorpion = None
         self.scorpion_timer = 0
 
+        # Lone-head pressure while the centipede camps the player zone
+        self.head_spawn_timer = 0
+
+        # Extra life every 12,000 points
+        self.next_extra_life = 12000
+
         # Invincibility after death
         self.invincible = 0
 
@@ -84,10 +91,15 @@ class Centipede(Game):
                 self.mushrooms[(x, y)] = 4  # 4 hits to destroy
 
     def spawn_centipede(self):
-        """Spawn a new centipede."""
+        """Spawn a new centipede wave.
+
+        Waves total 12 units like the original: wave n has a chain of
+        max(12-(n-1), 6) body segments plus min(n-1, 6) independent fast
+        heads entering at random positions near the top.
+        """
         self.segments = []
-        length = 8 + self.level * 2
-        length = min(length, 16)
+        length = max(12 - (self.level - 1), 6)
+        num_heads = min(self.level - 1, 6)
 
         # Start from top — ensure start_x is high enough for all segments
         min_start_x = length * 3 + 2
@@ -103,6 +115,16 @@ class Centipede(Game):
                 'y': float(start_y),
                 'dir_x': 1,  # Moving right
                 'is_head': i == 0
+            })
+
+        # Independent fast heads enter at random x near the top
+        for _ in range(num_heads):
+            self.segments.append({
+                'x': float(random.randint(6, 58)),
+                'y': float(start_y),
+                'dir_x': random.choice([1, -1]),
+                'is_head': True,
+                'speed_mult': 1.5,
             })
 
     def update(self, input_state: InputState, dt: float):
@@ -149,6 +171,7 @@ class Centipede(Game):
                     self.mushrooms[(mx, my)] = health - 1
                     if self.mushrooms[(mx, my)] <= 0:
                         del self.mushrooms[(mx, my)]
+                        self.poisoned.discard((mx, my))
                         self.score += 1
                     self.bullet = None
                     break
@@ -161,11 +184,12 @@ class Centipede(Game):
                         self.bullet = None
                         break
 
-            # Check spider
+            # Check spider — proximity scoring, closer kills are worth more
             if self.bullet and self.spider:
                 if abs(bx - self.spider['x']) < 4 and abs(by - self.spider['y']) < 4:
+                    dy = abs(self.player_y - self.spider['y'])
+                    self.score += 900 if dy < 8 else 600 if dy < 16 else 300
                     self.spider = None
-                    self.score += 600
                     self.bullet = None
 
             # Check flea
@@ -175,6 +199,9 @@ class Centipede(Game):
                     if self.flea['hits'] <= 0:
                         self.flea = None
                         self.score += 200
+                    else:
+                        # First hit doubles its descent speed
+                        self.flea['vy'] *= 2
                     self.bullet = None
 
             # Check scorpion
@@ -186,6 +213,23 @@ class Centipede(Game):
 
         # Update centipede
         self.update_centipede(dt)
+
+        # Anti-camping pressure: while any segment is in the player zone,
+        # lone heads periodically enter from the sides at player-zone rows
+        if any(seg['y'] >= self.PLAYER_AREA_TOP for seg in self.segments):
+            self.head_spawn_timer += dt
+            if self.head_spawn_timer >= 4.0:
+                self.head_spawn_timer = 0
+                from_left = random.random() < 0.5
+                self.segments.append({
+                    'x': 2.0 if from_left else 62.0,
+                    'y': float(random.choice([50, 54, 58])),
+                    'dir_x': 1 if from_left else -1,
+                    'is_head': True,
+                    'speed_mult': 1.5,
+                })
+        else:
+            self.head_spawn_timer = 0
 
         # Update spider
         self.update_spider(dt)
@@ -208,6 +252,11 @@ class Centipede(Game):
             if self.spider:
                 if abs(self.player_x - self.spider['x']) < 4 and abs(self.player_y - self.spider['y']) < 4:
                     self.player_hit()
+
+        # Extra life every 12,000 points
+        if self.score >= self.next_extra_life:
+            self.lives += 1
+            self.next_extra_life += 12000
 
         # Check if centipede is cleared
         if len(self.segments) == 0:
@@ -237,9 +286,11 @@ class Centipede(Game):
     def update_centipede(self, dt: float):
         """Update centipede movement — grid-row dropping, one row at a time."""
         speed = self.SEGMENT_SPEED + self.level * 2
-        step = speed * dt
+        base_step = speed * dt
 
         for seg in self.segments:
+            step = base_step * seg.get('speed_mult', 1.0)
+
             # --- vertical drop phase (animate one row down) ---
             if seg.get('dropping'):
                 seg['drop_progress'] += step
@@ -250,9 +301,19 @@ class Centipede(Game):
                     del seg['drop_progress']
                     del seg['drop_target']
                     del seg['drop_start']
-                    # Must travel one grid cell horizontally before
-                    # mushroom collisions re-enable (prevents cascade)
-                    seg['h_since_drop'] = 0.0
+                    if seg.get('plummet') and seg['y'] < self.PLAYER_AREA_TOP \
+                            and seg['y'] + 4.0 <= 60:
+                        # Poisoned: keep plummeting row-by-row until the
+                        # player zone, then resume normal behavior
+                        seg['dropping'] = True
+                        seg['drop_start'] = seg['y']
+                        seg['drop_target'] = seg['y'] + 4.0
+                        seg['drop_progress'] = 0.0
+                    else:
+                        seg.pop('plummet', None)
+                        # Must travel one grid cell horizontally before
+                        # mushroom collisions re-enable (prevents cascade)
+                        seg['h_since_drop'] = 0.0
                 else:
                     seg['y'] = seg['drop_start'] + seg['drop_progress']
                 continue  # no horizontal movement while dropping
@@ -274,6 +335,8 @@ class Centipede(Game):
                 for (mx, my) in self.mushrooms:
                     if abs(my - row_y) < 1 and abs(new_x - mx) < 3:
                         hit = True
+                        if (mx, my) in self.poisoned:
+                            seg['plummet'] = True  # dive to the player zone
                         break
 
             if hit:
@@ -352,6 +415,7 @@ class Centipede(Game):
                 if my >= self.PLAYER_AREA_TOP - 4:
                     if abs(self.spider['x'] - mx) < 4 and abs(self.spider['y'] - my) < 4:
                         del self.mushrooms[(mx, my)]
+                        self.poisoned.discard((mx, my))
                         break
 
             # Exit screen
@@ -371,10 +435,11 @@ class Centipede(Game):
                 self.flea = {
                     'x': random.randint(10, 54),
                     'y': 0,
-                    'hits': 2
+                    'hits': 2,
+                    'vy': 30,  # doubles after the first hit
                 }
         else:
-            self.flea['y'] += 30 * dt
+            self.flea['y'] += self.flea['vy'] * dt
 
             # Drop mushrooms
             if random.random() < 0.1:
@@ -397,11 +462,17 @@ class Centipede(Game):
                 side = random.choice([-1, 1])
                 self.scorpion = {
                     'x': 0 if side > 0 else 63,
-                    'y': random.randint(10, 30),
+                    # Snap to a mushroom grid row so it passes over caps
+                    'y': (random.randint(10, 30) // 4) * 4 + 2,
                     'dir': side
                 }
         else:
             self.scorpion['x'] += self.scorpion['dir'] * 16 * dt
+
+            # Poison every mushroom the scorpion passes over
+            for (mx, my) in self.mushrooms:
+                if abs(my - self.scorpion['y']) < 2 and abs(mx - self.scorpion['x']) < 3:
+                    self.poisoned.add((mx, my))
 
             # Exit screen
             if self.scorpion['x'] < -5 or self.scorpion['x'] > 68:
@@ -410,6 +481,14 @@ class Centipede(Game):
     def player_hit(self):
         """Handle player death."""
         self.lives -= 1
+
+        # Mushroom repair tally: every damaged or poisoned mushroom is
+        # restored to full health at +5 points each (like the original)
+        for pos, health in self.mushrooms.items():
+            if health < 4 or pos in self.poisoned:
+                self.mushrooms[pos] = 4
+                self.score += 5
+        self.poisoned.clear()
 
         if self.lives <= 0:
             self.state = GameState.GAME_OVER
@@ -470,8 +549,10 @@ class Centipede(Game):
 
     def draw_mushroom(self, x: int, y: int, health: int):
         """Draw a mushroom."""
-        # Color based on health
-        if health == 4:
+        # Color based on health (poisoned caps are purple)
+        if (x, y) in self.poisoned:
+            color = (170, 0, 255)
+        elif health == 4:
             color = Colors.GREEN
         elif health == 3:
             color = (150, 200, 50)

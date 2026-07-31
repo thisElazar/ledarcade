@@ -51,8 +51,11 @@ class Breakout(Game):
     # Speed tiers (pixels per second)
     SPEED_INITIAL = 40.0
     SPEED_AFTER_4 = 50.0
-    SPEED_AFTER_12 = 60.0
-    SPEED_TOP_ROWS = 70.0  # When ball is in orange/red zone
+    SPEED_AFTER_12 = 62.0
+    SPEED_TOP_ROWS = 75.0  # After first orange/red brick hit (persists for the ball)
+
+    # Quantized paddle deflection zones (fixed angles, radians from vertical)
+    PADDLE_ANGLES = [-0.85, -0.5, -0.17, 0.17, 0.5, 0.85]
 
     # Paddle sizes
     PADDLE_FULL = 12
@@ -68,6 +71,8 @@ class Breakout(Game):
         self.lives = 3
         self.screen = 1  # Current screen (1 or 2)
         self.hit_count = 0  # Total brick hits this ball
+        self.orange_hit = False  # Hit an orange-row brick this ball?
+        self.red_hit = False     # Hit a red-row brick this ball?
         self.hit_ceiling = False  # Has ball hit top wall this screen?
 
         # Paddle - centered within walled playfield
@@ -78,6 +83,7 @@ class Breakout(Game):
         # Ball
         self.ball_x = float(GRID_SIZE // 2)
         self.ball_y = float(self.paddle_y - 2)
+        self.prev_ball_x = self.ball_x
         self.ball_dx = 0.0
         self.ball_dy = 0.0
         self.ball_speed = self.SPEED_INITIAL
@@ -118,6 +124,8 @@ class Breakout(Game):
             self.ball_dy = -self.ball_speed
             self.ball_launched = True
             self.hit_count = 0
+            self.orange_hit = False
+            self.red_hit = False
 
     def get_current_speed(self):
         """Calculate ball speed based on authentic rules."""
@@ -129,10 +137,8 @@ class Breakout(Game):
         else:
             speed = self.SPEED_INITIAL
 
-        # Faster in top rows (orange/red zone)
-        ball_y = int(self.ball_y)
-        top_zone_y = 8 + 4 * 3  # Top 4 rows
-        if ball_y < top_zone_y:
+        # Persistent speed-up once an orange or red brick has been hit
+        if self.orange_hit or self.red_hit:
             speed = max(speed, self.SPEED_TOP_ROWS)
 
         return speed
@@ -168,7 +174,8 @@ class Breakout(Game):
             self.ball_dx *= scale
             self.ball_dy *= scale
 
-        # Move ball
+        # Move ball (remember previous x for brick collision axis)
+        self.prev_ball_x = self.ball_x
         self.ball_x += self.ball_dx * dt
         self.ball_y += self.ball_dy * dt
 
@@ -199,6 +206,8 @@ class Breakout(Game):
             else:
                 # Reset for next ball but keep paddle size
                 self.hit_count = 0
+                self.orange_hit = False
+                self.red_hit = False
 
         # Paddle collision
         ball_ix, ball_iy = int(self.ball_x), int(self.ball_y)
@@ -207,8 +216,11 @@ class Breakout(Game):
             self.paddle_y <= ball_bottom <= self.paddle_y + 1 and
             self.paddle_x - 1 <= ball_ix <= self.paddle_x + self.paddle_width):
 
+            # Quantized deflection: fixed angle per paddle zone
             hit_pos = (self.ball_x - self.paddle_x) / self.paddle_width
-            angle = (hit_pos - 0.5) * 2.0
+            zone = min(len(self.PADDLE_ANGLES) - 1,
+                       max(0, int(hit_pos * len(self.PADDLE_ANGLES))))
+            angle = self.PADDLE_ANGLES[zone]
 
             self.ball_dx = math.sin(angle) * self.ball_speed
             self.ball_dy = -abs(math.cos(angle) * self.ball_speed)
@@ -220,6 +232,11 @@ class Breakout(Game):
                 self.bricks.remove(brick)
                 self.score += brick['points']
                 self.hit_count += 1
+                # Persistent speed triggers: first orange / red brick hit
+                if brick['row'] >= 6:
+                    self.red_hit = True
+                elif brick['row'] >= 4:
+                    self.orange_hit = True
                 break
 
         # Screen cleared - advance or win
@@ -237,7 +254,12 @@ class Breakout(Game):
                 self.state = GameState.WIN
 
     def ball_brick_collision(self, brick) -> bool:
-        """Check and handle ball-brick collision (2x2 ball)."""
+        """Check and handle ball-brick collision (2x2 ball).
+
+        Bounce axis is decided by penetration: if the ball was outside the
+        brick's x-span last frame it hit a side (flip dx), otherwise it hit
+        the top/bottom (flip dy).
+        """
         bx, by = int(self.ball_x), int(self.ball_y)
 
         for dx in range(2):
@@ -245,7 +267,12 @@ class Breakout(Game):
                 px, py = bx + dx, by + dy
                 if (brick['x'] <= px <= brick['x'] + brick['w'] and
                     brick['y'] <= py <= brick['y'] + brick['h']):
-                    self.ball_dy = -self.ball_dy
+                    prev_bx = int(self.prev_ball_x)
+                    if (prev_bx + 1 < brick['x'] or
+                            prev_bx > brick['x'] + brick['w']):
+                        self.ball_dx = -self.ball_dx
+                    else:
+                        self.ball_dy = -self.ball_dy
                     return True
         return False
 
@@ -299,3 +326,23 @@ class Breakout(Game):
             else:
                 self.display.draw_text_small(8, 40, "SCREEN 2", Colors.CYAN)
                 self.display.draw_text_small(4, 50, "BTN:LAUNCH", Colors.GRAY)
+
+    def draw_game_over(self, selection: int = 0):
+        """Custom game over — nods to the original's 896 max score on a win."""
+        self.display.clear(Colors.BLACK)
+
+        if self.state == GameState.WIN:
+            self.display.draw_text_small(12, 12, "YOU WIN!", Colors.GREEN)
+            self.display.draw_text_small(8, 22, f"SCORE:{self.score}", Colors.WHITE)
+            self.display.draw_text_small(8, 32, "MAX: 896", Colors.YELLOW)
+        else:
+            self.display.draw_text_small(8, 12, "GAME OVER", Colors.RED)
+            self.display.draw_text_small(8, 22, f"SCORE:{self.score}", Colors.WHITE)
+
+        # Draw selection options
+        if selection == 0:
+            self.display.draw_text_small(4, 44, ">PLAY AGAIN", Colors.YELLOW)
+            self.display.draw_text_small(4, 54, " MENU", Colors.GRAY)
+        else:
+            self.display.draw_text_small(4, 44, " PLAY AGAIN", Colors.GRAY)
+            self.display.draw_text_small(4, 54, ">MENU", Colors.YELLOW)

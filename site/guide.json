@@ -20,10 +20,11 @@
      "name": "ASTROIDS",
      "cls": "Asteroids",
      "module": "games/asteroids.py",
-     "desc": "Rotate and thrust your ship, shoot asteroids that split into smaller pieces. Screen wraps. Survive and score. Inspired by the 1979 vector arcade classic.",
+     "desc": "Rotate and thrust your ship, shoot asteroids that split large-medium-small \u2014 the small ones score the most (20/50/100). Down triggers hyperspace: a random teleport with a death risk that grows with rock count. Extra ship every 10,000 points. Screen wraps. Inspired by the 1979 vector arcade classic.",
      "controls": {
       "Left/Right": "Rotate ship",
       "Up": "Thrust forward",
+      "Down": "Hyperspace (risky teleport)",
       "Space": "Fire"
      }
     },
@@ -31,7 +32,7 @@
      "name": "BOMBMAN",
      "cls": "Bomberman",
      "module": "games/bomberman.py",
-     "desc": "Place bombs on a grid to destroy walls and enemies. Collect power-ups for range, speed, and extra bombs. Bombs chain-react. Clear all enemies to advance.",
+     "desc": "Place bombs on a grid to destroy walls and enemies. Bombs turn solid once you step off them - you can wall yourself in. Collect power-ups for range, speed, and extra bombs, but blasting a revealed power-up or the exit destroys it and spawns angry reinforcements. Clear all enemies to open the exit, and beat the 200-second timer or a swarm of fast chasers floods the level.",
      "controls": {
       "Arrow Keys": "Move",
       "Space": "Place bomb"
@@ -51,7 +52,7 @@
      "name": "BURGER TIME",
      "cls": "BurgerTime",
      "module": "games/burgertime.py",
-     "desc": "Walk across burger ingredients to drop them down platforms. Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Assemble all burgers to clear the level.",
+     "desc": "Walk across burger ingredients to drop them down platforms \u2014 each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.",
      "controls": {
       "Arrow Keys": "Move (4-way on platforms/ladders)",
       "Space": "Throw pepper (limited supply)"
@@ -61,7 +62,7 @@
      "name": "CENTIPEED",
      "cls": "Centipede",
      "module": "games/centipede.py",
-     "desc": "Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Clear the centipede to advance.",
+     "desc": "Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Scorpions poison mushrooms \u2014 a segment that touches one dives straight down at you. Spiders score more the closer you shoot them (300/600/900). Losing a life repairs the field at +5 a mushroom. Extra life every 12,000. Clear the wave to advance.",
      "controls": {
       "Arrow Keys": "Move (full movement in lower area)",
       "Space": "Fire"
@@ -71,7 +72,7 @@
      "name": "DEFENDR",
      "cls": "Defender",
      "module": "games/defender.py",
-     "desc": "Side-scrolling shooter. Fly left or right, shoot aliens, rescue humanoids from abduction. Radar shows the full map. Hold both buttons for a smart bomb.",
+     "desc": "Side-scrolling shooter. Shoot aliens and rescue falling humanoids: catch one and fly low to set it down for bonus points. Lose every humanoid and the planet is destroyed. Baiters hunt you if a wave drags on; every 5th wave restores the planet. Extra ship and smart bomb every 10000 points. Radar shows the full map. Hold both buttons for a smart bomb.",
      "controls": {
       "Left/Right": "Thrust + set facing direction",
       "Up/Down": "Vertical movement",
@@ -83,7 +84,7 @@
      "name": "DIG DIG",
      "cls": "DigDug",
      "module": "games/digdug.py",
-     "desc": "Dig tunnels underground and inflate enemies with your pump until they pop, or lure them under falling rocks. Clear all enemies to advance.",
+     "desc": "Dig tunnels underground and inflate enemies with your pump until they pop \u2014 each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; Fygars pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.",
      "controls": {
       "Arrow Keys": "Move/Dig",
       "Space": "Pump (hold to inflate enemies)"
@@ -93,7 +94,7 @@
      "name": "FROGGY",
      "cls": "Frogger",
      "module": "games/frogger.py",
-     "desc": "Cross five lanes of traffic, then hop across logs and turtles to reach home. Guide all five frogs home to clear the level. Don\u2019t get hit or fall in the water.",
+     "desc": "Cross five lanes of traffic, then hop across logs and turtles to reach home. Points come only from new forward progress; turtles dive on a fixed rhythm (they dim just before going under). Flies in home slots are bonus food, crocodile heads are death. Carry the purple lady frog home for extra points, and mind the snake on the median from level 3.",
      "controls": {
       "Arrow Keys": "Hop one cell in direction",
       "Escape": "Return to menu"
@@ -103,7 +104,7 @@
      "name": "GALAXA",
      "cls": "Galaga",
      "module": "games/galaga.py",
-     "desc": "Fixed-position shooter. Move left/right and fire at alien formations. Survive waves of diving attacks.",
+     "desc": "Fixed-position shooter. Enemies swoop in along entrance arcs, form up, then dive \u2014 and dodged divers loop back into formation. Bosses take two hits and can trap your ship in a tractor beam; shoot the captor while it dives to free the ship and fight as a dual fighter. Every 4th level from level 3 is a no-fire bonus challenge stage.",
      "controls": {
       "Left/Right": "Move ship",
       "Space": "Fire"
@@ -113,7 +114,7 @@
      "name": "GOLD RUNNER",
      "cls": "LodeRunner",
      "module": "games/loderunner.py",
-     "desc": "Collect all gold on each level, then escape to the top. Dig holes to trap guards. 150 levels.",
+     "desc": "Collect all gold on each level, then escape to the top. Dig holes to trap guards \u2014 they can pick up gold and carry it. Endless procedurally generated levels that get harder as you go.",
      "controls": {
       "Arrow Keys": "Move (Left/Right/Climb)",
       "Space": "Dig (in direction you're facing)"
@@ -123,7 +124,7 @@
      "name": "INVADERS",
      "cls": "Invaders",
      "module": "games/invaders.py",
-     "desc": "Shoot rows of aliens before they reach the bottom. They speed up as you destroy them. Inspired by the 1978 classic.",
+     "desc": "Shoot rows of aliens before they reach the bottom. One shot on screen at a time; the rack marches faster as it thins, and invaders grind through your shields. Saucer bonus depends on how many shots you have fired. Inspired by the 1978 classic.",
      "controls": {
       "Left/Right": "Move ship",
       "Space": "Fire"
@@ -133,17 +134,18 @@
      "name": "LUNAR LANDER",
      "cls": "LunarLander",
      "module": "games/lunarlander.py",
-     "desc": "Manage thrust and rotation to soft-land on a lunar surface. Land gently on a flat pad to score. Too much speed and you crash.",
+     "desc": "Fly attempt after attempt on one shared fuel tank. Left button is a gentle low burn, right button a full burn. Soft-land upright on a pad for full points and a fuel payout (harder pads pay more); land hard for half points. Crashes score nothing and drain 30 fuel from the tank \u2014 the game ends when the tank runs dry. The view zooms 2x for the final approach.",
      "controls": {
       "Left/Right": "Rotate lander",
-      "Space": "Main thrust (direction lander is pointing)"
+      "Left button": "Low burn",
+      "Right button": "Full burn"
      }
     },
     {
      "name": "MONKEY KONG",
      "cls": "DonkeyKong",
      "module": "games/donkeykong.py",
-     "desc": "Climb platforms, jump over barrels, and reach the top. Inspired by the game that started the platformer genre.",
+     "desc": "Climb platforms, jump over barrels, and beat the bonus timer to the top. Barrels steer down ladders toward you, a fireball prowls the girders, and the hammer smashes both \u2014 but you can\u2019t jump or climb while holding it. Even levels are rivet boards: run over all 8 rivets to drop DK.",
      "controls": {
       "Arrow Keys": "Move (Left/Right), Climb (Up/Down)",
       "Space": "Jump"
@@ -153,7 +155,7 @@
      "name": "MS. PAK-MAN",
      "cls": "MsPacMan",
      "module": "games/mspacman.py",
-     "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes and semi-random ghost AI.",
+     "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)",
       "Escape": "Return to menu"
@@ -163,17 +165,18 @@
      "name": "NITE DRIVER",
      "cls": "NightDriver",
      "module": "games/nightdriver.py",
-     "desc": "Steer between roadside posts against a black background. Stay on the road at increasing speeds. Inspired by one of the earliest first-person driving games.",
+     "desc": "A 90-second timed run inspired by one of the earliest first-person driving games: only white posts and oncoming headlights pierce the dark. Pick NOVICE, PRO, or EXPERT - each is a fixed curve script, not random. Shift up through 4 gears to build speed; the road visibly swings in turns and drifting off it costs a 2-second stall. Score is distance; 4000 earns +15 seconds. The run ends only at 0:00.",
      "controls": {
-      "Left/Right": "Steer",
-      "Space": "Restart (when crashed)"
+      "Left/Right": "Steer (and choose course before start)",
+      "Up/Down": "Shift gear (1-4)",
+      "Space": "Gas (hold)"
      }
     },
     {
      "name": "PAK-MAN",
      "cls": "PacMan",
      "module": "games/pacman.py",
-     "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Each ghost has unique AI: Blinky chases, Pinky ambushes, Inky flanks, Clyde wanders.",
+     "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)",
       "Escape": "Return to menu"
@@ -183,7 +186,7 @@
      "name": "PING",
      "cls": "Pong",
      "module": "games/pong.py",
-     "desc": "Two paddles, one ball. First to 7 wins. The simplest game that\u2019s still fun.",
+     "desc": "Two paddles, one ball. First to 11 wins. The simplest game that\u2019s still fun.",
      "controls": {
       "Up/Down": "Move paddle",
       "Space": "Start game / Restart"
@@ -193,9 +196,9 @@
      "name": "Q*BIT",
      "cls": "QBert",
      "module": "games/qbert.py",
-     "desc": "Hop on cubes in an isometric pyramid to change their colors. Change every cube to advance. Avoid Coily the snake and other enemies. Don\u2019t fall off the edges.",
+     "desc": "Hop on cubes in an isometric pyramid to change their colors \u2014 later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.",
      "controls": {
-      "Arrow Keys": "Hop diagonally (Up+Left, Up+Right, Down+Left, Down+Right)",
+      "Arrow Keys": "Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)",
       "Space": "Not used (movement only)"
      }
     },
@@ -213,12 +216,13 @@
      "name": "TETROMINOS",
      "cls": "Tetris",
      "module": "games/tetris.py",
-     "desc": "Stack falling tetrominoes, clear complete lines. Game ends when pieces reach the top.",
+     "desc": "Stack falling tetrominoes, clear complete lines. NES-style speed curve: gravity ramps up with every level. Left button rotates, right button hard-drops.",
      "controls": {
       "Left/Right": "Move piece",
-      "Up": "Rotate piece",
+      "Up": "Rotate CW",
       "Down": "Soft drop (faster fall)",
-      "Space": "Hard drop (instant drop)"
+      "Space": "Rotate CCW",
+      "Z": "Hard drop (instant drop)"
      }
     }
    ]
@@ -236,7 +240,7 @@
      "name": "ARCANOID",
      "cls": "Arkanoid",
      "module": "games/arkanoid.py",
-     "desc": "Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, extra lives. Clear all the bricks to advance through the levels.",
+     "desc": "Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, catch, extra lives. Power-ups last until you catch the next capsule or lose the ball. Clear all the bricks to advance through the levels.",
      "controls": {
       "Left/Right": "Move paddle (Vaus)",
       "Space": "Launch ball / Fire laser"
@@ -256,7 +260,7 @@
      "name": "INDIE 500",
      "cls": "Indy500",
      "module": "games/indy500.py",
-     "desc": "Top-down time-attack racing on an oval track. Complete 7 laps before the 60-second timer runs out - drift off the track and you grind to a halt.",
+     "desc": "Head-to-head racing against a drone car - first to 4 laps wins the track. Beat the drone on all 6 tracks for victory; if it finishes first, the race is over. Walls and bumping the drone send cars spinning, the steering snaps to 16 rotary detents on release, and the final ice track has barely any grip.",
      "controls": {
       "Left/Right": "Steer",
       "Space": "Gas"
@@ -287,11 +291,12 @@
      "name": "SKI RUN",
      "cls": "SkiFree",
      "module": "games/skifree.py",
-     "desc": "Ski downhill, dodging trees, rocks, and dogs. The Abominable Snowman chases you eventually.",
+     "desc": "Ski downhill, dodging trees, rocks, wandering dogs, and rival skiers. Hold a turn to carve hard. Slalom gates and ramp flips (press the button mid-air, land it clean) build STYLE points. The Abominable Snowman appears at 750m and sprints faster than plain skiing - boost is your only escape.",
      "controls": {
-      "Left/Right": "Steer (diagonal skiing)",
+      "Left/Right": "Steer (hold ~0.4s to carve into a hard turn)",
       "Up": "Brake / slow down",
-      "Button": "Speed boost (limited fuel)"
+      "Button": "Speed boost (limited fuel)",
+      "Button (in air)": "Flip trick (land it for style!)"
      }
     },
     {
@@ -486,12 +491,13 @@
      "name": "SAIMON",
      "cls": "Simon",
      "module": "games/simon.py",
-     "desc": "Four colored quadrants flash in sequence. Repeat the pattern. Each round adds one step. Game ends when you get the sequence wrong.",
+     "desc": "Four colored quadrants flash in sequence - each color has its own flash signature. Repeat the pattern, but hesitate more than 3 seconds and you lose. Left/Right at idle picks the goal (8/14/20/31 signals); reach it for the victory salute. Playback tempo lurches faster at 6 and 14 signals, just like the original.",
      "controls": {
       "Up": "Green (top)",
       "Right": "Red (right)",
       "Down": "Blue (bottom)",
       "Left": "Yellow (left)",
+      "Left/Right (idle)": "Set goal (8/14/20/31)",
       "Space": "Start game"
      }
     },

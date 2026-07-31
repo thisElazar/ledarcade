@@ -1,18 +1,20 @@
 """
 Lunar Lander - Arcade Classic
 ==============================
-Land safely on the moon! Survive as many landings as possible.
+Land safely on the moon! One shared fuel tank — make it last.
 
 Controls:
   Left/Right - Rotate lander
-  Space      - Main thrust (direction lander is pointing)
+  Space      - Low burn (gentle thrust)
+  Z          - Full burn
 
 Progression:
-  - Each successful landing advances to next level
-  - Higher levels have: more gravity, less fuel, rougher terrain, smaller pads
-  - Score accumulates across landings
-  - Bonus fuel awarded on successful landing
-  - Game ends on crash
+  - One shared fuel tank across all attempts (like the original)
+  - Each successful landing advances the level and pays fuel into the
+    tank (harder pads pay more); higher levels have more gravity,
+    rougher terrain, and smaller pads
+  - Crashing scores nothing and drains fuel - then a new terrain appears
+  - Game ends when the fuel is gone and the lander is down
 """
 
 from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
@@ -25,7 +27,12 @@ class LunarLander(Game):
     description = "Moon Landing"
     category = "arcade"
     GUIDE = {
-        'desc': 'Manage thrust and rotation to soft-land on a lunar surface. Land gently on a flat pad to score. Too much speed and you crash.',
+        'desc': 'Fly attempt after attempt on one shared fuel tank. Left button is a gentle low burn, right button a full burn. Soft-land upright on a pad for full points and a fuel payout (harder pads pay more); land hard for half points. Crashes score nothing and drain 30 fuel from the tank — the game ends when the tank runs dry. The view zooms 2x for the final approach.',
+        'controls': {
+            'Left/Right': 'Rotate lander',
+            'Left button': 'Low burn',
+            'Right button': 'Full burn',
+        },
     }
 
     # Base physics (modified by level)
@@ -36,9 +43,11 @@ class LunarLander(Game):
     MAX_LATERAL_SPEED = 12.0     # Max horizontal speed for safe landing
     MAX_LANDING_ANGLE = 0.21     # Max angle from vertical for safe landing (~12 degrees)
 
-    # Fuel (modified by level)
+    # Fuel — one shared tank across all attempts
     BASE_FUEL = 250.0
-    THRUST_FUEL_RATE = 25.0      # Fuel per second of thrust
+    FUEL_MAX = 400.0             # Tank capacity (gauge maximum)
+    THRUST_FUEL_RATE = 25.0      # Fuel per second of full thrust
+    LOW_BURN = 0.4               # Low-burn throttle fraction (thrust and fuel)
 
     # Lander
     LANDER_WIDTH = 6
@@ -63,19 +72,21 @@ class LunarLander(Game):
         self.score = 0
         self.level = 1
         self.landings = 0
+        # The shared fuel tank — filled once here, never reset per attempt
+        self.fuel = self.BASE_FUEL
         self.start_new_descent()
 
     def start_new_descent(self):
-        """Start a new descent attempt (called at game start and after successful landing)."""
+        """Start a new descent attempt (after a landing or a crash).
+
+        Deliberately does NOT touch self.fuel — the tank is shared across
+        attempts; difficulty escalates through terrain, not fuel cuts.
+        """
         # Calculate level-based difficulty
         level_factor = min(self.level, 10)  # Cap at level 10 difficulty
 
         # Physics get harder: more gravity
         self.gravity = self.BASE_GRAVITY + (level_factor - 1) * 1.5
-
-        # Less starting fuel at higher levels
-        fuel_penalty = (level_factor - 1) * 15
-        base_fuel = max(self.BASE_FUEL - fuel_penalty, 120)
 
         # Lander state
         self.x = 32.0
@@ -84,10 +95,10 @@ class LunarLander(Game):
         self.vx = random.uniform(-3 - level_factor * 0.5, 3 + level_factor * 0.5)
         self.vy = 0.0
         self.angle = random.uniform(-0.3, 0.3)
-        self.fuel = base_fuel
 
         # Thrust state (for visuals)
         self.thrusting = False
+        self.thrust_level = 0.0
 
         # Generate terrain and landing pads
         self.generate_terrain()
@@ -95,9 +106,12 @@ class LunarLander(Game):
         # Landing state
         self.landed = False
         self.crashed = False
+        self.crash_timer = 0.0
         self.landing_pad = None
         self.landing_multiplier = 1
         self.landing_bonus = 0
+        self.landing_quality = 'GOOD'
+        self.landing_fuel_gain = 0
 
     def generate_terrain(self):
         """Generate random terrain with landing pads. Difficulty scales with level."""
@@ -137,8 +151,9 @@ class LunarLander(Game):
         segment_width = GRID_SIZE // 6
         current_pad_idx = 0
 
-        # Terrain roughness increases with level
-        max_height_change = min(2 + level_factor // 3, 5)
+        # Terrain roughness increases with level (the difficulty lever,
+        # now that the fuel tank is no longer cut per level)
+        max_height_change = min(2 + level_factor // 2, 6)
 
         while x < GRID_SIZE:
             segment = x // segment_width
@@ -227,10 +242,19 @@ class LunarLander(Game):
             return
 
         if self.crashed:
+            # Brief crash message, then a fresh terrain — the shared fuel
+            # pool is untouched. Down with an empty tank ends the game.
+            self.crash_timer -= dt
+            if self.crash_timer <= 0:
+                if self.fuel <= 0:
+                    self.state = GameState.GAME_OVER
+                else:
+                    self.start_new_descent()
             return
 
         # Reset thrust visuals
         self.thrusting = False
+        self.thrust_level = 0.0
 
         # Rotation (left/right rotates the lander)
         if input_state.left:
@@ -238,13 +262,19 @@ class LunarLander(Game):
         if input_state.right:
             self.angle += self.ROTATION_SPEED * dt
 
-        # Main thrust (pushes in direction lander is pointing)
-        if (input_state.action_l_held or input_state.action_r_held) and self.fuel > 0:
+        # Two-level throttle: left button = low burn, right button = full
+        # burn (both held = full). Thrust and fuel scale together.
+        if self.fuel > 0:
+            if input_state.action_r_held:
+                self.thrust_level = 1.0
+            elif input_state.action_l_held:
+                self.thrust_level = self.LOW_BURN
+        if self.thrust_level > 0:
             # Thrust direction: angle=0 means pointing up, so thrust is up
             # angle>0 means tilted right, thrust pushes up-right
-            self.vx += math.sin(self.angle) * self.BASE_THRUST * dt
-            self.vy -= math.cos(self.angle) * self.BASE_THRUST * dt
-            self.fuel -= self.THRUST_FUEL_RATE * dt
+            self.vx += math.sin(self.angle) * self.BASE_THRUST * self.thrust_level * dt
+            self.vy -= math.cos(self.angle) * self.BASE_THRUST * self.thrust_level * dt
+            self.fuel -= self.THRUST_FUEL_RATE * self.thrust_level * dt
             self.thrusting = True
 
         # Clamp fuel
@@ -270,89 +300,142 @@ class LunarLander(Game):
             self.landed = True
             self.landing_pad = pad
             self.landing_multiplier = pad[3]
-            # Scoring: base points * multiplier + fuel bonus + level bonus
-            base_points = 50
-            fuel_bonus = int(self.fuel * 0.5)
-            level_bonus = self.level * 25
-            self.landing_bonus = int(base_points * self.landing_multiplier + fuel_bonus + level_bonus)
+            # Landing quality: soft touchdowns pay full, hard ones half
+            if abs(self.vy) < 8.0:
+                self.landing_quality = 'GOOD'
+                self.landing_bonus = 50 * self.landing_multiplier
+            else:
+                self.landing_quality = 'HARD'
+                self.landing_bonus = 25 * self.landing_multiplier
             self.score += self.landing_bonus
+            # Landing pays fuel into the shared tank, not points
+            gain = 50 * self.landing_multiplier
+            self.landing_fuel_gain = int(min(self.FUEL_MAX - self.fuel, gain))
+            self.fuel = min(self.FUEL_MAX, self.fuel + gain)
             self.landings += 1
             # Don't set GAME_OVER yet - show landed screen, then advance level
         elif crashed:
             self.crashed = True
-            self.state = GameState.GAME_OVER
+            self.crash_timer = 2.0
+            self.fuel = max(0, self.fuel - 30)  # Wrecked landers cost fuel
+
+    def zoomed(self) -> bool:
+        """2x view for the final approach — when close above the ground."""
+        alt = self.get_terrain_height(int(self.x)) - (self.y + self.LANDER_HEIGHT)
+        return alt < 14
 
     def draw(self):
         self.display.clear(Colors.BLACK)
 
+        zoom = self.zoomed()
+
         # Draw terrain
-        self.draw_terrain()
+        self.draw_terrain(zoom)
 
         # Draw lander
         if not self.crashed:
-            self.draw_lander()
+            self.draw_lander(zoom)
         else:
-            self.draw_explosion()
+            self.draw_explosion(zoom)
 
         # Draw HUD
         self.draw_hud()
 
         # Draw landed success screen
         if self.landed:
-            self.display.draw_text_small(14, 14, "LANDED!", Colors.GREEN)
+            quality_color = Colors.GREEN if self.landing_quality == 'GOOD' else Colors.ORANGE
+            self.display.draw_text_small(8, 14, f"{self.landing_quality} LANDING", quality_color)
             self.display.draw_text_small(10, 24, f"+{self.landing_bonus}", Colors.YELLOW)
             if self.landing_multiplier > 1:
                 self.display.draw_text_small(35, 24, f"{self.landing_multiplier}X", Colors.CYAN)
-            self.display.draw_text_small(4, 34, f"SCORE:{self.score}", Colors.WHITE)
+            self.display.draw_text_small(4, 34, f"FUEL+{self.landing_fuel_gain}", self.FUEL_COLOR)
             self.display.draw_text_small(4, 44, f"NEXT:LV{self.level + 1}", Colors.GRAY)
             self.display.draw_text_small(8, 54, "PRESS BTN", Colors.GRAY)
 
-        # Draw crash message
-        elif self.state == GameState.GAME_OVER:
-            self.display.draw_text_small(14, 16, "CRASHED!", Colors.RED)
-            self.display.draw_text_small(4, 28, f"LEVEL:{self.level}", Colors.GRAY)
-            self.display.draw_text_small(4, 38, f"LANDS:{self.landings}", Colors.GRAY)
+        # Brief crash message (the fuel penalty, then a fresh terrain)
+        elif self.crashed and self.state != GameState.GAME_OVER:
+            self.display.draw_text_small(16, 16, "CRASHED", Colors.RED)
+            self.display.draw_text_small(16, 26, "FUEL-30", self.FUEL_COLOR)
 
-    def draw_terrain(self):
-        """Draw the terrain and landing pads."""
-        # Draw terrain
-        for x in range(GRID_SIZE):
-            terrain_y = self.terrain[x]
-            # Fill from terrain to bottom
-            for y in range(terrain_y, GRID_SIZE):
-                self.display.set_pixel(x, y, self.TERRAIN_COLOR)
+    def draw_terrain(self, zoom: bool = False):
+        """Draw the terrain and landing pads (2x centered on lander if zoomed)."""
+        if not zoom:
+            # Draw terrain
+            for x in range(GRID_SIZE):
+                terrain_y = self.terrain[x]
+                # Fill from terrain to bottom
+                for y in range(terrain_y, GRID_SIZE):
+                    self.display.set_pixel(x, y, self.TERRAIN_COLOR)
 
-        # Draw landing pads
-        for pad_x_start, pad_x_end, pad_y, multiplier in self.pads:
-            if multiplier == 1:
-                color = self.PAD_COLOR
-            elif multiplier == 2:
-                color = self.PAD_2X_COLOR
-            else:
-                color = self.PAD_5X_COLOR
+            # Draw landing pads
+            for pad_x_start, pad_x_end, pad_y, multiplier in self.pads:
+                if multiplier == 1:
+                    color = self.PAD_COLOR
+                elif multiplier == 2:
+                    color = self.PAD_2X_COLOR
+                else:
+                    color = self.PAD_5X_COLOR
 
-            # Draw pad surface
-            for x in range(pad_x_start, pad_x_end + 1):
-                self.display.set_pixel(x, pad_y - 1, color)
-                self.display.set_pixel(x, pad_y, color)
+                # Draw pad surface
+                for x in range(pad_x_start, pad_x_end + 1):
+                    self.display.set_pixel(x, pad_y - 1, color)
+                    self.display.set_pixel(x, pad_y, color)
 
-            # Draw multiplier indicator
-            mid_x = (pad_x_start + pad_x_end) // 2
-            self.display.draw_text_small(mid_x - 2, pad_y - 7, f"{multiplier}X", color)
+                # Draw multiplier indicator
+                mid_x = (pad_x_start + pad_x_end) // 2
+                self.display.draw_text_small(mid_x - 2, pad_y - 7, f"{multiplier}X", color)
+            return
 
-    def draw_lander(self):
-        """Draw the lunar lander with rotation."""
-        cx = int(self.x)
-        cy = int(self.y + 3)  # Center point (adjusted for sprite)
+        # Zoomed: each screen column samples half a world pixel; the lander
+        # world center maps to screen (32, 28)
+        cy = self.y + 3
+        for px in range(GRID_SIZE):
+            wx = self.x + (px - 32) / 2.0
+            col = int(max(0, min(GRID_SIZE - 1, wx)))
+            terrain_y = self.terrain[col]
+
+            # Pad columns get their marker color on the top rows
+            pad_color = None
+            for pad_x_start, pad_x_end, pad_y, multiplier in self.pads:
+                if pad_x_start <= col <= pad_x_end:
+                    if multiplier == 1:
+                        pad_color = self.PAD_COLOR
+                    elif multiplier == 2:
+                        pad_color = self.PAD_2X_COLOR
+                    else:
+                        pad_color = self.PAD_5X_COLOR
+                    break
+
+            sy_top = 28 + int((terrain_y - cy) * 2)
+            for sy in range(max(0, sy_top), GRID_SIZE):
+                if pad_color is not None and sy < sy_top + 4:
+                    self.display.set_pixel(px, sy, pad_color)
+                else:
+                    self.display.set_pixel(px, sy, self.TERRAIN_COLOR)
+
+    def draw_lander(self, zoom: bool = False):
+        """Draw the lunar lander with rotation (2x at screen center if zoomed)."""
+        if zoom:
+            cx, cy, s = 32, 28, 2
+        else:
+            cx = int(self.x)
+            cy = int(self.y + 3)  # Center point (adjusted for sprite)
+            s = 1
 
         cos_a = math.cos(self.angle)
         sin_a = math.sin(self.angle)
 
         def rotate_point(px, py):
-            """Rotate point around center."""
-            rx = cx + int(px * cos_a - py * sin_a)
-            ry = cy + int(px * sin_a + py * cos_a)
+            """Rotate point around center (scaled)."""
+            rx = cx + int((px * cos_a - py * sin_a) * s)
+            ry = cy + int((px * sin_a + py * cos_a) * s)
             return rx, ry
+
+        def plot(rx, ry, color):
+            """Draw an s x s block (set_pixel clips off-screen)."""
+            for oy in range(s):
+                for ox in range(s):
+                    self.display.set_pixel(rx + ox, ry + oy, color)
 
         # Lander body pixels (relative to center)
         # Negative y = toward top of lander, positive y = toward engine
@@ -371,32 +454,36 @@ class LunarLander(Game):
         # Draw body
         for px, py in body_pixels:
             rx, ry = rotate_point(px, py)
-            if 0 <= rx < GRID_SIZE and 0 <= ry < GRID_SIZE:
-                self.display.set_pixel(rx, ry, self.LANDER_COLOR)
+            plot(rx, ry, self.LANDER_COLOR)
 
         # Draw legs
         for px, py in leg_pixels:
             rx, ry = rotate_point(px, py)
-            if 0 <= rx < GRID_SIZE and 0 <= ry < GRID_SIZE:
-                self.display.set_pixel(rx, ry, self.LANDER_COLOR)
+            plot(rx, ry, self.LANDER_COLOR)
 
         # Thrust flame (extends from bottom, opposite to thrust direction)
         if self.thrusting:
-            flame_len = random.randint(2, 4)
+            # Full burn throws a longer flame than a low burn
+            if self.thrust_level >= 1.0:
+                flame_len = random.randint(2, 4)
+            else:
+                flame_len = random.randint(1, 2)
             # Flame comes out bottom of lander (opposite to thrust direction)
             # Start from bottom of lander (y=+2 relative to center) then extend outward
             for i in range(flame_len):
                 # Base position at bottom of lander, then extend in opposite direction of thrust
                 dist = 2 + i
-                fx = cx + int(-sin_a * dist)  # Opposite x direction from thrust
-                fy = cy + int(cos_a * dist)   # Opposite y direction from thrust
-                if 0 <= fx < GRID_SIZE and 0 <= fy < GRID_SIZE:
-                    self.display.set_pixel(fx, fy, self.THRUST_COLOR)
+                fx = cx + int(-sin_a * dist * s)  # Opposite x direction from thrust
+                fy = cy + int(cos_a * dist * s)   # Opposite y direction from thrust
+                plot(fx, fy, self.THRUST_COLOR)
 
-    def draw_explosion(self):
+    def draw_explosion(self, zoom: bool = False):
         """Draw crash explosion."""
-        cx = int(self.x)
-        cy = int(self.y)
+        if zoom:
+            cx, cy = 32, 28
+        else:
+            cx = int(self.x)
+            cy = int(self.y)
 
         for i in range(8):
             px = cx + random.randint(-4, 4)
@@ -410,8 +497,8 @@ class LunarLander(Game):
         # Level indicator
         self.display.draw_text_small(1, 1, f"L{self.level}", Colors.WHITE)
 
-        # Fuel bar
-        fuel_pct = self.fuel / self.BASE_FUEL
+        # Fuel bar (fixed gauge maximum so the bar is honest)
+        fuel_pct = min(1.0, self.fuel / self.FUEL_MAX)
         fuel_width = int(16 * fuel_pct)
         fuel_color = self.FUEL_COLOR if fuel_pct > 0.25 else self.DANGER_COLOR
         self.display.draw_rect(14, 1, fuel_width, 4, fuel_color)

@@ -6,7 +6,7 @@ power-ups, and different brick types.
 
 Features:
 - Multiple unique level layouts
-- Power-ups (extend paddle, multi-ball, laser, slow, extra life)
+- Power-ups (extend paddle, multi-ball, laser, slow, catch, extra life)
 - Different brick types (normal, hard, indestructible)
 - Progressive difficulty
 
@@ -47,7 +47,7 @@ class Arkanoid(Game):
     description = "1986 Taito classic"
     category = "retro"
     GUIDE = {
-        'desc': 'Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, extra lives. Clear all the bricks to advance through the levels.',
+        'desc': 'Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, catch, extra lives. Power-ups last until you catch the next capsule or lose the ball. Clear all the bricks to advance through the levels.',
     }
 
     # Brick types
@@ -62,6 +62,7 @@ class Arkanoid(Game):
     POWERUP_SLOW = 3     # Slow ball
     POWERUP_MULTI = 4    # Multi-ball
     POWERUP_LIFE = 5     # Extra life (Player)
+    POWERUP_CATCH = 6    # Ball sticks to paddle, release with fire
 
     # Colors for brick types
     BRICK_COLORS = {
@@ -75,6 +76,12 @@ class Arkanoid(Game):
         'yellow': Colors.YELLOW,
         'silver': Colors.GRAY,      # Hard brick
         'gold': (200, 180, 50),     # Indestructible
+    }
+
+    # Arcade color-based brick scoring (silver = 50 * (level+1) at destruction)
+    BRICK_POINTS = {
+        'white': 50, 'orange': 60, 'cyan': 70, 'green': 90,
+        'red': 100, 'blue': 110, 'pink': 120, 'yellow': 120,
     }
 
     # Paddle sizes
@@ -108,9 +115,8 @@ class Arkanoid(Game):
         self.balls = []
         self.spawn_ball()
 
-        # Power-ups
+        # Power-ups (persist until the next capsule or ball loss)
         self.active_powerup = self.POWERUP_NONE
-        self.powerup_timer = 0
         self.falling_powerups = []  # {'x', 'y', 'type'}
 
         # Laser
@@ -140,6 +146,9 @@ class Arkanoid(Game):
             'dy': 0.0,
             'speed': self.get_level_base_speed(),
             'launched': launched,
+            'caught': False,      # True only when held by the Catch powerup
+            'stuck_offset': 0.0,  # offset from paddle center while caught
+            'prev_x': float(x),   # previous-frame x for collision axis
         }
 
         if launched:
@@ -176,7 +185,7 @@ class Arkanoid(Game):
                     'color': self.BRICK_COLORS[color_name],
                     'type': brick_type,
                     'hits': 1,  # adjusted in load_level for silver/gold
-                    'powerup': brick_type == self.BRICK_NORMAL and random.random() < 0.15,
+                    'points': self.BRICK_POINTS.get(color_name, 0),
                 })
         return bricks
 
@@ -203,6 +212,7 @@ class Arkanoid(Game):
             ball['dx'] = math.sin(angle) * ball['speed']
             ball['dy'] = -ball['speed']
             ball['launched'] = True
+            ball['caught'] = False
 
     def spawn_powerup(self, x, y):
         """Spawn a falling power-up."""
@@ -212,6 +222,7 @@ class Arkanoid(Game):
             self.POWERUP_SLOW,
             self.POWERUP_MULTI,
             self.POWERUP_LIFE,
+            self.POWERUP_CATCH,
         ])
         self.falling_powerups.append({
             'x': x,
@@ -219,23 +230,40 @@ class Arkanoid(Game):
             'type': powerup_type,
         })
 
+    def brick_score(self, brick):
+        """Points for destroying a brick (silver scales with level)."""
+        if brick['type'] == self.BRICK_HARD:
+            return 50 * (self.level + 1)
+        return brick['points']
+
+    def maybe_drop_capsule(self, brick):
+        """Roll for a capsule at brick destruction (arcade-style)."""
+        if (not self.falling_powerups and len(self.balls) == 1 and
+                random.random() < 0.25):
+            self.spawn_powerup(brick['x'] + brick['w'] // 2, brick['y'])
+
+    def reset_ball_speeds(self, speed):
+        """Set every ball's speed, rescaling velocity to match."""
+        for ball in self.balls:
+            ball['speed'] = speed
+            current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
+            if current_speed > 0:
+                scale = ball['speed'] / current_speed
+                ball['dx'] *= scale
+                ball['dy'] *= scale
+
     def deactivate_powerup(self):
         """Clean up effects of the current active powerup."""
         if self.active_powerup == self.POWERUP_EXTEND:
             self.paddle_width = self.PADDLE_NORMAL
-        elif self.active_powerup == self.POWERUP_SLOW:
-            base_speed = self.get_level_base_speed()
-            for ball in self.balls:
-                ball['speed'] = base_speed
-                current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
-                if current_speed > 0:
-                    scale = ball['speed'] / current_speed
-                    ball['dx'] *= scale
-                    ball['dy'] *= scale
         self.active_powerup = self.POWERUP_NONE
 
     def apply_powerup(self, powerup_type):
-        """Apply a power-up effect."""
+        """Apply a power-up effect. Powerups persist until the next capsule
+        or ball loss."""
+        # Catching ANY capsule resets accumulated ball speed (risk/reward)
+        self.reset_ball_speeds(self.get_level_base_speed())
+
         # Life is instant — just add a life, don't replace active powerup
         if powerup_type == self.POWERUP_LIFE:
             self.lives += 1
@@ -245,26 +273,27 @@ class Arkanoid(Game):
         self.deactivate_powerup()
 
         self.active_powerup = powerup_type
-        self.powerup_timer = 10.0  # 10 seconds
 
         if powerup_type == self.POWERUP_EXTEND:
             self.paddle_width = self.PADDLE_EXTENDED
         elif powerup_type == self.POWERUP_MULTI:
-            # Spawn extra balls
+            # Disruption: split into 3 balls, +/-0.5 rad from source heading.
+            # A caught ball is released first so the split always happens.
+            if not any(b['launched'] for b in self.balls) and self.balls:
+                self.launch_ball(self.balls[0])
             for ball in self.balls[:]:
                 if ball['launched']:
-                    self.spawn_ball(ball['x'], ball['y'], launched=True)
+                    heading = math.atan2(ball['dy'], ball['dx'])
+                    for da in (-0.5, 0.5):
+                        self.spawn_ball(ball['x'], ball['y'], launched=True)
+                        new_ball = self.balls[-1]
+                        new_ball['speed'] = ball['speed']
+                        new_ball['dx'] = math.cos(heading + da) * new_ball['speed']
+                        new_ball['dy'] = math.sin(heading + da) * new_ball['speed']
                     break
         elif powerup_type == self.POWERUP_SLOW:
-            # Slow powerup reduces speed to 2/3 of level base speed
-            slow_speed = self.get_level_base_speed() * 0.67
-            for ball in self.balls:
-                ball['speed'] = slow_speed
-                current_speed = math.sqrt(ball['dx']**2 + ball['dy']**2)
-                if current_speed > 0:
-                    scale = ball['speed'] / current_speed
-                    ball['dx'] *= scale
-                    ball['dy'] *= scale
+            # Slow the ball to 2/3 base speed; the per-hit ramp rebuilds it
+            self.reset_ball_speeds(self.get_level_base_speed() * 0.67)
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -293,20 +322,15 @@ class Arkanoid(Game):
         if self.laser_cooldown > 0:
             self.laser_cooldown -= dt
 
-        # Update power-up timer
-        if self.powerup_timer > 0:
-            self.powerup_timer -= dt
-            if self.powerup_timer <= 0:
-                self.deactivate_powerup()
-
         # Update balls
         for ball in self.balls[:]:
             if not ball['launched']:
-                ball['x'] = self.paddle_x + self.paddle_width / 2
+                ball['x'] = self.paddle_x + self.paddle_width / 2 + ball['stuck_offset']
                 ball['y'] = self.paddle_y - 2
                 continue
 
-            # Move ball
+            # Move ball (remember previous x for brick collision axis)
+            ball['prev_x'] = ball['x']
             ball['x'] += ball['dx'] * dt
             ball['y'] += ball['dy'] * dt
 
@@ -332,6 +356,16 @@ class Arkanoid(Game):
                 self.paddle_y <= ball_iy + 1 <= self.paddle_y + 2 and
                 self.paddle_x - 1 <= ball_ix <= self.paddle_x + self.paddle_width):
 
+                if self.active_powerup == self.POWERUP_CATCH:
+                    # Catch: ball sticks to the paddle, release with fire
+                    ball['launched'] = False
+                    ball['caught'] = True
+                    ball['stuck_offset'] = ball['x'] - (self.paddle_x + self.paddle_width / 2)
+                    ball['dx'] = 0.0
+                    ball['dy'] = 0.0
+                    ball['y'] = self.paddle_y - 2
+                    continue
+
                 hit_pos = (ball['x'] - self.paddle_x) / self.paddle_width
                 angle = (hit_pos - 0.5) * 1.2
                 ball['dx'] = math.sin(angle) * ball['speed']
@@ -352,10 +386,9 @@ class Arkanoid(Game):
                             ball['dx'] *= scale
                             ball['dy'] *= scale
                     if brick['hits'] <= 0 and brick['type'] != self.BRICK_INDESTRUCTIBLE:
-                        if brick.get('powerup'):
-                            self.spawn_powerup(brick['x'] + brick['w'] // 2, brick['y'])
+                        self.maybe_drop_capsule(brick)
                         self.bricks.remove(brick)
-                        self.score += 10
+                        self.score += self.brick_score(brick)
                     elif brick['type'] == self.BRICK_HARD:
                         # Darken hard brick on first hit
                         brick['color'] = Colors.DARK_GRAY
@@ -375,8 +408,9 @@ class Arkanoid(Game):
                     if brick['type'] != self.BRICK_INDESTRUCTIBLE:
                         brick['hits'] -= 1
                         if brick['hits'] <= 0:
+                            self.maybe_drop_capsule(brick)
                             self.bricks.remove(brick)
-                            self.score += 10
+                            self.score += self.brick_score(brick)
                     self.lasers.remove(laser)
                     break
 
@@ -424,7 +458,12 @@ class Arkanoid(Game):
                 self.paddle_width = self.PADDLE_NORMAL
 
     def ball_brick_collision(self, ball, brick) -> bool:
-        """Check ball-brick collision."""
+        """Check ball-brick collision.
+
+        Bounce axis is decided by penetration: if the ball was outside the
+        brick's x-span last frame it hit a side (flip dx), otherwise it hit
+        the top/bottom (flip dy).
+        """
         bx, by = int(ball['x']), int(ball['y'])
 
         for dx in range(2):
@@ -432,7 +471,12 @@ class Arkanoid(Game):
                 px, py = bx + dx, by + dy
                 if (brick['x'] <= px <= brick['x'] + brick['w'] and
                     brick['y'] <= py <= brick['y'] + brick['h']):
-                    ball['dy'] = -ball['dy']
+                    prev_bx = int(ball['prev_x'])
+                    if (prev_bx + 1 < brick['x'] or
+                            prev_bx > brick['x'] + brick['w']):
+                        ball['dx'] = -ball['dx']
+                    else:
+                        ball['dy'] = -ball['dy']
                     return True
         return False
 
@@ -454,6 +498,7 @@ class Arkanoid(Game):
             self.POWERUP_LASER: Colors.RED,
             self.POWERUP_SLOW: Colors.GREEN,
             self.POWERUP_MULTI: Colors.MAGENTA,
+            self.POWERUP_CATCH: Colors.YELLOW,
         }
         color = powerup_paddle_colors.get(self.active_powerup, Colors.CYAN)
         for i in range(self.paddle_width):
@@ -482,6 +527,7 @@ class Arkanoid(Game):
             self.POWERUP_SLOW: Colors.GREEN,
             self.POWERUP_MULTI: Colors.MAGENTA,
             self.POWERUP_LIFE: Colors.GRAY,
+            self.POWERUP_CATCH: Colors.YELLOW,
         }
         powerup_letters = {
             self.POWERUP_EXTEND: 'E',  # Extend
@@ -489,6 +535,7 @@ class Arkanoid(Game):
             self.POWERUP_SLOW: 'S',    # Slow
             self.POWERUP_MULTI: 'M',   # Multi-ball
             self.POWERUP_LIFE: 'P',    # Player (extra life)
+            self.POWERUP_CATCH: 'C',   # Catch
         }
         for powerup in self.falling_powerups:
             px, py = int(powerup['x']), int(powerup['y'])
@@ -504,8 +551,9 @@ class Arkanoid(Game):
             # Draw letter in contrasting color
             self.display.draw_text_small(px - 1, py, letter, Colors.BLACK)
 
-        # Draw launch prompt
-        if self.balls and not self.balls[0]['launched']:
+        # Draw launch prompt (not when the ball is merely caught on the paddle)
+        if (self.balls and not self.balls[0]['launched'] and
+                not self.balls[0]['caught']):
             level_name = self.levels[self.level % len(self.levels)]['name']
             self.display.draw_text_small(12, 38, level_name, Colors.YELLOW)
             self.display.draw_text_small(8, 50, "BTN:START", Colors.GRAY)

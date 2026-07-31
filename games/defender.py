@@ -41,7 +41,7 @@ class Defender(Game):
     description = "Protect humans from aliens!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Side-scrolling shooter. Fly left or right, shoot aliens, rescue humanoids from abduction. Radar shows the full map. Hold both buttons for a smart bomb.',
+        'desc': 'Side-scrolling shooter. Shoot aliens and rescue falling humanoids: catch one and fly low to set it down for bonus points. Lose every humanoid and the planet is destroyed. Baiters hunt you if a wave drags on; every 5th wave restores the planet. Extra ship and smart bomb every 10000 points. Radar shows the full map. Hold both buttons for a smart bomb.',
     }
 
     def __init__(self, display: Display):
@@ -56,6 +56,12 @@ class Defender(Game):
         self._both_held_prev = False
         self.wave = 1
         self.wave_clear_timer = 0
+        self.wave_time = 0.0        # Time into the current wave (baiters, batches)
+        self.next_baiter = 40.0     # Baiters punish slow waves
+        self.baiter_interval = 12.0
+        self.pending_spawns = []    # Timed lander batches
+        self.planet_alive = True
+        self.next_bonus_score = 10000  # Extra ship + bomb every 10000
 
         # Player
         self.px = WORLD_WIDTH / 2  # world x
@@ -118,14 +124,24 @@ class Defender(Game):
             })
 
     def _spawn_wave(self):
-        """Spawn enemies for the current wave."""
+        """Spawn enemies for the current wave. Landers arrive in timed batches."""
         self.enemies = []
+        self.pending_spawns = []
         num_landers = 6 + self.wave * 2
-        num_bombers = 1 + self.wave
+        num_bombers = 1 + self.wave // 2
         num_pods = max(0, self.wave - 2)
 
-        for _ in range(num_landers):
-            self._spawn_enemy('lander')
+        # On a destroyed planet there are no humans to grab — waves are mutants
+        lander_type = 'lander' if self.planet_alive else 'mutant'
+
+        # Landers arrive in 3 batches ~12s apart, so pressure builds over the wave
+        batch = num_landers // 3
+        for _ in range(num_landers - 2 * batch):
+            self._spawn_enemy(lander_type)
+        if batch > 0:
+            self.pending_spawns.append({'time': 12.0, 'etype': lander_type, 'count': batch})
+            self.pending_spawns.append({'time': 24.0, 'etype': lander_type, 'count': batch})
+
         for _ in range(num_bombers):
             self._spawn_enemy('bomber')
         for _ in range(num_pods):
@@ -152,6 +168,9 @@ class Defender(Game):
         elif etype == 'swarmer':
             enemy['vx'] = random.uniform(-60, 60)
             enemy['vy'] = random.uniform(-30, 30)
+        elif etype == 'baiter':
+            enemy['vx'] = random.uniform(-60, 60)
+            enemy['shoot_timer'] = random.uniform(0.5, 1.5)
         self.enemies.append(enemy)
         return enemy
 
@@ -187,6 +206,14 @@ class Defender(Game):
             self.wave_clear_timer -= dt
             if self.wave_clear_timer <= 0:
                 self.wave += 1
+                self.wave_time = 0.0
+                self.next_baiter = 40.0
+                self.baiter_interval = 12.0
+                if self.wave % 5 == 0:
+                    # Planet restored: fresh terrain and a new population
+                    self._generate_terrain()
+                    self._spawn_humans(10)
+                    self.planet_alive = True
                 self._spawn_wave()
             return
 
@@ -199,6 +226,24 @@ class Defender(Game):
         # Invincibility
         if self.invincible > 0:
             self.invincible -= dt
+
+        # Wave clock: timed lander batches, then baiters if the wave drags on
+        self.wave_time += dt
+        while self.pending_spawns and self.wave_time >= self.pending_spawns[0]['time']:
+            spawn_batch = self.pending_spawns.pop(0)
+            for _ in range(spawn_batch['count']):
+                # If the planet died mid-wave, late lander batches arrive as
+                # mutants (matches the dead-planet wave rule in _spawn_wave)
+                etype = spawn_batch['etype']
+                if etype == 'lander' and not self.planet_alive:
+                    etype = 'mutant'
+                self._spawn_enemy(etype)
+        if self.wave_time >= self.next_baiter:
+            self._spawn_enemy('baiter',
+                              self._wrap_x(self.px + random.choice([-1, 1]) * random.uniform(40, 60)),
+                              random.uniform(5, 25))
+            self.next_baiter = self.wave_time + self.baiter_interval
+            self.baiter_interval = max(5.0, self.baiter_interval - 1.5)
 
         # Player movement
         if input_state.left:
@@ -304,24 +349,34 @@ class Defender(Game):
             if h['state'] == 'falling':
                 dist_x = abs(self._world_dist_x(h['wx'], self.px))
                 if dist_x < 5 and abs(h['wy'] - self.py) < 5:
-                    # Caught! Set back on terrain
-                    h['state'] = 'walking'
-                    h['wy'] = self._terrain_y(h['wx']) - 1
+                    # Caught! Rides along until set down on the ground
+                    h['state'] = 'rescued'
+                    h['fall_dist'] = 0.0
                     self.score += 500
 
         # Clean dead enemies
         self.enemies = [e for e in self.enemies if e['alive']]
 
-        # Check all humans dead -> all landers become mutants
-        if all(h['state'] == 'dead' for h in self.humans):
+        # Last human dies -> planet destroyed, landers mutate (fires once)
+        if self.planet_alive and all(h['state'] == 'dead' for h in self.humans):
+            self.planet_alive = False
             for e in self.enemies:
                 if e['type'] == 'lander':
                     e['type'] = 'mutant'
                     e['vx'] = random.uniform(-40, 40)
 
-        # Check wave clear
-        if len(self.enemies) == 0:
+        # Check wave clear (all batches must have arrived and died)
+        if len(self.enemies) == 0 and not self.pending_spawns:
             self.wave_clear_timer = 1.5
+            # Survivor bonus: each living human pays out per wave (caps at x5)
+            survivors = sum(1 for h in self.humans if h['state'] != 'dead')
+            self.score += survivors * 100 * min(self.wave, 5)
+
+        # Extra ship + smart bomb every 10000 points
+        while self.score >= self.next_bonus_score:
+            self.lives += 1
+            self.smart_bombs += 1
+            self.next_bonus_score += 10000
 
     def _bullet_alive(self, b):
         """Check if a bullet has traveled too far (>80px)."""
@@ -333,8 +388,8 @@ class Defender(Game):
         """Kill all visible enemies."""
         for e in self.enemies:
             if self._is_visible(e['wx']):
-                pts = {'lander': 100, 'mutant': 150, 'bomber': 250,
-                       'pod': 1000, 'swarmer': 150}.get(e['type'], 100)
+                pts = {'lander': 150, 'mutant': 150, 'bomber': 250,
+                       'pod': 1000, 'swarmer': 150, 'baiter': 200}.get(e['type'], 100)
                 self.score += pts
                 # Release captured humans
                 for h in self.humans:
@@ -363,13 +418,25 @@ class Defender(Game):
                     # Captor died
                     h['state'] = 'falling'
                     h['captor'] = None
+                    h['fall_dist'] = 0.0
             elif h['state'] == 'falling':
-                h['wy'] += 40 * dt
+                fall = 40 * dt
+                h['wy'] += fall
+                h['fall_dist'] = h.get('fall_dist', 0.0) + fall
                 terrain_y = self._terrain_y(h['wx'])
                 if h['wy'] >= terrain_y - 1:
-                    # Landed safely back on ground
                     h['wy'] = terrain_y - 1
+                    # Survives a short drop; dies from a long one
+                    h['state'] = 'dead' if h['fall_dist'] > 14 else 'walking'
+                    h['fall_dist'] = 0.0
+            elif h['state'] == 'rescued':
+                # Riding under the player ship; set down when flying low
+                h['wx'] = self.px
+                h['wy'] = self.py + 2
+                if self.planet_alive and self._terrain_y(self.px) - self.py <= 4:
                     h['state'] = 'walking'
+                    h['wy'] = self._terrain_y(h['wx']) - 1
+                    self.score += 500
 
     def _update_enemies(self, dt):
         for e in self.enemies:
@@ -386,13 +453,18 @@ class Defender(Game):
                 self._update_pod(e, dt)
             elif e['type'] == 'swarmer':
                 self._update_swarmer(e, dt)
+            elif e['type'] == 'baiter':
+                self._update_baiter(e, dt)
 
-            # Shooting (landers, mutants)
-            if e['type'] in ('lander', 'mutant', 'bomber'):
+            # Shooting (landers, mutants, bombers, baiters)
+            if e['type'] in ('lander', 'mutant', 'bomber', 'baiter'):
                 e['shoot_timer'] -= dt
                 if e['shoot_timer'] <= 0 and self._is_visible(e['wx']):
                     self._enemy_shoot(e)
-                    e['shoot_timer'] = random.uniform(1.5, 3.5)
+                    if e['type'] == 'baiter':
+                        e['shoot_timer'] = random.uniform(0.6, 1.4)
+                    else:
+                        e['shoot_timer'] = random.uniform(1.5, 3.5)
 
     def _update_lander(self, e, dt):
         """Lander: patrol, then dive to grab a human."""
@@ -453,6 +525,17 @@ class Defender(Game):
         e['wx'] = self._wrap_x(e['wx'] + e['vx'] * dt)
         e['wy'] = max(3, min(VIEW_HEIGHT - 3, e['wy'] + e['vy'] * dt))
 
+    def _update_baiter(self, e, dt):
+        """Baiter: fast hunter that spawns when a wave drags on."""
+        dx = self._world_dist_x(e['wx'], self.px)
+        dy = self.py - e['wy']
+        e['vx'] += math.copysign(80, dx) * dt
+        e['vy'] += math.copysign(50, dy) * dt
+        e['vx'] = max(-70, min(70, e['vx']))
+        e['vy'] = max(-70, min(70, e['vy']))
+        e['wx'] = self._wrap_x(e['wx'] + e['vx'] * dt)
+        e['wy'] = max(3, min(VIEW_HEIGHT - 3, e['wy'] + e['vy'] * dt))
+
     def _update_bomber(self, e, dt):
         """Bomber: flies horizontally, drops mines."""
         e['wx'] = self._wrap_x(e['wx'] + e['vx'] * dt)
@@ -506,8 +589,8 @@ class Defender(Game):
                 size = 1 if e['type'] == 'swarmer' else 3
                 if dist_x < size + 1 and dist_y < size + 1:
                     # Hit!
-                    pts = {'lander': 100, 'mutant': 150, 'bomber': 250,
-                           'pod': 1000, 'swarmer': 150}.get(e['type'], 100)
+                    pts = {'lander': 150, 'mutant': 150, 'bomber': 250,
+                           'pod': 1000, 'swarmer': 150, 'baiter': 200}.get(e['type'], 100)
                     self.score += pts
 
                     # Release captured human
@@ -537,6 +620,11 @@ class Defender(Game):
 
     def _player_hit(self):
         self.lives -= 1
+        # Any humanoid riding along falls free
+        for h in self.humans:
+            if h['state'] == 'rescued':
+                h['state'] = 'falling'
+                h['fall_dist'] = 0.0
         if self.lives <= 0:
             self.state = GameState.GAME_OVER
         else:
@@ -555,8 +643,9 @@ class Defender(Game):
             self.display.set_pixel(sx, sy, (40, 40, 60))
         random.seed()
 
-        # Draw terrain
-        self._draw_terrain()
+        # Draw terrain (gone once the planet is destroyed — just stars)
+        if self.planet_alive:
+            self._draw_terrain()
 
         # Draw humans
         for h in self.humans:
@@ -686,6 +775,11 @@ class Defender(Game):
             self.display.set_pixel(sx + 1, sy + 1, c)
         elif etype == 'swarmer':
             self.display.set_pixel(sx, sy, Colors.YELLOW)
+        elif etype == 'baiter':
+            # Flat, fast dart
+            self.display.set_pixel(sx - 1, sy, Colors.GREEN)
+            self.display.set_pixel(sx, sy, Colors.CYAN)
+            self.display.set_pixel(sx + 1, sy, Colors.GREEN)
 
     def _draw_scanner(self):
         """Draw the radar/scanner at the bottom of the screen."""
@@ -700,13 +794,21 @@ class Defender(Game):
         # Scale: 256px world -> 64px scanner
         scale = VIEW_WIDTH / WORLD_WIDTH  # 0.25
 
-        # Terrain on scanner
-        for sx in range(64):
-            wx = int(sx / scale) % WORLD_WIDTH
-            ty = self._terrain_y(wx)
-            scanner_ty = SCANNER_Y + int((ty / VIEW_HEIGHT) * SCANNER_HEIGHT)
-            for sy in range(scanner_ty, 64):
-                self.display.set_pixel(sx, sy, (0, 40, 0))
+        # Terrain on scanner (stars instead once the planet is destroyed)
+        if self.planet_alive:
+            for sx in range(64):
+                wx = int(sx / scale) % WORLD_WIDTH
+                ty = self._terrain_y(wx)
+                scanner_ty = SCANNER_Y + int((ty / VIEW_HEIGHT) * SCANNER_HEIGHT)
+                for sy in range(scanner_ty, 64):
+                    self.display.set_pixel(sx, sy, (0, 40, 0))
+        else:
+            random.seed(7)
+            for _ in range(12):
+                self.display.set_pixel(random.randint(0, 63),
+                                       random.randint(SCANNER_Y + 1, 62),
+                                       (50, 50, 70))
+            random.seed()
 
         # Player on scanner
         psx = int((self.px * scale) % 64)

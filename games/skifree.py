@@ -5,9 +5,10 @@ Ski down the mountain, dodge trees and rocks!
 The Yeti appears at 750m — use boost to outrun him!
 
 Controls:
-  Left/Right - Steer (diagonal skiing)
+  Left/Right - Steer (hold ~0.4s to carve into a hard turn)
   Up         - Brake / slow down
   Button     - Speed boost (limited fuel)
+  Button (in air) - Flip trick (land it for style!)
 """
 
 import random
@@ -20,7 +21,7 @@ class SkiFree(Game):
     description = "Ski the slopes!"
     category = "retro"
     GUIDE = {
-        'desc': 'Ski downhill, dodging trees, rocks, and dogs. The Abominable Snowman chases you eventually.',
+        'desc': 'Ski downhill, dodging trees, rocks, wandering dogs, and rival skiers. Hold a turn to carve hard. Slalom gates and ramp flips (press the button mid-air, land it clean) build STYLE points. The Abominable Snowman appears at 750m and sprints faster than plain skiing - boost is your only escape.',
     }
 
     # Player constants
@@ -62,10 +63,25 @@ class SkiFree(Game):
     JUMP_DURATION = 0.5        # Airborne time from ramp
     MOGUL_JUMP_DURATION = 0.2  # Small hop from mogul
 
-    # Yeti
+    # Hard turn: hold a direction this long to carve into the ±2 stance
+    HARD_TURN_HOLD = 0.4
+
+    # Style: slalom gates and flips
+    GATE_SPACING = 120         # World px between gate rows (~40 m)
+    GATE_WIDTH = 8             # Px between the two flags
+    GATE_STYLE = 10            # Style for passing between the flags
+    GATE_PENALTY = 5           # Style lost for missing a nearby gate
+    FLIP_DURATION = 0.4        # Seconds a flip takes
+    FLIP_STYLE = 25            # Style for a landed flip
+
+    # Yeti — faster than plain skiing (MAX_SPEED); only boost outruns him.
+    # _update_yeti adds a downhill drift of 0.7 * player speed ON TOP of
+    # yeti_speed, so effective closure = yeti_speed - 0.3 * player_speed.
+    # Plain skiing tops out at MAX_SPEED 80 -> 0.3*80 = 24 < 27 (caught);
+    # BOOST is 110 -> 0.3*110 = 33 > 30 (escapes).
     YETI_SPAWN_DISTANCE = 750   # Meters
-    YETI_SPEED_MIN = 30.0       # Slowest (slower than player base)
-    YETI_SPEED_MAX = 65.0       # Fastest burst
+    YETI_SPEED_MIN = 27.0       # Slowest lope (still catches plain skiing)
+    YETI_SPEED_MAX = 30.0       # Fastest burst (only BOOST pulls away)
     YETI_SPEED_CHANGE = 1.5     # Seconds between speed shifts
     YETI_CATCH_DIST = 4.0       # Pixels to catch player
 
@@ -95,6 +111,13 @@ class SkiFree(Game):
     YETI_ARMS = (0, 0, 0)
     BOOST_COLOR = (50, 200, 255)
     BOOST_EMPTY = (60, 60, 70)
+    GATE_BLUE = (60, 120, 255)
+    GATE_RED = (255, 60, 60)
+    GATE_POLE = (120, 90, 60)
+    DOG_COLOR = (150, 100, 50)
+    DOG_DARK = (110, 70, 35)
+    RIVAL_BODY = (40, 160, 80)
+    STYLE_COLOR = (80, 200, 255)
 
     def __init__(self, display: Display):
         super().__init__(display)
@@ -108,17 +131,25 @@ class SkiFree(Game):
         self.player_x = 32.0        # World X (unbounded)
         self.player_y = float(self.PLAYER_Y_DEFAULT)  # Screen Y
         self.direction = 0
+        self.turn_hold = 0.0        # How long the current direction is held
         self.braking = False
         self.speed = self.BASE_SPEED
+
+        # Style points (gates + tricks)
+        self.style = 0
 
         # Crash state
         self.crashed = False
         self.crash_timer = 0.0
         self.invuln_timer = 0.0
 
-        # Jump state
+        # Jump / trick state
         self.airborne = False
         self.air_timer = 0.0
+        self.air_from_ramp = False
+        self.flipping = False
+        self.flip_timer = 0.0
+        self.flip_done = False
 
         # Boost state
         self.boost_fuel = self.BOOST_FUEL_MAX
@@ -140,6 +171,8 @@ class SkiFree(Game):
 
         # Obstacles: {type, x, y, w, h} — world-space coords (fixed after creation)
         self.obstacles = []
+        # Moving entities (dogs, rival skiers) — world-space, updated per frame
+        self.entities = []
         # Chunk-based generation
         self.generated_chunks = set()
 
@@ -193,6 +226,40 @@ class SkiFree(Game):
             self._generate_obstacle_row(rng, x_min, y, distance_meters)
             y += interval
 
+        # Slalom gates every GATE_SPACING of world y (~40 m), blue/red
+        # alternating by row
+        gy = -(-y_min // self.GATE_SPACING) * self.GATE_SPACING
+        while gy < y_min + self.CHUNK_SIZE:
+            gx = x_min + rng.randint(4, self.CHUNK_SIZE - 12)
+            self.obstacles.append({
+                'type': 'gate', 'x': gx, 'y': gy,
+                'w': self.GATE_WIDTH, 'h': 2,
+                'ci': (gy // self.GATE_SPACING) % 2, 'scored': False,
+            })
+            gy += self.GATE_SPACING
+
+        # Moving hazards: an occasional dog or rival skier per chunk
+        # (skip the first couple rows so the start stays clear)
+        if cy >= 2:
+            if rng.random() < 0.2:
+                self.entities.append({
+                    'kind': 'dog',
+                    'x': float(x_min + rng.randint(8, self.CHUNK_SIZE - 8)),
+                    'y': float(y_min + rng.randint(0, self.CHUNK_SIZE - 1)),
+                    'vx': rng.choice([-1.0, 1.0]) * rng.uniform(6.0, 12.0),
+                    'turn_timer': rng.uniform(1.0, 3.0),
+                    'tangle': 0.0,
+                })
+            if rng.random() < 0.15:
+                self.entities.append({
+                    'kind': 'rival',
+                    'x': float(x_min + rng.randint(8, self.CHUNK_SIZE - 8)),
+                    'y': float(y_min + rng.randint(0, self.CHUNK_SIZE - 1)),
+                    'vy': rng.uniform(20.0, 32.0),
+                    'sway': rng.uniform(0.0, 6.28),
+                    'tangle': 0.0,
+                })
+
     def _generate_obstacle_row(self, rng, x_min, y, distance_meters):
         """Generate a row of obstacles at the given world y position."""
         density = min(0.8, 0.3 + distance_meters / 4000.0)
@@ -238,7 +305,7 @@ class SkiFree(Game):
             return {'type': 'ramp', 'x': x, 'y': y, 'w': 4, 'h': 2}
 
     def _cull_far(self):
-        """Remove obstacles far from the camera."""
+        """Remove obstacles and entities far from the camera."""
         cam_x = self.player_x - 32
         cam_y = self.distance
         cull_dist = self.CHUNK_SIZE * 2.5
@@ -246,6 +313,9 @@ class SkiFree(Game):
         self.obstacles = [o for o in self.obstacles
                           if abs(o['y'] - cam_y) < cull_dist
                           and abs(o['x'] - cam_x) < cull_dist]
+        self.entities = [e for e in self.entities
+                         if abs(e['y'] - cam_y) < cull_dist
+                         and abs(e['x'] - cam_x) < cull_dist]
 
         # Prune old vertical chunk records (but keep horizontal for determinism)
         current_cy = int(math.floor(cam_y / self.CHUNK_SIZE))
@@ -278,6 +348,7 @@ class SkiFree(Game):
             self.score = int(self.distance_meters)
             self._generate_chunks()
             self._cull_far()
+            self._update_entities(dt)
 
             # Yeti still moves during crash
             if self.yeti_active:
@@ -297,17 +368,38 @@ class SkiFree(Game):
             self.player_y += 40.0 * dt
         self.player_y = max(self.PLAYER_Y_MIN, min(self.PLAYER_Y_MAX, self.player_y))
 
-        # Left/Right steer
+        # Left/Right steer — holding a direction carves into the hard stance
         if input_state.left and input_state.right:
             self.direction = 0
+            self.turn_hold = 0.0
         elif input_state.left:
-            self.direction = -1
+            if self.direction in (-1, -2):
+                self.turn_hold += dt
+                if self.turn_hold >= self.HARD_TURN_HOLD:
+                    self.direction = -2
+            else:
+                self.direction = -1
+                self.turn_hold = 0.0
         elif input_state.right:
-            self.direction = 1
+            if self.direction in (1, 2):
+                self.turn_hold += dt
+                if self.turn_hold >= self.HARD_TURN_HOLD:
+                    self.direction = 2
+            else:
+                self.direction = 1
+                self.turn_hold = 0.0
         else:
             self.direction = 0
+            self.turn_hold = 0.0
 
         self.braking = False
+
+        # Trick: press the button while airborne off a ramp to start a flip
+        if (self.airborne and self.air_from_ramp and not self.flipping
+                and not self.flip_done
+                and (input_state.action_l or input_state.action_r)):
+            self.flipping = True
+            self.flip_timer = self.FLIP_DURATION
 
         # Boost
         if (input_state.action_l_held or input_state.action_r_held) and self.boost_fuel > 0:
@@ -341,11 +433,28 @@ class SkiFree(Game):
         self.distance_meters = self.distance / 3.0
         self.score = int(self.distance_meters)
 
-        # --- Jump timer ---
+        # --- Jump timer / flip trick ---
         if self.airborne:
             self.air_timer -= dt
+            if self.flipping:
+                self.flip_timer -= dt
+                if self.flip_timer <= 0:
+                    self.flipping = False
+                    self.flip_done = True
             if self.air_timer <= 0:
                 self.airborne = False
+                if self.flipping:
+                    # Landed mid-flip — faceplant
+                    self.flipping = False
+                    self.crashed = True
+                    self.crash_timer = self.CRASH_DURATION
+                    self.speed *= 0.2
+                    self.boosting = False
+                elif self.flip_done:
+                    # Stomped it
+                    self.style += self.FLIP_STYLE
+                self.flip_done = False
+                self.air_from_ramp = False
 
         # --- Collision detection ---
         if not self.airborne and self.invuln_timer <= 0:
@@ -376,14 +485,50 @@ class SkiFree(Game):
                     elif obs['type'] == 'mogul':
                         self.airborne = True
                         self.air_timer = self.MOGUL_JUMP_DURATION
+                        self.air_from_ramp = False
                     elif obs['type'] == 'ramp':
                         self.airborne = True
                         self.air_timer = self.JUMP_DURATION
+                        self.air_from_ramp = True
                         self.speed *= 1.2
+
+            # Tangle with a dog or rival skier — comedic wipeout
+            if not self.crashed:
+                for ent in self.entities:
+                    ex = int(ent['x'] - cam_x)
+                    ey = int(ent['y'] - self.distance)
+                    if (player_box[0] < ex + 3
+                            and player_box[0] + player_box[2] > ex
+                            and player_box[1] < ey + 3
+                            and player_box[1] + player_box[3] > ey):
+                        self.crashed = True
+                        self.crash_timer = self.CRASH_DURATION
+                        self.speed *= 0.2
+                        self.boosting = False
+                        ent['tangle'] = 0.8
+                        break
+
+        # --- Slalom gates: pass between the flags for style ---
+        player_world_y = self.distance + self.player_y
+        for obs in self.obstacles:
+            if obs['type'] != 'gate' or obs['scored']:
+                continue
+            if obs['y'] <= player_world_y:
+                obs['scored'] = True
+                # Only judge gates crossed this instant (not ones that
+                # scrolled past during a crash)
+                if player_world_y - obs['y'] > 6:
+                    continue
+                dx = abs(self.player_x - (obs['x'] + obs['w'] / 2.0))
+                if dx <= obs['w'] / 2.0:
+                    self.style += self.GATE_STYLE
+                elif dx <= 16:
+                    self.style = max(0, self.style - self.GATE_PENALTY)
 
         # --- Generate new chunks & cull ---
         self._generate_chunks()
         self._cull_far()
+        self._update_entities(dt)
 
         # --- Yeti ---
         if not self.yeti_active and self.distance_meters >= self.YETI_SPAWN_DISTANCE:
@@ -433,6 +578,24 @@ class SkiFree(Game):
             return True
         return False
 
+    def _update_entities(self, dt: float):
+        """Move the wandering dogs and descending rival skiers."""
+        for ent in self.entities:
+            if ent['tangle'] > 0:
+                ent['tangle'] -= dt
+                continue  # Tangled entities sit and tumble for a moment
+            if ent['kind'] == 'dog':
+                ent['x'] += ent['vx'] * dt
+                ent['turn_timer'] -= dt
+                if ent['turn_timer'] <= 0:
+                    if random.random() < 0.6:
+                        ent['vx'] = -ent['vx']
+                    ent['turn_timer'] = random.uniform(1.0, 3.0)
+            else:  # rival skier — slowly descends, swaying side to side
+                ent['y'] += ent['vy'] * dt
+                ent['sway'] += dt * 1.5
+                ent['x'] += math.sin(ent['sway']) * 6.0 * dt
+
     def draw(self):
         cam_x = self.player_x - 32
         cam_y = self.distance
@@ -452,6 +615,10 @@ class SkiFree(Game):
         sorted_obs = sorted(self.obstacles, key=lambda o: o['y'])
         for obs in sorted_obs:
             self._draw_obstacle(obs, cam_x, cam_y)
+
+        # Draw moving entities (dogs, rival skiers)
+        for ent in self.entities:
+            self._draw_entity(ent, cam_x, cam_y)
 
         # Draw player
         if not self.yeti_eating:
@@ -536,6 +703,58 @@ class SkiFree(Game):
                         c = self.RAMP_COLORS[(dx + 1) % len(self.RAMP_COLORS)]
                         self.display.set_pixel(x + dx, y + 1, c)
 
+        elif obs['type'] == 'gate':
+            # Slalom gate: two flags on short poles, blue/red alternating
+            color = self.GATE_BLUE if obs['ci'] == 0 else self.GATE_RED
+            for gx in (x, x + obs['w']):
+                if 0 <= gx < GRID_SIZE:
+                    if 0 <= y < GRID_SIZE:
+                        self.display.set_pixel(gx, y, color)
+                    if 0 <= y + 1 < GRID_SIZE:
+                        self.display.set_pixel(gx, y + 1, self.GATE_POLE)
+
+    def _draw_entity(self, ent: dict, cam_x: float, cam_y: float):
+        x = int(ent['x'] - cam_x)
+        y = int(ent['y'] - cam_y)
+
+        if x < -4 or x > GRID_SIZE + 4 or y < -4 or y > GRID_SIZE + 4:
+            return
+
+        tangled = ent['tangle'] > 0
+        if ent['kind'] == 'dog':
+            body = self.DOG_COLOR
+            if tangled and int(ent['tangle'] * 10) % 2 == 0:
+                body = (255, 140, 100)
+            # Small sideways dog: head leads in the direction of travel
+            head_dx = 2 if ent['vx'] > 0 else 0
+            if 0 <= y < GRID_SIZE and 0 <= x + head_dx < GRID_SIZE:
+                self.display.set_pixel(x + head_dx, y, body)
+            if 0 <= y + 1 < GRID_SIZE:
+                for dx in range(3):
+                    if 0 <= x + dx < GRID_SIZE:
+                        self.display.set_pixel(x + dx, y + 1, body)
+            if 0 <= y + 2 < GRID_SIZE:
+                for dx in (0, 2):
+                    if 0 <= x + dx < GRID_SIZE:
+                        self.display.set_pixel(x + dx, y + 2, self.DOG_DARK)
+        else:
+            # Rival skier — same silhouette as the player, green jacket
+            body = self.RIVAL_BODY
+            if tangled and int(ent['tangle'] * 10) % 2 == 0:
+                body = (255, 140, 100)
+            if 0 <= y < GRID_SIZE and 0 <= x < GRID_SIZE:
+                self.display.set_pixel(x, y, self.SKIER_HEAD)
+            if 0 <= y + 1 < GRID_SIZE:
+                for dx in (-1, 0, 1):
+                    if 0 <= x + dx < GRID_SIZE:
+                        self.display.set_pixel(x + dx, y + 1, body)
+            if 0 <= y + 2 < GRID_SIZE and 0 <= x < GRID_SIZE:
+                self.display.set_pixel(x, y + 2, body)
+            if 0 <= y + 3 < GRID_SIZE:
+                for dx in (-1, 1):
+                    if 0 <= x + dx < GRID_SIZE:
+                        self.display.set_pixel(x + dx, y + 3, self.SKIER_SKI)
+
     def _draw_player(self):
         px = 32  # Always screen center
         py = int(self.player_y)
@@ -561,6 +780,35 @@ class SkiFree(Game):
             jump_py = py - 3
         else:
             jump_py = py
+
+        # Mid-flip — 2-frame rotation
+        if self.airborne and self.flipping:
+            frame = int((self.FLIP_DURATION - self.flip_timer)
+                        / self.FLIP_DURATION * 2) % 2
+            if frame == 0:
+                # Sideways: body horizontal, skis trailing
+                if 0 <= jump_py + 1 < GRID_SIZE:
+                    for dx in (-1, 0, 1):
+                        if 0 <= px + dx < GRID_SIZE:
+                            self.display.set_pixel(px + dx, jump_py + 1,
+                                                   self.SKIER_BODY)
+                    if 0 <= px - 2 < GRID_SIZE:
+                        self.display.set_pixel(px - 2, jump_py + 1,
+                                               self.SKIER_HEAD)
+                if 0 <= jump_py < GRID_SIZE and 0 <= px + 2 < GRID_SIZE:
+                    self.display.set_pixel(px + 2, jump_py, self.SKIER_SKI)
+            else:
+                # Upside down: skis above, head below
+                if 0 <= jump_py < GRID_SIZE:
+                    for dx in (-1, 1):
+                        if 0 <= px + dx < GRID_SIZE:
+                            self.display.set_pixel(px + dx, jump_py,
+                                                   self.SKIER_SKI)
+                if 0 <= jump_py + 1 < GRID_SIZE:
+                    self.display.set_pixel(px, jump_py + 1, self.SKIER_BODY)
+                if 0 <= jump_py + 2 < GRID_SIZE:
+                    self.display.set_pixel(px, jump_py + 2, self.SKIER_HEAD)
+            return
 
         if self.direction == 0:
             if 0 <= jump_py < GRID_SIZE:
@@ -677,14 +925,16 @@ class SkiFree(Game):
                 self.display.set_pixel(yx + 1, yy + 4, self.YETI_BODY)
 
     def _draw_hud(self):
-        """Draw distance and boost meter."""
+        """Draw distance, style points, yeti warning, and boost meter."""
         self.display.draw_rect(0, 0, GRID_SIZE, 7, (0, 0, 0))
 
         dist_str = f"{int(self.distance_meters)}M"
         self.display.draw_text_small(1, 1, dist_str, Colors.WHITE)
 
-        if self.yeti_active:
-            self.display.draw_text_small(28, 1, "YETI", Colors.RED)
+        self.display.draw_text_small(24, 1, f"S{self.style}", self.STYLE_COLOR)
+
+        if self.yeti_active and int(self.distance * 0.1) % 2 == 0:
+            self.display.draw_text_small(42, 1, "Y!", Colors.RED)
 
         bar_x = 53
         bar_w = 10
@@ -706,5 +956,8 @@ class SkiFree(Game):
             self.display.draw_text_small(4, 28, "YETI GOT YOU", Colors.WHITE)
         else:
             self.display.draw_text_small(8, 28, f"DIST:{self.score}M", Colors.WHITE)
+
+        self.display.draw_text_small(8, 38, f"STYLE:{self.style}",
+                                     self.STYLE_COLOR)
 
         self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

@@ -17,7 +17,7 @@ class LodeRunner(Game):
     description = "Dig & Escape!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Collect all gold on each level, then escape to the top. Dig holes to trap guards. 150 levels.',
+        'desc': 'Collect all gold on each level, then escape to the top. Dig holes to trap guards — they can pick up gold and carry it. Endless procedurally generated levels that get harder as you go.',
     }
 
     # Tile types
@@ -76,6 +76,8 @@ class LodeRunner(Game):
 
         self.move_timer = 0
         self.move_delay = 0.13
+        self.fall_timer = 0.0
+        self.fall_delay = 0.08  # Seconds per tile of falling (faster than walking)
         self.dig_cooldown = 0
         self.enemy_start_delay = 1.5  # Guards pause before chasing
 
@@ -203,6 +205,7 @@ class LodeRunner(Game):
                 'x': ex, 'y': ey,
                 'falling': False, 'trapped': False,
                 'trap_timer': 0, 'move_timer': 0,
+                'fall_timer': 0.0, 'gold': False,
             })
 
         # --- Exit ladder at top ---
@@ -229,20 +232,34 @@ class LodeRunner(Game):
         # On solid ground
         if y + 1 >= self.LEVEL_HEIGHT:
             return True
+        # Standing on a trapped guard's head
+        for enemy in self.enemies:
+            if enemy['trapped'] and enemy['x'] == x and enemy['y'] == y + 1:
+                return True
+        # A dug hole below is no support (checked before the tile, which
+        # remains BRICK while the hole is open)
+        if (x, y + 1) in self.holes:
+            return False
         below = self.tiles[y + 1][x]
         if below in [self.BRICK, self.SOLID, self.LADDER]:
             return True
-        if (x, y + 1) in self.holes:
-            return False
         return False
 
     def dig_hole(self, x: int, y: int) -> bool:
         """Dig a hole in a brick. Returns True if successful."""
-        if 0 <= x < self.LEVEL_WIDTH and 0 <= y < self.LEVEL_HEIGHT:
-            if self.tiles[y][x] == self.BRICK:
-                self.holes[(x, y)] = 10.0  # ~10s like original
-                return True
-        return False
+        if not (0 <= x < self.LEVEL_WIDTH and 0 <= y < self.LEVEL_HEIGHT):
+            return False
+        if self.tiles[y][x] != self.BRICK or (x, y) in self.holes:
+            return False
+        # Can't dig under a covered tile (brick/ladder directly above)
+        if y > 0 and self.tiles[y - 1][x] in (self.BRICK, self.SOLID, self.LADDER):
+            return False
+        # Can't dig a tile a guard occupies
+        for enemy in self.enemies:
+            if enemy['x'] == x and enemy['y'] == y:
+                return False
+        self.holes[(x, y)] = 10.0  # ~10s like original
+        return True
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -256,11 +273,17 @@ class LodeRunner(Game):
             if self.holes[pos] <= 0:
                 del self.holes[pos]
                 # Crush any enemy still in the hole — respawn at top
+                # (before the player check, so a shared hole can't entomb a guard)
                 for enemy in self.enemies:
                     if (enemy['x'], enemy['y']) == pos:
                         enemy['trapped'] = False
+                        enemy['fall_timer'] = 0.0
                         enemy['y'] = 0
                         enemy['x'] = random.randint(1, self.LEVEL_WIDTH - 2)
+                # A refilling hole kills the player caught inside it
+                if (self.player_x, self.player_y) == pos:
+                    self.player_hit()
+                    return
 
         # Player movement
         if self.move_timer >= self.move_delay:
@@ -308,16 +331,21 @@ class LodeRunner(Game):
             if self.dig_hole(dig_x, self.player_y + 1):
                 self.dig_cooldown = 0.3  # Cooldown after successful dig
 
-        # Apply gravity to player
-        if not self.is_supported(self.player_x, self.player_y):
-            if self.tiles[self.player_y][self.player_x] != self.ROPE:
+        # Apply gravity to player (timed — one tile per fall_delay seconds)
+        if (not self.is_supported(self.player_x, self.player_y) and
+                self.tiles[self.player_y][self.player_x] != self.ROPE):
+            self.fall_timer += dt
+            if self.fall_timer >= self.fall_delay:
+                self.fall_timer = 0.0
                 self.player_y += 1
+        else:
+            self.fall_timer = 0.0
 
         # Collect gold
         if self.tiles[self.player_y][self.player_x] == self.GOLD:
             self.tiles[self.player_y][self.player_x] = self.EMPTY
             self.gold_remaining -= 1
-            self.score += 100
+            self.score += 250
 
             # Open exit when all gold collected
             if self.gold_remaining <= 0:
@@ -344,57 +372,170 @@ class LodeRunner(Game):
                     break
 
     def update_enemies(self, dt: float):
-        """Update enemy AI."""
+        """Update guard AI."""
         for enemy in self.enemies:
             enemy['move_timer'] += dt
 
             # Check if in hole
-            if (enemy['x'], enemy['y']) in self.holes:
+            if not enemy['trapped'] and (enemy['x'], enemy['y']) in self.holes:
                 enemy['trapped'] = True
                 enemy['trap_timer'] = 5.0  # ~5s like original
+                # A trapped guard always drops its gold above the hole
+                if enemy['gold']:
+                    gy = enemy['y'] - 1
+                    if gy >= 0 and self.tiles[gy][enemy['x']] == self.EMPTY:
+                        enemy['gold'] = False
+                        self.tiles[gy][enemy['x']] = self.GOLD
 
             if enemy['trapped']:
                 enemy['trap_timer'] -= dt
                 if enemy['trap_timer'] <= 0:
-                    # Escape from hole
-                    enemy['trapped'] = False
-                    enemy['y'] -= 1
+                    # Climb out only if the space above is clear
+                    ax, ay = enemy['x'], enemy['y'] - 1
+                    blocked = (ay < 0 or self.is_solid(ax, ay) or
+                               (self.player_x, self.player_y) == (ax, ay) or
+                               any(o is not enemy and (o['x'], o['y']) == (ax, ay)
+                                   for o in self.enemies))
+                    if blocked:
+                        enemy['trap_timer'] = 0.5  # retry shortly
+                    else:
+                        enemy['trapped'] = False
+                        enemy['y'] -= 1
                 continue
 
-            # Apply gravity
-            if not self.is_supported(enemy['x'], enemy['y']):
-                if self.tiles[enemy['y']][enemy['x']] != self.ROPE:
+            # Apply gravity (timed — one tile per fall_delay seconds)
+            if (not self.is_supported(enemy['x'], enemy['y']) and
+                    self.tiles[enemy['y']][enemy['x']] != self.ROPE):
+                enemy['fall_timer'] += dt
+                if enemy['fall_timer'] >= self.fall_delay:
+                    enemy['fall_timer'] = 0.0
                     enemy['y'] += 1
-                    continue
+                continue
+            enemy['fall_timer'] = 0.0
 
-            # Chase player — guards get faster at higher levels
+            # Guards move on a slower schedule than the player
             enemy_speed = max(0.18, 0.28 - self.level * 0.01)
             if enemy['move_timer'] >= enemy_speed:
                 enemy['move_timer'] = 0
 
-                dx = 0
-                dy = 0
+                dx, dy = self.guard_pick_move(enemy)
+                nx, ny = enemy['x'] + dx, enemy['y'] + dy
 
-                # Horizontal chase
-                if self.player_x < enemy['x'] and not self.is_solid(enemy['x'] - 1, enemy['y']):
-                    dx = -1
-                elif self.player_x > enemy['x'] and not self.is_solid(enemy['x'] + 1, enemy['y']):
-                    dx = 1
+                # Two guards never occupy the same cell
+                if (dx or dy) and not any(
+                        o is not enemy and (o['x'], o['y']) == (nx, ny)
+                        for o in self.enemies):
+                    old_x, old_y = enemy['x'], enemy['y']
+                    enemy['x'], enemy['y'] = nx, ny
 
-                # Vertical chase (ladders)
-                current_tile = self.tiles[enemy['y']][enemy['x']]
-                if dx == 0 or random.random() < 0.3:
-                    if self.player_y < enemy['y'] and current_tile == self.LADDER:
-                        if not self.is_solid(enemy['x'], enemy['y'] - 1):
-                            dy = -1
-                            dx = 0
-                    elif self.player_y > enemy['y']:
-                        if enemy['y'] + 1 < self.LEVEL_HEIGHT and self.tiles[enemy['y'] + 1][enemy['x']] == self.LADDER:
-                            dy = 1
-                            dx = 0
+                    # Gold: pick up when walking onto it (carry at most one)
+                    if self.tiles[ny][nx] == self.GOLD and not enemy['gold']:
+                        enemy['gold'] = True
+                        self.tiles[ny][nx] = self.EMPTY
+                    # Small chance to drop carried gold on the cell just left
+                    elif (enemy['gold'] and
+                          self.tiles[old_y][old_x] == self.EMPTY and
+                          random.random() < 0.05):
+                        enemy['gold'] = False
+                        self.tiles[old_y][old_x] = self.GOLD
 
-                enemy['x'] += dx
-                enemy['y'] += dy
+    def guard_pick_move(self, enemy):
+        """Original-style guard AI (reimplemented scan).
+
+        Same row as the runner: run straight at him. Otherwise scan the
+        columns reachable by walking along the current row and score every
+        ladder-up / ladder-down / fall-through exit by how close its
+        destination row gets to the runner's row; commit to the best.
+        Returns a (dx, dy) step.
+        """
+        ex, ey = enemy['x'], enemy['y']
+        px, py = self.player_x, self.player_y
+
+        # Same row: run straight at the runner
+        if ey == py and ex != px:
+            step = 1 if px > ex else -1
+            if not self.is_solid(ex + step, ey):
+                return step, 0
+
+        # Scan reachable columns along this row (stop at walls; a gap is
+        # walkable into but not past — it's a fall-through exit)
+        best = None  # (row_dist, col_dist, dx, dy)
+
+        def consider(row_dist, col_dist, dx, dy):
+            nonlocal best
+            cand = (row_dist, col_dist, dx, dy)
+            if best is None or cand[:2] < best[:2]:
+                best = cand
+
+        for direction in (0, -1, 1):
+            cx = ex
+            while True:
+                if direction == 0:
+                    pass  # evaluate the current column once
+                else:
+                    cx += direction
+                    if self.is_solid(cx, ey):
+                        break
+                first_dx = 0 if cx == ex else (1 if cx > ex else -1)
+                col_dist = abs(cx - ex)
+
+                # Ladder-up exit
+                if py < ey and self.tiles[ey][cx] == self.LADDER:
+                    dest = self.climb_dest_row(cx, ey)
+                    if dest < ey:
+                        consider(abs(dest - py), col_dist,
+                                 first_dx if first_dx else 0,
+                                 -1 if cx == ex else 0)
+
+                # Ladder-down / fall-through exit
+                if py > ey:
+                    dest = self.descend_dest_row(cx, ey)
+                    if dest > ey:
+                        consider(abs(dest - py), col_dist,
+                                 first_dx if first_dx else 0,
+                                 1 if cx == ex else 0)
+
+                if direction == 0:
+                    break
+                # Can't walk past an unsupported column — the guard drops there
+                if not self.is_supported(cx, ey):
+                    break
+
+        if best is not None:
+            _, _, dx, dy = best
+            # Vertical steps must be into open space
+            if dy == -1 and self.is_solid(ex, ey - 1):
+                return 0, 0
+            if dy == 1 and self.is_solid(ex, ey + 1):
+                return 0, 0
+            return dx, dy
+
+        # No useful exit: shuffle toward the runner if the way is open
+        if px != ex:
+            step = 1 if px > ex else -1
+            if not self.is_solid(ex + step, ey):
+                return step, 0
+        return 0, 0
+
+    def climb_dest_row(self, x, y):
+        """Row reached by climbing the ladder at (x, y) upward."""
+        ty = y
+        while (ty > 0 and self.tiles[ty][x] == self.LADDER and
+                not self.is_solid(x, ty - 1)):
+            ty -= 1
+            if ty <= self.player_y:
+                break
+        return ty
+
+    def descend_dest_row(self, x, y):
+        """Row reached by climbing down / falling / dropping from (x, y)."""
+        ty = y
+        while (ty < self.LEVEL_HEIGHT - 1 and ty < self.player_y and
+                not self.is_solid(x, ty + 1)):
+            ty += 1
+            if self.tiles[ty][x] == self.ROPE:
+                break  # falling guards grab ropes
+        return ty
 
     def player_hit(self):
         """Handle player death."""
@@ -404,6 +545,7 @@ class LodeRunner(Game):
         else:
             self.player_x = 2
             self.player_y = self.LEVEL_HEIGHT - 2
+            self.fall_timer = 0.0
             self.enemy_start_delay = 1.5  # Brief reprieve on respawn
             # Reset enemies
             for enemy in self.enemies:
@@ -496,6 +638,10 @@ class LodeRunner(Game):
         self.display.set_pixel(px + 1, py, color)
         self.display.set_pixel(px, py + 1, color)
         self.display.set_pixel(px + 1, py + 1, color)
+
+        # Show carried gold as a glint on the guard
+        if enemy['gold']:
+            self.display.set_pixel(px + 1, py, self.GOLD_COLOR)
 
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)

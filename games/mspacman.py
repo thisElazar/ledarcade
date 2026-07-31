@@ -19,7 +19,7 @@ class MsPacMan(Game):
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes and semi-random ghost AI.',
+        'desc': 'Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.',
     }
 
     # 4 cycling maze layouts (21x19 tiles at 3px each = 63x57)
@@ -148,6 +148,11 @@ class MsPacMan(Game):
         ('banana',     (255, 255, 0),   5000),
     ]
 
+    # Scatter/chase phase durations in seconds (as in Pac-Man).
+    # Even indices are scatter, odd are chase; the final chase never ends.
+    # Levels 5+ shorten scatter phases to 5 seconds.
+    MODE_SCHEDULE = [7.0, 20.0, 7.0, 20.0, 5.0, 20.0, 5.0, float('inf')]
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
@@ -175,20 +180,26 @@ class MsPacMan(Game):
         self.pac_y = 14.0
         self.pac_dir = (0, 0)  # Current direction
         self.pac_next_dir = (0, 0)  # Queued direction
-        self.pac_speed = 6.0  # Tiles per second
+        self.pac_speed = 6.6  # Tiles per second - faster than Pac-Man's 6.0
+        self.pac_slow_timer = 0  # Brief slowdown after eating a dot
         self.mouth_open = True
         self.mouth_timer = 0
 
         # Ghosts - positioned in/around ghost house (rows 8-11)
+        # The orange ghost is Sue in Ms. Pac-Man (Clyde's AI, new name)
         self.ghosts = [
             {'name': 'blinky', 'x': 10.0, 'y': 7.0, 'dir': (-1, 0), 'color': Colors.RED,
-             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 1), 'in_house': False, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
             {'name': 'pinky', 'x': 10.0, 'y': 9.0, 'dir': (0, 1), 'color': Colors.PINK,
-             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (1, 1), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
             {'name': 'inky', 'x': 9.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.CYAN,
-             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False},
-            {'name': 'clyde', 'x': 11.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.ORANGE,
-             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False},
+             'scatter_target': (19, 17), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
+            {'name': 'sue', 'x': 11.0, 'y': 10.0, 'dir': (0, -1), 'color': Colors.ORANGE,
+             'scatter_target': (1, 17), 'in_house': True, 'frightened': False, 'eaten': False,
+             'dot_counter': 0},
         ]
         # Base speeds (will be modified by level)
         self.base_ghost_speed = 4.5
@@ -196,16 +207,16 @@ class MsPacMan(Game):
         self.ghost_speed = self.base_ghost_speed
         self.frightened_speed = self.base_frightened_speed
         self.frightened_timer = 0
-        self.ghost_release_timer = 0
+        self.ghost_release_timer = 0  # Time since last dot eaten (no-dot fallback release)
         self.ghosts_released = 1  # Blinky starts outside
 
         # Level-based difficulty settings
         self._apply_level_difficulty()
 
-        # Mode switching (scatter/chase)
-        self.chase_mode = True
+        # Mode switching (scatter/chase) - arcade phase schedule, starts in scatter
+        self.mode_phase = 0
         self.mode_timer = 0
-        self.mode_duration = 20.0
+        self.chase_mode = False
 
         # Power pellet flashing
         self.pellet_flash = 0
@@ -213,14 +224,18 @@ class MsPacMan(Game):
         # Eaten ghost points
         self.ghost_points = 200
 
+        # One extra life awarded at 10,000 points
+        self.extra_life_awarded = False
+
         # Fruit state
         self.fruit = {'active': False, 'x': 0.0, 'y': 0.0,
-                      'dir': (1, 0), 'type': 0, 'timer': 0.0}
+                      'dir': (1, 0), 'type': 0, 'timer': 0.0, 'leaving': False}
         self.fruit_score_display = 0
         self.fruit_score_timer = 0.0
+        self.fruit_score_pos = (0.0, 0.0)
 
     def _get_maze_index(self):
-        """Get maze index based on current level."""
+        """Get maze index based on current level (arcade banding)."""
         level = self.level
         if level <= 2:
             return 0
@@ -228,10 +243,10 @@ class MsPacMan(Game):
             return 1
         elif level <= 9:
             return 2
-        elif level <= 14:
+        elif level <= 13:
             return 3
         else:
-            return 2 + ((level - 15) % 2)  # Alternate mazes 3 & 4
+            return 2 + (((level - 14) // 4) % 2)  # Alternate mazes 3 & 4 every 4 levels
 
     def _load_maze(self, maze_index):
         """Load a maze layout by index."""
@@ -250,7 +265,7 @@ class MsPacMan(Game):
         self.dots_eaten = 0
         self.fruit_spawned_count = 0
         self.fruit = {'active': False, 'x': 0.0, 'y': 0.0,
-                      'dir': (1, 0), 'type': 0, 'timer': 0.0}
+                      'dir': (1, 0), 'type': 0, 'timer': 0.0, 'leaving': False}
 
     def get_tile(self, x, y):
         """Get tile at position, handling wrapping."""
@@ -320,11 +335,17 @@ class MsPacMan(Game):
         elif input_state.right:
             self.pac_next_dir = (1, 0)
 
-        # Update mode timer
-        self.mode_timer += dt
-        if self.mode_timer >= self.mode_duration:
-            self.mode_timer = 0
-            self.chase_mode = not self.chase_mode
+        # Advance scatter/chase phase (timer pauses while ghosts are frightened)
+        if self.frightened_timer <= 0 and self.mode_phase < len(self.MODE_SCHEDULE) - 1:
+            self.mode_timer += dt
+            if self.mode_timer >= self._mode_phase_duration(self.mode_phase):
+                self.mode_timer = 0
+                self.mode_phase += 1
+                self.chase_mode = (self.mode_phase % 2 == 1)
+                # Mode flips force ghosts to reverse direction
+                for ghost in self.ghosts:
+                    if not ghost['eaten'] and not ghost['in_house']:
+                        ghost['dir'] = (-ghost['dir'][0], -ghost['dir'][1])
 
         # Update frightened timer
         if self.frightened_timer > 0:
@@ -334,19 +355,21 @@ class MsPacMan(Game):
                     ghost['frightened'] = False
                 self.ghost_points = 200
 
-        # Release ghosts from house
-        self.ghost_release_timer += dt
-        ghost_release_interval = self._get_ghost_release_interval()
-        if self.ghost_release_timer >= ghost_release_interval and self.ghosts_released < 4:
+        # Dot slowdown wears off
+        if self.pac_slow_timer > 0:
+            self.pac_slow_timer -= dt
+
+        # Dot-counter house exits (house order: Pinky, Inky, Sue)
+        if self.ghosts_released < 4:
             for ghost in self.ghosts:
                 if ghost['in_house']:
-                    ghost['in_house'] = False
-                    ghost['x'] = 10.0
-                    ghost['y'] = 7.0
-                    ghost['dir'] = (-1, 0)
-                    self.ghosts_released += 1
-                    self.ghost_release_timer = 0
+                    if ghost['dot_counter'] >= self._ghost_dot_limit(ghost['name']):
+                        self._release_next_ghost()
                     break
+            # Fallback: if no dot eaten for 4 seconds, release the next ghost anyway
+            self.ghost_release_timer += dt
+            if self.ghost_release_timer >= 4.0:
+                self._release_next_ghost()
 
         # Move Pac-Man
         self.move_pacman(dt)
@@ -366,14 +389,23 @@ class MsPacMan(Game):
                 self.score += 10
                 self.dots_remaining -= 1
                 self.dots_eaten += 1
+                self.pac_slow_timer = 0.05  # Chewing slows her briefly
+                self._count_dot_for_house()
                 self._check_fruit_spawn()
             elif tile == 3:  # Power pellet
                 self.maze[ty][tx] = 0
                 self.score += 50
                 self.dots_remaining -= 1
                 self.dots_eaten += 1
+                self.pac_slow_timer = 0.15
+                self._count_dot_for_house()
                 self.activate_power()
                 self._check_fruit_spawn()
+
+        # Extra life at 10,000 points (awarded once)
+        if not self.extra_life_awarded and self.score >= 10000:
+            self.extra_life_awarded = True
+            self.lives += 1
 
         # Check win condition
         if self.dots_remaining <= 0:
@@ -414,13 +446,12 @@ class MsPacMan(Game):
         self.pellet_flash += dt
 
     def _check_fruit_spawn(self):
-        """Spawn fruit at ~35% and ~85% dots eaten."""
+        """Spawn fruit at the arcade dot counts (70 and 170 of 244, scaled to our maze)."""
         if self.fruit_spawned_count >= 2 or self.fruit['active']:
             return
-        ratio = self.dots_eaten / max(self.dots_total, 1)
-        if self.fruit_spawned_count == 0 and ratio >= 0.35:
+        if self.fruit_spawned_count == 0 and self.dots_eaten >= self.dots_total * 70 // 244:
             self._spawn_fruit()
-        elif self.fruit_spawned_count == 1 and ratio >= 0.85:
+        elif self.fruit_spawned_count == 1 and self.dots_eaten >= self.dots_total * 170 // 244:
             self._spawn_fruit()
 
     def _spawn_fruit(self):
@@ -435,15 +466,19 @@ class MsPacMan(Game):
         else:
             x = float(self.maze_width - 1)
             d = (-1, 0)
-        # Fruit type based on level
-        fruit_idx = min(self.level - 1, len(self.FRUIT_TYPES) - 1)
+        # Fruit type based on level; levels 8+ draw randomly from the full table
+        if self.level >= 8:
+            fruit_idx = random.randint(0, len(self.FRUIT_TYPES) - 1)
+        else:
+            fruit_idx = min(self.level - 1, len(self.FRUIT_TYPES) - 1)
         self.fruit = {
             'active': True,
             'x': x,
             'y': float(row),
             'dir': d,
             'type': fruit_idx,
-            'timer': 10.0,  # 10 second lifetime
+            'timer': 10.0,  # 10 seconds before it heads for an exit
+            'leaving': False,
         }
 
     def _move_fruit(self, dt):
@@ -453,8 +488,8 @@ class MsPacMan(Game):
 
         self.fruit['timer'] -= dt
         if self.fruit['timer'] <= 0:
-            self.fruit['active'] = False
-            return
+            # Time's up: head for the nearest tunnel and leave (still edible en route)
+            self.fruit['leaving'] = True
 
         # Move at 75% of Pac-Man speed
         speed = self.pac_speed * 0.75
@@ -485,7 +520,21 @@ class MsPacMan(Game):
                     if self.tile_passable(nx, ny, is_ghost=False):
                         possible.append(d)
             if possible:
-                self.fruit['dir'] = random.choice(possible)
+                if self.fruit['leaving']:
+                    # Steer toward the nearest tunnel mouth
+                    target = self._fruit_exit_target()
+                    best_dir = possible[0]
+                    best_dist = float('inf')
+                    for d in possible:
+                        nx = tile_x + d[0]
+                        ny = tile_y + d[1]
+                        dist = (nx - target[0])**2 + (ny - target[1])**2
+                        if dist < best_dist:
+                            best_dist = dist
+                            best_dir = d
+                    self.fruit['dir'] = best_dir
+                else:
+                    self.fruit['dir'] = random.choice(possible)
 
         # Move
         dx, dy = self.fruit['dir']
@@ -501,11 +550,21 @@ class MsPacMan(Game):
             self.fruit['x'] = round(self.fruit['x'])
             self.fruit['y'] = round(self.fruit['y'])
 
-        # Tunnel wrap
-        if self.fruit['x'] < 0:
-            self.fruit['x'] = self.maze_width - 1.0
-        elif self.fruit['x'] >= self.maze_width:
-            self.fruit['x'] = 0.0
+        # Tunnel wrap - a leaving fruit exits the maze instead
+        if self.fruit['x'] < 0 or self.fruit['x'] >= self.maze_width:
+            if self.fruit['leaving']:
+                self.fruit['active'] = False
+            elif self.fruit['x'] < 0:
+                self.fruit['x'] = self.maze_width - 1.0
+            else:
+                self.fruit['x'] = 0.0
+
+    def _fruit_exit_target(self):
+        """Nearest tunnel mouth for a departing fruit (just outside the maze)."""
+        fy = self.fruit['y']
+        row = min(self.tunnel_rows, key=lambda r: abs(r - fy))
+        x = -1 if self.fruit['x'] < self.maze_width / 2 else self.maze_width
+        return (x, row)
 
     def _check_fruit_collection(self):
         """Check if Pac-Man collected the fruit."""
@@ -518,6 +577,7 @@ class MsPacMan(Game):
             self.score += points
             self.fruit_score_display = points
             self.fruit_score_timer = 1.5
+            self.fruit_score_pos = (self.fruit['x'], self.fruit['y'])
             self.fruit['active'] = False
 
     def move_pacman(self, dt: float):
@@ -558,11 +618,12 @@ class MsPacMan(Game):
                             self.pac_x = float(check_tx)
                         break
 
-        # Move in current direction
+        # Move in current direction (slower for a moment after eating a dot)
         if self.pac_dir != (0, 0):
             dx, dy = self.pac_dir
-            new_x = self.pac_x + dx * self.pac_speed * dt
-            new_y = self.pac_y + dy * self.pac_speed * dt
+            speed = self.pac_speed * (0.8 if self.pac_slow_timer > 0 else 1.0)
+            new_x = self.pac_x + dx * speed * dt
+            new_y = self.pac_y + dy * speed * dt
 
             new_tile_x = int(round(new_x))
             new_tile_y = int(round(new_y))
@@ -597,7 +658,7 @@ class MsPacMan(Game):
             self.pac_x = 0.0
 
     def move_ghost(self, ghost, dt: float):
-        """Move ghost with AI - semi-random at intersections."""
+        """Move ghost with AI."""
         if ghost['in_house']:
             ghost['y'] += ghost['dir'][1] * 1.5 * dt
             if ghost['y'] < 9.0:
@@ -620,9 +681,19 @@ class MsPacMan(Game):
             speed = self.frightened_speed
         else:
             speed = self.ghost_speed
+            # Cruise Elroy: Blinky speeds up as the dots run out
+            if ghost['name'] == 'blinky':
+                if self.dots_remaining <= self._elroy_threshold() // 2:
+                    speed *= 1.10
+                elif self.dots_remaining <= self._elroy_threshold():
+                    speed *= 1.05
 
         gx, gy = ghost['x'], ghost['y']
         tile_x, tile_y = int(round(gx)), int(round(gy))
+
+        # Ghosts slow down in the tunnel mouths
+        if not ghost['eaten'] and tile_y in self.tunnel_rows and (tile_x <= 2 or tile_x >= 18):
+            speed *= 0.55
 
         at_center = abs(gx - tile_x) < 0.1 and abs(gy - tile_y) < 0.1
 
@@ -655,12 +726,9 @@ class MsPacMan(Game):
                     if self.tile_passable(next_x, next_y, is_ghost=True):
                         possible.append(d)
 
-            # Choose direction - semi-random AI
+            # Choose direction
             if possible:
                 if ghost['frightened'] and not ghost['eaten']:
-                    ghost['dir'] = random.choice(possible)
-                elif not ghost['eaten'] and len(possible) >= 3 and random.random() < 0.25:
-                    # Ms. Pac-Man: 25% chance of random turn at intersections
                     ghost['dir'] = random.choice(possible)
                 else:
                     target = self.get_ghost_target(ghost)
@@ -718,20 +786,36 @@ class MsPacMan(Game):
         if ghost['eaten']:
             return (10.0, 8.0)
 
+        name = ghost['name']
         if not self.chase_mode:
+            # Cruise Elroy Blinky ignores scatter and keeps chasing
+            if name == 'blinky' and self.dots_remaining <= self._elroy_threshold():
+                return (self.pac_x, self.pac_y)
+            # Ms. Pac-Man: during the first two scatters of a level, Blinky and
+            # Pinky roam to pseudo-random tiles instead of their corners
+            if self.mode_phase <= 2 and name in ('blinky', 'pinky'):
+                tgt = ghost.get('random_target')
+                if tgt is None or (abs(ghost['x'] - tgt[0]) < 1.5 and
+                                   abs(ghost['y'] - tgt[1]) < 1.5):
+                    tgt = self._random_roam_target()
+                    ghost['random_target'] = tgt
+                return tgt
             return ghost['scatter_target']
 
-        name = ghost['name']
         if name == 'blinky':
             return (self.pac_x, self.pac_y)
         elif name == 'pinky':
+            # Pac-Man's overflow bug survives here: facing up also shifts 4 left
+            if self.pac_dir == (0, -1):
+                return (self.pac_x - 4, self.pac_y - 4)
             return (self.pac_x + self.pac_dir[0] * 4, self.pac_y + self.pac_dir[1] * 4)
         elif name == 'inky':
+            # Inky's overflow bug was fixed in Ms. Pac-Man - pivot is straight up
             px = self.pac_x + self.pac_dir[0] * 2
             py = self.pac_y + self.pac_dir[1] * 2
             blinky = self.ghosts[0]
             return (px + (px - blinky['x']), py + (py - blinky['y']))
-        elif name == 'clyde':
+        elif name == 'sue':
             dist = math.sqrt((self.pac_x - ghost['x'])**2 + (self.pac_y - ghost['y'])**2)
             if dist > 8:
                 return (self.pac_x, self.pac_y)
@@ -740,27 +824,73 @@ class MsPacMan(Game):
 
         return (self.pac_x, self.pac_y)
 
+    def _random_roam_target(self):
+        """Pick a random passable tile for a roaming scatter ghost."""
+        while True:
+            tx = random.randint(1, self.maze_width - 2)
+            ty = random.randint(1, self.maze_height - 2)
+            if self.maze[ty][tx] != 1 and self.maze[ty][tx] != 4:
+                return (tx, ty)
+
     def _get_frightened_duration(self):
-        """Get frightened duration based on level."""
+        """Get frightened duration based on level (~20% shorter than PAK-MAN's)."""
         frightened_table = {
-            1: 6.0, 2: 5.0, 3: 4.0, 4: 3.0, 5: 2.0,
-            6: 5.0, 7: 4.0, 8: 3.0, 9: 1.0, 10: 5.0,
-            11: 2.0, 12: 1.0, 13: 1.0, 14: 3.0, 15: 1.0,
-            16: 1.0, 17: 0.0, 18: 1.0,
+            1: 4.8, 2: 4.0, 3: 3.2, 4: 2.4, 5: 1.6,
+            6: 4.0, 7: 3.2, 8: 2.4, 9: 0.8, 10: 4.0,
+            11: 1.6, 12: 0.8, 13: 0.8, 14: 2.4, 15: 0.8,
+            16: 0.8, 17: 0.0, 18: 0.8,
         }
         if self.level >= 19:
             return 0.0
-        return frightened_table.get(self.level, 6.0)
+        return frightened_table.get(self.level, 4.8)
 
     def _get_ghost_speed_multiplier(self):
         """Get ghost speed multiplier based on level."""
         multiplier = 1.0 + (self.level - 1) * 0.05
         return min(multiplier, 1.4)
 
-    def _get_ghost_release_interval(self):
-        """Get interval between ghost releases from the pen."""
-        interval = 4.0 - (self.level - 1) * 0.3
-        return max(interval, 1.0)
+    def _mode_phase_duration(self, phase):
+        """Duration of a scatter/chase phase; levels 5+ shorten scatters to 5s."""
+        duration = self.MODE_SCHEDULE[phase]
+        if self.level >= 5 and phase % 2 == 0:
+            return min(duration, 5.0)
+        return duration
+
+    def _elroy_threshold(self):
+        """Dots-remaining count at which Blinky becomes 'Cruise Elroy'."""
+        return min(20 + (self.level - 1) * 10, self.dots_total // 3)
+
+    def _ghost_dot_limit(self, name):
+        """Personal dot-counter limit before a ghost leaves the house."""
+        if name == 'inky':
+            return 30 if self.level == 1 else 0
+        if name == 'sue':
+            if self.level == 1:
+                return 60
+            if self.level == 2:
+                return 50
+            return 0
+        return 0  # Pinky (and returned Blinky) leave immediately
+
+    def _count_dot_for_house(self):
+        """Credit an eaten dot to the preferred waiting ghost's counter."""
+        self.ghost_release_timer = 0
+        for ghost in self.ghosts:
+            if ghost['in_house']:
+                ghost['dot_counter'] += 1
+                break
+
+    def _release_next_ghost(self):
+        """Release the next waiting ghost (house order: Pinky, Inky, Sue)."""
+        for ghost in self.ghosts:
+            if ghost['in_house']:
+                ghost['in_house'] = False
+                ghost['x'] = 10.0  # Exit through door
+                ghost['y'] = 7.0
+                ghost['dir'] = (-1, 0)
+                self.ghosts_released += 1
+                self.ghost_release_timer = 0
+                return
 
     def _apply_level_difficulty(self):
         """Apply difficulty settings based on current level."""
@@ -801,10 +931,17 @@ class MsPacMan(Game):
         for ghost in self.ghosts:
             ghost['frightened'] = False
             ghost['eaten'] = False
+            ghost['dot_counter'] = 0
+            ghost['random_target'] = None
 
         self.ghosts_released = 1
         self.ghost_release_timer = 0
         self.frightened_timer = 0
+
+        # Scatter/chase schedule restarts on death and new level
+        self.mode_phase = 0
+        self.mode_timer = 0
+        self.chase_mode = False
 
         # Deactivate fruit on death
         self.fruit['active'] = False
@@ -863,9 +1000,14 @@ class MsPacMan(Game):
             self.display.set_pixel(fx, fy + 1, color)
             self.display.set_pixel(fx + 1, fy + 1, color)
 
-        # Draw fruit score popup
+        # Draw fruit score popup - point value near where the fruit was eaten
         if self.fruit_score_timer > 0:
-            self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
+            text = f"{self.fruit_score_display}"
+            sx = self.offset_x + int(self.fruit_score_pos[0] * self.tile_size) - 2
+            sy = self.offset_y + int(self.fruit_score_pos[1] * self.tile_size) - 4
+            sx = max(1, min(sx, 63 - len(text) * 4))
+            sy = max(self.offset_y, min(sy, 58))
+            self.display.draw_text_small(sx, sy, text, Colors.WHITE)
 
         # Draw ghosts (2x2)
         for ghost in self.ghosts:
