@@ -1,7 +1,7 @@
 """
 Pong - The original arcade classic
 ==================================
-Beat the AI opponent! First to 7 wins.
+Beat the AI opponent! First to 11 wins.
 
 Controls:
   Up/Down - Move paddle
@@ -18,9 +18,18 @@ class Pong(Game):
     description = "Beat the AI!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Two paddles, one ball. First to 7 wins. The simplest game that’s still fun.',
+        'desc': 'Two paddles, one ball. First to 11 wins. The simplest game that’s still fun.',
     }
-    
+
+    # 8-segment quantized deflection angles (Alcorn's hardware design):
+    # each paddle is divided into 8 zones, each with a fixed bounce angle.
+    DEFLECT_ANGLES = [-1.0, -0.75, -0.4, -0.15, 0.15, 0.4, 0.75, 1.0]
+
+    # The hardware quirk: paddles can't quite reach the top of the field,
+    # leaving a gap for the classic kill shot.
+    PADDLE_TOP = 11
+
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
@@ -29,7 +38,7 @@ class Pong(Game):
         self.state = GameState.PLAYING
         self.score = 0
         self.ai_score = 0
-        self.win_score = 7
+        self.win_score = 11
 
         # Paddles
         self.paddle_height = 8
@@ -58,7 +67,6 @@ class Pong(Game):
         self.ball_dy = 0.0
         self.ball_base_speed = 45.0  # Starting ball speed
         self.ball_speed = self.ball_base_speed
-        self.ball_speed_increment = 2.0  # Speed increase per volley
         self.ball_max_speed = 90.0  # Maximum ball speed
         self.ball_active = False
         self.volley_count = 0  # Track volleys for speed scaling
@@ -96,14 +104,11 @@ class Pong(Game):
 
         # Reset volley count and ball speed for new point
         self.volley_count = 0
-        # Ball base speed increases slightly with total points scored
-        total_points = self.score + self.ai_score
-        self.ball_speed = self.ball_base_speed + (total_points * 1.5)
-        self.ball_speed = min(self.ball_speed, self.ball_max_speed * 0.7)  # Cap serve speed
+        self.ball_speed = self.ball_base_speed
 
         # Serve toward the player who just lost (original Pong rules)
-        # If AI scored, serve toward AI (right). If player scored, serve toward player (left).
-        direction = 1 if self.last_scorer == 'ai' else -1
+        # If AI scored, serve toward player (left). If player scored, serve toward AI (right).
+        direction = -1 if self.last_scorer == 'ai' else 1
         angle = random.uniform(-0.5, 0.5)
 
         self.ball_dx = direction * self.ball_speed * math.cos(angle)
@@ -134,7 +139,7 @@ class Pong(Game):
         # Player paddle movement
         paddle_speed = 50.0
         if input_state.up:
-            self.player_y = max(8, self.player_y - paddle_speed * dt)
+            self.player_y = max(self.PADDLE_TOP, self.player_y - paddle_speed * dt)
         if input_state.down:
             self.player_y = min(GRID_SIZE - self.paddle_height, self.player_y + paddle_speed * dt)
         
@@ -157,7 +162,7 @@ class Pong(Game):
         if self.ai_y < self.ai_target_y - 1:
             self.ai_y = min(GRID_SIZE - self.paddle_height, self.ai_y + ai_speed * dt)
         elif self.ai_y > self.ai_target_y + 1:
-            self.ai_y = max(8, self.ai_y - ai_speed * dt)
+            self.ai_y = max(self.PADDLE_TOP, self.ai_y - ai_speed * dt)
         
         if not self.ball_active:
             return
@@ -183,13 +188,15 @@ class Pong(Game):
             self.ball_x > 0 and
             self.player_y - 1 <= self.ball_y <= self.player_y + self.paddle_height):
 
-            # Bounce with angle based on hit position
+            # Bounce with angle from the 8-segment deflection table
             hit_pos = (self.ball_y - self.player_y) / self.paddle_height
-            angle = (hit_pos - 0.5) * 1.2
+            seg = min(7, max(0, int(hit_pos * 8)))
+            angle = self.DEFLECT_ANGLES[seg]
 
-            # Increase volley count and ball speed
+            # Stepped speed-up: x1.25 at volley 4, x1.25 again at volley 12
             self.volley_count += 1
-            self.ball_speed = min(self.ball_max_speed, self.ball_speed + self.ball_speed_increment)
+            if self.volley_count in (4, 12):
+                self.ball_speed = min(self.ball_max_speed, self.ball_speed * 1.25)
 
             self.ball_dx = abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)
@@ -205,11 +212,13 @@ class Pong(Game):
             self.ai_y - 1 <= self.ball_y <= self.ai_y + self.paddle_height):
 
             hit_pos = (self.ball_y - self.ai_y) / self.paddle_height
-            angle = (hit_pos - 0.5) * 1.2
+            seg = min(7, max(0, int(hit_pos * 8)))
+            angle = self.DEFLECT_ANGLES[seg]
 
-            # Increase volley count and ball speed
+            # Stepped speed-up: x1.25 at volley 4, x1.25 again at volley 12
             self.volley_count += 1
-            self.ball_speed = min(self.ball_max_speed, self.ball_speed + self.ball_speed_increment)
+            if self.volley_count in (4, 12):
+                self.ball_speed = min(self.ball_max_speed, self.ball_speed * 1.25)
 
             self.ball_dx = -abs(self.ball_speed * math.cos(angle))
             self.ball_dy = self.ball_speed * math.sin(angle)

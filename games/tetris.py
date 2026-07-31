@@ -5,9 +5,10 @@ Stack the falling blocks and clear lines!
 
 Controls:
   Left/Right - Move piece
-  Up         - Rotate piece
+  Up         - Rotate CW
   Down       - Soft drop (faster fall)
-  Space      - Hard drop (instant drop)
+  Space      - Rotate CCW
+  Z          - Hard drop (instant drop)
 """
 
 import random
@@ -87,7 +88,7 @@ class Tetris(Game):
     description = "Clear lines!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Stack falling tetrominoes, clear complete lines. Game ends when pieces reach the top.',
+        'desc': 'Stack falling tetrominoes, clear complete lines. NES-style speed curve: gravity ramps up with every level. Left button rotates, right button hard-drops.',
     }
 
     # Playfield dimensions (standard Tetris is 10 wide, 20 tall)
@@ -121,19 +122,20 @@ class Tetris(Game):
         self.piece_x = 0
         self.piece_y = 0
         
-        # Next piece
-        self.next_piece = random.choice(list(TETROMINOS.keys()))
-        
+        # 7-bag randomizer: every permutation of the 7 pieces, then reshuffle
+        self.bag = []
+        self.next_piece = self.next_from_bag()
+
         # Spawn first piece
         self.spawn_piece()
-        
+
         # Timing
         self.fall_timer = 0
         self.fall_delay = NES_GRAVITY[0]
         self.move_timer = 0
         self.move_delay = 0.1
         self.lock_timer = 0
-        self.lock_delay = 0.0  # NES: instant lock, no delay
+        self.lock_delay = 0.45  # Grounded grace period; move/rotate resets it
 
         # Input handling
         self.das_timer = 0
@@ -144,10 +146,17 @@ class Tetris(Game):
         self.line_clear_rows = []
         self.line_clear_timer = 0
     
+    def next_from_bag(self):
+        """Draw the next piece from the 7-bag, refilling when empty."""
+        if not self.bag:
+            self.bag = list(TETROMINOS.keys())
+            random.shuffle(self.bag)
+        return self.bag.pop()
+
     def spawn_piece(self):
         """Spawn a new piece at the top."""
         self.current_piece = self.next_piece
-        self.next_piece = random.choice(list(TETROMINOS.keys()))
+        self.next_piece = self.next_from_bag()
         self.current_rotation = 0
         self.piece_x = self.BOARD_WIDTH // 2 - 2
         self.piece_y = 0
@@ -274,24 +283,14 @@ class Tetris(Game):
             self.piece_x += move_dx
             self.lock_timer = 0  # Reset lock delay on movement
         
-        # Rotation (Up only, single press)
+        # Rotation: Up = clockwise, left button = counter-clockwise
         if input_state.up_pressed:
-            new_rotation = (self.current_rotation + 1) % 4
-            if not self.check_collision(rotation=new_rotation):
-                self.current_rotation = new_rotation
-                self.lock_timer = 0
-            # Try wall kicks
-            elif not self.check_collision(dx=-1, rotation=new_rotation):
-                self.piece_x -= 1
-                self.current_rotation = new_rotation
-                self.lock_timer = 0
-            elif not self.check_collision(dx=1, rotation=new_rotation):
-                self.piece_x += 1
-                self.current_rotation = new_rotation
-                self.lock_timer = 0
+            self.try_rotate(1)
+        if input_state.action_l:
+            self.try_rotate(-1)
 
-        # Hard drop (Action button)
-        if (input_state.action_l or input_state.action_r):
+        # Hard drop (right button)
+        if input_state.action_r:
             while not self.check_collision(dy=1):
                 self.piece_y += 1
                 self.score += 2
@@ -300,22 +299,36 @@ class Tetris(Game):
 
         # Soft drop (Down held = faster fall)
         drop_delay = self.fall_delay / 10 if input_state.down else self.fall_delay
-        
-        # Gravity
-        self.fall_timer += dt
-        if self.fall_timer >= drop_delay:
-            self.fall_timer = 0
 
-            if not self.check_collision(dy=1):
+        if self.check_collision(dy=1):
+            # Grounded: accumulate lock delay (successful move/rotate resets it)
+            self.fall_timer = 0
+            self.lock_timer += dt
+            if self.lock_timer >= self.lock_delay:
+                self.lock_piece()
+        else:
+            # Airborne: gravity
+            self.lock_timer = 0
+            self.fall_timer += dt
+            if self.fall_timer >= drop_delay:
+                self.fall_timer = 0
                 self.piece_y += 1
                 if input_state.down:
                     self.score += 1  # Bonus for soft drop
+
+    def try_rotate(self, direction):
+        """Rotate the piece with wall kicks (+/-2 kicks for the I piece)."""
+        new_rotation = (self.current_rotation + direction) % 4
+        kicks = [0, -1, 1]
+        if self.current_piece == 'I':
+            kicks += [-2, 2]
+        for kick in kicks:
+            if not self.check_collision(dx=kick, rotation=new_rotation):
+                self.piece_x += kick
+                self.current_rotation = new_rotation
                 self.lock_timer = 0
-            else:
-                # Piece is resting - start lock timer
-                self.lock_timer += dt + drop_delay
-                if self.lock_timer >= self.lock_delay:
-                    self.lock_piece()
+                return True
+        return False
     
     def draw(self):
         self.display.clear(Colors.BLACK)
