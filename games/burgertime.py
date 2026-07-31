@@ -176,7 +176,7 @@ class BurgerTime(Game):
     description = "Stack the burgers!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Walk across burger ingredients to drop them down platforms. Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Assemble all burgers to clear the level.',
+        'desc': 'Walk across burger ingredients to drop them down platforms — each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.',
     }
 
     # Colors
@@ -207,8 +207,8 @@ class BurgerTime(Game):
     # Game constants
     MOVE_SPEED = 14.0
     CLIMB_SPEED = 12.0
-    ENEMY_SPEED = 7.0
-    ENEMY_CLIMB_SPEED = 4.5
+    ENEMY_SPEED = 11.0
+    ENEMY_CLIMB_SPEED = 7.0  # Scaled with ENEMY_SPEED (11/7 of the old 4.5)
     INGREDIENT_FALL_SPEED = 25.0
     CASCADE_DELAY = 0.12  # Stagger between cascade steps
 
@@ -236,6 +236,11 @@ class BurgerTime(Game):
         self.pepper_x = 0
         self.pepper_y = 0
         self.pepper_timer = 0.0
+
+        # Bonus food economy: every ~8-10 drops a treat appears
+        self.drop_count = 0
+        self.next_bonus_at = random.randint(8, 10)
+        self.bonus_food = None  # {'x', 'y', 'type', 'timer'}
 
         # Build level
         self.build_level()
@@ -409,6 +414,17 @@ class BurgerTime(Game):
             if self.pepper_timer <= 0:
                 self.pepper_active = False
 
+        # Bonus food: pickup gives +500 and +1 pepper
+        if self.bonus_food:
+            self.bonus_food['timer'] -= dt
+            if self.bonus_food['timer'] <= 0:
+                self.bonus_food = None
+            elif (abs(self.chef_x - self.bonus_food['x']) < 3 and
+                  abs(self.chef_y - self.bonus_food['y']) < 3):
+                self.score += 500
+                self.peppers = min(self.peppers + 1, 9)
+                self.bonus_food = None
+
         # Chef movement
         self.update_chef(input_state, dt)
 
@@ -509,7 +525,6 @@ class BurgerTime(Game):
                     continue
                 if abs(enemy['x'] - self.pepper_x) < 10 and abs(enemy['y'] - self.pepper_y) < 8:
                     enemy['stunned'] = 3.0
-                    self.score += 25
 
         # Walk animation
         if moved:
@@ -534,7 +549,7 @@ class BurgerTime(Game):
                     if chef_left <= pixel_x <= chef_right:
                         ing['walked'][i] = True
 
-                # Check if fully walked - award points for dropping
+                # Check if fully walked - drop it
                 if all(ing['walked']):
                     # Don't drop if this column already has a cascade in progress
                     col_busy = any(
@@ -542,15 +557,30 @@ class BurgerTime(Game):
                         for o in self.ingredients
                     )
                     if not col_busy:
-                        self.score += 50
                         self.drop_ingredient(ing)
+                        self._count_drop()
 
-    def drop_ingredient(self, ingredient, delay=0.0):
-        """Drop an ingredient to the next floor, recursively cascading anything below.
+    def _count_drop(self):
+        """Every ~8-10 drop events, a bonus food appears mid-screen."""
+        self.drop_count += 1
+        if self.drop_count >= self.next_bonus_at and self.bonus_food is None:
+            self.drop_count = 0
+            self.next_bonus_at = random.randint(8, 10)
+            self.bonus_food = {
+                'x': random.choice([24, 38]),
+                'y': float(FLOOR_Y[random.choice([2, 3])]),
+                'type': random.choice(['icecream', 'coffee', 'fries']),
+                'timer': 8.0,
+            }
 
-        The entire cascade chain is set up deterministically with staggered
-        delays so each piece visually pushes the next one down.
-        If enemies are riding the ingredient, it falls all the way to the plate.
+    def drop_ingredient(self, ingredient, delay=0.0, min_y=None):
+        """Drop an ingredient, recursively cascading anything in its path.
+
+        A piece falls exactly 1 + (number of riding enemies) floors; it goes
+        to the plate only when that travel exhausts the floors below it.
+        Pieces knocked down by a faller land below it (min_y), so a chain
+        settles one floor apart. The cascade is set up deterministically with
+        staggered delays so each piece visually pushes the next one down.
         """
         ingredient['walked'] = [False] * ingredient['width']
 
@@ -572,55 +602,55 @@ class BurgerTime(Game):
         current_y = ingredient['y']
         bx_center = BURGER_X[col] + INGREDIENT_WIDTH // 2
 
-        if num_riding > 0:
-            # Enemies riding = fall ALL the way to the plate
-            # Cascade any ingredients below in this column first
-            intermediates = sorted(
-                [o for o in self.ingredients
-                 if o is not ingredient and not o['falling']
-                 and not o.get('at_plate') and o['col_idx'] == col
-                 and o['y'] > current_y],
-                key=lambda o: o['y']
-            )
-            d = delay + self.CASCADE_DELAY
-            for other in intermediates:
-                self.drop_ingredient(other, delay=d)
-                d += self.CASCADE_DELAY
+        # Floors below with a platform under this burger column
+        floors_below = []
+        for fy in FLOOR_Y:
+            if fy <= current_y + 4:
+                continue
+            for plat in self.platforms:
+                if abs(plat['y'] - fy) < 2 and plat['x1'] <= bx_center <= plat['x2']:
+                    floors_below.append(fy)
+                    break
 
-            # Land at the plate
+        # A knocked-down piece must settle below whatever knocked it down
+        reachable = (floors_below if min_y is None
+                     else [fy for fy in floors_below if fy > min_y + 2])
+
+        # Each rider adds one extra floor of travel
+        levels = 1 + num_riding
+
+        if len(reachable) >= levels:
+            target_floor = reachable[levels - 1]
+            target_y = target_floor - 2
+            fell = sum(1 for fy in floors_below if fy <= target_floor)
+        else:
+            # Travel exhausts the floors — land at the plate
+            fell = len(floors_below) + 1
             slot = self.plate_slots[col]
             target_y = PLATE_Y - 2 - (slot * 2)
             self.plate_slots[col] += 1
             ingredient['at_plate'] = True
-        else:
-            # Normal drop: find next floor below
-            floors_below = []
-            for fy in FLOOR_Y:
-                if fy <= current_y + 4:
-                    continue
-                for plat in self.platforms:
-                    if abs(plat['y'] - fy) < 2 and plat['x1'] <= bx_center <= plat['x2']:
-                        floors_below.append(fy)
-                        break
 
-            target_floor = floors_below[0] if floors_below else None
+        # +50 per floor fallen
+        self.score += 50 * fell
 
-            if target_floor is not None:
-                target_y = target_floor - 2
-
-                # Recursive cascade: push any ingredient sitting at target floor first
-                for other in self.ingredients:
-                    if other is not ingredient and not other['falling']:
-                        if other.get('at_plate'):
-                            continue
-                        if other['col_idx'] == col and abs(other['y'] - target_y) < 3:
-                            self.drop_ingredient(other, delay=delay + self.CASCADE_DELAY)
-            else:
-                # No more floors — land at the plate with proper stacking
-                slot = self.plate_slots[col]
-                target_y = PLATE_Y - 2 - (slot * 2)
-                self.plate_slots[col] += 1
-                ingredient['at_plate'] = True
+        # Recursive cascade: knock down any resting ingredient in the fall
+        # path, each settling one floor below the piece above it
+        in_path = sorted(
+            [o for o in self.ingredients
+             if o is not ingredient and not o['falling']
+             and not o.get('at_plate') and o['col_idx'] == col
+             and current_y < o['y'] <= target_y + 2],
+            key=lambda o: o['y']
+        )
+        d = delay + self.CASCADE_DELAY
+        push_below = target_y
+        for other in in_path:
+            if other['falling']:  # Already dropped by a nested cascade
+                continue
+            self.drop_ingredient(other, delay=d, min_y=push_below)
+            push_below = other['target_y']
+            d += self.CASCADE_DELAY
 
         ingredient['target_y'] = target_y
         ingredient['falling'] = True
@@ -660,11 +690,18 @@ class BurgerTime(Game):
             if ing['y'] >= ing['target_y']:
                 ing['y'] = ing['target_y']
                 ing['falling'] = False
-                # Kill carried enemies on landing
+                # Riders survive the landing — stunned on the resting floor
                 for enemy in ing['carrying_enemies']:
                     enemy['riding'] = False
-                    enemy['dead'] = True
-                    enemy['respawn_timer'] = 4.0
+                    if ing.get('at_plate'):
+                        # Carried all the way down — gone (respawns later)
+                        enemy['dead'] = True
+                        enemy['respawn_timer'] = 4.0
+                    else:
+                        enemy['stunned'] = 1.5
+                        enemy['y'] = float(min(
+                            FLOOR_Y, key=lambda f: abs(f - (ing['y'] + 2))))
+                        enemy['on_ladder'] = False
                 ing['carrying_enemies'] = []
                 # Update floor_idx to match new y position
                 if not ing.get('at_plate'):
@@ -713,13 +750,16 @@ class BurgerTime(Game):
             if enemy.get('riding'):
                 continue
 
-            # Dead enemies respawn after a delay
+            # Dead enemies respawn after a delay, entering from a playfield
+            # edge (the edge burger zones are always walkable)
             if enemy.get('dead'):
                 enemy['respawn_timer'] -= dt
                 if enemy['respawn_timer'] <= 0:
+                    side = random.choice([-1, 1])
                     floor_idx = random.randint(0, 2)
-                    enemy['x'] = float(self._random_x_on_floor(floor_idx))
+                    enemy['x'] = 2.0 if side < 0 else 61.0
                     enemy['y'] = float(FLOOR_Y[floor_idx])
+                    enemy['direction'] = -side  # Walk inward
                     enemy['dead'] = False
                     enemy['stunned'] = 1.5
                     enemy['on_ladder'] = False
@@ -741,8 +781,11 @@ class BurgerTime(Game):
             dx = self.chef_x - enemy['x']
             dy = self.chef_y - enemy['y']
 
-            h_speed = self.ENEMY_SPEED * (1 + self.level * 0.08)
-            v_speed = self.ENEMY_CLIMB_SPEED * (1 + self.level * 0.08)
+            # Speed scales with level but caps below the chef's 14 so
+            # enemies can always be outrun (climb stays proportional)
+            mult = min(1 + self.level * 0.08, 12.5 / self.ENEMY_SPEED)
+            h_speed = self.ENEMY_SPEED * mult
+            v_speed = self.ENEMY_CLIMB_SPEED * mult
 
             if enemy['on_ladder']:
                 ladder = self.get_ladder_at(enemy['x'], enemy['y'])
@@ -952,6 +995,11 @@ class BurgerTime(Game):
                 enemy['riding'] = False
                 enemy['respawn_timer'] = 0.0
 
+            # Detach riders from falling ingredients — the enemies were just
+            # reset above, so a piece landing later must not yank them back
+            for ing in self.ingredients:
+                ing['carrying_enemies'] = []
+
     def check_win(self):
         """Check if all ingredients have reached the plate."""
         for ing in self.ingredients:
@@ -962,9 +1010,8 @@ class BurgerTime(Game):
         return True
 
     def next_level(self):
-        """Advance to next level."""
+        """Advance to next level. Peppers carry over — restock via bonus food."""
         self.level += 1
-        self.peppers = min(self.peppers + 2, 9)
         self.chef_x = float(self._random_x_on_floor(5))
         self.chef_y = float(FLOOR_Y[5])
         self.on_ladder = False
@@ -994,6 +1041,10 @@ class BurgerTime(Game):
         # Draw ingredients
         for ing in self.ingredients:
             self.draw_ingredient(ing)
+
+        # Draw bonus food
+        if self.bonus_food:
+            self.draw_bonus_food()
 
         # Draw pepper effect
         if self.pepper_active:
@@ -1049,6 +1100,22 @@ class BurgerTime(Game):
             elif ing['type'] == 'bun_bottom':
                 self.display.set_pixel(px, y + dy, self.BUN_BOTTOM_COLOR)
                 self.display.set_pixel(px, y + 1 + dy, self.BUN_BOTTOM_COLOR)
+
+    def draw_bonus_food(self):
+        """Draw the 3px bonus item standing on its floor."""
+        x = int(self.bonus_food['x'])
+        y = int(self.bonus_food['y'])
+        colors = {
+            'icecream': ((255, 220, 230), (255, 120, 170), (210, 160, 80)),
+            'coffee': ((240, 240, 240), (120, 70, 30), (150, 90, 40)),
+            'fries': ((255, 60, 60), (255, 220, 80), (255, 220, 80)),
+        }[self.bonus_food['type']]
+        # Blink during the last 2 seconds
+        if self.bonus_food['timer'] < 2.0 and int(self.bonus_food['timer'] * 6) % 2 == 0:
+            return
+        self.display.set_pixel(x, y - 2, colors[0])
+        self.display.set_pixel(x, y - 1, colors[1])
+        self.display.set_pixel(x, y, colors[2])
 
     def draw_enemy(self, enemy):
         """Draw an enemy."""

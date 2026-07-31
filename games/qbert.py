@@ -4,7 +4,7 @@ Q*bert - Isometric Cube Hopping
 Hop on cubes to change their colors. Avoid enemies!
 
 Controls:
-  Arrow Keys - Hop diagonally (Up+Left, Up+Right, Down+Left, Down+Right)
+  Arrow Keys - Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)
   Space      - Not used (movement only)
 """
 
@@ -17,7 +17,7 @@ class QBert(Game):
     description = "Hop & Color!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Hop on cubes in an isometric pyramid to change their colors. Change every cube to advance. Avoid Coily the snake and other enemies. Don’t fall off the edges.',
+        'desc': 'Hop on cubes in an isometric pyramid to change their colors — later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.',
     }
 
     # Pyramid dimensions
@@ -35,6 +35,9 @@ class QBert(Game):
     CUBE_SIDE_RIGHT = (40, 40, 180)       # Medium blue for right side
     CUBE_TARGET_LEFT = (200, 150, 0)      # Darker gold
     CUBE_TARGET_RIGHT = (230, 180, 0)     # Medium gold
+    CUBE_MID_COLOR = (255, 120, 180)      # Pink - intermediate (2-hop levels)
+    CUBE_MID_LEFT = (190, 80, 130)
+    CUBE_MID_RIGHT = (220, 100, 155)
 
     QBERT_COLOR = (255, 128, 0)           # Orange
     QBERT_NOSE = (255, 80, 80)            # Red-pink nose
@@ -91,6 +94,10 @@ class QBert(Game):
         self.qbert_frame = 0
         self.anim_timer = 0.0
 
+        # Green-ball freeze and death (swear-bubble) pause
+        self.freeze_timer = 0.0
+        self.swear_timer = 0.0
+
         # Check if level complete
         self.level_complete = False
         self.level_transition_timer = 0.0
@@ -141,6 +148,13 @@ class QBert(Game):
                 self.next_level()
             return
 
+        # Death pause: swear bubble, then resolve
+        if self.swear_timer > 0:
+            self.swear_timer -= dt
+            if self.swear_timer <= 0:
+                self.resolve_death()
+            return
+
         # Disc ride animation
         if self.on_disc:
             self.disc_ride_timer -= dt
@@ -148,8 +162,7 @@ class QBert(Game):
                 self.on_disc = False
                 self.qbert_row = 0
                 self.qbert_col = 0
-                # Clear all enemies when using disc
-                self.enemies.clear()
+                # Enemies persist — only a lured Coily is gone
             return
 
         # Animation timer
@@ -171,16 +184,23 @@ class QBert(Game):
 
                 # Check if landed on valid cube
                 if self.is_valid_cube(self.qbert_row, self.qbert_col):
-                    # Change cube color
-                    if self.cubes[self.qbert_row][self.qbert_col] == 0:
-                        self.cubes[self.qbert_row][self.qbert_col] = 1
+                    # Advance cube color per this level's rules
+                    mode = self.cube_mode()
+                    cube = self.cubes[self.qbert_row][self.qbert_col]
+                    if mode == 2:
+                        # Re-hopping a finished cube reverts it
+                        self.cubes[self.qbert_row][self.qbert_col] = 1 - cube
+                        if cube == 0:
+                            self.score += 25
+                    elif cube < self.cube_target():
+                        self.cubes[self.qbert_row][self.qbert_col] = cube + 1
                         self.score += 25
 
                     # Check level complete
                     if self.check_level_complete():
                         self.level_complete = True
                         self.level_transition_timer = 1.5
-                        self.score += 1000
+                        self.score += 1000 + 250 * (self.level - 1)
                 else:
                     # Fell off pyramid - check for disc
                     disc = self.check_disc_collision()
@@ -189,6 +209,7 @@ class QBert(Game):
                         self.disc_ride_timer = 1.0
                         disc['active'] = False
                         self.score += 50
+                        self.lure_coily()
                     else:
                         self.player_die()
                         return
@@ -219,20 +240,21 @@ class QBert(Game):
                     new_row = self.qbert_row + 1
                     new_col = self.qbert_col + 1
                     moved = True
-                # Also allow single direction for easier control
+                # Single directions map to a consistent 45-degree rotation:
+                # up=up-right, right=down-right, down=down-left, left=up-left
                 elif input_state.up:
                     new_row = self.qbert_row - 1
                     new_col = self.qbert_col
                     moved = True
-                elif input_state.down:
+                elif input_state.right:
                     new_row = self.qbert_row + 1
                     new_col = self.qbert_col + 1
                     moved = True
-                elif input_state.left:
+                elif input_state.down:
                     new_row = self.qbert_row + 1
                     new_col = self.qbert_col
                     moved = True
-                elif input_state.right:
+                elif input_state.left:
                     new_row = self.qbert_row - 1
                     new_col = self.qbert_col - 1
                     moved = True
@@ -256,13 +278,39 @@ class QBert(Game):
             self.enemy_spawn_timer = 0
             self.spawn_enemy()
 
+    def cube_mode(self):
+        """Per-level cube rules, cycling with level:
+        0 = one hop, permanent; 1 = two hops via intermediate color;
+        2 = one hop, but re-hopping reverts."""
+        return (self.level - 1) % 3
+
+    def cube_target(self):
+        """Cube state that counts as finished for the current mode."""
+        return 2 if self.cube_mode() == 1 else 1
+
     def check_level_complete(self):
         """Check if all cubes are the target color."""
+        target = self.cube_target()
         for row in self.cubes:
             for cube in row:
-                if cube == 0:
+                if cube != target:
                     return False
         return True
+
+    def lure_coily(self):
+        """A hatched Coily close to the edge follows Q*bert off it."""
+        for enemy in self.enemies:
+            if (enemy['type'] == 'coily' and not enemy.get('is_egg')
+                    and not enemy.get('falling_off')):
+                dist = (abs(enemy['row'] - self.qbert_row) +
+                        abs(enemy['col'] - self.qbert_col))
+                if dist <= 2:
+                    x, y = self.get_cube_screen_pos(enemy['row'], enemy['col'])
+                    enemy['falling_off'] = True
+                    enemy['fall_x'] = x
+                    enemy['fall_y'] = float(y)
+                    self.score += 500
+                    return
 
     def check_disc_collision(self):
         """Check if Q*bert landed on a spinning disc."""
@@ -282,8 +330,15 @@ class QBert(Game):
         return None
 
     def spawn_enemy(self):
-        """Spawn a new enemy at the top of the pyramid."""
-        enemy_type = random.choice(['coily', 'slick', 'sam'])
+        """Spawn a new enemy at the top of the pyramid (one Coily max)."""
+        choices = ['slick', 'sam', 'red_ball', 'red_ball']
+        if not any(e['type'] == 'coily' for e in self.enemies):
+            choices += ['coily', 'coily', 'coily']
+
+        if random.random() < 0.08:
+            enemy_type = 'green_ball'  # Rare: freezes enemies on touch
+        else:
+            enemy_type = random.choice(choices)
 
         if enemy_type == 'coily':
             # Coily starts as an egg at top
@@ -295,12 +350,12 @@ class QBert(Game):
                 'move_timer': 0.0,
             })
         else:
-            # Slick and Sam start at top corners
-            col = 0 if random.random() < 0.5 else 0
+            # Balls/slick/sam drop in on row 1, never on Q*bert's respawn
+            # cube at the apex (like the real game)
             self.enemies.append({
                 'type': enemy_type,
-                'row': 0,
-                'col': col,
+                'row': 1,
+                'col': random.randint(0, 1),
                 'move_timer': 0.0,
             })
 
@@ -308,7 +363,21 @@ class QBert(Game):
         """Update enemy movement."""
         enemies_to_remove = []
 
+        frozen = self.freeze_timer > 0
+        if frozen:
+            self.freeze_timer -= dt
+
         for enemy in self.enemies:
+            # A lured Coily falls off the pyramid
+            if enemy.get('falling_off'):
+                enemy['fall_y'] += 50 * dt
+                if enemy['fall_y'] > GRID_SIZE:
+                    enemies_to_remove.append(enemy)
+                continue
+
+            if frozen:
+                continue
+
             enemy['move_timer'] += dt
 
             move_rate = 0.6 if enemy['type'] == 'coily' and not enemy.get('is_egg') else 0.8
@@ -344,6 +413,14 @@ class QBert(Game):
                         elif enemy['row'] >= self.PYRAMID_ROWS - 1:
                             # Coily falls off if at bottom
                             enemies_to_remove.append(enemy)
+                elif enemy['type'] in ('red_ball', 'green_ball'):
+                    # Balls bounce down the pyramid and roll off the bottom
+                    if enemy['row'] < self.PYRAMID_ROWS - 1:
+                        enemy['row'] += 1
+                        if random.random() < 0.5:
+                            enemy['col'] += 1
+                    else:
+                        enemies_to_remove.append(enemy)
                 else:
                     # Slick and Sam move down and undo cube colors
                     if enemy['row'] < self.PYRAMID_ROWS - 1:
@@ -351,10 +428,10 @@ class QBert(Game):
                         if random.random() < 0.5:
                             enemy['col'] += 1
 
-                        # Undo cube color
+                        # Undo cube color one step
                         if self.is_valid_cube(enemy['row'], enemy['col']):
-                            if self.cubes[enemy['row']][enemy['col']] == 1:
-                                self.cubes[enemy['row']][enemy['col']] = 0
+                            if self.cubes[enemy['row']][enemy['col']] > 0:
+                                self.cubes[enemy['row']][enemy['col']] -= 1
                     else:
                         enemies_to_remove.append(enemy)
 
@@ -367,18 +444,29 @@ class QBert(Game):
             return
 
         for enemy in self.enemies:
+            if enemy.get('falling_off'):
+                continue
             if enemy['row'] == self.qbert_row and enemy['col'] == self.qbert_col:
                 if enemy['type'] in ['slick', 'sam']:
                     # Catching Slick/Sam gives points
                     self.enemies.remove(enemy)
                     self.score += 300
-                else:
-                    # Coily kills Q*bert
+                elif enemy['type'] == 'green_ball':
+                    # Green ball: points + freeze all enemies
+                    self.enemies.remove(enemy)
+                    self.score += 100
+                    self.freeze_timer = 3.5
+                elif self.freeze_timer <= 0:
+                    # Coily or red ball kills Q*bert (unless frozen)
                     self.player_die()
                     return
 
     def player_die(self):
-        """Handle Q*bert death."""
+        """Q*bert swears; the death resolves after a short pause."""
+        self.swear_timer = 0.8
+
+    def resolve_death(self):
+        """Apply the death after the swear-bubble pause."""
         self.lives -= 1
         if self.lives <= 0:
             self.state = GameState.GAME_OVER
@@ -388,9 +476,8 @@ class QBert(Game):
             self.qbert_col = 0
             self.is_hopping = False
             self.enemies.clear()
-            # Restore discs
-            for disc in self.discs:
-                disc['active'] = True
+            self.enemy_spawn_timer = 0
+            # Used discs do NOT come back — they respawn only on a new level
 
     def next_level(self):
         """Advance to next level."""
@@ -408,8 +495,9 @@ class QBert(Game):
         # Clear enemies
         self.enemies.clear()
         self.enemy_spawn_timer = 0
+        self.freeze_timer = 0.0
 
-        # Restore discs
+        # Restore discs (new level only)
         for disc in self.discs:
             disc['active'] = True
 
@@ -440,6 +528,13 @@ class QBert(Game):
             # Draw Q*bert riding disc to top
             self.draw_qbert_on_disc()
 
+        # Swear bubble beside Q*bert during the death pause
+        if self.swear_timer > 0:
+            qx, qy = self.get_qbert_screen_pos()
+            bx = min(max(qx + 6, 2), 44)
+            by = max(qy - 8, 8)
+            self.display.draw_text_small(bx, by, "@!#?", Colors.WHITE)
+
         # Draw HUD
         self.draw_hud()
 
@@ -448,14 +543,20 @@ class QBert(Game):
         x, y = self.get_cube_screen_pos(row, col)
 
         # Determine colors based on cube state
-        if self.cubes[row][col] == 1:
-            top_color = self.CUBE_TARGET_COLOR
-            left_color = self.CUBE_TARGET_LEFT
-            right_color = self.CUBE_TARGET_RIGHT
-        else:
+        state = self.cubes[row][col]
+        if state == 0:
             top_color = self.CUBE_START_COLOR
             left_color = self.CUBE_SIDE_LEFT
             right_color = self.CUBE_SIDE_RIGHT
+        elif state < self.cube_target():
+            # Intermediate color on 2-hop levels
+            top_color = self.CUBE_MID_COLOR
+            left_color = self.CUBE_MID_LEFT
+            right_color = self.CUBE_MID_RIGHT
+        else:
+            top_color = self.CUBE_TARGET_COLOR
+            left_color = self.CUBE_TARGET_LEFT
+            right_color = self.CUBE_TARGET_RIGHT
 
         # Draw cube top (diamond shape)
         cx = x + self.CUBE_WIDTH // 2
@@ -537,9 +638,27 @@ class QBert(Game):
 
     def draw_enemy(self, enemy):
         """Draw an enemy."""
-        x, y = self.get_cube_screen_pos(enemy['row'], enemy['col'])
-        x += self.CUBE_WIDTH // 2 - 1
-        y -= 1
+        if enemy.get('falling_off'):
+            # Lured Coily plummeting off the pyramid
+            x = int(enemy['fall_x']) + self.CUBE_WIDTH // 2 - 1
+            y = int(enemy['fall_y'])
+        else:
+            x, y = self.get_cube_screen_pos(enemy['row'], enemy['col'])
+            x += self.CUBE_WIDTH // 2 - 1
+            y -= 1
+
+        if enemy['type'] == 'red_ball':
+            self.display.set_pixel(x, y, Colors.RED)
+            self.display.set_pixel(x + 1, y, Colors.RED)
+            self.display.set_pixel(x, y + 1, (180, 0, 0))
+            self.display.set_pixel(x + 1, y + 1, (180, 0, 0))
+            return
+        if enemy['type'] == 'green_ball':
+            self.display.set_pixel(x, y, Colors.GREEN)
+            self.display.set_pixel(x + 1, y, Colors.GREEN)
+            self.display.set_pixel(x, y + 1, (0, 140, 0))
+            self.display.set_pixel(x + 1, y + 1, (0, 140, 0))
+            return
 
         if enemy['type'] == 'coily':
             if enemy.get('is_egg'):
