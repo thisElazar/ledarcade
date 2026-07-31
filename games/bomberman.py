@@ -1,7 +1,8 @@
 """
 Bomberman - Grid-Based Bomb Action
 ==================================
-Place bombs to destroy walls and enemies. Find the exit!
+Place bombs to destroy walls and enemies.
+Clear every enemy to open the exit — before the timer runs out!
 
 Controls:
   Arrow Keys - Move
@@ -17,7 +18,7 @@ class Bomberman(Game):
     description = "Bomb & Blast!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Place bombs on a grid to destroy walls and enemies. Collect power-ups for range, speed, and extra bombs. Bombs chain-react. Clear all enemies to advance.',
+        'desc': 'Place bombs on a grid to destroy walls and enemies. Bombs turn solid once you step off them - you can wall yourself in. Collect power-ups for range, speed, and extra bombs, but blasting a revealed power-up or the exit destroys it and spawns angry reinforcements. Clear all enemies to open the exit, and beat the 200-second timer or a swarm of fast chasers floods the level.',
     }
 
     # Grid dimensions
@@ -84,6 +85,7 @@ class Bomberman(Game):
         self.player_speed = 1  # Tiles per move
         self.move_timer = 0.0
         self.move_delay = 0.18
+        self.spawn_invuln = 0.0  # Contact-kill grace after respawn
 
         # Bomb stats
         self.max_bombs = 1
@@ -223,16 +225,28 @@ class Bomberman(Game):
         self.active_bombs = []
         self.explosions = []
 
+        # Stage timer — expiry floods the level with fast chasers
+        self.stage_timer = 200.0
+        self.time_up = False
+
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
             return
 
         self.anim_timer += dt
+        if self.spawn_invuln > 0:
+            self.spawn_invuln -= dt
 
         # Animation
         if self.anim_timer > 0.15:
             self.anim_timer = 0
             self.player_frame = (self.player_frame + 1) % 2
+
+        # Stage timer — when it expires, a swarm of fast chasers takes over
+        self.stage_timer -= dt
+        if self.stage_timer <= 0 and not self.time_up:
+            self.time_up = True
+            self.spawn_time_up_swarm()
 
         # Update move timer
         self.move_timer += dt
@@ -263,8 +277,9 @@ class Bomberman(Game):
                     # Check powerup pickup
                     self.check_powerup_pickup()
 
-                    # Check exit
-                    if self.exit_revealed and new_x == self.exit_x and new_y == self.exit_y:
+                    # Check exit — only open once every enemy is dead
+                    if (self.exit_revealed and not self.enemies
+                            and new_x == self.exit_x and new_y == self.exit_y):
                         self.next_level()
                         return
 
@@ -292,6 +307,10 @@ class Bomberman(Game):
         """Check if player can move to position."""
         if x < 0 or x >= self.GRID_WIDTH or y < 0 or y >= self.GRID_HEIGHT:
             return False
+        # Solidified bombs block movement (see update_bombs)
+        for bomb in self.active_bombs:
+            if bomb['solid'] and bomb['x'] == x and bomb['y'] == y:
+                return False
         tile = self.grid[y][x]
         # Can walk on empty, exit, powerups
         if tile in [self.EMPTY, self.EXIT, self.POWERUP_BOMB, self.POWERUP_FIRE, self.POWERUP_SPEED]:
@@ -314,6 +333,7 @@ class Bomberman(Game):
             'x': self.player_x,
             'y': self.player_y,
             'timer': 3.0,  # 3 seconds until explosion
+            'solid': False,  # Becomes solid once the player steps off it
         })
 
     def update_bombs(self, dt: float):
@@ -321,6 +341,11 @@ class Bomberman(Game):
         bombs_to_explode = []
 
         for bomb in self.active_bombs:
+            # A bomb solidifies the moment the player leaves its tile —
+            # place carelessly and you can trap yourself
+            if not bomb['solid'] and (bomb['x'] != self.player_x
+                                      or bomb['y'] != self.player_y):
+                bomb['solid'] = True
             bomb['timer'] -= dt
             if bomb['timer'] <= 0:
                 bombs_to_explode.append(bomb)
@@ -387,6 +412,15 @@ class Bomberman(Game):
 
         # Temporarily mark as explosion
         old_tile = self.grid[y][x]
+
+        # Retaliation: flame touching the exit or a revealed power-up spawns
+        # enemies around it — and power-ups are destroyed for good
+        if old_tile == self.EXIT or old_tile in (
+                self.POWERUP_BOMB, self.POWERUP_FIRE, self.POWERUP_SPEED):
+            self.spawn_retaliation(x, y)
+            if old_tile != self.EXIT:
+                old_tile = self.EMPTY
+
         self.grid[y][x] = self.EXPLOSION
 
         self.explosions.append({
@@ -395,6 +429,51 @@ class Bomberman(Game):
             'timer': 0.5,
             'old_tile': old_tile if old_tile not in [self.EXPLOSION, self.BOMB] else self.EMPTY,
         })
+
+    def spawn_retaliation(self, x, y):
+        """Spawn punishment enemies around a blasted exit or power-up."""
+        count = max(0, min(6, 10 - len(self.enemies)))
+        spots = []
+        for dy in range(-3, 4):
+            for dx in range(-3, 4):
+                nx, ny = x + dx, y + dy
+                if (0 < nx < self.GRID_WIDTH - 1
+                        and 0 < ny < self.GRID_HEIGHT - 1
+                        and self.grid[ny][nx] == self.EMPTY
+                        and (nx, ny) != (self.player_x, self.player_y)):
+                    spots.append((nx, ny))
+        random.shuffle(spots)
+        for ex, ey in spots[:count]:
+            self.enemies.append({
+                'x': ex,
+                'y': ey,
+                'move_timer': 0.0,
+                'move_delay': self.enemy_base_delay * 0.6,
+                'direction': random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)]),
+                'type': self.ENEMY_TYPE_FAST,
+            })
+
+    def spawn_time_up_swarm(self):
+        """Timer expired — replace all enemies with a swarm of fast chasers."""
+        self.enemies = []
+        count = random.randint(8, 10)
+        spots = []
+        for y in range(1, self.GRID_HEIGHT - 1):
+            for x in range(1, self.GRID_WIDTH - 1):
+                if (self.grid[y][x] == self.EMPTY
+                        and abs(x - self.player_x) + abs(y - self.player_y) > 4):
+                    spots.append((x, y))
+        random.shuffle(spots)
+        for ex, ey in spots[:count]:
+            self.enemies.append({
+                'x': ex,
+                'y': ey,
+                'move_timer': random.random() * 0.2,
+                'move_delay': self.enemy_base_delay * 0.5,
+                'direction': random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)]),
+                'type': self.ENEMY_TYPE_CHASER,
+                'rage': True,
+            })
 
     def update_explosions(self, dt: float):
         """Update explosion timers."""
@@ -430,6 +509,13 @@ class Bomberman(Game):
 
     def update_enemies(self, dt: float):
         """Update enemy movement with different behaviors based on type."""
+        # Lingering flames kill — walking into an explosion tile is fatal,
+        # not just being there at the detonation instant
+        for enemy in self.enemies[:]:
+            if self.grid[enemy['y']][enemy['x']] == self.EXPLOSION:
+                self.enemies.remove(enemy)
+                self.score += 100
+
         for enemy in self.enemies:
             enemy['move_timer'] += dt
 
@@ -530,6 +616,8 @@ class Bomberman(Game):
 
     def check_enemy_collision(self):
         """Check if player collides with enemy."""
+        if self.spawn_invuln > 0:
+            return
         for enemy in self.enemies:
             if enemy['x'] == self.player_x and enemy['y'] == self.player_y:
                 self.player_die()
@@ -607,13 +695,19 @@ class Bomberman(Game):
                     else:
                         self.display.set_pixel(px + dx, py + dy, self.EXPLOSION_COLOR)
         elif tile == self.EXIT:
-            # Exit door
+            # Exit door — dim gray until every enemy is dead
+            if self.enemies:
+                frame_color = (110, 110, 110)
+                fill_color = (55, 55, 55)
+            else:
+                frame_color = self.EXIT_COLOR
+                fill_color = (60, 120, 60)
             for dy in range(self.TILE_SIZE):
                 for dx in range(self.TILE_SIZE):
                     if dx == 0 or dx == self.TILE_SIZE - 1 or dy == 0:
-                        self.display.set_pixel(px + dx, py + dy, self.EXIT_COLOR)
+                        self.display.set_pixel(px + dx, py + dy, frame_color)
                     else:
-                        self.display.set_pixel(px + dx, py + dy, (60, 120, 60))
+                        self.display.set_pixel(px + dx, py + dy, fill_color)
         elif tile == self.POWERUP_BOMB:
             self.draw_powerup(px, py, self.POWERUP_BOMB_COLOR)
         elif tile == self.POWERUP_FIRE:
@@ -660,7 +754,10 @@ class Bomberman(Game):
 
         # Get enemy color based on type
         enemy_type = enemy.get('type', self.ENEMY_TYPE_RANDOM)
-        if enemy_type == self.ENEMY_TYPE_CHASER:
+        if enemy.get('rage'):
+            # Time-up swarm — angry red flash
+            color = (255, 60, 60) if self.player_frame == 0 else (255, 170, 170)
+        elif enemy_type == self.ENEMY_TYPE_CHASER:
             color = self.ENEMY_CHASER_COLOR
         elif enemy_type == self.ENEMY_TYPE_FAST:
             color = self.ENEMY_FAST_COLOR
@@ -708,6 +805,11 @@ class Bomberman(Game):
         """Draw the heads-up display."""
         # Score
         self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
+
+        # Stage timer
+        t = max(0, int(self.stage_timer))
+        timer_color = Colors.RED if t < 30 else Colors.WHITE
+        self.display.draw_text_small(21, 1, f"{t}", timer_color)
 
         # Level
         self.display.draw_text_small(35, 1, f"L{self.level}", Colors.YELLOW)
