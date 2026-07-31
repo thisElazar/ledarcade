@@ -18,14 +18,16 @@ class Galaga(Game):
     description = "Shoot the aliens!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Fixed-position shooter. Move left/right and fire at alien formations. Survive waves of diving attacks.',
+        'desc': 'Fixed-position shooter. Enemies swoop in along entrance arcs, form up, then dive — and dodged divers loop back into formation. Bosses take two hits and can trap your ship in a tractor beam; shoot the captor while it dives to free the ship and fight as a dual fighter. Every 4th level from level 3 is a no-fire bonus challenge stage.',
     }
 
     # Player constants
     PLAYER_Y = 58
     PLAYER_SPEED = 34.0
-    FIRE_COOLDOWN = 0.25
-    MAX_BULLETS = 3
+    MAX_BULLETS = 2
+
+    # In-flight (diver/entrant) kill scores by type
+    DIVE_SCORES = {'bee': 100, 'butterfly': 160, 'boss': 400}
 
     # Enemy constants
     FORMATION_TOP = 10
@@ -46,7 +48,6 @@ class Galaga(Game):
 
         # Player state
         self.player_x = 32.0
-        self.fire_cooldown = 0
 
         # Bullets (player): list of {x, y}
         self.bullets = []
@@ -54,24 +55,20 @@ class Galaga(Game):
         # Enemy bullets
         self.enemy_bullets = []
 
-        # Enemies in formation: dict of (col, row) -> {type, alive, x, y}
-        self.formation = {}
-        self.setup_formation()
-
         # Formation movement
         self.formation_offset_x = 0.0
         self.formation_dir = 1
         self.formation_speed = 8.0
         self.formation_time = 0
 
-        # Diving enemies: list of {x, y, type, angle, speed, path_index, path}
-        self.divers = []
-        self.dive_timer = 0
+        # Dive timing
         self.dive_interval = 2.0  # Seconds between dive attacks
 
         # Captured ship state
-        self.captured_ship = None
         self.has_dual_ship = False
+
+        # Formation slots, divers, entrance choreography, challenge state
+        self._setup_wave()
 
         # Animation
         self.anim_frame = 0
@@ -97,10 +94,111 @@ class Galaga(Game):
 
                 self.formation[(col, row)] = {
                     'type': enemy_type,
-                    'alive': True,
+                    'alive': False,  # Slots fill as enemies fly their entrance
+                    'hp': 2 if enemy_type == 'boss' else 1,
+                    'captured': False,  # Boss holding a captured fighter
                     'base_x': start_x + col * self.ENEMY_SPACING_X,
                     'base_y': self.FORMATION_TOP + row * self.ENEMY_SPACING_Y,
                 }
+
+    def _setup_wave(self):
+        """Set up formation slots and entrance choreography for this level."""
+        self.challenge = self.level >= 3 and (self.level - 3) % 4 == 0
+        self.setup_formation()
+        self.divers = []
+        self.enemy_bullets = []
+        self.entrants = []
+        self.spawn_queue = []
+        self.entry_timer = 0.0
+        self.dive_timer = 0
+
+        if self.challenge:
+            # Challenging stage: 5 flights of 8 fly through and exit — no
+            # formation, no enemy fire. 1000 per wiped flight, 10000 perfect.
+            flight_types = ['bee', 'butterfly', 'bee', 'butterfly', 'boss']
+            self.flight_remaining = [8] * 5
+            self.flight_kills = [0] * 5
+            for f in range(5):
+                side = 1 if f % 2 == 0 else -1
+                for i in range(8):
+                    self.spawn_queue.append({
+                        'delay': f * 3.0 + i * 0.25,
+                        'side': side, 'type': flight_types[f],
+                        'col': None, 'row': None, 'flight': f,
+                    })
+        else:
+            # Entrance: 4 mirrored streams of 8 (one per formation row), each
+            # enemy peeling off the arc to its own slot
+            for row in range(self.FORMATION_ROWS):
+                side = 1 if row % 2 == 0 else -1
+                for i, col in enumerate(range(self.FORMATION_COLS)):
+                    self.spawn_queue.append({
+                        'delay': row * 2.4 + i * 0.22,
+                        'side': side, 'type': self.formation[(col, row)]['type'],
+                        'col': col, 'row': row, 'flight': None,
+                    })
+
+    def _entrance_pos(self, side: int, t: float) -> tuple:
+        """Point along the mirrored entrance arc (side=+1 right, -1 left):
+        swoop in from the top edge, then half-loop back up mid-screen."""
+        if t < 0.4:
+            u = t / 0.4
+            return 32 + side * (34 - 26 * u), -4.0 + 44 * u
+        u = (t - 0.4) / 0.6
+        cx, cy, r = 32 + side * 8, 30.0, 10.0
+        a = math.pi * (0.5 + u)
+        return cx + side * r * math.cos(a), cy + r * math.sin(a)
+
+    def _update_entrants(self, dt: float):
+        """Spawn queued enemies and fly them along their entrance arcs."""
+        if self.spawn_queue:
+            self.entry_timer += dt
+            while self.spawn_queue and self.spawn_queue[0]['delay'] <= self.entry_timer:
+                spec = self.spawn_queue.pop(0)
+                x, y = self._entrance_pos(spec['side'], 0.0)
+                self.entrants.append({
+                    'x': x, 'y': y, 't': 0.0,
+                    'side': spec['side'], 'type': spec['type'],
+                    'col': spec['col'], 'row': spec['row'],
+                    'flight': spec['flight'], 'phase': 'arc',
+                    'hp': 2 if spec['type'] == 'boss' else 1,
+                })
+
+        for ent in self.entrants[:]:
+            if ent['phase'] == 'arc':
+                ent['t'] += dt * 0.55
+                ent['x'], ent['y'] = self._entrance_pos(ent['side'], min(ent['t'], 1.0))
+                if ent['t'] >= 1.0:
+                    ent['phase'] = 'exit' if ent['flight'] is not None else 'to_slot'
+            elif ent['phase'] == 'to_slot':
+                tx, ty = self.get_formation_pos(ent['col'], ent['row'])
+                dx, dy = tx - ent['x'], ty - ent['y']
+                dist = math.hypot(dx, dy)
+                if dist < 2:
+                    slot = self.formation[(ent['col'], ent['row'])]
+                    slot['alive'] = True
+                    slot['hp'] = ent['hp']
+                    self.entrants.remove(ent)
+                else:
+                    step = 45 * dt
+                    ent['x'] += dx / dist * step
+                    ent['y'] += dy / dist * step
+            else:  # 'exit' — challenge flights climb off the top
+                ent['x'] += -ent['side'] * 30 * dt
+                ent['y'] -= 35 * dt
+                if ent['y'] < -4:
+                    self.entrants.remove(ent)
+                    self._flight_resolved(ent['flight'], killed=False)
+
+    def _flight_resolved(self, flight, killed: bool):
+        """Track challenge-flight results; bonus for wiping a full flight."""
+        if flight is None:
+            return
+        self.flight_remaining[flight] -= 1
+        if killed:
+            self.flight_kills[flight] += 1
+        if self.flight_remaining[flight] == 0 and self.flight_kills[flight] == 8:
+            self.score += 1000
 
     def get_formation_pos(self, col: int, row: int) -> tuple:
         """Get current screen position of formation slot."""
@@ -134,15 +232,15 @@ class Galaga(Game):
             self.player_x -= self.PLAYER_SPEED * dt
         if input_state.right:
             self.player_x += self.PLAYER_SPEED * dt
-        self.player_x = max(3, min(60, self.player_x))
+        # Dual fighter sits at +6, so keep both ships on the field
+        max_x = 55 if self.has_dual_ship else 60
+        self.player_x = max(3, min(max_x, self.player_x))
 
-        # Firing
-        self.fire_cooldown -= dt
-        if (input_state.action_l_held or input_state.action_r_held) and self.fire_cooldown <= 0 and len(self.bullets) < self.MAX_BULLETS:
+        # Firing: one shot per button press, classic two-shot limit
+        if (input_state.action_l or input_state.action_r) and len(self.bullets) < self.MAX_BULLETS:
             self.bullets.append({'x': self.player_x, 'y': self.PLAYER_Y - 2})
             if self.has_dual_ship:
                 self.bullets.append({'x': self.player_x + 6, 'y': self.PLAYER_Y - 2})
-            self.fire_cooldown = self.FIRE_COOLDOWN
 
         # Update bullets
         for bullet in self.bullets:
@@ -161,11 +259,15 @@ class Galaga(Game):
         oscillation_amplitude = 6 + min(self.level, 5)  # Wider sway at higher levels (max +5)
         self.formation_offset_x = math.sin(self.formation_time * oscillation_speed) * oscillation_amplitude
 
-        # Dive attack timing
-        self.dive_timer += dt
-        if self.dive_timer >= self.dive_interval and self.count_alive() > 0:
-            self.dive_timer = 0
-            self.start_dive_attack()
+        # Entrance choreography / challenge flights
+        self._update_entrants(dt)
+
+        # Dive attack timing (waits until the entrance is complete)
+        if not self.spawn_queue and not self.entrants and not self.challenge:
+            self.dive_timer += dt
+            if self.dive_timer >= self.dive_interval and self.count_alive() > 0:
+                self.dive_timer = 0
+                self.start_dive_attack()
 
         # Update divers
         self.update_divers(dt)
@@ -180,25 +282,51 @@ class Galaga(Game):
                     continue
                 ex, ey = self.get_formation_pos(col, row)
                 if abs(bx - ex) < 4 and abs(by - ey) < 4:
-                    enemy['alive'] = False
                     if bullet in self.bullets:
                         self.bullets.remove(bullet)
-                    self.score += 50 if enemy['type'] == 'bee' else 80 if enemy['type'] == 'butterfly' else 150
+                    enemy['hp'] -= 1
+                    if enemy['hp'] <= 0:
+                        enemy['alive'] = False
+                        enemy['captured'] = False
+                        self.score += 50 if enemy['type'] == 'bee' else 80 if enemy['type'] == 'butterfly' else 150
                     break
+            if bullet not in self.bullets:
+                continue
 
             # Check divers
             for diver in self.divers[:]:
                 if abs(bx - diver['x']) < 4 and abs(by - diver['y']) < 4:
-                    self.divers.remove(diver)
                     if bullet in self.bullets:
                         self.bullets.remove(bullet)
-                    self.score += 100
+                    diver['hp'] -= 1
+                    if diver['hp'] <= 0:
+                        self.divers.remove(diver)
+                        self.score += self.DIVE_SCORES.get(diver['type'], 100)
+                        if diver.get('has_captured'):
+                            # Freed the captured fighter — dual ship!
+                            self.has_dual_ship = True
+                    break
+            if bullet not in self.bullets:
+                continue
+
+            # Check entering enemies (entrance arcs / challenge flights)
+            for ent in self.entrants[:]:
+                if abs(bx - ent['x']) < 4 and abs(by - ent['y']) < 4:
+                    if bullet in self.bullets:
+                        self.bullets.remove(bullet)
+                    ent['hp'] -= 1
+                    if ent['hp'] <= 0:
+                        self.entrants.remove(ent)
+                        self.score += self.DIVE_SCORES.get(ent['type'], 100)
+                        self._flight_resolved(ent['flight'], killed=True)
                     break
 
-        # Collision: enemy bullets vs player
+        # Collision: enemy bullets vs player (dual covers both ships)
         if self.invincible <= 0:
             for bullet in self.enemy_bullets[:]:
-                if abs(bullet['x'] - self.player_x) < 3 and abs(bullet['y'] - self.PLAYER_Y) < 3:
+                bdx = bullet['x'] - self.player_x
+                in_x = (-3 < bdx < 8) if self.has_dual_ship else abs(bdx) < 3
+                if in_x and abs(bullet['y'] - self.PLAYER_Y) < 3:
                     self.player_hit()
                     self.enemy_bullets.remove(bullet)
                     break
@@ -211,8 +339,11 @@ class Galaga(Game):
                     self.divers.remove(diver)
                     break
 
-        # Check level complete
-        if self.count_alive() == 0 and len(self.divers) == 0:
+        # Check level complete (challenge stages end when all flights resolve)
+        if (self.count_alive() == 0 and not self.divers and
+                not self.entrants and not self.spawn_queue):
+            if self.challenge and all(k == 8 for k in self.flight_kills):
+                self.score += 10000  # Perfect challenge stage
             self.next_level()
 
     def start_dive_attack(self):
@@ -229,20 +360,30 @@ class Galaga(Game):
 
         for col, row, enemy in chosen:
             ex, ey = self.get_formation_pos(col, row)
-            enemy['alive'] = False  # Remove from formation
+            enemy['alive'] = False  # Leaves formation while diving
 
             # Create dive path toward player then loop back
             # Diver speed scales with level, capped for playability
             diver_speed = min(75, 30 + self.level * 6)  # Faster dive speed, capped at 75
-            self.divers.append({
+            diver = {
                 'x': ex,
                 'y': ey,
+                'col': col,  # Remembers its slot so it can rejoin
+                'row': row,
                 'type': enemy['type'],
-                'phase': 'dive',  # dive, attack, return
+                'phase': 'dive',  # dive, beam, attack, return
                 'speed': diver_speed,
                 'target_x': self.player_x,
+                'hp': enemy['hp'],
+                'has_captured': enemy['captured'],
                 'shoot_timer': random.uniform(0.3, 1.2 - min(self.level * 0.05, 0.5)),  # Shoot more often at higher levels
-            })
+            }
+            # Bosses may stop mid-dive and fire a tractor beam
+            if (enemy['type'] == 'boss' and not diver['has_captured']
+                    and not self.has_dual_ship and random.random() < 0.4):
+                diver['will_beam'] = True
+            enemy['captured'] = False
+            self.divers.append(diver)
 
     def update_divers(self, dt: float):
         """Update diving enemies."""
@@ -265,9 +406,29 @@ class Galaga(Game):
                     max_interval = max(0.8, 1.5 - self.level * 0.06)
                     diver['shoot_timer'] = random.uniform(min_interval, max_interval)
 
+                # Bosses may stop mid-dive and fire the tractor beam
+                if diver.get('will_beam') and diver['y'] >= 36:
+                    diver['phase'] = 'beam'
+                    diver['beam_timer'] = 1.5
                 # Switch to attack phase near player level
-                if diver['y'] >= self.PLAYER_Y - 10:
+                elif diver['y'] >= self.PLAYER_Y - 10:
                     diver['phase'] = 'attack'
+
+            elif diver['phase'] == 'beam':
+                # Hover and sweep an expanding tractor cone below
+                diver['beam_timer'] -= dt
+                spread = 1.0 - max(diver['beam_timer'], 0) / 1.5
+                half_w = 2 + 8 * spread
+                if (self.invincible <= 0 and spread > 0.3 and
+                        abs(self.player_x - diver['x']) < half_w):
+                    # Caught in the beam: fighter is captured, boss carries it
+                    self.player_hit()
+                    if self.state == GameState.PLAYING:
+                        diver['has_captured'] = True
+                    diver['beam_timer'] = 0
+                if diver['beam_timer'] <= 0:
+                    diver['will_beam'] = False
+                    diver['phase'] = 'return'
 
             elif diver['phase'] == 'attack':
                 # Swoop across
@@ -280,15 +441,21 @@ class Galaga(Game):
                     diver['y'] = -5
 
             elif diver['phase'] == 'return':
-                # Return to formation area
-                diver['y'] += speed * 0.8 * dt
-                target_x = 32 + random.uniform(-10, 10)
-                dx = target_x - diver['x']
-                diver['x'] += math.copysign(min(abs(dx), speed * dt), dx)
-
-                # Rejoin formation or disappear if at top
-                if diver['y'] >= self.FORMATION_TOP:
+                # Fly back to this enemy's own slot and rejoin the formation
+                tx, ty = self.get_formation_pos(diver['col'], diver['row'])
+                dx = tx - diver['x']
+                dy = ty - diver['y']
+                dist = math.hypot(dx, dy)
+                if dist < 2:
+                    slot = self.formation[(diver['col'], diver['row'])]
+                    slot['alive'] = True
+                    slot['hp'] = diver['hp']
+                    slot['captured'] = diver.get('has_captured', False)
                     self.divers.remove(diver)
+                else:
+                    step = speed * 0.8 * dt
+                    diver['x'] += dx / dist * step
+                    diver['y'] += dy / dist * step
 
     def player_hit(self):
         """Handle player getting hit."""
@@ -305,9 +472,7 @@ class Galaga(Game):
         """Advance to next level."""
         self.level += 1
         self.dive_interval = max(1.0, 2.0 - self.level * 0.1)
-        self.setup_formation()
-        self.divers = []
-        self.enemy_bullets = []
+        self._setup_wave()
 
     def draw(self):
         self.display.clear(Colors.BLACK)
@@ -324,11 +489,21 @@ class Galaga(Game):
         for (col, row), enemy in self.formation.items():
             if enemy['alive']:
                 x, y = self.get_formation_pos(col, row)
-                self.draw_enemy(int(x), int(y), enemy['type'])
+                self.draw_enemy(int(x), int(y), enemy['type'], enemy['hp'])
+                if enemy['captured']:
+                    self._draw_captured_ship(int(x), int(y) - 3)
 
-        # Draw divers
+        # Draw divers (and any active tractor beam)
         for diver in self.divers:
-            self.draw_enemy(int(diver['x']), int(diver['y']), diver['type'])
+            if diver['phase'] == 'beam':
+                self._draw_beam(diver)
+            self.draw_enemy(int(diver['x']), int(diver['y']), diver['type'], diver['hp'])
+            if diver.get('has_captured'):
+                self._draw_captured_ship(int(diver['x']), int(diver['y']) - 3)
+
+        # Draw entering enemies
+        for ent in self.entrants:
+            self.draw_enemy(int(ent['x']), int(ent['y']), ent['type'], ent['hp'])
 
         # Draw bullets
         for bullet in self.bullets:
@@ -366,11 +541,30 @@ class Galaga(Game):
         self.display.set_pixel(x + 1, y, Colors.WHITE)
         self.display.set_pixel(x + 2, y, Colors.CYAN)
 
-    def draw_enemy(self, x: int, y: int, enemy_type: str):
+    def _draw_beam(self, diver):
+        """Expanding cyan/yellow tractor cone below a beaming boss."""
+        bx = int(diver['x'])
+        top = int(diver['y']) + 2
+        spread = 1.0 - max(diver['beam_timer'], 0) / 1.5
+        for sy in range(top, self.PLAYER_Y + 1):
+            frac = (sy - top) / max(1, self.PLAYER_Y - top)
+            half_w = int((2 + 8 * spread) * frac)
+            color = Colors.CYAN if (sy + self.anim_frame) % 2 == 0 else Colors.YELLOW
+            self.display.set_pixel(bx - half_w, sy, color)
+            self.display.set_pixel(bx + half_w, sy, color)
+
+    def _draw_captured_ship(self, x: int, y: int):
+        """Small red fighter carried by a boss."""
+        self.display.set_pixel(x, y - 1, Colors.RED)
+        self.display.set_pixel(x - 1, y, Colors.RED)
+        self.display.set_pixel(x, y, Colors.RED)
+        self.display.set_pixel(x + 1, y, Colors.RED)
+
+    def draw_enemy(self, x: int, y: int, enemy_type: str, hp: int = 2):
         """Draw an enemy."""
         if enemy_type == 'boss':
-            # Green boss with wings
-            color = Colors.GREEN
+            # Green boss with wings (turns blue after the first hit)
+            color = Colors.GREEN if hp >= 2 else Colors.BLUE
             self.display.set_pixel(x, y - 1, color)
             self.display.set_pixel(x - 1, y, color)
             self.display.set_pixel(x, y, Colors.WHITE)
