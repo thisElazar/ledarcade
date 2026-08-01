@@ -496,9 +496,11 @@ class MsPacMan(Game):
         fx, fy = self.fruit['x'], self.fruit['y']
         tile_x, tile_y = int(round(fx)), int(round(fy))
 
-        # At tile center, pick a new direction
+        # At tile center, pick a new direction (once per tile — re-snapping
+        # every frame stalls the fruit when the per-frame step is < 0.1)
         at_center = abs(fx - tile_x) < 0.1 and abs(fy - tile_y) < 0.1
-        if at_center:
+        if at_center and self.fruit.get('decided_tile') != (tile_x, tile_y):
+            self.fruit['decided_tile'] = (tile_x, tile_y)
             self.fruit['x'] = float(tile_x)
             self.fruit['y'] = float(tile_y)
             fx, fy = self.fruit['x'], self.fruit['y']
@@ -695,9 +697,13 @@ class MsPacMan(Game):
         if not ghost['eaten'] and tile_y in self.tunnel_rows and (tile_x <= 2 or tile_x >= 18):
             speed *= 0.55
 
+        # Decide only once per tile: at slow speeds (tunnel/frightened) the
+        # per-frame step is smaller than the snap window, and re-snapping
+        # every frame stalls the ghost on the tile center forever.
         at_center = abs(gx - tile_x) < 0.1 and abs(gy - tile_y) < 0.1
 
-        if at_center:
+        if at_center and ghost.get('decided_tile') != (tile_x, tile_y):
+            ghost['decided_tile'] = (tile_x, tile_y)
             ghost['x'] = float(tile_x)
             ghost['y'] = float(tile_y)
             gx, gy = ghost['x'], ghost['y']
@@ -756,8 +762,10 @@ class MsPacMan(Game):
                 ghost['x'] = new_x
                 ghost['y'] = new_y
             else:
+                # Stop at tile center; re-decide next frame
                 ghost['x'] = round(ghost['x'])
                 ghost['y'] = round(ghost['y'])
+                ghost['decided_tile'] = None
 
         # Tunnel wrap
         if ghost['x'] < 0:

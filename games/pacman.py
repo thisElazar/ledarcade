@@ -440,10 +440,14 @@ class PacMan(Game):
         if not ghost['eaten'] and tile_y == 9 and (tile_x <= 2 or tile_x >= 18):
             speed *= 0.55
 
-        # Check if at tile center (for direction decisions)
+        # Check if at tile center (for direction decisions). Decide only once
+        # per tile: at slow speeds (tunnel/frightened) the per-frame step is
+        # smaller than the snap window, and re-snapping every frame stalls
+        # the ghost on the tile center forever.
         at_center = abs(gx - tile_x) < 0.1 and abs(gy - tile_y) < 0.1
 
-        if at_center:
+        if at_center and ghost.get('decided_tile') != (tile_x, tile_y):
+            ghost['decided_tile'] = (tile_x, tile_y)
             # Snap to center
             ghost['x'] = float(tile_x)
             ghost['y'] = float(tile_y)
@@ -509,9 +513,10 @@ class PacMan(Game):
                 ghost['x'] = new_x
                 ghost['y'] = new_y
             else:
-                # Stop at tile center
+                # Stop at tile center; re-decide next frame
                 ghost['x'] = round(ghost['x'])
                 ghost['y'] = round(ghost['y'])
+                ghost['decided_tile'] = None
 
         # Tunnel wrap
         if ghost['x'] < 0:
