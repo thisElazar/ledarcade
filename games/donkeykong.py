@@ -504,10 +504,15 @@ class DonkeyKong(Game):
 
         for barrel in self.barrels:
             if barrel.get('oil'):
-                # First barrel of a life: rolls diagonally into the oil drum
-                # and ignites a fireball
-                barrel['y'] += self.BARREL_SPEED * dt * 2.0
-                barrel['x'] -= self.BARREL_SPEED * dt * 0.7
+                # First barrel of a life: DK rolls it left along the top,
+                # then it drops down the screen edge into the oil drum and
+                # ignites a fireball. Harmless choreography — it must not
+                # dive-bomb Mario, who spawns beside the drum.
+                if barrel['x'] > self.oil_x + 2:
+                    barrel['x'] -= self.BARREL_SPEED * dt * 2.0
+                    barrel['y'] += self.BARREL_SPEED * dt * 0.3
+                else:
+                    barrel['y'] += self.BARREL_SPEED * dt * 2.5
                 if barrel['y'] + self.BARREL_SIZE >= self.oil_y:
                     barrels_to_remove.append(barrel)
                     self.spawn_fireball()
@@ -620,6 +625,9 @@ class DonkeyKong(Game):
         )
 
         for barrel in self.barrels[:]:  # Copy list to allow removal
+            if barrel.get('oil'):
+                # The scripted drum-delivery barrel is scenery, not a hazard
+                continue
             barrel_rect = (
                 barrel['x'], barrel['y'],
                 self.BARREL_SIZE, self.BARREL_SIZE
@@ -672,12 +680,17 @@ class DonkeyKong(Game):
             'ladder': None,
             'decide_timer': random.uniform(1.0, 2.5),
             'flicker': 0.0,
+            # Harmless while igniting — the drum sits beside Mario's spawn,
+            # so an instantly-lethal fireball would spawn-kill an idle player
+            'ignite': 1.5,
         })
 
     def update_fireballs(self, dt: float):
         """Fireballs random-walk girders and climb ladders."""
         for fb in self.fireballs:
             fb['flicker'] += dt
+            if fb.get('ignite', 0) > 0:
+                fb['ignite'] -= dt
 
             if fb['on_ladder']:
                 fb['y'] += fb['climb_dir'] * self.FIREBALL_SPEED * dt
@@ -728,6 +741,8 @@ class DonkeyKong(Game):
             self.PLAYER_WIDTH, self.PLAYER_HEIGHT
         )
         for fb in self.fireballs[:]:
+            if fb.get('ignite', 0) > 0 and not self.has_hammer:
+                continue  # still igniting — harmless (but hammerable)
             if self.rect_overlap(player_rect, (fb['x'], fb['y'], 2, 2)):
                 if self.has_hammer:
                     self.fireballs.remove(fb)
@@ -951,6 +966,14 @@ class DonkeyKong(Game):
         """Draw a 2x2 flickering fireball."""
         x, y = int(fb['x']), int(fb['y'])
         hot = int(fb['flicker'] * 12) % 2 == 0
+        if fb.get('ignite', 0) > 0:
+            # Igniting: dim ember, only the top pixels sputter
+            c = Colors.RED if hot else (100, 40, 0)
+            self.display.set_pixel(x, y + 1, c)
+            self.display.set_pixel(x + 1, y + 1, c)
+            if hot:
+                self.display.set_pixel(x, y, (100, 40, 0))
+            return
         c1 = Colors.ORANGE if hot else Colors.YELLOW
         c2 = Colors.RED if hot else Colors.ORANGE
         self.display.set_pixel(x, y, c1)
