@@ -147,7 +147,7 @@ class Bowling(Game):
     description = "10-pin bowling with position and aim"
     category = "bar"
     GUIDE = {
-        'desc': 'Ten-pin bowling. Time your release and aim your angle. Standard scoring — strikes, spares, and splits over 10 frames.',
+        'desc': 'Ten-pin bowling. Time your release and aim your angle. Standard scoring — strikes and spares over 10 frames, bonus balls in the tenth.',
         'how': 'Play solo or against a second player, alternating turns frame by frame. The game ends once all 10 frames are complete for every player, and in two-player mode the higher total score wins.',
         'legend': {
             'F#': 'Current frame, out of 10.',

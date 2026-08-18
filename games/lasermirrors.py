@@ -640,8 +640,8 @@ class LaserMirrors(Game):
     description = "Redirect the beam"
     category = "unique"
     GUIDE = {
-        'desc': 'Rotate and place mirrors to redirect the laser beam to its target. A puzzle of angles and reflection.',
-        'how': "Rotate and place mirrors to steer the beam onto its target and clear the level; clearing scores 100 points plus 10 for every second still left on the par timer. Levels keep coming and grow harder, later ones adding switches and doors.",
+        'desc': 'Rotate the mirrors to redirect the laser beam to its target. A puzzle of angles and reflection — every level is generated solvable.',
+        'how': "Rotate the mirrors to steer the beam onto its target and clear the level; clearing scores 100 points plus 10 for every second still left on the par timer. Levels keep coming and grow harder, later ones adding switches and doors.",
         'legend': {
             'L#': 'Current level (puzzle) number.',
             'top-right number': 'Your accumulated score across levels.',

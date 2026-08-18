@@ -21,7 +21,7 @@ class Road(Visual):
     description = "Desert drive"
     category = "road_rail"
     GUIDE = {
-        'desc': 'A single road with cars following each other. Car-following models produce stop-and-go waves from nothing — no accident, no bottleneck, just the physics of human reaction times.',
+        'desc': 'A drive down an endless desert two-lane at dusk — dashed centerline, roadside signs and mile markers scrolling past. Adjust speed, look out the side window. (Real traffic-flow simulation lives in HIGHWAY.)',
     }
 
     # Color palette - beautiful desert day

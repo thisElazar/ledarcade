@@ -159,7 +159,7 @@ class Convection(Visual):
 
     # ── Helpers ───────────────────────────────────────────────────
     def _rayleigh(self):
-        """Effective Rayleigh number (simplified, for display)."""
+        """Heating strength shown on the dT overlay (not a real Rayleigh number)."""
         return self.temp_gradient * 10.0
 
     # ── Physics step ─────────────────────────────────────────────
@@ -177,9 +177,9 @@ class Convection(Visual):
         viscosity = 0.0001
         temp_diffusion = 0.0002
 
-        # Effective Rayleigh number and buoyancy
+        # Heating knob → buoyancy. NOT a real Rayleigh number (Ra_c is 1708 for
+        # a real layer); this is a display-scaled control with an onset at 5.0.
         Ra = grad * 10.0
-        # Critical Ra ~ 5.0 (gradient ~ 0.5)
         buoyancy = max(0.0, (Ra - 5.0) * 0.08) if Ra > 5.0 else 0.0
 
         # --- Apply buoyancy force (VERTICAL ONLY) ---

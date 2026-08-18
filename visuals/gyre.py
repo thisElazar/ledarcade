@@ -26,7 +26,7 @@ class Gyre(Visual):
     description = "Swirling vortex"
     category = "automata"
     GUIDE = {
-        'desc': 'Rotating vortex patterns driven by simple agent rules. Particles orbit local centers of rotation, forming spirals that merge and split.',
+        'desc': 'A cellular automaton where each quadrant of the grid copies from a different neighbour, so patterns refract at the boundaries and get drawn into swirling spiral gyres. From Rucker & Walker’s CelLab, after an idea of Bill Gosper.',
     }
 
     def __init__(self, display: Display):

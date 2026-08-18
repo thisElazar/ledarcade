@@ -587,10 +587,11 @@ class WindowWasher(Game):
         self.score = 0
         self.level = 1
         self.time = 0.0
-        self.phase = 'title'
-        self.phase_timer = 2.5
 
         self._load_level(1)
+        # After _load_level (which sets phase='playing') so the title shows.
+        self.phase = 'title'
+        self.phase_timer = 2.5
 
     def _load_level(self, level):
         """Set up a new building for the given level."""

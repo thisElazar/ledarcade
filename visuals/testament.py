@@ -419,7 +419,7 @@ class Testament(Visual):
     description = "Sacred scenes"
     category = "culture"
     GUIDE = {
-        'desc': 'Biblical narratives visualized as animated LED scenes. Key moments from Genesis through Revelation rendered in pixel art.',
+        'desc': 'Ambient scenes from the world’s sacred stories — the burning bush, Noah’s ark, the star of Bethlehem, and moments from Hindu, Buddhist, Islamic and Sikh tradition — each a stable, gently animated symbol.',
     }
 
     MAX_PARTICLES = 300

@@ -164,7 +164,7 @@ def _build_group_indices():
 
 # Wavelength range mapped to 64 pixels
 WL_MIN = 380.0
-WL_MAX = 700.0
+WL_MAX = 780.0   # include the deep-red K doublet (766/770 nm)
 
 
 class Spectroscope(Visual):

@@ -376,7 +376,7 @@ class Pinball(Game):
     description = "Scrolling pinball with flippers and bumpers"
     category = "bar"
     GUIDE = {
-        'desc': 'Pinball with flippers, bumpers, ramps, and a plunger. L button controls the left flipper, R button the right. Hit targets to score; don’t let the ball drain.',
+        'desc': 'Pinball with flippers, bumpers, drop targets, rollovers, a spinner and a plunger on a tall scrolling table. L button controls the left flipper, R button the right. Hit targets to score; don’t let the ball drain.',
         'how': 'You get 3 balls; draining the last one ends the game. Bumpers score 500 points apiece, rollover lanes 500, the spinner 75, and slingshots 25. Clearing all 3 drop targets pays a 5,000 point bonus and raises your score multiplier (2x, 3x, 5x, then 10x), while lighting all 3 rollover lanes temporarily upgrades the bumpers to a higher-scoring tier.',
     }
 

@@ -33,13 +33,13 @@ PLATE_COLOR = (20, 20, 25)
 # Planet definitions: name, color, orbital_radius, orbital_period_ratio
 # Using simplified orbital period ratios relative to Mercury (innermost = 1.0)
 # Real ratios: Mercury=1, Venus=2.55, Earth=4.15, Mars=7.8, Jupiter=49, Saturn=122
-# Simplified for visibility on 64x64
+# Periods use the real ratios (radii are compressed to fit 64x64)
 PLANETS = [
     {"name": "Mercury", "color": (180, 180, 180), "radius": 8,  "period": 1.0,    "size": 1},
-    {"name": "Venus",   "color": (230, 200, 150), "radius": 13, "period": 2.5,    "size": 1},
-    {"name": "Earth",   "color": (100, 150, 255), "radius": 18, "period": 4.0,    "size": 2},
-    {"name": "Mars",    "color": (255, 100, 80),  "radius": 23, "period": 7.5,    "size": 1},
-    {"name": "Jupiter", "color": (255, 200, 150), "radius": 28, "period": 20.0,   "size": 3},
+    {"name": "Venus",   "color": (230, 200, 150), "radius": 13, "period": 2.55,    "size": 1},
+    {"name": "Earth",   "color": (100, 150, 255), "radius": 18, "period": 4.15,    "size": 2},
+    {"name": "Mars",    "color": (255, 100, 80),  "radius": 23, "period": 7.8,    "size": 1},
+    {"name": "Jupiter", "color": (255, 200, 150), "radius": 28, "period": 49.0,   "size": 3},
 ]
 
 # Gear definitions for the base mechanism

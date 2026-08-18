@@ -39,7 +39,7 @@ class QuarksLab(Visual):
     description = "Explore Quarks parameter space"
     category = "automata"
     GUIDE = {
-        'desc': "Explore the Quarks automaton's parameter space. The joystick sets particle count and interaction radius, tuning how charge-like cells bond and break.",
+        'desc': "Explore the Quarks automaton's parameter space. Left/Right sets how many roaming hotspots inject energy, Up/Down how far they wander — from a single slow pulse to a field of interfering ripples.",
         'legend': {
             'q=': 'Number of quarks — energy-injecting hotspots driving the automaton.',
             'r=': 'Roam radius — how far each quark hotspot wanders from its base position.',

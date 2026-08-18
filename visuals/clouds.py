@@ -479,7 +479,7 @@ class Clouds(Visual):
     description = "Cloud type reference"
     category = "nature"
     GUIDE = {
-        'desc': 'Procedurally generated clouds drifting across the sky. Perlin noise fields produce layered formations that shift and dissolve.',
+        'desc': 'A field guide to the ten WMO cloud genera plus fog, lenticular and mammatus — each drawn as a pixel sprite at its altitude band, with the standard abbreviation and what weather it brings.',
         'controls': {
             'Button': 'Toggle sky / detail view',
             'Up/Down': 'Cycle cloud type',

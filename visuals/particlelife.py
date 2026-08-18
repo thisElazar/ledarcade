@@ -41,7 +41,7 @@ class ParticleLife(Visual):
     description = "Emergent particles"
     category = "automata"
     GUIDE = {
-        'desc': 'Particle Life variant tuned for drifting, pulsing jellyfish motion. Multiple species with asymmetric attraction and repulsion forces produce bell shapes trailing tentacles.',
+        'desc': 'Particle Life: several species with a random asymmetric attraction/repulsion matrix. Clusters, chasers and drifting membranes emerge — some runs look like jellyfish, every reset is different.',
         'credit': 'Jeffrey Ventrella, 2007',
     }
 
