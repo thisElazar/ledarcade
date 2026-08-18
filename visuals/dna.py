@@ -143,7 +143,7 @@ class DNA(Visual):
             return [
                 ("DEOXYRIBONUCLEIC ACID", (255, 255, 255)),
                 ("A=T  G=C  BASE PAIRING", mid),
-                ("3 BILLION BASE PAIRS PER CELL", mid),
+                ("3 BILLION BASE PAIRS PER GENOME", mid),
                 ("WATSON AND CRICK 1953", (255, 255, 255)),
                 ("ROSALIND FRANKLIN X-RAY DIFFRACTION", mid),
             ]

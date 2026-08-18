@@ -58,8 +58,11 @@ tools/*_preview.png
 tools/*_test*
 tools/pottery_*.png
 
-# Research/experiment docs (not part of runtime)
-docs/
+# Research/experiment docs: markdown + raw experiment data are tracked as
+# provenance for the visuals they back; the paper binaries are not.
+docs/*.pdf
+docs/*.docx
+docs/.DS_Store
 tools/basin_experiment.py
 
 # Session transcripts

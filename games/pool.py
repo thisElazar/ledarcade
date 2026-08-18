@@ -100,7 +100,7 @@ class Pool(Game):
     description = "Billiards with Video Hustler scoring"
     category = "bar"
     GUIDE = {
-        'desc': '8-ball billiards. Aim with the joystick, set power, and shoot. Pocket all your balls (stripes or solids) then sink the 8-ball to win.',
+        'desc': 'Six-ball pool, score attack. Aim with the joystick, set power, and shoot. Every ball you sink scores; clear the table for a bonus. Scratching the cue ball is a foul.',
     }
 
     def __init__(self, display: Display):

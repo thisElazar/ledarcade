@@ -134,7 +134,7 @@ class DonkeyKong(Game):
         self.bonus_tick = 0.0
 
         # Level speed increases with difficulty
-        speed_mult = 1.0 + (self.level - 1) * 0.15
+        self.speed_mult = 1.0 + (self.level - 1) * 0.15
         self.barrel_spawn_rate = max(1.2, 2.5 - (self.level - 1) * 0.3)
 
         if self.board_type == 'rivets':
@@ -509,10 +509,10 @@ class DonkeyKong(Game):
                 # ignites a fireball. Harmless choreography — it must not
                 # dive-bomb Mario, who spawns beside the drum.
                 if barrel['x'] > self.oil_x + 2:
-                    barrel['x'] -= self.BARREL_SPEED * dt * 2.0
-                    barrel['y'] += self.BARREL_SPEED * dt * 0.3
+                    barrel['x'] -= self.BARREL_SPEED * self.speed_mult * dt * 2.0
+                    barrel['y'] += self.BARREL_SPEED * self.speed_mult * dt * 0.3
                 else:
-                    barrel['y'] += self.BARREL_SPEED * dt * 2.5
+                    barrel['y'] += self.BARREL_SPEED * self.speed_mult * dt * 2.5
                 if barrel['y'] + self.BARREL_SIZE >= self.oil_y:
                     barrels_to_remove.append(barrel)
                     self.spawn_fireball()
@@ -520,7 +520,7 @@ class DonkeyKong(Game):
 
             if barrel.get('falling', False):
                 # Barrel is falling between girders
-                barrel['y'] += self.BARREL_SPEED * dt * 3
+                barrel['y'] += self.BARREL_SPEED * self.speed_mult * dt * 3
                 # Only land on girders BELOW where we started falling
                 fall_origin = barrel.get('fall_origin_y', 0)
                 target = self.find_girder_below(barrel['x'], fall_origin + self.BARREL_SIZE)
@@ -537,7 +537,7 @@ class DonkeyKong(Game):
 
             elif barrel['on_ladder']:
                 # Barrel is rolling down a ladder
-                barrel['y'] += self.BARREL_SPEED * dt * 1.5
+                barrel['y'] += self.BARREL_SPEED * self.speed_mult * dt * 1.5
                 # Check if reached bottom of ladder
                 ladder = self.get_ladder_at(barrel['x'], barrel['y'])
                 if ladder is None or barrel['y'] >= ladder['y2'] - 2:
@@ -560,7 +560,7 @@ class DonkeyKong(Game):
 
                 if girder:
                     # Move horizontally
-                    barrel['x'] += barrel['velocity_x'] * self.BARREL_SPEED * dt
+                    barrel['x'] += barrel['velocity_x'] * self.BARREL_SPEED * self.speed_mult * dt
 
                     # Update Y to follow slope
                     new_y = self.get_girder_y_at_x(girder, barrel['x'])

@@ -23,7 +23,7 @@ class Aurora(Visual):
     description = "CelLab flowing paint CA"
     category = "automata"
     GUIDE = {
-        'desc': 'CelLab flowing paint cellular automaton by Rudy Rucker and John Walker. Globby streams of color flow and merge on a ring topology.',
+        'desc': 'Streaks of paint poured from the top edge blur, drift and merge as they run down the grid on a ring topology. Inspired by the flowing-paint rules in Rucker & Walker’s CelLab.',
     }
 
     def __init__(self, display: Display):

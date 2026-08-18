@@ -34,7 +34,7 @@ ATOM_ROWS = GRID_SIZE // ATOM_SIZE  # 16
 # Max active particles (Pi 3 performance)
 MAX_PARTICLES = 180
 
-_SCENARIOS = ['ALPHA DECAY', 'BETA DECAY', 'CHAIN REACTION', 'HALF-LIFE', 'RANDOM MIX']
+_SCENARIOS = ['ALPHA DECAY', 'BETA DECAY', 'CASCADE (DEMO)', 'HALF-LIFE', 'RANDOM MIX']
 
 PALETTES = [
     # Nuclear: green unstable, yellow/orange particles, dark bg
@@ -125,7 +125,7 @@ class Radioactive(Visual):
             ("RADIOACTIVE DECAY", (255, 255, 255)),
             ("ATOMS EMIT ALPHA BETA AND GAMMA", mid),
             ("HALF-LIFE: TIME FOR HALF TO DECAY", mid),
-            ("CHAIN REACTIONS TRIGGER NEIGHBORS", mid),
+            ("INDUCED DECAY: A DEMO, NOT PHYSICS", mid),
             ("HENRI BECQUEREL 1896", (255, 255, 255)),
         ]
 
@@ -209,7 +209,7 @@ class Radioactive(Visual):
             self.particle_types = [BETA]
             self._fill_all_unstable()
 
-        elif scenario == 'CHAIN REACTION':
+        elif scenario == 'CASCADE (DEMO)':
             self.half_life = 999.0  # Natural decay very unlikely
             self.particle_types = [ALPHA, BETA, GAMMA]
             self._fill_all_unstable()
@@ -354,7 +354,7 @@ class Radioactive(Visual):
         self.elapsed += dt
 
         scenario = _SCENARIOS[self.scenario_idx]
-        is_chain = scenario == 'CHAIN REACTION'
+        is_chain = scenario == 'CASCADE (DEMO)'
 
         # -- Decay atoms --
         unstable_count = 0

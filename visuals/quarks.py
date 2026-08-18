@@ -25,7 +25,7 @@ class Quarks(Visual):
     description = "Flowing mandalas"
     category = "automata"
     GUIDE = {
-        'desc': 'Particles with charge-like properties that attract and repel, forming fleeting bonds and structures. Simple local rules produce behavior reminiscent of particle physics.',
+        'desc': 'A heat-diffusion cellular automaton (CelLab’s “Rug” rule — average your neighbours, add one) with roaming “quark” hotspots injecting energy. Smooth mandala-like colour waves ripple out from wherever the hotspots wander.',
     }
 
     def __init__(self, display: Display):

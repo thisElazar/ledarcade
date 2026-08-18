@@ -1,0 +1,1 @@
+{"id": "baseline", "axis": "baseline", "run": 0, "error": "claude CLI error (exit 1): Error: Input must be provided either through stdin or as a prompt argument when using --print\n", "timestamp": "2026-02-14T17:27:05.110871+00:00"}

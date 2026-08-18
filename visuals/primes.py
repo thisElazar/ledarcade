@@ -156,7 +156,7 @@ class Primes(Visual):
         cx, cy = 32, 32
         scale = 1.8
         for n in range(1, min(count + 1, _LIMIT)):
-            angle = n * 2 * math.pi
+            angle = 2 * math.pi * math.sqrt(n)   # Sacks spiral: theta = 2*pi*sqrt(n)
             radius = math.sqrt(n) * scale
             px = int(cx + radius * math.cos(angle))
             py = int(cy - radius * math.sin(angle))

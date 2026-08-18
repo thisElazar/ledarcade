@@ -544,13 +544,13 @@ class ChordChart(Visual):
 
         self._draw_header(d)
         self._draw_fretboard(d)
+        self._draw_strings(d)   # strings under the dots, not through them
         voicing = self._current_voicing()
         if voicing:
             self._draw_nut(d, voicing)
             self._draw_markers(d, voicing)
             self._draw_dots(d, voicing)
             self._draw_barres(d, voicing)
-        self._draw_strings(d)
         self._draw_footer(d, voicing)
 
     def _draw_char(self, d, x, y, char, color):

@@ -166,7 +166,7 @@ class TrashBlaster(Game):
     description = "Blast the trash!"
     category = "retro"
     GUIDE = {
-        'desc': 'Shoot upward to blast falling garbage before it stacks to the top.',
+        'desc': 'Sixty-second crosshair shooter: sweep the sights across the sky and blast falling garbage before it hits the ground. Faster junk, more points.',
     }
 
     TRASH_COLORS = [

@@ -21,7 +21,7 @@ class SineScroller(Visual):
     description = "Wavy scroller"
     category = "digital"
     GUIDE = {
-        'desc': 'Text scrolling along a sine wave — the classic demoscene intro effect. Each character bobs independently on a sinusoidal path.',
+        'desc': 'Bands of colour riding a rolling two-harmonic sine wave across the screen — a wordless take on the classic demoscene sine-scroller.',
     }
 
     # Pattern types

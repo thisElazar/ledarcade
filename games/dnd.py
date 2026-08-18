@@ -19,7 +19,7 @@ class DnD(Game):
     description = "Dungeon Crawler!"
     category = "retro"
     GUIDE = {
-        'desc': 'Explore rooms, fight monsters, collect treasure. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.',
+        'desc': 'Explore rooms, fight monsters, find quivers and health. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.',
     }
 
     # Display layout
