@@ -81,7 +81,7 @@ class Microscope(Visual):
     description = "Biological specimens"
     category = "science_micro"
     GUIDE = {
-        'desc': 'Scenes viewed through a virtual microscope: microorganisms, cell structures, and crystal formations.',
+        'desc': 'Scenes viewed through a virtual microscope: paramecia, amoebae, diatoms and other microorganisms drifting under the lens.',
         'controls': {
             'Up/Down': 'Switch category',
             'Left/Right': 'Step through items',

@@ -74,7 +74,7 @@ class Fibonacci(Visual):
     description = "Sunflower phyllotaxis"
     category = "math"
     GUIDE = {
-        'desc': 'The Fibonacci sequence visualized. Golden spirals, phyllotaxis patterns, and the golden ratio — the mathematics that appears everywhere in nature.',
+        'desc': 'Sunflower phyllotaxis: seeds placed one at a time, each rotated 137.508° (the golden angle) from the last, at radius √n. The Vogel model — Fibonacci spirals emerge on their own.',
     }
 
     def reset(self):

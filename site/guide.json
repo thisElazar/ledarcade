@@ -250,7 +250,7 @@
      "name": "DND",
      "cls": "DnD",
      "module": "games/dnd.py",
-     "desc": "Explore rooms, fight monsters, collect treasure. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.",
+     "desc": "Explore rooms, fight monsters, find quivers and health. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.",
      "controls": {
       "Arrow Keys": "Move through dungeon",
       "Space": "Shoot arrow in facing direction"
@@ -314,7 +314,7 @@
      "name": "TRASHBLASTER",
      "cls": "TrashBlaster",
      "module": "games/trashblaster.py",
-     "desc": "Shoot upward to blast falling garbage before it stacks to the top.",
+     "desc": "Sixty-second crosshair shooter: sweep the sights across the sky and blast falling garbage before it hits the ground. Faster junk, more points.",
      "controls": {
       "Arrow Keys": "Move targeting crosshair",
       "Space/Action": "Fire laser at crosshair position"
@@ -409,7 +409,7 @@
      "name": "POWDER GAME",
      "cls": "SandGame",
      "module": "games/sandgame.py",
-     "desc": "Falling-sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal \u2014 a creative toy.",
+     "desc": "Falling-sand particle physics sandbox. Place 18 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal \u2014 a creative toy.",
      "controls": {
       "Joystick": "Move cursor",
       "Button (tap)": "Toggle material select mode"
@@ -537,7 +537,7 @@
      "name": "BOWLING",
      "cls": "Bowling",
      "module": "games/bowling.py",
-     "desc": "Ten-pin bowling. Time your release and aim your angle. Standard scoring \u2014 strikes, spares, and splits over 10 frames.",
+     "desc": "Ten-pin bowling. Time your release and aim your angle. Standard scoring \u2014 strikes and spares over 10 frames, bonus balls in the tenth.",
      "controls": {
       "Space": "Lock position / confirm aim / confirm power / navigate",
       "Joystick": "Cancel aim\u2192position / cancel power\u2192aim / navigate"
@@ -557,7 +557,7 @@
      "name": "PINBALL",
      "cls": "Pinball",
      "module": "games/pinball.py",
-     "desc": "Pinball with flippers, bumpers, ramps, and a plunger. L button controls the left flipper, R button the right. Hit targets to score; don\u2019t let the ball drain.",
+     "desc": "Pinball with flippers, bumpers, drop targets, rollovers, a spinner and a plunger on a tall scrolling table. L button controls the left flipper, R button the right. Hit targets to score; don\u2019t let the ball drain.",
      "controls": {
       "Space (held)": "Left flipper",
       "Z (held)": "Right flipper",
@@ -569,7 +569,7 @@
      "name": "POOL",
      "cls": "Pool",
      "module": "games/pool.py",
-     "desc": "8-ball billiards. Aim with the joystick, set power, and shoot. Pocket all your balls (stripes or solids) then sink the 8-ball to win.",
+     "desc": "Six-ball pool, score attack. Aim with the joystick, set power, and shoot. Every ball you sink scores; clear the table for a bonus. Scratching the cue ball is a foul.",
      "controls": {
       "Left/Right": "Aim cue ball direction",
       "Up/Down": "Fine/coarse aim adjustment",
@@ -694,7 +694,7 @@
      "name": "LASER MIRRORS",
      "cls": "LaserMirrors",
      "module": "games/lasermirrors.py",
-     "desc": "Rotate and place mirrors to redirect the laser beam to its target. A puzzle of angles and reflection.",
+     "desc": "Rotate the mirrors to redirect the laser beam to its target. A puzzle of angles and reflection \u2014 every level is generated solvable.",
      "controls": {
       "Left/Right": "Rotate view",
       "Up/Down": "Move forward/backward",
@@ -2541,8 +2541,8 @@
      "name": "GRAY-SCOTT",
      "cls": "GrayScott",
      "module": "visuals/grayscott.py",
-     "desc": "Turing proposed that reaction-diffusion could explain biological pattern formation. The Gray-Scott model uses two parameters: F (feed rate, how fast chemical U is replenished) and K (kill rate, how fast chemical V is removed). Different F/K combinations produce distinct pattern families \u2014 spots, stripes, coral, and worms. The joystick explores the Pearson parameter space; overlay labels show the Greek-letter classification (Alpha, Beta, etc.) from Pearson\u2019s 1993 taxonomy.",
-     "credit": "Alan Turing, 1952",
+     "desc": "Turing proposed that reaction-diffusion could explain biological pattern formation. The Gray-Scott model uses two parameters: F (feed rate, how fast chemical U is replenished) and K (kill rate, how fast chemical V is removed). Different F/K combinations produce distinct pattern families \u2014 spots, stripes, coral, and worms \u2014 cycled here from Pearson\u2019s 1993 taxonomy. Up/Down changes palette.",
+     "credit": "Turing 1952 \u00b7 Gray & Scott 1983 \u00b7 Pearson 1993",
      "controls": {
       "Up/Down": "Cycle color palette",
       "Button": "Re-seed grid"
@@ -2564,7 +2564,7 @@
      "name": "GYRE",
      "cls": "Gyre",
      "module": "visuals/gyre.py",
-     "desc": "Rotating vortex patterns driven by simple agent rules. Particles orbit local centers of rotation, forming spirals that merge and split.",
+     "desc": "A cellular automaton where each quadrant of the grid copies from a different neighbour, so patterns refract at the boundaries and get drawn into swirling spiral gyres. From Rucker & Walker\u2019s CelLab, after an idea of Bill Gosper.",
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
@@ -2600,7 +2600,7 @@
      "name": "JELLYFISH",
      "cls": "ParticleLife",
      "module": "visuals/particlelife.py",
-     "desc": "Particle Life variant tuned for drifting, pulsing jellyfish motion. Multiple species with asymmetric attraction and repulsion forces produce bell shapes trailing tentacles.",
+     "desc": "Particle Life: several species with a random asymmetric attraction/repulsion matrix. Clusters, chasers and drifting membranes emerge \u2014 some runs look like jellyfish, every reset is different.",
      "credit": "Jeffrey Ventrella, 2007",
      "controls": {
       "Up/Down": "Adjust species count (changes colors)",
@@ -2675,7 +2675,7 @@
      "name": "QUARKS",
      "cls": "Quarks",
      "module": "visuals/quarks.py",
-     "desc": "Particles with charge-like properties that attract and repel, forming fleeting bonds and structures. Simple local rules produce behavior reminiscent of particle physics.",
+     "desc": "A heat-diffusion cellular automaton (CelLab\u2019s \u201cRug\u201d rule \u2014 average your neighbours, add one) with roaming \u201cquark\u201d hotspots injecting energy. Smooth mandala-like colour waves ripple out from wherever the hotspots wander.",
      "controls": {
       "Left/Right": "Adjust speed",
       "Up/Down": "Change color palette",
@@ -2686,7 +2686,7 @@
      "name": "QUARKS LAB",
      "cls": "QuarksLab",
      "module": "visuals/quarkslab.py",
-     "desc": "Explore the Quarks automaton's parameter space. The joystick sets particle count and interaction radius, tuning how charge-like cells bond and break.",
+     "desc": "Explore the Quarks automaton's parameter space. Left/Right sets how many roaming hotspots inject energy, Up/Down how far they wander \u2014 from a single slow pulse to a field of interfering ripples.",
      "controls": {
       "Left/Right": "Adjust number of quarks (hotspots)",
       "Up/Down": "Adjust roam radius",
@@ -2698,7 +2698,7 @@
      "name": "RUCKER PAINT",
      "cls": "Aurora",
      "module": "visuals/aurora.py",
-     "desc": "CelLab flowing paint cellular automaton by Rudy Rucker and John Walker. Globby streams of color flow and merge on a ring topology.",
+     "desc": "Streaks of paint poured from the top edge blur, drift and merge as they run down the grid on a ring topology. Inspired by the flowing-paint rules in Rucker & Walker\u2019s CelLab.",
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust flow speed",
@@ -2745,8 +2745,8 @@
      "name": "SLIME",
      "cls": "Slime",
      "module": "visuals/slime.py",
-     "desc": "Agents deposit and follow chemical trails, mimicking slime mold (Physarum polycephalum). Simple deposit-sense-turn rules produce networks similar to real transport systems.",
-     "credit": "Jeff Jones, 2010",
+     "desc": "Six slime-mold colonies spread across the grid and fight for territory. Each cell grows into empty neighbours and can be overrun by a stronger rival \u2014 frontiers advance, stall, and get swallowed until one colony wins or they settle into a truce.",
+     "credit": "Colony-competition cellular automaton",
      "controls": {
       "Left/Right": "Adjust growth speed",
       "Space": "Reset with new random colonies",
@@ -2757,8 +2757,8 @@
      "name": "SLIME LAB",
      "cls": "SlimeLab",
      "module": "visuals/slimelab.py",
-     "desc": "Two slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.",
-     "credit": "after Jeff Jones, 2010",
+     "desc": "Six slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.",
+     "credit": "Colony-competition cellular automaton",
      "controls": {
       "Left/Right": "Adjust growth chance (frontier expansion rate)",
       "Up/Down": "Adjust attack power (border takeover rate)",
@@ -2903,7 +2903,7 @@
      "name": "COINS",
      "cls": "Coins",
      "module": "visuals/coins.py",
-     "desc": "Historical coins rendered from Wikimedia Commons and the Met Museum Open Access collection. Ancient Greek, Roman, medieval, and early modern currency.",
+     "desc": "Historical coins rendered from Wikimedia Commons photographs. Ancient Greek, Roman, medieval, and early modern currency.",
      "controls": {
       "Left/Right": "Cycle coins within era",
       "Up/Down": "Toggle info overlay",
@@ -2971,7 +2971,7 @@
      "name": "TESTAMENT",
      "cls": "Testament",
      "module": "visuals/testament.py",
-     "desc": "Biblical narratives visualized as animated LED scenes. Key moments from Genesis through Revelation rendered in pixel art.",
+     "desc": "Ambient scenes from the world\u2019s sacred stories \u2014 the burning bush, Noah\u2019s ark, the star of Bethlehem, and moments from Hindu, Buddhist, Islamic and Sikh tradition \u2014 each a stable, gently animated symbol.",
      "controls": {
       "Up/Down": "Switch scene",
       "Left/Right": "Adjust speed",
@@ -3461,7 +3461,7 @@
      "name": "CRYSTALLIZE",
      "cls": "Crystallize",
      "module": "visuals/crystallize.py",
-     "desc": "Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model \u2014 a generalization of the Ising model to multiple spin states. Inspired by an introspection experiment where 94 AI agents independently reported the same phenomenon: ideas crystallizing into competing domains with grain boundaries at their edges. The simulation\u2019s temperature curve is derived from token-usage math measuring how Claude\u2019s output changes under sustained prompting.",
+     "desc": "Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model \u2014 a generalization of the Ising model to multiple spin states. Inspired by an introspection experiment (docs/introspection-experiment-log.md) where 84 Claude agents across three model tiers independently reported the same phenomenon: ideas crystallizing into competing domains with grain boundaries at their edges. The Potts update rule is a Boltzmann distribution \u2014 the same equation as the softmax that samples each token \u2014 so the annealing cycle is a literal, not metaphorical, picture of that process.",
      "credit": "R.B. Potts, 1952",
      "controls": {
       "Action (L or R)": "Cycle FIELD / SEQUENCE / STREAM views",
@@ -3584,7 +3584,7 @@
      "name": "SINESCROLL",
      "cls": "SineScroller",
      "module": "visuals/sinescroller.py",
-     "desc": "Text scrolling along a sine wave \u2014 the classic demoscene intro effect. Each character bobs independently on a sinusoidal path.",
+     "desc": "Bands of colour riding a rolling two-harmonic sine wave across the screen \u2014 a wordless take on the classic demoscene sine-scroller.",
      "controls": {
       "Left/Right": "Adjust wave/scroll speed",
       "Up/Down": "Cycle color palette",
@@ -3719,7 +3719,7 @@
      "name": "CAT",
      "cls": "Cat",
      "module": "visuals/cat.py",
-     "desc": "A pixel cat walking, sitting, sleeping, and chasing a laser dot.",
+     "desc": "A pixel cat dozing on a windowsill \u2014 sleeping, waking, stretching, relaxing, curling back up.",
      "controls": {
       "Space": "Pet the cat (makes it purr)",
       "Left/Right": "Change cat color",
@@ -3777,7 +3777,7 @@
      "name": "POLAROID",
      "cls": "Polaroid",
      "module": "visuals/polaroid.py",
-     "desc": "An instant camera that \u201cphotographs\u201d other visuals in the collection. The image develops slowly in the classic Polaroid white frame.",
+     "desc": "An instant camera. Each shot develops slowly in the classic white frame \u2014 sunsets, gradients and abstract scenes fading in from black.",
      "controls": {
       "Left/Right": "Rotate camera",
       "Space": "Take a picture (flash!)",
@@ -3855,7 +3855,7 @@
      "name": "FIBONACCI",
      "cls": "Fibonacci",
      "module": "visuals/fibonacci.py",
-     "desc": "The Fibonacci sequence visualized. Golden spirals, phyllotaxis patterns, and the golden ratio \u2014 the mathematics that appears everywhere in nature.",
+     "desc": "Sunflower phyllotaxis: seeds placed one at a time, each rotated 137.508\u00b0 (the golden angle) from the last, at radius \u221an. The Vogel model \u2014 Fibonacci spirals emerge on their own.",
      "controls": {
       "Up/Down": "Cycle palette",
       "Left/Right": "Adjust speed",
@@ -3866,7 +3866,7 @@
      "name": "FRACTALS",
      "cls": "Fractals",
      "module": "visuals/fractals.py",
-     "desc": "Classic fractals rendered in real time: Mandelbrot set, Julia sets, Sierpinski triangle, Koch snowflake, and fractal trees. Joystick to pan and zoom into infinite self-similar detail.",
+     "desc": "Classic fractals rendered in real time: Mandelbrot set, Julia sets, Sierpinski triangle, Koch snowflake, and fractal trees. Left/Right switches fractal, Up/Down cycles the palette.",
      "controls": {
       "Left/Right": "Change fractal",
       "Up/Down": "Cycle color palette",
@@ -3923,7 +3923,7 @@
      "name": "PI",
      "cls": "Pi",
      "module": "visuals/pi.py",
-     "desc": "Visualizations of \u03c0 \u2014 its digits mapped to colors, its geometric definition as circumference over diameter, and Monte Carlo estimation by random points in a circle.",
+     "desc": "Two arms rotating at rates 1 and \u03c0. Because \u03c0 is irrational the tip never retraces its path \u2014 the trail slowly fills a dense, ever-shifting rosette.",
      "controls": {
       "Up/Down": "Cycle palette",
       "Left/Right": "Rotation speed",
@@ -4390,7 +4390,7 @@
      "name": "CLOUDS",
      "cls": "Clouds",
      "module": "visuals/clouds.py",
-     "desc": "Procedurally generated clouds drifting across the sky. Perlin noise fields produce layered formations that shift and dissolve.",
+     "desc": "A field guide to the ten WMO cloud genera plus fog, lenticular and mammatus \u2014 each drawn as a pixel sprite at its altitude band, with the standard abbreviation and what weather it brings.",
      "controls": {
       "Button": "Toggle sky / detail view",
       "Up/Down": "Cycle cloud type",
@@ -4505,7 +4505,7 @@
      "name": "WATER CYCLE",
      "cls": "WaterCycle",
      "module": "visuals/watercycle.py",
-     "desc": "The hydrological cycle animated: evaporation, cloud formation, precipitation, runoff, and groundwater flow. A continuous loop of water moving through the Earth system.",
+     "desc": "The hydrological cycle animated: evaporation, condensation into clouds, precipitation, and collection back into the sea. A continuous loop of water moving through the Earth system.",
      "controls": {
       "Left/Right": "Slow down / speed up",
       "Button": "Toggle labels"
@@ -4515,7 +4515,7 @@
      "name": "WEATHER",
      "cls": "Weather",
      "module": "visuals/weather.py",
-     "desc": "Animated weather scenes: rain, snow, thunderstorms, sunshine. Particles fall with realistic physics, lightning flashes illuminate the grid.",
+     "desc": "Animated weather scenes: rain, snow, thunderstorms, sunshine. Falling particles, drifting clouds, lightning flashes that light the whole grid.",
      "controls": {
       "Button": "Cycle weather type"
      }
@@ -4589,7 +4589,7 @@
      "name": "ROAD",
      "cls": "Road",
      "module": "visuals/road.py",
-     "desc": "A single road with cars following each other. Car-following models produce stop-and-go waves from nothing \u2014 no accident, no bottleneck, just the physics of human reaction times.",
+     "desc": "A drive down an endless desert two-lane at dusk \u2014 dashed centerline, roadside signs and mile markers scrolling past. Adjust speed, look out the side window. (Real traffic-flow simulation lives in HIGHWAY.)",
      "controls": {
       "Space": "Toggle between views",
       "Up/Down": "Adjust speed",
@@ -4732,7 +4732,7 @@
      "name": "MICROSCOPE",
      "cls": "Microscope",
      "module": "visuals/microscope.py",
-     "desc": "Scenes viewed through a virtual microscope: microorganisms, cell structures, and crystal formations.",
+     "desc": "Scenes viewed through a virtual microscope: paramecia, amoebae, diatoms and other microorganisms drifting under the lens.",
      "controls": {
       "Up/Down": "Switch category",
       "Left/Right": "Step through items",
@@ -4914,7 +4914,7 @@
      "name": "OSCILLOSCOPE",
      "cls": "Oscilloscope",
      "module": "visuals/oscilloscope.py",
-     "desc": "Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios \u2014 the same patterns used to calibrate TV broadcasts.",
+     "desc": "Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios \u2014 the classic way to compare two signals\u2019 frequency and phase on a scope.",
      "controls": {
       "Up/Down": "Cycle modes (sine, Lissajous, superposition, sweep)",
       "Left/Right": "Adjust frequency ratio / frequency (held = continuous)",
@@ -5050,7 +5050,7 @@
      "cls": "PredPrey",
      "module": "visuals/predprey.py",
      "desc": "Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation \u2014 more prey means more predators, more predators means fewer prey, and the cycle repeats.",
-     "credit": "Alfred Lotka, 1910",
+     "credit": "Lotka 1925 \u00b7 Volterra 1926",
      "controls": {
       "Left/Right": "Prey reproduction rate",
       "Up/Down": "Predator hunting efficiency",

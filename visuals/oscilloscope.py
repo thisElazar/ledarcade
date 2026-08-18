@@ -57,7 +57,7 @@ class Oscilloscope(Visual):
     description = "Phosphor-green waveforms and Lissajous figures"
     category = "science_bench"
     GUIDE = {
-        'desc': 'Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios — the same patterns used to calibrate TV broadcasts.',
+        'desc': 'Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios — the classic way to compare two signals’ frequency and phase on a scope.',
     }
 
     def reset(self):

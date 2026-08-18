@@ -67,7 +67,7 @@ class Pi(Visual):
     description = "Irrational beauty"
     category = "math"
     GUIDE = {
-        'desc': 'Visualizations of π — its digits mapped to colors, its geometric definition as circumference over diameter, and Monte Carlo estimation by random points in a circle.',
+        'desc': 'Two arms rotating at rates 1 and π. Because π is irrational the tip never retraces its path — the trail slowly fills a dense, ever-shifting rosette.',
     }
 
     def reset(self):

@@ -512,7 +512,7 @@ PATHWAYS = [
             ('NADH PRODUCED 3 TIMES',       (80, 160, 255)),
             ('FADH2 PRODUCED ONCE',         (160, 220, 80)),
             ('GTP MADE AT SUCCINYL-COA',    (255, 180, 50)),
-            ('6 ENZYMES  ONE TURN',         (140, 200, 100)),
+            ('8 ENZYMES  ONE TURN',         (140, 200, 100)),
         ],
     },
     # ==================================================================

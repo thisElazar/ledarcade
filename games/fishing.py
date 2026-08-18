@@ -402,7 +402,7 @@ class Fishing(Game):
         self.phase = "caught"
         self.phase_timer = 0.0
         self.score += self.target.weight
-        self.score = round(self.score, 1)
+        self.score = int(round(self.score))   # leaderboard stores ints
         self.fish_count += 1
         self.flash_text = f"{self.target.weight}LB"
         self.flash_timer = 2.0

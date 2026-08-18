@@ -75,7 +75,7 @@ class Coins(Visual):
     description = "Historic coins of the world"
     category = "culture"
     GUIDE = {
-        'desc': 'Historical coins rendered from Wikimedia Commons and the Met Museum Open Access collection. Ancient Greek, Roman, medieval, and early modern currency.',
+        'desc': 'Historical coins rendered from Wikimedia Commons photographs. Ancient Greek, Roman, medieval, and early modern currency.',
     }
 
     def reset(self):

@@ -439,7 +439,7 @@ class Seismic(Visual):
             ("P-WAVES: COMPRESSION", P_COLOR),
             ("S-WAVES: SHEAR", S_COLOR),
             ("LIQUID CORE BLOCKS S", (200, 50, 50)),
-            ("INGE LEHMANN 1936", (255, 255, 255)),
+            ("OLDHAM 1906  GUTENBERG 1914", (255, 255, 255)),
         ]
         segments = []
         px_off = 0

@@ -19,7 +19,7 @@ class Polaroid(Visual):
     description = "Say cheese!"
     category = "household"
     GUIDE = {
-        'desc': 'An instant camera that “photographs” other visuals in the collection. The image develops slowly in the classic Polaroid white frame.',
+        'desc': 'An instant camera. Each shot develops slowly in the classic white frame — sunsets, gradients and abstract scenes fading in from black.',
     }
 
     def __init__(self, display: Display):

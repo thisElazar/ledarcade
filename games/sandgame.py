@@ -116,7 +116,7 @@ class SandGame(Game):
     description = "Falling sand physics sandbox"
     category = "modern"
     GUIDE = {
-        'desc': 'Falling-sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal — a creative toy.',
+        'desc': 'Falling-sand particle physics sandbox. Place 18 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal — a creative toy.',
     }
 
     def __init__(self, display: Display):

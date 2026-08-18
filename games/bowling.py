@@ -147,7 +147,7 @@ class Bowling(Game):
     description = "10-pin bowling with position and aim"
     category = "bar"
     GUIDE = {
-        'desc': 'Ten-pin bowling. Time your release and aim your angle. Standard scoring — strikes, spares, and splits over 10 frames.',
+        'desc': 'Ten-pin bowling. Time your release and aim your angle. Standard scoring — strikes and spares over 10 frames, bonus balls in the tenth.',
     }
 
     def __init__(self, display: Display):

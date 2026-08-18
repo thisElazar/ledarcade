@@ -252,7 +252,7 @@ class Crystallize(Visual):
     description = "Potts model phase transition — watching a mind decide"
     category = "digital"
     GUIDE = {
-        'desc': 'Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model — a generalization of the Ising model to multiple spin states. Inspired by an introspection experiment where 94 AI agents independently reported the same phenomenon: ideas crystallizing into competing domains with grain boundaries at their edges. The simulation’s temperature curve is derived from token-usage math measuring how Claude’s output changes under sustained prompting.',
+        'desc': 'Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model — a generalization of the Ising model to multiple spin states. Inspired by an introspection experiment (docs/introspection-experiment-log.md) where 84 Claude agents across three model tiers independently reported the same phenomenon: ideas crystallizing into competing domains with grain boundaries at their edges. The Potts update rule is a Boltzmann distribution — the same equation as the softmax that samples each token — so the annealing cycle is a literal, not metaphorical, picture of that process.',
         'credit': 'R.B. Potts, 1952',
     }
 

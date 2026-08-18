@@ -48,8 +48,8 @@ class SlimeLab(Visual):
     description = "Explore Slime parameter space"
     category = "automata"
     GUIDE = {
-        'desc': 'Two slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.',
-        'credit': 'after Jeff Jones, 2010',
+        'desc': 'Six slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.',
+        'credit': 'Colony-competition cellular automaton',
     }
 
     def __init__(self, display: Display):

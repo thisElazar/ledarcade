@@ -5,8 +5,8 @@ A cellular automaton that combines Life's persistence with
 Brain's refractory states. Firing cells leave slowly fading
 trails, creating beautiful dissolving patterns.
 
-Based on the "Faders" rule from CelLab by Rudy Rucker and John Walker,
-described as Rucker's "pride and joy."
+Inspired by the "Faders" family of rules in CelLab by Rudy Rucker and
+John Walker (this uses a B23/S23 birth/survival with a fading tail).
 Source: https://fourmilab.ch/cellab/
 
 Controls:
