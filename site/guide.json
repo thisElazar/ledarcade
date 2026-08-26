@@ -3846,7 +3846,7 @@
      "desc": "A gas spreads from one wall until it fills the box - entropy climbs. Press Action and every velocity reverses: the gas un-mixes back to where it started. The rules never changed; there are just vastly more mixed arrangements than ordered ones.",
      "credit": "Ludwig Boltzmann, 1877 / Claude Shannon, 1948",
      "controls": {
-      "Action": "Reverse time",
+      "Action": "Cycle particle colour",
       "Up/Down": "Block size for the entropy meter",
       "Left/Right": "Gas density"
      }

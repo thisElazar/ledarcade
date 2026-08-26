@@ -19,10 +19,10 @@ block distribution, normalised to log2(#blocks). Up/Down changes the
 block size - entropy depends on what you choose not to resolve. The
 faint block tint behind the particles is that macrostate.
 
-Left alone it cycles: mix -> reverse -> un-mix -> hold at order -> repeat.
+It runs on its own: mix -> reverse -> un-mix -> hold at order -> repeat.
 
 Controls:
-  Action      - Reverse time (flip every velocity)
+  Action      - Cycle particle colour
   Up/Down     - Coarse-grain block size for the entropy meter
   Left/Right  - Gas density (restarts)
 """
@@ -73,12 +73,14 @@ def _build_obstacles():
 
 OBSTACLES = _build_obstacles()
 
-# Particle colour by how many share a pixel (1..4)
-COUNT_COLORS = [None,
-                (70, 170, 255),
-                (150, 220, 255),
-                (230, 245, 255),
-                (255, 255, 255)]
+# Particle palettes: colour by how many share a pixel (1..4)
+PALETTES = [
+    [None, (70, 170, 255), (150, 220, 255), (230, 245, 255), (255, 255, 255)],
+    [None, (255, 120, 30), (255, 180, 60), (255, 230, 140), (255, 255, 255)],
+    [None, (40, 210, 110), (130, 240, 160), (210, 255, 220), (255, 255, 255)],
+    [None, (170, 70, 255), (210, 140, 255), (240, 210, 255), (255, 255, 255)],
+    [None, (255, 70, 130), (255, 140, 180), (255, 210, 225), (255, 255, 255)],
+]
 
 
 def _popcount(v):
@@ -97,7 +99,7 @@ class Entropy(Visual):
                 'ones.',
         'credit': 'Ludwig Boltzmann, 1877 / Claude Shannon, 1948',
         'controls': {
-            'Action': 'Reverse time',
+            'Action': 'Cycle particle colour',
             'Up/Down': 'Block size for the entropy meter',
             'Left/Right': 'Gas density',
         },
@@ -113,6 +115,7 @@ class Entropy(Visual):
         self.time = 0.0
         self.density_idx = 2
         self.block_idx = 1
+        self.palette_idx = 0
         self.overlay_timer = 0.0
         self.overlay_text = ""
         self._seed_gas()
@@ -244,9 +247,7 @@ class Entropy(Visual):
     def handle_input(self, inp) -> bool:
         consumed = False
         if inp.action_l or inp.action_r:
-            self._reverse()
-            self.hold_timer = 0.0
-            self._show_overlay("REVERSE")
+            self.palette_idx = (self.palette_idx + 1) % len(PALETTES)
             consumed = True
         if inp.up_pressed:
             self.block_idx = min(len(BLOCK_SIZES) - 1, self.block_idx + 1)
@@ -295,7 +296,6 @@ class Entropy(Visual):
             # Heading away from order and far enough out: turn around.
             if abs(self.tau) >= CYCLE_STEPS and self.tau * self.direction > 0:
                 self._reverse()
-                self._show_overlay("REVERSE")
 
     # -----------------------------------------------------------------
     # Draw
@@ -331,6 +331,7 @@ class Entropy(Visual):
                 bits ^= low
 
         # Microstate: particles, brighter where several share a pixel
+        colors = PALETTES[self.palette_idx]
         for y in range(CH_H):
             e, w, n, s = self.e[y], self.w[y], self.n[y], self.s[y]
             any1 = e | w | n | s
@@ -345,13 +346,13 @@ class Entropy(Visual):
                 low = bits & -bits
                 x = low.bit_length() - 1
                 if eq4 & low:
-                    col = COUNT_COLORS[4]
+                    col = colors[4]
                 elif ge3 & low:
-                    col = COUNT_COLORS[3]
+                    col = colors[3]
                 elif ge2 & low:
-                    col = COUNT_COLORS[2]
+                    col = colors[2]
                 else:
-                    col = COUNT_COLORS[1]
+                    col = colors[1]
                 d.set_pixel(x, py, col)
                 bits ^= low
 
