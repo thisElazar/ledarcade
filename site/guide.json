@@ -3886,6 +3886,18 @@
      }
     },
     {
+     "name": "Maxwell's Demon",
+     "cls": "MaxwellDemon",
+     "module": "visuals/maxwell.py",
+     "desc": "A thought experiment made visible. A demon sorts fast and slow gas particles between two chambers, seemingly violating the second law of thermodynamics.",
+     "credit": "James Clerk Maxwell, 1867",
+     "controls": {
+      "Button": "Toggle the demon on / off",
+      "Up/Down": "Adjust the demon\u2019s selectivity",
+      "Left/Right": "Slow down / speed up the simulation"
+     }
+    },
+    {
      "name": "MOBIUS",
      "cls": "Mobius",
      "module": "visuals/mobius.py",
@@ -4714,18 +4726,6 @@
       "Left/Right": "Lower / raise temperature",
       "Up/Down": "Cycle palette",
       "Button": "Toggle labels"
-     }
-    },
-    {
-     "name": "Maxwell's Demon",
-     "cls": "MaxwellDemon",
-     "module": "visuals/maxwell.py",
-     "desc": "A thought experiment made visible. A demon sorts fast and slow gas particles between two chambers, seemingly violating the second law of thermodynamics.",
-     "credit": "James Clerk Maxwell, 1867",
-     "controls": {
-      "Button": "Toggle the demon on / off",
-      "Up/Down": "Adjust the demon\u2019s selectivity",
-      "Left/Right": "Slow down / speed up the simulation"
      }
     },
     {
@@ -5786,6 +5786,7 @@
       "FIBONACCI",
       "FRACTALS",
       "GAME THEORY",
+      "Maxwell's Demon",
       "MOBIUS",
       "NETWORK",
       "PERCOLATION",
@@ -5834,7 +5835,6 @@
       "ELECTRONS",
       "LATTICES",
       "MATTER",
-      "Maxwell's Demon",
       "MICROSCOPE",
       "MOLECULES",
       "BRAIN",

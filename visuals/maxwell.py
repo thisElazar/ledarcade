@@ -99,7 +99,7 @@ IDLE_TIMEOUT = 8.0
 class MaxwellDemon(Visual):
     name = "Maxwell's Demon"
     description = "Thermodynamic thought experiment — a demon sorts hot and cold gas"
-    category = "science_micro"
+    category = "math"
     GUIDE = {
         'desc': 'A thought experiment made visible. A demon sorts fast and slow gas particles between two chambers, seemingly violating the second law of thermodynamics.',
         'credit': 'James Clerk Maxwell, 1867',

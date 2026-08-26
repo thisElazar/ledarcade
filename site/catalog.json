@@ -3870,6 +3870,12 @@
           "is_game": false
         },
         {
+          "name": "Maxwell's Demon",
+          "cls": "MaxwellDemon",
+          "module": "visuals/maxwell.py",
+          "is_game": false
+        },
+        {
           "name": "MOBIUS",
           "cls": "Mobius",
           "module": "visuals/mobius.py",
@@ -4370,12 +4376,6 @@
           "name": "MATTER",
           "cls": "MatterPhases",
           "module": "visuals/matter.py",
-          "is_game": false
-        },
-        {
-          "name": "Maxwell's Demon",
-          "cls": "MaxwellDemon",
-          "module": "visuals/maxwell.py",
           "is_game": false
         },
         {
@@ -5829,6 +5829,11 @@
               "module": "visuals/gametheory.py"
             },
             {
+              "name": "Maxwell's Demon",
+              "cls": "MaxwellDemon",
+              "module": "visuals/maxwell.py"
+            },
+            {
               "name": "MOBIUS",
               "cls": "Mobius",
               "module": "visuals/mobius.py"
@@ -6086,11 +6091,6 @@
               "name": "MATTER",
               "cls": "MatterPhases",
               "module": "visuals/matter.py"
-            },
-            {
-              "name": "Maxwell's Demon",
-              "cls": "MaxwellDemon",
-              "module": "visuals/maxwell.py"
             },
             {
               "name": "MICROSCOPE",
