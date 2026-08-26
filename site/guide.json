@@ -3843,12 +3843,12 @@
      "name": "ENTROPY",
      "cls": "Entropy",
      "module": "visuals/entropy.py",
-     "desc": "Shannon entropy visualized. Measures the information content and disorder of a system \u2014 the foundation of information theory.",
-     "credit": "Claude Shannon, 1948",
+     "desc": "A gas spreads from one wall until it fills the box - entropy climbs. Press Action and every velocity reverses: the gas un-mixes back to where it started. The rules never changed; there are just vastly more mixed arrangements than ordered ones.",
+     "credit": "Ludwig Boltzmann, 1877 / Claude Shannon, 1948",
      "controls": {
-      "Left/Right": "Alphabet size (2-8 symbols)",
-      "Up/Down": "Cycle demo mode",
-      "Action": "Mode-specific reset/action"
+      "Action": "Reverse time",
+      "Up/Down": "Block size for the entropy meter",
+      "Left/Right": "Gas density"
      }
     },
     {
