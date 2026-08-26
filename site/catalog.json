@@ -4349,12 +4349,6 @@
           "is_game": false
         },
         {
-          "name": "CELL",
-          "cls": "Cell",
-          "module": "visuals/cell.py",
-          "is_game": false
-        },
-        {
           "name": "DNA",
           "cls": "DNA",
           "module": "visuals/dna.py",
@@ -6076,79 +6070,6 @@
               "module": "visuals/spices.py"
             },
             {
-              "name": "CELL",
-              "cls": "Cell",
-              "module": "visuals/cell.py"
-            },
-            {
-              "name": "DNA",
-              "cls": "DNA",
-              "module": "visuals/dna.py"
-            },
-            {
-              "name": "ELECTRONS",
-              "cls": "Electrons",
-              "module": "visuals/electrons.py"
-            },
-            {
-              "name": "LATTICES",
-              "cls": "Lattice",
-              "module": "visuals/lattice.py",
-              "deps": [
-                "visuals/molecule.py"
-              ]
-            },
-            {
-              "name": "MATTER",
-              "cls": "MatterPhases",
-              "module": "visuals/matter.py"
-            },
-            {
-              "name": "MICROSCOPE",
-              "cls": "Microscope",
-              "module": "visuals/microscope.py"
-            },
-            {
-              "name": "MOLECULES",
-              "cls": "Molecule",
-              "module": "visuals/molecule.py"
-            },
-            {
-              "name": "BRAIN",
-              "cls": "Neurons",
-              "module": "visuals/neurons.py"
-            },
-            {
-              "name": "ORBITALS",
-              "cls": "Orbitals",
-              "module": "visuals/orbitals.py"
-            },
-            {
-              "name": "PEPTIDES",
-              "cls": "Peptides",
-              "module": "visuals/peptides.py"
-            },
-            {
-              "name": "ELEMENTS",
-              "cls": "Periodic",
-              "module": "visuals/periodic.py"
-            },
-            {
-              "name": "PROTEINS",
-              "cls": "Proteins",
-              "module": "visuals/proteins.py"
-            },
-            {
-              "name": "RADIOACTIVE",
-              "cls": "Radioactive",
-              "module": "visuals/radioactive.py"
-            },
-            {
-              "name": "SPECTROSCOPE",
-              "cls": "Spectroscope",
-              "module": "visuals/spectroscope.py"
-            },
-            {
               "name": "CHLADNI",
               "cls": "Chladni",
               "module": "visuals/chladni.py"
@@ -6550,6 +6471,74 @@
               "name": "XOR",
               "cls": "XORPattern",
               "module": "visuals/xorpattern.py"
+            },
+            {
+              "name": "DNA",
+              "cls": "DNA",
+              "module": "visuals/dna.py"
+            },
+            {
+              "name": "ELECTRONS",
+              "cls": "Electrons",
+              "module": "visuals/electrons.py"
+            },
+            {
+              "name": "LATTICES",
+              "cls": "Lattice",
+              "module": "visuals/lattice.py",
+              "deps": [
+                "visuals/molecule.py"
+              ]
+            },
+            {
+              "name": "MATTER",
+              "cls": "MatterPhases",
+              "module": "visuals/matter.py"
+            },
+            {
+              "name": "MICROSCOPE",
+              "cls": "Microscope",
+              "module": "visuals/microscope.py"
+            },
+            {
+              "name": "MOLECULES",
+              "cls": "Molecule",
+              "module": "visuals/molecule.py"
+            },
+            {
+              "name": "BRAIN",
+              "cls": "Neurons",
+              "module": "visuals/neurons.py"
+            },
+            {
+              "name": "ORBITALS",
+              "cls": "Orbitals",
+              "module": "visuals/orbitals.py"
+            },
+            {
+              "name": "PEPTIDES",
+              "cls": "Peptides",
+              "module": "visuals/peptides.py"
+            },
+            {
+              "name": "ELEMENTS",
+              "cls": "Periodic",
+              "module": "visuals/periodic.py"
+            },
+            {
+              "name": "PROTEINS",
+              "cls": "Proteins",
+              "module": "visuals/proteins.py"
+            },
+            {
+              "name": "RADIOACTIVE",
+              "cls": "Radioactive",
+              "module": "visuals/radioactive.py"
+            },
+            {
+              "name": "SPECTROSCOPE",
+              "cls": "Spectroscope",
+              "module": "visuals/spectroscope.py"
             },
             {
               "name": "SALON",
@@ -8889,11 +8878,6 @@
               "name": "MICROSCOPE",
               "cls": "Microscope",
               "module": "visuals/microscope.py"
-            },
-            {
-              "name": "CELL",
-              "cls": "Cell",
-              "module": "visuals/cell.py"
             },
             {
               "name": "MOLECULES",

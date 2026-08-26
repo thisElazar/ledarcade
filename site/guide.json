@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 183,
+  "visuals": 182,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -5187,29 +5187,6 @@
      }
     },
     {
-     "name": "CELL",
-     "cls": "Cell",
-     "module": "visuals/cell.py",
-     "desc": "A data-driven cross-section of a living cell. 14 real biochemical pathways: ATP synthase spinning, ribosomes translating mRNA, protein complexes cycling through conformational states.",
-     "legend": {
-      "IMS": "Intermembrane space \u2014 the region between a mitochondrion's inner and outer membranes.",
-      "INTRA": "Intracellular side of the membrane (inside the cell).",
-      "EXTRA": "Extracellular side of the membrane (outside the cell).",
-      "PRE": "Presynaptic side of a synapse \u2014 the signal-sending neuron.",
-      "POST": "Postsynaptic side of a synapse \u2014 the signal-receiving neuron.",
-      "CYT C/CYT B6F/COQ/FADH2": "Molecules in the scrolling notes: cytochrome c, cytochrome b6f complex, coenzyme Q, reduced flavin adenine dinucleotide.",
-      "E1/E2/E3/UB": "Ubiquitin-pathway proteins in the scrolling notes: E1/E2/E3 enzyme classes and UB (ubiquitin).",
-      "PAM": "Protospacer adjacent motif \u2014 the DNA sequence Cas9 locates next to its target.",
-      "TFIID/TATA/sites/strand": "Transcription and translation notation: TFIID (factor), TATA (promoter), A/P/E SITE (tRNA sites), 5 TO 3 (strand direction).",
-      "GPCR": "G-protein coupled receptor."
-     },
-     "controls": {
-      "Up/Down": "Switch pathway group",
-      "Left/Right": "Step through pathways",
-      "Button": "Toggle auto-cycle"
-     }
-    },
-    {
      "name": "DNA",
      "cls": "DNA",
      "module": "visuals/dna.py",
@@ -5309,7 +5286,7 @@
      "name": "MOLECULES",
      "cls": "Molecule",
      "module": "visuals/molecule.py",
-     "desc": "3D ball-and-stick models with CPK coloring (carbon black, oxygen red, nitrogen blue). Real molecules rotating in space: amino acids, sugars, neurotransmitters.",
+     "desc": "3D ball-and-stick models with CPK coloring (carbon black, oxygen red, nitrogen blue). Real 3D conformers from PubChem rotating in space: amino acids, sugars, neurotransmitters.",
      "legend": {
       "chemical formula": "The molecule's formula, each element's letters coloured like its atoms. It alternates with the molecule's name."
      },
@@ -6460,20 +6437,6 @@
       "PASTA",
       "SAUCES",
       "SPICES",
-      "CELL",
-      "DNA",
-      "ELECTRONS",
-      "LATTICES",
-      "MATTER",
-      "MICROSCOPE",
-      "MOLECULES",
-      "BRAIN",
-      "ORBITALS",
-      "PEPTIDES",
-      "ELEMENTS",
-      "PROTEINS",
-      "RADIOACTIVE",
-      "SPECTROSCOPE",
       "CHLADNI",
       "COLOR THEORY",
       "CONVECTION",
@@ -6551,6 +6514,19 @@
       "TWISTER",
       "MAZE",
       "XOR",
+      "DNA",
+      "ELECTRONS",
+      "LATTICES",
+      "MATTER",
+      "MICROSCOPE",
+      "MOLECULES",
+      "BRAIN",
+      "ORBITALS",
+      "PEPTIDES",
+      "ELEMENTS",
+      "PROTEINS",
+      "RADIOACTIVE",
+      "SPECTROSCOPE",
       "SALON",
       "GRAND MUSEUM",
       "WONDER GLOW",
@@ -6955,7 +6931,6 @@
       "ELEMENTS",
       "SPECTROSCOPE",
       "MICROSCOPE",
-      "CELL",
       "MOLECULES",
       "CHLADNI",
       "COULOMB",
