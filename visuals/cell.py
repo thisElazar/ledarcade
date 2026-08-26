@@ -1222,6 +1222,7 @@ class Cell(Visual):
     name = "CELL"
     description = "Cellular pathways"
     category = "science_micro"
+    dev_only = True  # hand-authored pathways, not data-pipeline grounded; hidden until reworked
     GUIDE = {
         'desc': 'A data-driven cross-section of a living cell. 14 real biochemical pathways: ATP synthase spinning, ribosomes translating mRNA, protein complexes cycling through conformational states.',
         'controls': {
