@@ -50,7 +50,10 @@ S_BRIGHT = (255, 180, 100)
 SHADOW_COLOR = (120, 20, 20) # dim red arc for shadow zone
 
 # ── Intro phase durations (seconds) ────────────────────────────
-INTRO_DURATIONS = [3.0, 3.0, 3.0, 3.0, 4.0, 2.0]
+# Phases 0-1 are a static labelled cross-section before any wave moves; they
+# were 3s each, which is a long time to look at a still disc. The narrated
+# wave phases (2-5) keep their length.
+INTRO_DURATIONS = [1.8, 1.8, 3.0, 3.0, 4.0, 2.0]
 
 # ── Layer ring colors (brighter for boundary outlines) ─────────
 LAYER_BOUNDARY_COLORS = [
@@ -193,9 +196,14 @@ def _trace_ray(source_x, source_y, angle, wave_type):
             else:
                 norm_x, norm_y = 0.0, -1.0
 
-            # Angle of incidence
+            # Angle of incidence. Orient the normal ALONG the ray, not
+            # against it: the transmitted direction below is built as
+            # sin_r*tangent + cos_r*normal, so a normal pointing back the way
+            # the ray came turns every refraction into a bounce. That is why
+            # no ray used to get past the crust — they were all folded back
+            # at the first boundary and skimmed around the surface.
             dot = dx * norm_x + dy * norm_y
-            if dot > 0:
+            if dot < 0:
                 norm_x, norm_y = -norm_x, -norm_y
                 dot = -dot
 
@@ -299,7 +307,8 @@ def _trace_reflected_ray(source_x, source_y, angle, wave_type, reflect_layer_nam
                 else:
                     norm_x, norm_y = 0.0, -1.0
                 dot = dx * norm_x + dy * norm_y
-                if dot > 0:
+                # Same orientation fix as _trace_ray: normal along the ray.
+                if dot < 0:
                     norm_x, norm_y = -norm_x, -norm_y
                     dot = -dot
                 sin_i = _sqrt(max(0, 1.0 - dot * dot))
@@ -805,7 +814,9 @@ class Seismic(Visual):
 
         if phase == 0:
             # Label at bottom
-            d.draw_text_small(2, 56, "EARTH'S INTERIOR", (180, 180, 140))
+            # 16 chars at 4px each is 64px — one pixel wider than the panel,
+            # so the final R used to be sliced off. Centred and shortened.
+            d.draw_text_small(6, 56, "INSIDE EARTH", (180, 180, 140))
         else:
             # Phase 1: show active layer name near its position
             if 0 <= active_label < len(intro_layers):
@@ -1162,18 +1173,17 @@ class Seismic(Visual):
         d.set_pixel(15, 59, S_COLOR)
         d.draw_text_small(17, 57, "S", S_COLOR)
 
-        # Mode name on right
-        mode = FOCUS_MODES[self.focus_idx]
-        text_w = len(mode) * 4
-        mx = 62 - text_w
-        d.draw_text_small(mx, 57, mode, (100, 100, 100))
-
-        # Button hint (fades in after 3s idle, disappears after first press)
-        if not self._btn_hint_shown and self._btn_hint_timer <= 0:
-            # Gentle pulse
+        # Right-hand slot: the button hint while it's up, otherwise the mode
+        # name. They used to be drawn at fixed x's that overlapped from x=42
+        # to x=59, printing BTN:QUAKE straight through WAVES.
+        hint_up = not self._btn_hint_shown and self._btn_hint_timer <= 0
+        if hint_up:
             pulse = 0.5 + 0.5 * math.sin(self.time * 2.0)
             c = int(120 + 60 * pulse)
-            d.draw_text_small(24, 57, "BTN:QUAKE", (c, c, int(c * 0.6)))
+            text, color = "BTN:QUAKE", (c, c, int(c * 0.6))
+        else:
+            text, color = FOCUS_MODES[self.focus_idx], (100, 100, 100)
+        d.draw_text_small(62 - len(text) * 4, 57, text, color)
 
     # ── Shadow zone narrative ───────────────────────────────────
 
