@@ -4801,12 +4801,13 @@
      "name": "RADIOACTIVE",
      "cls": "Radioactive",
      "module": "visuals/radioactive.py",
-     "desc": "A grid of atoms spontaneously decays, emitting alpha, beta, and gamma particles. Five scenarios demonstrate different decay modes. Each event is probabilistic \u2014 quantum randomness made visible.",
+     "desc": "A single nucleus drawn as the protons and neutrons it contains, stepping down a real decay chain. Alpha decay throws off two protons and two neutrons; beta decay turns a neutron into a proton. Uranium-238 needs fourteen decays to reach stable lead-206.",
+     "credit": "Henri Becquerel, 1896",
      "controls": {
-      "Left/Right": "Cycle scenario",
-      "Up/Down": "Cycle color palette",
-      "Single button": "Reset current scenario",
-      "Both buttons": "Toggle scrolling notes"
+      "Left/Right": "Step through the chain",
+      "Up/Down": "Change decay chain",
+      "Single button": "Force the next decay",
+      "Both buttons": "Toggle the chain map"
      }
     },
     {
