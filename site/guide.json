@@ -3927,8 +3927,8 @@
      "desc": "A phase transition in connectivity. Below a critical threshold, clusters stay isolated. Above it, a spanning cluster suddenly connects the entire grid.",
      "credit": "Broadbent & Hammersley, 1957",
      "controls": {
-      "Left/Right": "Adjust occupation probability p",
-      "Action": "Regenerate grid"
+      "Left/Right": "Raise / lower p",
+      "Action": "Deal a fresh lattice"
      }
     },
     {
