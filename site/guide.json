@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 183,
+  "visuals": 182,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -5013,18 +5013,6 @@
      }
     },
     {
-     "name": "GENETIC DRIFT",
-     "cls": "GeneticDrift",
-     "module": "visuals/geneticdrift.py",
-     "desc": "Allele frequencies shift through random sampling in finite populations. Watch genetic diversity rise and fall without selection pressure \u2014 pure chance shaping evolution.",
-     "credit": "Hardy & Weinberg, 1908",
-     "controls": {
-      "Left/Right": "Population size",
-      "Up/Down": "Selection pressure (favors A)",
-      "Action": "Bottleneck (kill 90%)"
-     }
-    },
-    {
      "name": "MOON PHASES",
      "cls": "MoonPhases",
      "module": "visuals/moon.py",
@@ -5895,7 +5883,6 @@
       "CONSTELLATIONS",
       "ECOSYSTEM",
       "EVOLUTION",
-      "GENETIC DRIFT",
       "EARTH",
       "MOON PHASES",
       "SOLAR SYSTEM",

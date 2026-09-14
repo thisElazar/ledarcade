@@ -4553,12 +4553,6 @@
           "is_game": false
         },
         {
-          "name": "GENETIC DRIFT",
-          "cls": "GeneticDrift",
-          "module": "visuals/geneticdrift.py",
-          "is_game": false
-        },
-        {
           "name": "MOON PHASES",
           "cls": "MoonPhases",
           "module": "visuals/moon.py",
@@ -6404,11 +6398,6 @@
               "name": "EVOLUTION",
               "cls": "Evolution",
               "module": "visuals/evolution.py"
-            },
-            {
-              "name": "GENETIC DRIFT",
-              "cls": "GeneticDrift",
-              "module": "visuals/geneticdrift.py"
             },
             {
               "name": "EARTH",
