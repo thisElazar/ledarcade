@@ -4583,7 +4583,7 @@
      "credit": "Biham, Middleton & Levine, 1992",
      "controls": {
       "Up/Down": "Adjust density",
-      "Space": "Reset with current density"
+      "Action": "Reset with current density"
      }
     },
     {
