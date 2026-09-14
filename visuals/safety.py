@@ -35,7 +35,9 @@ class Safety(Visual):
         self.epilepsy = persistent.get_epilepsy_safe()
         self.cb_mode = persistent.get_colorblind_mode()
         self.max_bright = persistent.get_max_brightness_pct()
-        self.cursor = 0  # 0=epilepsy, 1=colorblind, 2=max brightness
+        self.photo = persistent.get_photo_mode()
+        self._photo_at_start = self.photo  # refresh pin only applies at boot
+        self.cursor = 0  # 0=epilepsy, 1=colorblind, 2=max brightness, 3=photo
 
     def _apply(self):
         """Persist settings and push to display's safety pipeline."""
@@ -43,6 +45,7 @@ class Safety(Visual):
         persistent.set_epilepsy_safe(self.epilepsy)
         persistent.set_colorblind_mode(self.cb_mode)
         persistent.set_max_brightness_pct(self.max_bright)
+        persistent.set_photo_mode(self.photo)
         if hasattr(self.display, 'set_safety'):
             self.display.set_safety(
                 colorblind_mode=self.cb_mode,
@@ -53,10 +56,10 @@ class Safety(Visual):
     def handle_input(self, input_state) -> bool:
         # Navigate options
         if input_state.up_pressed:
-            self.cursor = (self.cursor - 1) % 3
+            self.cursor = (self.cursor - 1) % 4
             return True
         if input_state.down_pressed:
-            self.cursor = (self.cursor + 1) % 3
+            self.cursor = (self.cursor + 1) % 4
             return True
 
         # Button press: accept and exit
@@ -75,6 +78,8 @@ class Safety(Visual):
             elif self.cursor == 2:
                 step = 5 if input_state.right_pressed else -5
                 self.max_bright = max(10, min(100, self.max_bright + step))
+            elif self.cursor == 3:
+                self.photo = not self.photo
             self._apply()
             return True
 
@@ -92,8 +97,8 @@ class Safety(Visual):
         d.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
 
         # Row positions
-        rows = [14, 26, 38]
-        labels = ["EPILEPSY", "COLOR", "MAX BRT"]
+        rows = [13, 23, 33, 43]
+        labels = ["EPILEPSY", "COLOR", "MAX BRT", "PHOTO"]
 
         for i, (y, label) in enumerate(zip(rows, labels)):
             selected = (i == self.cursor)
@@ -115,12 +120,18 @@ class Safety(Visual):
             elif i == 1:
                 val = _CB_LABELS.get(self.cb_mode, "NONE")
                 val_color = Colors.GREEN if self.cb_mode != "none" else prefix_color
-            else:
+            elif i == 2:
                 val = str(self.max_bright)
                 val_color = Colors.WHITE if selected else Colors.GRAY
+            else:
+                val = "ON" if self.photo else "OFF"
+                val_color = Colors.GREEN if self.photo else Colors.RED
 
             d.draw_text_small(42, y, val, val_color)
 
         # Instructions at bottom
         d.draw_line(0, 52, 63, 52, Colors.DARK_GRAY)
-        d.draw_text_small(2, 55, "BTN:ACCEPT", Colors.GRAY)
+        if self.photo != self._photo_at_start:
+            d.draw_text_small(2, 55, "REBOOT TO APPLY", Colors.YELLOW)
+        else:
+            d.draw_text_small(2, 55, "BTN:ACCEPT", Colors.GRAY)

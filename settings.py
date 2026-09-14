@@ -29,6 +29,7 @@ DEFAULTS = {
     "epilepsy_safe": False,
     "colorblind_mode": "none",  # "none", "protanopia", "deuteranopia", "tritanopia"
     "max_brightness_pct": 100,
+    "photo_mode": False,  # pin LED refresh to a fixed rate so cameras don't see banding
 }
 
 # In-memory settings cache
@@ -196,6 +197,16 @@ def get_epilepsy_safe():
 def set_epilepsy_safe(value):
     """Set epilepsy-safe mode (bool)."""
     set("epilepsy_safe", bool(value))
+
+
+def get_photo_mode():
+    """Get photo mode (bool). Applied at display init; needs a restart."""
+    return get("photo_mode", False)
+
+
+def set_photo_mode(value):
+    """Set photo mode (bool)."""
+    set("photo_mode", bool(value))
 
 
 def get_colorblind_mode():

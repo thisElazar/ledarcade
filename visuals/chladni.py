@@ -80,6 +80,7 @@ _RING_INNER2 = (_RING_INNER * 0.5) ** 2  # squared inner radius in (cx,cy) space
 
 class Chladni(Visual):
     name = "CHLADNI"
+    idle_exclude = True   # interactive lab with a HUD; not for the idle screen
     description = "Vibrating plate nodal patterns"
     category = "science_bench"
     GUIDE = {

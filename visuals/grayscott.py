@@ -55,6 +55,12 @@ class GrayScott(Visual):
         self.time += dt
         self.u, self.v = _step_gray_scott(self.u, self.v, self.f, self.k,
                                            self.steps_per_frame)
+        # Seeds can die out (marginal F/K, or committed lab params in a dead
+        # regime), leaving a black screen forever. Fall back to the default
+        # regime and reseed rather than sit on black or flicker reseeds.
+        if self.v.max() < 0.01:
+            self.f, self.k = 0.035, 0.065
+            self.u, self.v = _init_grid()
 
     def draw(self):
         _draw_turing(self.display, self.v, self.palette_idx)

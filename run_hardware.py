@@ -478,6 +478,8 @@ def _pick_idle_visual(display):
         cat = getattr(v, 'category', '')
         if cat == 'utility':
             continue
+        if getattr(v, 'idle_exclude', False):
+            continue
 
         name = v.__name__
         if name in blacklist:
@@ -552,7 +554,8 @@ def main():
     from cabinet_config import get_gpio_slowdown
     display = HardwareDisplay(brightness=saved_brightness,
                               gpio_slowdown=get_gpio_slowdown(),
-                              gamma=saved_gamma, toe=saved_toe)
+                              gamma=saved_gamma, toe=saved_toe,
+                              limit_refresh_hz=120 if persistent.get_photo_mode() else 0)
     # Load persisted safety settings
     display.set_safety(
         colorblind_mode=persistent.get_colorblind_mode(),
