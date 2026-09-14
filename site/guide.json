@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 182,
+  "visuals": 183,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -2646,6 +2646,20 @@
       "Up": "Randomize (dense)",
       "Down": "Randomize (sparse)",
       "Escape": "Exit"
+     }
+    },
+    {
+     "name": "LIFE LAB",
+     "cls": "LifeLab",
+     "module": "visuals/lifelab.py",
+     "desc": "A bench for Conway's Life. Load a famous seed \u2014 Gosper's glider gun, the R-pentomino, a diehard \u2014 choose a life-like rule, and set it running. The same seed under a different rule behaves nothing like itself.",
+     "credit": "John Conway, 1970",
+     "controls": {
+      "Left/Right": "Cycle seed pattern",
+      "Up/Down": "Cycle rule",
+      "Action L": "Run / pause",
+      "Action R": "Reseed the current pattern",
+      "Both": "Commit rule + pattern to settings"
      }
     },
     {
@@ -5797,6 +5811,7 @@
       "LENIA",
       "LENIA LAB",
       "LIFE",
+      "LIFE LAB",
       "MITOSIS",
       "MITOSIS LAB",
       "JELLYFISH",

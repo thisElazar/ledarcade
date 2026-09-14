@@ -2507,6 +2507,12 @@
           "is_game": false
         },
         {
+          "name": "LIFE LAB",
+          "cls": "LifeLab",
+          "module": "visuals/lifelab.py",
+          "is_game": false
+        },
+        {
           "name": "MITOSIS",
           "cls": "Mitosis",
           "module": "visuals/mitosis.py",
@@ -5951,6 +5957,11 @@
               "name": "LIFE",
               "cls": "Life",
               "module": "visuals/life.py"
+            },
+            {
+              "name": "LIFE LAB",
+              "cls": "LifeLab",
+              "module": "visuals/lifelab.py"
             },
             {
               "name": "MITOSIS",

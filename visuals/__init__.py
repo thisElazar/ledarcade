@@ -76,6 +76,7 @@ from .starfield import Starfield
 from .fire import Fire
 from .matrix import Matrix
 from .life import Life
+from .lifelab import LifeLab
 from .clock import Clock
 from .weather import Weather
 from .dvd import DVD
@@ -353,6 +354,7 @@ ALL_VISUALS = [
     Fire,
     Matrix,
     Life,
+    LifeLab,
     Clock,
     Weather,
     DVD,
@@ -699,6 +701,7 @@ __all__ = [
     'Fire',
     'Matrix',
     'Life',
+    'LifeLab',
     'Clock',
     'Weather',
     'DVD',
