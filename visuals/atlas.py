@@ -504,9 +504,150 @@ def _find_atlas():
 #
 # The world atlas npz decompresses to ~1.3 GB (roads/rails alone are two
 # 522 MB dense masks), which cannot live in a Pi's 906 MB of RAM and takes
-# a long time to inflate every launch. Instead, stream the npz members out
-# to raw .npy files once, then memory-map them: every later load is
-# near-instant and only the pages a view actually touches stay resident.
+# a long time to inflate every launch. So the npz members are streamed out
+# to raw .npy files once, and loaded from there.
+#
+# Loading them purely as memmaps made the launch instant but the *panning*
+# bad: the renderer samples a 64x64 window by fancy indexing, which touches
+# 64 scattered rows, and on a cold region every one of those is a page fault
+# against the SD card. Panning walks into cold regions continuously, so it
+# hitches the whole time, and with nothing slow left at startup the loading
+# screen flashed past unread.
+#
+# So: pay the cost once, up front, behind the progress bar, and hold the
+# arrays the renderer actually samples in RAM. The two huge masks are
+# bit-packed to fit (they are almost all zeros), and anything that still
+# doesn't fit the budget stays memory-mapped rather than failing.
+
+_BITPACK_KEYS = ('roads', 'rails')
+
+# Sizing, from the real atlas: 1.29 GB unpacked, of which roads and rails are
+# 1.04 GB. Packed one bit per pixel those two become ~130 MB, leaving ~246 MB
+# of everything else — about 376 MB resident in total, which a 906 MB Pi can
+# hold alongside Python, pygame and the framebuffer with room to spare.
+# Entries are taken smallest-first, so if an atlas ever grows past this the
+# thing that spills back to a memmap is the single largest grid, not the
+# dozen small ones the renderer samples every frame.
+_RESIDENT_BUDGET = 420 * 1024 * 1024
+
+
+class _BitMask:
+    """A 2-D 0/1 mask stored one bit per pixel.
+
+    Exposes just enough of the ndarray surface for _sample / _sample_at:
+    `.shape`, and fancy indexing with a pair of integer arrays. Sampling
+    stays vectorised — the unpack is a shift and a mask over the 64x64
+    window actually being drawn, not over the whole grid.
+    """
+
+    __slots__ = ('_packed', 'shape', 'dtype', 'nbytes')
+
+    def __init__(self, packed, shape):
+        self._packed = packed
+        self.shape = shape
+        self.dtype = np.uint8
+        self.nbytes = packed.nbytes
+
+    def __getitem__(self, idx):
+        rows, cols = idx
+        cols = np.asarray(cols)
+        byte = self._packed[rows, cols >> 3]
+        return ((byte >> (7 - (cols & 7))) & 1).astype(np.uint8)
+
+
+def _bitmask_cache_path(unpack_dir, key):
+    return os.path.join(unpack_dir, key + '.packed.npz')
+
+
+def _load_bitmask(unpack_dir, key, fpath, progress=None):
+    """Load a sparse mask as a _BitMask, packing and caching it once.
+
+    Packing is done in row blocks so the peak extra allocation is a few MB
+    rather than a second copy of a 522 MB array — the exact thing a Pi
+    cannot afford.
+    """
+    cache = _bitmask_cache_path(unpack_dir, key)
+    if os.path.exists(cache):
+        try:
+            with np.load(cache) as z:
+                return _BitMask(z['packed'], tuple(int(v) for v in z['shape']))
+        except Exception:
+            pass    # corrupt or truncated cache: rebuild it below
+
+    src = np.load(fpath, mmap_mode='r')
+    if src.ndim != 2:
+        return np.array(src)
+
+    h, w = src.shape
+    packed = np.empty((h, (w + 7) // 8), dtype=np.uint8)
+    block = max(1, 4_000_000 // max(1, w))
+    for y0 in range(0, h, block):
+        y1 = min(h, y0 + block)
+        packed[y0:y1] = np.packbits(np.asarray(src[y0:y1]) != 0, axis=-1)
+        if progress:
+            progress(y1 / h, f"PACK {key.upper()}")
+
+    try:
+        tmp = cache + '.tmp'
+        # Write through a file object: np.savez would otherwise append its
+        # own .npz to the temp name and the rename would miss.
+        with open(tmp, 'wb') as f:
+            np.savez(f, packed=packed, shape=np.array([h, w]))
+        os.replace(tmp, cache)
+    except OSError:
+        pass        # read-only or full disk: just don't cache it
+
+    return _BitMask(packed, (h, w))
+
+
+def _make_resident(atlas, unpack_dir, names, progress=None):
+    """Pull the atlas arrays into RAM, within budget.
+
+    Smallest first, so the many small per-frame grids all win the budget
+    before any single large one can eat it.
+    """
+    entries = []
+    for fname in names:
+        key = fname[:-4] if fname.endswith('.npy') else fname
+        fpath = os.path.join(unpack_dir, fname)
+        try:
+            size = os.path.getsize(fpath)
+        except OSError:
+            size = 0
+        entries.append((size, key, fpath))
+    entries.sort()
+
+    budget = _RESIDENT_BUDGET
+    total = len(entries) or 1
+    for i, (size, key, fpath) in enumerate(entries):
+        base = i / total
+        span = 1.0 / total
+
+        if key in _BITPACK_KEYS:
+            def _sub(frac, label, _b=base, _s=span):
+                if progress:
+                    progress(_b + _s * frac, label)
+            mask = _load_bitmask(unpack_dir, key, fpath, _sub)
+            atlas[key] = mask
+            budget -= getattr(mask, 'nbytes', 0)
+            continue
+
+        if progress:
+            progress(base, "LOADING")
+        try:
+            arr = np.load(fpath, mmap_mode='r')
+        except Exception:
+            # Object arrays (place/airport names) can't be memory-mapped.
+            atlas[key] = np.load(fpath, allow_pickle=True)
+            continue
+
+        if arr.nbytes <= budget:
+            atlas[key] = np.array(arr)      # real copy: resident, no faults
+            budget -= arr.nbytes
+        else:
+            atlas[key] = arr                # over budget: leave it mapped
+    return atlas
+
 
 def _unpack_dir_for(path):
     return path[:-len('.npz')] + '_unpacked'
@@ -558,11 +699,11 @@ def _unpack_atlas(path, unpack_dir, progress=None):
 
 
 def _load_atlas_arrays(path, progress=None):
-    """Load an atlas .npz as a dict of arrays, memory-mapped where possible.
+    """Load an atlas .npz as a dict of arrays, resident where they fit.
 
     Falls back to the old eager decompress when unpacking isn't possible
     (read-only or full disk) — that path needs enough RAM for the whole
-    atlas and is what the memory-mapping exists to avoid.
+    atlas and is what the unpacking exists to avoid.
     """
     try:
         unpacked = _unpack_atlas(path, _unpack_dir_for(path), progress)
@@ -574,15 +715,7 @@ def _load_atlas_arrays(path, progress=None):
         unpack_dir = _unpack_dir_for(path)
         with zipfile.ZipFile(path) as z:
             names = z.namelist()
-        for fname in names:
-            key = fname[:-4] if fname.endswith('.npy') else fname
-            fpath = os.path.join(unpack_dir, fname)
-            try:
-                atlas[key] = np.load(fpath, mmap_mode='r')
-            except Exception:
-                # Object arrays (place/airport names) can't be memory-mapped
-                atlas[key] = np.load(fpath, allow_pickle=True)
-        return atlas
+        return _make_resident(atlas, unpack_dir, names, progress)
 
     d = np.load(path, allow_pickle=True)
     for key in d.files:
