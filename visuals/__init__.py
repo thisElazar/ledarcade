@@ -146,6 +146,7 @@ from .credits import Credits
 from .stats import Stats
 from .controls import Controls
 from .shutdown import Shutdown
+from .usb_share import UsbShare
 from .wifi_config import WiFiConfig
 from .refresh import Refresh
 from .idlemix import IdleMix
@@ -429,6 +430,7 @@ ALL_VISUALS = [
     Stats,
     Controls,
     Shutdown,
+    UsbShare,
     WiFiConfig,
     Refresh,
     IdleMix,
@@ -770,6 +772,7 @@ __all__ = [
     'Stats',
     'Controls',
     'Shutdown',
+    'UsbShare',
     'Refresh',
     'IdleMix',
     'NewtonCradle',

@@ -10201,6 +10201,12 @@
           "cls": "Refresh",
           "module": "visuals/refresh.py",
           "is_game": false
+        },
+        {
+          "name": "USB SHARE",
+          "cls": "UsbShare",
+          "module": "visuals/usb_share.py",
+          "is_game": false
         }
       ]
     }

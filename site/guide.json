@@ -6697,6 +6697,17 @@
       "Up/Down": "Select YES/NO",
       "Button": "Confirm selection"
      }
+    },
+    {
+     "name": "USB SHARE",
+     "cls": "UsbShare",
+     "module": "visuals/usb_share.py",
+     "desc": "Copy your PAINT and PAINT GIF creations onto a USB stick, or bring in art from another cabinet. Nothing gets duplicated, and the stick is safe to pull out as soon as it says so.",
+     "controls": {
+      "Up/Down": "Select SEND/GET",
+      "Button": "Confirm selection",
+      "Left/Right": "Back to menu"
+     }
     }
    ]
   }
