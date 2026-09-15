@@ -478,6 +478,8 @@ def _pick_idle_visual(display):
         cat = getattr(v, 'category', '')
         if cat == 'utility':
             continue
+        if getattr(v, 'idle_exclude', False):
+            continue
 
         name = v.__name__
         if name in blacklist:
