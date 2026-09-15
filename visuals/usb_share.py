@@ -190,6 +190,20 @@ def _find_usb():
     return None, None
 
 
+def usb_present():
+    """Cheap sysfs-only check for a USB storage device with media in it."""
+    try:
+        for dev in os.listdir("/sys/block"):
+            path = os.path.join("/sys/block", dev)
+            if dev.startswith("sd") and "/usb" in os.path.realpath(path):
+                with open(os.path.join(path, "size")) as f:
+                    if int(f.read().strip() or 0) > 0:
+                        return True
+    except (OSError, ValueError):
+        pass
+    return False
+
+
 def transfer(direction):
     """Mount the stick, send ('send') or get ('get') art, unmount.
     Returns (ok, counts dict or error message)."""
@@ -232,6 +246,7 @@ class UsbShare(Visual):
     name = "USB SHARE"
     description = "Swap art on a USB stick"
     category = "utility"
+    menu_visible = staticmethod(usb_present)  # only listed while a stick is plugged in
     GUIDE = {
         'desc': 'Copy your PAINT and PAINT GIF creations onto a USB stick, or bring in art from another cabinet. Nothing gets duplicated, and the stick is safe to pull out as soon as it says so.',
     }

@@ -20,7 +20,7 @@ from enum import Enum, auto
 from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState, TERMINAL_STATES
 import update_checker
 from catalog import (
-    register_games, register_visuals, get_all_categories,
+    register_games, register_visuals, get_all_categories, sync_conditional_items,
     GAME_CATEGORIES, VISUAL_CATEGORIES, VISUAL_CATEGORY_MAP
 )
 from highscores import get_high_score_manager
@@ -651,6 +651,7 @@ def main():
     cat_scroll_held_time = 0.0   # How long left/right has been held
     cat_scroll_accum = 0.0       # Accumulator for auto-scroll timing
     cat_scroll_dir = 0           # -1 = left, +1 = right, 0 = none
+    menu_sync_timer = 0.0        # Throttle for sync_conditional_items()
 
     running = True
     while running:
@@ -777,6 +778,18 @@ def main():
                     draw_menu(display, categories, 0, 0)
                 elif not konami_match:
                     category = categories[cat_index]
+
+                    # Show/hide hardware-dependent items (USB SHARE) about once a second,
+                    # keeping the cursor on the same item if the list shifts
+                    menu_sync_timer += dt
+                    if menu_sync_timer >= 1.0:
+                        menu_sync_timer = 0.0
+                        selected = category.items[item_index] if category.items else None
+                        if sync_conditional_items() and category.items:
+                            if selected in category.items:
+                                item_index = category.items.index(selected)
+                            else:
+                                item_index = min(item_index, len(category.items) - 1)
 
                     # Category navigation (left/right) with scroll acceleration
                     if len(categories) > 1:

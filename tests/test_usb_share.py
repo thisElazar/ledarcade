@@ -80,3 +80,29 @@ def test_junk_on_a_stick_is_rejected(tmp_path):
 
     assert merge(stick, cab) == {"copied": 1, "skipped": 0, "bad": 3}
     assert _listing(cab) == ["paint_gif/my-cool-anim.gif"]
+
+
+def test_usb_share_is_only_in_the_menu_while_a_stick_is_present(monkeypatch):
+    import catalog
+    from visuals import ALL_VISUALS
+    from visuals.usb_share import UsbShare
+
+    present = False
+    monkeypatch.setattr(UsbShare, "menu_visible", staticmethod(lambda: present))
+    utility = catalog.VISUAL_CATEGORY_MAP["utility"]
+    try:
+        catalog.register_visuals(ALL_VISUALS)
+        assert UsbShare not in utility.items
+
+        present = True
+        assert catalog.sync_conditional_items() is True
+        assert UsbShare in utility.items
+        assert utility.items == sorted(utility.items, key=lambda c: c.name.upper())
+        assert catalog.sync_conditional_items() is False  # no change, no churn
+
+        present = False
+        assert catalog.sync_conditional_items() is True
+        assert UsbShare not in utility.items
+    finally:
+        monkeypatch.undo()
+        catalog.register_visuals(ALL_VISUALS)

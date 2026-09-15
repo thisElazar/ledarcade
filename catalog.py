@@ -102,6 +102,11 @@ GAME_CATEGORY_MAP: Dict[str, Category] = {cat.key: cat for cat in GAME_CATEGORIE
 VISUAL_CATEGORY_MAP: Dict[str, Category] = {cat.key: cat for cat in VISUAL_CATEGORIES}
 
 
+# Visuals with a menu_visible() hook (e.g. USB SHARE) are only listed while it
+# returns True; the menu loop re-checks them via sync_conditional_items().
+_CONDITIONAL: List[Tuple[Any, Category]] = []
+
+
 def register_games(game_classes):
     """Register game classes into their categories."""
     for cat in GAME_CATEGORIES:
@@ -119,15 +124,33 @@ def register_visuals(visual_classes):
     """Register visual classes into their categories."""
     for cat in VISUAL_CATEGORIES:
         cat.items = []
+    _CONDITIONAL.clear()
 
     for visual_class in visual_classes:
         if not DEV_MODE and getattr(visual_class, 'dev_only', False):
             continue
         category_key = getattr(visual_class, 'category', 'nature')
-        if category_key in VISUAL_CATEGORY_MAP:
-            VISUAL_CATEGORY_MAP[category_key].add(visual_class)
+        cat = VISUAL_CATEGORY_MAP.get(category_key, VISUAL_CATEGORY_MAP['nature'])
+        if hasattr(visual_class, 'menu_visible'):
+            _CONDITIONAL.append((visual_class, cat))
         else:
-            VISUAL_CATEGORY_MAP['nature'].add(visual_class)
+            cat.add(visual_class)
+    sync_conditional_items()
+
+
+def sync_conditional_items():
+    """Add/remove menu_visible() items to match the current conditions.
+    Returns True if any category's item list changed."""
+    changed = False
+    for visual_class, cat in _CONDITIONAL:
+        shown = visual_class in cat.items
+        if visual_class.menu_visible() != shown:
+            if shown:
+                cat.items.remove(visual_class)
+            else:
+                cat.add(visual_class)
+            changed = True
+    return changed
 
 
 def get_all_categories(mode='all'):
