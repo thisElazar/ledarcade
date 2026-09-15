@@ -69,8 +69,8 @@ class DefenderDemo(Visual):
         if self.ai_shoot:
             ai_input.action_l_held = True
         if self.ai_bomb:
-            ai_input.action_r = True
-            self.ai_bomb = False  # Single press
+            ai_input.action_r_held = True
+            self.ai_bomb = False
 
         self.game.update(ai_input, dt)
 
