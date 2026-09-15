@@ -2809,9 +2809,9 @@
      "desc": "256 elementary 1D cellular automata, each defined by a single number. Rule 30 generates randomness; Rule 110 is Turing-complete.",
      "credit": "Stephen Wolfram, 1983",
      "controls": {
-      "Left/Right": "Adjust speed",
+      "Left/Right": "Cycle through all 256 rules",
       "Up/Down": "Cycle color palette",
-      "Space": "Change rule (new pattern rolls in from bottom)"
+      "Button": "Reseed pattern"
      }
     }
    ]

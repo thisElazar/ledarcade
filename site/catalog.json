@@ -2478,7 +2478,10 @@
           "name": "JELLYFISH",
           "cls": "ParticleLife",
           "module": "visuals/particlelife.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/particlelifelab.py"
+          ]
         },
         {
           "name": "LENIA",
@@ -5976,7 +5979,10 @@
             {
               "name": "JELLYFISH",
               "cls": "ParticleLife",
-              "module": "visuals/particlelife.py"
+              "module": "visuals/particlelife.py",
+              "deps": [
+                "visuals/particlelifelab.py"
+              ]
             },
             {
               "name": "QUARKS",
@@ -8464,7 +8470,10 @@
             {
               "name": "JELLYFISH",
               "cls": "ParticleLife",
-              "module": "visuals/particlelife.py"
+              "module": "visuals/particlelife.py",
+              "deps": [
+                "visuals/particlelifelab.py"
+              ]
             },
             {
               "name": "RUCKER PAINT",
