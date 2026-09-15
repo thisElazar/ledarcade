@@ -47,7 +47,7 @@ section .wrap { max-width: 800px; }
 .accordion summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 1.2em minmax(0, 1fr) auto; align-items: baseline; gap: 12px; padding: 12px 0; }
 .accordion summary::-webkit-details-marker { display: none; }
 .accordion summary::before { content: "+"; font-family: var(--mono); color: var(--ink-3); }
-.accordion details[open] summary::before { content: "2"; }
+.accordion details[open] summary::before { content: "−"; }
 .accordion summary:hover { color: var(--rubric); }
 .accordion summary h2 { font-size: 20px; font-weight: 500; }
 .accordion summary .count { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
