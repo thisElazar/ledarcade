@@ -56,9 +56,13 @@ FADE_DURATION = 0.5            # fade transition
 MANUAL_PAUSE = 15.0            # seconds to pause auto-cycle after manual input
 
 # Vertical zones shared across scenes
-LABEL_Y = 59                   # y for label text
+LABEL_Y = 58                   # y for label text (5-row font, 1px gutter)
 MANTLE_BOTTOM = 52             # below this is deep mantle
 DEEP_BOTTOM = 57               # below this is label area
+
+# Pixels of surface travel per second. Slow enough to read as geology rather
+# than as a scrolling background, fast enough that a 10s scene visibly moves.
+DRIFT_RATE = 1.6
 
 # Mantle gradient colors
 MANTLE_TOP_C = (200, 80, 20)   # warm orange near crust
@@ -121,6 +125,12 @@ class Tectonic(Visual):
         self._trn_ripple = []          # transform ripple particles
         self._trn_offset_shift = 0.0   # animated offset for plates
 
+        # Plate drift. The boundary scenes used to be still frames with
+        # arrows drawn on top telling you which way things were supposed to
+        # be going; this is how far the surface has actually travelled, and
+        # the crust texture is sampled through it so the plates move.
+        self._drift = 0.0
+
         # Hotspot
         self._hot_plume = []
         self._hot_plate_offset = 0.0
@@ -138,7 +148,6 @@ class Tectonic(Visual):
 
         self._init_scene(self.scene_idx)
         self._build_notes_segments()
-        self._show_overlay("DIVERGENT")
 
     # ── scene init ─────────────────────────────────────────────────
 
@@ -315,7 +324,10 @@ class Tectonic(Visual):
         self.fade_from = self.scene_idx
         self.fade_to = to_idx
         self._init_scene(to_idx)
-        self._show_overlay(SCENES[to_idx])
+        # No scene-name overlay here. Each scene draws its own name along the
+        # bottom, and during the half-second cross-fade the outgoing scene is
+        # still drawing its label — so announcing the incoming name up top put
+        # CONVERGENT and DIVERGENT on screen at once, over a divergent rift.
 
     def _trigger_event(self):
         """Trigger a scene-specific event."""
@@ -378,6 +390,8 @@ class Tectonic(Visual):
             if self.scene_timer <= 0:
                 next_idx = (self.scene_idx + 1) % len(SCENES)
                 self._start_fade(next_idx)
+
+        self._drift += sdt * DRIFT_RATE
 
         # Update active scene(s)
         active = self.scene_idx
@@ -585,7 +599,14 @@ class Tectonic(Visual):
                 d.set_pixel(x, y, _add_color(cur, c))
 
     def _draw_label(self, text, brightness):
-        """Draw scene label centered at bottom."""
+        """Draw scene label centered at bottom.
+
+        Both scenes render during the cross-fade, and two centred labels at
+        the same y overprint into unreadable mush. Only the dominant half of
+        the fade gets to draw, so the name swaps once, cleanly.
+        """
+        if brightness < 0.5:
+            return
         d = self.display
         text_w = len(text) * 4
         x = max(0, (64 - text_w) // 2)
@@ -648,11 +669,16 @@ class Tectonic(Visual):
         crust_top = 10
         crust_bot = 18
 
-        # Surface terrain on top of plates (sparse green/brown)
+        # Surface terrain on top of plates (sparse green/brown).
+        # Both plates are sampled through the drift, in opposite directions:
+        # features march away from the rift as new crust is made at it, which
+        # is sea-floor spreading and the reason the arrows point outward.
+        drift = self._drift
         for x in range(64):
             in_gap = 28 <= x <= 35
             if in_gap:
                 continue
+            tex_x = int(x + drift) if x < 28 else int(x - drift)
 
             for y in range(crust_top, crust_bot):
                 # Layered texture: top rows darker (soil), lower rows lighter (rock)
@@ -665,12 +691,15 @@ class Tectonic(Visual):
                     base = (160, 130, 80)   # tan rock
                 else:
                     base = (130, 105, 65)   # deeper rock
+                # Per-column shade keyed to the drifting coordinate, so the
+                # body of the plate moves too and not just the vegetation.
+                base = _scale_color(base, 0.88 + 0.12 * ((tex_x * 7) % 5) / 4.0)
                 c = _scale_color(base, br)
                 cur = d.get_pixel(x, y)
                 d.set_pixel(x, y, _add_color(cur, c))
 
             # Sparse surface vegetation
-            if x % 5 == 2 or x % 7 == 0:
+            if tex_x % 5 == 2 or tex_x % 7 == 0:
                 py = crust_top - 1
                 if 0 <= py < 64 and not in_gap:
                     green = _scale_color((40, 80, 30), br)
@@ -794,6 +823,9 @@ class Tectonic(Visual):
                 d.set_pixel(x, sy, _add_color(cur, shimmer))
 
         # -- Oceanic crust (thin, gray-blue) --
+        # Banded through the drift so the sea floor is visibly conveyed into
+        # the trench rather than sitting still under an arrow that says it is.
+        drift = self._drift
         for x in range(0, 30):
             top = oceanic_crust_top
             bot = oceanic_crust_bot
@@ -802,11 +834,13 @@ class Tectonic(Visual):
                 bend = (x - 24) * 1.5
                 top = int(oceanic_crust_top + bend)
                 bot = int(oceanic_crust_bot + bend)
+            band = 0.85 + 0.15 * (int(x - drift) % 4) / 3.0
             for y in range(top, bot):
                 if y >= 64:
                     break
                 layer_t = (y - top) / max(1, bot - top - 1)
                 base = _lerp_color((70, 80, 95), (50, 60, 75), layer_t)
+                base = _scale_color(base, band)
                 c = _scale_color(base, br)
                 cur = d.get_pixel(x, y)
                 d.set_pixel(x, y, _add_color(cur, c))
@@ -959,16 +993,20 @@ class Tectonic(Visual):
                     cur = d.get_pixel(draw_x, sy)
                     d.set_pixel(draw_x, sy, _add_color(cur, stripe_c))
 
-        # Surface features: sparse brown terrain, slightly different elevation
+        # Surface features: sparse brown terrain, slightly different elevation.
+        # The two blocks slide past each other, so their terrain is sampled
+        # through the drift in opposite directions along the fault.
+        drift = self._drift
         for x in range(64):
             if x == fault_x or x == fault_x - 1:
                 continue
             on_left = x < fault_x - 1
+            tex_x = int(x - drift) if on_left else int(x + drift)
             surface_y = crust_top - 1
             if on_left:
-                surface_y = crust_top - 2 if x % 6 < 3 else crust_top - 1
+                surface_y = crust_top - 2 if tex_x % 6 < 3 else crust_top - 1
             else:
-                surface_y = crust_top - 1 if x % 6 < 3 else crust_top - 2
+                surface_y = crust_top - 1 if tex_x % 6 < 3 else crust_top - 2
             if 0 <= surface_y < 64:
                 terrain_c = _scale_color((80, 65, 40), br)
                 cur = d.get_pixel(x, surface_y)

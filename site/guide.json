@@ -2649,6 +2649,20 @@
      }
     },
     {
+     "name": "LIFE LAB",
+     "cls": "LifeLab",
+     "module": "visuals/lifelab.py",
+     "desc": "A bench for Conway's Life. Load a famous seed \u2014 Gosper's glider gun, the R-pentomino, a diehard \u2014 choose a life-like rule, and set it running. The same seed under a different rule behaves nothing like itself.",
+     "credit": "John Conway, 1970",
+     "controls": {
+      "Left/Right": "Cycle seed pattern",
+      "Up/Down": "Cycle rule",
+      "Action L": "Run / pause",
+      "Action R": "Reseed the current pattern",
+      "Both": "Commit rule + pattern to settings"
+     }
+    },
+    {
      "name": "MITOSIS",
      "cls": "Mitosis",
      "module": "visuals/mitosis.py",
@@ -3927,8 +3941,8 @@
      "desc": "A phase transition in connectivity. Below a critical threshold, clusters stay isolated. Above it, a spanning cluster suddenly connects the entire grid.",
      "credit": "Broadbent & Hammersley, 1957",
      "controls": {
-      "Left/Right": "Adjust occupation probability p",
-      "Action": "Regenerate grid"
+      "Left/Right": "Raise / lower p",
+      "Action": "Deal a fresh lattice"
      }
     },
     {
@@ -4583,7 +4597,7 @@
      "credit": "Biham, Middleton & Levine, 1992",
      "controls": {
       "Up/Down": "Adjust density",
-      "Space": "Reset with current density"
+      "Action": "Reset with current density"
      }
     },
     {
@@ -4787,12 +4801,13 @@
      "name": "RADIOACTIVE",
      "cls": "Radioactive",
      "module": "visuals/radioactive.py",
-     "desc": "A grid of atoms spontaneously decays, emitting alpha, beta, and gamma particles. Five scenarios demonstrate different decay modes. Each event is probabilistic \u2014 quantum randomness made visible.",
+     "desc": "A single nucleus drawn as the protons and neutrons it contains, stepping down a real decay chain. Alpha decay throws off two protons and two neutrons; beta decay turns a neutron into a proton. Uranium-238 needs fourteen decays to reach stable lead-206.",
+     "credit": "Henri Becquerel, 1896",
      "controls": {
-      "Left/Right": "Cycle scenario",
-      "Up/Down": "Cycle color palette",
-      "Single button": "Reset current scenario",
-      "Both buttons": "Toggle scrolling notes"
+      "Left/Right": "Step through the chain",
+      "Up/Down": "Change decay chain",
+      "Single button": "Force the next decay",
+      "Both buttons": "Toggle the chain map"
      }
     },
     {
@@ -5010,18 +5025,6 @@
       "Left/Right": "Mutation rate (low = exploitation, high = exploration)",
       "Up/Down": "Cycle landscape type",
       "Space": "Mass extinction (kill 80%)"
-     }
-    },
-    {
-     "name": "GENETIC DRIFT",
-     "cls": "GeneticDrift",
-     "module": "visuals/geneticdrift.py",
-     "desc": "Allele frequencies shift through random sampling in finite populations. Watch genetic diversity rise and fall without selection pressure \u2014 pure chance shaping evolution.",
-     "credit": "Hardy & Weinberg, 1908",
-     "controls": {
-      "Left/Right": "Population size",
-      "Up/Down": "Selection pressure (favors A)",
-      "Action": "Bottleneck (kill 90%)"
      }
     },
     {
@@ -5809,6 +5812,7 @@
       "LENIA",
       "LENIA LAB",
       "LIFE",
+      "LIFE LAB",
       "MITOSIS",
       "MITOSIS LAB",
       "JELLYFISH",
@@ -5895,7 +5899,6 @@
       "CONSTELLATIONS",
       "ECOSYSTEM",
       "EVOLUTION",
-      "GENETIC DRIFT",
       "EARTH",
       "MOON PHASES",
       "SOLAR SYSTEM",

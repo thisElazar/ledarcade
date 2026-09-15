@@ -76,6 +76,7 @@ from .starfield import Starfield
 from .fire import Fire
 from .matrix import Matrix
 from .life import Life
+from .lifelab import LifeLab
 from .clock import Clock
 from .weather import Weather
 from .dvd import DVD
@@ -332,7 +333,6 @@ from .gametheory import GameTheory
 from .erosion import Erosion
 from .atlas import Atlas
 # globe.py class renamed to Earth (old GIF-based earth.py deleted)
-from .geneticdrift import GeneticDrift
 from .convection import Convection
 from .entropy import Entropy
 from .maxwell import MaxwellDemon
@@ -354,6 +354,7 @@ ALL_VISUALS = [
     Fire,
     Matrix,
     Life,
+    LifeLab,
     Clock,
     Weather,
     DVD,
@@ -618,7 +619,6 @@ ALL_VISUALS = [
     GameTheory,
     Erosion,
     Atlas,
-    GeneticDrift,
     Convection,
     Entropy,
     MaxwellDemon,
@@ -701,6 +701,7 @@ __all__ = [
     'Fire',
     'Matrix',
     'Life',
+    'LifeLab',
     'Clock',
     'Weather',
     'DVD',
@@ -878,7 +879,6 @@ __all__ = [
     'GameTheory',
     'Erosion',
     'Atlas',
-    'GeneticDrift',
     'Convection',
     'Entropy',
     'MaxwellDemon',

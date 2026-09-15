@@ -2507,6 +2507,12 @@
           "is_game": false
         },
         {
+          "name": "LIFE LAB",
+          "cls": "LifeLab",
+          "module": "visuals/lifelab.py",
+          "is_game": false
+        },
+        {
           "name": "MITOSIS",
           "cls": "Mitosis",
           "module": "visuals/mitosis.py",
@@ -4553,12 +4559,6 @@
           "is_game": false
         },
         {
-          "name": "GENETIC DRIFT",
-          "cls": "GeneticDrift",
-          "module": "visuals/geneticdrift.py",
-          "is_game": false
-        },
-        {
           "name": "MOON PHASES",
           "cls": "MoonPhases",
           "module": "visuals/moon.py",
@@ -5959,6 +5959,11 @@
               "module": "visuals/life.py"
             },
             {
+              "name": "LIFE LAB",
+              "cls": "LifeLab",
+              "module": "visuals/lifelab.py"
+            },
+            {
               "name": "MITOSIS",
               "cls": "Mitosis",
               "module": "visuals/mitosis.py"
@@ -6404,11 +6409,6 @@
               "name": "EVOLUTION",
               "cls": "Evolution",
               "module": "visuals/evolution.py"
-            },
-            {
-              "name": "GENETIC DRIFT",
-              "cls": "GeneticDrift",
-              "module": "visuals/geneticdrift.py"
             },
             {
               "name": "EARTH",

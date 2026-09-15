@@ -1,16 +1,18 @@
 """
-Percolation - Phase Transition
-===============================
-Site percolation on a 64x64 grid. Each cell is open with probability p.
-At the critical threshold (p ~ 0.593), a giant cluster suddenly connects
-across the entire grid -- a dramatic phase transition.
+Percolation - Critical Threshold
+=================================
+Site percolation on a fixed lattice. Every site is dealt a hidden
+threshold once; a site is open when p rises past its threshold. So p only
+ever *opens* sites -- clusters grow, touch, and swallow each other, and at
+the critical point (p ~ 0.593) one of them abruptly spans the whole grid.
 
-The auto-sweep slowly raises p from below critical to above, lingering
-at the transition so you can watch the spanning cluster ignite.
+Dealing the thresholds once is the whole point. Re-rolling the lattice at
+each p shows only disconnected snapshots of noise; holding it fixed makes
+the transition a single continuous story you can watch ignite.
 
 Controls:
-  Left/Right  - Adjust occupation probability p
-  Action      - Regenerate grid
+  Left/Right  - Raise / lower p
+  Action      - Deal a fresh lattice
 """
 
 import random
@@ -24,23 +26,53 @@ VIVID_COLORS = [
     (255, 60, 180), (120, 255, 60), (255, 80, 120),
 ]
 
-SMALL_THRESHOLD = 8
-MEDIUM_THRESHOLD = 40
+# A cluster earns a vivid color once it reaches this many sites; below it
+# stays dim, so growth reads as clusters *lighting up* one after another.
+VIVID_THRESHOLD = 14
 
 BLOCKED_COLOR = (4, 3, 8)
-DIM_CLUSTER_COLOR = (25, 25, 35)
+DIM_CLUSTER_COLOR = (30, 30, 42)
+FRESH_COLOR = (150, 170, 200)   # a site the rising p just opened
 
 P_CRIT = 0.593
-N = GRID_SIZE  # 64
+
+# Layout: lattice on top, HUD strip along the bottom. The old build drew the
+# p-bar straight over row 63, eating the bottom row of the lattice.
+W = GRID_SIZE               # 64
+H = 58                      # lattice rows 0..57
+HUD_Y = 59                  # 5-row HUD band (3x5 font) at rows 59..63
+BAR_Y = 61
+BAR_X0 = 26
+
+P_MIN, P_MAX = 0.20, 0.85
 
 
-class _UnionFind:
-    """Weighted quick-union with path compression."""
-    __slots__ = ('parent', 'rank')
+class _Lattice:
+    """Union-find over the sites, grown by raising p.
 
-    def __init__(self, n):
+    Weighted union by size with path compression, plus two things the plain
+    algorithm doesn't carry: each root keeps the list of its members (so a
+    merge can repaint just the absorbed side) and the four edges its cluster
+    touches (so spanning is O(1) at union time, not an O(N) rescan per step).
+    """
+
+    __slots__ = ('parent', 'size', 'members', 'edges', 'color', 'is_open',
+                 'threshold', 'order', 'cursor', 'spanning_root', '_vivid_i')
+
+    def __init__(self):
+        n = W * H
         self.parent = list(range(n))
-        self.rank = [0] * n
+        self.size = [1] * n
+        self.members = [None] * n          # only maintained for live roots
+        self.edges = [0] * n               # bit 1=left 2=right 4=top 8=bottom
+        self.color = [None] * n
+        self.is_open = [False] * n
+        self.threshold = [random.random() for _ in range(n)]
+        # Sites in the order p will open them.
+        self.order = sorted(range(n), key=self.threshold.__getitem__)
+        self.cursor = 0
+        self.spanning_root = None
+        self._vivid_i = 0
 
     def find(self, x):
         p = self.parent
@@ -49,15 +81,106 @@ class _UnionFind:
             x = p[x]
         return x
 
-    def union(self, a, b):
+    def _edge_bits(self, idx):
+        x = idx % W
+        y = idx // W
+        bits = 0
+        if x == 0:
+            bits |= 1
+        if x == W - 1:
+            bits |= 2
+        if y == 0:
+            bits |= 4
+        if y == H - 1:
+            bits |= 8
+        return bits
+
+    def _next_vivid(self):
+        c = VIVID_COLORS[self._vivid_i % len(VIVID_COLORS)]
+        self._vivid_i += 1
+        return c
+
+    def open_to(self, p, repaint):
+        """Open every site whose threshold has fallen below p.
+
+        `repaint(idx, color)` is called for each pixel that changed, so the
+        caller only touches what actually moved.
+        """
+        order = self.order
+        thr = self.threshold
+        n = len(order)
+        while self.cursor < n and thr[order[self.cursor]] <= p:
+            idx = order[self.cursor]
+            self.cursor += 1
+            self._open_site(idx, repaint)
+
+    def _open_site(self, idx, repaint):
+        self.is_open[idx] = True
+        self.members[idx] = [idx]
+        self.edges[idx] = self._edge_bits(idx)
+        self.size[idx] = 1
+        self.color[idx] = None
+        repaint(idx, FRESH_COLOR)
+
+        x = idx % W
+        y = idx // W
+        if x > 0 and self.is_open[idx - 1]:
+            self._union(idx, idx - 1, repaint)
+        if x < W - 1 and self.is_open[idx + 1]:
+            self._union(idx, idx + 1, repaint)
+        if y > 0 and self.is_open[idx - W]:
+            self._union(idx, idx - W, repaint)
+        if y < H - 1 and self.is_open[idx + W]:
+            self._union(idx, idx + W, repaint)
+
+        # Settle just this pixel into its cluster's color -- unless the site
+        # tipped the cluster over the vivid threshold, which lights it up whole.
+        self._refresh_color(self.find(idx), repaint, [idx])
+
+    def _union(self, a, b, repaint):
         ra, rb = self.find(a), self.find(b)
         if ra == rb:
             return
-        if self.rank[ra] < self.rank[rb]:
+        # Larger cluster wins: it keeps its identity and color, the smaller
+        # one is absorbed and repainted. That asymmetry is what makes the
+        # giant cluster read as *eating* its neighbours near p_c.
+        if self.size[ra] < self.size[rb]:
             ra, rb = rb, ra
         self.parent[rb] = ra
-        if self.rank[ra] == self.rank[rb]:
-            self.rank[ra] += 1
+        self.size[ra] += self.size[rb]
+        self.edges[ra] |= self.edges[rb]
+        absorbed = self.members[rb]
+        self.members[ra].extend(absorbed)
+        self.members[rb] = None
+        if self.color[ra] is None:
+            self.color[ra] = self.color[rb]
+        self.color[rb] = None
+
+        bits = self.edges[ra]
+        if self.spanning_root is None and ((bits & 3) == 3 or (bits & 12) == 12):
+            self.spanning_root = ra
+
+        self._refresh_color(ra, repaint, absorbed)
+
+    def _refresh_color(self, root, repaint, only):
+        """Settle a cluster's color and repaint `only` those of its members.
+
+        `only` matters: near p_c the giant cluster holds thousands of sites,
+        and repainting all of them every time one more joins is what turns a
+        cheap sweep into a stall. The one case worth the full sweep is the
+        frame a cluster crosses into vivid -- it lights up all at once.
+        """
+        if self.size[root] >= VIVID_THRESHOLD and self.color[root] is None:
+            self.color[root] = self._next_vivid()
+            only = self.members[root]
+        col = self.color[root] or DIM_CLUSTER_COLOR
+        for i in only:
+            repaint(i, col)
+
+    def spanning_members(self):
+        if self.spanning_root is None:
+            return ()
+        return self.members[self.find(self.spanning_root)]
 
 
 class Percolation(Visual):
@@ -74,241 +197,170 @@ class Percolation(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.p = 0.50
-
-        # Pre-baked pixel buffer: (r,g,b) per pixel, set in _generate()
-        self._pixels = [[(0, 0, 0)] * N for _ in range(N)]
-        # List of (x, y) coords that belong to the spanning cluster (for pulse)
-        self._spanning_coords = []
-        self.has_spanning = False
-
-        # Overlay
-        self.overlay_timer = 0.0
-        self.spans_flash_timer = 0.0
-
-        # Auto-sweep
+        self.p = P_MIN
         self.idle_timer = 0.0
-        self.auto_sweep = False
-        self.sweep_p = 0.40
-        self.sweep_speed = 0.01
-        self.sweep_interval = 0.8
-        self.sweep_timer = 0.0
-        self.sweep_pause = 0.0
-
-        self._generate()
-
-    def _generate(self):
-        """Generate grid, compute clusters, and pre-bake the pixel buffer."""
-        p = self.p
-
-        # Random grid (flat list for speed)
-        grid = [random.random() < p for _ in range(N * N)]
-
-        # Union-Find
-        uf = _UnionFind(N * N)
-        for y in range(N):
-            row = y * N
-            for x in range(N):
-                idx = row + x
-                if not grid[idx]:
-                    continue
-                if x + 1 < N and grid[idx + 1]:
-                    uf.union(idx, idx + 1)
-                if y + 1 < N and grid[idx + N]:
-                    uf.union(idx, idx + N)
-
-        # Compute cluster sizes by root
-        root_sizes = {}
-        for idx in range(N * N):
-            if grid[idx]:
-                root = uf.find(idx)
-                root_sizes[root] = root_sizes.get(root, 0) + 1
-
-        # Detect spanning clusters (left↔right or top↔bottom)
-        left_roots = set()
-        right_roots = set()
-        top_roots = set()
-        bottom_roots = set()
-        for i in range(N):
-            idx = i * N  # left column
-            if grid[idx]:
-                left_roots.add(uf.find(idx))
-            idx = i * N + N - 1  # right column
-            if grid[idx]:
-                right_roots.add(uf.find(idx))
-            idx = i  # top row
-            if grid[idx]:
-                top_roots.add(uf.find(idx))
-            idx = (N - 1) * N + i  # bottom row
-            if grid[idx]:
-                bottom_roots.add(uf.find(idx))
-
-        spanning_roots = (left_roots & right_roots) | (top_roots & bottom_roots)
-        self.has_spanning = len(spanning_roots) > 0
-
-        # Assign colors to roots by size (largest get vivid colors)
-        sorted_roots = sorted(root_sizes.items(), key=lambda x: -x[1])
-        root_colors = {}
-        vivid_idx = 0
-        for root, size in sorted_roots:
-            if root in spanning_roots:
-                root_colors[root] = None  # sentinel: spanning
-            elif size >= MEDIUM_THRESHOLD:
-                root_colors[root] = VIVID_COLORS[vivid_idx % len(VIVID_COLORS)]
-                vivid_idx += 1
-            elif size >= SMALL_THRESHOLD:
-                base = VIVID_COLORS[vivid_idx % len(VIVID_COLORS)]
-                root_colors[root] = (base[0] // 3, base[1] // 3, base[2] // 3)
-                vivid_idx += 1
-            else:
-                root_colors[root] = DIM_CLUSTER_COLOR
-
-        # Pre-bake pixel buffer and collect spanning coords
-        pixels = self._pixels
-        spanning_coords = []
-        for y in range(N):
-            row = pixels[y]
-            for x in range(N):
-                idx = y * N + x
-                if not grid[idx]:
-                    row[x] = BLOCKED_COLOR
-                    continue
-                root = uf.find(idx)
-                col = root_colors.get(root, DIM_CLUSTER_COLOR)
-                if col is None:
-                    # Spanning cluster: store base gold, will pulse in draw()
-                    row[x] = (255, 220, 120)  # base color, overwritten each frame
-                    spanning_coords.append((x, y))
-                else:
-                    row[x] = col
-
-        self._spanning_coords = spanning_coords
-
-        # Overlays
+        self.auto_sweep = True
+        self.hold_timer = 0.0
         self.overlay_timer = 2.0
-        if self.has_spanning:
+        self.spans_flash_timer = 0.0
+        self._deal()
+
+    def _deal(self):
+        """Deal a fresh hidden threshold per site and flood back up to p."""
+        self._pixels = [BLOCKED_COLOR] * (W * H)
+        self.lattice = _Lattice()
+        self._spanning_cache = ()
+        self._had_spanning = False
+        self.lattice.open_to(self.p, self._repaint)
+        self._sync_spanning()
+
+    def _repaint(self, idx, color):
+        self._pixels[idx] = color
+
+    def _set_p(self, p):
+        """Move p. Rising just opens more sites; falling re-deals, because a
+        site that has opened cannot un-open without rebuilding the clusters."""
+        p = min(P_MAX, max(P_MIN, p))
+        if p < self.p:
+            self.p = p
+            self._deal()
+            return
+        self.p = p
+        self.lattice.open_to(p, self._repaint)
+        self._sync_spanning()
+
+    def _sync_spanning(self):
+        self._spanning_cache = self.lattice.spanning_members()
+        if self._spanning_cache and not self._had_spanning:
+            self._had_spanning = True
             self.spans_flash_timer = 3.0
+
+    # -- input --------------------------------------------------------
 
     def handle_input(self, input_state) -> bool:
         consumed = False
 
         if input_state.action_l or input_state.action_r:
-            self._generate()
+            self.p = P_MIN
+            self._deal()
+            self.overlay_timer = 2.0
             self.idle_timer = 0.0
             self.auto_sweep = False
             consumed = True
 
         if input_state.left_pressed:
-            self.p = max(0.20, round(self.p - 0.01, 2))
-            self._generate()
+            self._set_p(round(self.p - 0.01, 3))
+            self.overlay_timer = 2.0
             self.idle_timer = 0.0
             self.auto_sweep = False
             consumed = True
         if input_state.right_pressed:
-            self.p = min(0.80, round(self.p + 0.01, 2))
-            self._generate()
+            self._set_p(round(self.p + 0.01, 3))
+            self.overlay_timer = 2.0
             self.idle_timer = 0.0
             self.auto_sweep = False
             consumed = True
 
         return consumed
 
+    # -- update -------------------------------------------------------
+
     def update(self, dt: float):
         self.time += dt
-
         if self.overlay_timer > 0:
             self.overlay_timer -= dt
         if self.spans_flash_timer > 0:
             self.spans_flash_timer -= dt
 
-        # Auto-sweep
         if not self.auto_sweep:
             self.idle_timer += dt
             if self.idle_timer >= 6.0:
                 self.auto_sweep = True
-                self.sweep_p = 0.40
-                self.sweep_timer = 0.0
-                self.sweep_pause = 0.0
-                self.p = self.sweep_p
-                self._generate()
-        else:
-            if self.sweep_pause > 0:
-                self.sweep_pause -= dt
-                return
+                self.p = P_MIN
+                self.hold_timer = 0.0
+                self._deal()
+            return
 
-            self.sweep_timer += dt
-            if self.sweep_timer >= self.sweep_interval:
-                self.sweep_timer -= self.sweep_interval
-                self.sweep_p += self.sweep_speed
+        if self.hold_timer > 0:
+            self.hold_timer -= dt
+            return
 
-                if self.sweep_p > 0.72:
-                    self.sweep_p = 0.40
-                    self.sweep_timer = 0.0
-                    self.sweep_pause = 2.0
+        # Crawl through the transition and hurry along the dull ends, so the
+        # interesting 0.55-0.62 window gets most of the screen time.
+        dist = abs(self.p - P_CRIT)
+        speed = 0.010 if dist < 0.04 else (0.030 if dist < 0.12 else 0.055)
+        self._set_p(self.p + speed * dt)
 
-                self.p = round(self.sweep_p, 3)
-                self._generate()
+        if self._spanning_cache and self.hold_timer <= 0 and self.p >= P_CRIT:
+            # Let the spanning cluster sit for a beat, then start over.
+            if self.p >= P_CRIT + 0.06:
+                self.hold_timer = 3.0
+                self.p = P_MIN
+                self._deal()
+                self.overlay_timer = 2.0
 
-                if abs(self.p - P_CRIT) < 0.03:
-                    self.sweep_pause = 1.5
+    # -- draw ---------------------------------------------------------
 
     def draw(self):
         d = self.display
         d.clear()
         set_pixel = d.set_pixel
-        t = self.time
-
-        # Blit pre-baked pixel buffer (fast: no per-pixel logic)
         pixels = self._pixels
-        for y in range(N):
-            row = pixels[y]
-            for x in range(N):
-                c = row[x]
-                if c != BLOCKED_COLOR:
+
+        i = 0
+        for y in range(H):
+            for x in range(W):
+                c = pixels[i]
+                i += 1
+                if c is not BLOCKED_COLOR:
                     set_pixel(x, y, c)
 
-        # Pulse spanning cluster pixels (only those, not all 4096)
-        if self._spanning_coords:
-            pulse = 0.55 + 0.45 * math.sin(t * 3.5)
-            hue_t = t * 0.4
-            sr = int(255 * (0.9 + 0.1 * math.sin(hue_t)) * pulse)
-            sg = int(220 * (0.8 + 0.2 * math.sin(hue_t + 1.0)) * pulse)
-            sb = int(120 * (0.6 + 0.4 * math.sin(hue_t + 2.0)) * pulse)
-            sr = min(255, sr)
-            sg = min(255, sg)
-            sb = min(255, sb)
-            span_col = (sr, sg, sb)
-            for x, y in self._spanning_coords:
-                set_pixel(x, y, span_col)
+        # The spanning cluster pulses, but never dims to nothing -- the old
+        # build let the pulse bottom out and the punchline vanished mid-swing.
+        if self._spanning_cache:
+            pulse = 0.88 + 0.12 * math.sin(self.time * 3.5)
+            span_col = (min(255, int(255 * pulse)),
+                        min(255, int(225 * pulse)),
+                        min(255, int(130 * pulse)))
+            for idx in self._spanning_cache:
+                set_pixel(idx % W, idx // W, span_col)
 
-        # P-value bar at bottom (row 63)
-        bar_fill = int(self.p * N)
-        near_crit = abs(self.p - P_CRIT) < 0.015
-        crit_pixel = int(P_CRIT * N)
+        self._draw_hud()
 
-        for x in range(N):
-            if x < bar_fill:
-                if near_crit:
-                    set_pixel(x, 63, (255, 140, 40))
-                else:
-                    set_pixel(x, 63, (60, 80, 140))
-            else:
-                set_pixel(x, 63, (8, 8, 15))
-
-        # Critical threshold tick
-        set_pixel(crit_pixel, 62, (120, 60, 60))
-
-        # "SPANS!" flash
-        if self.spans_flash_timer > 0 and self.has_spanning:
+        if self.spans_flash_timer > 0:
             alpha = min(1.0, self.spans_flash_timer / 0.5)
-            flash = 0.5 + 0.5 * math.sin(t * 8.0)
-            bright = int(255 * alpha * (0.5 + 0.5 * flash))
-            col = (bright, bright, min(255, int(bright * 0.6)))
-            d.draw_text_small(2, 2, "SPANS!", col)
+            flash = 0.5 + 0.5 * math.sin(self.time * 8.0)
+            b = int(255 * alpha * (0.55 + 0.45 * flash))
+            d.draw_text_small(2, 2, "SPANS!", (b, b, min(255, int(b * 0.6))))
 
-        # P value overlay
-        if self.overlay_timer > 0:
-            alpha = min(1.0, self.overlay_timer / 0.5)
-            p_str = f"P {self.p:.2f}"
-            c = int(200 * alpha)
-            d.draw_text_small(2, 56, p_str, (c, c, int(220 * alpha)))
+    def _draw_hud(self):
+        d = self.display
+        set_pixel = d.set_pixel
+
+        near_crit = abs(self.p - P_CRIT) < 0.015
+        spanning = bool(self._spanning_cache)
+
+        # p readout, left of the scale.
+        if spanning:
+            text_col = (255, 210, 110)
+        elif near_crit:
+            text_col = (255, 150, 60)
+        else:
+            text_col = (150, 160, 200)
+        d.draw_text_small(1, HUD_Y, f"P{self.p:.2f}"[:5], text_col)
+
+        # Scale bar: filled proportion of the P_MIN..P_MAX window.
+        span = P_MAX - P_MIN
+        width = W - BAR_X0
+        fill = int(round((self.p - P_MIN) / span * width))
+        crit_x = BAR_X0 + int(round((P_CRIT - P_MIN) / span * width))
+        bar_col = (255, 150, 50) if near_crit else (70, 95, 160)
+        for x in range(BAR_X0, W):
+            lit = x - BAR_X0 < fill
+            set_pixel(x, BAR_Y, bar_col if lit else (10, 10, 18))
+            set_pixel(x, BAR_Y + 1, bar_col if lit else (10, 10, 18))
+
+        # Critical-threshold tick, above and below the bar.
+        if BAR_X0 <= crit_x < W:
+            set_pixel(crit_x, BAR_Y - 1, (200, 90, 70))
+            set_pixel(crit_x, BAR_Y + 2, (200, 90, 70))
