@@ -18,6 +18,7 @@ Controls:
 import math
 import random
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 
 class Quarks(Visual):
@@ -150,10 +151,10 @@ class Quarks(Visual):
 
         # Create animated seed points (hotspots that inject energy)
         self.seeds = []
-        num_seeds = random.randint(4, 7)
+        num_seeds = settings.get('quarks_lab_num', random.randint(4, 7))
+        move_radius = settings.get('quarks_lab_radius', random.randint(12, 22))
         for _ in range(num_seeds):
-            # Choose shape: pinwheel or donut
-            shape = random.choice(['pinwheel', 'pinwheel', 'donut'])  # 2:1 ratio
+            shape = random.choice(['pinwheel', 'pinwheel', 'donut'])
 
             seed = {
                 'base_x': random.uniform(0, GRID_SIZE),
@@ -161,8 +162,7 @@ class Quarks(Visual):
                 'phase': random.uniform(0, math.pi * 2),
                 'freq': random.uniform(0.8, 1.5),
                 'shape': shape,
-                # Movement parameters
-                'move_radius': random.uniform(12, 22),  # How far they roam
+                'move_radius': move_radius,
                 'move_speed_x': random.uniform(0.15, 0.35) * random.choice([-1, 1]),
                 'move_speed_y': random.uniform(0.15, 0.35) * random.choice([-1, 1]),
                 'move_phase_x': random.uniform(0, math.pi * 2),

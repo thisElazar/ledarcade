@@ -14,6 +14,17 @@ Controls:
 
 import random
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
+
+_RULES = [
+    ((3,), (2, 3)),         # Conway
+    ((3, 6), (2, 3)),       # HighLife
+    ((3, 6, 7, 8), (3, 4, 6, 7, 8)),  # Day & Night
+    ((3, 6, 8), (2, 4, 5)), # Morley
+    ((3, 4), (3, 4)),       # 34 Life
+    ((3, 5, 6, 7, 8), (5, 6, 7, 8)),  # Diamoeba
+    ((2,), ()),             # Seeds
+]
 
 
 class Life(Visual):
@@ -37,7 +48,9 @@ class Life(Visual):
         self.paused = False
         self.generation = 0
 
-        # Grid of cells (True = alive, False = dead)
+        rule_idx = settings.get('life_lab_rule', 0) % len(_RULES)
+        self.birth, self.survive = _RULES[rule_idx]
+
         self.grid = [[False] * GRID_SIZE for _ in range(GRID_SIZE)]
 
         # History for stepping backward
@@ -85,14 +98,10 @@ class Life(Visual):
                 neighbors = self._count_neighbors(x, y)
                 alive = self.grid[y][x]
 
-                # Conway's rules:
-                # - Live cell with 2-3 neighbors survives
-                # - Dead cell with exactly 3 neighbors becomes alive
-                # - All other cells die or stay dead
                 if alive:
-                    new_grid[y][x] = neighbors in (2, 3)
+                    new_grid[y][x] = neighbors in self.survive
                 else:
-                    new_grid[y][x] = neighbors == 3
+                    new_grid[y][x] = neighbors in self.birth
 
         self.grid = new_grid
         self.generation += 1

@@ -13,12 +13,13 @@ Notable rules:
   Rule 184 - Traffic flow modeling
 
 Controls:
-  Left/Right - Adjust speed
+  Left/Right - Cycle through all 256 rules
   Up/Down    - Cycle color palette
-  Space      - Change rule (new pattern rolls in from bottom)
+  Button     - Reseed pattern
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 
 class Wolfram(Visual):
@@ -30,24 +31,19 @@ class Wolfram(Visual):
         'credit': 'Stephen Wolfram, 1983',
     }
 
-    # Preset rules for easy cycling - notable/interesting rules
-    PRESET_RULES = [30, 90, 110, 184, 45, 73, 105, 150]
-
     def __init__(self, display: Display):
         super().__init__(display)
 
     def reset(self):
         self.time = 0.0
-        self.speed = 1.2  # Slightly faster default
+        self.speed = 1.2
         self.update_timer = 0.0
-        self.update_interval = 0.05  # Time between generations
+        self.update_interval = 0.05
 
-        # Current rule index into presets
-        self.rule_index = 0
-        self.rule = self.PRESET_RULES[self.rule_index]
-
-        # Build the rule lookup table
+        self.rule = settings.get('wolfram_rule', 30) % 256
         self.build_rule_table()
+
+        self.overlay_timer = 2.5
 
         # Clean monochrome color palettes - single color, no age gradient
         self.palettes = [
@@ -108,33 +104,33 @@ class Wolfram(Visual):
         consumed = False
 
         if input_state.up_pressed:
-            # Next color palette
             self.current_palette = (self.current_palette + 1) % len(self.palettes)
             self.cell_color = self.palettes[self.current_palette]
             consumed = True
 
         if input_state.down_pressed:
-            # Previous color palette
             self.current_palette = (self.current_palette - 1) % len(self.palettes)
             self.cell_color = self.palettes[self.current_palette]
             consumed = True
 
-        if input_state.left:
-            # Slow down
-            self.speed = max(0.3, self.speed - 0.3)
-            consumed = True
-
-        if input_state.right:
-            # Speed up
-            self.speed = min(4.0, self.speed + 0.3)
-            consumed = True
-
-        if (input_state.action_l or input_state.action_r):
-            # Next preset rule - new pattern rolls in from bottom
-            self.rule_index = (self.rule_index + 1) % len(self.PRESET_RULES)
-            self.rule = self.PRESET_RULES[self.rule_index]
+        if input_state.right_pressed:
+            self.rule = (self.rule + 1) % 256
             self.build_rule_table()
             self._reset_current_gen()
+            self.overlay_timer = 2.5
+            settings.set('wolfram_rule', self.rule)
+            consumed = True
+
+        if input_state.left_pressed:
+            self.rule = (self.rule - 1) % 256
+            self.build_rule_table()
+            self._reset_current_gen()
+            self.overlay_timer = 2.5
+            settings.set('wolfram_rule', self.rule)
+            consumed = True
+
+        if input_state.action_l or input_state.action_r:
+            self.init_pattern()
             consumed = True
 
         return consumed
@@ -152,6 +148,9 @@ class Wolfram(Visual):
         while self.update_timer >= self.update_interval:
             self.update_timer -= self.update_interval
             self.step_generation()
+
+        if self.overlay_timer > 0:
+            self.overlay_timer = max(0.0, self.overlay_timer - dt)
 
     def step_generation(self):
         """Compute next generation and scroll display."""
@@ -186,5 +185,9 @@ class Wolfram(Visual):
                     # Cell is alive - use current color
                     self.display.set_pixel(x, y, self.cell_color)
                 else:
-                    # Cell is dead - black
                     self.display.set_pixel(x, y, (0, 0, 0))
+
+        if self.overlay_timer > 0:
+            alpha = min(1.0, self.overlay_timer / 0.5)
+            c = (int(255 * alpha), int(255 * alpha), int(255 * alpha))
+            self.display.draw_text_small(2, 2, "RULE %d" % self.rule, c)

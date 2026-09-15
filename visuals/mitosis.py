@@ -20,6 +20,7 @@ Controls:
 import random
 import math
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 
 class Colony:
@@ -54,12 +55,11 @@ class Mitosis(Visual):
     def reset(self):
         self.time = 0.0
 
-        # Simulation parameters - tuned for equilibrium
-        self.base_growth_rate = 1.2  # Radius units per second
-        self.split_radius = 6.5      # Split when radius exceeds this
-        self.min_radius = 2.0        # Minimum colony size
-        self.max_colonies = 40       # Population cap
-        self.competition_strength = 0.5  # Stronger competition
+        self.base_growth_rate = settings.get('mitosis_lab_growth', 1.2)
+        self.split_radius = 6.5
+        self.min_radius = 2.0
+        self.max_colonies = 40
+        self.competition_strength = settings.get('mitosis_lab_comp', 0.5)
         self.fade_rate = 0.35        # Faster energy drain
         self.energy_from_area = 0.008  # Less energy from size
 

@@ -18,6 +18,7 @@ Controls:
 import random
 import math
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 
 class Boid:
@@ -63,10 +64,9 @@ class Boids(Visual):
         """Reset the simulation with new random boids."""
         self.time = 0.0
 
-        # Tunable weights for the three rules (stronger flocking)
-        self.separation_weight = 1.8
+        self.separation_weight = settings.get('boids_lab_sep', 1.8)
         self.alignment_weight = 1.5
-        self.cohesion_weight = 1.8
+        self.cohesion_weight = settings.get('boids_lab_coh', 1.8)
 
         # Overall speed multiplier
         self.speed_multiplier = 1.0

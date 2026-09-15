@@ -129,6 +129,7 @@ from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
 from .win95maze import Win95Maze
 from .demonspirals import DemonSpirals
 from .particlelife import ParticleLife
+from .particlelifelab import ParticleLifeLab
 from .fireflies import Fireflies
 from .starwarsca import StarWarsCA
 from .truchet import Truchet

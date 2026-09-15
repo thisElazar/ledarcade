@@ -20,6 +20,8 @@ Controls:
 import random
 import math
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
+from .particlelifelab import _build_matrix, _PRESET_NAMES
 
 
 class Particle:
@@ -69,14 +71,15 @@ class ParticleLife(Visual):
         super().__init__(display)
 
     def reset(self):
-        """Reset the simulation with new particles and rules."""
         self.time = 0.0
         self.speed = 1.0
-        self.num_species = self.DEFAULT_NUM_SPECIES
+        self.num_species = settings.get('plife_lab_species', self.DEFAULT_NUM_SPECIES)
+        self.num_species = max(3, min(6, self.num_species))
         self.num_particles = self.DEFAULT_NUM_PARTICLES
         self.interaction_radius = self.DEFAULT_INTERACTION_RADIUS
 
-        self._generate_rules()
+        preset_idx = settings.get('plife_lab_preset', 0) % len(_PRESET_NAMES)
+        self.attraction = _build_matrix(preset_idx, self.num_species)
         self._spawn_particles()
 
     def _generate_rules(self):

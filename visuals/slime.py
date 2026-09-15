@@ -13,6 +13,7 @@ Controls:
 import random
 import math
 from . import Visual, Display, Colors, GRID_SIZE
+import settings
 
 
 # Colony colors
@@ -42,6 +43,8 @@ class Slime(Visual):
         self.time = 0.0
         self.growth_speed = 1.0
         self.step_timer = 0.0
+        self.growth_chance = settings.get('slime_lab_growth', 0.15)
+        self.attack_power = settings.get('slime_lab_attack', 0.10)
 
         # Grid stores colony ID (0 = empty, 1+ = colony number)
         self.grid = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
@@ -228,7 +231,7 @@ class Slime(Visual):
 
         for x, y, neighbors in frontier:
             # Growth chance
-            if random.random() > 0.15:
+            if random.random() > self.growth_chance:
                 continue
 
             # Winner is colony with most neighbor strength
@@ -276,7 +279,7 @@ class Slime(Visual):
         # Process attacks
         for x, y, old_colony, new_colony, advantage in attacks:
             # Probability based on advantage
-            if random.random() < advantage * 0.1:
+            if random.random() < advantage * self.attack_power:
                 self.grid[y][x] = new_colony
                 self.strength[y][x] = 0.5
                 self.age[y][x] = 0
