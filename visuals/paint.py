@@ -257,7 +257,6 @@ class Paint(Visual):
                 self.mode = MODE_MENU
                 self.debounce = 0.12
                 self.menu_color = self.color_idx
-                self.menu_tool = self.tool
             self.btn_hold_time = 0.0
             self.painting = False
         self.btn_was_held = btn_now

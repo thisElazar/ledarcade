@@ -75,6 +75,7 @@ MODE_MENU = 1
 MODE_LOAD = 2
 MODE_PREVIEW = 3
 MODE_NAME = 4
+MODE_DUP = 5
 
 # Load sources
 LOAD_PROJECTS = 0  # GIF projects (proj_XXX)
@@ -148,6 +149,9 @@ class PaintGif(Visual):
         self.menu_color = self.color_idx
         self.menu_tool = self.tool
 
+        # Duplicate target (remembered): False = next frame, True = last frame
+        self.dup_to_end = False
+
         # Load browser
         self.load_source = LOAD_PROJECTS
         self.load_items = []
@@ -218,6 +222,8 @@ class PaintGif(Visual):
             self._update_preview(inp, dt)
         elif self.mode == MODE_NAME:
             self._update_name(inp, dt)
+        elif self.mode == MODE_DUP:
+            self._update_dup(inp, dt)
 
     # ── Draw mode ─────────────────────────────────────────────────────
 
@@ -253,7 +259,6 @@ class PaintGif(Visual):
                 self.mode = MODE_MENU
                 self.debounce = 0.12
                 self.menu_color = self.color_idx
-                self.menu_tool = self.tool
             self.btn_hold_time = 0.0
             self.painting = False
         self.btn_was_held = btn_now
@@ -391,8 +396,8 @@ class PaintGif(Visual):
         self.overlay_text = f"+F {self.frame_idx+1}/{len(self.frames)}"
         self.overlay_timer = 1.0
 
-    def _dup_frame(self):
-        new_idx = self.frame_idx + 1
+    def _dup_frame(self, to_end=False):
+        new_idx = len(self.frames) if to_end else self.frame_idx + 1
         dup = [row[:] for row in self.canvas]
         self.frames.insert(new_idx, dup)
         self._shift_stacks(new_idx, 1)
@@ -474,8 +479,8 @@ class PaintGif(Visual):
             self._add_frame()
             self._to_draw()
         elif t == TOOL_DUP:
-            self._dup_frame()
-            self._to_draw()
+            self.mode = MODE_DUP
+            self.debounce = 0.12
         elif t == TOOL_DEL:
             self._del_frame()
             self._to_draw()
@@ -530,6 +535,19 @@ class PaintGif(Visual):
     def _to_draw(self):
         self.mode = MODE_DRAW
         self.debounce = 0.12
+
+    # ── Duplicate target picker ───────────────────────────────────────
+
+    def _update_dup(self, inp, dt):
+        if inp.up_pressed or inp.down_pressed:
+            self.dup_to_end = not self.dup_to_end
+        if inp.left_pressed:
+            self.mode = MODE_MENU
+            self.debounce = 0.12
+            return
+        if inp.action_l or inp.action_r:
+            self._dup_frame(self.dup_to_end)
+            self._to_draw()
 
     # ── Load browser ──────────────────────────────────────────────────
 
@@ -769,6 +787,8 @@ class PaintGif(Visual):
             self._draw_preview_hud()
         elif self.mode == MODE_NAME:
             self._draw_name_entry()
+        elif self.mode == MODE_DUP:
+            self._draw_dup_picker()
 
         # Overlay feedback text
         if self.overlay_timer > 0 and self.overlay_text:
@@ -911,6 +931,18 @@ class PaintGif(Visual):
                 y += 7
 
         self.display.draw_text_small(2, 57, "L/R SOURCE", (80, 80, 80))
+
+    def _draw_dup_picker(self):
+        self.display.draw_text_small(2, 2, "DUPLICATE TO", (200, 160, 40))
+        for x in range(GRID_SIZE):
+            self.display.set_pixel(x, 10, (40, 40, 40))
+        for i, label in enumerate(("NEXT FRAME", "LAST FRAME")):
+            y = 20 + i * 10
+            selected = (i == 1) == self.dup_to_end
+            if selected:
+                self.display.draw_text_small(2, y, ">", (255, 255, 255))
+            self.display.draw_text_small(7, y, label, (255, 255, 255) if selected else (60, 60, 60))
+        self.display.draw_text_small(2, 48, "<:BACK", (120, 120, 120))
 
     def _draw_name_entry(self):
         self.display.draw_text_small(2, 2, "EXPORT GIF", (200, 160, 40))
