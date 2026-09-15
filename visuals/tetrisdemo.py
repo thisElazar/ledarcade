@@ -92,7 +92,7 @@ class TetrisDemo(Visual):
             ai_input.left = True
         else:
             # In position - hard drop!
-            ai_input.action_l = True
+            ai_input.action_r = True
             # Prepare for next piece
             self.target_col = None
             self.target_rot = None
