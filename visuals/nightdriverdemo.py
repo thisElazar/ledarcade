@@ -32,6 +32,7 @@ class NightDriverDemo(Visual):
         self.time = 0.0
         self.game = NightDriver(self.display)
         self.game.reset()
+        self.game.started = True  # skip course select menu
         self.restart_timer = 0.0
         self.decision_timer = 0.0
         self.decision_interval = 0.03  # Recalculate every 30ms for responsive steering
@@ -50,9 +51,8 @@ class NightDriverDemo(Visual):
         if self.game.state == GameState.GAME_OVER:
             self.restart_timer += dt
             if self.restart_timer > 3.0:
-                restart_input = InputState()
-                restart_input.action_l = True
-                self.game.update(restart_input, dt)
+                self.game.reset()
+                self.game.started = True
                 self.restart_timer = 0.0
             return
 

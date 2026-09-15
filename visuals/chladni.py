@@ -80,7 +80,7 @@ _RING_INNER2 = (_RING_INNER * 0.5) ** 2  # squared inner radius in (cx,cy) space
 
 class Chladni(Visual):
     name = "CHLADNI"
-    idle_exclude = True   # interactive lab with a HUD; not for the idle screen
+    # idle_exclude removed: auto-sweep makes it active on the attract screen
     description = "Vibrating plate nodal patterns"
     category = "science_bench"
     GUIDE = {
@@ -290,6 +290,9 @@ class Chladni(Visual):
             self.overlay_timer = max(0.0, self.overlay_timer - dt)
         if self.settle < 1.0:
             self.settle = min(1.0, self.settle + dt * 0.4)  # ~2.5 s to settle
+
+        # Auto-sweep frequency so patterns evolve on the attract screen
+        self.frequency += dt * 0.15
 
     def draw(self):
         d = self.display
