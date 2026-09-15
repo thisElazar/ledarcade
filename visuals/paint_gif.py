@@ -37,28 +37,29 @@ TOOL_UNDO = 6
 TOOL_REDO = 7
 TOOL_PREV = 8
 TOOL_NEXT = 9
-TOOL_ADD = 10
-TOOL_DUP = 11
-TOOL_DEL = 12
-TOOL_MOVE_FWD = 13
-TOOL_MOVE_BCK = 14
-TOOL_ONION = 15
-TOOL_PLAY = 16
-TOOL_EXPORT = 17
-TOOL_CLEAR = 18
-TOOL_SAVE = 19
-TOOL_LOAD = 20
-TOOL_STAMP = 21
+TOOL_SCRUB = 10
+TOOL_ADD = 11
+TOOL_DUP = 12
+TOOL_DEL = 13
+TOOL_MOVE_FWD = 14
+TOOL_MOVE_BCK = 15
+TOOL_ONION = 16
+TOOL_PLAY = 17
+TOOL_EXPORT = 18
+TOOL_CLEAR = 19
+TOOL_SAVE = 20
+TOOL_LOAD = 21
+TOOL_STAMP = 22
 
 TOOL_NAMES = [
     "PENCIL", "MARKER", "BRUSH", "ERASER", "FILL", "EYEDROP",
-    "UNDO", "REDO", "PREV", "NEXT", "ADD", "DUP", "DEL",
+    "UNDO", "REDO", "PREV", "NEXT", "SCRUB", "ADD", "DUP", "DEL",
     "MOVE FWD", "MOVE BCK",
     "ONION", "PLAY", "EXPORT", "CLEAR", "SAVE", "LOAD", "STAMP",
 ]
 TOOL_INITIALS = [
     "P", "M", "B", "E", "F", "D",
-    "U", "R", "<", ">", "+", "2", "X",
+    "U", "R", "<", ">", "=", "+", "2", "X",
     "}", "{",
     "O", "!", "G", "C", "S", "L", "W",
 ]
@@ -76,6 +77,11 @@ MODE_LOAD = 2
 MODE_PREVIEW = 3
 MODE_NAME = 4
 MODE_DUP = 5
+MODE_SCRUB = 6
+
+# Scrub: a tap moves one frame; holding repeats after a short delay
+SCRUB_DELAY = 0.3
+SCRUB_RATE = 0.07
 
 # Load sources
 LOAD_PROJECTS = 0  # GIF projects (proj_XXX)
@@ -152,6 +158,10 @@ class PaintGif(Visual):
         # Duplicate target (remembered): False = next frame, True = last frame
         self.dup_to_end = False
 
+        # Scrub browser
+        self.scrub_idx = 0
+        self.scrub_hold = 0.0
+
         # Load browser
         self.load_source = LOAD_PROJECTS
         self.load_items = []
@@ -224,6 +234,8 @@ class PaintGif(Visual):
             self._update_name(inp, dt)
         elif self.mode == MODE_DUP:
             self._update_dup(inp, dt)
+        elif self.mode == MODE_SCRUB:
+            self._update_scrub(inp, dt)
 
     # ── Draw mode ─────────────────────────────────────────────────────
 
@@ -475,6 +487,11 @@ class PaintGif(Visual):
         elif t == TOOL_NEXT:
             self._go_next_frame()
             self._to_draw()
+        elif t == TOOL_SCRUB:
+            self.scrub_idx = self.frame_idx
+            self.scrub_hold = 0.0
+            self.mode = MODE_SCRUB
+            self.debounce = 0.12
         elif t == TOOL_ADD:
             self._add_frame()
             self._to_draw()
@@ -535,6 +552,28 @@ class PaintGif(Visual):
     def _to_draw(self):
         self.mode = MODE_DRAW
         self.debounce = 0.12
+
+    # ── Scrub browser ─────────────────────────────────────────────────
+
+    def _update_scrub(self, inp, dt):
+        last = len(self.frames) - 1
+        if inp.left_pressed or inp.right_pressed:
+            step = -1 if inp.left_pressed else 1
+            self.scrub_idx = _clamp(self.scrub_idx + step, 0, last)
+            self.scrub_hold = 0.0
+        elif inp.dx:
+            self.scrub_hold += dt
+            if self.scrub_hold >= SCRUB_DELAY:
+                self.scrub_hold -= SCRUB_RATE
+                self.scrub_idx = _clamp(self.scrub_idx + inp.dx, 0, last)
+        else:
+            self.scrub_hold = 0.0
+
+        if inp.action_l or inp.action_r:
+            self.frame_idx = self.scrub_idx
+            self.overlay_text = f"{self.frame_idx+1}/{len(self.frames)}"
+            self.overlay_timer = 1.0
+            self._to_draw()
 
     # ── Duplicate target picker ───────────────────────────────────────
 
@@ -789,6 +828,9 @@ class PaintGif(Visual):
             self._draw_name_entry()
         elif self.mode == MODE_DUP:
             self._draw_dup_picker()
+        elif self.mode == MODE_SCRUB:
+            self._draw_canvas(self.frames[self.scrub_idx])
+            self._draw_scrub_hud()
 
         # Overlay feedback text
         if self.overlay_timer > 0 and self.overlay_text:
@@ -811,8 +853,8 @@ class PaintGif(Visual):
                     b = pixel[2] * 77 >> 8
                     self.display.set_pixel(x, y, (r, g, b))
 
-    def _draw_canvas(self):
-        canvas = self.canvas
+    def _draw_canvas(self, canvas=None):
+        canvas = canvas or self.canvas
         for y in range(CANVAS_SIZE):
             row = canvas[y]
             for x in range(CANVAS_SIZE):
@@ -847,6 +889,17 @@ class PaintGif(Visual):
         for dy in range(b):
             for dx in range(b):
                 self.display.set_pixel(self.cx + dx, self.cy + dy, (255, 255, 255))
+
+    def _draw_scrub_hud(self):
+        n = len(self.frames)
+        self.display.draw_text_small(2, 55, f"<{self.scrub_idx+1}/{n}>", (255, 255, 255))
+        # Timeline along the bottom edge: dim track, bright marker
+        for x in range(GRID_SIZE):
+            self.display.set_pixel(x, 63, (40, 40, 40))
+        x0 = self.scrub_idx * GRID_SIZE // n
+        x1 = max(x0 + 1, (self.scrub_idx + 1) * GRID_SIZE // n)
+        for x in range(x0, x1):
+            self.display.set_pixel(x, 63, (255, 200, 0))
 
     def _draw_preview_hud(self):
         label = f"FPS:{self.preview_fps}"
