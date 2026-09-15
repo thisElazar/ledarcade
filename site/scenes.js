@@ -1,0 +1,1353 @@
+// Scene classes extracted verbatim from index.html (lines 269-1620). Each takes a Display.
+class Fire {
+  constructor(display) {
+    this.display = display;
+    this.name = 'FIRE';
+    this.desc = 'Classic fire simulation';
+    this.category = 'OUTDOORS';
+  }
+  reset() {
+    this.heat = [];
+    for (let y = 0; y < GRID; y++) this.heat[y] = new Float32Array(GRID);
+  }
+  update(dt) {
+    // Heat source at bottom
+    for (let x = 0; x < GRID; x++) {
+      this.heat[GRID-1][x] = Math.random() < 0.75
+        ? 160 + Math.random() * 95
+        : Math.random() * 100;
+    }
+    // Propagate upward
+    for (let y = GRID - 2; y >= 0; y--) {
+      for (let x = 0; x < GRID; x++) {
+        const below = this.heat[y+1][x];
+        const left  = this.heat[y+1][Math.max(0, x-1)];
+        const right = this.heat[y+1][Math.min(GRID-1, x+1)];
+        const avg = (below * 3 + left + right) / 5;
+        this.heat[y][x] = Math.max(0, avg - Math.random() * 4);
+      }
+    }
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const v = this.heat[y][x] / 255;
+        if (v > 0.01) {
+          let r, g, b;
+          if (v < 0.25)      { const t=v/0.25;         r=128*t; g=0; b=0; }
+          else if (v < 0.5)  { const t=(v-0.25)/0.25;  r=128+127*t; g=64*t; b=0; }
+          else if (v < 0.75) { const t=(v-0.5)/0.25;   r=255; g=64+128*t; b=0; }
+          else               { const t=(v-0.75)/0.25;  r=255; g=192+63*t; b=255*t; }
+          this.display.setPixel(x, y, [r, g, b]);
+        }
+      }
+    }
+  }
+}
+
+// ----- Matrix -----
+class MatrixRain {
+  constructor(display) {
+    this.display = display;
+    this.name = 'MATRIX';
+    this.desc = 'Falling digital rain';
+    this.category = 'DIGITAL';
+  }
+  reset() {
+    this.time = 0;
+    this.drops = [];
+    for (let x = 0; x < GRID; x++) {
+      for (let n = 0; n < (Math.random() < 0.4 ? 2 : 1); n++) {
+        this.drops.push(this._makeDrop(x, true));
+      }
+    }
+  }
+  _makeDrop(x, scatter) {
+    return {
+      x,
+      y: scatter ? (Math.random() * GRID * 3 - GRID * 2) : -(Math.random() * 20 + 1),
+      speed: 15 + Math.random() * 20,
+      length: 5 + Math.floor(Math.random() * 11),
+    };
+  }
+  update(dt) {
+    this.time += dt;
+    for (const d of this.drops) {
+      d.y += d.speed * dt;
+      if (d.y - d.length > GRID) Object.assign(d, this._makeDrop(d.x, false));
+    }
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    for (const d of this.drops) {
+      const hy = d.y | 0;
+      for (let i = 0; i < d.length; i++) {
+        const y = hy - i;
+        if (y >= 0 && y < GRID) {
+          if (i === 0) {
+            this.display.setPixel(d.x, y, [200, 255, 200]);
+          } else {
+            const fade = 1 - i / d.length;
+            const br = 200 * fade * fade | 0;
+            this.display.setPixel(d.x, y, [0, br, br * 0.4 | 0]);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ----- Plasma -----
+class Plasma {
+  constructor(display) {
+    this.display = display;
+    this.name = 'PLASMA';
+    this.desc = 'Sine wave interference patterns';
+    this.category = 'DIGITAL';
+  }
+  reset() { this.time = 0; }
+  update(dt) { this.time += dt; }
+  draw() {
+    this.display.clear(0, 0, 0);
+    const t = this.time;
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const v1 = Math.sin(x * 0.1 + t);
+        const v2 = Math.sin(y * 0.1 + t * 0.7);
+        const v3 = Math.sin((x + y) * 0.1 + t * 0.5);
+        const v4 = Math.sin(Math.sqrt((x-32)**2 + (y-32)**2) * 0.15 - t);
+        let v = (v1 + v2 + v3 + v4 + 4) / 8; // 0..1
+        // Rainbow palette
+        const h = v * 6;
+        const hi = h | 0, f = h - hi;
+        let r, g, b;
+        switch (hi) {
+          case 0: r=255; g=255*f|0; b=0; break;
+          case 1: r=255*(1-f)|0; g=255; b=0; break;
+          case 2: r=0; g=255; b=255*f|0; break;
+          case 3: r=0; g=255*(1-f)|0; b=255; break;
+          case 4: r=255*f|0; g=0; b=255; break;
+          default: r=255; g=0; b=255*(1-f)|0; break;
+        }
+        this.display.setPixel(x, y, [r, g, b]);
+      }
+    }
+  }
+}
+
+// ----- Starfield -----
+class Starfield {
+  constructor(display) {
+    this.display = display;
+    this.name = 'STARFIELD';
+    this.desc = '3D star tunnel';
+    this.category = 'OUTDOORS';
+  }
+  reset() {
+    this.time = 0;
+    this.stars = [];
+    for (let i = 0; i < 120; i++) this.stars.push(this._makeStar());
+  }
+  _makeStar() {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * 0.9 + 0.1;
+    return { x: Math.cos(a)*d, y: Math.sin(a)*d, z: Math.random()*0.5 + 0.5 };
+  }
+  update(dt) {
+    this.time += dt;
+    for (const s of this.stars) {
+      s.z -= 0.5 * dt;
+      if (s.z <= 0.01) { Object.assign(s, this._makeStar()); s.z = 1; }
+    }
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    const cx = GRID / 2, cy = GRID / 2;
+    // Sort far to near
+    this.stars.sort((a, b) => b.z - a.z);
+    for (const s of this.stars) {
+      if (s.z > 0.01) {
+        const sx = cx + (s.x / s.z) * cx | 0;
+        const sy = cy + (s.y / s.z) * cy | 0;
+        let br = Math.max(50, Math.min(255, 255 * (1 - s.z) | 0));
+        if (sx >= 0 && sx < GRID && sy >= 0 && sy < GRID) {
+          // Warp trails
+          const color = [br, br, br * 0.9 | 0];
+          const pz = s.z + 0.05;
+          const px = cx + (s.x / pz) * cx | 0;
+          const py = cy + (s.y / pz) * cy | 0;
+          this.display.drawLine(px, py, sx, sy, color);
+          if (s.z < 0.25) {
+            this.display.setPixel(sx+1, sy, color);
+            this.display.setPixel(sx, sy+1, color);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ----- Boids -----
+class Boids {
+  constructor(display) {
+    this.display = display;
+    this.name = 'BOIDS';
+    this.desc = 'Emergent flocking behavior';
+    this.category = 'AUTOMATA';
+  }
+  reset() {
+    this.time = 0;
+    this.boids = [];
+    for (let i = 0; i < 55; i++) this._spawnRandom();
+    this.spawnTimer = 0;
+  }
+  _spawnRandom() {
+    const a = Math.random() * Math.PI * 2;
+    const spd = 1.5 + Math.random();
+    this.boids.push({
+      x: 5 + Math.random() * (GRID - 10),
+      y: 5 + Math.random() * (GRID - 10),
+      vx: Math.cos(a) * spd,
+      vy: Math.sin(a) * spd,
+    });
+  }
+  _dist(a, b) {
+    let dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+    if (dx > GRID/2) dx = GRID - dx;
+    if (dy > GRID/2) dy = GRID - dy;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  _tdiff(from, to) {
+    let d = to - from;
+    if (d > GRID/2) d -= GRID;
+    else if (d < -GRID/2) d += GRID;
+    return d;
+  }
+  update(dt) {
+    this.time += dt;
+    this.spawnTimer += dt;
+    if (this.spawnTimer > 0.2) { this.spawnTimer = 0; this._spawnRandom(); }
+
+    const PR = 10, SR = 2.5;
+    const newV = [];
+    for (const b of this.boids) {
+      let sepX=0, sepY=0, aliX=0, aliY=0, cohX=0, cohY=0, nc=0;
+      for (const o of this.boids) {
+        if (o === b) continue;
+        const d = this._dist(b, o);
+        if (d < PR) {
+          nc++;
+          aliX += o.vx; aliY += o.vy;
+          cohX += this._tdiff(b.x, o.x); cohY += this._tdiff(b.y, o.y);
+          if (d < SR && d > 0) {
+            const w = 1/d;
+            sepX += this._tdiff(o.x, b.x) * w;
+            sepY += this._tdiff(o.y, b.y) * w;
+          }
+        }
+      }
+      let ax = sepX * 1.8, ay = sepY * 1.8;
+      if (nc > 0) {
+        ax += (aliX/nc - b.vx) * 1.5;
+        ay += (aliY/nc - b.vy) * 1.5;
+        ax += (cohX/nc) * 1.8;
+        ay += (cohY/nc) * 1.8;
+      }
+      newV.push([b.vx + ax * dt, b.vy + ay * dt]);
+    }
+    for (let i = 0; i < this.boids.length; i++) {
+      const b = this.boids[i];
+      b.vx = newV[i][0]; b.vy = newV[i][1];
+      // Limit speed
+      const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+      if (spd > 3) { b.vx = b.vx/spd*3; b.vy = b.vy/spd*3; }
+      else if (spd < 0.5 && spd > 0) { b.vx = b.vx/spd*0.5; b.vy = b.vy/spd*0.5; }
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      // Soft boundary
+      const m = 6, tf = 0.15;
+      if (b.x < m) b.vx += tf; else if (b.x > GRID-m) b.vx -= tf;
+      if (b.y < m) b.vy += tf; else if (b.y > GRID-m) b.vy -= tf;
+    }
+    // Remove off-screen, cap population
+    this.boids = this.boids.filter(b => b.x > -3 && b.x < GRID+3 && b.y > -3 && b.y < GRID+3);
+    if (this.boids.length > 90) this.boids = this.boids.slice(-60);
+  }
+  _headingColor(vx, vy) {
+    const h = ((Math.atan2(vy, vx) + Math.PI) / (Math.PI * 2)) * 6;
+    const i = h | 0, f = h - i;
+    let r, g, b;
+    switch (i) {
+      case 0: r=1; g=f; b=0; break;
+      case 1: r=1-f; g=1; b=0; break;
+      case 2: r=0; g=1; b=f; break;
+      case 3: r=0; g=1-f; b=1; break;
+      case 4: r=f; g=0; b=1; break;
+      default: r=1; g=0; b=1-f; break;
+    }
+    return [r*255|0, g*255|0, b*255|0];
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    for (const b of this.boids) {
+      const px = b.x | 0, py = b.y | 0;
+      const c = this._headingColor(b.vx, b.vy);
+      for (let dy = 0; dy < 2; dy++)
+        for (let dx = 0; dx < 2; dx++)
+          this.display.setPixel(px+dx, py+dy, c);
+      // Trail
+      const spd = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+      if (spd > 0.1) {
+        const tdx = -b.vx/spd, tdy = -b.vy/spd;
+        for (let i = 1; i < 4; i++) {
+          const fade = 1 - i/4;
+          this.display.setPixel(
+            px + tdx*i*1.2 | 0, py + tdy*i*1.2 | 0,
+            [c[0]*fade*0.5|0, c[1]*fade*0.5|0, c[2]*fade*0.5|0]
+          );
+        }
+      }
+    }
+  }
+}
+
+// ----- Life -----
+class Life {
+  constructor(display) {
+    this.display = display;
+    this.name = 'LIFE';
+    this.desc = "Conway's cellular automaton";
+    this.category = 'AUTOMATA';
+  }
+  reset() {
+    this.time = 0;
+    this.stepTimer = 0;
+    this.grid = [];
+    for (let y = 0; y < GRID; y++) {
+      this.grid[y] = new Uint8Array(GRID);
+      for (let x = 0; x < GRID; x++)
+        this.grid[y][x] = Math.random() < 0.3 ? 1 : 0;
+    }
+  }
+  _countNeighbors(x, y) {
+    let c = 0;
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        if (this.grid[(y+dy+GRID)%GRID][(x+dx+GRID)%GRID]) c++;
+      }
+    return c;
+  }
+  update(dt) {
+    this.time += dt;
+    this.stepTimer += dt;
+    if (this.stepTimer < 0.1) return;
+    this.stepTimer = 0;
+    const next = [];
+    for (let y = 0; y < GRID; y++) {
+      next[y] = new Uint8Array(GRID);
+      for (let x = 0; x < GRID; x++) {
+        const n = this._countNeighbors(x, y);
+        next[y][x] = this.grid[y][x] ? (n===2||n===3 ? 1 : 0) : (n===3 ? 1 : 0);
+      }
+    }
+    this.grid = next;
+    // Auto-reseed if population dies
+    let pop = 0;
+    for (let y = 0; y < GRID; y++) for (let x = 0; x < GRID; x++) pop += this.grid[y][x];
+    if (pop < 10) this.reset();
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    // Slowly shifting hue
+    const hue = (this.time * 0.05) % 1;
+    const h = hue * 6, hi = h | 0, f = h - hi;
+    let r, g, b;
+    switch (hi) {
+      case 0: r=255; g=255*f|0; b=0; break;
+      case 1: r=255*(1-f)|0; g=255; b=0; break;
+      case 2: r=0; g=255; b=255*f|0; break;
+      case 3: r=0; g=255*(1-f)|0; b=255; break;
+      case 4: r=255*f|0; g=0; b=255; break;
+      default: r=255; g=0; b=255*(1-f)|0; break;
+    }
+    const color = [r, g, b];
+    for (let y = 0; y < GRID; y++)
+      for (let x = 0; x < GRID; x++)
+        if (this.grid[y][x]) this.display.setPixel(x, y, color);
+  }
+}
+
+// ----- DVD Bounce -----
+const DVD_COLORS = [
+  [255,0,0],[255,127,0],[255,255,0],[0,255,0],
+  [0,255,255],[0,127,255],[127,0,255],[255,0,255],[255,0,127],
+];
+class DVD {
+  constructor(display) {
+    this.display = display;
+    this.name = 'DVD';
+    this.desc = 'The iconic bouncing screensaver';
+    this.category = 'HOUSEHOLD';
+  }
+  reset() {
+    this.W = 12; this.H = 8;
+    this.x = Math.random() * (GRID - this.W);
+    this.y = Math.random() * (GRID - this.H);
+    this.dx = Math.random() < 0.5 ? -1 : 1;
+    this.dy = Math.random() < 0.5 ? -1 : 1;
+    this.speed = 25;
+    this.ci = Math.floor(Math.random() * DVD_COLORS.length);
+    this.flash = 0;
+  }
+  update(dt) {
+    if (this.flash > 0) this.flash -= dt * 3;
+    this.x += this.dx * this.speed * dt;
+    this.y += this.dy * this.speed * dt;
+    let hitX = false, hitY = false;
+    if (this.x <= 0)            { this.x = 0; this.dx = 1; hitX = true; }
+    if (this.x >= GRID - this.W) { this.x = GRID - this.W; this.dx = -1; hitX = true; }
+    if (this.y <= 0)            { this.y = 0; this.dy = 1; hitY = true; }
+    if (this.y >= GRID - this.H) { this.y = GRID - this.H; this.dy = -1; hitY = true; }
+    if (hitX || hitY) this.ci = (this.ci + 1) % DVD_COLORS.length;
+    if (hitX && hitY) this.flash = 1;
+  }
+  draw() {
+    if (this.flash > 0) {
+      const f = this.flash * 255 | 0;
+      this.display.clear(f, f, f);
+    } else {
+      this.display.clear(0, 0, 0);
+    }
+    const c = DVD_COLORS[this.ci];
+    const ix = this.x | 0, iy = this.y | 0;
+    for (let py = 0; py < this.H; py++)
+      for (let px = 0; px < this.W; px++)
+        this.display.setPixel(ix + px, iy + py, c);
+  }
+}
+
+
+// ----- Turing (Gray-Scott Reaction-Diffusion) -----
+const TURING_PAL = [[5,10,40],[10,40,120],[20,100,180],[80,200,220],[200,255,255],[255,255,255]];
+class Turing {
+  constructor(display) {
+    this.display = display;
+    this.name = 'TURING';
+    this.desc = 'Reaction-diffusion spots';
+    this.category = 'SCIENCE';
+  }
+  reset() {
+    this.time = 0;
+    const N = GRID * GRID;
+    this.u = new Float64Array(N).fill(1);
+    this.v = new Float64Array(N);
+    this.uN = new Float64Array(N);
+    this.vN = new Float64Array(N);
+    this.f = 0.035; this.k = 0.065;
+    // Seed patches of v
+    for (let s = 0; s < 5; s++) {
+      const cx = 5 + Math.random() * 54 | 0;
+      const cy = 5 + Math.random() * 54 | 0;
+      const r = 2 + Math.random() * 2;
+      for (let dy = -4; dy <= 4; dy++)
+        for (let dx = -4; dx <= 4; dx++)
+          if (dx*dx+dy*dy <= r*r) {
+            const i = ((cy+dy+GRID)%GRID)*GRID + (cx+dx+GRID)%GRID;
+            this.v[i] = 0.5 + (Math.random()-0.5)*0.1;
+            this.u[i] = 0.5 + (Math.random()-0.5)*0.1;
+          }
+    }
+  }
+  update(dt) {
+    this.time += dt;
+    const {u, v, uN, vN, f, k} = this;
+    for (let step = 0; step < 8; step++) {
+      for (let y = 0; y < GRID; y++) {
+        for (let x = 0; x < GRID; x++) {
+          const i = y*GRID+x;
+          const up=((y-1+GRID)%GRID)*GRID+x, dn=((y+1)%GRID)*GRID+x;
+          const lt=y*GRID+(x-1+GRID)%GRID, rt=y*GRID+(x+1)%GRID;
+          const lapU = u[up]+u[dn]+u[lt]+u[rt]-4*u[i];
+          const lapV = v[up]+v[dn]+v[lt]+v[rt]-4*v[i];
+          const uvv = u[i]*v[i]*v[i];
+          uN[i] = u[i] + 0.16*lapU - uvv + f*(1-u[i]);
+          vN[i] = v[i] + 0.08*lapV + uvv - (f+k)*v[i];
+        }
+      }
+      // Swap buffers
+      const tu = new Float64Array(u); u.set(uN); uN.set(tu);
+      const tv = new Float64Array(v); v.set(vN); vN.set(tv);
+    }
+    this.u = u; this.v = v;
+  }
+  draw() {
+    const pal = TURING_PAL, nC = pal.length;
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const val = Math.max(0, Math.min(1, this.v[y*GRID+x]));
+        const fi = val * (nC - 1);
+        const lo = Math.min(fi | 0, nC - 2), hi = lo + 1;
+        const t = fi - lo;
+        this.display.setPixel(x, y, [
+          pal[lo][0]+(pal[hi][0]-pal[lo][0])*t|0,
+          pal[lo][1]+(pal[hi][1]-pal[lo][1])*t|0,
+          pal[lo][2]+(pal[hi][2]-pal[lo][2])*t|0,
+        ]);
+      }
+    }
+  }
+}
+
+// ----- Hodge (Hodgepodge Machine) -----
+class Hodge {
+  constructor(display) {
+    this.display = display;
+    this.name = 'HODGE';
+    this.desc = 'Belousov-Zhabotinsky spiral waves';
+    this.category = 'AUTOMATA';
+  }
+  reset() {
+    this.time = 0; this.stepTimer = 0;
+    this.n = 63; this.k1 = 2; this.k2 = 3; this.g = 5;
+    this.grid = new Uint8Array(GRID*GRID);
+    this.next = new Uint8Array(GRID*GRID);
+    for (let i = 0; i < GRID*GRID; i++)
+      this.grid[i] = Math.random() < 0.2 ? Math.random()*this.n|0 : 0;
+    // Build gradient palette
+    const keys = [[20,0,80],[0,100,200],[0,200,150],[100,255,100],[255,255,0],[255,100,0],[150,0,100]];
+    this.colors = [];
+    const nC = this.n + 1, segs = keys.length - 1, per = nC / segs;
+    for (let i = 0; i < nC; i++) {
+      const seg = Math.min(i / per | 0, segs - 1);
+      const t = (i - seg * per) / per;
+      this.colors.push([
+        keys[seg][0]+(keys[seg+1][0]-keys[seg][0])*t|0,
+        keys[seg][1]+(keys[seg+1][1]-keys[seg][1])*t|0,
+        keys[seg][2]+(keys[seg+1][2]-keys[seg][2])*t|0,
+      ]);
+    }
+  }
+  update(dt) {
+    this.time += dt; this.stepTimer += dt;
+    if (this.stepTimer < 0.1) return;
+    this.stepTimer = 0;
+    const {grid, next, n, k1, k2, g} = this;
+    let alive = false;
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const i = y*GRID+x, state = grid[i];
+        let infected = 0, ill = 0, total = state;
+        for (let dy = -1; dy <= 1; dy++)
+          for (let dx = -1; dx <= 1; dx++) {
+            if (!dx && !dy) continue;
+            const ni = ((y+dy+GRID)%GRID)*GRID + (x+dx+GRID)%GRID;
+            const ns = grid[ni]; total += ns;
+            if (ns === n) ill++; else if (ns > 0) infected++;
+          }
+        if (state === 0) next[i] = Math.min((infected/k1|0) + (ill/k2|0), n);
+        else if (state === n) next[i] = 0;
+        else next[i] = Math.min((total/9|0) + g, n);
+        if (next[i] > 0) alive = true;
+      }
+    }
+    grid.set(next);
+    if (!alive) this.reset();
+  }
+  draw() {
+    for (let y = 0; y < GRID; y++)
+      for (let x = 0; x < GRID; x++)
+        this.display.setPixel(x, y, this.colors[this.grid[y*GRID+x]]);
+  }
+}
+
+// ----- Double Pendulum -----
+const PEND_PAL = [[255,60,0],[255,160,0],[255,255,40],[255,80,0]];
+class DblPendulum {
+  constructor(display) {
+    this.display = display;
+    this.name = 'DBL PENDULUM';
+    this.desc = 'Chaotic double pendulum';
+    this.category = 'SCIENCE';
+  }
+  reset() {
+    this.time = 0;
+    this.L1 = 1; this.L2 = 1; this.m1 = 1; this.m2 = 1;
+    this.a1 = Math.PI*0.75 + (Math.random()-0.5)*0.6;
+    this.a2 = Math.PI*0.5 + (Math.random()-0.5)*0.6;
+    this.w1 = 0; this.w2 = 0;
+    this.S = 13; // scale
+    this.px = 32; this.py = 64 - 2 - 3 - 13*2 | 0;
+    this.trail = []; this.maxTrail = 500;
+  }
+  _deriv(a1, a2, w1, w2) {
+    const g=9.81, m1=this.m1, m2=this.m2, L1=this.L1, L2=this.L2;
+    const da=a1-a2, sd=Math.sin(da), cd=Math.cos(da), M=m1+m2;
+    let den = 2*M - m2*(1+Math.cos(2*da));
+    if (Math.abs(den)<1e-10) den=1e-10;
+    const al1=(-g*M*Math.sin(a1)-m2*g*Math.sin(a1-2*a2)
+      -2*m2*sd*(w2*w2*L2+w1*w1*L1*cd))/(L1*den);
+    const al2=(2*sd*(w1*w1*L1*M+g*M*Math.cos(a1)
+      +w2*w2*L2*m2*cd))/(L2*den);
+    return [al1, al2];
+  }
+  update(dt) {
+    this.time += dt;
+    const steps = 10, h = dt / steps;
+    for (let s = 0; s < steps; s++) {
+      let {a1,a2,w1,w2} = this;
+      const [dw11,dw21]=this._deriv(a1,a2,w1,w2);
+      const [dw12,dw22]=this._deriv(a1+w1*h/2,a2+w2*h/2,w1+dw11*h/2,w2+dw21*h/2);
+      const [dw13,dw23]=this._deriv(a1+(w1+dw11*h/2)*h/2,a2+(w2+dw21*h/2)*h/2,w1+dw12*h/2,w2+dw22*h/2);
+      const [dw14,dw24]=this._deriv(a1+(w1+dw12*h/2)*h,a2+(w2+dw22*h/2)*h,w1+dw13*h,w2+dw23*h);
+      this.a1+=h*(w1+(w1+dw11*h/2)*2+(w1+dw12*h/2)*2+(w1+dw13*h))/6;
+      this.a2+=h*(w2+(w2+dw21*h/2)*2+(w2+dw22*h/2)*2+(w2+dw23*h))/6;
+      this.w1+=h*(dw11+2*dw12+2*dw13+dw14)/6;
+      this.w2+=h*(dw21+2*dw22+2*dw23+dw24)/6;
+    }
+    const x1=this.px+this.S*Math.sin(this.a1);
+    const y1=this.py+this.S*Math.cos(this.a1);
+    const x2=x1+this.S*Math.sin(this.a2);
+    const y2=y1+this.S*Math.cos(this.a2);
+    this.trail.push([Math.round(x2),Math.round(y2)]);
+    if (this.trail.length>this.maxTrail) this.trail.shift();
+  }
+  draw() {
+    this.display.clear(0,0,0);
+    const pal=PEND_PAL, total=this.trail.length;
+    for (let i=0;i<total;i++) {
+      const [tx,ty]=this.trail[i];
+      if (tx>=0&&tx<GRID&&ty>=0&&ty<GRID) {
+        const t=i/(total-1||1);
+        const pi=t*(pal.length-1), lo=pi|0, hi=Math.min(lo+1,pal.length-1), f=pi-lo;
+        const br=0.15+0.85*t;
+        this.display.setPixel(tx,ty,[
+          (pal[lo][0]+(pal[hi][0]-pal[lo][0])*f)*br|0,
+          (pal[lo][1]+(pal[hi][1]-pal[lo][1])*f)*br|0,
+          (pal[lo][2]+(pal[hi][2]-pal[lo][2])*f)*br|0,
+        ]);
+      }
+    }
+    const x1=this.px+this.S*Math.sin(this.a1)|0;
+    const y1=this.py+this.S*Math.cos(this.a1)|0;
+    const x2=x1+this.S*Math.sin(this.a2)|0;
+    const y2=y1+this.S*Math.cos(this.a2)|0;
+    this.display.drawLine(this.px,this.py,x1,y1,[160,160,170]);
+    this.display.drawLine(x1,y1,x2,y2,[160,160,170]);
+    this.display.setPixel(this.px,this.py,[255,255,255]);
+    this.display.drawCircle(x1,y1,2,[200,200,210],true);
+    this.display.drawCircle(x2,y2,3,PEND_PAL[0],true);
+  }
+}
+
+// ----- 3-Body Orbits -----
+const ORBIT_PAL = [[255,50,100],[50,255,150],[100,100,255],[255,255,50],[255,100,255],[50,255,255]];
+class Orbits3Body {
+  constructor(display) {
+    this.display = display;
+    this.name = '3 BODY';
+    this.desc = 'Gravitational dance';
+    this.category = 'SCIENCE';
+  }
+  reset() {
+    this.time = 0; this.bodies = [];
+    const cx=GRID/2, cy=GRID/2;
+    for (let i=0;i<3;i++) {
+      const a=2*Math.PI*i/3+(Math.random()-0.5)*0.4;
+      const r=18;
+      const v=Math.sqrt(800*10*2/(2*r+2))*0.65;
+      this.bodies.push({
+        x:cx+r*Math.cos(a), y:cy+r*Math.sin(a),
+        vx:-v*Math.sin(a)+(Math.random()-0.5), vy:v*Math.cos(a)+(Math.random()-0.5),
+        ax:0, ay:0, mass:10, radius:3, ci:i,
+        trail: [],
+      });
+    }
+  }
+  update(dt) {
+    this.time += dt;
+    const G=800, SOFT2=25, h=0.0005, steps=8;
+    const b=this.bodies;
+    for (let s=0;s<steps;s++) {
+      // Compute accelerations
+      for (const bi of b) { bi.ax=0; bi.ay=0; }
+      for (let i=0;i<b.length;i++)
+        for (let j=i+1;j<b.length;j++) {
+          const dx=b[j].x-b[i].x, dy=b[j].y-b[i].y;
+          const d2=dx*dx+dy*dy+SOFT2;
+          const inv=1/Math.sqrt(d2), inv3=inv*inv*inv, f=G*inv3;
+          b[i].ax+=f*dx*b[j].mass; b[i].ay+=f*dy*b[j].mass;
+          b[j].ax-=f*dx*b[i].mass; b[j].ay-=f*dy*b[i].mass;
+        }
+      // Verlet step
+      for (const bi of b) {
+        bi.vx+=0.5*h*bi.ax; bi.vy+=0.5*h*bi.ay;
+        bi.x+=h*bi.vx; bi.y+=h*bi.vy;
+      }
+      // Recompute accelerations
+      for (const bi of b) { bi.ax=0; bi.ay=0; }
+      for (let i=0;i<b.length;i++)
+        for (let j=i+1;j<b.length;j++) {
+          const dx=b[j].x-b[i].x, dy=b[j].y-b[i].y;
+          const d2=dx*dx+dy*dy+SOFT2;
+          const inv=1/Math.sqrt(d2), inv3=inv*inv*inv, f=G*inv3;
+          b[i].ax+=f*dx*b[j].mass; b[i].ay+=f*dy*b[j].mass;
+          b[j].ax-=f*dx*b[i].mass; b[j].ay-=f*dy*b[i].mass;
+        }
+      for (const bi of b) { bi.vx+=0.5*h*bi.ax; bi.vy+=0.5*h*bi.ay; }
+    }
+    // Edge force + trails
+    const margin=12, strength=80;
+    for (const bi of b) {
+      let t=0;
+      if (bi.x<margin) t=Math.max(t,(margin-bi.x)/margin);
+      else if (bi.x>GRID-margin) t=Math.max(t,(bi.x-(GRID-margin))/margin);
+      if (bi.y<margin) t=Math.max(t,(margin-bi.y)/margin);
+      else if (bi.y>GRID-margin) t=Math.max(t,(bi.y-(GRID-margin))/margin);
+      if (t>0) {
+        const dx=GRID/2-bi.x, dy=GRID/2-bi.y;
+        const d=Math.sqrt(dx*dx+dy*dy)+0.1, f=strength*t*t*0.0005;
+        bi.vx+=dx/d*f; bi.vy+=dy/d*f;
+      }
+      bi.trail.push([bi.x,bi.y]);
+      if (bi.trail.length>120) bi.trail.shift();
+    }
+    if (b.length<2) this.reset();
+  }
+  draw() {
+    this.display.clear(0,0,0);
+    for (const bi of this.bodies) {
+      const c=ORBIT_PAL[bi.ci%ORBIT_PAL.length];
+      const tl=bi.trail.length;
+      for (let i=0;i<tl;i++) {
+        const [tx,ty]=bi.trail[i];
+        const ix=tx|0, iy=ty|0;
+        if (ix>=0&&ix<GRID&&iy>=0&&iy<GRID) {
+          const t=(i+1)/tl;
+          this.display.setPixel(ix,iy,[c[0]*t*0.4|0,c[1]*t*0.4|0,c[2]*t*0.4|0]);
+        }
+      }
+      const ix=bi.x|0, iy=bi.y|0;
+      this.display.drawCircle(ix,iy,bi.radius,c,true);
+      if (ix>=0&&ix<GRID&&iy>=0&&iy<GRID)
+        this.display.setPixel(ix,iy,[Math.min(255,c[0]+80),Math.min(255,c[1]+80),Math.min(255,c[2]+80)]);
+    }
+  }
+}
+
+
+// ----- Lava Lamp -----
+const LAVA_SCHEMES = [
+  [[255,100,0],[20,0,60]],   // Orange on purple
+  [[255,50,50],[20,20,80]],  // Red on blue
+  [[50,255,50],[20,20,60]],  // Green on purple
+  [[255,255,50],[80,20,20]], // Yellow on dark red
+  [[50,200,255],[60,20,60]], // Cyan on purple
+];
+class LavaLamp {
+  constructor(display) {
+    this.display = display;
+    this.name = 'LAVA LAMP';
+    this.desc = 'Metaball blob simulation';
+    this.category = 'HOUSEHOLD';
+  }
+  reset() {
+    this.time = 0;
+    this.schemeIdx = 0;
+    this.blobs = [];
+    for (let i = 0; i < 13; i++) {
+      this.blobs.push({
+        x: 12 + Math.random() * (GRID - 24),
+        y: 8 + Math.random() * (GRID - 16),
+        vx: 0, vy: (Math.random() - 0.5) * 10,
+        radius: 8 + Math.random() * 12,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+    this.density = new Float32Array(GRID * GRID);
+  }
+  update(dt) {
+    this.time += dt;
+    const cx = GRID / 2, cy = GRID / 2;
+    for (const b of this.blobs) {
+      b.phase += dt * 2;
+      const xOff = (b.x - cx) / cx;
+      if (Math.abs(xOff) < 0.4) {
+        b.vy -= (4 + (b.y - cy) * 0.1) * dt;
+      } else {
+        b.vy += (2 + (cy - b.y) * 0.08) * dt;
+      }
+      if (b.y < cy - 5) b.vx += xOff * 6 * dt;
+      else if (b.y > cy + 5) b.vx -= xOff * 6 * dt;
+      b.vx += (Math.random() - 0.5) * 8 * dt;
+      b.vy += (Math.random() - 0.5) * 4 * dt;
+      b.vx += Math.sin(this.time * 0.5 + b.phase) * 5 * dt;
+      b.vx *= 0.99; b.vy *= 0.99;
+      b.vx = Math.max(-6, Math.min(6, b.vx));
+      b.vy = Math.max(-6, Math.min(6, b.vy));
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      const m = b.radius + 2;
+      if (b.x < m) { b.x = m; b.vx = Math.abs(b.vx) * 0.6; }
+      else if (b.x > GRID - m) { b.x = GRID - m; b.vx = -Math.abs(b.vx) * 0.6; }
+      if (b.y < m) { b.y = m; b.vy = Math.abs(b.vy) * 0.6; }
+      else if (b.y > GRID - m) { b.y = GRID - m; b.vy = -Math.abs(b.vy) * 0.6; }
+      b.radius = 10 + Math.sin(b.phase) * 3;
+    }
+  }
+  draw() {
+    const [blobColor, bgColor] = LAVA_SCHEMES[this.schemeIdx];
+    const d = this.density;
+    d.fill(0);
+    // Accumulate density
+    for (const b of this.blobs) {
+      const r = (b.radius | 0) + 4;
+      const bx = b.x | 0, by = b.y | 0;
+      for (let dy = -r; dy <= r; dy++) {
+        const py = by + dy;
+        if (py < 0 || py >= GRID) continue;
+        for (let dx = -r; dx <= r; dx++) {
+          const px = bx + dx;
+          if (px < 0 || px >= GRID) continue;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < b.radius) {
+            const s = 1 - dist / b.radius;
+            d[py * GRID + px] += s * s;
+          }
+        }
+      }
+    }
+    // Draw
+    for (let y = 0; y < GRID; y++) {
+      const bgF = 1.0 + (GRID - y) / GRID * 0.3;
+      const bgR = Math.min(255, bgColor[0] * bgF | 0);
+      const bgG = Math.min(255, bgColor[1] * bgF | 0);
+      const bgB = Math.min(255, bgColor[2] * bgF | 0);
+      for (let x = 0; x < GRID; x++) {
+        const v = d[y * GRID + x];
+        if (v > 0.3) {
+          const br = Math.min(1.0, v);
+          this.display.setPixel(x, y, [
+            blobColor[0] * (0.6 + 0.4 * br) | 0,
+            blobColor[1] * (0.6 + 0.4 * br) | 0,
+            blobColor[2] * (0.6 + 0.4 * br) | 0,
+          ]);
+        } else if (v > 0.15) {
+          const f = (v - 0.15) / 0.15;
+          this.display.setPixel(x, y, [
+            blobColor[0] * 0.4 * f | 0,
+            blobColor[1] * 0.4 * f | 0,
+            blobColor[2] * 0.4 * f | 0,
+          ]);
+        } else {
+          this.display.setPixel(x, y, [bgR, bgG, bgB]);
+        }
+      }
+    }
+  }
+}
+
+// ----- Cat Stretch -----
+const CAT_COLORS = [
+  [[255,140,50],[200,100,30],[255,180,150]],  // Orange tabby
+  [[120,120,120],[80,80,80],[180,150,150]],    // Gray
+  [[40,40,40],[20,20,20],[100,80,80]],         // Black
+  [[240,230,210],[200,180,160],[255,200,180]], // Cream
+];
+const PILLOW_COLORS = [
+  [[100,80,140],[70,50,100]],  // Purple
+  [[80,120,140],[50,80,100]],  // Blue
+  [[140,100,100],[100,70,70]], // Rose
+  [[100,130,100],[70,90,70]],  // Sage
+];
+class CatStretch {
+  constructor(display) {
+    this.display = display;
+    this.name = 'CAT';
+    this.desc = 'Cozy feline on a pillow';
+    this.category = 'HOUSEHOLD';
+  }
+  reset() {
+    this.time = 0; this.stateTime = 0;
+    this.catState = 0; // 0=sleep,1=wake,2=stretch,3=relax,4=curl
+    this.catColorIdx = 0; this.pillowIdx = 0;
+    this.stretch = 0; this.breathPhase = 0;
+    this.tailPhase = Math.random() * Math.PI * 2;
+    this.blinkTimer = 3; this.eyesClosed = false;
+    this.catX = 32; this.catY = 38;
+  }
+  _changeState(s) { this.catState = s; this.stateTime = 0; }
+  update(dt) {
+    this.time += dt; this.stateTime += dt;
+    this.breathPhase += dt * 1.5;
+    this.tailPhase += dt * 2;
+    this.blinkTimer -= dt;
+    if (this.blinkTimer <= 0) {
+      this.eyesClosed = !this.eyesClosed;
+      this.blinkTimer = this.eyesClosed ? 0.15 : 2 + Math.random() * 4;
+    }
+    const s = this.catState;
+    if (s === 0) { this.stretch = 0; if (this.stateTime > 4) this._changeState(1); }
+    else if (s === 1) { this.stretch = Math.min(0.3, this.stateTime * 0.15); if (this.stateTime > 2) this._changeState(2); }
+    else if (s === 2) { this.stretch += (1 - this.stretch) * dt * 2; if (this.stateTime > 3) this._changeState(3); }
+    else if (s === 3) {
+      if (this.stateTime < 1.5) this.stretch = 1;
+      else this.stretch = Math.max(0.5, this.stretch - dt * 0.3);
+      if (this.stateTime > 4) this._changeState(4);
+    }
+    else if (s === 4) { this.stretch = Math.max(0, this.stretch - dt * 0.4); if (this.stateTime > 3) this._changeState(0); }
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    const [bodyC, darkC, earC] = CAT_COLORS[this.catColorIdx];
+    const [pillowC, pillowD] = PILLOW_COLORS[this.pillowIdx];
+    // Pillow
+    const px = 10, py = 42, pw = 44, ph = 18;
+    for (let y = py; y < py + ph; y++) {
+      for (let x = px; x < px + pw; x++) {
+        const dx = Math.min(x - px, px + pw - 1 - x);
+        const dy = Math.min(y - py, py + ph - 1 - y);
+        if (dx + dy < 4) continue;
+        const c = y > py + ph - 4 ? pillowD : (y < py + 3 ? [Math.min(255,pillowC[0]+20),Math.min(255,pillowC[1]+20),Math.min(255,pillowC[2]+20)] : pillowC);
+        this.display.setPixel(x, y, c);
+      }
+    }
+    // Pillow indent
+    const indentY = py + 2;
+    const indentD = 2 + (Math.sin(this.breathPhase) * 0.5 | 0);
+    for (let x = px + 8; x < px + pw - 8; x++)
+      for (let dy = 0; dy < indentD; dy++)
+        this.display.setPixel(x, indentY + dy, pillowD);
+    // Body
+    const cx = this.catX, cy = this.catY;
+    const breath = Math.sin(this.breathPhase);
+    const bodyW = 18 + this.stretch * 10 | 0;
+    let bodyH = Math.max(9, (12 - this.stretch * 3 | 0) + (breath * 0.8 | 0));
+    const bodyCx = cx - (this.stretch * 5 | 0);
+    const bodyLeft = bodyCx - (bodyW >> 1), bodyRight = bodyCx + (bodyW >> 1);
+    for (let dy = -(bodyH >> 1); dy <= (bodyH >> 1); dy++) {
+      const rf = Math.max(0, 1 - (dy * dy) / ((bodyH / 2 + 1) ** 2)) ** 0.5;
+      const rhw = (bodyW / 2 * rf) | 0;
+      for (let dx = -rhw; dx <= rhw; dx++) {
+        const ppx = bodyCx + dx, ppy = cy + dy;
+        if (ppx >= 0 && ppx < GRID && ppy >= 0 && ppy < GRID) {
+          this.display.setPixel(ppx, ppy, (dy > (bodyH >> 1) - 2 || Math.abs(dx) > rhw - 2) ? darkC : bodyC);
+        }
+      }
+    }
+    // Head
+    const headX = bodyRight - 2 + (this.stretch * 4 | 0);
+    const headY = cy - 4 - (this.stretch * 3 | 0);
+    const headR = 7;
+    for (let dy = -headR; dy < headR + 2; dy++)
+      for (let dx = -headR - 1; dx < headR + 2; dx++) {
+        const cb = dy > 2 ? 1 : 0;
+        if (dx * dx + dy * dy <= (headR + cb) ** 2) {
+          const hpx = headX + dx, hpy = headY + dy;
+          if (hpx >= 0 && hpx < GRID && hpy >= 0 && hpy < GRID)
+            this.display.setPixel(hpx, hpy, bodyC);
+        }
+      }
+    // Ears
+    for (const ex of [headX - 5, headX + 5]) {
+      const ey = headY - 6;
+      for (let row = 0; row < 5; row++) {
+        const w = 4 - row;
+        for (let dx = -w; dx <= w; dx++) {
+          const epx = ex + dx, epy = ey + row;
+          if (epx >= 0 && epx < GRID && epy >= 0 && epy < GRID)
+            this.display.setPixel(epx, epy, (Math.abs(dx) < w - 1 && row > 0) ? earC : bodyC);
+        }
+      }
+    }
+    // Eyes
+    const eyeY = headY;
+    if (this.catState === 0 || this.eyesClosed) {
+      for (const ex of [headX - 3, headX + 3]) {
+        this.display.setPixel(ex - 1, eyeY, darkC);
+        this.display.setPixel(ex, eyeY, darkC);
+        this.display.setPixel(ex + 1, eyeY, darkC);
+        this.display.setPixel(ex - 1, eyeY - 1, darkC);
+        this.display.setPixel(ex + 1, eyeY - 1, darkC);
+      }
+    } else {
+      for (const ex of [headX - 3, headX + 3]) {
+        for (let edy = -1; edy <= 1; edy++)
+          for (let edx = -1; edx <= 1; edx++)
+            this.display.setPixel(ex + edx, eyeY + edy, [40, 160, 80]);
+        this.display.setPixel(ex, eyeY, [20, 20, 20]);
+        this.display.setPixel(ex - 1, eyeY - 1, [255, 255, 255]);
+      }
+    }
+    // Nose
+    this.display.setPixel(headX, headY + 4, [255, 140, 150]);
+    this.display.setPixel(headX - 1, headY + 3, [255, 140, 150]);
+    this.display.setPixel(headX + 1, headY + 3, [255, 140, 150]);
+    // Mouth
+    if (this.catState === 2 && this.stretch > 0.7) {
+      for (let ydy = 1; ydy < 4; ydy++)
+        for (let ydx = -2; ydx < 3; ydx++)
+          if (ydy === 1 || Math.abs(ydx) < 2)
+            this.display.setPixel(headX + ydx, headY + 4 + ydy, [180, 90, 100]);
+    } else {
+      this.display.setPixel(headX - 1, headY + 5, darkC);
+      this.display.setPixel(headX + 1, headY + 5, darkC);
+    }
+    // Whiskers
+    const wc = [Math.min(255,bodyC[0]+60),Math.min(255,bodyC[1]+60),Math.min(255,bodyC[2]+60)];
+    this.display.setPixel(headX - 6, headY + 2, wc);
+    this.display.setPixel(headX - 7, headY + 3, wc);
+    this.display.setPixel(headX + 6, headY + 2, wc);
+    this.display.setPixel(headX + 7, headY + 3, wc);
+    // Front legs when stretching
+    if (this.stretch > 0.3) {
+      const legExt = this.stretch * 14 | 0;
+      const legY = cy + (bodyH >> 1) - 2;
+      const legStart = bodyRight - 2;
+      for (let lpx = legStart; lpx <= legStart + legExt; lpx++)
+        if (lpx >= 0 && lpx < GRID) {
+          this.display.setPixel(lpx, legY, bodyC);
+          this.display.setPixel(lpx, legY + 1, bodyC);
+        }
+      if (legExt > 3) {
+        const pawX = legStart + legExt;
+        if (pawX >= 0 && pawX + 1 < GRID) {
+          this.display.setPixel(pawX, legY, [255,180,180]);
+          this.display.setPixel(pawX+1, legY, [255,180,180]);
+          this.display.setPixel(pawX, legY+1, [255,180,180]);
+          this.display.setPixel(pawX+1, legY+1, [255,180,180]);
+        }
+      }
+    }
+    // Tail
+    let tx = bodyLeft + 1, ty = cy;
+    for (let i = 1; i < 12; i++) {
+      const t = i / 12;
+      const wave = Math.sin(this.tailPhase + t * 2.5) * 1.5 * t;
+      const curl = 0.4 + (1 - this.stretch) * 0.4;
+      const ntx = (bodyLeft + 1 - i - t * t * curl * 6) | 0;
+      const nty = (cy - t * 5 + wave) | 0;
+      this.display.drawLine(tx, ty, ntx, nty, bodyC);
+      tx = ntx; ty = nty;
+    }
+  }
+}
+
+// ----- Cloverleaf (Highway Interchange) -----
+class Cloverleaf {
+  constructor(display) {
+    this.display = display;
+    this.name = 'CLOVERLEAF';
+    this.desc = 'Highway interchange simulation';
+    this.category = 'ROAD + RAIL';
+  }
+  reset() {
+    this.time = 0;
+    this.typeIndex = 0;
+    this.types = ['cloverleaf', 'diamond', 'turbine'];
+    this.spawnRate = 2.5;
+    this.spawnTimer = 0;
+    this.autoTimer = 0;
+    this.autoInterval = 18;
+    this.vehicles = [];
+    this.HWY = [55,55,60]; this.GROUND = [30,45,30];
+    this.DASH = [80,70,20];
+    this.DIR_COLORS = {NB:[255,80,80],SB:[80,120,255],EB:[80,255,80],WB:[255,255,80]};
+    this._build();
+  }
+  _densify(wps) {
+    const pts = [];
+    for (let i = 0; i < wps.length - 1; i++) {
+      const [x0,y0] = wps[i], [x1,y1] = wps[i+1];
+      const d = Math.hypot(x1-x0, y1-y0);
+      const n = Math.max(1, d * 1.5 | 0);
+      for (let j = 0; j < n; j++) { const t = j/n; pts.push([x0+(x1-x0)*t, y0+(y1-y0)*t]); }
+    }
+    pts.push(wps[wps.length-1]);
+    return pts;
+  }
+  _arc(cx, cy, r, startDeg, sweepDeg, n=30) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const a = (startDeg + sweepDeg * i / n) * Math.PI / 180;
+      pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+    }
+    return pts;
+  }
+  _bezier(p0,p1,p2,p3,n=40) {
+    const pts = [];
+    for (let i = 0; i <= n; i++) {
+      const t = i/n, u = 1-t;
+      pts.push([u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],
+                u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]);
+    }
+    return pts;
+  }
+  _paintPath(pts) {
+    for (const [x,y] of pts) {
+      for (let dx = -1; dx <= 1; dx++)
+        for (let dy = -1; dy <= 1; dy++) {
+          const ix = x+dx|0, iy = y+dy|0;
+          if (ix >= 0 && ix < GRID && iy >= 0 && iy < GRID)
+            this.road.add(iy * GRID + ix);
+        }
+    }
+  }
+  _build() {
+    this.road = new Set();
+    this.paths = {};
+    // Main highways
+    for (let y = 0; y < GRID; y++) for (let x = 29; x < 35; x++) this.road.add(y*GRID+x);
+    for (let x = 0; x < GRID; x++) for (let y = 29; y < 35; y++) this.road.add(y*GRID+x);
+    // Through paths
+    this.paths.NB_thru = this._densify([[33,66],[33,-3]]);
+    this.paths.SB_thru = this._densify([[31,-3],[31,66]]);
+    this.paths.EB_thru = this._densify([[-3,33],[66,33]]);
+    this.paths.WB_thru = this._densify([[66,31],[-3,31]]);
+    const type = this.types[this.typeIndex];
+    if (type === 'cloverleaf') {
+      const R = 7;
+      const ne = this._arc(42,22,R,180,270);
+      this._paintPath(ne);
+      this.paths.NB_WB = this._densify([[33,66],[33,26],[34,24],[35,22]].concat(ne).concat([[42,29],[40,30],[38,31],[-3,31]]));
+      const se = this._arc(42,42,R,270,270);
+      this._paintPath(se);
+      this.paths.EB_NB = this._densify([[-3,33],[36,33],[40,34],[42,35]].concat(se).concat([[35,42],[34,40],[33,38],[33,-3]]));
+      const sw = this._arc(22,42,R,0,270);
+      this._paintPath(sw);
+      this.paths.SB_EB = this._densify([[31,-3],[31,38],[30,40],[29,42]].concat(sw).concat([[22,35],[24,34],[26,33],[66,33]]));
+      const nw = this._arc(22,22,R,90,270);
+      this._paintPath(nw);
+      this.paths.WB_SB = this._densify([[66,31],[28,31],[24,30],[22,29]].concat(nw).concat([[29,22],[30,24],[31,26],[31,66]]));
+    } else if (type === 'diamond') {
+      this.paths.NB_WB = this._densify([[33,66],[33,27],[36,25],[40,31],[-3,31]]);
+      this.paths.EB_NB = this._densify([[-3,33],[37,33],[39,36],[33,39],[33,-3]]);
+      this.paths.SB_EB = this._densify([[31,-3],[31,37],[28,39],[24,33],[66,33]]);
+      this.paths.WB_SB = this._densify([[66,31],[27,31],[25,28],[31,25],[31,66]]);
+    } else { // turbine
+      const ne = this._bezier([33,22],[33,6],[56,31],[42,31]);
+      this._paintPath(ne);
+      this.paths.NB_WB = this._densify([[33,66],[33,22]]).concat(ne).concat(this._densify([[42,31],[-3,31]]));
+      const se = this._bezier([42,33],[58,33],[33,58],[33,42]);
+      this._paintPath(se);
+      this.paths.EB_NB = this._densify([[-3,33],[42,33]]).concat(se).concat(this._densify([[33,42],[33,-3]]));
+      const sw = this._bezier([31,42],[31,58],[8,33],[22,33]);
+      this._paintPath(sw);
+      this.paths.SB_EB = this._densify([[31,-3],[31,42]]).concat(sw).concat(this._densify([[22,33],[66,33]]));
+      const nw = this._bezier([22,31],[6,31],[31,6],[31,22]);
+      this._paintPath(nw);
+      this.paths.WB_SB = this._densify([[66,31],[22,31]]).concat(nw).concat(this._densify([[31,22],[31,66]]));
+    }
+  }
+  update(dt) {
+    this.time += dt;
+    this.autoTimer += dt;
+    if (this.autoTimer >= this.autoInterval) {
+      this.autoTimer = 0;
+      this.typeIndex = (this.typeIndex + 1) % this.types.length;
+      this._build(); this.vehicles = [];
+    }
+    this.spawnTimer += dt;
+    if (this.spawnTimer >= 1 / Math.max(0.1, this.spawnRate)) {
+      this.spawnTimer = 0;
+      const keys = Object.keys(this.paths);
+      const thru = keys.filter(k => k.endsWith('_thru'));
+      const ramp = keys.filter(k => !k.endsWith('_thru'));
+      const key = (ramp.length && Math.random() < 0.4) ? ramp[Math.random()*ramp.length|0] : thru[Math.random()*thru.length|0];
+      const origin = key.split('_')[0];
+      this.vehicles.push({key, progress:0, speed:18+Math.random()*10, color:this.DIR_COLORS[origin]||[255,255,255]});
+    }
+    for (const v of this.vehicles) v.progress += v.speed * dt;
+    this.vehicles = this.vehicles.filter(v => v.progress < this.paths[v.key].length - 1);
+  }
+  draw() {
+    this.display.clear(this.GROUND[0], this.GROUND[1], this.GROUND[2]);
+    // Road
+    for (const idx of this.road) {
+      const x = idx % GRID, y = idx / GRID | 0;
+      this.display.setPixel(x, y, this.HWY);
+    }
+    // Lane dashes
+    for (let y = 0; y < GRID; y++) { if (y >= 28 && y <= 35) continue; if (y % 4 < 2) this.display.setPixel(32, y, this.DASH); }
+    for (let x = 0; x < GRID; x++) { if (x >= 28 && x <= 35) continue; if (x % 4 < 2) this.display.setPixel(x, 32, this.DASH); }
+    // Vehicles
+    for (const v of this.vehicles) {
+      const path = this.paths[v.key];
+      const i = v.progress | 0;
+      if (i >= path.length - 1) continue;
+      const f = v.progress - i;
+      const x = path[i][0] + (path[i+1][0] - path[i][0]) * f | 0;
+      const y = path[i][1] + (path[i+1][1] - path[i][1]) * f | 0;
+      if (x >= 0 && x < GRID && y >= 0 && y < GRID) this.display.setPixel(x, y, v.color);
+    }
+    // Label
+    this.display.drawTextSmall(2, 1, this.types[this.typeIndex].toUpperCase(), [160,160,160]);
+  }
+}
+
+
+// ----- Ripples -----
+class Ripples {
+  constructor(display) {
+    this.display = display;
+    this.name = 'RIPPLES';
+    this.desc = 'Wave interference patterns';
+    this.category = 'OUTDOORS';
+  }
+  reset() {
+    this.time = 0; this.dropTimer = 0;
+    const N = GRID * GRID;
+    this.u = new Float32Array(N);
+    this.v = new Float32Array(N);
+    this.damping = 0.97;
+  }
+  update(dt) {
+    this.time += dt; this.dropTimer += dt;
+    if (this.dropTimer > 1.2) {
+      this.dropTimer = 0;
+      const cx = 8 + Math.random() * (GRID - 16) | 0;
+      const cy = 8 + Math.random() * (GRID - 16) | 0;
+      for (let dy = -2; dy <= 2; dy++)
+        for (let dx = -2; dx <= 2; dx++)
+          if (dx*dx + dy*dy <= 4) {
+            const i = (cy+dy)*GRID + cx+dx;
+            if (i >= 0 && i < GRID*GRID) this.u[i] = 255;
+          }
+    }
+    const next = new Float32Array(GRID * GRID);
+    for (let y = 1; y < GRID-1; y++) {
+      for (let x = 1; x < GRID-1; x++) {
+        const i = y*GRID+x;
+        const lap = this.u[i-1] + this.u[i+1] + this.u[i-GRID] + this.u[i+GRID] - 4*this.u[i];
+        next[i] = (2*this.u[i] - this.v[i] + lap * 0.5) * this.damping;
+      }
+    }
+    this.v = this.u;
+    this.u = next;
+  }
+  draw() {
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const val = this.u[y*GRID+x];
+        if (Math.abs(val) > 1) {
+          const pos = Math.max(0, val), neg = Math.max(0, -val);
+          this.display.setPixel(x, y, [
+            Math.min(255, neg * 0.3 | 0),
+            Math.min(255, 20 + pos * 0.8 | 0),
+            Math.min(255, 40 + pos * 1.2 + neg * 0.5 | 0)
+          ]);
+        } else {
+          this.display.setPixel(x, y, [0, 5, 15]);
+        }
+      }
+    }
+  }
+}
+
+// ----- Lorenz Attractor -----
+const LORENZ_PAL = [[20,0,60],[40,20,120],[60,100,200],[100,200,255],[200,255,255]];
+class Lorenz {
+  constructor(display) {
+    this.display = display;
+    this.name = 'LORENZ';
+    this.desc = 'Strange attractor trajectory';
+    this.category = 'SCIENCE';
+  }
+  reset() {
+    this.time = 0;
+    this.x = 0.1; this.y = 0; this.z = 0;
+    this.trail = []; this.maxTrail = 800;
+    this.sigma = 10; this.rho = 28; this.beta = 8/3;
+  }
+  update(dt) {
+    this.time += dt;
+    const {sigma, rho, beta} = this;
+    const h = 0.005;
+    for (let i = 0; i < 12; i++) {
+      const dx = sigma * (this.y - this.x);
+      const dy = this.x * (rho - this.z) - this.y;
+      const dz = this.x * this.y - beta * this.z;
+      this.x += dx * h; this.y += dy * h; this.z += dz * h;
+    }
+    const sx = 32 + this.x * 0.9 | 0;
+    const sy = 60 - this.z * 0.7 | 0;
+    this.trail.push([sx, sy]);
+    if (this.trail.length > this.maxTrail) this.trail.shift();
+  }
+  draw() {
+    this.display.clear(0, 0, 0);
+    const pal = LORENZ_PAL, nC = pal.length, total = this.trail.length;
+    for (let i = 0; i < total; i++) {
+      const [tx, ty] = this.trail[i];
+      if (tx >= 0 && tx < GRID && ty >= 0 && ty < GRID) {
+        const t = i / total;
+        const fi = t * (nC - 1), lo = fi | 0, hi = Math.min(lo + 1, nC - 1), f = fi - lo;
+        this.display.setPixel(tx, ty, [
+          (pal[lo][0]+(pal[hi][0]-pal[lo][0])*f) * (0.2 + 0.8*t) | 0,
+          (pal[lo][1]+(pal[hi][1]-pal[lo][1])*f) * (0.2 + 0.8*t) | 0,
+          (pal[lo][2]+(pal[hi][2]-pal[lo][2])*f) * (0.2 + 0.8*t) | 0,
+        ]);
+      }
+    }
+  }
+}
+
+// ----- Cyclic CA (Demon Spirals) -----
+class CyclicCA {
+  constructor(display) {
+    this.display = display;
+    this.name = 'DEMON SPIRALS';
+    this.desc = 'Cyclic cellular automaton';
+    this.category = 'AUTOMATA';
+  }
+  reset() {
+    this.time = 0; this.stepTimer = 0;
+    this.states = 14;
+    this.grid = new Uint8Array(GRID * GRID);
+    for (let i = 0; i < GRID * GRID; i++)
+      this.grid[i] = Math.random() * this.states | 0;
+    this.colors = [];
+    for (let i = 0; i < this.states; i++) {
+      const h = i / this.states * 6, hi = h | 0, f = h - hi;
+      let r, g, b;
+      switch (hi) {
+        case 0: r=255; g=255*f|0; b=0; break;
+        case 1: r=255*(1-f)|0; g=255; b=0; break;
+        case 2: r=0; g=255; b=255*f|0; break;
+        case 3: r=0; g=255*(1-f)|0; b=255; break;
+        case 4: r=255*f|0; g=0; b=255; break;
+        default: r=255; g=0; b=255*(1-f)|0; break;
+      }
+      this.colors.push([r, g, b]);
+    }
+  }
+  update(dt) {
+    this.time += dt; this.stepTimer += dt;
+    if (this.stepTimer < 0.07) return;
+    this.stepTimer = 0;
+    const {grid, states} = this;
+    const next = new Uint8Array(GRID * GRID);
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const i = y*GRID+x, target = (grid[i] + 1) % states;
+        const up = ((y-1+GRID)%GRID)*GRID+x;
+        const dn = ((y+1)%GRID)*GRID+x;
+        const lt = y*GRID+(x-1+GRID)%GRID;
+        const rt = y*GRID+(x+1)%GRID;
+        next[i] = (grid[up]===target||grid[dn]===target||grid[lt]===target||grid[rt]===target)
+          ? target : grid[i];
+      }
+    }
+    grid.set(next);
+  }
+  draw() {
+    for (let y = 0; y < GRID; y++)
+      for (let x = 0; x < GRID; x++)
+        this.display.setPixel(x, y, this.colors[this.grid[y*GRID+x]]);
+  }
+}
+
+
+// =============================================================
+// SHOWCASE CONTROLLER
+// =============================================================
+

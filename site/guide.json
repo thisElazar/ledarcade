@@ -15,6 +15,7 @@
     35
    ],
    "key": "arcade",
+   "group": "games",
    "items": [
     {
      "name": "ASTROIDS",
@@ -235,6 +236,7 @@
     35
    ],
    "key": "retro",
+   "group": "games",
    "items": [
     {
      "name": "ARCANOID",
@@ -341,6 +343,7 @@
     35
    ],
    "key": "modern",
+   "group": "games",
    "items": [
     {
      "name": "AGAR.IO",
@@ -455,6 +458,7 @@
     35
    ],
    "key": "toys",
+   "group": "games",
    "items": [
     {
      "name": "LITE OUT",
@@ -532,6 +536,7 @@
     230
    ],
    "key": "bar",
+   "group": "games",
    "items": [
     {
      "name": "BOWLING",
@@ -596,6 +601,7 @@
     230
    ],
    "key": "2_player",
+   "group": "games",
    "items": [
     {
      "name": "CHECKERS",
@@ -667,6 +673,7 @@
     132
    ],
    "key": "unique",
+   "group": "games",
    "items": [
     {
      "name": "DRIFT",
@@ -721,6 +728,7 @@
     210
    ],
    "key": "game_mix",
+   "group": "games",
    "items": [
     {
      "name": "ALL GAMES",
@@ -879,6 +887,7 @@
     45
    ],
    "key": "art",
+   "group": "visuals",
    "items": [],
    "paintings": [
     {
@@ -2475,6 +2484,7 @@
     200
    ],
    "key": "automata",
+   "group": "visuals",
    "items": [
     {
      "name": "BOIDS",
@@ -2814,6 +2824,7 @@
     136
    ],
    "key": "cooking",
+   "group": "visuals",
    "items": [
     {
      "name": "BAKING",
@@ -2912,6 +2923,7 @@
     85
    ],
    "key": "culture",
+   "group": "visuals",
    "items": [
     {
      "name": "COINS",
@@ -3014,6 +3026,7 @@
     65
    ],
    "key": "demos",
+   "group": "visuals",
    "items": [
     {
      "name": "AGAR.IO",
@@ -3458,6 +3471,7 @@
     224
    ],
    "key": "digital",
+   "group": "visuals",
    "items": [
     {
      "name": "AMIGA BARS",
@@ -3675,6 +3689,7 @@
     163
    ],
    "key": "gallery",
+   "group": "visuals",
    "items": [
     {
      "name": "GRAND MUSEUM",
@@ -3706,6 +3721,7 @@
     106
    ],
    "key": "household",
+   "group": "visuals",
    "items": [
     {
      "name": "AQUARIUM",
@@ -3829,6 +3845,7 @@
     224
    ],
    "key": "math",
+   "group": "visuals",
    "items": [
     {
      "name": "ATTRACTORS",
@@ -4022,6 +4039,7 @@
     217
    ],
    "key": "mechanics",
+   "group": "visuals",
    "items": [
     {
      "name": "ANTIKYTHERA",
@@ -4230,6 +4248,7 @@
     217
    ],
    "key": "music",
+   "group": "visuals",
    "items": [
     {
      "name": "CHORD CHART",
@@ -4399,6 +4418,7 @@
     73
    ],
    "key": "nature",
+   "group": "visuals",
    "items": [
     {
      "name": "AUDUBON",
@@ -4556,6 +4576,7 @@
     217
    ],
    "key": "road_rail",
+   "group": "visuals",
    "items": [
     {
      "name": "ATLAS",
@@ -4662,6 +4683,7 @@
     224
    ],
    "key": "science_micro",
+   "group": "visuals",
    "items": [
     {
      "name": "BRAIN",
@@ -4831,6 +4853,7 @@
     224
    ],
    "key": "science_bench",
+   "group": "visuals",
    "items": [
     {
      "name": "CHLADNI",
@@ -4982,6 +5005,7 @@
     224
    ],
    "key": "science_macro",
+   "group": "visuals",
    "items": [
     {
      "name": "CONSTELLATIONS",
@@ -5117,6 +5141,7 @@
     65
    ],
    "key": "titles",
+   "group": "visuals",
    "items": [
     {
      "name": "WONDER AUTOMATON",
@@ -5688,6 +5713,7 @@
     194
    ],
    "key": "visual_mix",
+   "group": "visuals",
    "items": [
     {
      "name": "ALL VISUALS",
@@ -6513,6 +6539,7 @@
     204
    ],
    "key": "utility",
+   "group": "utility",
    "items": [
     {
      "name": "ABOUT",

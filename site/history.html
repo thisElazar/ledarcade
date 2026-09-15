@@ -2,555 +2,172 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wonder Cabinet - History</title>
-<link rel="stylesheet" href="shared.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Wonder Cabinet · History</title>
+<meta name="description" content="The games, machines, algorithms, and discoveries in the Wonder Cabinet, placed in time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="v2.css">
 <style>
-.timeline-section {
-  padding: 0 0 20px;
-}
-.timeline-section h2 {
-  text-align: center;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: #c8a86e;
-  margin-bottom: 6px;
-}
-.timeline-section .tl-subtitle {
-  text-align: center;
-  font-size: 13px;
-  color: #6a6254;
-  margin-bottom: 20px;
-}
-.timeline-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 16px;
-  margin-bottom: 16px;
-  padding: 0 20px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: #6a6254;
-}
-.legend-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.timeline-track {
-  position: relative;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
-.timeline-track::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(255,255,255,0.06);
-}
-.tl-era {
-  text-align: center;
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  color: #3a3428;
-  text-transform: uppercase;
-  padding: 20px 0;
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 1;
-}
-.tl-era::before,
-.tl-era::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(255,255,255,0.04);
-}
-.tl-item {
-  position: relative;
-  width: 50%;
-  padding: 10px 28px;
-  min-height: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
-  z-index: 1;
-}
-.tl-item.left {
-  margin-right: auto;
-  text-align: right;
-  padding-right: 28px;
-}
-.tl-item.right {
-  margin-left: auto;
-  text-align: left;
-  padding-left: 28px;
-}
-.tl-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--c);
-  box-shadow: 0 0 5px color-mix(in srgb, var(--c) 60%, transparent);
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.tl-item.left .tl-dot {
-  right: -4px;
-}
-.tl-item.right .tl-dot {
-  left: -4px;
-}
-.tl-yr {
-  font-size: 10px;
-  color: #5a5448;
-  white-space: nowrap;
-  line-height: 1.2;
-}
-.tl-nm {
-  font-size: 12px;
-  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  letter-spacing: 0.02em;
-  color: #9a9284;
-  white-space: nowrap;
-  line-height: 1.3;
-}
-@media (max-width: 500px) {
-  .timeline-track::after {
-    left: 20px;
-  }
-  .tl-item {
-    width: 100%;
-    padding-left: 36px;
-    text-align: left;
-  }
-  .tl-item.left {
-    margin-right: 0;
-    text-align: left;
-    padding-right: 10px;
-    padding-left: 36px;
-  }
-  .tl-item.right {
-    margin-left: 0;
-    padding-left: 36px;
-  }
-  .tl-item.left .tl-dot,
-  .tl-item.right .tl-dot {
-    left: 16px;
-    right: auto;
-  }
-  .tl-era {
-    text-align: left;
-    padding-left: 36px;
-  }
+.timeline { max-width: 640px; }
+.timeline td.n { width: 6.5em; padding-right: 22px; color: var(--ink-2); white-space: nowrap; }
+.timeline td.nm { font-weight: 500; }
+.timeline td.cat { text-align: right; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.timeline tr.era td { padding: 30px 0 8px; border-bottom: 1px solid var(--rule); font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); text-align: center; }
+.timeline tr.era:first-child td { padding-top: 12px; }
+@media (max-width: 460px) {
+  .timeline td.n { width: 5.5em; padding-right: 12px; font-size: 13px; }
+  .timeline td.cat { font-size: 10px; }
 }
 </style>
 </head>
-
 <body>
 
-<nav class="site-nav">
-  <a class="nav-brand" href="index.html">WONDER CABINET</a>
-  <a href="emulator.html">EMULATOR</a>
-  <a href="guide.html">FIELD GUIDE</a>
-  <a href="history.html" class="active">HISTORY</a>
-
-  <a href="order.html">ORDER</a>
-</nav>
-
-<header>
-  <h1>WONDER CABINET</h1>
-  <p class="tagline">A cabinet of electronic curiosities</p>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">Wonder Cabinet</a>
+    <nav class="nav" aria-label="Site">
+      <a href="emulator.html">Emulator</a>
+      <a href="guide.html">Field Guide</a>
+      <a href="history.html" class="now">History</a>
+      <a href="order.html">Order</a>
+    </nav>
+    <span class="status">MADE TO ORDER · FROM $495</span>
+  </div>
 </header>
 
-<section class="timeline-section" id="timeline">
-  <h2>A HISTORY OF IDEAS</h2>
-  <p class="tl-subtitle">Games, machines, algorithms, and discoveries in the collection &mdash; placed in time</p>
-
-  <nav class="timeline-legend">
-    <span class="legend-item"><span class="legend-dot" style="background:#b464ff"></span>MACHINES</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#6496ff"></span>PHYSICS</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#50c8a0"></span>BIOLOGY</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ff64ff"></span>AUTOMATA</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ffff00"></span>GAMES</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#64ffff"></span>DIGITAL</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ffb432"></span>MUSIC</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#e8c44a"></span>ART</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ff8080"></span>HOUSEHOLD</span>
-  </nav>
-
-  <div class="timeline-track">
-
-    <span class="tl-era">ANCIENT WORLD</span>
-
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">BOWLING</span><span class="tl-yr">~3200 BC</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">~3000 BC</span><span class="tl-nm">MANCALA</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">GO</span><span class="tl-yr">~500 BC</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">~250 BC</span><span class="tl-nm">ARCHIMEDES' SCREW</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">ASTROLABE</span><span class="tl-yr">~200 BC</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">~100 BC</span><span class="tl-nm">ANTIKYTHERA</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">CHESS</span><span class="tl-yr">~600</span><span class="tl-dot"></span>
-    </div>
-
-    <span class="tl-era">MEDIEVAL &amp; RENAISSANCE</span>
-
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">~1100</span><span class="tl-nm">HURDY GURDY</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">CHECKERS</span><span class="tl-yr">~1100</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1440</span><span class="tl-nm">GUTENBERG PRESS</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">SOLAR SYSTEM</span><span class="tl-yr">1543</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1657</span><span class="tl-nm">PENDULUM CLOCK</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">MICROSCOPE</span><span class="tl-yr">1670</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#64ffff">
-      <span class="tl-dot"></span><span class="tl-yr">1704</span><span class="tl-nm">TRUCHET TILES</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">ORRERY</span><span class="tl-yr">1713</span><span class="tl-dot"></span>
-    </div>
-
-    <span class="tl-era">AGE OF INDUSTRY</span>
-
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1769</span><span class="tl-nm">WATT ENGINE</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">COULOMB'S LAW</span><span class="tl-yr">1785</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#6496ff">
-      <span class="tl-dot"></span><span class="tl-yr">1787</span><span class="tl-nm">CHLADNI PLATES</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffb432">
-      <span class="tl-nm">MUSIC BOX</span><span class="tl-yr">~1796</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1804</span><span class="tl-nm">JACQUARD LOOM</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffb432">
-      <span class="tl-nm">METRONOME</span><span class="tl-yr">1815</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">~1829</span><span class="tl-nm">LOCOMOTIVE</span>
-    </div>
-    <div class="tl-item left" style="--c:#e8c44a">
-      <span class="tl-nm">GREAT WAVE</span><span class="tl-yr">1831</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1851</span><span class="tl-nm">SINGER</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">GYROSCOPE</span><span class="tl-yr">1852</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#6496ff">
-      <span class="tl-dot"></span><span class="tl-yr">1858</span><span class="tl-nm">M&Ouml;BIUS STRIP</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">SPECTROSCOPE</span><span class="tl-yr">1859</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#6496ff">
-      <span class="tl-dot"></span><span class="tl-yr">1865</span><span class="tl-nm">EM FIELD</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">PERIODIC TABLE</span><span class="tl-yr">1869</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1874</span><span class="tl-nm">FIFTEEN PUZZLE</span>
-    </div>
-
-    <span class="tl-era">TURN OF CENTURY</span>
-
-    <div class="tl-item left" style="--c:#ffb432">
-      <span class="tl-nm">GRAMOPHONE</span><span class="tl-yr">1887</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#e8c44a">
-      <span class="tl-dot"></span><span class="tl-yr">1889</span><span class="tl-nm">STARRY NIGHT</span>
-    </div>
-    <div class="tl-item left" style="--c:#e8c44a">
-      <span class="tl-nm">THE SCREAM</span><span class="tl-yr">1893</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">1896</span><span class="tl-nm">PIANO ROLL</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">RADIOACTIVITY</span><span class="tl-yr">1896</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1897</span><span class="tl-nm">OSCILLOSCOPE</span>
-    </div>
-    <div class="tl-item left" style="--c:#e8c44a">
-      <span class="tl-nm">WATER LILIES</span><span class="tl-yr">1906</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#b464ff">
-      <span class="tl-dot"></span><span class="tl-yr">1908</span><span class="tl-nm">MODEL T</span>
-    </div>
-    <div class="tl-item left" style="--c:#50c8a0">
-      <span class="tl-nm">BOHR ATOM</span><span class="tl-yr">1913</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">1920</span><span class="tl-nm">THEREMIN</span>
-    </div>
-
-    <span class="tl-era">MID-CENTURY</span>
-
-    <div class="tl-item left" style="--c:#e8c44a">
-      <span class="tl-nm">MONDRIAN</span><span class="tl-yr">1943</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1947</span><span class="tl-nm">PINBALL</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">CURTA</span><span class="tl-yr">1948</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ff8080">
-      <span class="tl-dot"></span><span class="tl-yr">1948</span><span class="tl-nm">POLAROID</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">TURING PATTERNS</span><span class="tl-yr">1952</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#50c8a0">
-      <span class="tl-dot"></span><span class="tl-yr">1953</span><span class="tl-nm">DNA STRUCTURE</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">LORENZ ATTRACTOR</span><span class="tl-yr">1963</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ff8080">
-      <span class="tl-dot"></span><span class="tl-yr">1963</span><span class="tl-nm">LAVA LAMP</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">QUARKS</span><span class="tl-yr">1964</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">1964</span><span class="tl-nm">MOOG SYNTH</span>
-    </div>
-    <div class="tl-item left" style="--c:#b464ff">
-      <span class="tl-nm">NEWTON'S CRADLE</span><span class="tl-yr">1967</span><span class="tl-dot"></span>
-    </div>
-
-    <span class="tl-era">THE COMPUTER AGE</span>
-
-    <div class="tl-item right" style="--c:#ff64ff">
-      <span class="tl-dot"></span><span class="tl-yr">1970</span><span class="tl-nm">GAME OF LIFE</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">MASTERMIND</span><span class="tl-yr">1971</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">1971</span><span class="tl-nm">EQUALIZER</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">PONG</span><span class="tl-yr">1972</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1973</span><span class="tl-nm">OTHELLO</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">CONNECT 4</span><span class="tl-yr">1974</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1974</span><span class="tl-nm">D&amp;D</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">FIREFLY SYNC</span><span class="tl-yr">1975</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1976</span><span class="tl-nm">BREAKOUT</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">SIMON</span><span class="tl-yr">1978</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1978</span><span class="tl-nm">SPACE INVADERS</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">LUNAR LANDER</span><span class="tl-yr">1979</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1979</span><span class="tl-nm">ASTEROIDS</span>
-    </div>
-
-    <span class="tl-era">GOLDEN AGE OF ARCADES</span>
-
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">PAC-MAN</span><span class="tl-yr">1980</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffb432">
-      <span class="tl-dot"></span><span class="tl-yr">1980</span><span class="tl-nm">TR-808</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">CENTIPEDE</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1981</span><span class="tl-nm">DONKEY KONG</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">GALAGA</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1981</span><span class="tl-nm">FROGGER</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">DEFENDER</span><span class="tl-yr">1981</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1981</span><span class="tl-nm">3D MONSTER MAZE</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">MS. PAC-MAN</span><span class="tl-yr">1982</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1982</span><span class="tl-nm">DIG DUG</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">Q*BERT</span><span class="tl-yr">1982</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1982</span><span class="tl-nm">BURGERTIME</span>
-    </div>
-
-    <span class="tl-era">8-BIT &amp; BEYOND</span>
-
-    <div class="tl-item right" style="--c:#ff64ff">
-      <span class="tl-dot"></span><span class="tl-yr">1983</span><span class="tl-nm">WOLFRAM CA</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">LODE RUNNER</span><span class="tl-yr">1983</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1983</span><span class="tl-nm">BOMBERMAN</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">GRAY-SCOTT</span><span class="tl-yr">1983</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1984</span><span class="tl-nm">TETRIS</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">ARKANOID</span><span class="tl-yr">1986</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ff64ff">
-      <span class="tl-dot"></span><span class="tl-yr">1987</span><span class="tl-nm">BOIDS</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">SANDPILE</span><span class="tl-yr">1987</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#64ffff">
-      <span class="tl-dot"></span><span class="tl-yr">~1987</span><span class="tl-nm">AMIGA DEMOS</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">HODGEPODGE</span><span class="tl-yr">1988</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1989</span><span class="tl-nm">PIPE DREAM</span>
-    </div>
-    <div class="tl-item left" style="--c:#ff8080">
-      <span class="tl-nm">SOLITAIRE</span><span class="tl-yr">1990</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1991</span><span class="tl-nm">SKIFREE</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">JEZZBALL</span><span class="tl-yr">1992</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1995</span><span class="tl-nm">LIGHTS OUT</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">BOP IT</span><span class="tl-yr">1996</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">1996</span><span class="tl-nm">RUSH HOUR</span>
-    </div>
-
-    <span class="tl-era">CONNECTED ERA</span>
-
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">SNAKE</span><span class="tl-yr">1997</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#64ffff">
-      <span class="tl-dot"></span><span class="tl-yr">1999</span><span class="tl-nm">MATRIX RAIN</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">STABLE FLUIDS</span><span class="tl-yr">1999</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ff8080">
-      <span class="tl-dot"></span><span class="tl-yr">~2000</span><span class="tl-nm">DVD LOGO</span>
-    </div>
-    <div class="tl-item left" style="--c:#6496ff">
-      <span class="tl-nm">SPIKING NEURONS</span><span class="tl-yr">2003</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">2006</span><span class="tl-nm">SAND GAME</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">PORTAL</span><span class="tl-yr">2007</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item left" style="--c:#ff64ff">
-      <span class="tl-nm">PARTICLE LIFE</span><span class="tl-yr">2007</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#64ffff">
-      <span class="tl-dot"></span><span class="tl-yr">2007</span><span class="tl-nm">CURL NOISE</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">BLOONS</span><span class="tl-yr">2007</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">2013</span><span class="tl-nm">GEOMETRY DASH</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">FLAPPY BIRD</span><span class="tl-yr">2013</span><span class="tl-dot"></span>
-    </div>
-    <div class="tl-item right" style="--c:#ffff00">
-      <span class="tl-dot"></span><span class="tl-yr">2014</span><span class="tl-nm">2048</span>
-    </div>
-    <div class="tl-item left" style="--c:#ffff00">
-      <span class="tl-nm">AGAR.IO</span><span class="tl-yr">2015</span><span class="tl-dot"></span>
-    </div>
-
+<section>
+  <div class="wrap">
+    <div class="sec-head" style="justify-content:center"><h2>A History of Ideas</h2></div>
+    <table class="ledger timeline">
+      <tbody>
+      <tr class="era"><td colspan="3">ANCIENT WORLD</td></tr>
+      <tr><td class="n num">~3200 BC</td><td class="nm">Bowling</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">~3000 BC</td><td class="nm">Mancala</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">~500 BC</td><td class="nm">Go</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">~250 BC</td><td class="nm">Archimedes' Screw</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">~200 BC</td><td class="nm">Astrolabe</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">~100 BC</td><td class="nm">Antikythera</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">~600</td><td class="nm">Chess</td><td class="cat">Games</td></tr>
+      <tr class="era"><td colspan="3">MEDIEVAL &amp; RENAISSANCE</td></tr>
+      <tr><td class="n num">~1100</td><td class="nm">Hurdy Gurdy</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">~1100</td><td class="nm">Checkers</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1440</td><td class="nm">Gutenberg Press</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1543</td><td class="nm">Solar System</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1657</td><td class="nm">Pendulum Clock</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1670</td><td class="nm">Microscope</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1704</td><td class="nm">Truchet Tiles</td><td class="cat">Digital</td></tr>
+      <tr><td class="n num">1713</td><td class="nm">Orrery</td><td class="cat">Machines</td></tr>
+      <tr class="era"><td colspan="3">AGE OF INDUSTRY</td></tr>
+      <tr><td class="n num">1769</td><td class="nm">Watt Engine</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1785</td><td class="nm">Coulomb's Law</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1787</td><td class="nm">Chladni Plates</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">~1796</td><td class="nm">Music Box</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1804</td><td class="nm">Jacquard Loom</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1815</td><td class="nm">Metronome</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">~1829</td><td class="nm">Locomotive</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1831</td><td class="nm">Great Wave</td><td class="cat">Art</td></tr>
+      <tr><td class="n num">1851</td><td class="nm">Singer</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1852</td><td class="nm">Gyroscope</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1858</td><td class="nm">Möbius Strip</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1859</td><td class="nm">Spectroscope</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1865</td><td class="nm">EM Field</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1869</td><td class="nm">Periodic Table</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1874</td><td class="nm">Fifteen Puzzle</td><td class="cat">Games</td></tr>
+      <tr class="era"><td colspan="3">TURN OF CENTURY</td></tr>
+      <tr><td class="n num">1887</td><td class="nm">Gramophone</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1889</td><td class="nm">Starry Night</td><td class="cat">Art</td></tr>
+      <tr><td class="n num">1893</td><td class="nm">The Scream</td><td class="cat">Art</td></tr>
+      <tr><td class="n num">1896</td><td class="nm">Piano Roll</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1896</td><td class="nm">Radioactivity</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1897</td><td class="nm">Oscilloscope</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1906</td><td class="nm">Water Lilies</td><td class="cat">Art</td></tr>
+      <tr><td class="n num">1908</td><td class="nm">Model T</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1913</td><td class="nm">Bohr Atom</td><td class="cat">Biology</td></tr>
+      <tr><td class="n num">1920</td><td class="nm">Theremin</td><td class="cat">Music</td></tr>
+      <tr class="era"><td colspan="3">MID-CENTURY</td></tr>
+      <tr><td class="n num">1943</td><td class="nm">Mondrian</td><td class="cat">Art</td></tr>
+      <tr><td class="n num">1947</td><td class="nm">Pinball</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1948</td><td class="nm">Curta</td><td class="cat">Machines</td></tr>
+      <tr><td class="n num">1948</td><td class="nm">Polaroid</td><td class="cat">Household</td></tr>
+      <tr><td class="n num">1952</td><td class="nm">Turing Patterns</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1953</td><td class="nm">DNA Structure</td><td class="cat">Biology</td></tr>
+      <tr><td class="n num">1963</td><td class="nm">Lorenz Attractor</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1963</td><td class="nm">Lava Lamp</td><td class="cat">Household</td></tr>
+      <tr><td class="n num">1964</td><td class="nm">Quarks</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">1964</td><td class="nm">Moog Synth</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1967</td><td class="nm">Newton's Cradle</td><td class="cat">Machines</td></tr>
+      <tr class="era"><td colspan="3">THE COMPUTER AGE</td></tr>
+      <tr><td class="n num">1970</td><td class="nm">Game of Life</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1971</td><td class="nm">Mastermind</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1971</td><td class="nm">Equalizer</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1972</td><td class="nm">Pong</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1973</td><td class="nm">Othello</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1974</td><td class="nm">Connect 4</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1974</td><td class="nm">D&amp;D</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1975</td><td class="nm">Firefly Sync</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1976</td><td class="nm">Breakout</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1978</td><td class="nm">Simon</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1978</td><td class="nm">Space Invaders</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1979</td><td class="nm">Lunar Lander</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1979</td><td class="nm">Asteroids</td><td class="cat">Games</td></tr>
+      <tr class="era"><td colspan="3">GOLDEN AGE OF ARCADES</td></tr>
+      <tr><td class="n num">1980</td><td class="nm">Pac-Man</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1980</td><td class="nm">TR-808</td><td class="cat">Music</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">Centipede</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">Donkey Kong</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">Galaga</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">Frogger</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">Defender</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1981</td><td class="nm">3D Monster Maze</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1982</td><td class="nm">Ms. Pac-Man</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1982</td><td class="nm">Dig Dug</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1982</td><td class="nm">Q*bert</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1982</td><td class="nm">BurgerTime</td><td class="cat">Games</td></tr>
+      <tr class="era"><td colspan="3">8-BIT &amp; BEYOND</td></tr>
+      <tr><td class="n num">1983</td><td class="nm">Wolfram CA</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1983</td><td class="nm">Lode Runner</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1983</td><td class="nm">Bomberman</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1983</td><td class="nm">Gray-Scott</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1984</td><td class="nm">Tetris</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1986</td><td class="nm">Arkanoid</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1987</td><td class="nm">Boids</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1987</td><td class="nm">Sandpile</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">~1987</td><td class="nm">Amiga Demos</td><td class="cat">Digital</td></tr>
+      <tr><td class="n num">1988</td><td class="nm">Hodgepodge</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">1989</td><td class="nm">Pipe Dream</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1990</td><td class="nm">Solitaire</td><td class="cat">Household</td></tr>
+      <tr><td class="n num">1991</td><td class="nm">SkiFree</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1992</td><td class="nm">JezzBall</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1995</td><td class="nm">Lights Out</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1996</td><td class="nm">Bop It</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1996</td><td class="nm">Rush Hour</td><td class="cat">Games</td></tr>
+      <tr class="era"><td colspan="3">CONNECTED ERA</td></tr>
+      <tr><td class="n num">1997</td><td class="nm">Snake</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">1999</td><td class="nm">Matrix Rain</td><td class="cat">Digital</td></tr>
+      <tr><td class="n num">1999</td><td class="nm">Stable Fluids</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">~2000</td><td class="nm">DVD Logo</td><td class="cat">Household</td></tr>
+      <tr><td class="n num">2003</td><td class="nm">Spiking Neurons</td><td class="cat">Physics</td></tr>
+      <tr><td class="n num">2006</td><td class="nm">Sand Game</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2007</td><td class="nm">Portal</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2007</td><td class="nm">Particle Life</td><td class="cat">Automata</td></tr>
+      <tr><td class="n num">2007</td><td class="nm">Curl Noise</td><td class="cat">Digital</td></tr>
+      <tr><td class="n num">2007</td><td class="nm">Bloons</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2013</td><td class="nm">Geometry Dash</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2013</td><td class="nm">Flappy Bird</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2014</td><td class="nm">2048</td><td class="cat">Games</td></tr>
+      <tr><td class="n num">2015</td><td class="nm">Agar.io</td><td class="cat">Games</td></tr>
+      </tbody>
+    </table>
   </div>
 </section>
 
 <footer>
-  Programmed with AI, Designed &amp; Curated by Hand
+  <div class="wrap">
+    <span>Programmed with AI, designed &amp; curated by hand</span>
+    <span><a href="https://github.com/thisElazar/ledarcade">Source</a> · <a href="https://thiselazar.com/">thiselazar.com</a></span>
+  </div>
 </footer>
 
 </body>

@@ -2,230 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wonder Cabinet - Order</title>
-<link rel="stylesheet" href="shared.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Order · Wonder Cabinet</title>
+<meta name="description" content="Order a Wonder Cabinet. Handmade to order in hickory and birch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="v2.css">
 <style>
-.order-section {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
+.order-page { max-width: 560px; margin-inline: auto; }
+.tiers { margin-bottom: 36px; }
+form { border: 1px solid var(--rule); }
+.field { display: grid; grid-template-columns: 11em minmax(0, 1fr); align-items: baseline; border-top: 1px solid var(--rule-2); }
+.field:first-child { border-top: 0; }
+.field label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); padding: 14px 18px; }
+.field input, .field select, .field textarea {
+  width: 100%; border: 0; border-left: 1px solid var(--rule-2); background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 18px; padding: 11px 16px; outline: none; border-radius: 0;
 }
-.order-section h2 {
-  text-align: center;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: #c8a86e;
-  margin-bottom: 6px;
-}
-.order-section .order-subtitle {
-  text-align: center;
-  font-size: 13px;
-  color: #6a6254;
-  margin-bottom: 32px;
-  line-height: 1.6;
-}
-.order-form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.form-group label {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  color: #9a9284;
-  text-transform: uppercase;
-}
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group select,
-.form-group textarea {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  font-size: 13px;
-  color: #d8d0c4;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: rgba(200, 168, 110, 0.5);
-}
-.form-group textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-.form-group select {
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9284' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-  cursor: pointer;
-}
-.form-group select option {
-  background: #1a1a1e;
-  color: #d8d0c4;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.submit-btn {
-  background: rgba(200, 168, 110, 0.15);
-  border: 1px solid rgba(200, 168, 110, 0.3);
-  border-radius: 6px;
-  padding: 12px 24px;
-  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  font-size: 12px;
-  letter-spacing: 0.15em;
-  color: #c8a86e;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 8px;
-}
-.submit-btn:hover {
-  background: rgba(200, 168, 110, 0.25);
-  border-color: rgba(200, 168, 110, 0.5);
-}
-
-.form-note {
-  font-size: 11px;
-  color: #4a4438;
-  text-align: center;
-  margin-top: 8px;
-}
-
-@media (max-width: 500px) {
-  .form-row { grid-template-columns: 1fr; }
+.field input:focus, .field select:focus, .field textarea:focus { background: #f6f4ef; }
+.field select { appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231b1a17' fill='none' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; padding-right: 36px; }
+.field textarea { min-height: 96px; resize: vertical; display: block; }
+.submit { border-top: 1px solid var(--rule); padding: 18px; display: flex; justify-content: center; }
+.after { text-align: center; margin-top: 14px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-2); }
+@media (max-width: 560px) {
+  .field { grid-template-columns: 1fr; }
+  .field label { padding-bottom: 0; }
+  .field input, .field select, .field textarea { border-left: 0; }
 }
 </style>
 </head>
-
 <body>
 
-<nav class="site-nav">
-  <a class="nav-brand" href="index.html">WONDER CABINET</a>
-  <a href="emulator.html">EMULATOR</a>
-  <a href="guide.html">FIELD GUIDE</a>
-  <a href="history.html">HISTORY</a>
-
-  <a href="order.html" class="active">ORDER</a>
-</nav>
-
-<header>
-  <h1>WONDER CABINET</h1>
-  <p class="tagline">A cabinet of electronic curiosities</p>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">Wonder Cabinet</a>
+    <nav class="nav" aria-label="Site">
+      <a href="emulator.html">Emulator</a>
+      <a href="guide.html">Field Guide</a>
+      <a href="history.html">History</a>
+      <a href="order.html" class="now">Order</a>
+    </nav>
+    <span class="status">MADE TO ORDER · FROM $495</span>
+  </div>
 </header>
 
-<section class="order-section">
-  <h2>ORDER INQUIRY</h2>
-  <p class="order-subtitle">
-    Each cabinet is handmade to order &mdash; hickory frame, birch ply panels,
-    64&times;64 RGB LED matrix (2.5mm pitch), Raspberry Pi 3B, joystick &amp; buttons.
-    Cabinets range from $200&ndash;$350 depending on options and shipping.
-    The Wonder Cabinet is currently in advanced prototype &mdash; every unit is
-    handmade, so expect some variability between builds.
-  </p>
+<section>
+  <div class="wrap order-page">
+    <div class="sec-head" style="justify-content:center"><h2>Order</h2></div>
 
-  <form class="order-form" action="submit-order.php" method="POST">
-
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" required>
+    <div class="tiers">
+      <div class="tier"><h3>Standard</h3><span class="price num">$495</span><p>Natural hickory. Your choice of stick and button colour.</p></div>
+      <div class="tier"><h3>Custom</h3><span class="price num">$595</span><p>Stained or painted from the menu of finishes.</p></div>
+      <div class="tier"><h3>Full Custom</h3><span class="price num">By discussion</span><p>Your colours, logos, and artwork throughout.</p></div>
+      <div class="terms">$100 DEPOSIT HOLDS A BUILD SLOT, REFUNDABLE<br>MADE TO ORDER · 4–6 WEEKS</div>
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+    <form action="submit-order.php" method="POST">
+      <div class="field"><label for="name">Name</label><input type="text" id="name" name="name" required autocomplete="name"></div>
+      <div class="field"><label for="email">Email</label><input type="email" id="email" name="email" required autocomplete="email"></div>
+      <div class="field"><label for="phone">Phone</label><input type="tel" id="phone" name="phone" autocomplete="tel"></div>
+      <div class="field"><label for="finish">Finish</label>
+        <select id="finish" name="finish">
+          <optgroup label="Standard · $495">
+            <option value="Natural">Natural hickory</option>
+          </optgroup>
+          <optgroup label="Custom · $595">
+            <option value="Walnut">Walnut stain</option>
+            <option value="Ebony">Ebony stain</option>
+            <option value="Cherry">Cherry stain</option>
+            <option value="Black">Black paint</option>
+            <option value="White">White paint</option>
+            <option value="Red">Red paint</option>
+            <option value="Navy Blue">Navy blue paint</option>
+            <option value="Forest Green">Forest green paint</option>
+          </optgroup>
+          <optgroup label="Full Custom · by discussion">
+            <option value="Full Custom">Full custom</option>
+          </optgroup>
+        </select>
       </div>
-      <div class="form-group">
-        <label for="phone">Phone</label>
-        <input type="tel" id="phone" name="phone">
+      <div class="field" id="sheenField" hidden><label for="sheen">Sheen</label>
+        <select id="sheen" name="sheen">
+          <option>Matte</option>
+          <option>Glossy</option>
+        </select>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label for="finish">Cabinet Finish</label>
-      <select id="finish" name="finish">
-        <option value="Natural">Natural (no stain)</option>
-        <option value="Walnut">Walnut stain</option>
-        <option value="Ebony">Ebony stain</option>
-        <option value="Cherry">Cherry stain</option>
-        <option value="Matte Black">Matte Black paint</option>
-        <option value="White">White paint</option>
-        <option value="Red">Red paint</option>
-        <option value="Navy Blue">Navy Blue paint</option>
-        <option value="Forest Green">Forest Green paint</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="pi">Raspberry Pi</label>
-      <select id="pi" name="pi_model">
-        <option value="Pi 3B">Pi 3B (included)</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="joystick">Joystick Color</label>
+      <div class="field"><label for="joystick">Stick</label>
         <select id="joystick" name="joystick_color">
-          <option>Red</option>
-          <option>Yellow</option>
-          <option>Blue</option>
-          <option>Black</option>
-          <option>White</option>
-          <option>Green</option>
-          <option>Orange</option>
-          <option>Purple</option>
-          <option>Pink</option>
+          <option>Red</option><option>Yellow</option><option>Blue</option><option>Black</option><option>White</option><option>Green</option><option>Orange</option><option>Purple</option><option>Pink</option>
         </select>
       </div>
-      <div class="form-group">
-        <label for="buttons">Button Color</label>
+      <div class="field"><label for="buttons">Buttons</label>
         <select id="buttons" name="button_color">
-          <option>Red</option>
-          <option>Yellow</option>
-          <option>Blue</option>
-          <option>Black</option>
-          <option>White</option>
-          <option>Green</option>
-          <option>Orange</option>
-          <option>Purple</option>
-          <option>Pink</option>
+          <option>Red</option><option>Yellow</option><option>Blue</option><option>Black</option><option>White</option><option>Green</option><option>Orange</option><option>Purple</option><option>Pink</option>
         </select>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label for="notes">Customization Notes</label>
-      <textarea id="notes" name="notes" placeholder="Custom artwork, game preferences, special requests..."></textarea>
-    </div>
-
-    <button type="submit" class="submit-btn">SUBMIT INQUIRY</button>
-    <p class="form-note">We'll respond within 2 business days</p>
-  </form>
+      <div class="field"><label for="notes">Notes</label><textarea id="notes" name="notes"></textarea></div>
+      <input type="hidden" name="pi_model" value="Pi 3B">
+      <div class="submit"><button type="submit" class="btn primary">Send inquiry →</button></div>
+    </form>
+    <p class="after">REPLY WITHIN 2 BUSINESS DAYS</p>
+  </div>
 </section>
 
+<script>
+// Sheen applies to stains and paints, not natural hickory.
+const finishEl = document.getElementById('finish'), sheenField = document.getElementById('sheenField');
+function syncSheen() { sheenField.hidden = finishEl.value === 'Natural'; }
+finishEl.addEventListener('change', syncSheen); syncSheen();
+</script>
+
 <footer>
-  Programmed with AI, Designed &amp; Curated by Hand
+  <div class="wrap">
+    <span>Programmed with AI, designed &amp; curated by hand</span>
+    <span><a href="https://github.com/thisElazar/ledarcade">Source</a> · <a href="https://thiselazar.com/">thiselazar.com</a></span>
+  </div>
 </footer>
 
 </body>

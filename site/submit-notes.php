@@ -30,60 +30,49 @@ $sent = mail($to, $subject, $body, $headers);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wonder Cabinet - Note <?php echo $sent ? 'Sent' : 'Error'; ?></title>
-<link rel="stylesheet" href="shared.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="v2.css">
 <style>
-.result {
-  max-width: 480px;
-  margin: 80px auto;
-  text-align: center;
-  padding: 0 24px;
-}
-.result h2 {
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  color: #c8a86e;
-  margin-bottom: 16px;
-}
-.result p {
-  font-size: 13px;
-  color: #6a6254;
-  line-height: 1.6;
-}
-.result a {
-  color: #c8a86e;
-  text-decoration: none;
-}
+.result { max-width: 560px; margin: 0 auto; padding: 56px var(--gutter) 80px; text-align: center; }
+.result h2 { font-size: 32px; font-weight: 500; margin-bottom: 14px; }
+.result p { font-size: 19px; color: var(--ink-2); }
+.result p + p { margin-top: 12px; }
 </style>
 </head>
 <body>
-<nav class="site-nav">
-  <a class="nav-brand" href="index.html">WONDER CABINET</a>
-  <a href="emulator.html">EMULATOR</a>
-  <a href="guide.html">FIELD GUIDE</a>
-  <a href="history.html">HISTORY</a>
-  <a href="order.html">ORDER</a>
-</nav>
-<header>
-  <h1>WONDER CABINET</h1>
-  <p class="tagline">A cabinet of electronic curiosities</p>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">Wonder Cabinet</a>
+    <nav class="nav" aria-label="Site">
+      <a href="emulator.html">Emulator</a>
+      <a href="guide.html">Field Guide</a>
+      <a href="history.html">History</a>
+      <a href="order.html">Order</a>
+    </nav>
+    <span class="status">MADE TO ORDER · FROM $495</span>
+  </div>
 </header>
 <?php if ($sent): ?>
 <div class="result">
-  <h2>NOTE SENT</h2>
+  <h2>Note Sent</h2>
   <p>Thanks<?php echo $name ? ', ' . $name : ''; ?>. We appreciate the feedback.</p>
   <p><a href="<?php echo $page === 'Emulator' ? 'emulator.html' : ($page === 'Field Guide' ? 'guide.html' : 'index.html'); ?>">&larr; Back to <?php echo strtolower($page); ?></a></p>
 </div>
 <?php else: ?>
 <div class="result">
-  <h2>SOMETHING WENT WRONG</h2>
+  <h2>Something Went Wrong</h2>
   <p>Your note couldn't be sent. Please email us directly at
   <a href="mailto:elazarwhodoesthings@gmail.com">elazarwhodoesthings@gmail.com</a>.</p>
   <p><a href="<?php echo $page === 'Emulator' ? 'emulator.html' : ($page === 'Field Guide' ? 'guide.html' : 'index.html'); ?>">&larr; Try again</a></p>
 </div>
 <?php endif; ?>
 <footer>
-  Programmed with AI, Designed &amp; Curated by Hand
+  <div class="wrap">
+    <span>Programmed with AI, designed &amp; curated by hand</span>
+    <span><a href="https://github.com/thisElazar/ledarcade">Source</a> · <a href="https://thiselazar.com/">thiselazar.com</a></span>
+  </div>
 </footer>
 </body>
 </html>

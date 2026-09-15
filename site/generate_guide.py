@@ -278,6 +278,8 @@ def main():
                 'name': cat_def['name'],
                 'color': cat_def['color'],
                 'key': key,
+                'group': ('games' if cat_def in GAME_CATEGORIES
+                          else 'utility' if key == 'utility' else 'visuals'),
                 'items': items_by_cat[key],
             }
             if key == 'art' and painting_groups:
