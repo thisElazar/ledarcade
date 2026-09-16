@@ -355,6 +355,46 @@ def render_stills(cls, a, out):
             print(f"{base}_{k}.png")
 
 
+def _parse_state(spec):
+    out = {}
+    for kv in spec.split(","):
+        k, _, v = kv.partition("=")
+        try:
+            v = float(v) if "." in v else int(v)
+        except ValueError:
+            pass
+        out[k.strip()] = v
+    return out
+
+
+def render_states(cls, a, out):
+    """Carousel slides from one visual at several parameter states: for each
+    'a=1,b=2' group in --states, build a fresh instance, set those attributes,
+    run --skip seconds, then save one 4:5 PNG. If the visual has a
+    param_overlay_timer it is re-armed so the panel labels its own state."""
+    from arcade import Display
+    display = Display()
+    dt = 1.0 / a.fps
+    comp = PaperComposer(a.title, "Wonder Cabinet" if a.brand == "WONDER CABINET" else a.brand, slide=True)
+    base = out[:-4] if out.endswith(".png") else out
+    for k, spec in enumerate(a.states.split("|"), 1):
+        vis = cls(display)
+        for attr, val in _parse_state(spec).items():
+            if not hasattr(vis, attr):
+                sys.exit(f"{cls.__name__} has no attribute {attr!r}")
+            setattr(vis, attr, val)
+        _warm(vis, a.skip, dt)
+        if hasattr(vis, "param_overlay_timer"):
+            vis.param_overlay_timer = 2.0
+        vis.update(dt)
+        vis.draw()
+        ff = _open_ffmpeg(f"{base}_{k}.png", a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py))
+        ff.stdin.write(comp.frame(display))
+        ff.stdin.close()
+        ff.wait()
+        print(f"{base}_{k}.png  {spec}")
+
+
 def render_montage(classes, a, out):
     from arcade import Display
     from transitions import TransitionManager
@@ -408,6 +448,7 @@ def main():
     ap.add_argument("--vertical", action="store_true", help="1080x1920 instead of 1080x1080")
     ap.add_argument("--no-glow", action="store_true")
     ap.add_argument("--title", help="text above the panel (vertical only)")
+    ap.add_argument("--states", help='carousel: "f=0.01,k=0.047|f=0.026,k=0.051" — one fresh run and one PNG per | group')
     ap.add_argument("--stills", help='carousel: comma-separated seconds, one 1080x1350 paper-style PNG each (e.g. "2,10,18")')
     ap.add_argument("--paper", action="store_true", help="site style: white page, serif title, ruled mount (implies --vertical)")
     ap.add_argument("--label", action="store_true", help="title from the catalog: NAME over CATEGORY - CREDIT (vertical only)")
@@ -441,9 +482,9 @@ def main():
         cls = _find(a.name)
         if a.label:
             a.title = catalog_label(cls)
-        if a.stills:
+        if a.stills or a.states:
             out = a.out or f"{cls.__name__.lower()}_slide.png"
-            render_stills(cls, a, out)
+            (render_states if a.states else render_stills)(cls, a, out)
             return
         out = a.out or f"{cls.__name__.lower()}{suffix}.mp4"
         render_single(cls, a, out)
