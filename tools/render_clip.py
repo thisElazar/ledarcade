@@ -225,18 +225,24 @@ def _blit_text(canvas, font, text, y, color, spacing=0):
         x += cw + spacing
 
 
+# 4:5 carousel slide: same page, shorter
+S_H, S_PANEL_Y, S_BRAND_Y, S_BRAND_SIZE = 1350, 165, 30, 84
+
+
 class PaperComposer(Composer):
-    def __init__(self, title=None, brand="Wonder Cabinet"):
+    def __init__(self, title=None, brand="Wonder Cabinet", slide=False):
         self.mask = _dot_mask()
         self.vertical = True
-        self.w, self.h = V_W, V_H
+        self.w, self.h = V_W, (S_H if slide else V_H)
         self.canvas = np.full((self.h, self.w, 3), 255, dtype=np.uint8)
-        self.px, self.py = PANEL_X, P_PANEL_Y
+        self.px, self.py = PANEL_X, (S_PANEL_Y if slide else P_PANEL_Y)
+        self.slide = slide
         self.title = None
         self.serif = _font("EBGaramond.ttf", 60)
         self.mono = _font("IBMPlexMono-Regular.ttf", 24)
         if brand:
-            _blit_text(self.canvas, _font("EBGaramond.ttf", 104), brand, 118, INK)
+            _blit_text(self.canvas, _font("EBGaramond.ttf", S_BRAND_SIZE if slide else 104), brand,
+                       S_BRAND_Y if slide else 118, INK)
         x0, y0 = self.px - MOUNT_PAD - 1, self.py - MOUNT_PAD - 1
         x1, y1 = self.px + 1024 + MOUNT_PAD, self.py + 1024 + MOUNT_PAD
         self.canvas[y0, x0:x1 + 1] = RULE
@@ -255,9 +261,10 @@ class PaperComposer(Composer):
         head, _, sub = title.partition("::")
         y = self.py + 1024 + MOUNT_PAD + 1
         self.canvas[y:, :] = 255
-        _blit_text(self.canvas, self.serif, head.strip().title() if head.isupper() else head.strip(), y + 34, INK)
+        dy_title, dy_sub = (26, 108) if self.slide else (34, 122)
+        _blit_text(self.canvas, self.serif, head.strip().title() if head.isupper() else head.strip(), y + dy_title, INK)
         if sub.strip():
-            _blit_text(self.canvas, self.mono, sub.strip().upper(), y + 122, INK_3, spacing=3)
+            _blit_text(self.canvas, self.mono, sub.strip().upper(), y + dy_sub, INK_3, spacing=3)
 
 
 def _find(name):
@@ -279,6 +286,11 @@ def _open_ffmpeg(out, fps, w, h, glow, box=None):
         g = "split[a][b];[b]gblur=sigma=10[b];[a][b]blend=all_mode=screen,format=rgb24,"
     else:
         g = ""
+    if out.endswith(".png"):
+        cmd = ["ffmpeg", "-y", "-loglevel", "error",
+               "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-",
+               "-vf", f"{g}format=rgb24", "-frames:v", "1", out]
+        return subprocess.Popen(cmd, stdin=subprocess.PIPE)
     vf = f"{g}format=yuv420p"
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-",
@@ -317,6 +329,30 @@ def render_single(cls, a, out):
         ff.stdin.write(comp.frame(display))
     ff.stdin.close()
     ff.wait()
+
+
+def render_stills(cls, a, out):
+    """Carousel slides: run the visual once and save a 4:5 PNG at each --stills time."""
+    from arcade import Display
+    display = Display()
+    vis = cls(display)
+    dt = 1.0 / a.fps
+    _warm(vis, a.skip, dt)
+    comp = PaperComposer(a.title, "Wonder Cabinet" if a.brand == "WONDER CABINET" else a.brand, slide=True)
+    times = sorted(float(t) for t in a.stills.split(","))
+    base = out[:-4] if out.endswith(".png") else out
+    t, k = 0.0, 0
+    while k < len(times):
+        vis.update(dt)
+        vis.draw()
+        t += dt
+        if t >= times[k]:
+            k += 1
+            ff = _open_ffmpeg(f"{base}_{k}.png", a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py))
+            ff.stdin.write(comp.frame(display))
+            ff.stdin.close()
+            ff.wait()
+            print(f"{base}_{k}.png")
 
 
 def render_montage(classes, a, out):
@@ -372,6 +408,7 @@ def main():
     ap.add_argument("--vertical", action="store_true", help="1080x1920 instead of 1080x1080")
     ap.add_argument("--no-glow", action="store_true")
     ap.add_argument("--title", help="text above the panel (vertical only)")
+    ap.add_argument("--stills", help='carousel: comma-separated seconds, one 1080x1350 paper-style PNG each (e.g. "2,10,18")')
     ap.add_argument("--paper", action="store_true", help="site style: white page, serif title, ruled mount (implies --vertical)")
     ap.add_argument("--label", action="store_true", help="title from the catalog: NAME over CATEGORY - CREDIT (vertical only)")
     ap.add_argument("--cards", help='placard: "0:HEADING|4:HEADING :: body|..." timed cards above the panel (vertical only)')
@@ -404,6 +441,10 @@ def main():
         cls = _find(a.name)
         if a.label:
             a.title = catalog_label(cls)
+        if a.stills:
+            out = a.out or f"{cls.__name__.lower()}_slide.png"
+            render_stills(cls, a, out)
+            return
         out = a.out or f"{cls.__name__.lower()}{suffix}.mp4"
         render_single(cls, a, out)
     else:
