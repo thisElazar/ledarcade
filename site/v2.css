@@ -145,7 +145,7 @@ table.ledger tr.total td, table.ledger tr.total th { border-bottom: 1px solid va
 .tier p { grid-column: 1 / -1; font-size: 16px; color: var(--ink-2); }
 .terms { padding: 14px 22px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); border-top: 1px solid var(--rule); line-height: 1.9; }
 .terms.deposit { text-align: center; padding-top: 18px; }
-.terms.deposit .btn { margin-bottom: 8px; }
+.terms.deposit .btn { margin: 0 6px 10px; }
 
 /* Footer */
 footer { border-top: 1px solid var(--rule); margin-top: 8px; }
