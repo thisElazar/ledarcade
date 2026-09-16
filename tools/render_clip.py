@@ -7,12 +7,17 @@ Render visuals to MP4 that looks like the real LED panel — for social posts.
     python tools/render_clip.py FIRE --seconds 15 --skip 2 --out ../marketing/clips/fire.mp4
     python tools/render_clip.py --montage "FIRE,BOIDS,SLIME:8" --each 5   # idle reel; NAME:sec = warm-up
     python tools/render_clip.py BOIDS --vertical --title "flocking - 1986"   # text above panel
+    python tools/render_clip.py CHLADNI --vertical --seconds 30 \
+        --cards "0:CHLADNI FIGURES|3:CHLADNI FIGURES :: Ernst Chladni, 1787. Sand on a bowed plate gathers where it is still."
     python tools/render_clip.py --list                        # names you can pass
 
 Vertical clips can carry a title above the panel and a brand line below, drawn
 in the cabinet's own 3x5 pixel font through the same LED-dot look (wraps at 16
-chars, max 2 lines). Montage mode titles each slot with the visual's name unless
---title is given. Square clips never carry text.
+chars, max 2 lines). --cards replaces the title with timed placard cards:
+"start:HEADING" or "start:HEADING :: body" separated by |, the heading in
+panel-size LEDs and the body in half-size LEDs (32 chars, 3 lines). Montage
+mode titles each slot with the visual's name unless --title is given. Square
+clips never carry text.
 
 Montage mode mimics the cabinet's idle screen: each visual plays for --each
 seconds (transition included), switched by the real TransitionManager (the same
@@ -28,7 +33,8 @@ import sys
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(HERE))
 
 import numpy as np  # noqa: E402
 
@@ -53,34 +59,98 @@ BRAND_COLOR = (110, 110, 110)
 _FONT_MAP = str.maketrans({"·": "-", "×": "x", "—": "-", "–": "-", "’": "'"})
 
 
-def _wrap16(text):
+BODY_COLOR = (222, 214, 196)
+BODY_CELL = 8      # placard body text: half-size LEDs, 32 chars per line
+CARD_GAP = 24      # px between a card's heading and body
+
+
+def _wrap(text, width, max_lines, what):
     words, lines, cur = text.split(), [], ""
     for w in words:
-        if len(cur) + len(w) + (1 if cur else 0) <= 16:
+        if len(cur) + len(w) + (1 if cur else 0) <= width:
             cur = (cur + " " + w).strip()
         else:
             lines.append(cur)
             cur = w
     lines.append(cur)
-    if len(lines) > 2 or any(len(l) > 16 for l in lines):
-        sys.exit(f"title too long for the 3x5 font (max 2 lines of 16): {text!r}")
+    if len(lines) > max_lines or any(len(l) > width for l in lines):
+        sys.exit(f"{what} too long for the 3x5 font (max {max_lines} lines of {width}): {text!r}")
     return lines
 
 
-def _text_strip(text, color, mask):
-    """Render text with the cabinet font on a scratch Display, dot-upscaled.
-    Returns (H, 1024, 3) uint8, H = 16 * (5 per line + 3 gap)."""
-    from arcade import Display
-    lines = _wrap16(text.translate(_FONT_MAP))
-    rows = 5 * len(lines) + 3 * (len(lines) - 1)
-    d = Display()
-    d.clear()
+def _text_strip(text, color, cell=CELL, width=16, max_lines=2, what="title"):
+    """Render text in the cabinet's 3x5 font as LED dots. Returns (H, 1024, 3)
+    uint8. cell = output px per LED: 16 matches the panel (16 chars/line),
+    8 is the half-size placard body (32 chars/line)."""
+    from arcade import _FONT_3X5
+    lines = _wrap(text.translate(_FONT_MAP), width, max_lines, what)
+    cols = 4 * width
+    rows = 8 * len(lines) - 3
+    grid = np.zeros((rows, cols), dtype=np.uint8)
     for i, line in enumerate(lines):
-        x = (64 - (4 * len(line) - 1)) // 2
-        d.draw_text_small(x, i * 8, line, color)
-    buf = np.asarray(d.buffer, dtype=np.uint8)[:rows]
-    big = np.repeat(np.repeat(buf, CELL, 0), CELL, 1)
-    return (big * mask[:rows * CELL]).astype(np.uint8)
+        x0 = (cols - (4 * len(line) - 1)) // 2
+        for j, ch in enumerate(line):
+            for r, row in enumerate(_FONT_3X5.get(ch, [])):
+                for c, px in enumerate(row):
+                    if px == "1":
+                        grid[i * 8 + r, x0 + j * 4 + c] = 1
+    yy, xx = np.mgrid[0:cell, 0:cell]
+    d = np.hypot(xx + 0.5 - cell / 2, yy + 0.5 - cell / 2)
+    dot = np.clip(DOT_RADIUS * cell / CELL + 0.5 - d, 0, 1)
+    mask = np.tile(dot, (rows, cols))[..., None]
+    big = np.repeat(np.repeat(grid, cell, 0), cell, 1)[..., None] * np.array(color, dtype=np.float32)
+    return (big * mask).astype(np.uint8)
+
+
+def _card_strip(card):
+    """A card is 'HEADING' or 'HEADING :: body'. Heading in panel-size LEDs
+    (2 lines of 16 alone, 1 line with a body); body half-size, 3 lines of 32."""
+    head, _, body = card.partition("::")
+    head, body = head.strip(), body.strip()
+    if not body:
+        return _text_strip(head, TITLE_COLOR)
+    h = _text_strip(head, TITLE_COLOR, max_lines=1, what="card heading")
+    b = _text_strip(body.upper(), BODY_COLOR, cell=BODY_CELL, width=32, max_lines=3, what="card body")
+    strip = np.zeros((h.shape[0] + CARD_GAP + b.shape[0], 1024, 3), dtype=np.uint8)
+    strip[:h.shape[0]] = h
+    strip[h.shape[0] + CARD_GAP:] = b
+    return strip
+
+
+def catalog_label(cls):
+    """'NAME :: CATEGORY - CREDIT' straight from site/guide.json, the cabinet's
+    own catalog. Falls back to 'CATEGORY - YEAR' when the credit is too long
+    for one line. Paintings resolve to 'TITLE :: ART - ARTIST, YEAR'."""
+    import json
+    import re
+    g = json.load(open(os.path.join(os.path.dirname(HERE), "site", "guide.json")))
+    name = getattr(cls, "name", cls.__name__)
+
+    def label(title, cat, credit):
+        sub = f"{cat} - {credit}" if credit else cat
+        if len(sub) > 32:
+            year = re.search(r"-?\d{3,4}$", credit)
+            sub = f"{cat} - {year.group()}" if year else cat
+        return f"{title.upper()} :: {sub.upper()}"
+
+    for cat in g["categories"]:
+        for it in cat.get("items", []):
+            if it.get("cls") == cls.__name__ or it.get("name") == name:
+                return label(it["name"], cat["name"], it.get("credit", ""))
+        for p in cat.get("paintings", []):
+            for w in p.get("works", []):
+                if w["title"].upper() == name.upper():
+                    return label(w["title"], cat["name"], f"{p['artist']}, {w['year']}")
+    return name.upper()
+
+
+def parse_cards(spec):
+    """'0:FIRE|4:HEADING :: body|...' -> [(start_seconds, card), ...]"""
+    cards = []
+    for item in spec.split("|"):
+        t, _, text = item.partition(":")
+        cards.append((float(t), text.strip()))
+    return sorted(cards)
 
 
 class Composer:
@@ -95,7 +165,7 @@ class Composer:
         self.py = PANEL_Y if vertical else 28
         self.title = None
         if vertical and brand:
-            strip = _text_strip(brand, BRAND_COLOR, self.mask)
+            strip = _text_strip(brand, BRAND_COLOR)
             y = self.py + 1024 + TITLE_GAP
             self.canvas[y:y + strip.shape[0], self.px:self.px + 1024] = strip
         if vertical and title:
@@ -106,15 +176,88 @@ class Composer:
             return
         self.title = title
         self.canvas[:self.py, :] = 0
-        strip = _text_strip(title, TITLE_COLOR, self.mask)
+        strip = _card_strip(title)
         y = self.py - TITLE_GAP - strip.shape[0]
+        if y < 0:
+            sys.exit(f"card does not fit above the panel: {title!r}")
         self.canvas[y:y + strip.shape[0], self.px:self.px + 1024] = strip
+
+    def set_time(self, cards, t):
+        """Placard mode: show whichever card has started by time t."""
+        for start, card in reversed(cards):
+            if t >= start:
+                self.set_title(card)
+                return
 
     def frame(self, display):
         buf = np.asarray(display.buffer, dtype=np.uint8)
         big = np.repeat(np.repeat(buf, CELL, 0), CELL, 1)
         self.canvas[self.py:self.py + 1024, self.px:self.px + 1024] = (big * self.mask).astype(np.uint8)
         return self.canvas.tobytes()
+
+
+
+# Paper layout (1080x1920), matching the site: white page, EB Garamond title,
+# IBM Plex Mono category line, the panel black only inside a 1px ruled mount.
+PAPER = (255, 255, 255)
+INK, INK_3, RULE = (27, 26, 23), (124, 120, 110), (27, 26, 23)
+P_PANEL_Y = 340
+MOUNT_PAD = 14
+FONTS = os.path.join(HERE, "fonts")
+
+
+def _font(name, size):
+    import pygame
+    pygame.font.init()
+    return pygame.font.Font(os.path.join(FONTS, name), size)
+
+
+def _blit_text(canvas, font, text, y, color, spacing=0):
+    """Draw one centred line of text onto a white numpy canvas."""
+    import pygame
+    chars = [font.render(c, True, color, PAPER) for c in text] if spacing else [font.render(text, True, color, PAPER)]
+    w = sum(c.get_width() for c in chars) + spacing * (len(chars) - 1)
+    x = (canvas.shape[1] - w) // 2
+    for c in chars:
+        arr = pygame.surfarray.array3d(c).transpose(1, 0, 2)
+        h, cw = arr.shape[:2]
+        canvas[y:y + h, x:x + cw] = arr
+        x += cw + spacing
+
+
+class PaperComposer(Composer):
+    def __init__(self, title=None, brand="Wonder Cabinet"):
+        self.mask = _dot_mask()
+        self.vertical = True
+        self.w, self.h = V_W, V_H
+        self.canvas = np.full((self.h, self.w, 3), 255, dtype=np.uint8)
+        self.px, self.py = PANEL_X, P_PANEL_Y
+        self.title = None
+        self.serif = _font("EBGaramond.ttf", 60)
+        self.mono = _font("IBMPlexMono-Regular.ttf", 24)
+        if brand:
+            _blit_text(self.canvas, _font("EBGaramond.ttf", 104), brand, 118, INK)
+        x0, y0 = self.px - MOUNT_PAD - 1, self.py - MOUNT_PAD - 1
+        x1, y1 = self.px + 1024 + MOUNT_PAD, self.py + 1024 + MOUNT_PAD
+        self.canvas[y0, x0:x1 + 1] = RULE
+        self.canvas[y1, x0:x1 + 1] = RULE
+        self.canvas[y0:y1 + 1, x0] = RULE
+        self.canvas[y0:y1 + 1, x1] = RULE
+        self.canvas[self.py:self.py + 1024, self.px:self.px + 1024] = 0
+        if title:
+            self.set_title(title)
+
+    def set_title(self, title):
+        """'NAME :: CATEGORY - CREDIT' -> serif title line, mono small-caps line."""
+        if title == self.title:
+            return
+        self.title = title
+        head, _, sub = title.partition("::")
+        y = self.py + 1024 + MOUNT_PAD + 1
+        self.canvas[y:, :] = 255
+        _blit_text(self.canvas, self.serif, head.strip().title() if head.isupper() else head.strip(), y + 34, INK)
+        if sub.strip():
+            _blit_text(self.canvas, self.mono, sub.strip().upper(), y + 122, INK_3, spacing=3)
 
 
 def _find(name):
@@ -126,9 +269,16 @@ def _find(name):
     sys.exit(f"no visual named {name!r} — try --list")
 
 
-def _open_ffmpeg(out, fps, w, h, glow):
+def _open_ffmpeg(out, fps, w, h, glow, box=None):
     # The blend must be followed by format=rgb24 or ffmpeg swaps G/B channels.
-    g = "split[a][b];[b]gblur=sigma=10[b];[a][b]blend=all_mode=screen,format=rgb24," if glow else ""
+    if glow and box:   # glow only inside the panel so it never bleeds onto the paper
+        x, y = box
+        g = (f"split=3[a][b][c];[b]crop=1024:1024:{x}:{y}[pb];[c]crop=1024:1024:{x}:{y},gblur=sigma=10[pc];"
+             f"[pb][pc]blend=all_mode=screen,format=rgb24[pg];[a][pg]overlay={x}:{y},")
+    elif glow:
+        g = "split[a][b];[b]gblur=sigma=10[b];[a][b]blend=all_mode=screen,format=rgb24,"
+    else:
+        g = ""
     vf = f"{g}format=yuv420p"
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w}x{h}", "-r", str(fps), "-i", "-",
@@ -143,15 +293,25 @@ def _warm(vis, seconds, dt):
         vis.draw()
 
 
+def _composer(a, title=None):
+    title = title or a.title
+    if a.paper:
+        return PaperComposer(title, "Wonder Cabinet" if a.brand == "WONDER CABINET" else a.brand)
+    return Composer(a.vertical, title, a.brand)
+
+
 def render_single(cls, a, out):
     from arcade import Display
     display = Display()
     vis = cls(display)
     dt = 1.0 / a.fps
     _warm(vis, a.skip, dt)
-    comp = Composer(a.vertical, a.title, a.brand)
-    ff = _open_ffmpeg(out, a.fps, comp.w, comp.h, not a.no_glow)
-    for _ in range(int(a.seconds * a.fps)):
+    cards = parse_cards(a.cards) if a.cards else None
+    comp = _composer(a)
+    ff = _open_ffmpeg(out, a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py) if a.paper else None)
+    for i in range(int(a.seconds * a.fps)):
+        if cards:
+            comp.set_time(cards, i * dt)
         vis.update(dt)
         vis.draw()
         ff.stdin.write(comp.frame(display))
@@ -171,8 +331,8 @@ def render_montage(classes, a, out):
         visuals.append(v)
 
     tm = TransitionManager()
-    comp = Composer(a.vertical, a.title or visuals[0].name, a.brand)
-    ff = _open_ffmpeg(out, a.fps, comp.w, comp.h, not a.no_glow)
+    comp = _composer(a, a.title or visuals[0].name)
+    ff = _open_ffmpeg(out, a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py) if a.paper else None)
     idx, cycle = 0, 0.0
     cur = visuals[0]
     total = int(a.each * len(visuals) * a.fps)
@@ -212,11 +372,16 @@ def main():
     ap.add_argument("--vertical", action="store_true", help="1080x1920 instead of 1080x1080")
     ap.add_argument("--no-glow", action="store_true")
     ap.add_argument("--title", help="text above the panel (vertical only)")
+    ap.add_argument("--paper", action="store_true", help="site style: white page, serif title, ruled mount (implies --vertical)")
+    ap.add_argument("--label", action="store_true", help="title from the catalog: NAME over CATEGORY - CREDIT (vertical only)")
+    ap.add_argument("--cards", help='placard: "0:HEADING|4:HEADING :: body|..." timed cards above the panel (vertical only)')
     ap.add_argument("--brand", default="WONDER CABINET", help='text below the panel (vertical only; "" for none)')
     ap.add_argument("--out")
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
 
+    if a.paper:
+        a.vertical = True
     if a.list:
         from visuals import ALL_VISUALS
         for v in ALL_VISUALS:
@@ -237,6 +402,8 @@ def main():
         render_montage(classes, a, out)
     elif a.name:
         cls = _find(a.name)
+        if a.label:
+            a.title = catalog_label(cls)
         out = a.out or f"{cls.__name__.lower()}{suffix}.mp4"
         render_single(cls, a, out)
     else:
