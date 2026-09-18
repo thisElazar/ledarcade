@@ -370,10 +370,11 @@
      "name": "BLOONS TD",
      "cls": "BloonsTD",
      "module": "games/bloonstd.py",
-     "desc": "Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end.",
+     "desc": "Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end. The bottom bar shows all four tower types as colour swatches with the price of the highlighted one; swatches dim and the price turns red when you cannot afford it. Left button places the highlighted type on an empty square, or selects a tower you already own \u2014 press it again on that tower to buy its upgrade. Right button switches which tower type is highlighted, and the name of the new type flashes above the swatches. Waves start automatically on the countdown.",
      "controls": {
-      "Arrows": "Move placement cursor (fine 2px grid)",
-      "Button": "Place tower / select tower / upgrade / cycle type"
+      "Arrows": "Move placement cursor",
+      "Left button": "Place tower / select tower / upgrade selected tower",
+      "Right button": "Switch tower type"
      }
     },
     {

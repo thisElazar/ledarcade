@@ -5,8 +5,9 @@ Tower defense: bloons follow a serpentine path, place towers to pop them,
 survive 20 waves. Economy system with lives and money.
 
 Controls:
-  Arrows  - Move placement cursor (fine 2px grid)
-  Button  - Place tower / select tower / upgrade / cycle type
+  Arrows       - Move placement cursor (fine 2px grid)
+  Left button  - Place tower / select tower / upgrade selected tower
+  Right button - Switch tower type
   Waves auto-start every 15 seconds
 """
 
@@ -105,6 +106,15 @@ START_MONEY = 500
 START_LIVES = 20
 WAVE_AUTO_START = 15.0  # seconds between waves
 
+# Feedback timings
+BROKE_FLASH_TIME = 0.6   # money flashes red after a purchase you can't afford
+HINT_TIME = 5.0          # button hint shown at the start of a fresh game
+NAME_FLASH_TIME = 1.2    # tower name flashes above the palette when it changes
+
+# Bottom-bar tower palette geometry (4 swatches, 3px wide, 5px apart)
+PALETTE_X = 15
+PALETTE_STEP = 5
+
 # Waves: list of groups, each group = (type_index, count, interval)
 WAVES = [
     # W1-3: Reds
@@ -161,7 +171,12 @@ class BloonsTD(Game):
     description = "Tower defense with bloons"
     category = "modern"
     GUIDE = {
-        'desc': 'Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end.',
+        'desc': 'Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end. The bottom bar shows all four tower types as colour swatches with the price of the highlighted one; swatches dim and the price turns red when you cannot afford it. Left button places the highlighted type on an empty square, or selects a tower you already own — press it again on that tower to buy its upgrade. Right button switches which tower type is highlighted, and the name of the new type flashes above the swatches. Waves start automatically on the countdown.',
+        'controls': {
+            'Arrows': 'Move placement cursor',
+            'Left button': 'Place tower / select tower / upgrade selected tower',
+            'Right button': 'Switch tower type',
+        },
     }
 
     def __init__(self, display: Display):
@@ -205,6 +220,12 @@ class BloonsTD(Game):
         # Auto-start countdown
         self.wave_countdown = WAVE_AUTO_START
 
+        # Feedback timers
+        self.broke_flash = 0.0
+        self.hint_timer = HINT_TIME
+        self.name_flash = NAME_FLASH_TIME
+        self.name_flash_type = TOWER_DART
+
     def _can_place(self, gx, gy):
         """Check if tower can be placed at grid cell."""
         if (gx, gy) in PATH_CELLS:
@@ -228,6 +249,11 @@ class BloonsTD(Game):
             if abs(t['gx'] - gx) <= 1 and abs(t['gy'] - gy) <= 1:
                 return i
         return None
+
+    def _flash_name(self, tower_type):
+        """Briefly show a tower type's name above the palette."""
+        self.name_flash = NAME_FLASH_TIME
+        self.name_flash_type = tower_type
 
     def _start_wave(self):
         """Begin spawning the next wave."""
@@ -287,6 +313,12 @@ class BloonsTD(Game):
             return
 
         self.cursor_blink += dt
+        if self.broke_flash > 0:
+            self.broke_flash -= dt
+        if self.hint_timer > 0:
+            self.hint_timer -= dt
+        if self.name_flash > 0:
+            self.name_flash -= dt
 
         if self.phase == PHASE_PLACE:
             self._update_place(input_state, dt)
@@ -326,19 +358,31 @@ class BloonsTD(Game):
                 self.cursor_gx = min(30, self.cursor_gx + 1)
             self.selected_tower = None
 
-        # Either button: place / select / upgrade / cycle
-        if inp.action_l or inp.action_r:
+        # Right button: always switch tower type
+        if inp.action_r:
+            self.hint_timer = 0.0
+            self.selected_tower_type = (self.selected_tower_type + 1) % len(TOWER_DEFS)
+            self.selected_tower = None
+            self._flash_name(self.selected_tower_type)
+
+        # Left button: place / select / upgrade
+        if inp.action_l:
+            self.hint_timer = 0.0
             existing = self._tower_at(self.cursor_gx, self.cursor_gy)
             if existing is not None and self.selected_tower == existing:
                 # Already selected — upgrade it
                 t = self.towers[existing]
                 tdef = TOWER_DEFS[t['type']]
-                if not t['upgraded'] and self.money >= tdef['upgrade_cost']:
-                    self.money -= tdef['upgrade_cost']
-                    t['upgraded'] = True
+                if not t['upgraded']:
+                    if self.money >= tdef['upgrade_cost']:
+                        self.money -= tdef['upgrade_cost']
+                        t['upgraded'] = True
+                    else:
+                        self.broke_flash = BROKE_FLASH_TIME
             elif existing is not None:
                 # Select this tower
                 self.selected_tower = existing
+                self._flash_name(self.towers[existing]['type'])
             elif self._can_place(self.cursor_gx, self.cursor_gy):
                 tdef = TOWER_DEFS[self.selected_tower_type]
                 if self.money >= tdef['cost']:
@@ -351,12 +395,9 @@ class BloonsTD(Game):
                         'cooldown': 0.0,
                     })
                     self.selected_tower = len(self.towers) - 1
+                    self._flash_name(self.selected_tower_type)
                 else:
-                    # Can't afford — cycle tower type
-                    self.selected_tower_type = (self.selected_tower_type + 1) % len(TOWER_DEFS)
-            else:
-                # Invalid spot — cycle tower type
-                self.selected_tower_type = (self.selected_tower_type + 1) % len(TOWER_DEFS)
+                    self.broke_flash = BROKE_FLASH_TIME
 
     def _update_wave(self, dt):
         # Spawn bloons
@@ -551,8 +592,13 @@ class BloonsTD(Game):
         self._draw_cursor()
         self._draw_hud()
 
+        if self.name_flash > 0:
+            self._draw_name_flash()
+
         if self.phase == PHASE_WAVE_END:
             self._draw_wave_end()
+        elif self.hint_timer > 0:
+            self._draw_hint()
 
     def _draw_path(self):
         """Draw path by connecting waypoints."""
@@ -659,8 +705,11 @@ class BloonsTD(Game):
         # Top bar background
         self.display.draw_rect(0, 0, 64, 7, Colors.BLACK)
 
-        # Money top-left
-        self.display.draw_text_small(2, 1, f"${self.money}", Colors.YELLOW)
+        # Money top-left — flashes red when you tried to buy and came up short
+        money_color = Colors.YELLOW
+        if self.broke_flash > 0 and int(self.broke_flash * 10) % 2 == 0:
+            money_color = Colors.RED
+        self.display.draw_text_small(2, 1, f"${self.money}", money_color)
 
         # Lives top-right
         lives_text = f"L:{self.lives}"
@@ -678,22 +727,58 @@ class BloonsTD(Game):
         else:
             self.display.draw_text_small(2, 59, "WIN", Colors.GREEN)
 
-        # Selected tower type and cost / GO hint
         if self.selected_tower is not None:
+            # Selected an existing tower: show its upgrade price
             t = self.towers[self.selected_tower]
             tdef = TOWER_DEFS[t['type']]
             if t['upgraded']:
-                self.display.draw_text_small(20, 59, f"{tdef['name']}+", Colors.CYAN)
+                self.display.draw_text_small(15, 59, "MAXED", Colors.CYAN)
             else:
                 cost = tdef['upgrade_cost']
-                self.display.draw_text_small(20, 59, f"UP${cost}", Colors.CYAN)
+                afford = self.money >= cost
+                self.display.draw_text_small(
+                    15, 59, f"UP${cost}",
+                    Colors.CYAN if afford else Colors.RED)
         else:
-            tdef = TOWER_DEFS[self.selected_tower_type]
-            self.display.draw_text_small(20, 59, f"{tdef['name']}", tdef['color'])
-            # Show countdown during place phase
-            if self.phase == PHASE_PLACE and self.wave_num < len(WAVES):
-                secs = max(0, int(self.wave_countdown) + 1)
-                self.display.draw_text_small(50, 59, f"{secs}S", Colors.GREEN)
+            self._draw_tower_palette()
+
+        # Countdown to the next wave
+        if self.phase == PHASE_PLACE and self.wave_num < len(WAVES):
+            secs = max(0, int(self.wave_countdown) + 1)
+            self.display.draw_text_small(52, 59, f"{secs}S", Colors.GREEN)
+
+    def _draw_tower_palette(self):
+        """Swatch strip showing every tower type, plus the current one's price."""
+        for i, tdef in enumerate(TOWER_DEFS):
+            sx = PALETTE_X + i * PALETTE_STEP
+            afford = self.money >= tdef['cost']
+            color = tdef['color'] if afford else tuple(c // 4 for c in tdef['color'])
+            self.display.draw_rect(sx, 59, 3, 3, color)
+            if i == self.selected_tower_type:
+                # Underline marks the type the left button will place
+                for dx in range(3):
+                    self.display.set_pixel(sx + dx, 62, Colors.WHITE)
+
+        tdef = TOWER_DEFS[self.selected_tower_type]
+        afford = self.money >= tdef['cost']
+        self.display.draw_text_small(
+            35, 59, f"${tdef['cost']}",
+            Colors.WHITE if afford else Colors.RED)
+
+    def _draw_name_flash(self):
+        """Tower name, flashed just above the palette it points at."""
+        tdef = TOWER_DEFS[self.name_flash_type]
+        name = tdef['name']
+        w = len(name) * 4 - 1
+        self.display.draw_rect(PALETTE_X - 2, 51, w + 4, 7, Colors.BLACK)
+        self.display.draw_text_small(PALETTE_X, 52, name, tdef['color'])
+
+    def _draw_hint(self):
+        """Button legend, shown briefly at the start of a fresh game."""
+        self.display.draw_rect(7, 24, 50, 16, Colors.BLACK)
+        self.display.draw_rect(7, 24, 50, 16, Colors.GRAY, filled=False)
+        self.display.draw_text_small(11, 27, "L=PLACE", Colors.GREEN)
+        self.display.draw_text_small(11, 34, "R=SWITCH", Colors.CYAN)
 
     def _draw_wave_end(self):
         """Show wave completion message."""
