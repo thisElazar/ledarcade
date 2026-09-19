@@ -15,7 +15,6 @@ Controls:
   Left/Right - Adjust rotation speed
   Up/Down    - Cycle color palette
   Space      - Cycle texture pattern
-  Escape     - Exit
 """
 
 import math

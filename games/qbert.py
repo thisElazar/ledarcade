@@ -5,7 +5,6 @@ Hop on cubes to change their colors. Avoid enemies!
 
 Controls:
   Arrow Keys - Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)
-  Space      - Not used (movement only)
 """
 
 import random

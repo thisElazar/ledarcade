@@ -17,7 +17,6 @@ Controls:
   Up/Down     - Switch scene
   Left/Right  - Adjust speed
   Space/Z     - Scene action
-  Escape      - Exit
 """
 
 import math

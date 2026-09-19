@@ -5,7 +5,6 @@ Drop blocks to build a tower! Misaligned portions get cut off.
 
 Controls:
   Space      - Drop block
-  Escape     - Return to menu
 """
 
 import math

@@ -6,7 +6,6 @@ Stars fly toward the viewer from the center of the screen.
 Controls:
   Left/Right - Adjust speed
   Space      - Toggle warp mode
-  Escape     - Exit
 """
 
 import random

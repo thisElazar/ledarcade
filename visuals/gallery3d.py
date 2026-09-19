@@ -9,7 +9,8 @@ Each subclass provides only data: MAP, PAINTINGS, IMMERSIVE, WAYPOINTS.
 
 Controls:
   Up/Down    - Move forward/backward
-  Left/Right - Rotate view
+  Left/Right - Rotate view (in auto-walk: change walking pace)
+  Button     - Toggle auto-walk
   (starts in auto-walk mode; any input takes manual control)
 """
 

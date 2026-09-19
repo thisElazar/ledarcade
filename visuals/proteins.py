@@ -7,8 +7,8 @@ Real Cα coordinates from RCSB Protein Data Bank.
 
 Controls:
   Joystick   - Rotate protein in 3D (pauses auto-cycle to let you explore)
-  Z or X     - Cycle through proteins in current category (resumes auto-cycle)
-  Z+X        - Cycle through category playlists (NOBEL, ANCIENT, ANIMALS, etc.)
+  Button     - Cycle through proteins in current category (resumes auto-cycle)
+  Both       - Cycle through category playlists (NOBEL, ANCIENT, ANIMALS, etc.)
 
 Categories:
   ALL      - All proteins (no duplicates)

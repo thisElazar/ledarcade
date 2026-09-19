@@ -8,7 +8,6 @@ Controls:
   Left/Right - Adjust speed
   Up/Down    - Cycle color palette
   Space      - Randomize position/direction
-  Escape     - Exit
 """
 
 import random

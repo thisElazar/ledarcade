@@ -97,8 +97,7 @@
      "module": "games/frogger.py",
      "desc": "Cross five lanes of traffic, then hop across logs and turtles to reach home. Points come only from new forward progress; turtles dive on a fixed rhythm (they dim just before going under). Flies in home slots are bonus food, crocodile heads are death. Carry the purple lady frog home for extra points, and mind the snake on the median from level 3.",
      "controls": {
-      "Arrow Keys": "Hop one cell in direction",
-      "Escape": "Return to menu"
+      "Arrow Keys": "Hop one cell in direction"
      }
     },
     {
@@ -158,8 +157,7 @@
      "module": "games/mspacman.py",
      "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.",
      "controls": {
-      "Arrow Keys": "Set direction (queued for next intersection)",
-      "Escape": "Return to menu"
+      "Arrow Keys": "Set direction (queued for next intersection)"
      }
     },
     {
@@ -179,8 +177,7 @@
      "module": "games/pacman.py",
      "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.",
      "controls": {
-      "Arrow Keys": "Set direction (queued for next intersection)",
-      "Escape": "Return to menu"
+      "Arrow Keys": "Set direction (queued for next intersection)"
      }
     },
     {
@@ -199,8 +196,7 @@
      "module": "games/qbert.py",
      "desc": "Hop on cubes in an isometric pyramid to change their colors \u2014 later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.",
      "controls": {
-      "Arrow Keys": "Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)",
-      "Space": "Not used (movement only)"
+      "Arrow Keys": "Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)"
      }
     },
     {
@@ -209,8 +205,7 @@
      "module": "games/snake.py",
      "desc": "Eat food, grow longer, don\u2019t hit yourself or the walls. One of the most widely played games ever made.",
      "controls": {
-      "Arrow Keys": "Change direction",
-      "Space": "Start game / Restart after game over"
+      "Arrow Keys": "Change direction"
      }
     },
     {
@@ -275,8 +270,7 @@
      "desc": "Trap bouncing balls by building walls. Claim 75% of the area to advance. Don\u2019t let a ball hit a wall while it\u2019s forming.",
      "controls": {
       "Arrow Keys": "Move cursor and set wall direction",
-      "Space": "Build wall in current direction",
-      "Escape": "Return to menu"
+      "Space": "Build wall in current direction"
      }
     },
     {
@@ -296,7 +290,7 @@
      "desc": "Ski downhill, dodging trees, rocks, wandering dogs, and rival skiers. Hold a turn to carve hard. Slalom gates and ramp flips (press the button mid-air, land it clean) build STYLE points. The Abominable Snowman appears at 750m and sprints faster than plain skiing - boost is your only escape.",
      "controls": {
       "Left/Right": "Steer (hold ~0.4s to carve into a hard turn)",
-      "Up": "Brake / slow down",
+      "Up/Down": "Hang back up the slope / push ahead down it",
       "Button": "Speed boost (limited fuel)",
       "Button (in air)": "Flip trick (land it for style!)"
      }
@@ -383,8 +377,7 @@
      "module": "games/flappy.py",
      "desc": "Press a button to flap, thread through pipes. One hit and you\u2019re done.",
      "controls": {
-      "Space": "Flap (gain upward velocity)",
-      "Escape": "Return to menu"
+      "Space": "Flap (gain upward velocity)"
      }
     },
     {
@@ -393,8 +386,7 @@
      "module": "games/geometrydash.py",
      "desc": "One-button platformer. Hold the button to jump; the level scrolls at a fixed speed. Hit any obstacle and you restart.",
      "controls": {
-      "Space": "Jump (tap or hold for repeated jumps)",
-      "Escape": "Return to menu"
+      "Space": "Jump (tap or hold for repeated jumps)"
      }
     },
     {
@@ -425,8 +417,7 @@
      "module": "games/stack.py",
      "desc": "Press the button to drop a sliding block onto the stack. Misalignment shrinks the next platform. Game ends when the block gets too small. Score by stacking as high as possible.",
      "controls": {
-      "Space": "Drop block",
-      "Escape": "Return to menu"
+      "Space": "Drop block"
      }
     },
     {
@@ -435,8 +426,7 @@
      "module": "games/stickrunner.py",
      "desc": "Endless runner with a stick figure. Press the button to jump over obstacles. Score by distance. Procedurally generated levels.",
      "controls": {
-      "Space": "Jump",
-      "Escape": "Return to menu"
+      "Space": "Jump"
      }
     },
     {
@@ -694,8 +684,7 @@
      "desc": "Drop your line and reel in as many fish as you can before the 90-second timer runs out.",
      "controls": {
       "Up/Down": "Adjust lure depth",
-      "Space/Z": "Hook fish (hold or mash to reel)",
-      "Escape": "Return to menu"
+      "Space/Z": "Hook fish (hold or mash to reel)"
      }
     },
     {
@@ -2520,8 +2509,7 @@
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
-      "Space": "Randomize",
-      "Escape": "Exit"
+      "Space": "Randomize"
      }
     },
     {
@@ -2616,8 +2604,7 @@
      "controls": {
       "Up/Down": "Adjust species count (changes colors)",
       "Left/Right": "Adjust speed",
-      "Space": "New random rules",
-      "Escape": "Exit"
+      "Space": "New random rules"
      }
     },
     {
@@ -2655,8 +2642,7 @@
       "Left": "Step backward (when paused)",
       "Right": "Step forward (when paused)",
       "Up": "Randomize (dense)",
-      "Down": "Randomize (sparse)",
-      "Escape": "Exit"
+      "Down": "Randomize (sparse)"
      }
     },
     {
@@ -2762,8 +2748,7 @@
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
-      "Space": "Toggle center/random drop mode",
-      "Escape": "Exit"
+      "Space": "Toggle center/random drop mode"
      }
     },
     {
@@ -2774,8 +2759,7 @@
      "credit": "Jeff Jones, 2010",
      "controls": {
       "Left/Right": "Adjust growth speed",
-      "Space": "Reset with new random colonies",
-      "Escape": "Exit"
+      "Space": "Reset with new random colonies"
      }
     },
     {
@@ -2799,8 +2783,7 @@
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
-      "Space": "Randomize",
-      "Escape": "Exit"
+      "Space": "Randomize"
      }
     },
     {
@@ -3002,8 +2985,7 @@
      "controls": {
       "Up/Down": "Switch scene",
       "Left/Right": "Adjust speed",
-      "Space/Z": "Scene action",
-      "Escape": "Exit"
+      "Space/Z": "Scene action"
      }
     },
     {
@@ -3482,8 +3464,7 @@
      "controls": {
       "Left/Right": "Adjust animation speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Change wave pattern",
-      "Escape": "Exit"
+      "Space": "Change wave pattern"
      }
     },
     {
@@ -3548,8 +3529,7 @@
      "desc": "Falling green characters with trail fading, from the film\u2019s \u201cdigital rain\u201d effect. Designed by Simon Whiteley using characters scanned from a Japanese cookbook.",
      "controls": {
       "Left/Right": "Adjust speed",
-      "Space": "Toggle rainbow mode",
-      "Escape": "Exit"
+      "Space": "Toggle rainbow mode"
      }
     },
     {
@@ -3570,8 +3550,7 @@
      "controls": {
       "Left/Right": "Adjust animation speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Cycle pattern type",
-      "Escape": "Exit"
+      "Space": "Cycle pattern type"
      }
     },
     {
@@ -3581,8 +3560,7 @@
      "desc": "Four overlapping sine functions create smoothly animated color fields. One of the quintessential demoscene effects.",
      "controls": {
       "Left/Right": "Adjust speed",
-      "Up/Down": "Cycle color palette",
-      "Escape": "Exit"
+      "Up/Down": "Cycle color palette"
      }
     },
     {
@@ -3593,8 +3571,7 @@
      "controls": {
       "Left/Right": "Adjust cycle speed",
       "Up/Down": "Cycle through pattern modes",
-      "Space": "Reverse direction",
-      "Escape": "Exit"
+      "Space": "Reverse direction"
      }
     },
     {
@@ -3605,8 +3582,7 @@
      "controls": {
       "Left/Right": "Adjust rotation speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Cycle texture pattern",
-      "Escape": "Exit"
+      "Space": "Cycle texture pattern"
      }
     },
     {
@@ -3617,8 +3593,7 @@
      "controls": {
       "Left/Right": "Adjust wave/scroll speed",
       "Up/Down": "Cycle color palette",
-      "Action": "Cycle pattern type",
-      "Escape": "Exit"
+      "Action": "Cycle pattern type"
      }
     },
     {
@@ -3628,8 +3603,7 @@
      "desc": "3D stars rushing toward you with perspective projection. Dots start small in the center and streak outward as they approach.",
      "controls": {
       "Left/Right": "Adjust speed",
-      "Space": "Toggle warp mode",
-      "Escape": "Exit"
+      "Space": "Toggle warp mode"
      }
     },
     {
@@ -3652,8 +3626,7 @@
      "controls": {
       "Up/Down": "Cycle color palette",
       "Left/Right": "Adjust speed",
-      "Space": "Regenerate pattern (cycles tile size)",
-      "Escape": "Exit"
+      "Space": "Regenerate pattern (cycles tile size)"
      }
     },
     {
@@ -3664,8 +3637,7 @@
      "controls": {
       "Left/Right": "Adjust rotation speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Toggle twist intensity",
-      "Escape": "Exit"
+      "Space": "Toggle twist intensity"
      }
     },
     {
@@ -3676,8 +3648,7 @@
      "controls": {
       "Left/Right": "Adjust animation speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Cycle pattern variation",
-      "Escape": "Exit"
+      "Space": "Cycle pattern variation"
      }
     }
    ]
@@ -3699,7 +3670,8 @@
      "desc": "A walkable 3D museum in the style of early raycast games. Six themed galleries hang paintings, sprites, and animated rooms on their walls. Use the joystick to wander; the button reads the title plate.",
      "controls": {
       "Up/Down": "Move forward/backward",
-      "Left/Right": "Rotate view"
+      "Left/Right": "Rotate view (in auto-walk: change walking pace)",
+      "Button": "Toggle auto-walk"
      }
     },
     {
@@ -3709,7 +3681,8 @@
      "desc": "A walkable 3D gallery housing 116 classical paintings \u2014 Van Gogh, Monet, Hokusai, Vermeer, Klimt, and more. Four connected rooms with paintings stacked floor to ceiling. Joystick to walk; button for title plate.",
      "controls": {
       "Up/Down": "Move forward/backward",
-      "Left/Right": "Rotate view"
+      "Left/Right": "Rotate view (in auto-walk: change walking pace)",
+      "Button": "Toggle auto-walk"
      }
     }
    ]
@@ -3754,8 +3727,7 @@
      "controls": {
       "Space": "Pet the cat (makes it purr)",
       "Left/Right": "Change cat color",
-      "Up/Down": "Change pillow color",
-      "Escape": "Exit"
+      "Up/Down": "Change pillow color"
      }
     },
     {
@@ -3765,7 +3737,7 @@
      "desc": "A working digital clock. Hours, minutes, and seconds on the LED matrix.",
      "controls": {
       "Space": "Toggle between digital and analog mode",
-      "Escape": "Exit"
+      "Joystick": "Back to menu"
      }
     },
     {
@@ -3777,8 +3749,7 @@
      "controls": {
       "Left/Right": "Adjust speed",
       "Up/Down": "Cycle color palette",
-      "Space": "Randomize position/direction",
-      "Escape": "Exit"
+      "Space": "Randomize position/direction"
      }
     },
     {
@@ -3800,8 +3771,7 @@
      "credit": "Edward Craven Walker, 1963",
      "controls": {
       "Left/Right": "Adjust speed",
-      "Up/Down": "Cycle color scheme",
-      "Escape": "Exit"
+      "Up/Down": "Cycle color scheme"
      }
     },
     {
@@ -3822,8 +3792,7 @@
      "desc": "The classic solitaire victory cascade. Cards tumble and bounce across the screen in arcing trails.",
      "controls": {
       "Left/Right": "Adjust spawn rate",
-      "Space": "Reset cascade",
-      "Escape": "Exit"
+      "Space": "Reset cascade"
      }
     },
     {
@@ -3948,8 +3917,7 @@
      "controls": {
       "Left/Right": "Adjust rewiring probability p",
       "Up/Down": "Toggle Watts-Strogatz / Barabasi-Albert",
-      "Action": "Send signal pulse from random node",
-      "Escape": "Exit"
+      "Action": "Send signal pulse from random node"
      }
     },
     {
@@ -4396,7 +4364,9 @@
      "desc": "The only instrument you play without touching. Side view with pitch antenna, volume loop, and electromagnetic field arcs. Waveform display shows the output.",
      "credit": "L\u00e9on Theremin, 1920",
      "controls": {
-      "Button": "Toggle user mode (manual hand control)"
+      "Button": "Switch between auto mode and user mode (you move the hands)",
+      "Left/Right": "Auto: hand oscillation speed. User: volume hand (left hand)",
+      "Up/Down": "Auto: cycle waveform (Sine/Square/Triangle/Sawtooth). User: pitch hand (right hand)"
      }
     },
     {
@@ -4474,8 +4444,7 @@
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
-      "Space": "Randomize phases",
-      "Escape": "Exit"
+      "Space": "Randomize phases"
      }
     },
     {
@@ -4805,8 +4774,8 @@
      "desc": "Amino acids and peptides as rotating 3D bead-on-chain models. Each residue is a shaded sphere linked by backbone bonds, with disulfide bridges and ring closures, alongside a calculator-style info panel.",
      "controls": {
       "Joystick": "Manual 3D rotation",
-      "Z / X": "Cycle peptides",
-      "Z+X": "Cycle color mode"
+      "Button": "Cycle peptides",
+      "Both": "Cycle color mode"
      }
     },
     {
@@ -4816,8 +4785,8 @@
      "desc": "Real protein backbone structures from the RCSB Protein Data Bank. C\u03b1 coordinates with color-coded secondary structure: helices in red, sheets in yellow, coils in gray.",
      "controls": {
       "Joystick": "Rotate protein in 3D (pauses auto-cycle to let you explore)",
-      "Z or X": "Cycle through proteins in current category (resumes auto-cycle)",
-      "Z+X": "Cycle through category playlists (NOBEL, ANCIENT, ANIMALS, etc.)"
+      "Button": "Cycle through proteins in current category (resumes auto-cycle)",
+      "Both": "Cycle through category playlists (NOBEL, ANCIENT, ANIMALS, etc.)"
      }
     },
     {
@@ -6568,7 +6537,10 @@
      "cls": "Controls",
      "module": "visuals/controls.py",
      "desc": "A live map of the panel's controls. Press any button or push the joystick and watch it light up \u2014 the quickest way to check the inputs are working and learn the layout.",
-     "controls": {}
+     "controls": {
+      "Any": "Lights up its spot on the screen",
+      "Hold both 2s": "Back to menu"
+     }
     },
     {
      "name": "CREDITS",
@@ -6631,9 +6603,7 @@
      "module": "visuals/sysinfo.py",
      "desc": "Live Raspberry Pi vitals \u2014 CPU temperature, IP address, uptime, and memory use. Handy for setup and troubleshooting.",
      "controls": {
-      "Space/Action": "Refresh stats immediately",
-      "Up/Down": "Reserved for scrolling (future use)",
-      "Escape": "Exit"
+      "Any input": "Back to menu (stats refresh on their own)"
      }
     },
     {
@@ -6701,7 +6671,8 @@
      "desc": "Safely powers down the Raspberry Pi so you can unplug the cabinet without corrupting its storage. Always shut down here before pulling the plug.",
      "controls": {
       "Up/Down": "Select YES/NO",
-      "Button": "Confirm selection"
+      "Button": "Confirm selection",
+      "Left/Right": "Cancel, back to menu"
      }
     },
     {

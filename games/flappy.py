@@ -5,7 +5,6 @@ Tap to flap, navigate through pipe gaps. Don't hit the pipes or ground!
 
 Controls:
   Space      - Flap (gain upward velocity)
-  Escape     - Return to menu
 """
 
 import random

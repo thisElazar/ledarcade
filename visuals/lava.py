@@ -6,7 +6,6 @@ Blobs naturally rise and fall with convection currents.
 Controls:
   Left/Right - Adjust speed
   Up/Down    - Cycle color scheme
-  Escape     - Exit
 """
 
 import random

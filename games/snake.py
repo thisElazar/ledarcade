@@ -5,7 +5,6 @@ Eat food to grow longer. Don't hit yourself or the walls!
 
 Controls:
   Arrow Keys - Change direction
-  Space      - Start game / Restart after game over
 """
 
 import random

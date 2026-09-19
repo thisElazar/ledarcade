@@ -8,7 +8,6 @@ Controls:
   Left/Right - Adjust animation speed
   Up/Down    - Cycle color palette
   Space      - Cycle pattern variation
-  Escape     - Exit
 """
 
 from typing import Tuple

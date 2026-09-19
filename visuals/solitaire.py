@@ -6,7 +6,6 @@ The classic Windows Solitaire victory animation with bouncing cards.
 Controls:
   Left/Right - Adjust spawn rate
   Space      - Reset cascade
-  Escape     - Exit
 """
 
 import random

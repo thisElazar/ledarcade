@@ -6,7 +6,6 @@ Colorful, smoothly animated plasma waves using sine functions.
 Controls:
   Left/Right - Adjust speed
   Up/Down    - Cycle color palette
-  Escape     - Exit
 """
 
 import math

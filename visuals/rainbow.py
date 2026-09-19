@@ -8,7 +8,6 @@ Controls:
   Left/Right - Adjust cycle speed
   Up/Down    - Cycle through pattern modes
   Space      - Reverse direction
-  Escape     - Exit
 """
 
 import math

@@ -5,7 +5,6 @@ Navigate the maze, eat all dots. Avoid ghosts unless you eat a power pellet!
 
 Controls:
   Arrow Keys - Set direction (queued for next intersection)
-  Escape     - Return to menu
 """
 
 import random

@@ -8,8 +8,8 @@ bridges and cyclic closure where applicable.
 
 Controls:
   Joystick  - Manual 3D rotation
-  Z / X     - Cycle peptides
-  Z+X       - Cycle color mode
+  Button    - Cycle peptides
+  Both      - Cycle color mode
 """
 
 import math

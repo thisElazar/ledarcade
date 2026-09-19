@@ -4,9 +4,7 @@ SysInfo - System Information Display
 Shows Raspberry Pi system stats: CPU temp, IP address, uptime, memory usage.
 
 Controls:
-  Space/Action - Refresh stats immediately
-  Up/Down - Reserved for scrolling (future use)
-  Escape - Exit
+  Any input - Back to menu (stats refresh on their own)
 """
 
 import os

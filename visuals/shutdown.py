@@ -6,6 +6,7 @@ Safely shuts down the Raspberry Pi.
 Controls:
   Up/Down    - Select YES/NO
   Button     - Confirm selection
+  Left/Right - Cancel, back to menu
 """
 
 import os

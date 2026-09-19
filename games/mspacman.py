@@ -6,7 +6,6 @@ Bouncing fruit enters from the tunnels for bonus points.
 
 Controls:
   Arrow Keys - Set direction (queued for next intersection)
-  Escape     - Return to menu
 """
 
 import random

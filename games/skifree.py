@@ -6,7 +6,7 @@ The Yeti appears at 750m — use boost to outrun him!
 
 Controls:
   Left/Right - Steer (hold ~0.4s to carve into a hard turn)
-  Up         - Brake / slow down
+  Up/Down    - Hang back up the slope / push ahead down it
   Button     - Speed boost (limited fuel)
   Button (in air) - Flip trick (land it for style!)
 """

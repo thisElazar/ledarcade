@@ -7,7 +7,6 @@ rising bubble tubes, and a cycling selection display.
 Controls:
   Left/Right - Adjust animation speed
   Up/Down    - Cycle glow theme (Warm/Neon/Pastel/Psychedelic)
-  Escape     - Exit
 """
 
 import math

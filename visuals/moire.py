@@ -8,7 +8,6 @@ Controls:
   Left/Right - Adjust animation speed
   Up/Down    - Cycle color palette
   Space      - Cycle pattern type
-  Escape     - Exit
 """
 
 import math

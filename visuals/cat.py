@@ -8,7 +8,6 @@ Controls:
   Space      - Pet the cat (makes it purr)
   Left/Right - Change cat color
   Up/Down    - Change pillow color
-  Escape     - Exit
 """
 
 import math

@@ -8,7 +8,6 @@ Controls:
   Left/Right - Adjust wave/scroll speed
   Up/Down    - Cycle color palette
   Action     - Cycle pattern type
-  Escape     - Exit
 """
 
 import math

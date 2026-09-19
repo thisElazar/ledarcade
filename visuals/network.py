@@ -14,7 +14,6 @@ Controls:
   Left/Right  - Adjust rewiring probability p
   Up/Down     - Toggle Watts-Strogatz / Barabasi-Albert
   Action      - Send signal pulse from random node
-  Escape      - Exit
 """
 
 import random

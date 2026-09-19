@@ -5,8 +5,8 @@ Shows the arcade panel control layout with live input feedback.
 Press buttons and directions to see them light up.
 
 Controls:
-  All inputs shown live on screen
-  Hold both buttons 2s to exit
+  Any          - Lights up its spot on the screen
+  Hold both 2s - Back to menu
 """
 
 from . import Visual, Display, Colors, GRID_SIZE

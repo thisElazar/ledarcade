@@ -19,7 +19,6 @@ Controls:
   Up/Down     - Change color palette
   Left/Right  - Adjust speed
   Space       - Toggle center/random drop mode
-  Escape      - Exit
 """
 
 import random

@@ -6,7 +6,6 @@ Falling green characters like The Matrix.
 Controls:
   Left/Right - Adjust speed
   Space      - Toggle rainbow mode
-  Escape     - Exit
 """
 
 import random

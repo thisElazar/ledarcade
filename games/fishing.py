@@ -7,7 +7,6 @@ Wait for the bite, then hold/mash to reel in. Don't strike too early!
 Controls:
   Up/Down    - Adjust lure depth
   Space/Z    - Hook fish (hold or mash to reel)
-  Escape     - Return to menu
 """
 
 import random

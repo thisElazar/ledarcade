@@ -7,7 +7,6 @@ One colony may eventually dominate!
 Controls:
   Left/Right - Adjust growth speed
   Space      - Reset with new random colonies
-  Escape     - Exit
 """
 
 import random

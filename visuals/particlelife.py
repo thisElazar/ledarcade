@@ -14,7 +14,6 @@ Controls:
   Up/Down     - Adjust species count (changes colors)
   Left/Right  - Adjust speed
   Space       - New random rules
-  Escape      - Exit
 """
 
 import random

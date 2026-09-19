@@ -9,7 +9,6 @@ Controls:
   Up/Down     - Cycle color palette
   Left/Right  - Adjust speed
   Space       - Regenerate pattern (cycles tile size)
-  Escape      - Exit
 """
 
 import random

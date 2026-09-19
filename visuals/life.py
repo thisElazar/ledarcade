@@ -9,7 +9,6 @@ Controls:
   Right     - Step forward (when paused)
   Up        - Randomize (dense)
   Down      - Randomize (sparse)
-  Escape    - Exit
 """
 
 import random

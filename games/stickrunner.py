@@ -5,7 +5,6 @@ Run across rooftops, jump between buildings of all shapes and sizes!
 
 Controls:
   Space      - Jump
-  Escape     - Return to menu
 """
 
 import random

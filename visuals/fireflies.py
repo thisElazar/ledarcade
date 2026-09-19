@@ -9,7 +9,6 @@ Controls:
   Up/Down     - Change color palette
   Left/Right  - Adjust speed
   Space       - Randomize phases
-  Escape      - Exit
 """
 
 import random

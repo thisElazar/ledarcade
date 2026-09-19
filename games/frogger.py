@@ -6,7 +6,6 @@ Fill all 5 home slots to complete the level.
 
 Controls:
   Arrow Keys - Hop one cell in direction
-  Escape     - Return to menu
 """
 
 import random

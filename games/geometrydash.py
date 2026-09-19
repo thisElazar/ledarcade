@@ -5,7 +5,6 @@ Jump over spikes and obstacles! Precise timing required.
 
 Controls:
   Space      - Jump (tap or hold for repeated jumps)
-  Escape     - Return to menu
 """
 
 import random

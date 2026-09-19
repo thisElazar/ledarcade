@@ -5,7 +5,7 @@ Shows current time with animated effects.
 
 Controls:
   Space - Toggle between digital and analog mode
-  Escape - Exit
+  Joystick - Back to menu
 """
 
 import math

@@ -332,7 +332,18 @@ section .wrap { max-width: 800px; }
     'action': 'BUTTON', 'button': 'BUTTON', 'buttons': 'BOTH BUTTONS',
     'both': 'BOTH BUTTONS', 'both buttons': 'BOTH BUTTONS',
     'action l/r': 'EITHER BUTTON', 'l/r': 'EITHER BUTTON',
-    'joystick': 'JOYSTICK', 'any': 'ANY', 'any button': 'BUTTON'
+    'joystick': 'JOYSTICK', 'any': 'ANY', 'any button': 'BUTTON',
+    // Keyboard-era and one-off spellings still found in module docstrings.
+    // tests/test_controls_contract.py fails if a key in guide.json misses this table.
+    'arrow keys': 'JOYSTICK', 'arrows': 'JOYSTICK',
+    'single button': 'BUTTON', 'action button': 'BUTTON', 'space/action': 'BUTTON',
+    'space/z': 'EITHER BUTTON', 'action l or r': 'EITHER BUTTON',
+    'both btns': 'BOTH BUTTONS', 'action l + r': 'BOTH BUTTONS',
+    'hold both': 'HOLD BOTH BUTTONS', 'hold both 2s': 'HOLD BOTH 2S',
+    'left button': 'LEFT BTN', 'left btn': 'LEFT BTN',
+    'right button': 'RIGHT BTN', 'right btn': 'RIGHT BTN',
+    'action r + \u2191/\u2193': 'RIGHT BTN + UP/DOWN',
+    'action r + \u2190/\u2192': 'RIGHT BTN + LEFT/RIGHT'
   };
   // Space / Action L -> left button ; Z / Action R -> right button.
   var LEFT_BTN = {'space': 1, 'action l': 1, 'action_l': 1};

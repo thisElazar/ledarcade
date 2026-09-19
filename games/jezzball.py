@@ -25,7 +25,6 @@ Difficulty:
 Controls:
   Arrow Keys - Move cursor and set wall direction
   Space      - Build wall in current direction
-  Escape     - Return to menu
 """
 
 import random

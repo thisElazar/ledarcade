@@ -5,15 +5,9 @@ Side view of a theremin with pitch antenna, volume loop,
 moving hands, EM field arcs, and a scrolling waveform display.
 
 Controls:
-  Button     - Toggle user mode (manual hand control)
-
-  Auto mode:
-    Left/Right - Adjust hand oscillation speed
-    Up/Down    - Cycle waveform type (Sine/Square/Triangle/Sawtooth)
-
-  User mode:
-    Left/Right - Control volume hand (left hand, affects volume)
-    Up/Down    - Control pitch hand (right hand, affects frequency)
+  Button     - Switch between auto mode and user mode (you move the hands)
+  Left/Right - Auto: hand oscillation speed. User: volume hand (left hand)
+  Up/Down    - Auto: cycle waveform (Sine/Square/Triangle/Sawtooth). User: pitch hand (right hand)
 """
 
 import math
