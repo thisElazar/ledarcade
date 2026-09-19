@@ -1325,6 +1325,7 @@ _exit_hold = 0.0
   setStatus('ready', 'ready');
   emuState = 'menu';
 
+  const GAME_SPEED = 0.85;       // games only — web visitors are first-timers on keyboards
   let pyLastTime = performance.now();
   let pyFrameCount = 0;
   let pyFpsTimer = 0;
@@ -1429,7 +1430,7 @@ _sel
 if _item:
     if _is_game:
         try:
-            _item.update(_input, ${dt})
+            _item.update(_input, ${dt * GAME_SPEED})
             _item.draw()
         except Exception as _e:
             _item.state = GameState.GAME_OVER
