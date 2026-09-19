@@ -5,8 +5,6 @@
 
 const GRID = 64;
 const CELL = 10;
-const DOT  = 8;
-const GAP  = 1;
 
 // ----- Display (mirrors the Python Display class) -----
 
@@ -102,62 +100,88 @@ const FONT = {
 
 
 // ----- LED Renderer -----
+// The look of the marketing renders (tools/render_clip.py, paper_display.py):
+// round LED dots on black, plus a soft glow that is the frame blurred at LED
+// resolution, scaled up and screen-blended over the dots.
+
+const DOT_RADIUS = 6.5 / 16;   // of one LED cell, as in render_clip
+const GLOW_GAIN = 0.52;        // lit share of each LED cell (mean of render_clip's dot mask)
 
 class LEDRenderer {
-  constructor(ledCanvas, glowCanvas) {
-    this.ledCanvas = ledCanvas;
-    this.glowCanvas = glowCanvas;
-    this.ledCtx = ledCanvas.getContext('2d');
-    this.glowCtx = glowCanvas.getContext('2d');
+  constructor(ledCanvas) {
+    this.canvas = ledCanvas;
+    this.ctx = ledCanvas.getContext('2d');
 
-    // Handle device pixel ratio for sharp rendering
+    // The frame and its glow, one canvas pixel per LED
+    this.frame = this._grid();
+    this.glow = this._grid();
+    this.glowBuf = new Float32Array(GRID * GRID * 3);
+    this.mask = document.createElement('canvas');
+
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  _grid() {
+    const c = document.createElement('canvas');
+    c.width = c.height = GRID;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(GRID, GRID);
+    img.data.fill(255);
+    return { canvas: c, ctx, img };
+  }
+
+  // Backing store = displayed size in device pixels, snapped to whole-pixel LEDs.
+  // The mask is black with a round hole over every LED.
+  resize() {
     const dpr = window.devicePixelRatio || 1;
-    const size = GRID * CELL;
-    ledCanvas.width = size * dpr;
-    ledCanvas.height = size * dpr;
-    this.ledCtx.scale(dpr, dpr);
-
-    // Pre-create glow ImageData
-    this.glowImageData = this.glowCtx.createImageData(GRID, GRID);
-
-    // Fill LED background once
-    this.ledCtx.fillStyle = '#080808';
-    this.ledCtx.fillRect(0, 0, size, size);
+    const shown = this.canvas.clientWidth || GRID * CELL;
+    const cell = Math.max(3, Math.round(shown * dpr / GRID));
+    if (cell === this.cell) return;
+    this.cell = cell;
+    const size = this.canvas.width = this.canvas.height = this.mask.width = this.mask.height = GRID * cell;
+    const m = this.mask.getContext('2d');
+    m.fillStyle = '#000';
+    m.fillRect(0, 0, size, size);
+    m.globalCompositeOperation = 'destination-out';
+    m.beginPath();
+    for (let y = 0; y < GRID; y++) {
+      for (let x = 0; x < GRID; x++) {
+        const cx = (x + 0.5) * cell, cy = (y + 0.5) * cell;
+        m.moveTo(cx + DOT_RADIUS * cell, cy);
+        m.arc(cx, cy, DOT_RADIUS * cell, 0, Math.PI * 2);
+      }
+    }
+    m.fill();
   }
 
   render(display) {
     const buf = display.buffer;
-    const ctx = this.ledCtx;
-    const size = GRID * CELL;
-    const glowData = this.glowImageData.data;
+    const px = this.frame.img.data, gpx = this.glow.img.data, g = this.glowBuf;
+    const row = GRID * 3;
 
-    // Clear LED canvas to dark
-    ctx.fillStyle = '#060606';
-    ctx.fillRect(0, 0, size, size);
-
-    // Draw each pixel as an LED dot
-    for (let y = 0; y < GRID; y++) {
-      for (let x = 0; x < GRID; x++) {
-        const i = (y * GRID + x) * 3;
-        const r = buf[i], g = buf[i+1], b = buf[i+2];
-
-        // LED dot
-        if (r > 3 || g > 3 || b > 3) {
-          ctx.fillStyle = `rgb(${r},${g},${b})`;
-          ctx.fillRect(x * CELL + GAP, y * CELL + GAP, DOT, DOT);
-        } else {
-          // Faint unlit LED
-          ctx.fillStyle = '#0b0b0b';
-          ctx.fillRect(x * CELL + GAP, y * CELL + GAP, DOT, DOT);
-        }
-
-        // Glow pixel
-        const gi = (y * GRID + x) * 4;
-        glowData[gi] = r; glowData[gi+1] = g; glowData[gi+2] = b; glowData[gi+3] = 255;
-      }
+    // Frame as-is; glow = frame * gain, blurred [1 4 1]/6 across then down (edges clamped)
+    for (let i = 0, j = 0; i < buf.length; i += 3, j += 4) {
+      px[j] = buf[i]; px[j+1] = buf[i+1]; px[j+2] = buf[i+2];
+      const x = (i / 3) % GRID;
+      const l = x > 0 ? i - 3 : i, r = x < GRID - 1 ? i + 3 : i;
+      for (let c = 0; c < 3; c++) g[i+c] = (buf[l+c] + 4 * buf[i+c] + buf[r+c]) * (GLOW_GAIN / 6);
     }
+    for (let i = 0, j = 0; i < g.length; i += 3, j += 4) {
+      const u = i >= row ? i - row : i, d = i < g.length - row ? i + row : i;
+      for (let c = 0; c < 3; c++) gpx[j+c] = (g[u+c] + 4 * g[i+c] + g[d+c]) / 6;
+    }
+    this.frame.ctx.putImageData(this.frame.img, 0, 0);
+    this.glow.ctx.putImageData(this.glow.img, 0, 0);
 
-    this.glowCtx.putImageData(this.glowImageData, 0, 0);
+    const ctx = this.ctx, size = this.canvas.width;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(this.frame.canvas, 0, 0, size, size);   // square colour cells
+    ctx.drawImage(this.mask, 0, 0);                       // cut to round dots on black
+    ctx.globalCompositeOperation = 'screen';
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(this.glow.canvas, 0, 0, size, size);
   }
 
   getAverageColor(display) {

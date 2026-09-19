@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="v2.css">
 <style>
+/* ---------- Lights down: the page goes dark once the emulator starts, so the LEDs read ---------- */
+html.dark { color-scheme: dark; --paper: #0d0c0b; --ink: #e9e5da; --ink-2: #b3aea2; --ink-3: #85817a; --rule: #4a4740; --rule-2: #2a2824; --rubric: #d9694f; }
+body, .masthead, .lab-display, .rule { transition: background-color 2s, color 2s, border-color 2s; }
+
 /* ---------- Emulator ---------- */
 .emu-page .wrap { display: flex; flex-direction: column; align-items: center; padding-block: 40px 56px; }
 .lab-status { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 16px; display: block; text-align: center; }
@@ -20,8 +24,7 @@
 .lab-display { display: block; width: min(640px, 90vw); border: 1px solid var(--rule); padding: 14px; background: var(--paper); position: relative; outline: none; }
 .lab-display:focus-visible { outline: 2px solid var(--rubric); outline-offset: 3px; }
 .lab-display .canvas-wrap { position: relative; width: 100%; aspect-ratio: 1; background: var(--panel); }
-.lab-display .canvas-wrap canvas.led { width: 100%; height: 100%; image-rendering: pixelated; display: block; position: relative; z-index: 2; }
-.lab-display .canvas-wrap canvas.glow { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; filter: blur(4px) brightness(1.4); opacity: 0.35; pointer-events: none; z-index: 1; }
+.lab-display .canvas-wrap canvas.led { width: 100%; height: 100%; display: block; }
 .lab-display .click-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(7,7,7,0.6); cursor: pointer; z-index: 10; }
 .lab-display .click-overlay span { font-family: var(--mono); font-size: 13px; letter-spacing: 0.2em; color: #fff; border: 1px solid #fff; padding: 8px 14px; }
 
@@ -98,7 +101,6 @@
 
     <div class="lab-display" id="emuFrame" tabindex="0">
       <div class="canvas-wrap">
-        <canvas class="glow" id="pyGlowCanvas" width="64" height="64"></canvas>
         <canvas class="led" id="pyLedCanvas" width="640" height="640"></canvas>
         <div class="click-overlay" id="emuClickOverlay"><span>CLICK TO START</span></div>
       </div>
@@ -121,8 +123,6 @@
     <details class="lab-notes">
       <summary>Not in the browser</summary>
       <ul>
-        <li><span class="cat">SPRITES</span><span>GIF/PNG sprite animations</span></li>
-        <li><span class="cat">SUPERHEROES</span><span>GIF sprite animations</span></li>
         <li><span class="cat">GALLERY</span><span>3D galleries with image assets</span></li>
         <li><span class="cat">SCIENCE</span><span>Earth: globe texture</span></li>
         <li><span class="cat">UTILITY</span><span>Info, Update: system access</span></li>
@@ -168,13 +168,12 @@
   const pyStatusEl = document.getElementById('pyStatus');
   const pyFpsEl = document.getElementById('pyFps');
   const pyLedCanvas = document.getElementById('pyLedCanvas');
-  const pyGlowCanvas = document.getElementById('pyGlowCanvas');
   const emuFrame = document.getElementById('emuFrame');
   const emuOverlay = document.getElementById('emuClickOverlay');
 
   const GITHUB_RAW = 'https://raw.githubusercontent.com/thisElazar/ledarcade/main/';
 
-  const pyRenderer = new LEDRenderer(pyLedCanvas, pyGlowCanvas);
+  const pyRenderer = new LEDRenderer(pyLedCanvas);
   const pyDisplay = new Display();
 
   let catalog = null;
@@ -198,7 +197,11 @@
     pyStatusEl.className = 'lab-status ' + cls;
   }
 
-  emuFrame.addEventListener('focus', () => { hasFocus = true; emuOverlay.style.display = 'none'; });
+  emuFrame.addEventListener('focus', () => {
+    hasFocus = true;
+    emuOverlay.style.display = 'none';
+    document.documentElement.classList.add('dark');
+  });
   emuFrame.addEventListener('blur', () => {
     hasFocus = false;
     for (const k in keys) keys[k] = false;
