@@ -9,6 +9,8 @@ Controls:
   Up/Down    - Select item within category
   Space      - Launch selected item
   Hold both   - Back to menu (games) / Exit
+
+  python run_arcade.py --paper   # white-page look of the marketing renders
 """
 
 import pygame
@@ -535,7 +537,7 @@ def _pick_idle_visual(display):
     return vis
 
 
-def main():
+def main(display_class=Display):
     print("=" * 50)
     print("LED ARCADE")
     print("=" * 50)
@@ -563,8 +565,11 @@ def main():
     print()
     print("=" * 50)
 
-    # Initialize
-    display = Display()
+    # Initialize (--paper: marketing's white-page look, see paper_display.py)
+    if "--paper" in sys.argv:
+        from paper_display import PaperDisplay as display_class
+    display = display_class()
+    paper = hasattr(display, "set_label")
     # Load persisted safety settings
     import settings as persistent
     display.set_safety(
@@ -1101,6 +1106,8 @@ def main():
                             current_item.update(dt)
                             current_item.draw()
 
+        if paper:
+            display.set_label(idle_visual or current_item)
         display.render()
 
     pygame.quit()
