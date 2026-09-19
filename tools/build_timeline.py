@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """
-Generate an interactive timeline visualization of the project's git history.
+Generate the project timeline from git history.
 
-Shows every file as a bubble (sized by lines of code) on a zoomable
-date-vs-size scatter plot.  Hover for details, filter by directory,
-toggle Y axis between lines and commits.
+Two views in one HTML file:
+
+  table  One row per game/visual: when it was created, when it last got
+         focused attention, how much, and its documented controls checked
+         against the inputs its code reads. Sort by any column. This is the
+         worklist for the controls parity check.
+  chart  Every file as a bubble (sized by lines of code) on a zoomable
+         date-vs-size scatter plot.
+
+"Focused" commits touch at most FOCUSED_MAX files — deliberate work on that
+item, as opposed to repo-wide sweeps. History follows renames.
 
 Usage:
     python tools/build_timeline.py              # Build & open in browser
@@ -16,37 +24,55 @@ import json, os, subprocess, sys, argparse, webbrowser, http.server
 from pathlib import Path
 from collections import defaultdict
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from controls_vocab import audit, class_source  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 OUT  = ROOT / "tools" / "timeline.html"
 
 DIRS = {"visuals", "games", "tools", "site"}
+FOCUSED_MAX = 5   # a commit touching more files than this is a sweep
 
 # ── data extraction ──────────────────────────────────────────────────
 
 def extract():
     print("Extracting git history …", end=" ", flush=True)
 
-    # Single git log pass: get every commit's date and its files
+    # Single git log pass, newest first, following renames back in time
     r = subprocess.run(
-        ["git", "log", "--format=COMMIT %aI", "--name-only"],
+        ["git", "log", "-M", "--format=COMMIT %aI", "--name-status"],
         capture_output=True, text=True, cwd=ROOT,
     )
 
-    # Per-file: track first date, last date, commit count
-    first_date = {}   # file -> earliest ISO date
-    last_date  = {}   # file -> latest ISO date
-    commit_count = defaultdict(int)
-
-    current_date = None
+    commits = []
     for line in r.stdout.split("\n"):
         if line.startswith("COMMIT "):
-            current_date = line[7:]
-        elif line and current_date:
-            f = line
+            commits.append((line[7:], []))
+        elif line.strip() and commits:
+            commits[-1][1].append(line.split("\t"))
+
+    # Per-file (by its *current* path): first date, last date, commit counts
+    first_date = {}
+    last_date  = {}
+    last_focused = {}
+    commit_count = defaultdict(int)
+    focused_count = defaultdict(int)
+    alias = {}   # historical path -> current path
+
+    for date, files in commits:
+        focused = len(files) <= FOCUSED_MAX
+        for parts in files:
+            if parts[0].startswith("R") and len(parts) == 3:
+                f = alias.get(parts[2], parts[2])
+                alias[parts[1]] = f
+            else:
+                f = alias.get(parts[-1], parts[-1])
             commit_count[f] += 1
-            if f not in last_date:
-                last_date[f] = current_date   # first seen = most recent
-            first_date[f] = current_date       # keeps overwriting = oldest
+            last_date.setdefault(f, date)      # first seen = most recent
+            first_date[f] = date               # keeps overwriting = oldest
+            if focused:
+                focused_count[f] += 1
+                last_focused.setdefault(f, date)
 
     # Build data for tracked files in our directories
     r2 = subprocess.run(
@@ -83,6 +109,9 @@ def extract():
             name=name, file=basename, dir=d,
             created=created, modified=modified or created,
             lines=lines, commits=commit_count.get(f, 0),
+            focused=focused_count.get(f, 0),
+            last_focused=last_focused.get(f),
+            path=f,
         ))
         dir_counts[d] += 1
 
@@ -90,10 +119,249 @@ def extract():
     print(f"{len(data)} files ({', '.join(parts)})")
     return data
 
+
+def extract_items(files):
+    """One row per game/visual in site/guide.json, joined to its file's history
+    and audited for controls parity (see tools/controls_vocab.py)."""
+    by_path = {d["path"]: d for d in files}
+    guide = json.load(open(ROOT / "site" / "guide.json"))
+    game_keys = {"arcade", "retro", "modern", "toys", "bar", "2_player",
+                 "unique", "game_mix"}
+    sharing = defaultdict(int)
+    for cat in guide["categories"]:
+        for item in cat["items"]:
+            sharing[item.get("module")] += 1
+
+    rows = []
+    for cat in guide["categories"]:
+        for item in cat["items"]:
+            hist = by_path.get(item.get("module"))
+            if not hist:
+                continue
+            found = audit(item)
+            controls = item.get("controls") or {}
+            listed = cat["key"] in ("demos", "titles", "game_mix", "visual_mix")
+            flags = []
+            if found["unknown_keys"]:
+                flags.append("unknown key: " + ", ".join(found["unknown_keys"]))
+            if found["documented_not_read"]:
+                flags.append("documents unread " + "/".join(found["documented_not_read"]))
+            if found["read_not_documented"]:
+                flags.append("undocumented " + "/".join(found["read_not_documented"]))
+            if found["reads"] and not controls and not listed:
+                flags.append("reads input, no controls documented")
+            if found["sim_only_keys"]:
+                flags.append("sim-only key: " + ", ".join(found["sim_only_keys"]))
+            notes = []
+            if item.get("stub"):
+                notes.append("stub")
+            if "custom_exit = True" in class_source(item["cls"], item["module"]):
+                notes.append("own exit")
+            if sharing[item["module"]] > 1:
+                notes.append(f"file shared by {sharing[item['module']]}")
+            rows.append(dict(
+                name=item["name"], cls=item["cls"], module=item["module"],
+                cat=cat["key"], kind="game" if cat["key"] in game_keys else "visual",
+                created=hist["created"], last_focused=hist["last_focused"],
+                modified=hist["modified"], focused=hist["focused"],
+                commits=hist["commits"], lines=hist["lines"],
+                controls=controls, reads=found["reads"],
+                flags=flags, notes=notes,
+            ))
+    flagged = sum(1 for r in rows if r["flags"])
+    print(f"{len(rows)} catalog items, {flagged} with controls flags")
+    return rows
+
+# ── table view (plain strings: no f-string brace doubling) ──────────
+
+TABLE_CSS = """
+  #table-wrap {
+    position: absolute; top: 48px; left: 0; right: 0; bottom: 0;
+    overflow: auto; display: none;
+  }
+  body.view-table #table-wrap { display: block; }
+  body.view-table #canvas-wrap, body.view-table #help,
+  body.view-table .chart-only { display: none; }
+  body.view-chart .table-only { display: none; }
+
+  #t-bar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    padding: 10px 16px; background: #0a0a0f; border-bottom: 1px solid #222;
+  }
+  #t-search {
+    background: #111118; border: 1px solid #333; border-radius: 12px;
+    color: #ddd; font-family: inherit; font-size: 12px;
+    padding: 5px 12px; width: 220px;
+  }
+  #t-search:focus { outline: none; border-color: #4caf50; }
+  #t-count { font-size: 11px; color: #777; margin-left: auto; }
+  .chip.active { color: #fff; border-color: #4caf50; background: #4caf5018; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  thead th {
+    position: sticky; top: 47px; z-index: 10;
+    background: #111118; color: #999; font-weight: normal; text-align: left;
+    padding: 8px 10px; border-bottom: 1px solid #333;
+    cursor: pointer; white-space: nowrap; user-select: none;
+  }
+  thead th:hover { color: #fff; }
+  thead th.sorted { color: #6fcf73; }
+  thead th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody td { padding: 7px 10px; border-bottom: 1px solid #1a1a22; vertical-align: top; }
+  tbody tr:hover td { background: #12121a; }
+  td.name { color: #fff; white-space: nowrap; }
+  td.name small { display: block; color: #666; font-size: 10px; margin-top: 2px; }
+  td.date { white-space: nowrap; color: #aaa; }
+  td.never { color: #e57373; }
+  .kind-game { color: #64b5f6; } .kind-visual { color: #6fcf73; }
+  .ctl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 8px; max-width: 460px; }
+  .ctl b { color: #ffb74d; font-weight: normal; white-space: nowrap; }
+  .ctl span { color: #aaa; }
+  .none { color: #555; }
+  .reads { color: #888; white-space: nowrap; }
+  .flag { display: block; color: #e57373; margin-bottom: 2px; }
+  .note { display: inline-block; color: #777; border: 1px solid #2a2a33;
+          border-radius: 8px; padding: 0 6px; margin: 0 4px 2px 0; font-size: 10px; }
+  .bar { display: inline-block; height: 6px; background: #4caf50; border-radius: 3px;
+         margin-right: 6px; vertical-align: middle; opacity: 0.7; }
+"""
+
+TABLE_HTML = """
+<div id="table-wrap">
+  <div id="t-bar">
+    <input id="t-search" type="search" placeholder="filter name, file, control…">
+    <button class="filter-btn chip active" data-kind="visual">visuals</button>
+    <button class="filter-btn chip active" data-kind="game">games</button>
+    <button class="filter-btn chip" id="t-flagged">flagged only</button>
+    <button class="filter-btn chip" id="t-untouched">never refined</button>
+    <span id="t-count"></span>
+  </div>
+  <table>
+    <thead><tr>
+      <th data-key="name">name</th>
+      <th data-key="cat">category</th>
+      <th data-key="created">created</th>
+      <th data-key="last_focused">last focused work</th>
+      <th data-key="focused" class="num" title="commits touching 5 files or fewer">focused</th>
+      <th data-key="commits" class="num" title="all commits, sweeps included">all</th>
+      <th data-key="lines" class="num">lines</th>
+      <th data-key="ncontrols">documented controls</th>
+      <th data-key="nreads">code reads</th>
+      <th data-key="nflags">parity flags</th>
+    </tr></thead>
+    <tbody id="t-body"></tbody>
+  </table>
+</div>
+"""
+
+TABLE_JS = """
+// ── table view ──
+let tSort = { key: 'created', dir: 1 };
+let tKinds = { visual: true, game: true };
+let tFlagged = false, tUntouched = false, tQuery = '';
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function day(iso) { return iso ? iso.slice(0, 10) : null; }
+
+ITEMS.forEach(r => {
+  r.ncontrols = Object.keys(r.controls).length;
+  r.nreads = r.reads.length;
+  r.nflags = r.flags.length;
+  r.hay = [r.name, r.cls, r.module, r.cat, Object.keys(r.controls).join(' '),
+           Object.values(r.controls).join(' '), r.flags.join(' '), r.notes.join(' ')]
+          .join(' ').toLowerCase();
+});
+const maxFocused = Math.max(1, ...ITEMS.map(r => r.focused));
+
+function tRows() {
+  const rows = ITEMS.filter(r =>
+    tKinds[r.kind] && (!tFlagged || r.nflags) && (!tUntouched || !r.focused) &&
+    (!tQuery || r.hay.includes(tQuery)));
+  const k = tSort.key;
+  rows.sort((a, b) => {
+    let x = a[k], y = b[k];
+    if (x == null) x = ''; if (y == null) y = '';
+    const c = (typeof x === 'number') ? x - y : String(x).localeCompare(String(y));
+    // ties: oldest and least-touched first — the parity worklist order
+    return (c * tSort.dir) || a.created.localeCompare(b.created) || (a.focused - b.focused);
+  });
+  return rows;
+}
+
+function drawTable() {
+  const rows = tRows();
+  document.getElementById('t-count').textContent =
+    rows.length + ' of ' + ITEMS.length + ' items · ' +
+    rows.filter(r => r.nflags).length + ' flagged · ' +
+    rows.filter(r => !r.focused).length + ' never refined';
+  document.querySelectorAll('thead th').forEach(th => {
+    const on = th.dataset.key === tSort.key;
+    th.classList.toggle('sorted', on);
+    th.textContent = th.textContent.replace(/ [▲▼]$/, '') + (on ? (tSort.dir > 0 ? ' ▲' : ' ▼') : '');
+  });
+  document.getElementById('t-body').innerHTML = rows.map(r => {
+    const ctl = r.ncontrols
+      ? '<div class="ctl">' + Object.entries(r.controls).map(([k, v]) =>
+          '<b>' + esc(k) + '</b><span>' + esc(v) + '</span>').join('') + '</div>'
+      : '<span class="none">—</span>';
+    return '<tr>' +
+      '<td class="name"><span class="kind-' + r.kind + '">' + esc(r.name) + '</span>' +
+        '<small>' + esc(r.module) + ' · ' + esc(r.cls) + '</small></td>' +
+      '<td>' + esc(r.cat) + '</td>' +
+      '<td class="date">' + day(r.created) + '</td>' +
+      (r.last_focused ? '<td class="date">' + day(r.last_focused) + '</td>'
+                      : '<td class="date never">never</td>') +
+      '<td class="num"><span class="bar" style="width:' + Math.round(40 * r.focused / maxFocused) +
+        'px"></span>' + r.focused + '</td>' +
+      '<td class="num">' + r.commits + '</td>' +
+      '<td class="num">' + r.lines.toLocaleString() + '</td>' +
+      '<td>' + ctl + '</td>' +
+      '<td class="reads">' + (r.nreads ? esc(r.reads.join(' ')) : '<span class="none">nothing</span>') + '</td>' +
+      '<td>' + r.flags.map(f => '<span class="flag">' + esc(f) + '</span>').join('') +
+        r.notes.map(n => '<span class="note">' + esc(n) + '</span>').join('') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function initTable() {
+  document.querySelectorAll('thead th').forEach(th => th.addEventListener('click', () => {
+    const k = th.dataset.key;
+    if (tSort.key === k) tSort.dir = -tSort.dir;
+    else tSort = { key: k, dir: (k === 'name' || k === 'cat' || k === 'created' || k === 'last_focused') ? 1 : -1 };
+    drawTable();
+  }));
+  document.querySelectorAll('.chip[data-kind]').forEach(b => b.addEventListener('click', () => {
+    tKinds[b.dataset.kind] = !tKinds[b.dataset.kind];
+    b.classList.toggle('active', tKinds[b.dataset.kind]);
+    drawTable();
+  }));
+  document.getElementById('t-flagged').addEventListener('click', e => {
+    tFlagged = !tFlagged; e.target.classList.toggle('active', tFlagged); drawTable();
+  });
+  document.getElementById('t-untouched').addEventListener('click', e => {
+    tUntouched = !tUntouched; e.target.classList.toggle('active', tUntouched); drawTable();
+  });
+  document.getElementById('t-search').addEventListener('input', e => {
+    tQuery = e.target.value.trim().toLowerCase(); drawTable();
+  });
+  document.getElementById('view-toggle').addEventListener('click', () => {
+    const toChart = document.body.classList.contains('view-table');
+    document.body.className = toChart ? 'view-chart' : 'view-table';
+    document.getElementById('view-toggle').textContent = toChart ? 'view: chart' : 'view: table';
+    if (toChart) resize();
+  });
+  drawTable();
+}
+"""
+
 # ── HTML template ────────────────────────────────────────────────────
 
-def build_html(data):
+def build_html(data, items):
     data_json = json.dumps(data)
+    items_json = json.dumps(items)
     return f"""\
 <!DOCTYPE html>
 <html lang="en">
@@ -187,27 +455,29 @@ def build_html(data):
     color: #444;
     z-index: 100;
   }}
-</style>
+{TABLE_CSS}</style>
 </head>
-<body>
+<body class="view-table">
 
 <div id="toolbar">
   <h1>LED Arcade Timeline</h1>
-  <button class="filter-btn active" data-dir="visuals">visuals</button>
-  <button class="filter-btn active" data-dir="games">games</button>
-  <button class="filter-btn active" data-dir="tools">tools</button>
-  <button class="filter-btn active" data-dir="site">site</button>
+  <button class="filter-btn active chart-only" data-dir="visuals">visuals</button>
+  <button class="filter-btn active chart-only" data-dir="games">games</button>
+  <button class="filter-btn active chart-only" data-dir="tools">tools</button>
+  <button class="filter-btn active chart-only" data-dir="site">site</button>
   <div class="tb-spacer"></div>
-  <button class="tb-btn" id="y-axis-toggle">Y: lines</button>
-  <button class="tb-btn" id="reset-btn">reset zoom</button>
+  <button class="tb-btn chart-only" id="y-axis-toggle">Y: lines</button>
+  <button class="tb-btn chart-only" id="reset-btn">reset zoom</button>
+  <button class="tb-btn" id="view-toggle">view: table</button>
 </div>
 
 <div id="canvas-wrap"><canvas id="c"></canvas></div>
-<div id="tooltip"></div>
+{TABLE_HTML}<div id="tooltip"></div>
 <div id="help">scroll to zoom &middot; drag to pan &middot; click buttons to filter</div>
 
 <script>
 const DATA = {data_json};
+const ITEMS = {items_json};
 
 const DIR_COLORS = {{
   visuals: {{ dot: '#4caf50', glow: '#4caf5044', label: '#6fcf73' }},
@@ -249,7 +519,7 @@ function init() {{
     dragging = false; hoveredItem = null; hideTooltip(); draw();
   }});
 
-  document.querySelectorAll('.filter-btn').forEach(btn => {{
+  document.querySelectorAll('.filter-btn[data-dir]').forEach(btn => {{
     btn.addEventListener('click', () => {{
       filters[btn.dataset.dir] = !filters[btn.dataset.dir];
       btn.classList.toggle('active', filters[btn.dataset.dir]);
@@ -295,7 +565,7 @@ function computeBounds() {{
 }}
 
 function updateCounts() {{
-  document.querySelectorAll('.filter-btn').forEach(btn => {{
+  document.querySelectorAll('.filter-btn[data-dir]').forEach(btn => {{
     const dir = btn.dataset.dir;
     const n = DATA.filter(d => d.dir === dir).length;
     btn.textContent = dir + ' (' + n + ')';
@@ -522,7 +792,9 @@ function hideTooltip() {{
   document.getElementById('tooltip').style.display = 'none';
 }}
 
+{TABLE_JS}
 init();
+initTable();
 </script>
 </body>
 </html>"""
@@ -540,7 +812,7 @@ def main():
     args = parser.parse_args()
 
     data = extract()
-    html = build_html(data)
+    html = build_html(data, extract_items(data))
 
     out_path = Path(args.output)
     out_path.write_text(html)
