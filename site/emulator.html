@@ -171,7 +171,10 @@ body, .masthead, .lab-display, .rule { transition: background-color 2s, color 2s
   const emuFrame = document.getElementById('emuFrame');
   const emuOverlay = document.getElementById('emuClickOverlay');
 
-  const GITHUB_RAW = 'https://raw.githubusercontent.com/thisElazar/ledarcade/main/';
+  // Local dev (serve the repo root, open /site/emulator.html) runs the working-tree games
+  const GITHUB_RAW = ['localhost', '127.0.0.1'].includes(location.hostname)
+    ? '../'
+    : 'https://raw.githubusercontent.com/thisElazar/ledarcade/main/';
 
   const pyRenderer = new LEDRenderer(pyLedCanvas);
   const pyDisplay = new Display();
@@ -1325,10 +1328,13 @@ _exit_hold = 0.0
   setStatus('ready', 'ready');
   emuState = 'menu';
 
-  const GAME_SPEED = 0.85;       // games only — web visitors are first-timers on keyboards
-  let pyLastTime = performance.now();
+  // Tick like the cabinet: update() always sees dt = 1/30, whatever the browser's refresh rate.
+  // GAME_SPEED slows the clock, not dt, so games behave exactly as on hardware, just slower.
+  const CABINET_DT = 1 / 30;
+  const GAME_SPEED = 0.70;      // games only — web visitors are first-timers on keyboards
+  let pyNextTick = performance.now();
   let pyFrameCount = 0;
-  let pyFpsTimer = 0;
+  let pyFpsTimer = performance.now();
   let pendingLaunch = null;
   let playlistItems = null;
   let playlistIsGame = false;
@@ -1350,8 +1356,15 @@ _exit_hold = 0.0
   }
 
   function pyLoop(timestamp) {
-    const dt = Math.min((timestamp - pyLastTime) / 1000, 0.05);
-    pyLastTime = timestamp;
+    const inGame = emuState === 'running' && pyodide.globals.get('_is_game');
+    const realDt = CABINET_DT / (inGame ? GAME_SPEED : 1);
+    if (timestamp < pyNextTick - 4) {   // 4ms slack for rAF timestamp jitter
+      requestAnimationFrame(pyLoop);
+      return;
+    }
+    // A stalled browser skips the ticks it missed rather than replaying them
+    pyNextTick = Math.max(pyNextTick + realDt * 1000, timestamp);
+    const dt = CABINET_DT;
 
     if (hasFocus) {
       pushInputToPython();
@@ -1430,12 +1443,12 @@ _sel
 if _item:
     if _is_game:
         try:
-            _item.update(_input, ${dt * GAME_SPEED})
+            _item.update(_input, ${dt})
             _item.draw()
         except Exception as _e:
             _item.state = GameState.GAME_OVER
         if _input.action_l_held and _input.action_r_held:
-            _exit_hold += ${dt}
+            _exit_hold += ${realDt}
         else:
             _exit_hold = 0.0
         if _exit_hold >= 2.0:
@@ -1547,11 +1560,10 @@ _exit_hold = 0.0
     }
 
     pyFrameCount++;
-    pyFpsTimer += dt;
-    if (pyFpsTimer >= 1.0) {
+    if (timestamp - pyFpsTimer >= 1000) {
       pyFpsEl.textContent = pyFrameCount + ' fps \u00b7 Python via Pyodide';
       pyFrameCount = 0;
-      pyFpsTimer = 0;
+      pyFpsTimer = timestamp;
     }
 
     requestAnimationFrame(pyLoop);
