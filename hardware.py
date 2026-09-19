@@ -74,6 +74,17 @@ class Colors:
     GRAY = (128, 128, 128)
     DARK_GRAY = (64, 64, 64)
 
+    # Named game colors
+    SNAKE = GREEN
+    FOOD = RED
+    WALL = GRAY
+    PADDLE = WHITE
+    BALL = WHITE
+    BRICK = ORANGE
+    PLAYER = CYAN
+    ENEMY = RED
+    BULLET = YELLOW
+
 
 # =============================================================================
 # SHARED 3x5 FONT

@@ -873,6 +873,7 @@ def main(display_class=Display):
                                 in_shuffle_mode = True
                                 in_menu = False
                                 exit_hold = 0.0
+                                visual_exit_hold = 0.0
                             else:
                                 current_item = item_class(display)
                                 current_item.reset()
@@ -882,6 +883,7 @@ def main(display_class=Display):
                                 shuffle_playlist = None
                                 in_menu = False
                                 exit_hold = 0.0
+                                visual_exit_hold = 0.0
 
                     # Update name scroll for selected item
                     if cat_index != prev_cat_index or item_index != prev_item_index:
@@ -898,19 +900,21 @@ def main(display_class=Display):
 
         else:
             # Running item (game or visual)
-            # Hold BOTH buttons 2 sec to return to menu (games need both to avoid conflicts)
-            if input_state.action_l_held and input_state.action_r_held:
-                exit_hold += dt
-                if exit_hold >= 2.0:
-                    in_menu = True
-                    current_item = None
-                    game_over_initialized = False
-                    in_shuffle_mode = False
-                    shuffle_playlist = None
-                    idle_timer = 0.0
+            # Games: hold BOTH buttons 2 sec to return to menu
+            # Visuals: handled below, so custom_exit visuals can opt out (as on the cabinet)
+            if is_game:
+                if input_state.action_l_held and input_state.action_r_held:
+                    exit_hold += dt
+                    if exit_hold >= 2.0:
+                        in_menu = True
+                        current_item = None
+                        game_over_initialized = False
+                        in_shuffle_mode = False
+                        shuffle_playlist = None
+                        idle_timer = 0.0
+                        exit_hold = 0.0
+                else:
                     exit_hold = 0.0
-            else:
-                exit_hold = 0.0
 
             if current_item:
                 if is_game:

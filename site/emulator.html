@@ -403,21 +403,22 @@ body, .masthead, .lab-display, .rule { transition: background-color 2s, color 2s
     }
   });
 
-  // Both buttons = Space (action_l) — matching hardware layout
-  for (const btn of [btnL, btnR]) {
+  // Left button = Space (action_l), right button = Z (action_r) — as wired on the
+  // cabinet. Holding both for 2s leaves a game or visual, same as the panel.
+  for (const [btn, key] of [[btnL, ' '], [btnR, 'z']]) {
     btn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       emuFrame.focus();
-      keys[' '] = true;
+      keys[key] = true;
       btn.classList.add('pressed');
     }, { passive: false });
     btn.addEventListener('touchend', (e) => {
       e.preventDefault();
-      keys[' '] = false;
+      keys[key] = false;
       btn.classList.remove('pressed');
     }, { passive: false });
     btn.addEventListener('touchcancel', () => {
-      keys[' '] = false;
+      keys[key] = false;
       btn.classList.remove('pressed');
     });
   }
@@ -561,7 +562,7 @@ class Colors:
     ENEMY = RED
     BULLET = YELLOW
 
-FONT_3X5 = {
+FONT_3X5 = {  # generated from arcade._FONT_3X5 — tests/test_interface_parity.py keeps it in sync
     'A':['010','101','111','101','101'],'B':['110','101','110','101','110'],
     'C':['011','100','100','100','011'],'D':['110','101','101','101','110'],
     'E':['111','100','110','100','111'],'F':['111','100','110','100','100'],
@@ -583,17 +584,37 @@ FONT_3X5 = {
     ' ':['000','000','000','000','000'],':':['000','010','000','010','000'],
     '-':['000','000','111','000','000'],'.':['000','000','000','000','010'],
     '!':['010','010','010','000','010'],'?':['110','001','010','000','010'],
-    '/':['001','001','010','100','100'],
-    "'":['010','010','000','000','000'],
-    '+':['000','010','111','010','000'],
-    '*':['101','010','111','010','101'],
-    '(':['010','100','100','100','010'],
-    ')':['010','001','001','001','010'],
+    '+':['000','010','111','010','000'],'#':['010','111','010','111','010'],
+    '/':['001','010','010','010','100'],'>':['100','010','001','010','100'],
+    '^':['010','101','000','000','000'],'a':['000','011','101','101','011'],
+    'b':['100','100','110','101','110'],'c':['000','011','100','100','011'],
+    'd':['001','001','011','101','011'],'e':['000','010','111','100','011'],
+    'f':['001','010','110','010','010'],'g':['000','011','101','011','110'],
+    'h':['100','100','110','101','101'],'i':['010','000','010','010','010'],
+    'j':['010','000','010','010','100'],'k':['100','101','110','110','101'],
+    'l':['110','010','010','010','010'],'m':['000','000','111','111','101'],
+    'n':['000','000','110','101','101'],'o':['000','000','010','101','010'],
+    'p':['000','110','101','110','100'],'q':['000','011','101','011','001'],
+    'r':['000','000','011','100','100'],'s':['000','011','010','010','110'],
+    't':['010','010','111','010','011'],'u':['000','000','101','101','011'],
+    'v':['000','000','101','101','010'],'w':['000','000','101','111','111'],
+    'x':['000','000','101','010','101'],'y':['000','101','101','011','110'],
+    'z':['000','000','111','010','111'],'@':['011','101','111','100','011'],
+    '_':['000','000','000','000','111'],'$':['011','110','010','011','110'],
+    '%':['101','001','010','100','101'],'&':['010','101','010','101','011'],
+    '*':['000','101','010','101','000'],'(':['001','010','010','010','001'],
+    ')':['100','010','010','010','100'],'=':['000','111','000','111','000'],
+    '~':['000','000','011','110','000'],"'":['010','010','000','000','000'],
+    '"':['101','101','000','000','000'],',':['000','000','000','010','100'],
+    ';':['000','010','000','010','100'],'<':['001','010','100','010','001'],
 }
 
 class Display:
     def __init__(self):
         self.buffer = bytearray(GRID_SIZE * GRID_SIZE * 3)
+        # Same flat RGB layout as the cabinet's HardwareDisplay._fb, so visuals
+        # that blit whole frames (Solitaire, Earth, Atlas) take that path here.
+        self._fb = self.buffer
 
     def clear(self, color=None):
         if color is None: color = (0, 0, 0)
@@ -632,15 +653,15 @@ class Display:
 
     def draw_line(self, x0, y0, x1, y1, color):
         x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
-        dx = abs(x1 - x0); dy = -abs(y1 - y0)
+        dx = abs(x1 - x0); dy = abs(y1 - y0)
         sx = 1 if x0 < x1 else -1; sy = 1 if y0 < y1 else -1
-        err = dx + dy
+        err = dx - dy
         while True:
             self.set_pixel(x0, y0, color)
             if x0 == x1 and y0 == y1: break
             e2 = 2 * err
-            if e2 >= dy: err += dy; x0 += sx
-            if e2 <= dx: err += dx; y0 += sy
+            if e2 > -dy: err -= dy; x0 += sx
+            if e2 < dx: err += dx; y0 += sy
 
     def draw_circle(self, cx, cy, r, color, filled=False):
         for dy in range(-r, r + 1):
@@ -652,8 +673,11 @@ class Display:
                     if abs(d2 - r * r) < r * 2: self.set_pixel(cx + dx, cy + dy, color)
 
     def draw_text_small(self, x, y, text, color):
+        self.draw_text_raw(x, y, text.upper(), color)
+
+    def draw_text_raw(self, x, y, text, color):
         cursor = int(x)
-        for char in text.upper():
+        for char in text:
             glyph = FONT_3X5.get(char)
             if glyph:
                 for r in range(5):
