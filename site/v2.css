@@ -105,6 +105,8 @@ section .wrap { padding-block: 44px 52px; }
     linear-gradient(to top left, transparent calc(50% - 0.5px), var(--rule-2), transparent calc(50% + 0.5px));
 }
 .figure .well span { background: var(--paper); padding: 6px 14px; }
+.figure img { display: block; width: 100%; height: auto; }
+.figure.portrait { max-width: 560px; margin-inline: auto; }
 .figure figcaption { margin-top: 10px; font-size: 16px; }
 .figure figcaption .no { font-variant-caps: all-small-caps; letter-spacing: 0.1em; font-weight: 600; color: var(--rubric); }
 
