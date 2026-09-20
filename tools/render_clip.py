@@ -225,6 +225,14 @@ def _blit_text(canvas, font, text, y, color, spacing=0):
         x += cw + spacing
 
 
+# str.title() would print these as "Dna", "Tv", "3d"
+_KEEP_UPPER = {"DNA", "DVD", "GIF", "LED", "TV", "USB", "VHS", "XOR", "3D", "II", "III", "IV", "VI", "VII", "VIII"}
+
+
+def _title_case(text):
+    return " ".join(w if w in _KEEP_UPPER else w.title() for w in text.split(" "))
+
+
 # 4:5 carousel slide: same page, shorter
 S_H, S_PANEL_Y, S_BRAND_Y, S_BRAND_SIZE = 1350, 165, 30, 84
 
@@ -262,7 +270,7 @@ class PaperComposer(Composer):
         y = self.py + 1024 + MOUNT_PAD + 1
         self.canvas[y:, :] = 255
         dy_title, dy_sub = (26, 108) if self.slide else (34, 122)
-        _blit_text(self.canvas, self.serif, head.strip().title() if head.isupper() else head.strip(), y + dy_title, INK)
+        _blit_text(self.canvas, self.serif, _title_case(head.strip()) if head.isupper() else head.strip(), y + dy_title, INK)
         if sub.strip():
             _blit_text(self.canvas, self.mono, sub.strip().upper(), y + dy_sub, INK_3, spacing=3)
 
