@@ -61,6 +61,10 @@ COLOR_SCHEMES = [
     },
 ]
 
+# How many fish swim in the tank. One per species left the 64x46 water looking
+# empty, so each species gets a few; schooling reads properly with a crowd.
+FISH_COUNT = 20
+
 # Fish species: (name, base_color, secondary_color)
 FISH_SPECIES = [
     ('clown',    (255, 100, 30),  (255, 255, 255)),  # clownfish
@@ -261,10 +265,10 @@ class Aquarium(Visual):
             color = scheme['plants'][i % len(scheme['plants'])]
             self.plants.append(Plant(px, pt, color))
 
-        # Create 8 fish (one of each species)
+        # Stock the tank, cycling through the species so each is represented
         self.fish = []
-        for i in range(8):
-            self.fish.append(Fish(i, WALL_TOP, WALL_BOT))
+        for i in range(FISH_COUNT):
+            self.fish.append(Fish(i % len(FISH_SPECIES), WALL_TOP, WALL_BOT))
 
         # Schooling cooldown: when fish cluster too long, they scatter
         self.school_timer = 0.0      # time fish have been clustered
