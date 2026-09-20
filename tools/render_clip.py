@@ -117,10 +117,14 @@ def _card_strip(card):
     return strip
 
 
-def catalog_label(cls):
+def catalog_label(cls, paper=False):
     """'NAME :: CATEGORY - CREDIT' straight from site/guide.json, the cabinet's
     own catalog. Falls back to 'CATEGORY - YEAR' when the credit is too long
-    for one line. Paintings resolve to 'TITLE :: ART - ARTIST, YEAR'."""
+    for one line. Paintings resolve to 'TITLE :: ART - ARTIST, YEAR'.
+
+    The paper page sets type rather than LEDs, so it has room for a longer
+    credit line and keeps a painting's title in the guide's own casing
+    ("Girl with a Pearl Earring", not "Girl With A Pearl Earring")."""
     import json
     import re
     g = json.load(open(os.path.join(os.path.dirname(HERE), "site", "guide.json")))
@@ -128,7 +132,7 @@ def catalog_label(cls):
 
     def label(title, cat, credit):
         sub = f"{cat} - {credit}" if credit else cat
-        if len(sub) > 32:
+        if len(sub) > (56 if paper else 32):
             year = re.search(r"-?\d{3,4}$", credit)
             sub = f"{cat} - {year.group()}" if year else cat
         return f"{title.upper()} :: {sub.upper()}"
@@ -140,6 +144,9 @@ def catalog_label(cls):
         for p in cat.get("paintings", []):
             for w in p.get("works", []):
                 if w["title"].upper() == name.upper():
+                    if paper:
+                        return label(w["title"], cat["name"], f"{p['artist']}, {w['year']}").replace(
+                            w["title"].upper(), w["title"], 1)
                     return label(w["title"], cat["name"], f"{p['artist']}, {w['year']}")
     return name.upper()
 
@@ -520,7 +527,7 @@ def main():
     elif a.name:
         cls = _find(a.name)
         if a.label:
-            a.title = catalog_label(cls)
+            a.title = catalog_label(cls, a.paper)
         if a.stills or a.states:
             out = a.out or f"{cls.__name__.lower()}_slide.png"
             (render_states if a.states else render_stills)(cls, a, out)
