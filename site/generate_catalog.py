@@ -10,8 +10,19 @@ Matches the arcade machine's catalog.py registration logic:
 import ast
 import json
 import os
+import unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def strip_accents(s):
+    """Replace accented characters with ASCII equivalents for LED font.
+
+    Mirrors visuals/painting.py:_strip_accents — the cabinet strips accents when
+    it builds each painting class's name, so the catalog must strip them too.
+    """
+    nfkd = unicodedata.normalize('NFKD', s)
+    return ''.join(c for c in nfkd if not unicodedata.combining(c))
 
 # Category definitions matching catalog.py exactly
 GAME_CATEGORIES = [
@@ -282,7 +293,7 @@ def scan_painting_entries():
             continue
         cls_name = 'Painting' + ''.join(w.capitalize() for w in pid.split('_'))
         entries.append({
-            'name': title.upper(),
+            'name': strip_accents(title).upper(),
             'cls': cls_name,
             'module': 'visuals/painting.py',
             'is_game': False,

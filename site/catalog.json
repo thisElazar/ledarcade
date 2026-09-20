@@ -983,7 +983,7 @@
       "key": "art",
       "items": [
         {
-          "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+          "name": "A BAR AT THE FOLIES-BERGERE",
           "cls": "PaintingBarFoliesBergere",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1073,13 +1073,13 @@
           "is_game": false
         },
         {
-          "name": "BATHERS AT ASNI\u00c8RES",
+          "name": "BATHERS AT ASNIERES",
           "cls": "PaintingBathersAsnieres",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "BATTLE OF MOH\u00c1CS",
+          "name": "BATTLE OF MOHACS",
           "cls": "PaintingOttomanMohacs",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1097,7 +1097,7 @@
           "is_game": false
         },
         {
-          "name": "BIB\u00c9MUS QUARRIES",
+          "name": "BIBEMUS QUARRIES",
           "cls": "PaintingCezanneBibemus",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1157,7 +1157,7 @@
           "is_game": false
         },
         {
-          "name": "CAF\u00c9 TERRACE AT NIGHT",
+          "name": "CAFE TERRACE AT NIGHT",
           "cls": "PaintingCafeTerrace",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1367,7 +1367,7 @@
           "is_game": false
         },
         {
-          "name": "JEANNE H\u00c9BUTERNE",
+          "name": "JEANNE HEBUTERNE",
           "cls": "PaintingModiglianiPortrait",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1379,7 +1379,7 @@
           "is_game": false
         },
         {
-          "name": "LA GRENOUILL\u00c8RE",
+          "name": "LA GRENOUILLERE",
           "cls": "PaintingRenoirGrenouillere",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1421,13 +1421,13 @@
           "is_game": false
         },
         {
-          "name": "MAEST\u00c0",
+          "name": "MAESTA",
           "cls": "PaintingCimabueMaesta",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "MAEST\u00c0",
+          "name": "MAESTA",
           "cls": "PaintingDuccioMaesta",
           "module": "visuals/painting.py",
           "is_game": false
@@ -1441,6 +1441,12 @@
         {
           "name": "MELENCOLIA I",
           "cls": "PaintingDurerMelencolia",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "MERODE ALTARPIECE",
+          "cls": "PaintingCampinMerode",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1477,12 +1483,6 @@
         {
           "name": "MUSICAL GROUP BY CANDLELIGHT",
           "cls": "PaintingHonthorstCandlelight",
-          "module": "visuals/painting.py",
-          "is_game": false
-        },
-        {
-          "name": "M\u00c9RODE ALTARPIECE",
-          "cls": "PaintingCampinMerode",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -1543,6 +1543,12 @@
         {
           "name": "OPHELIA",
           "cls": "PaintingOphelia",
+          "module": "visuals/painting.py",
+          "is_game": false
+        },
+        {
+          "name": "OTANI ONIJI III AS YAKKO EDOBEI",
+          "cls": "PaintingSharakuActor",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2255,14 +2261,14 @@
           "is_game": false
         },
         {
-          "name": "TRINITY",
-          "cls": "PaintingRublevTrinity",
+          "name": "TRES RICHES HEURES (JANUARY)",
+          "cls": "PaintingTresRichesHeures",
           "module": "visuals/painting.py",
           "is_game": false
         },
         {
-          "name": "TR\u00c8S RICHES HEURES (JANUARY)",
-          "cls": "PaintingTresRichesHeures",
+          "name": "TRINITY",
+          "cls": "PaintingRublevTrinity",
           "module": "visuals/painting.py",
           "is_game": false
         },
@@ -2389,12 +2395,6 @@
         {
           "name": "YUSUF AND ZULAIKHA",
           "cls": "PaintingBehzadYusuf",
-          "module": "visuals/painting.py",
-          "is_game": false
-        },
-        {
-          "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
-          "cls": "PaintingSharakuActor",
           "module": "visuals/painting.py",
           "is_game": false
         }
@@ -7243,7 +7243,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "A BAR AT THE FOLIES-BERG\u00c8RE",
+              "name": "A BAR AT THE FOLIES-BERGERE",
               "cls": "PaintingBarFoliesBergere",
               "module": "visuals/painting.py"
             },
@@ -7298,7 +7298,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "LA GRENOUILL\u00c8RE",
+              "name": "LA GRENOUILLERE",
               "cls": "PaintingRenoirGrenouillere",
               "module": "visuals/painting.py"
             },
@@ -7318,7 +7318,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATHERS AT ASNI\u00c8RES",
+              "name": "BATHERS AT ASNIERES",
               "cls": "PaintingBathersAsnieres",
               "module": "visuals/painting.py"
             },
@@ -7358,7 +7358,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "CAF\u00c9 TERRACE AT NIGHT",
+              "name": "CAFE TERRACE AT NIGHT",
               "cls": "PaintingCafeTerrace",
               "module": "visuals/painting.py"
             },
@@ -7423,7 +7423,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BIB\u00c9MUS QUARRIES",
+              "name": "BIBEMUS QUARRIES",
               "cls": "PaintingCezanneBibemus",
               "module": "visuals/painting.py"
             },
@@ -7543,7 +7543,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "JEANNE H\u00c9BUTERNE",
+              "name": "JEANNE HEBUTERNE",
               "cls": "PaintingModiglianiPortrait",
               "module": "visuals/painting.py"
             },
@@ -7768,12 +7768,12 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAEST\u00c0",
+              "name": "MAESTA",
               "cls": "PaintingCimabueMaesta",
               "module": "visuals/painting.py"
             },
             {
-              "name": "MAEST\u00c0",
+              "name": "MAESTA",
               "cls": "PaintingDuccioMaesta",
               "module": "visuals/painting.py"
             },
@@ -7798,7 +7798,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "M\u00c9RODE ALTARPIECE",
+              "name": "MERODE ALTARPIECE",
               "cls": "PaintingCampinMerode",
               "module": "visuals/painting.py"
             },
@@ -7848,7 +7848,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "\u014cTANI ONIJI III AS YAKKO EDOBEI",
+              "name": "OTANI ONIJI III AS YAKKO EDOBEI",
               "cls": "PaintingSharakuActor",
               "module": "visuals/painting.py"
             },
@@ -7903,7 +7903,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "TR\u00c8S RICHES HEURES (JANUARY)",
+              "name": "TRES RICHES HEURES (JANUARY)",
               "cls": "PaintingTresRichesHeures",
               "module": "visuals/painting.py"
             },
@@ -7948,7 +7948,7 @@
               "module": "visuals/painting.py"
             },
             {
-              "name": "BATTLE OF MOH\u00c1CS",
+              "name": "BATTLE OF MOHACS",
               "cls": "PaintingOttomanMohacs",
               "module": "visuals/painting.py"
             },
