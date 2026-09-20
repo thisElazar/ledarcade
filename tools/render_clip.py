@@ -317,6 +317,8 @@ def render_single(cls, a, out):
     display = Display()
     vis = cls(display)
     dt = 1.0 / a.fps
+    if getattr(a, "set_state", None):
+        _apply_state(vis, a.set_state)
     _warm(vis, a.skip, dt)
     cards = parse_cards(a.cards) if a.cards else None
     comp = _composer(a)
@@ -337,6 +339,8 @@ def render_stills(cls, a, out):
     display = Display()
     vis = cls(display)
     dt = 1.0 / a.fps
+    if getattr(a, "set_state", None):
+        _apply_state(vis, a.set_state)
     _warm(vis, a.skip, dt)
     comp = PaperComposer(a.title, "Wonder Cabinet" if a.brand == "WONDER CABINET" else a.brand, slide=True)
     times = sorted(float(t) for t in a.stills.split(","))
@@ -355,44 +359,66 @@ def render_stills(cls, a, out):
             print(f"{base}_{k}.png")
 
 
-def _parse_state(spec):
-    out = {}
-    for kv in spec.split(","):
-        k, _, v = kv.partition("=")
-        try:
-            v = float(v) if "." in v else int(v)
-        except ValueError:
-            pass
-        out[k.strip()] = v
-    return out
+class _Press:
+    """Fake input_state: one key reads as pressed, everything else False."""
+    def __init__(self, key):
+        self.key = key
+    def __getattr__(self, name):
+        return name == self.key or name == f"{self.key}_pressed"
+
+
+def _apply_state(vis, spec):
+    """'f=0.01,k=0.047'  set attributes
+       'right*3'         press a key 3 times through handle_input (right/left/up/down/action_l/action_r)
+       '_shuffle_and_start()'  call a method"""
+    for tok in spec.split(","):
+        tok = tok.strip()
+        if not tok:
+            continue
+        if tok.endswith("()"):
+            getattr(vis, tok[:-2])()
+        elif "*" in tok and "=" not in tok:
+            key, _, n = tok.partition("*")
+            for _ in range(int(n or 1)):
+                vis.handle_input(_Press(key.strip()))
+        else:
+            k, _, v = tok.partition("=")
+            try:
+                v = float(v) if "." in v else int(v)
+            except ValueError:
+                pass
+            if not hasattr(vis, k.strip()):
+                sys.exit(f"{type(vis).__name__} has no attribute {k.strip()!r}")
+            setattr(vis, k.strip(), v)
 
 
 def render_states(cls, a, out):
-    """Carousel slides from one visual at several parameter states: for each
-    'a=1,b=2' group in --states, build a fresh instance, set those attributes,
-    run --skip seconds, then save one 4:5 PNG. If the visual has a
-    param_overlay_timer it is re-armed so the panel labels its own state."""
+    """Carousel slides from one visual at several states: for each | group in
+    --states, build a fresh instance, apply the group (see _apply_state), run
+    --skip seconds, then save one 4:5 PNG — or, if --out ends in .mp4, record
+    --seconds of 4:5 video. A param_overlay_timer, if present, is re-armed so
+    the panel labels its own state."""
     from arcade import Display
     display = Display()
     dt = 1.0 / a.fps
     comp = PaperComposer(a.title, "Wonder Cabinet" if a.brand == "WONDER CABINET" else a.brand, slide=True)
-    base = out[:-4] if out.endswith(".png") else out
+    video = out.endswith(".mp4")
+    base = out[:-4]
     for k, spec in enumerate(a.states.split("|"), 1):
         vis = cls(display)
-        for attr, val in _parse_state(spec).items():
-            if not hasattr(vis, attr):
-                sys.exit(f"{cls.__name__} has no attribute {attr!r}")
-            setattr(vis, attr, val)
+        _apply_state(vis, spec)
         _warm(vis, a.skip, dt)
         if hasattr(vis, "param_overlay_timer"):
             vis.param_overlay_timer = 2.0
-        vis.update(dt)
-        vis.draw()
-        ff = _open_ffmpeg(f"{base}_{k}.png", a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py))
-        ff.stdin.write(comp.frame(display))
+        fn = f"{base}_{k}.mp4" if video else f"{base}_{k}.png"
+        ff = _open_ffmpeg(fn, a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py))
+        for _ in range(int(a.seconds * a.fps) if video else 1):
+            vis.update(dt)
+            vis.draw()
+            ff.stdin.write(comp.frame(display))
         ff.stdin.close()
         ff.wait()
-        print(f"{base}_{k}.png  {spec}")
+        print(f"{fn}  {spec}")
 
 
 def render_montage(classes, a, out):
@@ -449,6 +475,11 @@ def main():
     ap.add_argument("--no-glow", action="store_true")
     ap.add_argument("--title", help="text above the panel (vertical only)")
     ap.add_argument("--states", help='carousel: "f=0.01,k=0.047|f=0.026,k=0.051" — one fresh run and one PNG per | group')
+    ap.add_argument("--set", dest="set_state",
+                    help='put the visual into a state before recording, same grammar as '
+                         '--states: "attr=value", "method()", "right*3" (a key pressed n '
+                         'times through handle_input). Several are comma-separated. '
+                         'Replaces the one-off wrapper scripts in marketing/tools/.')
     ap.add_argument("--stills", help='carousel: comma-separated seconds, one 1080x1350 paper-style PNG each (e.g. "2,10,18")')
     ap.add_argument("--paper", action="store_true", help="site style: white page, serif title, ruled mount (implies --vertical)")
     ap.add_argument("--label", action="store_true", help="title from the catalog: NAME over CATEGORY - CREDIT (vertical only)")
