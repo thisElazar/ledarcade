@@ -330,6 +330,30 @@ class HardwareDisplay:
         """Draw tiny 3x5 pixel text (uppercased). 3 wide + 1 space per char."""
         self._render_font(x, y, text.upper(), color)
 
+    def draw_text_clipped(self, x: int, y: int, text: str, color: Tuple[int, int, int],
+                          x0: int, x1: int):
+        """Draw uppercased 3x5 text at x, painting only columns inside [x0, x1).
+
+        Unlike draw_text_small, x may be negative and glyphs may be cut through
+        the middle of a column — what a scrolling marquee needs. Without this,
+        every marquee had to reach into the font table itself, and ten visuals
+        ended up carrying their own drifting copies of it.
+        """
+        text = text.upper()
+        for cx in range(max(x0, 0), min(x1, GRID_SIZE)):
+            px = cx - x
+            if px < 0:
+                continue
+            char_idx, col = divmod(px, 4)
+            if col >= 3 or char_idx >= len(text):
+                continue
+            glyph = _FONT_3X5.get(text[char_idx])
+            if glyph is None:
+                continue
+            for row_idx, row in enumerate(glyph):
+                if row[col] == '1':
+                    self.set_pixel(cx, y + row_idx, color)
+
     def draw_text_raw(self, x: int, y: int, text: str, color: Tuple[int, int, int]):
         """Draw tiny 3x5 text WITHOUT uppercasing — supports lowercase + symbols."""
         self._render_font(x, y, text, color)

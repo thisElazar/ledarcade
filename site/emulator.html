@@ -675,6 +675,23 @@ class Display:
     def draw_text_small(self, x, y, text, color):
         self.draw_text_raw(x, y, text.upper(), color)
 
+    def draw_text_clipped(self, x, y, text, color, x0, x1):
+        text = text.upper()
+        x = int(x); y = int(y)
+        for cx in range(max(int(x0), 0), min(int(x1), GRID_SIZE)):
+            px = cx - x
+            if px < 0:
+                continue
+            char_idx, col = divmod(px, 4)
+            if col >= 3 or char_idx >= len(text):
+                continue
+            glyph = FONT_3X5.get(text[char_idx])
+            if glyph is None:
+                continue
+            for r in range(5):
+                if glyph[r][col] == '1':
+                    self.set_pixel(cx, y + r, color)
+
     def draw_text_raw(self, x, y, text, color):
         cursor = int(x)
         for char in text:

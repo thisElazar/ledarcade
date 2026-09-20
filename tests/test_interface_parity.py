@@ -219,6 +219,93 @@ def test_emulator_font_matches_sim():
     assert not differ, f"emulator glyphs drawn differently: {differ}"
 
 
+def test_site_shared_js_font_matches_sim():
+    """site/shared.js draws the homepage scene plates with its own copy of the
+    font, stored as row bitmasks. It had drifted to 42 uppercase-only glyphs and
+    no drawTextRaw at all, so any lowercase or symbol would have silently
+    vanished the moment a JS scene drew one.
+    """
+    import json
+    import os
+    import re
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, "site", "shared.js"), encoding="utf-8") as f:
+        src = f.read()
+    literal = re.search(r"const FONT = (\{.*?\n\});", src, re.S).group(1)
+    table = json.loads(re.sub(r",(\s*\})", r"\1", literal))
+
+    expected = {ch: [int(row, 2) for row in rows]
+                for ch, rows in arcade._FONT_3X5.items()}
+    assert table == expected, "site/shared.js FONT has drifted from arcade._FONT_3X5"
+    for method in ("drawTextRaw(", "drawTextClipped("):
+        assert method in src, f"site/shared.js Display is missing {method})"
+
+
+def test_no_module_carries_its_own_font():
+    """One font, one source of truth.
+
+    Marquee scrolling needs a glyph clipped to a single column, which
+    draw_text_small cannot do, so ten visuals each pasted their own copy of the
+    font table and trimmed it. They drifted: characters went missing ('%' and
+    '=' in BAKING), and '(' ')' '/' ended up drawn differently from the rest of
+    the cabinet -- visible in the same string, since _draw_scrolling_text falls
+    back to draw_text_small whenever the text happens to fit. Display now has
+    draw_text_clipped, so nothing needs a private copy.
+    """
+    import ast
+    import glob
+    import os
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    offenders = []
+    for path in sorted(glob.glob(os.path.join(root, "visuals", "*.py"))
+                       + glob.glob(os.path.join(root, "games", "*.py"))):
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        # ast.walk, not tree.body: rudiments.py and chordchart.py each hid a
+        # font dict *inside a method*, where a module-level scan never saw it.
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Dict):
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name) and "FONT" in target.id.upper():
+                    offenders.append(f"{os.path.basename(path)}:{node.lineno} ({target.id})")
+    assert not offenders, (
+        "these modules define their own font table instead of importing "
+        f"arcade._FONT_3X5: {offenders}. Use display.draw_text_clipped() for "
+        "marquee text rather than reaching into the glyphs."
+    )
+
+
+def test_catalog_names_are_renderable():
+    """The emulator draws its menu from site/catalog.json, and a character the
+    font lacks draws nothing while still advancing the cursor — a hole in the
+    middle of the word. The cabinet strips accents when it builds each painting
+    class's name (visuals/painting.py), so site/generate_catalog.py has to strip
+    them too; it once did not, and 11 paintings read 'CAF  TERRACE AT NIGHT'.
+    """
+    import json
+    import os
+
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "site", "catalog.json")
+    with open(path, encoding="utf-8") as f:
+        catalog = json.load(f)
+
+    font = set(arcade._FONT_3X5)
+    unrenderable = []
+    for category in catalog["categories"]:
+        for item in category.get("items", []):
+            missing = {c for c in item["name"] if c.upper() not in font and c not in font}
+            if missing:
+                unrenderable.append((item["name"], "".join(sorted(missing))))
+    assert not unrenderable, (
+        "catalog.json names the emulator cannot draw: "
+        f"{unrenderable}. Regenerate with site/generate_catalog.py."
+    )
+
+
 def test_emulator_touch_buttons_reach_both_actions():
     """On a phone the two on-screen buttons are the only buttons. They once both
     sent Space, which made the right button (and hold-both-to-exit) unreachable."""

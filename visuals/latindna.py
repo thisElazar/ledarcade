@@ -284,13 +284,8 @@ class LatinDNA(Visual):
         else:
             total = name_px + 16
             sx = int(self._name_scroll_x) % total
-            for cx in range(name_start_x, 63):
-                px = sx + (cx - name_start_x)
-                char_idx = px // 4
-                col = px % 4
-                if col < 3 and 0 <= char_idx < len(name):
-                    self._draw_char_col(d, cx, 1, name[char_idx], col,
-                                        (255, 220, 100))
+            d.draw_text_clipped(name_start_x - sx, 1, name, (255, 220, 100),
+                                name_start_x, 63)
 
     def _draw_beats_and_grid(self, d, pat, cat_color):
         """Draw beat labels, grid cells, bar divider, and playhead."""
@@ -369,13 +364,7 @@ class LatinDNA(Visual):
         else:
             total = desc_px + 20
             sx = int(self._desc_scroll_x) % total
-            for cx in range(1, 63):
-                px = sx + (cx - 1)
-                char_idx = px // 4
-                col = px % 4
-                if col < 3 and 0 <= char_idx < len(desc):
-                    self._draw_char_col(d, cx, DESC_Y, desc[char_idx], col,
-                                        TEXT_DIM)
+            d.draw_text_clipped(1 - sx, DESC_Y, desc, TEXT_DIM, 1, 63)
 
     def _draw_footer(self, d, pat, cat_color):
         d.draw_rect(0, 58, 64, 6, HEADER_BG)
@@ -443,59 +432,11 @@ class LatinDNA(Visual):
         else:
             return ['' for _ in range(n)]
 
-    def _draw_char_col(self, d, x, y, ch, col, color):
-        """Draw a single column of a 3x5 character."""
-        glyph = _FONT.get(ch.upper())
-        if glyph is None or col >= 3:
-            return
-        for row_idx, row in enumerate(glyph):
-            if row[col] == '1':
-                d.set_pixel(x, y + row_idx, color)
-
-
 # ── Shared font for scrolling text ─────────────────────────────────
-_FONT = {
-    'A': ['010', '101', '111', '101', '101'],
-    'B': ['110', '101', '110', '101', '110'],
-    'C': ['011', '100', '100', '100', '011'],
-    'D': ['110', '101', '101', '101', '110'],
-    'E': ['111', '100', '110', '100', '111'],
-    'F': ['111', '100', '110', '100', '100'],
-    'G': ['011', '100', '101', '101', '011'],
-    'H': ['101', '101', '111', '101', '101'],
-    'I': ['111', '010', '010', '010', '111'],
-    'J': ['001', '001', '001', '101', '010'],
-    'K': ['101', '110', '100', '110', '101'],
-    'L': ['100', '100', '100', '100', '111'],
-    'M': ['101', '111', '111', '101', '101'],
-    'N': ['101', '111', '111', '111', '101'],
-    'O': ['010', '101', '101', '101', '010'],
-    'P': ['110', '101', '110', '100', '100'],
-    'Q': ['010', '101', '101', '110', '011'],
-    'R': ['110', '101', '110', '101', '101'],
-    'S': ['011', '100', '010', '001', '110'],
-    'T': ['111', '010', '010', '010', '010'],
-    'U': ['101', '101', '101', '101', '011'],
-    'V': ['101', '101', '101', '010', '010'],
-    'W': ['101', '101', '111', '111', '101'],
-    'X': ['101', '101', '010', '101', '101'],
-    'Y': ['101', '101', '010', '010', '010'],
-    'Z': ['111', '001', '010', '100', '111'],
-    ' ': ['000', '000', '000', '000', '000'],
-    '-': ['000', '000', '111', '000', '000'],
-    '+': ['000', '010', '111', '010', '000'],
-    '/': ['001', '001', '010', '100', '100'],
-    '0': ['111', '101', '101', '101', '111'],
-    '1': ['010', '110', '010', '010', '111'],
-    '2': ['110', '001', '010', '100', '111'],
-    '3': ['110', '001', '010', '001', '110'],
-    '4': ['101', '101', '111', '001', '001'],
-    '5': ['111', '100', '110', '001', '110'],
-    '6': ['011', '100', '110', '101', '010'],
-    '7': ['111', '001', '010', '010', '010'],
-    '8': ['010', '101', '010', '101', '010'],
-    '9': ['010', '101', '011', '001', '110'],
-}
+# The 3x5 glyphs are the cabinet's own font, shared by every renderer. This
+# module used to carry a private copy; the copies drifted, losing characters and
+# drawing '(', ')' and '/' differently from the rest of the cabinet.
+from arcade import _FONT_3X5 as _FONT  # noqa: E402
 
 
 def _blend(c1, c2, t):

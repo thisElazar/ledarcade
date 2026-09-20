@@ -71,19 +71,9 @@ UNDO_MAX = 32
 # Uses the exact screen-space positions from wondercabinet.py:
 #   WONDER  at (20, 24), CABINET at (18, 34)
 # 3x5 font, 4px stride.  Now canvas = screen, so coords are direct.
-_FONT_3X5 = {
-    'A': ['010', '101', '111', '101', '101'],
-    'B': ['110', '101', '110', '101', '110'],
-    'C': ['011', '100', '100', '100', '011'],
-    'D': ['110', '101', '101', '101', '110'],
-    'E': ['111', '100', '110', '100', '111'],
-    'I': ['111', '010', '010', '010', '111'],
-    'N': ['101', '111', '111', '111', '101'],
-    'O': ['010', '101', '101', '101', '010'],
-    'R': ['110', '101', '110', '101', '101'],
-    'T': ['111', '010', '010', '010', '010'],
-    'W': ['101', '101', '111', '111', '101'],
-}
+# 3x5 glyphs come from the cabinet's shared font. This module previously held an
+# 11-glyph subset of it; the glyphs were identical, so this is a no-op on screen.
+from arcade import _FONT_3X5  # noqa: E402
 
 
 def _build_stamp(text, x0, y0):
