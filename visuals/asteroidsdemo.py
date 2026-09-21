@@ -5,11 +5,12 @@ Asteroids plays itself using simple AI for idle screen demos.
 The AI navigates, shoots asteroids, and dodges threats.
 
 AI Strategy:
-- Find nearest asteroid (or UFO if present)
-- Rotate ship toward target
-- Thrust to approach (but not too close)
-- Shoot when aimed at target
-- Dodge when threats are very close
+- Hold position like a turret: drifting through a 64-pixel field is what kills
+- A rock is a threat only if its path crosses the ship; shoot the one that
+  arrives soonest, leading the shot
+- With nothing incoming, shoot the UFO, then whichever rock is quickest to hit
+- If something cannot be shot in time, thrust out of its path; if even that
+  is too late, hyperspace
 """
 
 import math
@@ -21,6 +22,13 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.asteroids import Asteroids
+
+
+BULLET_SPEED = 80.0   # the game's
+TURN_SPEED = 4.0      # the game's, rad/s
+LOOKAHEAD = 2.0       # seconds of rock paths worth worrying about
+CLEARANCE = 2.0       # px beyond the hit radius that still counts as a threat
+PANIC = 0.3           # seconds to impact at which only hyperspace is left
 
 
 class AsteroidsDemo(Visual):
@@ -40,6 +48,7 @@ class AsteroidsDemo(Visual):
         self.ai_rotate = 0  # -1 left, 0 none, 1 right
         self.ai_thrust = False
         self.ai_shoot = False
+        self.ai_hyperspace = False
         self.restart_timer = 0.0
 
     def handle_input(self, input_state):
@@ -73,6 +82,9 @@ class AsteroidsDemo(Visual):
             ai_input.up = True
         if self.ai_shoot:
             ai_input.action_l = True
+        if self.ai_hyperspace:
+            ai_input.down_pressed = True
+            self.ai_hyperspace = False
 
         self.game.update(ai_input, dt)
 
@@ -86,127 +98,107 @@ class AsteroidsDemo(Visual):
     def _decide_action(self):
         """AI decision-making for Asteroids."""
         game = self.game
-        ship_x, ship_y = game.ship_x, game.ship_y
-        ship_angle = game.ship_angle
-
-        # Reset actions
         self.ai_rotate = 0
         self.ai_thrust = False
         self.ai_shoot = False
-
-        # Check for immediate danger (very close asteroid or UFO bullet)
-        danger_dist, danger_angle = self._find_nearest_danger()
-        if danger_dist < 8:
-            # Dodge: thrust perpendicular to danger
-            escape_angle = danger_angle + math.pi / 2
-            angle_diff = self._normalize_angle(escape_angle - ship_angle)
-            if abs(angle_diff) > 0.5:
-                self.ai_rotate = 1 if angle_diff > 0 else -1
-            self.ai_thrust = True
+        if game.hyperspace_timer > 0:
             return
 
-        # Find target (UFO if present, otherwise nearest asteroid)
-        target = self._find_target()
+        # Everything that can hit the ship: (body, hit radius, can be shot)
+        bodies = [(a, a['size'] * 2 + 3, True) for a in game.asteroids]
+        bodies += [(b, 3, False) for b in game.ufo_bullets]
+        if game.ufo:
+            bodies.append((game.ufo, 4, True))
+
+        threats = []
+        for body, radius, shootable in bodies:
+            t_hit = self._time_to_hit(body, radius + CLEARANCE)
+            if t_hit is not None:
+                threats.append((t_hit, body, radius, shootable))
+        threats.sort(key=lambda th: th[0])
+
+        # What to shoot: the soonest threat that can be shot, else the UFO,
+        # else the rock that takes least turning and flying to hit
+        target = next((th[1] for th in threats if th[3]), None)
         if target is None:
-            return
+            target = game.ufo or min(game.asteroids, key=self._cost_to_hit, default=None)
+        aim_time = 0.0
+        if target is not None:
+            aim, dist = self._aim_at(target)
+            diff = self._normalize_angle(aim - game.ship_angle)
+            size = target.get('size', 1) * 2 + 1
+            if abs(diff) < max(0.06, math.atan2(size * 0.6, dist)):
+                self.ai_shoot = True
+            else:
+                self.ai_rotate = 1 if diff > 0 else -1
+            aim_time = abs(diff) / TURN_SPEED + dist / BULLET_SPEED
 
-        target_x, target_y = target
+        # Evade the soonest threat if it cannot be shot away in time
+        if threats and game.invulnerable_timer <= 0:
+            t_hit, body, radius, shootable = threats[0]
+            if not (shootable and body is target and aim_time < t_hit - 0.15):
+                # hyperspace is a gamble: only for a certain hit, not a near miss
+                sure = self._time_to_hit(body, radius)
+                if sure is not None and sure < PANIC:
+                    self.ai_hyperspace = True
+                else:
+                    self._dodge(body)
 
-        # Calculate angle to target
-        target_angle = math.atan2(target_y - ship_y, target_x - ship_x)
-        angle_diff = self._normalize_angle(target_angle - ship_angle)
-
-        # Rotate toward target
-        if abs(angle_diff) > 0.1:
-            self.ai_rotate = 1 if angle_diff > 0 else -1
-
-        # Calculate distance to target
-        dist = self._wrapped_distance(ship_x, ship_y, target_x, target_y)
-
-        # Thrust to approach if not too close
-        if dist > 15:
-            # Only thrust if roughly aimed in the right direction
-            if abs(angle_diff) < 1.0:
-                self.ai_thrust = True
-        elif dist < 10:
-            # Too close, maybe back off (thrust opposite direction)
-            # For now, just don't thrust forward
-            pass
-
-        # Shoot when aimed at target
-        if abs(angle_diff) < 0.3:
-            self.ai_shoot = True
-
-    def _find_target(self):
-        """Find the best target to shoot at."""
+    def _relative(self, body):
+        """Body's position and velocity relative to the ship, across the wrap."""
         game = self.game
-        ship_x, ship_y = game.ship_x, game.ship_y
+        px = (body['x'] - game.ship_x + GRID_SIZE / 2) % GRID_SIZE - GRID_SIZE / 2
+        height = GRID_SIZE - 8
+        py = (body['y'] - game.ship_y + height / 2) % height - height / 2
+        return px, py, body['dx'] - game.ship_dx, body['dy'] - game.ship_dy
 
-        # Prioritize UFO if present
-        if game.ufo:
-            return (game.ufo['x'], game.ufo['y'])
+    def _time_to_hit(self, body, radius):
+        """Seconds until the body comes within radius of the ship, or None."""
+        px, py, vx, vy = self._relative(body)
+        c = px * px + py * py - radius * radius
+        if c <= 0:
+            return 0.0
+        a = vx * vx + vy * vy
+        b = px * vx + py * vy
+        if a == 0 or b >= 0:
+            return None  # not moving relative to us, or moving away
+        disc = b * b - a * c
+        if disc < 0:
+            return None  # passes clear
+        t = (-b - math.sqrt(disc)) / a
+        return t if t < LOOKAHEAD else None
 
-        # Find nearest asteroid
-        nearest_dist = float('inf')
-        nearest_pos = None
-
-        for asteroid in game.asteroids:
-            dist = self._wrapped_distance(ship_x, ship_y, asteroid['x'], asteroid['y'])
-            if dist < nearest_dist:
-                nearest_dist = dist
-                nearest_pos = (asteroid['x'], asteroid['y'])
-
-        return nearest_pos
-
-    def _find_nearest_danger(self):
-        """Find the nearest danger (asteroid or UFO bullet) and return distance and angle."""
+    def _aim_at(self, body):
+        """(angle to fire at so the bullet meets the body, distance to there)."""
         game = self.game
-        ship_x, ship_y = game.ship_x, game.ship_y
+        px, py, vx, vy = self._relative(body)
+        # a bullet keeps half the ship's velocity
+        vx += game.ship_dx * 0.5
+        vy += game.ship_dy * 0.5
+        a = vx * vx + vy * vy - BULLET_SPEED * BULLET_SPEED
+        b = px * vx + py * vy
+        c = px * px + py * py
+        t = (-b - math.sqrt(b * b - a * c)) / a  # a < 0: always one future meeting
+        mx, my = px + vx * t, py + vy * t
+        return math.atan2(my, mx), math.hypot(mx, my)
 
-        nearest_dist = float('inf')
-        nearest_angle = 0
+    def _cost_to_hit(self, body):
+        aim, dist = self._aim_at(body)
+        return abs(self._normalize_angle(aim - self.game.ship_angle)) / TURN_SPEED + dist / BULLET_SPEED
 
-        # Check asteroids
-        for asteroid in game.asteroids:
-            dist = self._wrapped_distance(ship_x, ship_y, asteroid['x'], asteroid['y'])
-            # Account for asteroid size
-            effective_dist = dist - asteroid['size'] * 2
-            if effective_dist < nearest_dist:
-                nearest_dist = effective_dist
-                nearest_angle = math.atan2(asteroid['y'] - ship_y, asteroid['x'] - ship_x)
-
-        # Check UFO bullets
-        for bullet in game.ufo_bullets:
-            dist = self._wrapped_distance(ship_x, ship_y, bullet['x'], bullet['y'])
-            if dist < nearest_dist:
-                nearest_dist = dist
-                nearest_angle = math.atan2(bullet['y'] - ship_y, bullet['x'] - ship_x)
-
-        # Check UFO itself
-        if game.ufo:
-            dist = self._wrapped_distance(ship_x, ship_y, game.ufo['x'], game.ufo['y'])
-            if dist < nearest_dist:
-                nearest_dist = dist
-                nearest_angle = math.atan2(game.ufo['y'] - ship_y, game.ufo['x'] - ship_x)
-
-        return nearest_dist, nearest_angle
-
-    def _wrapped_distance(self, x1, y1, x2, y2):
-        """Calculate distance accounting for screen wrap."""
-        # Simple distance for now (screen wrap makes this complex)
-        dx = x2 - x1
-        dy = y2 - y1
-
-        # Account for horizontal wrap
-        if abs(dx) > GRID_SIZE / 2:
-            dx = GRID_SIZE - abs(dx) if dx > 0 else -(GRID_SIZE - abs(dx))
-
-        # Account for vertical wrap (play area is 8 to 64)
-        play_height = GRID_SIZE - 8
-        if abs(dy) > play_height / 2:
-            dy = play_height - abs(dy) if dy > 0 else -(play_height - abs(dy))
-
-        return math.sqrt(dx * dx + dy * dy)
+    def _dodge(self, body):
+        """Thrust if the ship is facing out of the body's path; else turn to."""
+        px, py, vx, vy = self._relative(body)
+        path = math.atan2(vy, vx)
+        # leave on the side of the path the ship is already on
+        side = 1 if px * vy - py * vx > 0 else -1
+        escape = path + side * math.pi / 2
+        diff = self._normalize_angle(escape - self.game.ship_angle)
+        if abs(diff) < 1.0:
+            self.ai_thrust = True
+        else:
+            self.ai_rotate = 1 if diff > 0 else -1
+            self.ai_shoot = False
 
     def _normalize_angle(self, angle):
         """Normalize angle to -pi to pi."""
