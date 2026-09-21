@@ -410,6 +410,7 @@ class TuringPatterns(_TuringBase):
         self.saved_timer = 0.0
         self.confirm_timer = 0.0
         self._both_held_prev = False
+        self.blank_time = 0.0
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -456,6 +457,16 @@ class TuringPatterns(_TuringBase):
 
     def update(self, dt):
         super().update(dt)
+        # In a dead regime the seeds die and the panel stays black for good.
+        # Keep f/k — they are what the lab is showing — but after a few blank
+        # seconds drop fresh seeds, so the visitor sees them die rather than nothing.
+        if self.v.max() < 0.01:
+            self.blank_time += dt
+            if self.blank_time > 3.0:
+                self.u, self.v = _init_grid()
+                self.blank_time = 0.0
+        else:
+            self.blank_time = 0.0
         if self.saved_timer > 0:
             self.saved_timer = max(0.0, self.saved_timer - dt)
         if self.confirm_timer > 0:
