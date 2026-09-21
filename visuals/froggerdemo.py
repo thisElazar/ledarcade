@@ -5,10 +5,10 @@ Frogger plays itself using AI for idle screen demos.
 The AI navigates through traffic and across water platforms.
 
 AI Strategy:
-- Check safety of forward moves (avoid cars, land on platforms)
-- Look ahead to predict object positions
-- Prefer moving up when safe, dodge sideways when needed
-- Target unfilled home slots
+- Everything in the game moves in a straight line, so where it will be is known
+- Decide only at the moment a hop can happen; take a hop only if the frog
+  survives the whole time it must sit there AND has a safe hop after that
+- Prefer up, then toward an open home, then waiting, then anything that lives
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -19,6 +19,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.frogger import Frogger
+
+
+DEPTH = 5     # hops of lookahead
+MARGIN = 1.5  # px of room the lookahead wants around a car or a platform edge
+SAMPLE = 1 / 30
 
 
 class FroggerDemo(Visual):
@@ -33,10 +38,7 @@ class FroggerDemo(Visual):
         self.time = 0.0
         self.game = Frogger(self.display)
         self.game.reset()
-        self.ai_direction = None
-        self.decision_timer = 0.0
-        self.decision_interval = 0.15  # Recalculate every 150ms
-        self.wait_timer = 0.0  # Time spent waiting at current position
+        self.restart_timer = 0.0
 
     def handle_input(self, input_state):
         # Demo doesn't respond to input (auto-plays)
@@ -47,28 +49,19 @@ class FroggerDemo(Visual):
 
         # If game over, restart after a pause
         if self.game.state == GameState.GAME_OVER:
-            self.decision_timer += dt
-            if self.decision_timer > 3.0:
+            self.restart_timer += dt
+            if self.restart_timer > 3.0:
                 self.game.reset()
-                self.decision_timer = 0.0
+                self.restart_timer = 0.0
             return
 
-        # Make AI decisions periodically
-        self.decision_timer += dt
-        if self.decision_timer >= self.decision_interval:
-            self.decision_timer = 0.0
-            self.ai_direction = self._decide_direction()
-
-        # Create input state with AI's chosen direction
+        # Decide only on a frame where the game will act on it
         ai_input = InputState()
-        if self.ai_direction == 'up':
-            ai_input.up = True
-        elif self.ai_direction == 'down':
-            ai_input.down = True
-        elif self.ai_direction == 'left':
-            ai_input.left = True
-        elif self.ai_direction == 'right':
-            ai_input.right = True
+        game = self.game
+        if not game.dying and game.move_cooldown - dt <= 0:
+            direction = self._decide_direction(dt)
+            if direction:
+                setattr(ai_input, direction, True)
 
         self.game.update(ai_input, dt)
 
@@ -79,159 +72,139 @@ class FroggerDemo(Visual):
         if int(self.time * 2) % 2 == 0:
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
-    def _is_safe_at(self, col, row, look_ahead_time=0.3):
-        """Check if position will be safe after look_ahead_time."""
+    def _decide_direction(self, dt):
+        """First choice, in order of preference, that the frog survives."""
         game = self.game
-        cell_size = game.cell_size
-        frog_x = col * cell_size
+        self.step = game.move_delay + dt  # time in a cell before the next hop
+        col, row = game.frog_col, game.frog_row
 
-        # Bounds check
-        if col < 0 or col >= game.cols:
+        # Sideways goal: an open home once on the river; before that the
+        # middle, because from an edge the first river row carries the frog off
+        toward = None
+        goal = self._open_home(col) if row >= 7 else game.cols // 2
+        if goal is not None and abs(goal - col) > 0.5:
+            toward = 'right' if goal > col else 'left'
+        order = ['up', toward, None, 'left', 'right', 'down']
+        if row == 11 and toward:
+            order = [toward, 'up', None, 'left', 'right', 'down']
+        moves = [m for i, m in enumerate(order) if m is not None or i == 2]
+
+        for depth in range(DEPTH, -1, -1):
+            memo = {}
+            for move in moves:
+                if self._survives(*self._hop(col, row, move), 0.0, depth, memo):
+                    return move
+        return None
+
+    def _hop(self, col, row, move):
+        game = self.game
+        if move == 'up':
+            return col, min(game.rows - 2, row + 1)
+        if move == 'down':
+            return col, max(0, row - 1)
+        if move == 'left':
+            return max(0, col - 1), row
+        if move == 'right':
+            return min(game.cols - 1, col + 1), row
+        return col, row
+
+    def _survives(self, col, row, t, depth, memo):
+        """Arriving at (col, row) t seconds from now: does the frog live
+        through its stay there, and is there a way on for depth more hops?"""
+        key = (round(col * 4), row, round(t / self.step), depth)
+        if key not in memo:
+            memo[key] = self._survives_uncached(col, row, t, depth, memo)
+        return memo[key]
+
+    def _survives_uncached(self, col, row, t, depth, memo):
+        if row == 12:
+            return self._home_open(col)
+        col = self._stay(col, row, t)
+        if col is None:
             return False
-
-        # Start zone and safe zone are always safe
-        if row == 0 or row == 6:
+        if depth == 0:
             return True
+        return any(self._survives(*self._hop(col, row, move), t + self.step, depth - 1, memo)
+                   for move in ('up', None, 'left', 'right', 'down'))
 
-        # Road rows: check for cars
+    def _stay(self, col, row, t):
+        """Sit at (col, row) from t for one step. Returns the column the frog
+        ends on (platforms carry it), or None if it dies."""
+        game = self.game
+        cell = game.cell_size
+        x = col * cell
+
         if 1 <= row <= 5:
             for car in game.cars:
-                if car['row'] == row:
-                    future_x = car['x'] + car['speed'] * look_ahead_time
-                    car_left = future_x
-                    car_right = future_x + car['length'] * cell_size
-                    frog_right = frog_x + cell_size
-                    if frog_x < car_right and frog_right > car_left:
-                        return False
-            return True
+                if car['row'] != row:
+                    continue
+                length = car['length'] * cell
+                ts = t
+                while ts <= t + self.step:
+                    cx = self._x_at(car, length, ts)
+                    if x < cx + length + MARGIN and x + cell > cx - MARGIN:
+                        return None
+                    ts += SAMPLE
+            return col
 
-        # Water rows: check for logs/turtles to land on
+        if row == 6 and game.snake:
+            ts = t
+            while ts <= t + self.step:
+                sx = self._snake_x(ts)
+                if x < sx + 3 + MARGIN and x + cell > sx - MARGIN:
+                    return None
+                ts += SAMPLE
+            return col
+
         if 7 <= row <= 11:
-            # Check logs
-            for log in game.logs:
-                if log['row'] == row:
-                    future_x = log['x'] + log['speed'] * look_ahead_time
-                    log_left = future_x - 2
-                    log_right = future_x + log['length'] * cell_size + 2
-                    if log_left <= frog_x <= log_right - cell_size:
-                        return True
+            for plat in game.logs + game.turtles:
+                if plat['row'] != row:
+                    continue
+                length = plat['length'] * cell
+                px = self._x_at(plat, length, t)
+                # the game allows 2px of overhang; the plan wants to be well on
+                if not (x >= px - 2 + MARGIN and x + cell <= px + length + 2 - MARGIN):
+                    continue
+                # The last row's logs run left: one is a dead end unless an
+                # open home still lies at or left of its right end
+                if row == 11 and not any(h * cell <= px + length - cell + 2
+                                         for i, h in enumerate(game.home_positions) if not game.homes[i]):
+                    return None
+                if 'dive_phase' in plat:
+                    # under from 7.0 to 9.0 of a 9 s cycle
+                    start = (game.dive_clock + plat['dive_phase'] + t) % 9.0
+                    if start + self.step + 0.2 >= 7.0:
+                        return None
+                end = col + plat['speed'] * self.step / cell
+                if end < 0.25 or end > game.cols - 1.25:
+                    return None  # carried off the screen
+                return end
+            return None
 
-            # Check turtles (only if not diving)
-            for turtle in game.turtles:
-                if turtle['row'] == row and not turtle['diving']:
-                    # Also check if turtle might dive soon (mirrors the
-                    # game's deterministic dive clock: 6s up, 1s warning,
-                    # 2s under, per-turtle phase offset)
-                    dive_t = (game.dive_clock + turtle['dive_phase']) % 9.0
-                    time_until_dive = 7.0 - dive_t
-                    if time_until_dive < 0.5:
-                        continue  # About to dive, not safe
-                    future_x = turtle['x'] + turtle['speed'] * look_ahead_time
-                    turtle_left = future_x - 2
-                    turtle_right = future_x + turtle['length'] * cell_size + 2
-                    if turtle_left <= frog_x <= turtle_right - cell_size:
-                        return True
+        return col
 
-            return False  # No platform = death
+    def _x_at(self, obj, length, t):
+        """Left edge of a car, log or turtle t seconds from now, with the
+        game's wrap: off one side, back on at the other."""
+        return (obj['x'] + length + obj['speed'] * t) % (GRID_SIZE + length) - length
 
-        # Home row - check if there's an unfilled slot
-        if row == 12:
-            for i, home_col in enumerate(game.home_positions):
-                if abs(col - home_col) <= 1 and not game.homes[i]:
-                    return True
-            return False  # No valid home slot
+    def _snake_x(self, t):
+        """The median snake bounces between 0 and GRID_SIZE - 3."""
+        snake = self.game.snake
+        span = GRID_SIZE - 3
+        x = (snake['x'] + snake['dir'] * snake['speed'] * t) % (2 * span)
+        return 2 * span - x if x > span else x
 
-        return True  # Default safe
-
-    def _get_best_home_col(self):
-        """Find the column of the nearest unfilled home."""
+    def _home_open(self, col):
         game = self.game
-        frog_col = int(game.frog_col)
-
-        # Find nearest unfilled home
-        best_col = None
-        best_dist = float('inf')
-
         for i, home_col in enumerate(game.home_positions):
-            if not game.homes[i]:
-                dist = abs(home_col - frog_col)
-                if dist < best_dist:
-                    best_dist = dist
-                    best_col = home_col
+            if abs(col - home_col) <= 0.9 and not game.homes[i]:
+                bonus = game.home_bonus
+                return not (bonus and bonus['slot'] == i and bonus['type'] == 'croc')
+        return False
 
-        return best_col if best_col is not None else 7
-
-    def _decide_direction(self):
-        """AI decision-making for Frogger movement."""
+    def _open_home(self, col):
+        """Column of the nearest unfilled home, or None."""
         game = self.game
-        frog_col = int(game.frog_col)
-        frog_row = game.frog_row
-
-        # If on water, account for platform drift
-        if 7 <= frog_row <= 11 and game.frog_riding:
-            # Recalculate actual column based on float position
-            frog_col = int(game.frog_col)
-
-        # Get target column (for homes)
-        target_col = self._get_best_home_col()
-
-        # Check possible moves with look-ahead
-        up_safe = self._is_safe_at(frog_col, frog_row + 1, 0.2)
-        left_safe = self._is_safe_at(frog_col - 1, frog_row, 0.2)
-        right_safe = self._is_safe_at(frog_col + 1, frog_row, 0.2)
-        stay_safe = self._is_safe_at(frog_col, frog_row, 0.3)
-
-        # On water rows, check if we're drifting off screen
-        if 7 <= frog_row <= 11:
-            if game.frog_col < 1:
-                # Drifting left off screen, try to move right
-                if right_safe:
-                    return 'right'
-                elif up_safe:
-                    return 'up'
-            elif game.frog_col > game.cols - 2:
-                # Drifting right off screen, try to move left
-                if left_safe:
-                    return 'left'
-                elif up_safe:
-                    return 'up'
-
-        # Priority 1: Move up if safe
-        if up_safe:
-            # On approach to home (row 11), align with target home
-            if frog_row == 11:
-                if frog_col < target_col - 1:
-                    if right_safe:
-                        return 'right'
-                elif frog_col > target_col + 1:
-                    if left_safe:
-                        return 'left'
-            return 'up'
-
-        # Priority 2: Move toward target column if it helps
-        if frog_col < target_col and right_safe:
-            # Check if moving right and then up would be safe
-            if self._is_safe_at(frog_col + 1, frog_row + 1, 0.4):
-                return 'right'
-        if frog_col > target_col and left_safe:
-            if self._is_safe_at(frog_col - 1, frog_row + 1, 0.4):
-                return 'left'
-
-        # Priority 3: Dodge sideways
-        if right_safe:
-            return 'right'
-        if left_safe:
-            return 'left'
-
-        # Priority 4: Check if up will be safe soon (with longer look-ahead)
-        for t in [0.3, 0.4, 0.5, 0.6]:
-            if self._is_safe_at(frog_col, frog_row + 1, t):
-                # Wait - it will be safe soon
-                return None
-
-        # Priority 5: Retreat if nothing else works
-        if self._is_safe_at(frog_col, frog_row - 1, 0.2) and frog_row > 0:
-            return 'down'
-
-        # Wait for better opportunity
-        return None
+        homes = [c for i, c in enumerate(game.home_positions) if not game.homes[i]]
+        return min(homes, key=lambda c: abs(c - col), default=None)
