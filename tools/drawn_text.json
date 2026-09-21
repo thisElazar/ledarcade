@@ -1,0 +1,5572 @@
+{
+ "crashed": {},
+ "drawn": {
+  "abc.py::PaintingAfKlintAdulthood": [
+   "#",
+   "Albert Gleizes",
+   "Contrast of Forms",
+   "Fernand Leger",
+   "Hilma af Klint",
+   "Portrait of Jacques Nayral",
+   "The Ten Largest, No. #, Adulthood",
+   "The Ten Largest, No. #, Youth"
+  ],
+  "abc.py::PaintingAfKlintYouth": [
+   "#",
+   "Albert Gleizes",
+   "Hilma af Klint",
+   "Portrait of Jacques Nayral",
+   "The City Rises",
+   "The Ten Largest, No. #, Adulthood",
+   "The Ten Largest, No. #, Youth",
+   "Umberto Boccioni"
+  ],
+  "abc.py::PaintingAjantaPadmapani": [
+   "#",
+   "Anonymous (Ajanta)",
+   "Anonymous (Ethiopian)",
+   "Bichitr",
+   "Bodhisattva Padmapani",
+   "Carpet Page",
+   "Eadfrith of Lindisfarne",
+   "Jahangir Preferring a Sufi Shaikh to Kings",
+   "Saint George Icon"
+  ],
+  "abc.py::PaintingAkbarCourt": [
+   "#",
+   "Anonymous (Ajanta)",
+   "Anonymous (Mughal)",
+   "Anonymous (Rajput)",
+   "Bichitr",
+   "Bodhisattva Padmapani",
+   "Court of Akbar",
+   "Jahangir Preferring a Sufi Shaikh to Kings",
+   "Radha and Krishna in the Boat of Love"
+  ],
+  "abc.py::PaintingAlexanderMosaic": [
+   "#",
+   "# BCE",
+   "Alexander Mosaic",
+   "Anonymous (Pompeii)",
+   "Anonymous (Stabiae)",
+   "Flora",
+   "Limbourg Brothers",
+   "Portrait of a Young Woman",
+   "Tres Riches Heures (January)"
+  ],
+  "abc.py::PaintingAlmondBlossoms": [
+   "#",
+   "Almond Blossoms",
+   "Irises",
+   "Sunflowers",
+   "Vincent van Gogh",
+   "Wheat Field with Cypresses"
+  ],
+  "abc.py::PaintingAmericanGothic": [
+   "#",
+   "American Gothic",
+   "Edward Hopper",
+   "Grant Wood",
+   "Nighthawks",
+   "The Fog Warning",
+   "The Starry Night",
+   "Vincent van Gogh",
+   "Winslow Homer"
+  ],
+  "abc.py::PaintingArcimboldoSummer": [
+   "#",
+   "Albrecht Durer",
+   "Giuseppe Arcimboldo",
+   "Hunters in the Snow",
+   "Pieter Bruegel",
+   "Self-Portrait at Twenty-Eight",
+   "Summer",
+   "The Tower of Babel"
+  ],
+  "abc.py::PaintingArnolfiniPortrait": [
+   "#",
+   "Albrecht Durer",
+   "Assumption of the Virgin",
+   "Jan van Eyck",
+   "Self-Portrait at Twenty-Eight",
+   "The Arnolfini Portrait",
+   "Titian",
+   "Young Hare"
+  ],
+  "abc.py::PaintingArtOfPainting": [
+   "#",
+   "Girl Reading a Letter at an Open Window",
+   "Girl with a Pearl Earring",
+   "Johannes Vermeer",
+   "The Art of Painting",
+   "The Milkmaid"
+  ],
+  "abc.py::PaintingBacchusAriadne": [
+   "#",
+   "Bacchus and Ariadne",
+   "Leonardo da Vinci",
+   "Primavera",
+   "Sandro Botticelli",
+   "The Birth of Venus",
+   "Titian",
+   "Virgin of the Rocks"
+  ],
+  "abc.py::PaintingBarFoliesBergere": [
+   "#",
+   "A Bar at the Folies-Bergere",
+   "Edouard Manet",
+   "James McNeill Whistler",
+   "The Fifer",
+   "The Shepherdess",
+   "Whistler's Mother",
+   "William-Adolphe Bouguereau"
+  ],
+  "abc.py::PaintingBathersAsnieres": [
+   "#",
+   "A Sunday on La Grande Jatte",
+   "Bathers at Asnieres",
+   "Georges Seurat",
+   "Gustave Caillebotte",
+   "Joaquin Sorolla",
+   "Paris Street; Rainy Day",
+   "Strolling Along the Seashore"
+  ],
+  "abc.py::PaintingBehzadYusuf": [
+   "#",
+   "Anonymous (Roman Egypt)",
+   "Kamal ud-Din Behzad",
+   "Mummy Portrait of a Young Woman",
+   "Otani Oniji III as Yakko Edobei",
+   "Reza Abbasi",
+   "Toshusai Sharaku",
+   "Two Lovers",
+   "Yusuf and Zulaikha"
+  ],
+  "abc.py::PaintingBelliniStFrancis": [
+   "#",
+   "Andrea Mantegna",
+   "Assumption of the Virgin",
+   "Correggio",
+   "Giovanni Bellini",
+   "Lamentation over the Dead Christ",
+   "Piero della Francesca",
+   "St. Francis in the Desert",
+   "The Flagellation of Christ"
+  ],
+  "abc.py::PaintingBerlinStreet": [
+   "#",
+   "Berlin Street Scene",
+   "Blue Horse I",
+   "Egon Schiele",
+   "Ernst Ludwig Kirchner",
+   "Franz Marc",
+   "Henri Matisse",
+   "Self-Portrait with Physalis",
+   "Woman with a Hat"
+  ],
+  "abc.py::PaintingBirthOfVenus": [
+   "#",
+   "Boulevard Montmartre",
+   "Camille Pissarro",
+   "Primavera",
+   "Robert Delaunay",
+   "Sandro Botticelli",
+   "Simultaneous Windows",
+   "The Birth of Venus"
+  ],
+  "abc.py::PaintingBlackSquare": [
+   "#",
+   "Black Square",
+   "Broadway Boogie Woogie",
+   "Color Study: Squares with Concentric Circles",
+   "Improvisation #",
+   "Kazimir Malevich",
+   "Piet Mondrian",
+   "Wassily Kandinsky"
+  ],
+  "abc.py::PaintingBlakeNewton": [
+   "#",
+   "Claude Monet",
+   "Gare Saint-Lazare",
+   "J.M.W. Turner",
+   "Newton",
+   "Rain, Steam and Speed",
+   "The Burning of the Houses of Parliament",
+   "William Blake"
+  ],
+  "abc.py::PaintingBlueHorse": [
+   "#",
+   "Berlin Street Scene",
+   "Blue Horse I",
+   "Ernst Ludwig Kirchner",
+   "Franz Marc",
+   "Henri Matisse",
+   "Open Window, Collioure",
+   "Woman with a Hat"
+  ],
+  "abc.py::PaintingBoccioniCityRises": [
+   "#",
+   "Hilma af Klint",
+   "States of Mind: The Farewells",
+   "The City Rises",
+   "The Ten Largest, No. #, Adulthood",
+   "The Ten Largest, No. #, Youth",
+   "Umberto Boccioni"
+  ],
+  "abc.py::PaintingBoccioniFarewells": [
+   "#",
+   "Beat the Whites with the Red Wedge",
+   "El Lissitzky",
+   "Hilma af Klint",
+   "States of Mind: The Farewells",
+   "The City Rises",
+   "The Ten Largest, No. #, Youth",
+   "Umberto Boccioni"
+  ],
+  "abc.py::PaintingBookOfKells": [
+   "#",
+   "# BCE",
+   "Alexander Mosaic",
+   "Anonymous (Insular)",
+   "Anonymous (Pompeii)",
+   "Carpet Page",
+   "Chi Rho Page",
+   "Eadfrith of Lindisfarne",
+   "Limbourg Brothers",
+   "Tres Riches Heures (January)"
+  ],
+  "abc.py::PaintingBotticelliAnnunciation": [
+   "#",
+   "Cestello Annunciation",
+   "Fra Angelico",
+   "Raphael",
+   "Sandro Botticelli",
+   "Sistine Madonna",
+   "The Annunciation",
+   "The School of Athens"
+  ],
+  "abc.py::PaintingBouguereauShepherdess": [
+   "#",
+   "James McNeill Whistler",
+   "John William Waterhouse",
+   "Lawrence Alma-Tadema",
+   "Miranda - The Tempest",
+   "The Roses of Heliogabalus",
+   "The Shepherdess",
+   "Whistler's Mother",
+   "William-Adolphe Bouguereau"
+  ],
+  "abc.py::PaintingBroadwayBoogie": [
+   "#",
+   "Black Square",
+   "Broadway Boogie Woogie",
+   "Improvisation #",
+   "Kazimir Malevich",
+   "Piet Mondrian",
+   "Wassily Kandinsky",
+   "White on White"
+  ],
+  "abc.py::PaintingCafeTerrace": [
+   "#",
+   "American Gothic",
+   "Cafe Terrace at Night",
+   "Grant Wood",
+   "The Bedroom",
+   "The Starry Night",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingCaillebotteRainy": [
+   "#",
+   "A Sunday on La Grande Jatte",
+   "Ballet Rehearsal on Stage",
+   "Edgar Degas",
+   "Georges Seurat",
+   "Gustave Caillebotte",
+   "La Grenouillere",
+   "Paris Street; Rainy Day",
+   "Pierre-Auguste Renoir"
+  ],
+  "abc.py::PaintingCallingStMatthew": [
+   "#",
+   "Assumption of the Virgin",
+   "Bacchus",
+   "Caravaggio",
+   "The Calling of Saint Matthew",
+   "The Supper at Emmaus",
+   "Titian"
+  ],
+  "abc.py::PaintingCampinMerode": [
+   "#",
+   "Diego Velazquez",
+   "Hans Memling",
+   "Hugo van der Goes",
+   "Merode Altarpiece",
+   "Portinari Altarpiece",
+   "Portrait of Pope Innocent X",
+   "Portrait of a Young Woman",
+   "Robert Campin"
+  ],
+  "abc.py::PaintingCanalettoVenice": [
+   "#",
+   "Antoine Watteau",
+   "Blacksmith Shop",
+   "Canaletto",
+   "Embarkation for Cythera",
+   "Entrance to the Grand Canal",
+   "Jeong Seon",
+   "Kim Hong-do",
+   "View of Geumgangsan"
+  ],
+  "abc.py::PaintingCaravaggioBacchus": [
+   "#",
+   "Assumption of the Virgin",
+   "Bacchus",
+   "Caravaggio",
+   "Jan van Eyck",
+   "The Arnolfini Portrait",
+   "The Calling of Saint Matthew",
+   "Titian"
+  ],
+  "abc.py::PaintingCaravaggioFruit": [
+   "#",
+   "Boy with a Basket of Fruit",
+   "Caravaggio",
+   "Medusa",
+   "The Musicians",
+   "The Supper at Emmaus"
+  ],
+  "abc.py::PaintingCaravaggioLutePlayer": [
+   "#",
+   "Caravaggio",
+   "Christ in the Storm on the Sea of Galilee",
+   "Georges de La Tour",
+   "Gerrit van Honthorst",
+   "Musical Group by Candlelight",
+   "Rembrandt",
+   "The Cheat with the Ace of Diamonds",
+   "The Lute Player"
+  ],
+  "abc.py::PaintingCaravaggioMedusa": [
+   "#",
+   "Boy with a Basket of Fruit",
+   "Caravaggio",
+   "Medusa",
+   "The Calling of Saint Matthew",
+   "The Supper at Emmaus"
+  ],
+  "abc.py::PaintingCaravaggioMusicians": [
+   "#",
+   "Artemisia Gentileschi",
+   "Boy with a Basket of Fruit",
+   "Caravaggio",
+   "Medusa",
+   "Self-Portrait as Allegory of Painting",
+   "The Musicians"
+  ],
+  "abc.py::PaintingCardPlayers": [
+   "#",
+   "Mont Sainte-Victoire",
+   "Paul Cezanne",
+   "The Basket of Apples",
+   "The Card Players",
+   "The Potato Eaters",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingCassattBath": [
+   "#",
+   "Berthe Morisot",
+   "Boulevard Montmartre",
+   "Camille Pissarro",
+   "Claude Monet",
+   "Haystacks (End of Summer)",
+   "Mary Cassatt",
+   "The Child's Bath",
+   "The Cradle"
+  ],
+  "abc.py::PaintingCellariusStarAtlas": [
+   "#",
+   "A Philosopher Lecturing on the Orrery",
+   "Andreas Cellarius",
+   "Georges de La Tour",
+   "Harmonia Macrocosmica",
+   "Joseph Wright of Derby",
+   "The Cheat with the Ace of Diamonds",
+   "Vincent van Gogh",
+   "Weaver at the Loom"
+  ],
+  "abc.py::PaintingCezanneApples": [
+   "#",
+   "Mont Sainte-Victoire",
+   "Paul Cezanne",
+   "Still Life with a Curtain",
+   "The Basket of Apples",
+   "The Card Players"
+  ],
+  "abc.py::PaintingCezanneBibemus": [
+   "#",
+   "Bibemus Quarries",
+   "Paul Cezanne",
+   "Paul Gauguin",
+   "Still Life with a Curtain",
+   "The Boy in the Red Vest",
+   "Vision After the Sermon"
+  ],
+  "abc.py::PaintingCezanneCurtain": [
+   "#",
+   "Paul Cezanne",
+   "Still Life with a Curtain",
+   "The Basket of Apples",
+   "The Boy in the Red Vest",
+   "The Card Players"
+  ],
+  "abc.py::PaintingCezanneRedVest": [
+   "#",
+   "Bibemus Quarries",
+   "Paul Cezanne",
+   "Still Life with a Curtain",
+   "The Basket of Apples",
+   "The Boy in the Red Vest"
+  ],
+  "abc.py::PaintingCimabueMaesta": [
+   "#",
+   "Assumption of the Virgin",
+   "Cimabue",
+   "Correggio",
+   "Duccio",
+   "Giovanni Bellini",
+   "Maesta",
+   "St. Francis in the Desert"
+  ],
+  "abc.py::PaintingCompositionVii": [
+   "#",
+   "Amedeo Modigliani",
+   "Composition VII",
+   "Composition VIII",
+   "Egon Schiele",
+   "Jeanne Hebuterne",
+   "Portrait of Edith",
+   "Wassily Kandinsky"
+  ],
+  "abc.py::PaintingCompositionViii": [
+   "#",
+   "Amedeo Modigliani",
+   "Composition VII",
+   "Composition VIII",
+   "Jeanne Hebuterne",
+   "Several Circles",
+   "Wassily Kandinsky"
+  ],
+  "abc.py::PaintingConstableClouds": [
+   "#",
+   "Cloud Study",
+   "J.M.W. Turner",
+   "John Constable",
+   "Rain, Steam and Speed",
+   "The Chess Players",
+   "Thomas Eakins",
+   "Vincent van Gogh",
+   "Weaver at the Loom"
+  ],
+  "abc.py::PaintingCorreggioAssumption": [
+   "#",
+   "Andrea Mantegna",
+   "Assumption of the Virgin",
+   "Cimabue",
+   "Correggio",
+   "Giovanni Bellini",
+   "Lamentation over the Dead Christ",
+   "Maesta",
+   "St. Francis in the Desert"
+  ],
+  "abc.py::PaintingCossacks": [
+   "#",
+   "Alphonse Mucha",
+   "El Greco",
+   "Harmony in Red",
+   "Henri Matisse",
+   "Ilya Repin",
+   "Job (Cigarettes)",
+   "Reply of the Zaporozhian Cossacks",
+   "View of Toledo"
+  ],
+  "abc.py::PaintingCreationOfAdam": [
+   "#",
+   "Lady with an Ermine",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Raphael",
+   "Sistine Madonna",
+   "The Creation of Adam",
+   "The Last Supper"
+  ],
+  "abc.py::PaintingDanceMoulin": [
+   "#",
+   "Claude Monet",
+   "Dance at Le Moulin de la Galette",
+   "Luncheon of the Boating Party",
+   "Pierre-Auguste Renoir",
+   "Poppy Field",
+   "Water Lilies and Japanese Bridge"
+  ],
+  "abc.py::PaintingDeathOfMarat": [
+   "#",
+   "Francisco Goya",
+   "Jacques-Louis David",
+   "Jean-Honore Fragonard",
+   "Napoleon Crossing the Alps",
+   "The Death of Marat",
+   "The Parasol",
+   "The Swing"
+  ],
+  "abc.py::PaintingDeathSardanapalus": [
+   "#",
+   "Caspar David Friedrich",
+   "Eugene Delacroix",
+   "Jacques-Louis David",
+   "Napoleon Crossing the Alps",
+   "Rosa Bonheur",
+   "The Death of Sardanapalus",
+   "The Horse Fair",
+   "Wanderer Above the Sea of Fog"
+  ],
+  "abc.py::PaintingDegasBallet": [
+   "#",
+   "Ballet Rehearsal on Stage",
+   "Edgar Degas",
+   "Gustave Caillebotte",
+   "La Grenouillere",
+   "Paris Street; Rainy Day",
+   "Pierre-Auguste Renoir",
+   "Two Sisters (On the Terrace)"
+  ],
+  "abc.py::PaintingDelaunayWindows": [
+   "#",
+   "Boulevard Montmartre",
+   "Camille Pissarro",
+   "Mary Cassatt",
+   "Robert Delaunay",
+   "Sandro Botticelli",
+   "Simultaneous Windows",
+   "The Birth of Venus",
+   "The Child's Bath"
+  ],
+  "abc.py::PaintingDuccioMaesta": [
+   "#",
+   "Andrei Rublev",
+   "Assumption of the Virgin",
+   "Cimabue",
+   "Correggio",
+   "Duccio",
+   "Maesta",
+   "Trinity"
+  ],
+  "abc.py::PaintingDurerHare": [
+   "#",
+   "Albrecht Durer",
+   "Giuseppe Arcimboldo",
+   "Jan van Eyck",
+   "Self-Portrait at Twenty-Eight",
+   "Summer",
+   "The Arnolfini Portrait",
+   "Young Hare"
+  ],
+  "abc.py::PaintingDurerJerome": [
+   "#",
+   "Albrecht Durer",
+   "Claude Monet",
+   "Gare Saint-Lazare",
+   "Leonardo da Vinci",
+   "Mona Lisa",
+   "Newton",
+   "St. Jerome in His Study",
+   "William Blake"
+  ],
+  "abc.py::PaintingDurerMelencolia": [
+   "#",
+   "Albrecht Durer",
+   "An Experiment on a Bird in the Air Pump",
+   "Joseph Wright of Derby",
+   "Melencolia I",
+   "Pieta",
+   "Rhinoceros",
+   "Titian"
+  ],
+  "abc.py::PaintingDurerRhinoceros": [
+   "#",
+   "Albrecht Durer",
+   "Francisco Goya",
+   "Melencolia I",
+   "Pieta",
+   "Rhinoceros",
+   "The Sleep of Reason Produces Monsters",
+   "Titian"
+  ],
+  "abc.py::PaintingDurerSelfPortrait": [
+   "#",
+   "Albrecht Durer",
+   "Giuseppe Arcimboldo",
+   "Hunters in the Snow",
+   "Pieter Bruegel",
+   "Self-Portrait at Twenty-Eight",
+   "Summer",
+   "Young Hare"
+  ],
+  "abc.py::PaintingEakinsChess": [
+   "#",
+   "Andreas Cellarius",
+   "Cloud Study",
+   "Harmonia Macrocosmica",
+   "John Constable",
+   "The Chess Players",
+   "Thomas Eakins",
+   "Vincent van Gogh",
+   "Weaver at the Loom"
+  ],
+  "abc.py::PaintingEpsomDerby": [
+   "#",
+   "J.M.W. Turner",
+   "Rosa Bonheur",
+   "The Derby at Epsom",
+   "The Fighting Temeraire",
+   "The Horse Fair",
+   "The Raft of the Medusa",
+   "Theodore Gericault"
+  ],
+  "abc.py::PaintingEthiopianStGeorge": [
+   "#",
+   "Anonymous (Ajanta)",
+   "Anonymous (Ethiopian)",
+   "Anonymous (Insular)",
+   "Bodhisattva Padmapani",
+   "Carpet Page",
+   "Chi Rho Page",
+   "Eadfrith of Lindisfarne",
+   "Saint George Icon"
+  ],
+  "abc.py::PaintingFanKuanTravelers": [
+   "#",
+   "Early Spring",
+   "Fan Kuan",
+   "Georges de La Tour",
+   "Guo Xi",
+   "Qingming Festival",
+   "The Penitent Magdalene",
+   "Travelers Among Mountains and Streams",
+   "Zhang Zeduan"
+  ],
+  "abc.py::PaintingFayumPortrait": [
+   "#",
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Roman Egypt)",
+   "Kamal ud-Din Behzad",
+   "Mummy Portrait of a Young Woman",
+   "Nebamun Hunting in the Marshes",
+   "Reza Abbasi",
+   "Two Lovers",
+   "Yusuf and Zulaikha"
+  ],
+  "abc.py::PaintingFightingTemeraire": [
+   "#",
+   "J.M.W. Turner",
+   "Rain, Steam and Speed",
+   "The Derby at Epsom",
+   "The Fighting Temeraire",
+   "The Raft of the Medusa",
+   "Theodore Gericault"
+  ],
+  "abc.py::PaintingFloraStabiae": [
+   "#",
+   "# BCE",
+   "Alexander Mosaic",
+   "Anonymous (Pompeii)",
+   "Anonymous (Roman)",
+   "Anonymous (Stabiae)",
+   "Flora",
+   "Portrait of a Young Woman",
+   "Villa of the Mysteries"
+  ],
+  "abc.py::PaintingFogWarning": [
+   "#",
+   "Edward Hopper",
+   "John Singer Sargent",
+   "Madame X",
+   "Nighthawks",
+   "The Fog Warning",
+   "The Gulf Stream",
+   "Winslow Homer"
+  ],
+  "abc.py::PaintingFraAngelicoAnnunciation": [
+   "#",
+   "Cestello Annunciation",
+   "Fra Angelico",
+   "Hieronymus Bosch",
+   "Raphael",
+   "Sandro Botticelli",
+   "The Annunciation",
+   "The Garden of Earthly Delights",
+   "The School of Athens"
+  ],
+  "abc.py::PaintingGardenEarthlyDelights": [
+   "#",
+   "Cestello Annunciation",
+   "Fra Angelico",
+   "Hieronymus Bosch",
+   "Sandro Botticelli",
+   "The Annunciation",
+   "The Garden of Earthly Delights",
+   "The Last Judgment"
+  ],
+  "abc.py::PaintingGauguinArearea": [
+   "#",
+   "Arearea (The Red Dog)",
+   "Bibemus Quarries",
+   "Henri de Toulouse-Lautrec",
+   "Moulin Rouge: La Goulue",
+   "Paul Cezanne",
+   "Paul Gauguin",
+   "Vision After the Sermon"
+  ],
+  "abc.py::PaintingGentileschiSelfPortrait": [
+   "#",
+   "Artemisia Gentileschi",
+   "Boy with a Basket of Fruit",
+   "Caravaggio",
+   "Johannes Vermeer",
+   "Self-Portrait as Allegory of Painting",
+   "The Lacemaker",
+   "The Musicians"
+  ],
+  "abc.py::PaintingGiottoLamentation": [
+   "#",
+   "Giotto",
+   "Hans Holbein the Younger",
+   "Lamentation",
+   "Michelangelo",
+   "Raphael",
+   "The Ambassadors",
+   "The Last Judgment",
+   "The Transfiguration"
+  ],
+  "abc.py::PaintingGirlPearlEarring": [
+   "#",
+   "Artemisia Gentileschi",
+   "Girl with a Pearl Earring",
+   "Johannes Vermeer",
+   "Self-Portrait as Allegory of Painting",
+   "The Lacemaker",
+   "The Milkmaid"
+  ],
+  "abc.py::PaintingGirlReadingLetter": [
+   "#",
+   "Girl Reading a Letter at an Open Window",
+   "Johannes Vermeer",
+   "The Art of Painting",
+   "The Astronomer",
+   "The Milkmaid"
+  ],
+  "abc.py::PaintingGirlWateringCan": [
+   "#",
+   "A Girl with a Watering Can",
+   "Dance at Le Moulin de la Galette",
+   "Luncheon of the Boating Party",
+   "Pierre-Auguste Renoir",
+   "Two Sisters (On the Terrace)"
+  ],
+  "abc.py::PaintingGleizesNayral": [
+   "#",
+   "Albert Gleizes",
+   "Contrast of Forms",
+   "Fernand Leger",
+   "Hilma af Klint",
+   "Portrait of Jacques Nayral",
+   "The City",
+   "The Ten Largest, No. #, Adulthood"
+  ],
+  "abc.py::PaintingGoyaColossus": [
+   "#",
+   "Antoine Watteau",
+   "Canaletto",
+   "Embarkation for Cythera",
+   "Entrance to the Grand Canal",
+   "Francisco Goya",
+   "The Colossus",
+   "The Sleep of Reason Produces Monsters"
+  ],
+  "abc.py::PaintingGoyaParasol": [
+   "#",
+   "Diego Velazquez",
+   "Francisco Goya",
+   "Jacques-Louis David",
+   "Jean-Honore Fragonard",
+   "Las Meninas",
+   "The Death of Marat",
+   "The Parasol",
+   "The Swing"
+  ],
+  "abc.py::PaintingGoyaSleepOfReason": [
+   "#",
+   "Antoine Watteau",
+   "Embarkation for Cythera",
+   "Francisco Goya",
+   "Pieta",
+   "The Colossus",
+   "The Sleep of Reason Produces Monsters",
+   "Titian"
+  ],
+  "abc.py::PaintingGreatWave": [
+   "#",
+   "Fine Wind, Clear Morning",
+   "Frederic Edwin Church",
+   "Ivan Aivazovsky",
+   "Katsushika Hokusai",
+   "Niagara",
+   "The Great Wave off Kanagawa",
+   "The Ninth Wave"
+  ],
+  "abc.py::PaintingGrisPortraitPicasso": [
+   "#",
+   "Highway and Byways",
+   "Juan Gris",
+   "Paul Klee",
+   "Portrait of Picasso",
+   "Still Life with Checked Tablecloth",
+   "Twittering Machine"
+  ],
+  "abc.py::PaintingGrisTablecloth": [
+   "#",
+   "Juan Gris",
+   "Paul Klee",
+   "Portrait of Picasso",
+   "Still Life (Violin and Inkwell)",
+   "Still Life with Checked Tablecloth",
+   "Twittering Machine"
+  ],
+  "abc.py::PaintingGrisViolin": [
+   "#",
+   "Fernand Leger",
+   "Juan Gris",
+   "Portrait of Picasso",
+   "Still Life (Violin and Inkwell)",
+   "Still Life with Checked Tablecloth",
+   "The City"
+  ],
+  "abc.py::PaintingGulfStream": [
+   "#",
+   "Joaquin Sorolla",
+   "John Singer Sargent",
+   "Madame X",
+   "Strolling Along the Seashore",
+   "The Fog Warning",
+   "The Gulf Stream",
+   "Winslow Homer"
+  ],
+  "abc.py::PaintingGuoXiEarlySpring": [
+   "#",
+   "Early Spring",
+   "Fan Kuan",
+   "Georges de La Tour",
+   "Guo Xi",
+   "Rembrandt",
+   "The Anatomy Lesson of Dr. Nicolaes Tulp",
+   "The Penitent Magdalene",
+   "Travelers Among Mountains and Streams"
+  ],
+  "abc.py::PaintingHarmonyInRed": [
+   "#",
+   "El Greco",
+   "Harmony in Red",
+   "Henri Matisse",
+   "Ilya Repin",
+   "Reply of the Zaporozhian Cossacks",
+   "The Red Studio",
+   "View of Toledo"
+  ],
+  "abc.py::PaintingHayWain": [
+   "#",
+   "J.M.W. Turner",
+   "John Constable",
+   "Norham Castle, Sunrise",
+   "Snow Storm: Steam-Boat off a Harbour's Mouth",
+   "The Hay Wain",
+   "The Oxbow",
+   "Thomas Cole"
+  ],
+  "abc.py::PaintingHaystacks": [
+   "#",
+   "Beat the Whites with the Red Wedge",
+   "Berthe Morisot",
+   "Claude Monet",
+   "El Lissitzky",
+   "Haystacks (End of Summer)",
+   "The Cradle",
+   "Woman with a Parasol"
+  ],
+  "abc.py::PaintingHiroshigePlum": [
+   "#",
+   "John Everett Millais",
+   "Katsushika Hokusai",
+   "Ophelia",
+   "Plum Park in Kameido",
+   "Sudden Shower over Shin-Ohashi",
+   "The Amida Falls",
+   "Utagawa Hiroshige"
+  ],
+  "abc.py::PaintingHiroshigeRain": [
+   "#",
+   "Bullfinch and Weeping Cherry",
+   "Katsushika Hokusai",
+   "Plum Park in Kameido",
+   "Sudden Shower over Shin-Ohashi",
+   "The Amida Falls",
+   "Utagawa Hiroshige"
+  ],
+  "abc.py::PaintingHokusaiBullfinch": [
+   "#",
+   "Bullfinch and Weeping Cherry",
+   "Fine Wind, Clear Morning",
+   "Katsushika Hokusai",
+   "The Amida Falls",
+   "The Great Wave off Kanagawa"
+  ],
+  "abc.py::PaintingHokusaiWaterfall": [
+   "#",
+   "Bullfinch and Weeping Cherry",
+   "Fine Wind, Clear Morning",
+   "Katsushika Hokusai",
+   "Sudden Shower over Shin-Ohashi",
+   "The Amida Falls",
+   "Utagawa Hiroshige"
+  ],
+  "abc.py::PaintingHolbeinAmbassadors": [
+   "#",
+   "Giotto",
+   "Hans Holbein the Younger",
+   "Lamentation",
+   "Raphael",
+   "The Ambassadors",
+   "The Last Supper",
+   "The Transfiguration",
+   "Tintoretto"
+  ],
+  "abc.py::PaintingHonthorstCandlelight": [
+   "#",
+   "Caravaggio",
+   "Christ in the Storm on the Sea of Galilee",
+   "Gerrit van Honthorst",
+   "Musical Group by Candlelight",
+   "Philosopher in Meditation",
+   "Rembrandt",
+   "The Lute Player"
+  ],
+  "abc.py::PaintingHorseFair": [
+   "#",
+   "Caspar David Friedrich",
+   "Eugene Delacroix",
+   "Rosa Bonheur",
+   "The Death of Sardanapalus",
+   "The Horse Fair",
+   "The Raft of the Medusa",
+   "Theodore Gericault",
+   "Wanderer Above the Sea of Fog"
+  ],
+  "abc.py::PaintingHuizongCranes": [
+   "#",
+   "Anonymous (Ottoman)",
+   "Anonymous (Rajput)",
+   "Auspicious Cranes",
+   "Battle of Mohacs",
+   "Emperor Huizong",
+   "Gu Hongzhong",
+   "Night Revels of Han Xizai",
+   "Ragamala: Dhanasri Ragini"
+  ],
+  "abc.py::PaintingHuneferBookDead": [
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Roman)",
+   "Book of the Dead of Hunefer",
+   "Nebamun Hunting in the Marshes",
+   "Nefertari Led by Isis",
+   "Villa of the Mysteries"
+  ],
+  "abc.py::PaintingHuntersSnow": [
+   "#",
+   "Giuseppe Arcimboldo",
+   "Hieronymus Bosch",
+   "Hunters in the Snow",
+   "Pieter Bruegel",
+   "Summer",
+   "The Last Judgment",
+   "The Tower of Babel"
+  ],
+  "abc.py::PaintingImpressionSunrise": [
+   "#",
+   "A Bar at the Folies-Bergere",
+   "Claude Monet",
+   "Edouard Manet",
+   "Impression, Sunrise",
+   "The Fifer",
+   "Water Lilies"
+  ],
+  "abc.py::PaintingIrises": [
+   "#",
+   "Irises",
+   "Self-Portrait",
+   "Sunflowers",
+   "The Bedroom",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingJahangirPortrait": [
+   "#",
+   "Anonymous (Ajanta)",
+   "Anonymous (Ethiopian)",
+   "Anonymous (Mughal)",
+   "Bichitr",
+   "Bodhisattva Padmapani",
+   "Court of Akbar",
+   "Jahangir Preferring a Sufi Shaikh to Kings",
+   "Saint George Icon"
+  ],
+  "abc.py::PaintingJapaneseBridge": [
+   "#",
+   "Claude Monet",
+   "Dance at Le Moulin de la Galette",
+   "Pierre-Auguste Renoir",
+   "Poppy Field",
+   "Rouen Cathedral (Sunset)",
+   "Water Lilies and Japanese Bridge"
+  ],
+  "abc.py::PaintingJeongSeonGeumgang": [
+   "#",
+   "Blacksmith Shop",
+   "Canaletto",
+   "Entrance to the Grand Canal",
+   "Jeong Seon",
+   "Kim Hong-do",
+   "Sesshu Toyo",
+   "Splashed-Ink Landscape",
+   "View of Geumgangsan"
+  ],
+  "abc.py::PaintingKandinskyColorStudy": [
+   "#",
+   "Color Study: Squares with Concentric Circles",
+   "Improvisation #",
+   "Several Circles",
+   "Wassily Kandinsky",
+   "Yellow-Red-Blue"
+  ],
+  "abc.py::PaintingKandinskyImprovisation": [
+   "#",
+   "Black Square",
+   "Color Study: Squares with Concentric Circles",
+   "Improvisation #",
+   "Kazimir Malevich",
+   "Wassily Kandinsky",
+   "Yellow-Red-Blue"
+  ],
+  "abc.py::PaintingKandinskyYellowRedBlue": [
+   "#",
+   "Color Study: Squares with Concentric Circles",
+   "Composition VIII",
+   "Several Circles",
+   "Wassily Kandinsky",
+   "Yellow-Red-Blue"
+  ],
+  "abc.py::PaintingKimHongdoBlacksmith": [
+   "#",
+   "Blacksmith Shop",
+   "Gu Hongzhong",
+   "Jeong Seon",
+   "Kim Hong-do",
+   "Night Revels of Han Xizai",
+   "Sesshu Toyo",
+   "Splashed-Ink Landscape",
+   "View of Geumgangsan"
+  ],
+  "abc.py::PaintingKleeCastleSun": [
+   "#",
+   "Castle and Sun",
+   "Highway and Byways",
+   "Kazimir Malevich",
+   "Paul Klee",
+   "Senecio",
+   "White on White"
+  ],
+  "abc.py::PaintingKleeHighway": [
+   "#",
+   "Castle and Sun",
+   "Highway and Byways",
+   "Paul Klee",
+   "Senecio",
+   "Twittering Machine"
+  ],
+  "abc.py::PaintingKleeSenecio": [
+   "#",
+   "Broadway Boogie Woogie",
+   "Castle and Sun",
+   "Kazimir Malevich",
+   "Paul Klee",
+   "Piet Mondrian",
+   "Senecio",
+   "White on White"
+  ],
+  "abc.py::PaintingKleeTwittering": [
+   "#",
+   "Castle and Sun",
+   "Highway and Byways",
+   "Juan Gris",
+   "Paul Klee",
+   "Portrait of Picasso",
+   "Twittering Machine"
+  ],
+  "abc.py::PaintingKlimtAdele": [
+   "#",
+   "Edvard Munch",
+   "Evening on Karl Johan",
+   "Gustav Klimt",
+   "Portrait of Adele Bloch-Bauer I",
+   "The Kiss",
+   "The Tree of Life"
+  ],
+  "abc.py::PaintingKlimtFarmGarden": [
+   "#",
+   "Alphonse Mucha",
+   "Cottage Garden",
+   "Farm Garden with Sunflowers",
+   "Gustav Klimt",
+   "Job (Cigarettes)",
+   "The Tree of Life"
+  ],
+  "abc.py::PaintingKlimtFlowerGarden": [
+   "#",
+   "Cottage Garden",
+   "Farm Garden with Sunflowers",
+   "Gustav Klimt",
+   "Portrait of Adele Bloch-Bauer I",
+   "The Tree of Life"
+  ],
+  "abc.py::PaintingKlimtTreeOfLife": [
+   "#",
+   "Cottage Garden",
+   "Gustav Klimt",
+   "Portrait of Adele Bloch-Bauer I",
+   "The Kiss",
+   "The Tree of Life"
+  ],
+  "abc.py::PaintingKorinIrises": [
+   "#",
+   "Hasegawa Tohaku",
+   "Irises",
+   "Kitagawa Utamaro",
+   "Ogata Korin",
+   "Pine Trees",
+   "Qingming Festival",
+   "Three Beauties of the Present Day",
+   "Zhang Zeduan"
+  ],
+  "abc.py::PaintingLaTourCheat": [
+   "#",
+   "A Philosopher Lecturing on the Orrery",
+   "Caravaggio",
+   "Georges de La Tour",
+   "Gerrit van Honthorst",
+   "Joseph Wright of Derby",
+   "Musical Group by Candlelight",
+   "The Cheat with the Ace of Diamonds",
+   "The Lute Player"
+  ],
+  "abc.py::PaintingLaTourMagdalene": [
+   "#",
+   "Diego Velazquez",
+   "Early Spring",
+   "Georges de La Tour",
+   "Guo Xi",
+   "Portrait of Pope Innocent X",
+   "Rembrandt",
+   "The Anatomy Lesson of Dr. Nicolaes Tulp",
+   "The Penitent Magdalene"
+  ],
+  "abc.py::PaintingLaTourNewborn": [
+   "#",
+   "Albrecht Durer",
+   "An Experiment on a Bird in the Air Pump",
+   "Georges de La Tour",
+   "Joseph Wright of Derby",
+   "Melencolia I",
+   "Philosopher in Meditation",
+   "Rembrandt",
+   "The Newborn"
+  ],
+  "abc.py::PaintingLadyErmine": [
+   "#",
+   "Lady with an Ermine",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Mona Lisa",
+   "The Creation of Adam",
+   "The Last Supper"
+  ],
+  "abc.py::PaintingLadyOfShalott": [
+   "#",
+   "John Everett Millais",
+   "John William Waterhouse",
+   "Miranda - The Tempest",
+   "Ophelia",
+   "Plum Park in Kameido",
+   "The Lady of Shalott",
+   "Utagawa Hiroshige"
+  ],
+  "abc.py::PaintingLasMeninas": [
+   "#",
+   "Diego Velazquez",
+   "Jean-Honore Fragonard",
+   "Las Meninas",
+   "Rembrandt",
+   "Syndics of the Drapers' Guild",
+   "The Jewish Bride",
+   "The Swing"
+  ],
+  "abc.py::PaintingLastJudgmentBosch": [
+   "#",
+   "Fra Angelico",
+   "Hieronymus Bosch",
+   "Pieter Bruegel",
+   "The Annunciation",
+   "The Garden of Earthly Delights",
+   "The Last Judgment",
+   "The Tower of Babel"
+  ],
+  "abc.py::PaintingLastJudgmentMichelangelo": [
+   "#",
+   "Bacchus and Ariadne",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Raphael",
+   "The Last Judgment",
+   "The Transfiguration",
+   "Titian",
+   "Virgin of the Rocks"
+  ],
+  "abc.py::PaintingLastSupper": [
+   "#",
+   "Albrecht Durer",
+   "Lady with an Ermine",
+   "Leonardo da Vinci",
+   "Mona Lisa",
+   "St. Jerome in His Study",
+   "The Last Supper"
+  ],
+  "abc.py::PaintingLegerCity": [
+   "#",
+   "Contrast of Forms",
+   "Fernand Leger",
+   "Juan Gris",
+   "Still Life (Violin and Inkwell)",
+   "Still Life with Checked Tablecloth",
+   "The City"
+  ],
+  "abc.py::PaintingLegerContrast": [
+   "#",
+   "Albert Gleizes",
+   "Contrast of Forms",
+   "Fernand Leger",
+   "Juan Gris",
+   "Portrait of Jacques Nayral",
+   "Still Life (Violin and Inkwell)",
+   "The City"
+  ],
+  "abc.py::PaintingLindisfarneGospels": [
+   "#",
+   "Anonymous (Ethiopian)",
+   "Anonymous (Insular)",
+   "Carpet Page",
+   "Chi Rho Page",
+   "Eadfrith of Lindisfarne",
+   "Limbourg Brothers",
+   "Saint George Icon",
+   "Tres Riches Heures (January)"
+  ],
+  "abc.py::PaintingLissitzkyWedge": [
+   "#",
+   "Beat the Whites with the Red Wedge",
+   "Claude Monet",
+   "El Lissitzky",
+   "States of Mind: The Farewells",
+   "The City Rises",
+   "Umberto Boccioni",
+   "Woman with a Parasol"
+  ],
+  "abc.py::PaintingLuncheonBoating": [
+   "#",
+   "A Girl with a Watering Can",
+   "Claude Monet",
+   "Dance at Le Moulin de la Galette",
+   "Luncheon of the Boating Party",
+   "Pierre-Auguste Renoir",
+   "Water Lilies and Japanese Bridge"
+  ],
+  "abc.py::PaintingMadameX": [
+   "#",
+   "Bathers at Asnieres",
+   "Georges Seurat",
+   "Joaquin Sorolla",
+   "John Singer Sargent",
+   "Madame X",
+   "Strolling Along the Seashore",
+   "The Gulf Stream",
+   "Winslow Homer"
+  ],
+  "abc.py::PaintingMantegnaDeadChrist": [
+   "#",
+   "Andrea Mantegna",
+   "Giovanni Bellini",
+   "Lamentation over the Dead Christ",
+   "Paolo Veronese",
+   "Piero della Francesca",
+   "St. Francis in the Desert",
+   "The Flagellation of Christ",
+   "The Wedding at Cana"
+  ],
+  "abc.py::PaintingMatisseOpenWindow": [
+   "#",
+   "Harmony in Red",
+   "Henri Matisse",
+   "Open Window, Collioure",
+   "The Red Studio",
+   "Woman with a Hat"
+  ],
+  "abc.py::PaintingMatisseRedStudio": [
+   "#",
+   "Harmony in Red",
+   "Henri Matisse",
+   "Ilya Repin",
+   "Open Window, Collioure",
+   "Reply of the Zaporozhian Cossacks",
+   "The Red Studio"
+  ],
+  "abc.py::PaintingMatisseWomanHat": [
+   "#",
+   "Blue Horse I",
+   "Franz Marc",
+   "Henri Matisse",
+   "Open Window, Collioure",
+   "The Red Studio",
+   "Woman with a Hat"
+  ],
+  "abc.py::PaintingMemlingPortrait": [
+   "#",
+   "Descent from the Cross",
+   "Hans Memling",
+   "Hugo van der Goes",
+   "Merode Altarpiece",
+   "Portinari Altarpiece",
+   "Portrait of a Young Woman",
+   "Robert Campin",
+   "Rogier van der Weyden"
+  ],
+  "abc.py::PaintingModiglianiPortrait": [
+   "#",
+   "Amedeo Modigliani",
+   "Composition VII",
+   "Egon Schiele",
+   "Jeanne Hebuterne",
+   "Portrait of Edith",
+   "Self-Portrait with Physalis",
+   "Wassily Kandinsky"
+  ],
+  "abc.py::PaintingMonaLisa": [
+   "#",
+   "Albrecht Durer",
+   "Claude Monet",
+   "Gare Saint-Lazare",
+   "Leonardo da Vinci",
+   "Mona Lisa",
+   "St. Jerome in His Study",
+   "The Last Supper"
+  ],
+  "abc.py::PaintingMonetGare": [
+   "#",
+   "Albrecht Durer",
+   "Claude Monet",
+   "Gare Saint-Lazare",
+   "J.M.W. Turner",
+   "Newton",
+   "St. Jerome in His Study",
+   "The Burning of the Houses of Parliament",
+   "William Blake"
+  ],
+  "abc.py::PaintingMontSainteVictoire": [
+   "#",
+   "Mont Sainte-Victoire",
+   "Paul Cezanne",
+   "The Card Players",
+   "The Potato Eaters",
+   "Vincent van Gogh",
+   "Wheat Field with Cypresses"
+  ],
+  "abc.py::PaintingMorisotCradle": [
+   "#",
+   "Berthe Morisot",
+   "Claude Monet",
+   "Haystacks (End of Summer)",
+   "Mary Cassatt",
+   "The Child's Bath",
+   "The Cradle",
+   "Woman with a Parasol"
+  ],
+  "abc.py::PaintingMoulinRouge": [
+   "#",
+   "Arearea (The Red Dog)",
+   "Henri Rousseau",
+   "Henri de Toulouse-Lautrec",
+   "Moulin Rouge: La Goulue",
+   "Paul Gauguin",
+   "The Dream",
+   "Vision After the Sermon"
+  ],
+  "abc.py::PaintingMuchaJob": [
+   "#",
+   "Alphonse Mucha",
+   "Cottage Garden",
+   "El Greco",
+   "Farm Garden with Sunflowers",
+   "Gustav Klimt",
+   "Job (Cigarettes)",
+   "View of Toledo"
+  ],
+  "abc.py::PaintingMunchKarlJohan": [
+   "#",
+   "Edvard Munch",
+   "Evening on Karl Johan",
+   "Gustav Klimt",
+   "Henri Rousseau",
+   "The Kiss",
+   "The Scream",
+   "The Sleeping Gypsy"
+  ],
+  "abc.py::PaintingNapoleonAlps": [
+   "#",
+   "Caspar David Friedrich",
+   "Francisco Goya",
+   "Jacques-Louis David",
+   "Napoleon Crossing the Alps",
+   "The Death of Marat",
+   "The Parasol",
+   "Wanderer Above the Sea of Fog"
+  ],
+  "abc.py::PaintingNebamunHunting": [
+   "#",
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Roman Egypt)",
+   "Kamal ud-Din Behzad",
+   "Mummy Portrait of a Young Woman",
+   "Nebamun Hunting in the Marshes",
+   "Nefertari Led by Isis",
+   "Yusuf and Zulaikha"
+  ],
+  "abc.py::PaintingNefertariTomb": [
+   "#",
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Roman Egypt)",
+   "Book of the Dead of Hunefer",
+   "Mummy Portrait of a Young Woman",
+   "Nebamun Hunting in the Marshes",
+   "Nefertari Led by Isis"
+  ],
+  "abc.py::PaintingNiagara": [
+   "#",
+   "Frederic Edwin Church",
+   "Ivan Aivazovsky",
+   "John Constable",
+   "Niagara",
+   "The Hay Wain",
+   "The Ninth Wave",
+   "The Oxbow",
+   "Thomas Cole"
+  ],
+  "abc.py::PaintingNightRevels": [
+   "#",
+   "Anonymous (Ottoman)",
+   "Auspicious Cranes",
+   "Battle of Mohacs",
+   "Emperor Huizong",
+   "Gu Hongzhong",
+   "Night Revels of Han Xizai",
+   "Sesshu Toyo",
+   "Splashed-Ink Landscape"
+  ],
+  "abc.py::PaintingNightWatch": [
+   "#",
+   "Johannes Vermeer",
+   "Rembrandt",
+   "Self-Portrait",
+   "The Astronomer",
+   "The Night Watch",
+   "View of Delft"
+  ],
+  "abc.py::PaintingNighthawks": [
+   "#",
+   "American Gothic",
+   "Edward Hopper",
+   "Grant Wood",
+   "Nighthawks",
+   "The Fog Warning",
+   "The Gulf Stream",
+   "Winslow Homer"
+  ],
+  "abc.py::PaintingNinthWave": [
+   "#",
+   "Frederic Edwin Church",
+   "Ivan Aivazovsky",
+   "Katsushika Hokusai",
+   "Niagara",
+   "The Great Wave off Kanagawa",
+   "The Ninth Wave",
+   "The Oxbow",
+   "Thomas Cole"
+  ],
+  "abc.py::PaintingOphelia": [
+   "#",
+   "John Everett Millais",
+   "John William Waterhouse",
+   "Ophelia",
+   "Plum Park in Kameido",
+   "Sudden Shower over Shin-Ohashi",
+   "The Lady of Shalott",
+   "Utagawa Hiroshige"
+  ],
+  "abc.py::PaintingOttomanMohacs": [
+   "#",
+   "Anonymous (Ottoman)",
+   "Anonymous (Rajput)",
+   "Auspicious Cranes",
+   "Battle of Mohacs",
+   "Emperor Huizong",
+   "Radha and Krishna in the Boat of Love",
+   "Ragamala: Dhanasri Ragini"
+  ],
+  "abc.py::PaintingPieroFlagellation": [
+   "#",
+   "Andrea Mantegna",
+   "Lamentation over the Dead Christ",
+   "Paolo Veronese",
+   "Piero della Francesca",
+   "The Flagellation of Christ",
+   "The Last Supper",
+   "The Wedding at Cana",
+   "Tintoretto"
+  ],
+  "abc.py::PaintingPissarroBoulevard": [
+   "#",
+   "Berthe Morisot",
+   "Boulevard Montmartre",
+   "Camille Pissarro",
+   "Mary Cassatt",
+   "Robert Delaunay",
+   "Simultaneous Windows",
+   "The Child's Bath",
+   "The Cradle"
+  ],
+  "abc.py::PaintingPoppies": [
+   "#",
+   "Claude Monet",
+   "Poppy Field",
+   "Rouen Cathedral (Sunset)",
+   "Water Lilies",
+   "Water Lilies and Japanese Bridge"
+  ],
+  "abc.py::PaintingPotatoEaters": [
+   "#",
+   "Almond Blossoms",
+   "Mont Sainte-Victoire",
+   "Paul Cezanne",
+   "The Potato Eaters",
+   "Vincent van Gogh",
+   "Wheat Field with Cypresses"
+  ],
+  "abc.py::PaintingPrimavera": [
+   "#",
+   "Bacchus and Ariadne",
+   "Primavera",
+   "Robert Delaunay",
+   "Sandro Botticelli",
+   "Simultaneous Windows",
+   "The Birth of Venus",
+   "Titian"
+  ],
+  "abc.py::PaintingRadhaKrishna": [
+   "#",
+   "Anonymous (Mughal)",
+   "Anonymous (Rajput)",
+   "Bichitr",
+   "Court of Akbar",
+   "Jahangir Preferring a Sufi Shaikh to Kings",
+   "Radha and Krishna in the Boat of Love",
+   "Ragamala: Dhanasri Ragini"
+  ],
+  "abc.py::PaintingRaftOfMedusa": [
+   "#",
+   "Eugene Delacroix",
+   "Rosa Bonheur",
+   "The Death of Sardanapalus",
+   "The Derby at Epsom",
+   "The Horse Fair",
+   "The Raft of the Medusa",
+   "Theodore Gericault"
+  ],
+  "abc.py::PaintingRagamalaDhanasri": [
+   "#",
+   "Anonymous (Mughal)",
+   "Anonymous (Ottoman)",
+   "Anonymous (Rajput)",
+   "Battle of Mohacs",
+   "Court of Akbar",
+   "Radha and Krishna in the Boat of Love",
+   "Ragamala: Dhanasri Ragini"
+  ],
+  "abc.py::PaintingRainSteamSpeed": [
+   "#",
+   "J.M.W. Turner",
+   "Rain, Steam and Speed",
+   "Snow Storm: Steam-Boat off a Harbour's Mouth",
+   "The Derby at Epsom",
+   "The Fighting Temeraire",
+   "Theodore Gericault"
+  ],
+  "abc.py::PaintingRaphaelTransfiguration": [
+   "#",
+   "Giotto",
+   "Lamentation",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Raphael",
+   "The Last Judgment",
+   "The Transfiguration",
+   "Virgin of the Rocks"
+  ],
+  "abc.py::PaintingRedFuji": [
+   "#",
+   "Bullfinch and Weeping Cherry",
+   "Fine Wind, Clear Morning",
+   "Ivan Aivazovsky",
+   "Katsushika Hokusai",
+   "The Great Wave off Kanagawa",
+   "The Ninth Wave"
+  ],
+  "abc.py::PaintingRembrandtAnatomy": [
+   "#",
+   "Diego Velazquez",
+   "Georges de La Tour",
+   "Merode Altarpiece",
+   "Portrait of Pope Innocent X",
+   "Rembrandt",
+   "Robert Campin",
+   "The Anatomy Lesson of Dr. Nicolaes Tulp",
+   "The Penitent Magdalene"
+  ],
+  "abc.py::PaintingRembrandtJewishBride": [
+   "#",
+   "Rembrandt",
+   "Self-Portrait",
+   "Syndics of the Drapers' Guild",
+   "The Jewish Bride",
+   "The Night Watch"
+  ],
+  "abc.py::PaintingRembrandtPhilosopher": [
+   "#",
+   "An Experiment on a Bird in the Air Pump",
+   "Christ in the Storm on the Sea of Galilee",
+   "Georges de La Tour",
+   "Joseph Wright of Derby",
+   "Philosopher in Meditation",
+   "Rembrandt",
+   "The Newborn"
+  ],
+  "abc.py::PaintingRembrandtSelfPortrait": [
+   "#",
+   "Johannes Vermeer",
+   "Rembrandt",
+   "Self-Portrait",
+   "The Jewish Bride",
+   "The Night Watch",
+   "View of Delft"
+  ],
+  "abc.py::PaintingRembrandtStorm": [
+   "#",
+   "Christ in the Storm on the Sea of Galilee",
+   "Georges de La Tour",
+   "Gerrit van Honthorst",
+   "Musical Group by Candlelight",
+   "Philosopher in Meditation",
+   "Rembrandt",
+   "The Newborn"
+  ],
+  "abc.py::PaintingRembrandtSyndics": [
+   "#",
+   "Diego Velazquez",
+   "Las Meninas",
+   "Rembrandt",
+   "Self-Portrait",
+   "Syndics of the Drapers' Guild",
+   "The Jewish Bride"
+  ],
+  "abc.py::PaintingRenoirGrenouillere": [
+   "#",
+   "A Girl with a Watering Can",
+   "Ballet Rehearsal on Stage",
+   "Edgar Degas",
+   "La Grenouillere",
+   "Pierre-Auguste Renoir",
+   "Two Sisters (On the Terrace)"
+  ],
+  "abc.py::PaintingRenoirTwoSisters": [
+   "#",
+   "A Girl with a Watering Can",
+   "La Grenouillere",
+   "Luncheon of the Boating Party",
+   "Pierre-Auguste Renoir",
+   "Two Sisters (On the Terrace)"
+  ],
+  "abc.py::PaintingRezaAbbasiLovers": [
+   "#",
+   "Kamal ud-Din Behzad",
+   "Kitagawa Utamaro",
+   "Otani Oniji III as Yakko Edobei",
+   "Reza Abbasi",
+   "Three Beauties of the Present Day",
+   "Toshusai Sharaku",
+   "Two Lovers",
+   "Yusuf and Zulaikha"
+  ],
+  "abc.py::PaintingRosesHeliogabalus": [
+   "#",
+   "John William Waterhouse",
+   "Lawrence Alma-Tadema",
+   "Miranda - The Tempest",
+   "The Lady of Shalott",
+   "The Roses of Heliogabalus",
+   "The Shepherdess",
+   "William-Adolphe Bouguereau"
+  ],
+  "abc.py::PaintingRouenCathedral": [
+   "#",
+   "Claude Monet",
+   "Impression, Sunrise",
+   "Poppy Field",
+   "Rouen Cathedral (Sunset)",
+   "Water Lilies"
+  ],
+  "abc.py::PaintingRublevTrinity": [
+   "#",
+   "Andrei Rublev",
+   "Cimabue",
+   "Descent from the Cross",
+   "Duccio",
+   "Maesta",
+   "Rogier van der Weyden",
+   "Trinity"
+  ],
+  "abc.py::PaintingSapphoPompeii": [
+   "#",
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Pompeii)",
+   "Anonymous (Roman)",
+   "Anonymous (Stabiae)",
+   "Book of the Dead of Hunefer",
+   "Flora",
+   "Portrait of a Young Woman",
+   "Villa of the Mysteries"
+  ],
+  "abc.py::PaintingSchieleEdith": [
+   "#",
+   "Amedeo Modigliani",
+   "Berlin Street Scene",
+   "Egon Schiele",
+   "Ernst Ludwig Kirchner",
+   "Jeanne Hebuterne",
+   "Portrait of Edith",
+   "Self-Portrait with Physalis"
+  ],
+  "abc.py::PaintingSchieleSelfPortrait": [
+   "#",
+   "Berlin Street Scene",
+   "Blue Horse I",
+   "Egon Schiele",
+   "Ernst Ludwig Kirchner",
+   "Franz Marc",
+   "Portrait of Edith",
+   "Self-Portrait with Physalis"
+  ],
+  "abc.py::PaintingSchoolOfAthens": [
+   "#",
+   "Cestello Annunciation",
+   "Michelangelo",
+   "Raphael",
+   "Sandro Botticelli",
+   "Sistine Madonna",
+   "The Creation of Adam",
+   "The School of Athens"
+  ],
+  "abc.py::PaintingSesshuHaboku": [
+   "#",
+   "Auspicious Cranes",
+   "Blacksmith Shop",
+   "Emperor Huizong",
+   "Gu Hongzhong",
+   "Kim Hong-do",
+   "Night Revels of Han Xizai",
+   "Sesshu Toyo",
+   "Splashed-Ink Landscape"
+  ],
+  "abc.py::PaintingSeveralCircles": [
+   "#",
+   "Composition VII",
+   "Composition VIII",
+   "Several Circles",
+   "Wassily Kandinsky",
+   "Yellow-Red-Blue"
+  ],
+  "abc.py::PaintingSharakuActor": [
+   "#",
+   "Irises",
+   "Kitagawa Utamaro",
+   "Ogata Korin",
+   "Otani Oniji III as Yakko Edobei",
+   "Reza Abbasi",
+   "Three Beauties of the Present Day",
+   "Toshusai Sharaku",
+   "Two Lovers"
+  ],
+  "abc.py::PaintingSistineMadonna": [
+   "#",
+   "Lady with an Ermine",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Raphael",
+   "Sistine Madonna",
+   "The Creation of Adam",
+   "The School of Athens"
+  ],
+  "abc.py::PaintingSleepingGypsy": [
+   "#",
+   "Edvard Munch",
+   "Henri Rousseau",
+   "Henri de Toulouse-Lautrec",
+   "Moulin Rouge: La Goulue",
+   "The Dream",
+   "The Scream",
+   "The Sleeping Gypsy"
+  ],
+  "abc.py::PaintingSorollaSeashore": [
+   "#",
+   "A Sunday on La Grande Jatte",
+   "Bathers at Asnieres",
+   "Georges Seurat",
+   "Joaquin Sorolla",
+   "John Singer Sargent",
+   "Madame X",
+   "Strolling Along the Seashore"
+  ],
+  "abc.py::PaintingStarryNight": [
+   "#",
+   "American Gothic",
+   "Cafe Terrace at Night",
+   "Edward Hopper",
+   "Grant Wood",
+   "Nighthawks",
+   "The Starry Night",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingSundayGrandeJatte": [
+   "#",
+   "A Sunday on La Grande Jatte",
+   "Ballet Rehearsal on Stage",
+   "Bathers at Asnieres",
+   "Edgar Degas",
+   "Georges Seurat",
+   "Gustave Caillebotte",
+   "Paris Street; Rainy Day"
+  ],
+  "abc.py::PaintingSunflowers": [
+   "#",
+   "Almond Blossoms",
+   "Irises",
+   "Self-Portrait",
+   "Sunflowers",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingSupperEmmaus": [
+   "#",
+   "Bacchus",
+   "Caravaggio",
+   "Medusa",
+   "The Calling of Saint Matthew",
+   "The Supper at Emmaus"
+  ],
+  "abc.py::PaintingTheBedroom": [
+   "#",
+   "Cafe Terrace at Night",
+   "Self-Portrait",
+   "The Bedroom",
+   "The Starry Night",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingTheDreamRousseau": [
+   "#",
+   "Arearea (The Red Dog)",
+   "Henri Rousseau",
+   "Henri de Toulouse-Lautrec",
+   "Moulin Rouge: La Goulue",
+   "Paul Gauguin",
+   "The Dream",
+   "The Sleeping Gypsy"
+  ],
+  "abc.py::PaintingTheFifer": [
+   "#",
+   "A Bar at the Folies-Bergere",
+   "Claude Monet",
+   "Edouard Manet",
+   "Impression, Sunrise",
+   "James McNeill Whistler",
+   "The Fifer",
+   "Whistler's Mother"
+  ],
+  "abc.py::PaintingTheKissKlimt": [
+   "#",
+   "Edvard Munch",
+   "Evening on Karl Johan",
+   "Gustav Klimt",
+   "Portrait of Adele Bloch-Bauer I",
+   "The Kiss",
+   "The Scream"
+  ],
+  "abc.py::PaintingTheMilkmaid": [
+   "#",
+   "Girl with a Pearl Earring",
+   "Johannes Vermeer",
+   "The Art of Painting",
+   "The Lacemaker",
+   "The Milkmaid"
+  ],
+  "abc.py::PaintingTheOxbow": [
+   "#",
+   "Frederic Edwin Church",
+   "J.M.W. Turner",
+   "John Constable",
+   "Niagara",
+   "Norham Castle, Sunrise",
+   "The Hay Wain",
+   "The Oxbow",
+   "Thomas Cole"
+  ],
+  "abc.py::PaintingTheScream": [
+   "#",
+   "Edvard Munch",
+   "Evening on Karl Johan",
+   "Henri Rousseau",
+   "The Dream",
+   "The Scream",
+   "The Sleeping Gypsy"
+  ],
+  "abc.py::PaintingTheSwing": [
+   "#",
+   "Diego Velazquez",
+   "Francisco Goya",
+   "Jean-Honore Fragonard",
+   "Las Meninas",
+   "Rembrandt",
+   "Syndics of the Drapers' Guild",
+   "The Parasol",
+   "The Swing"
+  ],
+  "abc.py::PaintingTintorettoLastSupper": [
+   "#",
+   "Giotto",
+   "Hans Holbein the Younger",
+   "Lamentation",
+   "Paolo Veronese",
+   "The Ambassadors",
+   "The Last Supper",
+   "The Wedding at Cana",
+   "Tintoretto"
+  ],
+  "abc.py::PaintingTitianAssumption": [
+   "#",
+   "Albrecht Durer",
+   "Assumption of the Virgin",
+   "Bacchus",
+   "Caravaggio",
+   "Jan van Eyck",
+   "The Arnolfini Portrait",
+   "Titian",
+   "Young Hare"
+  ],
+  "abc.py::PaintingTitianPieta": [
+   "#",
+   "Albrecht Durer",
+   "Francisco Goya",
+   "Pieta",
+   "Rhinoceros",
+   "The Colossus",
+   "The Sleep of Reason Produces Monsters",
+   "Titian"
+  ],
+  "abc.py::PaintingTohakuPineTrees": [
+   "#",
+   "Fan Kuan",
+   "Hasegawa Tohaku",
+   "Irises",
+   "Ogata Korin",
+   "Pine Trees",
+   "Qingming Festival",
+   "Travelers Among Mountains and Streams",
+   "Zhang Zeduan"
+  ],
+  "abc.py::PaintingTowerOfBabel": [
+   "#",
+   "Hieronymus Bosch",
+   "Hunters in the Snow",
+   "Pieter Bruegel",
+   "The Garden of Earthly Delights",
+   "The Last Judgment",
+   "The Tower of Babel"
+  ],
+  "abc.py::PaintingTresRichesHeures": [
+   "#",
+   "# BCE",
+   "Alexander Mosaic",
+   "Anonymous (Insular)",
+   "Anonymous (Pompeii)",
+   "Anonymous (Stabiae)",
+   "Chi Rho Page",
+   "Flora",
+   "Limbourg Brothers",
+   "Tres Riches Heures (January)"
+  ],
+  "abc.py::PaintingTurnerNorham": [
+   "#",
+   "J.M.W. Turner",
+   "John Constable",
+   "Norham Castle, Sunrise",
+   "Rain, Steam and Speed",
+   "Snow Storm: Steam-Boat off a Harbour's Mouth",
+   "The Hay Wain"
+  ],
+  "abc.py::PaintingTurnerParliament": [
+   "#",
+   "Cloud Study",
+   "J.M.W. Turner",
+   "John Constable",
+   "Newton",
+   "Rain, Steam and Speed",
+   "The Burning of the Houses of Parliament",
+   "William Blake"
+  ],
+  "abc.py::PaintingTurnerRainSteam": [
+   "#",
+   "Cloud Study",
+   "J.M.W. Turner",
+   "John Constable",
+   "Rain, Steam and Speed",
+   "The Burning of the Houses of Parliament",
+   "The Chess Players",
+   "Thomas Eakins"
+  ],
+  "abc.py::PaintingTurnerSnowstorm": [
+   "#",
+   "J.M.W. Turner",
+   "Norham Castle, Sunrise",
+   "Rain, Steam and Speed",
+   "Snow Storm: Steam-Boat off a Harbour's Mouth",
+   "The Fighting Temeraire"
+  ],
+  "abc.py::PaintingUtamaroBeauties": [
+   "#",
+   "Hasegawa Tohaku",
+   "Irises",
+   "Kitagawa Utamaro",
+   "Ogata Korin",
+   "Otani Oniji III as Yakko Edobei",
+   "Pine Trees",
+   "Three Beauties of the Present Day",
+   "Toshusai Sharaku"
+  ],
+  "abc.py::PaintingVanDerGoesPortinari": [
+   "#",
+   "Andrei Rublev",
+   "Descent from the Cross",
+   "Hans Memling",
+   "Hugo van der Goes",
+   "Portinari Altarpiece",
+   "Portrait of a Young Woman",
+   "Rogier van der Weyden",
+   "Trinity"
+  ],
+  "abc.py::PaintingVanDerWeydenDescent": [
+   "#",
+   "Andrei Rublev",
+   "Descent from the Cross",
+   "Duccio",
+   "Hugo van der Goes",
+   "Maesta",
+   "Portinari Altarpiece",
+   "Rogier van der Weyden",
+   "Trinity"
+  ],
+  "abc.py::PaintingVanGoghWeaver": [
+   "#",
+   "A Philosopher Lecturing on the Orrery",
+   "Andreas Cellarius",
+   "Harmonia Macrocosmica",
+   "Joseph Wright of Derby",
+   "The Chess Players",
+   "Thomas Eakins",
+   "Vincent van Gogh",
+   "Weaver at the Loom"
+  ],
+  "abc.py::PaintingVangoghSelfPortrait": [
+   "#",
+   "Cafe Terrace at Night",
+   "Irises",
+   "Self-Portrait",
+   "The Bedroom",
+   "Vincent van Gogh"
+  ],
+  "abc.py::PaintingVelazquezPope": [
+   "#",
+   "Diego Velazquez",
+   "Hans Memling",
+   "Merode Altarpiece",
+   "Portrait of Pope Innocent X",
+   "Portrait of a Young Woman",
+   "Rembrandt",
+   "Robert Campin",
+   "The Anatomy Lesson of Dr. Nicolaes Tulp"
+  ],
+  "abc.py::PaintingVermeerAstronomer": [
+   "#",
+   "Girl Reading a Letter at an Open Window",
+   "Johannes Vermeer",
+   "The Art of Painting",
+   "The Astronomer",
+   "View of Delft"
+  ],
+  "abc.py::PaintingVermeerLacemaker": [
+   "#",
+   "Artemisia Gentileschi",
+   "Caravaggio",
+   "Girl with a Pearl Earring",
+   "Johannes Vermeer",
+   "Self-Portrait as Allegory of Painting",
+   "The Lacemaker",
+   "The Musicians"
+  ],
+  "abc.py::PaintingVeroneseWeddingCana": [
+   "#",
+   "Hans Holbein the Younger",
+   "Paolo Veronese",
+   "Piero della Francesca",
+   "The Ambassadors",
+   "The Flagellation of Christ",
+   "The Last Supper",
+   "The Wedding at Cana",
+   "Tintoretto"
+  ],
+  "abc.py::PaintingViewOfDelft": [
+   "#",
+   "Girl Reading a Letter at an Open Window",
+   "Johannes Vermeer",
+   "Rembrandt",
+   "The Astronomer",
+   "The Night Watch",
+   "View of Delft"
+  ],
+  "abc.py::PaintingViewOfToledo": [
+   "#",
+   "Alphonse Mucha",
+   "El Greco",
+   "Farm Garden with Sunflowers",
+   "Gustav Klimt",
+   "Ilya Repin",
+   "Job (Cigarettes)",
+   "Reply of the Zaporozhian Cossacks",
+   "View of Toledo"
+  ],
+  "abc.py::PaintingVillaMysteries": [
+   "#",
+   "# BCE",
+   "Anonymous (Ancient Egypt)",
+   "Anonymous (Pompeii)",
+   "Anonymous (Roman)",
+   "Book of the Dead of Hunefer",
+   "Nefertari Led by Isis",
+   "Portrait of a Young Woman",
+   "Villa of the Mysteries"
+  ],
+  "abc.py::PaintingVirginOfRocks": [
+   "#",
+   "Bacchus and Ariadne",
+   "Leonardo da Vinci",
+   "Michelangelo",
+   "Primavera",
+   "Sandro Botticelli",
+   "The Last Judgment",
+   "Titian",
+   "Virgin of the Rocks"
+  ],
+  "abc.py::PaintingVisionSermon": [
+   "#",
+   "Arearea (The Red Dog)",
+   "Bibemus Quarries",
+   "Paul Cezanne",
+   "Paul Gauguin",
+   "The Boy in the Red Vest",
+   "Vision After the Sermon"
+  ],
+  "abc.py::PaintingWandererFog": [
+   "#",
+   "Caspar David Friedrich",
+   "Eugene Delacroix",
+   "Jacques-Louis David",
+   "Napoleon Crossing the Alps",
+   "The Death of Marat",
+   "The Death of Sardanapalus",
+   "Wanderer Above the Sea of Fog"
+  ],
+  "abc.py::PaintingWaterLilies": [
+   "#",
+   "Claude Monet",
+   "Edouard Manet",
+   "Impression, Sunrise",
+   "Rouen Cathedral (Sunset)",
+   "The Fifer",
+   "Water Lilies"
+  ],
+  "abc.py::PaintingWaterhouseMiranda": [
+   "#",
+   "John Everett Millais",
+   "John William Waterhouse",
+   "Lawrence Alma-Tadema",
+   "Miranda - The Tempest",
+   "Ophelia",
+   "The Lady of Shalott",
+   "The Roses of Heliogabalus"
+  ],
+  "abc.py::PaintingWatteauCythera": [
+   "#",
+   "Antoine Watteau",
+   "Canaletto",
+   "Embarkation for Cythera",
+   "Entrance to the Grand Canal",
+   "Francisco Goya",
+   "Jeong Seon",
+   "The Colossus",
+   "View of Geumgangsan"
+  ],
+  "abc.py::PaintingWheatfieldCypresses": [
+   "#",
+   "Almond Blossoms",
+   "Sunflowers",
+   "The Potato Eaters",
+   "Vincent van Gogh",
+   "Wheat Field with Cypresses"
+  ],
+  "abc.py::PaintingWhistlersMother": [
+   "#",
+   "A Bar at the Folies-Bergere",
+   "Edouard Manet",
+   "James McNeill Whistler",
+   "Lawrence Alma-Tadema",
+   "The Roses of Heliogabalus",
+   "The Shepherdess",
+   "Whistler's Mother",
+   "William-Adolphe Bouguereau"
+  ],
+  "abc.py::PaintingWhiteOnWhite": [
+   "#",
+   "Black Square",
+   "Broadway Boogie Woogie",
+   "Kazimir Malevich",
+   "Paul Klee",
+   "Piet Mondrian",
+   "Senecio",
+   "White on White"
+  ],
+  "abc.py::PaintingWomanParasol": [
+   "#",
+   "Beat the Whites with the Red Wedge",
+   "Claude Monet",
+   "El Lissitzky",
+   "Haystacks (End of Summer)",
+   "States of Mind: The Farewells",
+   "Umberto Boccioni",
+   "Woman with a Parasol"
+  ],
+  "abc.py::PaintingWrightAirPump": [
+   "#",
+   "Albrecht Durer",
+   "An Experiment on a Bird in the Air Pump",
+   "Georges de La Tour",
+   "Joseph Wright of Derby",
+   "Melencolia I",
+   "Rhinoceros",
+   "The Newborn"
+  ],
+  "abc.py::PaintingWrightOrrery": [
+   "#",
+   "A Philosopher Lecturing on the Orrery",
+   "Andreas Cellarius",
+   "Caravaggio",
+   "Georges de La Tour",
+   "Harmonia Macrocosmica",
+   "Joseph Wright of Derby",
+   "The Cheat with the Ace of Diamonds",
+   "The Lute Player"
+  ],
+  "abc.py::PaintingZhangZeduanQingming": [
+   "#",
+   "Early Spring",
+   "Fan Kuan",
+   "Guo Xi",
+   "Hasegawa Tohaku",
+   "Pine Trees",
+   "Qingming Festival",
+   "Travelers Among Mountains and Streams",
+   "Zhang Zeduan"
+  ],
+  "games/agario.py::Agario": [
+   "#",
+   "#:#"
+  ],
+  "games/arkanoid.py::Arkanoid": [
+   "#",
+   "BTN:START",
+   "ROUND #"
+  ],
+  "games/asteroids.py::Asteroids": [
+   "#"
+  ],
+  "games/bloons.py::Bloons": [
+   "#/#",
+   "BTN:RETRY",
+   "L#",
+   "MISS",
+   "OUT OF DARTS",
+   "SCORE:#"
+  ],
+  "games/bloonstd.py::BloonsTD": [
+   "#S",
+   "$#",
+   "CANNON",
+   "DART",
+   "ICE",
+   "L:#",
+   "L=PLACE",
+   "R=SWITCH",
+   "TACK",
+   "UP$#",
+   "W#"
+  ],
+  "games/bomberman.py::Bomberman": [
+   "#",
+   "B#",
+   "L#"
+  ],
+  "games/bopit.py::BopIt": [
+   "BEST:#",
+   "BOP IT!",
+   "BOP!",
+   "BTN:START",
+   "BUTTON",
+   "GAME",
+   "L-R",
+   "NEW BEST!",
+   "OVER",
+   "PULL!",
+   "SCORE:#",
+   "TWIST!",
+   "U-D",
+   "YEAH!"
+  ],
+  "games/bowling.py::Bowling": [
+   " # PLAYERS",
+   "#",
+   "># PLAYER",
+   "BOWLING",
+   "F#",
+   "GUTTER"
+  ],
+  "games/breakout.py::Breakout": [
+   "#",
+   "BTN:LAUNCH"
+  ],
+  "games/burgertime.py::BurgerTime": [
+   "#",
+   "L#",
+   "P#"
+  ],
+  "games/centipede.py::Centipede": [
+   "#"
+  ],
+  "games/checkers.py::Checkers": [
+   "P#"
+  ],
+  "games/chess.py::Chess": [
+   "P#"
+  ],
+  "games/connect4.py::Connect4": [
+   "P#"
+  ],
+  "games/darts.py::Darts": [
+   " # PLAYERS",
+   "#",
+   "># PLAYER",
+   "DARTS",
+   "DOUBLE #",
+   "MISS",
+   "R#/#"
+  ],
+  "games/defender.py::Defender": [
+   "#"
+  ],
+  "games/digdug.py::DigDug": [
+   "#"
+  ],
+  "games/dnd.py::DnD": [
+   "A#",
+   "D#"
+  ],
+  "games/donkeykong.py::DonkeyKong": [
+   "#"
+  ],
+  "games/drift.py::Drift": [
+   "LOWER",
+   "RAISE",
+   "SMOOTH",
+   "SPRING",
+   "WATER"
+  ],
+  "games/fifteenpuzzle.py::FifteenPuzzle": [
+   "#",
+   "M:#"
+  ],
+  "games/fishing.py::Fishing": [
+   "#",
+   "#.#LB",
+   "ESCAPED!"
+  ],
+  "games/flappy.py::Flappy": [
+   "#",
+   "BTN:FLAP"
+  ],
+  "games/frogger.py::Frogger": [
+   "#"
+  ],
+  "games/galaga.py::Galaga": [
+   "#"
+  ],
+  "games/game2048.py::Game2048": [
+   "#"
+  ],
+  "games/geometrydash.py::GeometryDash": [
+   "#"
+  ],
+  "games/go.py::Go": [
+   "#",
+   "B",
+   "PASS",
+   "W"
+  ],
+  "games/indy500.py::Indy500": [
+   "D#/#",
+   "P#/#",
+   "T#"
+  ],
+  "games/invaders.py::Invaders": [
+   "#"
+  ],
+  "games/jezzball.py::JezzBall": [
+   "#",
+   "#%",
+   "H",
+   "L#",
+   "V"
+  ],
+  "games/lasermirrors.py::LaserMirrors": [
+   "#",
+   "BY BOUNCING",
+   "L#",
+   "LIGHT TARGET",
+   "PRESS:ROTATE",
+   "THE BEAM"
+  ],
+  "games/lightsout.py::LightsOut": [
+   "#",
+   "L#",
+   "M:#"
+  ],
+  "games/loderunner.py::LodeRunner": [
+   "#",
+   "G:#"
+  ],
+  "games/lunarlander.py::LunarLander": [
+   "#",
+   "#X",
+   "<",
+   ">",
+   "CRASHED",
+   "FUEL-#",
+   "L#",
+   "v"
+  ],
+  "games/mancala.py::Mancala": [
+   "#",
+   "P#"
+  ],
+  "games/mastermind.py::Mastermind": [
+   "CODE:",
+   "LEFT:#",
+   "LOSE"
+  ],
+  "games/monstermaze.py::MonsterMaze": [
+   "#D MONSTER",
+   "E",
+   "FIND THE EXIT",
+   "HE IS HUNTING",
+   "L#",
+   "LEVEL #",
+   "MAZE",
+   "N",
+   "REX WAITS",
+   "S",
+   "S:#",
+   "W"
+  ],
+  "games/mspacman.py::MsPacMan": [
+   "#"
+  ],
+  "games/nightdriver.py::NightDriver": [
+   "#",
+   "< EXPERT >",
+   "< NOVICE >",
+   "< PRO >",
+   "BTN: START",
+   "DRIVER",
+   "G#",
+   "NIGHT"
+  ],
+  "games/othello.py::Othello": [
+   "P#: #"
+  ],
+  "games/pacman.py::PacMan": [
+   "#"
+  ],
+  "games/pinball.py::Pinball": [
+   "#",
+   "BALL #",
+   "DRAIN!",
+   "SCORE:#"
+  ],
+  "games/pipedream.py::PipeDream": [
+   "#",
+   "GAME OVER",
+   "NEXT",
+   "P:#",
+   "S:#"
+  ],
+  "games/pong.py::Pong": [
+   "#",
+   "GET READY"
+  ],
+  "games/pool.py::Pool": [
+   " # PLAYERS",
+   "#",
+   "># PLAYER",
+   "POOL",
+   "SHOTS:#"
+  ],
+  "games/portal.py::Portal": [
+   "#",
+   "APERTURE SCI",
+   "BEGIN TESTING",
+   "CH#",
+   "CHAMBER #",
+   "PORTAL",
+   "PRESS START",
+   "SUBJECT LOST",
+   "TIME UP"
+  ],
+  "games/qbert.py::QBert": [
+   "#",
+   "@!#?",
+   "L#"
+  ],
+  "games/rushhour.py::RushHour": [
+   ">",
+   "B",
+   "BEGINNER",
+   "C",
+   "D",
+   "E",
+   "EASY",
+   "EXPERT",
+   "G",
+   "GO!",
+   "HARD",
+   "L#",
+   "M:#",
+   "MEDIUM",
+   "RUSH HR",
+   "X"
+  ],
+  "games/sandgame.py::SandGame": [
+   ">",
+   "ACID",
+   "ERASE",
+   "FIRE",
+   "FUSE",
+   "GAS",
+   "GUNPOWDER",
+   "LAVA",
+   "METAL",
+   "NITRO",
+   "OIL",
+   "PLANT",
+   "SAND",
+   "STONE",
+   "VINE",
+   "WATER",
+   "WOOD"
+  ],
+  "games/shuffleboard.py::Shuffleboard": [
+   " # PLAYERS",
+   "#",
+   "># PLAYER",
+   "BOARD",
+   "R#",
+   "SHUFFLE"
+  ],
+  "games/simon.py::Simon": [
+   "#",
+   "</>: GOAL",
+   "?",
+   "BEST:#",
+   "CORRECT!",
+   "GAME OVER",
+   "GO",
+   "SCORE:#",
+   "WATCH...",
+   "X",
+   "YOUR TURN"
+  ],
+  "games/skifree.py::SkiFree": [
+   "#M",
+   "S#"
+  ],
+  "games/snake.py::Snake": [
+   "LEN:#",
+   "SCORE:#"
+  ],
+  "games/spacecruise.py::SpaceCruise": [
+   "#:#",
+   "I",
+   "M",
+   "S"
+  ],
+  "games/stack.py::Stack": [
+   "H:#",
+   "X#"
+  ],
+  "games/stickrunner.py::StickRunner": [
+   "#%",
+   "#M"
+  ],
+  "games/tetris.py::Tetris": [
+   "#",
+   "LN",
+   "LV",
+   "NX",
+   "SC"
+  ],
+  "games/trashblaster.py::TrashBlaster": [
+   "#:#"
+  ],
+  "games/windowwasher.py::WindowWasher": [
+   "#",
+   "L#"
+  ],
+  "visuals/about.py::About": [
+   "",
+   "# PIXELS",
+   "#X# RGB",
+   ">",
+   "BTN:EXIT",
+   "HUB#",
+   "LED MATRIX",
+   "RASPBERRY PI #",
+   "SYSTEM",
+   "TERMINAL"
+  ],
+  "visuals/agariodemo.py::AgarioDemo": [
+   "#",
+   "#:#",
+   "DEMO"
+  ],
+  "visuals/antikythera.py::Antikythera": [
+   "# BC"
+  ],
+  "visuals/aquarium.py::Aquarium": [],
+  "visuals/archimedes.py::Archimedes": [
+   "#RPM"
+  ],
+  "visuals/arkanoid_demo.py::ArkanoidDemo": [
+   "#",
+   "BTN:START",
+   "DEMO",
+   "E",
+   "ROUND #"
+  ],
+  "visuals/asteroidsdemo.py::AsteroidsDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/astrolabe.py::Astrolabe": [],
+  "visuals/atlas.py::Atlas": [
+   "ELEVATION",
+   "LIVE",
+   "NIGHT",
+   "SATELLITE",
+   "TERRAIN"
+  ],
+  "visuals/attractors.py::Attractors": [],
+  "visuals/aurora.py::Aurora": [],
+  "visuals/baking.py::Baking": [
+   "#",
+   "# FLOUR  # BUTTER  # SUGAR  # EGG",
+   "# FLOUR  # EGG  # MILK",
+   "# FLOUR  # FAT  # SUGAR",
+   "# FLOUR  # FAT  # WATER",
+   "# FLOUR  # LIQUID  # EGG  # FAT",
+   "# FLOUR  # WATER  # OIL  # SALT  # YEAST",
+   "# FLOUR  # WATER  # SALT  # YEAST",
+   "# FLOUR  # WATER  # SALT  # YEAST  # MALT",
+   "# FLOUR  # WATER  # SALT  # YEAST  # OIL",
+   "# FLOUR  # WATER  # SALT  # YEAST  # OIL  # SUGAR",
+   "# FLOUR  # WATER  # SALT  #.# YEAST",
+   "#/#",
+   "BAGEL",
+   "BASIC SANDWICH BREAD  #-#% HYDRATION",
+   "BUTTR",
+   "COOKIE DOUGH",
+   "CREAM FAT + SUGAR  ADD EGGS  FOLD IN FLOUR",
+   "CREPES",
+   "DETROIT",
+   "EGG",
+   "EQUAL PARTS BY WEIGHT  CREAM BUTTER + SUGAR",
+   "FAT",
+   "FLOUR",
+   "FOCACCIA",
+   "FOLDABLE THIN CRUST  OIL + SUGAR FOR BROWNING",
+   "KEEP COLD  VISIBLE FAT PIECES  FLAKY LAYERS",
+   "LIQID",
+   "LONG FERMENT #-#H  #F OVEN  # SEC BAKE",
+   "LOW HYDRATION  DENSE CHEWY  BOIL THEN BAKE",
+   "MALT",
+   "MILK",
+   "MIX WET + DRY SEPARATELY  FOLD GENTLY  LUMPY OK",
+   "MUFFINS",
+   "NEAPOLITAN",
+   "NEW YORK",
+   "OIL",
+   "PIE DOUGH",
+   "POUND CAKE",
+   "SALT",
+   "STANDARD BREAD",
+   "SUGAR",
+   "THICK PAN STYLE  CRISPY CHEESE EDGE  BRICK CHEESE",
+   "VERY HIGH HYDRATION  DIMPLE  GENEROUS OIL",
+   "VERY THIN BATTER  REST # HR  SWIRL PAN",
+   "WATER",
+   "YEAST"
+  ],
+  "visuals/balloons.py::Balloons": [],
+  "visuals/beamengine.py::BeamEngine": [
+   "#SPM"
+  ],
+  "visuals/bloonsdemo.py::BloonsDemo": [
+   "#/#",
+   "+# POP",
+   "DEMO",
+   "L#",
+   "LEVEL CLEAR!",
+   "NEXT: L#",
+   "SCORE:#"
+  ],
+  "visuals/bloonstddemo.py::BloonsTDDemo": [
+   "#S",
+   "$#",
+   "CLEAR!",
+   "DART",
+   "DEMO",
+   "L:#",
+   "L=PLACE",
+   "MAXED",
+   "R=SWITCH",
+   "TACK",
+   "UP$#",
+   "W#",
+   "WAVE"
+  ],
+  "visuals/bml.py::BML": [
+   "D#.#",
+   "FLOWING",
+   "SLOW"
+  ],
+  "visuals/boids.py::Boids": [],
+  "visuals/boidslab.py::BoidsLab": [
+   "BALANCED",
+   "SCHOOLING",
+   "sep=#.# coh=#.#"
+  ],
+  "visuals/bombermandemo.py::BombermanDemo": [
+   "#",
+   "B#",
+   "DEMO",
+   "L#"
+  ],
+  "visuals/bowlingdemo.py::BowlingDemo": [
+   "#",
+   "-# PINS",
+   "DEMO",
+   "F#",
+   "SPARE!"
+  ],
+  "visuals/breakoutdemo.py::BreakoutDemo": [
+   "#",
+   "BTN:LAUNCH",
+   "DEMO"
+  ],
+  "visuals/burgertimedemo.py::BurgerTimeDemo": [
+   "#",
+   "DEMO",
+   "L#",
+   "P#"
+  ],
+  "visuals/butcher.py::Butcher": [
+   "#/#",
+   "BEEF",
+   "BONE-IN THIGH / BONELESS THIGH",
+   "BRAISED SHANK / OSSO BUCO",
+   "BREAST",
+   "CHICKEN",
+   "CHUCK",
+   "CHUCK ROAST / GROUND BEEF / FLAT IRON",
+   "DRUMSTICK",
+   "DRUMSTICK / LEG QUARTER",
+   "LAMB",
+   "OSSO BUCO / SOUP BONES",
+   "OYSTER",
+   "OYSTER (HIDDEN GEM ON BACK)",
+   "RACK",
+   "RACK OF LAMB / LAMB CHOPS / CROWN ROAST",
+   "RIB",
+   "RIBEYE / PRIME RIB / BACK RIBS",
+   "SHANK",
+   "SHOULDER",
+   "SHOULDER ROAST / BLADE CHOP / STEW MEAT",
+   "THIGH",
+   "WHOLE BREAST / SPLIT BREAST / CUTLET"
+  ],
+  "visuals/camshaft.py::Camshaft": [
+   "# RPM"
+  ],
+  "visuals/cat.py::Cat": [],
+  "visuals/cell.py::Cell": [
+   "  --  ",
+   "ACTIN-MYOSIN CROSS-BRIDGE",
+   "ALL",
+   "CLEFT",
+   "ELECTRON TRANSPORT",
+   "EXTRA",
+   "GPCR SIGNALING",
+   "IMS",
+   "INTRA",
+   "LIGHT REACTIONS",
+   "LUMEN",
+   "MATRIX",
+   "MUSCLE",
+   "MUSCLE CONTRACTION",
+   "PHOTOSYNTHESIS",
+   "POST",
+   "PRE",
+   "SARCOMERE",
+   "SIGNALING",
+   "STROMA",
+   "SYNAPSE",
+   "SYNAPTIC TRANSMISSION"
+  ],
+  "visuals/centipededemo.py::CentipedeDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/checkersdemo.py::CheckersDemo": [
+   "DEMO",
+   "JUMP!",
+   "P#"
+  ],
+  "visuals/chessdemo.py::ChessDemo": [
+   "CHECK",
+   "DEMO",
+   "P#"
+  ],
+  "visuals/chladni.py::Chladni": [
+   "# HZ",
+   "ANNULAR",
+   "MODE #.#",
+   "SQUARE",
+   "TRIANGLE"
+  ],
+  "visuals/chordchart.py::ChordChart": [
+   "FR#",
+   "GTR"
+  ],
+  "visuals/circle5ths.py::CircleOfFifths": [
+   "#",
+   "##",
+   "#THS",
+   "#b",
+   "A",
+   "Ab",
+   "Am",
+   "B",
+   "Bb",
+   "Bbm",
+   "Bm",
+   "C",
+   "C#m",
+   "Cm",
+   "D",
+   "Db",
+   "Dm",
+   "E",
+   "Eb",
+   "Ebm",
+   "Em",
+   "F",
+   "F#m",
+   "Fm",
+   "G",
+   "G#m",
+   "Gb",
+   "Gm"
+  ],
+  "visuals/clock.py::Clock": [
+   "#"
+  ],
+  "visuals/clouds.py::Clouds": [
+   "#",
+   "#-# FT",
+   "#/#",
+   "#/#X",
+   "#X",
+   "(Cb)",
+   "(Fg)",
+   "(St)",
+   "CUMULONIMBUS",
+   "CUMULONIMBUS (Cb)",
+   "DRIZZLE",
+   "FOG",
+   "FOG (Fg)",
+   "LOW",
+   "MIST",
+   "STORM",
+   "STRATUS",
+   "STRATUS (St)",
+   "STRATUS AT GROUND LEVEL / VISIBILITY BELOW # KM / DEW POINT MET",
+   "SURFACE",
+   "SURFACE-# FT",
+   "TOWERING THUNDERSTORM CLOUD / ANVIL TOP / LIGHTNING HAIL TORNADOES",
+   "UNIFORM GRAY LAYER / DRIZZLE / OVERCAST DAYS / FOG THAT LIFTS",
+   "VERT"
+  ],
+  "visuals/coins.py::Coins": [
+   "#/# ANCIENT",
+   "AMONG EARLIEST INDIAN COINS, STAMPED SYMBOLS",
+   "AUTO OFF",
+   "AUTO ON",
+   "INDIAN (MAURYA)  C. #RD C. BCE",
+   "MAURYA PUNCH-MARKED COIN",
+   "ROMAN  C. # CE",
+   "ROMAN  C. #-# CE",
+   "ROMAN AUREUS",
+   "ROMAN DENARIUS",
+   "ROMAN GOLD STANDARD COIN",
+   "STANDARD ROMAN SILVER, CARACALLA PORTRAIT"
+  ],
+  "visuals/colortheory.py::ColorTheory": [
+   "COOL",
+   "ORG",
+   "PURE",
+   "RED",
+   "ROS",
+   "SHADE",
+   "SPECTRUM",
+   "TEMPERATURE",
+   "TINT",
+   "TINT/SHADE",
+   "V:#%",
+   "WARM"
+  ],
+  "visuals/connect4demo.py::Connect4Demo": [
+   "DEMO",
+   "P#"
+  ],
+  "visuals/constellations.py::Constellations": [
+   "ALL",
+   "AQUARIUS",
+   "ARIES",
+   "AUTUMN",
+   "CAPRICORNUS",
+   "HYDRUS",
+   "LACERTA",
+   "SAGITTARIUS",
+   "SCORPIUS",
+   "SUMMER",
+   "TAURUS"
+  ],
+  "visuals/controls.py::Controls": [
+   "ACTION",
+   "CONTROLS",
+   "HOLD BOTH:BACK",
+   "MOVE"
+  ],
+  "visuals/convection.py::Convection": [
+   "FLOW",
+   "RAYLEIGH #.#",
+   "RESET",
+   "TEMP"
+  ],
+  "visuals/copperbars.py::CopperBars": [],
+  "visuals/credits.py::Credits": [
+   "- GAMES -",
+   "ARCADE GAMES",
+   "GOLDEN AGE OF",
+   "INSPIRED BY THE",
+   "LED ARCADE"
+  ],
+  "visuals/crystallize.py::Crystallize": [
+   "DEEP OCEAN",
+   "EMBER",
+   "FIELD",
+   "SEQUENCE",
+   "SPEED #.#X",
+   "STREAM",
+   "THOUGHT"
+  ],
+  "visuals/curta.py::Curta": [
+   "#",
+   "#OPM"
+  ],
+  "visuals/cycliclab.py::CyclicLab": [
+   "DEFECTS",
+   "DEMONS",
+   "states=#",
+   "thresh=#"
+  ],
+  "visuals/cylon.py::Cylon": [],
+  "visuals/dartsdemo.py::DartsDemo": [
+   " # PLAYERS",
+   "#",
+   "+#",
+   "># PLAYER",
+   "BONUS!",
+   "DARTS",
+   "DEMO",
+   "R#/#",
+   "TRIPLE #!"
+  ],
+  "visuals/dblpendulum.py::DblPendulum": [],
+  "visuals/defenderdemo.py::DefenderDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/demonspirals.py::DemonSpirals": [],
+  "visuals/digdugdemo.py::DigDugDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/dna.py::DNA": [
+   "# MUTATION",
+   "#'",
+   "#NM DNA",
+   "#NM NUCLEOSOME",
+   "ACA",
+   "ACU",
+   "AGC",
+   "AUG",
+   "CHROMATIN",
+   "CHROMATIN LOOPS",
+   "CODONS",
+   "CRISPR",
+   "CYS",
+   "DNA",
+   "DOUBLE HELIX",
+   "MET",
+   "MRNA",
+   "MUTATION",
+   "POLAR",
+   "PROTEIN",
+   "REPLICATION",
+   "SCANNING",
+   "SER",
+   "SPECIAL",
+   "START",
+   "THR",
+   "TRANSCRIPTION",
+   "UGU"
+  ],
+  "visuals/donkeykongdemo.py::DonkeyKongDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/drift3d.py::Drift3D": [
+   "#X",
+   "DEFAULT",
+   "FAST",
+   "HIGH",
+   "HILLS",
+   "LOW",
+   "MID",
+   "MOUNTAINS",
+   "NORMAL",
+   "PLAINS",
+   "SLOW"
+  ],
+  "visuals/drummachine.py::DrumMachine": [
+   "#",
+   "BILLIE JEAN",
+   "ENTER SANDMAN",
+   "SANDSTORM"
+  ],
+  "visuals/dvd.py::DVD": [],
+  "visuals/ecosystem.py::Ecosystem": [
+   "ENERGY",
+   "NATURAL",
+   "RESEED",
+   "SUN #.#",
+   "XRAY"
+  ],
+  "visuals/effects.py::Effects": [
+   "Dither",
+   "EFFECTS",
+   "Fade to Black",
+   "Horizontal",
+   "Iris Wipe",
+   "L/R:TOGGLE",
+   "Random",
+   "Vertical Wipe",
+   "v"
+  ],
+  "visuals/electrons.py::Electrons": [
+   "#.# EV",
+   "+",
+   "-",
+   "ACCEPT",
+   "BAND GAP",
+   "BARRIER",
+   "CATHODE RAY",
+   "DONOR",
+   "E-GUN",
+   "METAL",
+   "N",
+   "N DOPING",
+   "N-TYPE",
+   "NO",
+   "P",
+   "P DOPING",
+   "P-TYPE",
+   "PAUSED",
+   "PHOTOELECTRIC",
+   "PHYSICS",
+   "PLAY",
+   "QUANTUM",
+   "RED",
+   "SEM DETECTOR",
+   "SEMICONDUCTOR",
+   "SILICON",
+   "SOLAR",
+   "SOLAR CELL",
+   "TUNNELING",
+   "UV",
+   "YES"
+  ],
+  "visuals/emfield.py::Coulomb": [
+   "CIRCUIT",
+   "DIPOLE",
+   "FIELD LINES",
+   "POTENTIAL",
+   "QUADRUPOLE",
+   "RANDOM"
+  ],
+  "visuals/entropy.py::Entropy": [
+   "BLOCK #",
+   "DENSITY #",
+   "ENTROPY",
+   "FWD"
+  ],
+  "visuals/erosion.py::Erosion": [
+   "CANYON",
+   "COASTAL",
+   "DIAMOND",
+   "DOWNPOUR",
+   "DRIZZLE",
+   "GRANITE",
+   "LIGHT RAIN",
+   "MOUNTAIN",
+   "PLATEAU",
+   "RAIN",
+   "ROCK",
+   "VOLCANO"
+  ],
+  "visuals/evolution.py::Evolution": [
+   "DOUBLE PEAK",
+   "EXTINCTION",
+   "G#",
+   "MUT #.#",
+   "N#",
+   "RUGGED",
+   "SINGLE PEAK"
+  ],
+  "visuals/faders.py::Faders": [],
+  "visuals/fibonacci.py::Fibonacci": [
+   "EARTH",
+   "NEON",
+   "RAINBOW"
+  ],
+  "visuals/fire.py::Fire": [],
+  "visuals/fireflies.py::Fireflies": [],
+  "visuals/flags.py::Flags": [
+   "AFGHANISTAN",
+   "ALBANIA",
+   "ALL COUNTRIES",
+   "ANDORRA",
+   "AUSTRALIA",
+   "EUROPE",
+   "FIJI",
+   "KIRIBATI",
+   "OCEANIA",
+   "VANUATU",
+   "VATICAN",
+   "ZIMBABWE"
+  ],
+  "visuals/flappydemo.py::FlappyDemo": [
+   "#",
+   "BTN:FLAP",
+   "DEMO"
+  ],
+  "visuals/flavors.py::Flavors": [
+   "#",
+   "#/#",
+   "ALLSPICE + SCOTCH BONNET + NUTMEG + CINNAMON + RUM + COCONUT + LIME",
+   "AMERICAS",
+   "BUTTER + SHALLOTS + THYME + TARRAGON + CREAM + WINE + MUSHROOMS",
+   "CARIBBEAN",
+   "CHINESE",
+   "CUMIN + CHILI + LIME + CILANTRO + GARLIC + OREGANO + AVOCADO",
+   "EAST ASIA",
+   "EUROPE",
+   "EVOO + SAFFRON + SMOKED PAPRIKA + GARLIC + SHERRY VINEGAR + ALMONDS",
+   "FRENCH",
+   "INDIAN",
+   "JAPANESE",
+   "MEXICAN",
+   "MIDDLE EASTERN",
+   "MIDEAST",
+   "MOROCCAN",
+   "RAS EL HANOUT + HARISSA + PRESERVED LEMON + SAFFRON + HONEY + ALMONDS",
+   "SLT",
+   "SOR",
+   "SOUTH ASIA",
+   "SOY + MISO + MIRIN + DASHI + SESAME + GINGER + WASABI",
+   "SOY + SESAME OIL + GINGER + GARLIC + FIVE-SPICE + HOISIN + CHILI OIL",
+   "SPANISH",
+   "SPC",
+   "SUMAC + ZAATAR + CUMIN + TAHINI + POMEGRANATE + YOGURT + MINT",
+   "SWT",
+   "TURMERIC + CUMIN + CORIANDER + GARAM MASALA + GINGER + GARLIC + YOGURT",
+   "UMA"
+  ],
+  "visuals/fluid.py::FluidInk": [],
+  "visuals/fluid.py::FluidMixing": [],
+  "visuals/fluid.py::FluidPlay": [
+   "DIR NEON",
+   "DIR RAINBOW",
+   "DIR WARM-COOL",
+   "VEL ELECTRIC",
+   "VEL INFERNO",
+   "VEL RAINBOW",
+   "VORT CYAN-MAG",
+   "VORT FIRE-ICE",
+   "VORT GOLD-TEAL"
+  ],
+  "visuals/fluid.py::FluidSculpt": [
+   "DIR NEON",
+   "DIR RAINBOW",
+   "DIR WARM-COOL",
+   "VEL ELECTRIC",
+   "VEL INFERNO",
+   "VEL RAINBOW",
+   "VORT CYAN-MAG",
+   "VORT FIRE-ICE",
+   "VORT GOLD-TEAL"
+  ],
+  "visuals/fluid.py::FluidTunnel": [
+   "AIRFOIL",
+   "ARROW",
+   "CIRCLE",
+   "CROSS",
+   "DIAMOND",
+   "ELBOW",
+   "FIRE",
+   "NEON",
+   "PLATE",
+   "Re=#",
+   "SQUARE",
+   "TESLA",
+   "THERMAL",
+   "WEDGE"
+  ],
+  "visuals/flux.py::Flux": [],
+  "visuals/fractals.py::Fractals": [
+   "GRAY",
+   "JULIA",
+   "KOCH",
+   "MANDELBROT",
+   "NEON",
+   "RAINBOW",
+   "TREE"
+  ],
+  "visuals/froggerdemo.py::FroggerDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/frozen_lake.py::FrozenLake": [],
+  "visuals/galagademo.py::GalagaDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/gallery3d.py::GalleryArt": [],
+  "visuals/gallery3d.py::GalleryAutomata": [],
+  "visuals/gallery3d.py::GalleryDigital": [],
+  "visuals/gallery3d.py::GalleryEffects": [],
+  "visuals/gallery3d.py::GalleryMuseum": [],
+  "visuals/gallery3d.py::GallerySalon": [],
+  "visuals/gallery3d.py::GalleryScience": [],
+  "visuals/gallery3d.py::GallerySprites": [],
+  "visuals/game2048demo.py::Game2048Demo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/gametheory.py::GameTheory": [
+   "COOP WORLD",
+   "DEFECT WORLD",
+   "DEFECTORS!",
+   "EQUAL",
+   "G:#",
+   "T=#.#"
+  ],
+  "visuals/gamma.py::Gamma": [
+   "#.#",
+   "BTN:ACCEPT",
+   "GAMMA",
+   "TOE"
+  ],
+  "visuals/geometrydemo.py::GeometryDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/globe.py::Earth": [
+   "EARTH",
+   "ELEVATION",
+   "LIVE",
+   "LOADING",
+   "NIGHT",
+   "READY",
+   "SATELLITE",
+   "SPIN OFF",
+   "SPIN ON",
+   "TERRAIN",
+   "THE WORLD"
+  ],
+  "visuals/gramophone.py::Gramophone": [
+   "# RPM",
+   "BRASS",
+   "PAINTED",
+   "SILVER"
+  ],
+  "visuals/grandfather.py::GrandfatherClock": [
+   "# BPM",
+   "TICK",
+   "TOCK"
+  ],
+  "visuals/grayscott.py::GrayScott": [],
+  "visuals/greenwave.py::GreenWave": [
+   "T-S"
+  ],
+  "visuals/gutenberg.py::GutenbergPress": [
+   "# PPM",
+   "PG #"
+  ],
+  "visuals/gyre.py::Gyre": [],
+  "visuals/gyroscope.py::Gyroscope": [
+   "PREC #",
+   "SPIN #"
+  ],
+  "visuals/highway.py::Highway": [
+   "FLOW",
+   "MERGE"
+  ],
+  "visuals/hodge.py::Hodge": [],
+  "visuals/hodgelab.py::HodgeLab": [
+   "BZ CLASSIC",
+   "g=#.# n=#"
+  ],
+  "visuals/hurdygurdy.py::HurdyGurdy": [
+   "# NPM",
+   "NOTE:A",
+   "NOTE:C",
+   "NOTE:E",
+   "NOTE:G"
+  ],
+  "visuals/idlemix.py::IdleMix": [
+   "#",
+   "A BAR AT ",
+   "A GIRL WI",
+   "A PHILOSO",
+   "A SUNDAY ",
+   "ALEXANDER",
+   "ALMOND BL",
+   "ART",
+   "AUTOMATA",
+   "BTN:CYCLE",
+   "COOKING",
+   "CULTURE",
+   "DEMOS",
+   "DIGITAL",
+   "HEROES",
+   "IDLE MIX",
+   "LR:WT BTN:",
+   "SCI BENCH",
+   "SCI MACRO",
+   "SCI MICRO",
+   "SPRITES",
+   "TITLES",
+   "WONDER AU",
+   "WONDER BA",
+   "WONDER BO",
+   "WONDER VH",
+   "WONDER VI",
+   "WONDER WA",
+   "WONDER WI",
+   "WONDER ZO"
+  ],
+  "visuals/indy500demo.py::Indy500Demo": [
+   "D#/#",
+   "DEMO",
+   "P#/#",
+   "T#"
+  ],
+  "visuals/interchange.py::Interchange": [
+   "CLOVERLEAF",
+   "DIAMOND",
+   "TURBINE"
+  ],
+  "visuals/intersection.py::Intersection": [],
+  "visuals/invadersdemo.py::InvadersDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/jacquard.py::Jacquard": [
+   "#",
+   "#ROW/MIN"
+  ],
+  "visuals/jezzballdemo.py::JezzBallDemo": [
+   "#",
+   "#%",
+   "+#",
+   "DEMO",
+   "H",
+   "L#",
+   "V"
+  ],
+  "visuals/knife.py::Knife": [
+   "#",
+   "#/#",
+   "#/# IN OR LESS  VERY FINE PIECES",
+   "#/# TO #/# IN  ROUGH IRREGULAR",
+   "#/# x #/# x # IN  THICK STICKS",
+   "#/# x #/# x # IN  THIN MATCHSTICKS",
+   "#/# x #/# x #/# IN  TINY FINE DICE",
+   "#/# x #/# x #/# IN  UNIFORM CUBES",
+   "BASIL / MINT / SPINACH / GARNISH / SOUPS / PASTA",
+   "BATONNET",
+   "BRUNOISE",
+   "CARROTS / CELERY / ONION / SAUCES / CONSOMME / GARNISH",
+   "CARROTS / PEPPERS / ZUCCHINI / STIR-FRY / GARNISH / SALADS",
+   "CHIFFONADE",
+   "CHOP",
+   "CLOVE",
+   "CRUDITE / FRIES / CARROTS / CELERY / DIPPING",
+   "DICE",
+   "GARLIC / SHALLOTS / HERBS / GINGER / SAUCES / MARINADES",
+   "HALF",
+   "JULIENNE",
+   "MINCE",
+   "ONIONS / TOMATOES / HERBS / SOUPS / STEWS / CHILI",
+   "PLANKS",
+   "POTATOES / SOUPS / STUFFING / MIREPOIX / SALSA",
+   "ROLL",
+   "SMALL DICE",
+   "SPECIAL",
+   "SPLIT",
+   "STACK",
+   "STICKS",
+   "STRIPS",
+   "VERY THIN RIBBONS  ROLLED LEAF STRIPS",
+   "WHOLE"
+  ],
+  "visuals/knitting.py::Knitting": [
+   "#X# RIBBING",
+   "ARAN CABLE",
+   "ARAN CREAM",
+   "ARAN DIAMOND",
+   "COWICHAN EARTH",
+   "ESTONIAN ROSE",
+   "FAIR ISLE ANCHOR",
+   "FAIR ISLE OXO",
+   "FAIR ISLE PEERIE",
+   "FAIR ISLE RED",
+   "FAIR ISLE STAR",
+   "GARTER",
+   "ICELAND",
+   "ICELANDIC GRAY",
+   "IRELAND",
+   "JAPAN",
+   "LOPAPEYSA",
+   "NATURAL WOOL",
+   "NORDIC BLUE",
+   "NORDIC STAR",
+   "NORWAY",
+   "SASHIKO ASANOHA",
+   "SASHIKO INDIGO",
+   "SCANDINAVIA",
+   "SCOTLAND",
+   "SEED STITCH",
+   "SELBUROSE",
+   "SHETLAND",
+   "SNOWFLAKE",
+   "SPEED #.#X",
+   "SPEED #X",
+   "SPEED .#X",
+   "STOCKINETTE",
+   "UNIVERSAL"
+  ],
+  "visuals/knots.py::Knots": [
+   "#",
+   "#.#X",
+   "#/#",
+   "#X",
+   ".#X",
+   "BOWLINE",
+   "JOINING TWO ROPES / DIFFERENT SIZES / RELIABLE",
+   "KING OF KNOTS / RESCUE / SAILING / WILL NOT SLIP",
+   "LOOP",
+   "OVERHAND",
+   "PULL",
+   "ROPE",
+   "SHEET BEND",
+   "SIMPLEST KNOT / STOPPER / BASE FOR OTHERS",
+   "TUCK",
+   "TWO ROPES"
+  ],
+  "visuals/lake.py::Lake": [],
+  "visuals/language.py::Language": [
+   "#/#",
+   "AUTO OFF",
+   "AUTO ON",
+   "BURMESE",
+   "CIAO MONDO",
+   "GIOI",
+   "ITALIAN",
+   "ITALIANO",
+   "JAVANESE",
+   "KHMER",
+   "LAO",
+   "MERHABA DUNYA",
+   "MINGALABA KABA",
+   "MONGOLIAN",
+   "OLA MUNDO",
+   "PASHTO",
+   "POLISH",
+   "POLSKI",
+   "PORTUGUES",
+   "PORTUGUESE",
+   "SABAIDEE LOK",
+   "SAIN BAINA UU",
+   "SALAM NURAI",
+   "SUGENG RAWUH",
+   "SUOSTEI LOK",
+   "TIENG VIET",
+   "TURKCE",
+   "TURKISH",
+   "VIETNAMESE",
+   "WITAJ SWIECIE",
+   "XIN CHAO THE"
+  ],
+  "visuals/latindna.py::LatinDNA": [
+   "#",
+   "#+#+#  THE FOUNDATION  AFRICAN ORIGIN",
+   "#/#",
+   "+",
+   "CASCARA",
+   "CONGA TUMBAO",
+   "II",
+   "OPEN TONES + SLAPS  SALSA CONGAS",
+   "TIMBALE SHELL  SALSA TIMEKEEPER",
+   "TRESILLO"
+  ],
+  "visuals/latingrooves.py::LatinGrooves": [
+   "#",
+   "BEMBE",
+   "SALSA",
+   "SONGO"
+  ],
+  "visuals/lattice.py::Lattice": [
+   "CALCITE",
+   "Cubic",
+   "FLUORITE",
+   "GARNET",
+   "JADE",
+   "LONSDALEITE",
+   "PYRITE",
+   "QUARTZ",
+   "SALT",
+   "SPINEL",
+   "ZIRCONIA"
+  ],
+  "visuals/lava.py::Lava": [],
+  "visuals/lenia.py::Lenia": [],
+  "visuals/lenia.py::LeniaLab": [
+   "SMOOTH FLOW",
+   "mu=#.#",
+   "sig=#.#"
+  ],
+  "visuals/life.py::Life": [
+   "||"
+  ],
+  "visuals/lifelab.py::LifeLab": [
+   "B#/S",
+   "B#/S#",
+   "BLOCKS",
+   "CONWAY",
+   "DIAMOEBA",
+   "G#",
+   "GLIDER GUN",
+   "PULSAR",
+   "READY",
+   "SEEDS",
+   "SOUP"
+  ],
+  "visuals/lightsoutdemo.py::LightsOutDemo": [
+   "#",
+   "DEMO",
+   "L#",
+   "M:#"
+  ],
+  "visuals/local/batman.py::Batman": [
+   "NO FRAMES"
+  ],
+  "visuals/local/galleries.py::GalleryAdventureTime": [
+   "ADVENTURE TIME",
+   "BABY PIG",
+   "BANANA GUARD",
+   "BUBBLEGUM",
+   "BUILDING MAP",
+   "CAKE",
+   "CHOOSE GOOSE",
+   "CINNAMON BUN",
+   "DEER",
+   "DEMON CAT",
+   "FINN",
+   "FIONNA",
+   "FLAME PRINCESS",
+   "GOLIAD",
+   "GOOP",
+   "GUNTER",
+   "GUNTER BOSS",
+   "HYOOMAN F",
+   "HYOOMAN M",
+   "ICE KING",
+   "JAKE",
+   "KEYPER",
+   "KING OF MARS",
+   "KITTEN",
+   "LADY RAINICORN",
+   "LAKE KNIGHT",
+   "LEMONGRAB",
+   "LSP",
+   "MARCELINE",
+   "MARCELINE FX",
+   "MR. CUPCAKE",
+   "MR. PIG",
+   "NEPTR",
+   "PEP BUTLER",
+   "PRINCESS MUSCLES",
+   "STARCHY",
+   "STORMO",
+   "SUSAN STRONG",
+   "TREE TRUNKS"
+  ],
+  "visuals/local/galleries.py::GalleryKidIcarus": [
+   "BUILDING MAP",
+   "ENEMIES",
+   "ICARUS MUSEUM",
+   "ITEMS",
+   "PIT"
+  ],
+  "visuals/local/galleries.py::GalleryKirby": [
+   "BUILDING MAP",
+   "ENEMIES",
+   "KING DEDEDE",
+   "KIRBY",
+   "KIRBY MUSEUM",
+   "SOLDIERS"
+  ],
+  "visuals/local/galleries.py::GallerySMB3": [
+   "BOSSES",
+   "BUILDING MAP",
+   "ENEMIES",
+   "HEROES",
+   "SMB# MUSEUM"
+  ],
+  "visuals/local/galleries.py::GalleryZelda": [
+   "BOSSES",
+   "BUILDING MAP",
+   "DUNGEON",
+   "ITEMS",
+   "LINK",
+   "NPCS",
+   "OVERWORLD",
+   "ZELDA MUSEUM"
+  ],
+  "visuals/local/greenlantern.py::GreenLantern": [
+   "NO FRAMES"
+  ],
+  "visuals/local/jakemusic.py::JakeMusic": [
+   "JAKE"
+  ],
+  "visuals/local/kirby.py::Kirby": [
+   "NO FRAMES"
+  ],
+  "visuals/local/link.py::Link": [
+   "NO FRAMES"
+  ],
+  "visuals/local/mario.py::Mario": [
+   "NO FRAMES"
+  ],
+  "visuals/local/megaman.py::MegaMan": [
+   "NO FRAMES"
+  ],
+  "visuals/local/metroid.py::MetroidChase": [],
+  "visuals/local/pit.py::Pit": [],
+  "visuals/local/playlists.py::SpriteGallery": [
+   "NO FRAMES"
+  ],
+  "visuals/local/playlists.py::SuperheroGallery": [
+   "NO FRAMES"
+  ],
+  "visuals/local/sonic.py::Sonic": [
+   "NO FRAMES"
+  ],
+  "visuals/local/spidey.py::Spidey": [
+   "NO FRAMES"
+  ],
+  "visuals/local/wonderjake.py::WonderJake": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/local/yoshi.py::Yoshi": [
+   "NO FRAMES"
+  ],
+  "visuals/locomotive.py::Locomotive": [
+   "# RPM"
+  ],
+  "visuals/loderunnerdemo.py::LodeRunnerDemo": [
+   "#",
+   "DEMO",
+   "G:#"
+  ],
+  "visuals/loom.py::Loom": [
+   "#",
+   "# PPM"
+  ],
+  "visuals/lunarlanderdemo.py::LunarLanderDemo": [
+   "#",
+   "#X",
+   "+#",
+   "<",
+   ">",
+   "CRASHED",
+   "DEMO",
+   "FUEL+#",
+   "FUEL-#",
+   "GOOD LANDING",
+   "L#",
+   "NEXT:LV#",
+   "PRESS BTN",
+   "v"
+  ],
+  "visuals/mancalademo.py::MancalaDemo": [
+   "#",
+   "DEMO",
+   "P#"
+  ],
+  "visuals/matrix.py::Matrix": [],
+  "visuals/matter.py::MatterPhases": [
+   "CLASSIC",
+   "FIRE",
+   "NEON",
+   "SOLID"
+  ],
+  "visuals/maxwell.py::MaxwellDemon": [
+   "DEMON OFF",
+   "DEMON ON",
+   "SELECT #.#",
+   "SPEED #.#X"
+  ],
+  "visuals/metronome.py::Metronome": [
+   "#",
+   "# BPM",
+   "#:#"
+  ],
+  "visuals/microscope.py::Microscope": [
+   "ALL",
+   "AMOEBA",
+   "BACTERIA",
+   "DIATOMS",
+   "MICROBE",
+   "PARAMECIUM",
+   "RED BLOOD CELLS    RED BLOOD CELLS",
+   "SICKLE CELLS",
+   "SURFACE TENSION    SURFACE TENSION",
+   "WATER"
+  ],
+  "visuals/mirror.py::Mirror": [
+   "#",
+   ">",
+   "BTN:ACCEPT",
+   "HDMI",
+   "MIRROR",
+   "OFF",
+   "ON",
+   "PORT"
+  ],
+  "visuals/mitosis.py::Mitosis": [],
+  "visuals/mitosislab.py::MitosisLab": [
+   "BALANCED",
+   "comp=#.#",
+   "grow=#.#"
+  ],
+  "visuals/mobius.py::Mobius": [],
+  "visuals/modelt.py::ModelT": [
+   "#RPM",
+   "COMP",
+   "E",
+   "EXHT",
+   "I",
+   "INTK",
+   "POWR"
+  ],
+  "visuals/moire.py::Moire": [],
+  "visuals/molecule.py::Molecule": [
+   "ADENINE",
+   "ADRENALINE",
+   "ATP",
+   "C#",
+   "CAFFEINE",
+   "CYTOSINE",
+   "DOPAMINE",
+   "GUANINE",
+   "H#",
+   "N",
+   "O#",
+   "S",
+   "SEROTONIN",
+   "TAURINE",
+   "THYMINE"
+  ],
+  "visuals/monstermazedemo.py::MonsterMazeDemo": [
+   "#D MONSTER",
+   "DEMO",
+   "E",
+   "FIND THE EXIT",
+   "HE IS HUNTING",
+   "L#",
+   "LEVEL #",
+   "MAZE",
+   "N",
+   "REX WAITS",
+   "S",
+   "S:#",
+   "W"
+  ],
+  "visuals/moon.py::MoonPhases": [
+   "BLOOD MOON",
+   "BLUE MOON",
+   "DAY # OF #",
+   "FIRST QUARTER",
+   "FULL MOON",
+   "LIVE",
+   "SILVER",
+   "WAXING GIBBOUS"
+  ],
+  "visuals/mspacmandemo.py::MsPacManDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/musicbox.py::MusicBox": [
+   "# BPM"
+  ],
+  "visuals/network.py::Network": [
+   "BARABASI-ALBERT",
+   "HOPS: #",
+   "RANDOM GRAPH",
+   "REGULAR LATTICE",
+   "SCALE-FREE",
+   "SMALL WORLD",
+   "WATTS-STROGATZ",
+   "p=#.#"
+  ],
+  "visuals/neurons.py::Neurons": [
+   "ALERT",
+   "CALM",
+   "DREAM",
+   "FOCUS",
+   "SLEEP"
+  ],
+  "visuals/newtoncradle.py::NewtonCradle": [],
+  "visuals/nightdriverdemo.py::NightDriverDemo": [
+   "#",
+   "DEMO",
+   "G#"
+  ],
+  "visuals/optics.py::Optics": [
+   "CONCAVE LENS",
+   "CONVEX LENS",
+   "CORNER",
+   "DOUBLE",
+   "PARALLEL",
+   "PRISM"
+  ],
+  "visuals/orbitals.py::Orbitals": [
+   "#S",
+   "BENZENE PI",
+   "COMBINED",
+   "DELOCALIZED",
+   "DENSITY",
+   "H#O",
+   "HYBRID",
+   "METAL BAND",
+   "PROBABILITY",
+   "S ORBITALS",
+   "SP",
+   "SP#"
+  ],
+  "visuals/orbits.py::OrbitsMulti": [],
+  "visuals/orbits.py::OrbitsSolar": [
+   "EARTH",
+   "JUPITER",
+   "MARS",
+   "MERCURY",
+   "NEPTUNE",
+   "SATURN",
+   "URANUS",
+   "VENUS"
+  ],
+  "visuals/orrery.py::Orrery": [],
+  "visuals/oscilloscope.py::Oscilloscope": [
+   "F=#.#",
+   "FREQ SWEEP",
+   "NOISE",
+   "SINE WAVE",
+   "SQUARE WAVE"
+  ],
+  "visuals/othellodemo.py::OthelloDemo": [
+   "DEMO",
+   "P#: #",
+   "P#:#"
+  ],
+  "visuals/pacmandemo.py::PacManDemo": [
+   "#",
+   "DEMO"
+  ],
+  "visuals/paint.py::Paint": [
+   "<",
+   ">",
+   "BRUSH",
+   "EXPORT",
+   "M",
+   "MARKER",
+   "NEW",
+   "P",
+   "PENCIL",
+   "^",
+   "v"
+  ],
+  "visuals/paint_gif.py::PaintGif": [
+   "#-#",
+   "<",
+   ">",
+   "BRUSH",
+   "F#/#",
+   "LOAD",
+   "M",
+   "MARKER",
+   "P",
+   "PENCIL",
+   "STAMP",
+   "^",
+   "v"
+  ],
+  "visuals/pantry.py::Pantry": [
+   "#",
+   "#/#",
+   "AROMATICS",
+   "BECHAMEL  CREAM SOUPS  GRATINS",
+   "BLOND ROUX",
+   "BOUQUET GARNI",
+   "BROWN BEEF",
+   "BROWN ROUX",
+   "CHICKEN STOCK",
+   "COOK #-# MIN  MED-DARK BROWN  NUTTY TOASTY",
+   "COOK #-# MIN TO PALE GOLD  SLIGHT NUTTY AROMA",
+   "DEMI-GLACE  BROWN SAUCES  BRAISES",
+   "DICE FINE  SWEAT IN BUTTER  NO BROWNING",
+   "ESPAGNOLE  GUMBO  BROWN SAUCES",
+   "HERBS",
+   "MELT BUTTER  ADD FLOUR  COOK #-# MIN  NO COLOR",
+   "MIREPOIX",
+   "NO BRASSICAS  SWEAT IN BUTTER  #-# MIN ONLY",
+   "PAELLA  BEANS  STEWS  RICE",
+   "RAW BONES + COLD WATER  NEVER BOIL  SKIM  #-# HRS",
+   "ROAST BONES #F  DEGLAZE PAN  SIMMER #-# HRS",
+   "ROUX",
+   "SACHET D'EPICES",
+   "SAUTE ONION + GARLIC  ADD TOMATO + PEPPER",
+   "SOFRITO",
+   "SOUPS  SAUCES  RISOTTO  BRAISES",
+   "STOCKS",
+   "STOCKS  BRAISES  SOUPS  STEWS",
+   "STOCKS  SOUPS  BRAISES  SAUCES",
+   "STOCKS  SOUPS  SAUCES  CONSOMME",
+   "SWEAT IN BUTTER  KEEP WHITE  NO COLOR",
+   "TIE WITH TWINE  SIMMER IN LIQUID  REMOVE BEFORE SERVE",
+   "USE",
+   "VEGETABLE",
+   "VEGETARIAN SOUPS  GRAINS  SAUCES",
+   "VELOUTE  LIGHT SAUCES",
+   "WHITE MIREPOIX",
+   "WHITE ROUX",
+   "WHITE STOCKS  CREAM SOUPS  VELOUTE",
+   "WRAP IN CHEESECLOTH  TIE CLOSED  HOLDS LOOSE SPICES"
+  ],
+  "visuals/particlelife.py::ParticleLife": [],
+  "visuals/pasta.py::Pasta": [
+   "#",
+   "#/#",
+   "AGNOLOTTI",
+   "BLESSED DOUGH",
+   "BOLOGNESE / BECHAMEL / RICOTTA / PESTO",
+   "BROCCOLI RABE / SAUSAGE / TOMATO / ANCHOVY",
+   "BROTH / CREAM / RAGU / SAGE BUTTER",
+   "BUTTER / ROAST JUS / SAGE / PAN DRIPPINGS",
+   "BUTTERFLIES",
+   "CAMPANIA  LONG",
+   "CAMPANIA  SHAPED",
+   "CAMPANIA  TUBE",
+   "CARBONARA / AGLIO E OLIO / POMODORO / ALLE VONGOLE",
+   "CHEESE SAUCE / BAKED / TOMATO / CREAM",
+   "COOKING POT",
+   "EMILIA-ROMAGNA  FILLED",
+   "EMILIA-ROMAGNA  SHAPED",
+   "EMILIA-ROMAGNA  SHEET",
+   "FARFALLE",
+   "FUSILLI",
+   "LASAGNA",
+   "LIGURIA  FILLED",
+   "LIGURIA  LONG",
+   "LINGUINE",
+   "LITTLE CAKES",
+   "LITTLE EARS",
+   "LITTLE SPINDLES",
+   "LITTLE STRINGS",
+   "LITTLE TONGUES",
+   "LITTLE TURNIPS",
+   "MACARONI",
+   "ORECCHIETTE",
+   "PESTO / CLAM SAUCE / SEAFOOD / AGLIO E OLIO",
+   "PESTO / RAGU / CREAM / PRIMAVERA",
+   "PIEDMONT  FILLED",
+   "PRIESTS CAPS",
+   "PUGLIA  SHAPED",
+   "RAVIOLI",
+   "SAGE BUTTER / MARINARA / CREAM / BROWN BUTTER",
+   "SALMON / PESTO / CREAM / PRIMAVERA",
+   "SPAGHETTI",
+   "TORTELLINI"
+  ],
+  "visuals/peptides.py::Peptides": [
+   "A",
+   "ACTH",
+   "AMYLOID BETA",
+   "BY TYPE",
+   "C",
+   "CRAMBIN",
+   "D",
+   "E",
+   "F",
+   "G",
+   "GLUTATHIONE",
+   "H",
+   "HEPCIDIN",
+   "I",
+   "INSULIN",
+   "K",
+   "KALATA B#",
+   "L",
+   "M",
+   "N",
+   "OXYTOCIN",
+   "P",
+   "Q",
+   "R",
+   "S",
+   "SECRETIN",
+   "T",
+   "V",
+   "VIP",
+   "W",
+   "Y"
+  ],
+  "visuals/percolation.py::Percolation": [
+   "P#.#"
+  ],
+  "visuals/periodic.py::Periodic": [
+   "ALL",
+   "CARBON",
+   "COPPER",
+   "GOLD",
+   "HELIUM",
+   "HYDROGEN",
+   "IODINE",
+   "LIFE",
+   "OGANESSON",
+   "PLATINUM",
+   "PRECIOUS",
+   "SILVER"
+  ],
+  "visuals/pi.py::Pi": [
+   "ICE",
+   "MONO",
+   "PI",
+   "RAINBOW"
+  ],
+  "visuals/pianoroll.py::PianoRoll": [
+   "#BPM",
+   "CLASSICAL",
+   "JAZZ",
+   "RAGTIME"
+  ],
+  "visuals/pinballdemo.py::PinballDemo": [
+   "#",
+   "#X",
+   "DEMO",
+   "DRAIN!"
+  ],
+  "visuals/pipedreamdemo.py::PipeDreamDemo": [
+   "#",
+   "DEMO",
+   "NEXT",
+   "P:#",
+   "S:#"
+  ],
+  "visuals/plasma.py::Plasma": [],
+  "visuals/plates.py::Audubon": [
+   "#/#",
+   "American Swift",
+   "Brasilian Caracara Eagle",
+   "Cardinal Grosbeak",
+   "Carolina Titmouse"
+  ],
+  "visuals/plates.py::Gould": [
+   "#/#",
+   "Eriocnemis Cupreiventris",
+   "Eriocnemis Vestitus",
+   "Lafresnaya Flavicaudata",
+   "Steganura Peruviana"
+  ],
+  "visuals/plates.py::Haeckel": [
+   "#/#",
+   "Ascomycetes",
+   "Muscinae",
+   "Orchidae",
+   "Stephoidea"
+  ],
+  "visuals/plates.py::Merian": [
+   "#/#",
+   "Okra & Insects",
+   "Painted Lady Butterfly",
+   "Plant & Caterpillars",
+   "Tobacco & Butterfly"
+  ],
+  "visuals/plates.py::Redoute": [
+   "#/#",
+   "Rosa Cinnamomea",
+   "Rosa L'Heritierana",
+   "Rosa Muscosa Alba",
+   "Rosa Turbinata"
+  ],
+  "visuals/polaroid.py::Polaroid": [],
+  "visuals/pongdemo.py::PongDemo": [
+   "#",
+   "DEMO",
+   "GET READY"
+  ],
+  "visuals/pooldemo.py::PoolDemo": [
+   "#",
+   "+#",
+   "DEMO",
+   "SHOTS:#"
+  ],
+  "visuals/pottery.py::Pottery": [
+   "#/#",
+   "AUTO OFF",
+   "AUTO ON",
+   "FIGURE: BIRD",
+   "MIDDLE NIGER  #TH CENTURY",
+   "MIDDLE NIGER  #TH-#TH CENTURY",
+   "SEATED FIGURE",
+   "TERRACOTTA",
+   "VESSEL: ZOOMORPHIC"
+  ],
+  "visuals/predprey.py::PredPrey": [
+   "HUNT #.#",
+   "PREY #.#",
+   "R:# F:#",
+   "RESEED"
+  ],
+  "visuals/primes.py::Primes": [
+   "  #",
+   " #",
+   "GRID",
+   "SACKS",
+   "ULAM"
+  ],
+  "visuals/projector.py::Projector": [
+   "# FPS",
+   "PROJECTOR"
+  ],
+  "visuals/proteins.py::Proteins": [
+   "AMYLOID BETA",
+   "HISTONE",
+   "P#",
+   "PLASTOCYANIN",
+   "RHODOPSIN",
+   "RUBISCO",
+   "SYNUCLEIN",
+   "THAUMATIN",
+   "THIOREDOXIN",
+   "UBIQUITIN"
+  ],
+  "visuals/qbertdemo.py::QBertDemo": [
+   "#",
+   "@!#?",
+   "DEMO",
+   "L#"
+  ],
+  "visuals/quarks.py::Quarks": [],
+  "visuals/quarkslab.py::QuarksLab": [
+   "DRIFTERS",
+   "q=# r=#"
+  ],
+  "visuals/radioactive.py::Radioactive": [
+   "#.# D",
+   "#.# Y",
+   "#.#E# Y",
+   "#P #N",
+   "ALPHA",
+   "BETA",
+   "H-#",
+   "He-#",
+   "I-#",
+   "IODINE-#",
+   "Pb-#",
+   "STABLE",
+   "TRITIUM",
+   "Th-#",
+   "U-#",
+   "URANIUM-#",
+   "Xe-#"
+  ],
+  "visuals/rainbow.py::Rainbow": [],
+  "visuals/refresh.py::Refresh": [
+   "=LATEST",
+   ">",
+   "?",
+   "AVAILABLE",
+   "NO",
+   "NO ROLLBACK",
+   "NOW:?",
+   "RESTART?",
+   "RLBK",
+   "UPD",
+   "YES",
+   "release",
+   "|"
+  ],
+  "visuals/ripples.py::Ripples": [],
+  "visuals/road.py::Road": [],
+  "visuals/rotozoom.py::Rotozoom": [],
+  "visuals/roundabout.py::Roundabout": [],
+  "visuals/rudiments.py::DrumRudiments": [
+   "#",
+   "#/#",
+   "DOUBLE RATAMACUE",
+   "II",
+   "L",
+   "R",
+   "SINGLE STROKE ROLL",
+   "TRIPLE RATAMACUE"
+  ],
+  "visuals/rug.py::Rug": [],
+  "visuals/ruglab.py::RugLab": [
+   "CLASSIC",
+   "FAST CYCLE",
+   "inc=#",
+   "states=#"
+  ],
+  "visuals/safety.py::Safety": [
+   "#",
+   ">",
+   "BTN:ACCEPT",
+   "COLOR",
+   "EPILEPSY",
+   "MAX BRT",
+   "NONE",
+   "OFF",
+   "ON",
+   "SAFETY"
+  ],
+  "visuals/sandpile.py::Sandpile": [],
+  "visuals/sauces.py::Sauces": [
+   "#",
+   "#/#",
+   "+ BLOOD ORANGE JUICE + ZEST",
+   "+ CAPERS + OLIVES + ANCHOVIES + CHILI",
+   "+ GARLIC + OREGANO + BASIL",
+   "+ GROUND MEAT + ONION CARROT CELERY + WINE + MILK  SLOW SIMMER",
+   "+ MADEIRA WINE",
+   "+ TARRAGON + SHALLOT + WHITE WINE VINEGAR  REDUCE FIRST",
+   "+ TOMATO PUREE",
+   "ARGENTINA",
+   "ASPARAGUS  STEAMED VEGETABLES",
+   "BEARNAISE",
+   "BECHAMEL",
+   "BEEF TENDERLOIN  HAM  MUSHROOMS",
+   "BIRYANI  CURRIES  KEBABS",
+   "BOLOGNESE",
+   "BUTTER + FLOUR (# MIN) + CHICKEN OR FISH STOCK",
+   "BUTTER + FLOUR (# MIN) + MILK + NUTMEG",
+   "CHIMICHURRI",
+   "CHORON",
+   "CREAM SAUCES  GRATINS  LASAGNA",
+   "DEMI-GLACE",
+   "ESPAGNOLE",
+   "FISH  EGGS  GRILLED MEAT",
+   "GRILLED STEAK  SAUSAGES",
+   "HOLLANDAISE",
+   "INDIA",
+   "MADEIRA",
+   "MALTAISE",
+   "MARINARA",
+   "MOTHER",
+   "MOTHER SAUCE",
+   "PARSLEY + GARLIC + OREGANO + VINEGAR + OIL",
+   "PASTA  PIZZA  DIPPING",
+   "PUTTANESCA",
+   "RAITA",
+   "SERVE",
+   "SPAGHETTI  LINGUINE",
+   "STEAK  GRILLED FISH  EGGS",
+   "SUPREME  ALLEMANDE  BERCY",
+   "TAGLIATELLE  LASAGNA  PAPPARDELLE",
+   "TOMATO",
+   "VELOUTE",
+   "WORLD",
+   "YOGURT + CUCUMBER + TOASTED CUMIN + MINT"
+  ],
+  "visuals/scales.py::Scales": [
+   "#",
+   "#/#",
+   "A",
+   "Ab",
+   "B",
+   "B HUNGARIAN",
+   "B JAPANESE",
+   "B MAJOR",
+   "Bb",
+   "Bb HUNGARIAN",
+   "Bb JAPANESE",
+   "C",
+   "C HUNGARIAN",
+   "C JAPANESE",
+   "C MAJOR",
+   "C#",
+   "C# MAJOR",
+   "D",
+   "DEGREES",
+   "E",
+   "Eb",
+   "F",
+   "F#",
+   "G",
+   "HUNGARIAN MINOR",
+   "IN SCALE - KOTO",
+   "IONIAN BRIGHT",
+   "NOTES",
+   "NUMBERS",
+   "R",
+   "b#"
+  ],
+  "visuals/scripts.py::Scripts": [
+   "#/#",
+   "A",
+   "A TIMES A",
+   "B",
+   "B# A",
+   "B# E",
+   "BRAILLE / DOTS-#",
+   "C",
+   "CUNEIFORM / A",
+   "CUNEIFORM / A TIMES A",
+   "CUNEIFORM / NE TIMES A",
+   "D",
+   "DOTS-#",
+   "E",
+   "F",
+   "LATIN / A",
+   "LATIN / B",
+   "LATIN / C",
+   "LATIN / D",
+   "LATIN / E",
+   "LATIN / F",
+   "LATIN / Y WITH DIAERESIS",
+   "LINEAR_B / B# A",
+   "LINEAR_B / B# E",
+   "LOUIS BRAILLE ~# AD",
+   "MYCENAEAN GREECE ~# BC",
+   "NE TIMES A",
+   "PHOENICIAN ADAPTATION ~# BC",
+   "SUMER ~# BC",
+   "Y WITH DIAERESIS"
+  ],
+  "visuals/seismic.py::Seismic": [
+   "BTN:QUAKE",
+   "INNER CORE",
+   "INSIDE EARTH",
+   "MANTLE",
+   "OUTER CORE",
+   "P",
+   "P-WAVE: FAST",
+   "PcP",
+   "REFLECT",
+   "S",
+   "SHADOW",
+   "WAVES",
+   "WHERE ARE THE S?"
+  ],
+  "visuals/settings.py::Settings": [
+   "#",
+   "BRIGHTNESS",
+   "BTN:ACCEPT"
+  ],
+  "visuals/shuffleboarddemo.py::ShuffleboardDemo": [
+   "#",
+   "+# PTS",
+   "DEMO",
+   "R#"
+  ],
+  "visuals/shutdown.py::Shutdown": [
+   ">",
+   "BTN:CONFIRM",
+   "NO",
+   "POWER OFF?",
+   "SHUTDOWN",
+   "YES"
+  ],
+  "visuals/signs.py::Signs": [
+   "#/#",
+   "ALL SIGNS",
+   "AUSTRALIA CROSSING    AUSTRALIA CROSSING",
+   "AUSTRALIA SPEED LIMIT    AUSTRALIA SPEED LIMIT",
+   "GERMANY WARNING    GERMANY WARNING",
+   "INDIA WARNING",
+   "JAPAN CROSSING",
+   "JAPAN WARNING",
+   "PEDESTRIAN",
+   "RUSSIA CROSSING    RUSSIA CROSSING",
+   "USA CROSSING",
+   "USA WARNING",
+   "VIETNAM NO ENTRY    VIETNAM NO ENTRY",
+   "WARNING"
+  ],
+  "visuals/sinescroller.py::SineScroller": [],
+  "visuals/singer.py::Singer": [
+   "# SPM",
+   "# ST"
+  ],
+  "visuals/skifreedemo.py::SkiFreeDemo": [
+   "#M",
+   "DEMO",
+   "S#"
+  ],
+  "visuals/slideshow.py::AllVisuals": [
+   "  --  ",
+   "#",
+   "#%",
+   "#M",
+   "ALKALI",
+   "ALL",
+   "BOSSES",
+   "BUILDING MAP",
+   "Berlin Street Scene",
+   "CABINET",
+   "Cestello Annunciation",
+   "Claude Monet",
+   "DEMO",
+   "DUNGEON",
+   "Ernst Ludwig Kirchner",
+   "HELIUM",
+   "ITEMS",
+   "LIGHT REACTIONS",
+   "LINK",
+   "LITHIUM",
+   "LUMEN",
+   "MUSCLE CONTRACTION",
+   "NOBLE GASES",
+   "NPCS",
+   "OVERWORLD",
+   "PHOTOSYNTHESIS",
+   "Poppy Field",
+   "Raphael",
+   "Rouen Cathedral (Sunset)",
+   "SARCOMERE",
+   "STROMA",
+   "Sandro Botticelli",
+   "The School of Athens",
+   "WONDER",
+   "ZELDA MUSEUM"
+  ],
+  "visuals/slideshow.py::ArtGallery": [
+   "#",
+   "A Sunday on La Grande Jatte",
+   "An Experiment on a Bird in the Air Pump",
+   "Caravaggio",
+   "Cloud Study",
+   "Georges Seurat",
+   "Giovanni Bellini",
+   "Giuseppe Arcimboldo",
+   "Gustav Klimt",
+   "Gustave Caillebotte",
+   "Jan van Eyck",
+   "John Constable",
+   "Joseph Wright of Derby",
+   "Kamal ud-Din Behzad",
+   "Paris Street; Rainy Day",
+   "Raphael",
+   "St. Francis in the Desert",
+   "Summer",
+   "The Arnolfini Portrait",
+   "The Calling of Saint Matthew",
+   "The Kiss",
+   "The Transfiguration",
+   "Yusuf and Zulaikha"
+  ],
+  "visuals/slideshow.py::Chill": [
+   "RAIN"
+  ],
+  "visuals/slideshow.py::Complexity": [],
+  "visuals/slideshow.py::Customs": [
+   "EXPORT FROM",
+   "NO GIFS",
+   "PAINT GIF"
+  ],
+  "visuals/slideshow.py::Demos": [
+   "#",
+   "#%",
+   "#:#",
+   "#M",
+   "#X",
+   "<",
+   ">",
+   "BTN:FLAP",
+   "DEMO",
+   "G#",
+   "L#",
+   "LN",
+   "LV",
+   "M:#",
+   "NEXT",
+   "NX",
+   "P#",
+   "P#: #",
+   "S:#",
+   "SC",
+   "v"
+  ],
+  "visuals/slideshow.py::Demoscene": [],
+  "visuals/slideshow.py::Education": [
+   "  --  ",
+   "# BC",
+   "#.#X",
+   "ALL",
+   "BLOOD MOON",
+   "DAY # OF #",
+   "EVAPORATION",
+   "EXTRA",
+   "GUANINE",
+   "HELIUM",
+   "HYDROGEN",
+   "INTRA",
+   "LIVE",
+   "NA+/K+ PUMP",
+   "OCEAN ENERGY",
+   "RED BLOOD CELLS    RED BLOOD CELLS",
+   "SICKLE CELLS",
+   "SPEED #.#X",
+   "TRANSPORT",
+   "WAXING GIBBOUS"
+  ],
+  "visuals/slideshow.py::Energy": [],
+  "visuals/slideshow.py::MusicMix": [
+   "#",
+   "# BPM",
+   "# NPM",
+   "# RPM",
+   "#:#",
+   "#BPM",
+   "BILLIE JEAN",
+   "CLASSICAL",
+   "COPPER",
+   "GTR",
+   "Hz",
+   "NOTE:C",
+   "PATCH",
+   "PUPPETS",
+   "SAW",
+   "SILVER",
+   "SIN",
+   "SQR",
+   "TRIANGLE",
+   "VU"
+  ],
+  "visuals/slideshow.py::Naturalist": [
+   "#/#",
+   "Arkansaw Flycatcher, Swallow-Tailed Flycatcher, Says Flycatcher",
+   "Brown-headed Nuthatch",
+   "Discomedusae",
+   "Eriocnemis Vestitus",
+   "Flowers & Butterflies",
+   "Plant & Caterpillars",
+   "Ramphodon Naevius",
+   "Rosa Damascena Celsiana",
+   "Rosa Inermis",
+   "Rose-breasted Grosbeak",
+   "Vine & Caterpillars"
+  ],
+  "visuals/slideshow.py::ScienceLab": [
+   "# HZ",
+   "#.# D",
+   "#.#X",
+   "#P #N",
+   "BETA",
+   "CALM",
+   "DIPOLE",
+   "GUANINE",
+   "I-#",
+   "IODINE-#",
+   "MERCURY",
+   "NEON",
+   "NEON WAVES",
+   "QUADRUPOLE",
+   "Re=#",
+   "TRANSITION",
+   "TRIANGLE"
+  ],
+  "visuals/slideshow.py::Title": [
+   "*",
+   "A",
+   "B",
+   "C",
+   "CABINET",
+   "D",
+   "E",
+   "I",
+   "JACKPOT",
+   "N",
+   "O",
+   "R",
+   "T",
+   "W",
+   "WONDER",
+   "WONDER CABINET"
+  ],
+  "visuals/slime.py::Slime": [],
+  "visuals/slimelab.py::SlimeLab": [
+   "BALANCED",
+   "CREEPING",
+   "atk=#.#",
+   "grow=#.#"
+  ],
+  "visuals/snakedemo.py::SnakeDemo": [
+   "DEMO",
+   "LEN:#",
+   "SCORE:#"
+  ],
+  "visuals/solids.py::Solids": [
+   "ARCHIMEDEAN",
+   "CATALAN",
+   "GREAT ICOSA",
+   "KEPLER-POINSOT",
+   "PLATONIC",
+   "RHOMBIC DODEC",
+   "SM STEL DODEC",
+   "SNUB DODECA",
+   "TETRA",
+   "TRIAKIS TETRA",
+   "TRUNC ICOSID",
+   "TRUNC TETRA",
+   "V# E# F#"
+  ],
+  "visuals/solitaire.py::Solitaire": [],
+  "visuals/sorting.py::Sorting": [
+   "BUBBLE",
+   "C:#",
+   "HEAP",
+   "QUICK",
+   "S:#",
+   "SPD #"
+  ],
+  "visuals/spacecruisedemo.py::SpaceCruiseDemo": [
+   "#:#",
+   "?",
+   "DEMO"
+  ],
+  "visuals/spectroscope.py::Spectroscope": [
+   "ALL",
+   "HELIUM",
+   "HYDROGEN",
+   "IRON",
+   "MERCURY",
+   "NITROGEN",
+   "NONMETALS",
+   "OXYGEN",
+   "TRANSITION",
+   "ZINC"
+  ],
+  "visuals/spices.py::Spices": [
+   "#",
+   "#/#",
+   "ALLSPICE + SCOTCH BONNET + THYME + GARLIC + GINGER + NUTMEG + CINNAMON + BLACK PEPPER",
+   "ANCHO CHILI + CUMIN + GARLIC + OREGANO + PAPRIKA + CAYENNE",
+   "CHICKEN / PORK / FISH / SHRIMP",
+   "CHILE BLEND",
+   "CHILE-LIME SALT",
+   "CHILI + SANSHO PEPPER + ORANGE PEEL + SESAME + HEMP SEED + NORI + GINGER",
+   "CHILI CON CARNE / TACOS / BEANS",
+   "CHILI PEPPER + DEHYDRATED LIME + SALT",
+   "CHILI POWDER",
+   "CHINA",
+   "CORIANDER + CUMIN + TURMERIC + CHILI + MUSTARD + FENUGREEK + BLACK PEPPER",
+   "COUSCOUS / MERGUEZ / SHAKSHUKA / EGGS",
+   "CUMIN + CORIANDER + CINNAMON + PAPRIKA + TURMERIC + GINGER + CARDAMOM + CLOVE + NUTMEG + BLACK PEPPER + ROSE PETALS",
+   "CURRIES / VINDALOO / RICE / LENTILS",
+   "CURRY BLEND",
+   "DRIED CHILES + CARAWAY + CORIANDER + CUMIN + GARLIC + OLIVE OIL + SMOKED PAPRIKA",
+   "FIVE FRAGRANCE",
+   "FIVE-SPICE",
+   "FOUR SPICES",
+   "FRANCE",
+   "FRUIT / CORN / MANGO / RIM DRINKS",
+   "FURIKAKE",
+   "GRILLED MEAT / RATATOUILLE / BREAD",
+   "HARISSA",
+   "HEAD OF THE SHOP",
+   "HERBES DE PROVENCE",
+   "HERBS OF PROVENCE",
+   "JAMAICA",
+   "JAPAN",
+   "JERK SEASONING",
+   "JERKED MEAT",
+   "MADRAS CURRY",
+   "MEANS",
+   "MEXICO",
+   "MOROCCO",
+   "NORI + SESAME + BONITO FLAKES + SALT + SUGAR",
+   "PATE / CHARCUTERIE / STEWS / TERRINES",
+   "QUATRE EPICES",
+   "RAS EL HANOUT",
+   "RICE / ONIGIRI / POPCORN / EGGS",
+   "ROAST DUCK / PORK BELLY / STIR-FRY",
+   "SEVEN FLAVOR CHILI",
+   "SHICHIMI",
+   "SOUTH INDIA",
+   "SPRINKLE OVER",
+   "STAR ANISE + CLOVE + CINNAMON + SICHUAN PEPPER + FENNEL",
+   "TAGINES / COUSCOUS / ROAST LAMB / MERGUEZ",
+   "TAJIN",
+   "TEXAS / MEXICO",
+   "THYME + ROSEMARY + OREGANO + SAVORY + MARJORAM + LAVENDER",
+   "TO CRUSH",
+   "TUNISIA",
+   "UDON / RAMEN / YAKITORI / RICE",
+   "WHITE PEPPER + NUTMEG + CLOVE + GINGER"
+  ],
+  "visuals/spirograph.py::Spirograph": [
+   "ASTROID",
+   "CARDIOID",
+   "DELTOID",
+   "LACE"
+  ],
+  "visuals/stackdemo.py::StackDemo": [
+   "DEMO",
+   "H:#",
+   "X#"
+  ],
+  "visuals/starfield.py::Starfield": [],
+  "visuals/starwarsca.py::StarWarsCA": [],
+  "visuals/stats.py::Stats": [
+   "- OVERVIEW -",
+   "<",
+   ">",
+   "AAA  # ENTRIES",
+   "ARCADE STATS",
+   "BAA  # ENTRIES",
+   "EAA  # ENTRIES",
+   "EJA  # ENTRIES",
+   "LEADERBOARD",
+   "OVERVIEW",
+   "TOTAL PLAYS #",
+   "UNIQUE GAMES #"
+  ],
+  "visuals/stickrunnerdemo.py::StickRunnerDemo": [
+   "#%",
+   "#M",
+   "DEMO"
+  ],
+  "visuals/synthesizer.py::Synthesizer": [
+   "#",
+   "Hz",
+   "PATCH",
+   "SAW",
+   "SIN",
+   "SQR",
+   "VU"
+  ],
+  "visuals/sysinfo.py::SysInfo": [
+   "#.#.#",
+   "#.#.#.#",
+   "IP:",
+   "MEM:",
+   "N/A",
+   "PY:",
+   "SYSTEM INFO",
+   "TEMP:",
+   "UP:",
+   "VER:"
+  ],
+  "visuals/tectonic.py::Tectonic": [
+   "CONVERGENT",
+   "DIVERGENT",
+   "HOTSPOT",
+   "SPEED #.#X",
+   "SPEED #X",
+   "TRANSFORM"
+  ],
+  "visuals/tessellations.py::Tessellations": [
+   "CAIRO",
+   "HERRINGBONE",
+   "HEXAGONS",
+   "MONO",
+   "PASTEL",
+   "PENROSE",
+   "SQUARES",
+   "TRIANGLES",
+   "WARM"
+  ],
+  "visuals/testpattern.py::TestPattern": [
+   "# PX/S",
+   "FULL WHITE",
+   "P:#",
+   "QUADRANT",
+   "STRESS TEST"
+  ],
+  "visuals/tetrisdemo.py::TetrisDemo": [
+   "#",
+   "#K",
+   "DEMO",
+   "LN",
+   "LV",
+   "NX",
+   "SC"
+  ],
+  "visuals/theremin.py::Theremin": [
+   "AUTO MODE",
+   "F=#.#",
+   "SAW",
+   "SINE",
+   "USER",
+   "USER MODE"
+  ],
+  "visuals/timers.py::Timers": [
+   "#M",
+   "#M#",
+   "#S",
+   "BTN:ACCEPT",
+   "CYCLE",
+   "IDLE",
+   "OFF",
+   "SCREENSAVER DELAY",
+   "SLEEP",
+   "TIMERS",
+   "TITLES"
+  ],
+  "visuals/trance.py::Trance": [],
+  "visuals/trashblasterdemo.py::TrashBlasterDemo": [
+   "#:#",
+   "DEMO"
+  ],
+  "visuals/truchet.py::Truchet": [],
+  "visuals/turing.py::TuringPatterns": [
+   "F=#.# K=#.#",
+   "LAMBDA"
+  ],
+  "visuals/turingmachine.py::TuringMachine": [
+   "# ONES",
+   "# STEPS",
+   "A,#>#,L,B",
+   "A,#>#,L,C",
+   "A,#>#,R,A",
+   "A,#>#,R,B",
+   "ADD",
+   "B,#>#,L,A",
+   "B,#>#,L,C",
+   "B,#>#,R,B",
+   "B,#>#,R,C",
+   "BB-#",
+   "BINARY CTR",
+   "Busy Beaver #: # ones, # steps",
+   "Busy Beaver #: #M steps!",
+   "C,#>#,L,B",
+   "C,#>#,L,D",
+   "C,#>#,L,E",
+   "C,#>#,R,D",
+   "C,#>#,R,HALT",
+   "D,#>#,L,A",
+   "D,#>#,L,D",
+   "D,#>#,R,A",
+   "D,#>#,R,D",
+   "D,#>#,R,HALT",
+   "E,#>#,L,A",
+   "E,#>#,R,HALT",
+   "HALT!",
+   "Increments binary",
+   "PAUSE",
+   "PAUSED",
+   "Q:A",
+   "Q:B",
+   "Q:C",
+   "Q:D",
+   "Q:E",
+   "Q:HALT",
+   "SPD #",
+   "STEP #",
+   "Unary # + #"
+  ],
+  "visuals/turntable.py::Turntable": [
+   "# RPM"
+  ],
+  "visuals/twister.py::Twister": [],
+  "visuals/typewriter.py::Typewriter": [
+   "# CPM",
+   "A",
+   "B",
+   "E",
+   "H",
+   "I",
+   "N",
+   "O",
+   "R",
+   "S",
+   "T"
+  ],
+  "visuals/usb_share.py::UsbShare": [
+   ">",
+   "BTN:GO",
+   "GET FROM USB",
+   "PLUG IN STICK",
+   "SEND TO USB",
+   "USB SHARE"
+  ],
+  "visuals/walk.py::Walk": [
+   "RUN #.#x",
+   "RUN #x",
+   "SNEAK #.#x",
+   "SNEAK #x",
+   "WALK #.#x",
+   "WALK #x"
+  ],
+  "visuals/watchgears.py::WatchGears": [],
+  "visuals/watercycle.py::WaterCycle": [
+   "COLLECTION",
+   "CONDENSATION",
+   "EVAPORATION",
+   "PRECIPITATION",
+   "SPEED #.#X"
+  ],
+  "visuals/wavetank.py::WaveTank": [
+   "#.#X",
+   "DOUBLE SLIT",
+   "INTERFERENCE",
+   "NEON WAVES",
+   "OCEAN WAVES",
+   "REFLECTION",
+   "RIPPLE",
+   "SINGLE SOURCE",
+   "THERMAL WAVES"
+  ],
+  "visuals/weather.py::Weather": [
+   "CLOUDS",
+   "FOG",
+   "HAIL",
+   "RAIN",
+   "RAINBOW",
+   "SNOW",
+   "SUN",
+   "THUNDER"
+  ],
+  "visuals/weaving.py::Weaving": [
+   "BASKET",
+   "BERBER",
+   "BIRD'S EYE",
+   "CHINA VIA SILK ROAD",
+   "DENIM",
+   "DIAMOND TWILL",
+   "EUROPE",
+   "EUROPE / ASIA",
+   "GOOSE EYE",
+   "HERRINGBONE",
+   "HOUNDSTOOTH",
+   "HUCK LACE",
+   "INDIGO",
+   "M'S AND O'S",
+   "MAYAN",
+   "MONK'S BELT",
+   "NATURAL",
+   "NIMES, FRANCE",
+   "NORDIC",
+   "NORSE / CELTIC",
+   "PATOLA",
+   "PLAIN",
+   "RIB",
+   "ROME / BRITAIN",
+   "ROSEPATH",
+   "SATIN",
+   "SCANDINAVIA",
+   "SCOTLAND",
+   "SILK",
+   "SPEED #.#X",
+   "SPEED #X",
+   "SPEED .#X",
+   "SWEDEN",
+   "TARTAN",
+   "TWILL",
+   "UNIVERSAL",
+   "UNIVERSAL # BCE",
+   "WAFFLE"
+  ],
+  "visuals/wifi_config.py::WiFiConfig": [
+   " ",
+   " _",
+   " a",
+   "#.#.#.#",
+   "(NONE)",
+   ")",
+   ".   ",
+   "..  ",
+   "... ",
+   "....",
+   "> SPC <",
+   "> a <",
+   "> b <",
+   "BTN:OK",
+   "CHAR:",
+   "CONNECTING",
+   "CoffeeShop",
+   "ENTER SSID",
+   "HomeNetwork",
+   "NETGEAR-Gue>",
+   "NETGEAR-Gues",
+   "Neighbors_#G",
+   "OTHER...",
+   "PW:",
+   "SPC",
+   "WIFI",
+   "_",
+   "a",
+   "a_",
+   "aa",
+   "abc",
+   "b",
+   "b_",
+   "ba",
+   "c",
+   "d",
+   "xfinitywifi",
+   "~"
+  ],
+  "visuals/win95maze.py::Win95Maze": [],
+  "visuals/wolfram.py::Wolfram": [
+   "RULE #"
+  ],
+  "visuals/wondercabinet.py::WonderAlien": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderAsteroids": [
+   "A",
+   "B",
+   "C",
+   "D",
+   "E",
+   "I",
+   "N",
+   "O",
+   "R",
+   "T",
+   "W"
+  ],
+  "visuals/wondercabinet.py::WonderAtari": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBSOD": [
+   "#%",
+   ":(",
+   "CABINET",
+   "I",
+   "IN",
+   "INT",
+   "INTO",
+   "INTO ",
+   "INTO A",
+   "P",
+   "PR",
+   "PRO",
+   "PROB",
+   "PROBL",
+   "PROBLE",
+   "PROBLEM",
+   "R",
+   "RA",
+   "RAN",
+   "W",
+   "WO",
+   "WON",
+   "WOND",
+   "WONDE",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBladeRunner": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBoids": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBoing": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBrain": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderBreakout": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderC64": [
+   "#",
+   "*",
+   "**",
+   "***",
+   "****",
+   "CABINET",
+   "R",
+   "RE",
+   "REA",
+   "READ",
+   "READY",
+   "READY.",
+   "RU",
+   "RUN",
+   "W",
+   "WO",
+   "WON",
+   "WOND",
+   "WONDE",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderCassette": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderCloseEncounters": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderColorBars": [
+   "CABINET",
+   "PLEASE",
+   "STANDBY",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderCrawl": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderCreeper": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderDK": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderDOS": [
+   "#K",
+   "B",
+   "BI",
+   "BIO",
+   "BIOS",
+   "BIOS ",
+   "BIOS #",
+   "BIOS #.",
+   "BIOS #.#",
+   "C:\\>",
+   "CABINET",
+   "O",
+   "OK",
+   "R",
+   "RA",
+   "RAM",
+   "RAM ",
+   "RAM  ",
+   "RAM  #",
+   "RAM  #K",
+   "W",
+   "WO",
+   "WON",
+   "WOND",
+   "WONDE",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderDiffusion": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderDoom": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderDrop": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderET": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderExorcist": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderFilm": [
+   "#",
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderFlow": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderFrogger": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderGameBoy": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderGhostbusters": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderGlitch": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderGlow": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderGodzilla": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderHodge": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderIndiana": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderInsertCoin": [
+   "#",
+   "A",
+   "CABINET",
+   "COIN",
+   "E",
+   "G",
+   "GAME",
+   "INSERT",
+   "M",
+   "O",
+   "OVER",
+   "R",
+   "V",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderInvaders": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderJaws": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderJurassicPark": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderKingKong": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderLife": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderLoading": [
+   "#%",
+   ".",
+   "..",
+   "...",
+   "CABINET",
+   "LOADING",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderMarquee": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderMatrix": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderMetropolis": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderN64": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderNES": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderNeon": [
+   "A",
+   "B",
+   "C",
+   "D",
+   "E",
+   "I",
+   "N",
+   "O",
+   "R",
+   "T",
+   "W"
+  ],
+  "visuals/wondercabinet.py::WonderNyanCat": [
+   "WONDER CABINET"
+  ],
+  "visuals/wondercabinet.py::WonderPS1": [],
+  "visuals/wondercabinet.py::WonderPacMan": [
+   "ABINET",
+   "BINET",
+   "CABINET",
+   "ET",
+   "INET",
+   "NET",
+   "T",
+   "W",
+   "WO",
+   "WON",
+   "WOND",
+   "WONDE",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderPipe": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderPong": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderPsycho": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderRetroTV": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSand": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSauron": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSega": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSlide": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSlime": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSnake": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderSpin": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderStarWars": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderStargate": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderTetris": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderTron": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderTypewriter": [
+   "C",
+   "CA",
+   "CAB",
+   "CABI",
+   "CABIN",
+   "CABINE",
+   "CABINET",
+   "W",
+   "WO",
+   "WON",
+   "WOND",
+   "WONDE",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderVHS": [
+   "#:#",
+   "CABINET",
+   "REWIND",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderVertigo": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderVinyl": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderWinXP": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderWizardOz": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/wondercabinet.py::WonderZoom": [
+   "CABINET",
+   "WONDER"
+  ],
+  "visuals/xorpattern.py::XORPattern": [],
+  "visuals/yoga.py::Yoga": [
+   "BALANCE #.#x",
+   "BALANCE #x",
+   "MOUNTAIN",
+   "SUN SALUTE #.#x",
+   "SUN SALUTE #x",
+   "UPWARD SALUTE",
+   "WARRIOR",
+   "WARRIOR #.#x",
+   "WARRIOR #x"
+  ]
+ }
+}

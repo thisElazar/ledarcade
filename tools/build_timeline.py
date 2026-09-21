@@ -26,6 +26,7 @@ from collections import defaultdict
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from controls_vocab import audit, class_source  # noqa: E402
+from legend_audit import labels_in, load_ledger, status_of  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT  = ROOT / "tools" / "timeline.html"
@@ -127,6 +128,7 @@ def extract_items(files):
     guide = json.load(open(ROOT / "site" / "guide.json"))
     game_keys = {"arcade", "retro", "modern", "toys", "bar", "2_player",
                  "unique", "game_mix"}
+    ledger = load_ledger()
     sharing = defaultdict(int)
     for cat in guide["categories"]:
         for item in cat["items"]:
@@ -159,6 +161,12 @@ def extract_items(files):
                 notes.append("own exit")
             if sharing[item["module"]] > 1:
                 notes.append(f"file shared by {sharing[item['module']]}")
+            labels = labels_in(item["cls"], item["module"])
+            entry = ledger.get(f"{item['module']}::{item['cls']}")
+            if entry:
+                legend = status_of(entry)
+            else:
+                legend = "unreviewed" if labels else None
             rows.append(dict(
                 name=item["name"], cls=item["cls"], module=item["module"],
                 cat=cat["key"], kind="game" if cat["key"] in game_keys else "visual",
@@ -167,9 +175,15 @@ def extract_items(files):
                 commits=hist["commits"], lines=hist["lines"],
                 controls=controls, reads=found["reads"],
                 flags=flags, notes=notes,
+                labels=labels, legend=legend,
+                legend_labels={k: v["meaning"] for k, v in
+                               (entry or {}).get("labels", {}).items()},
+                legend_note=(entry or {}).get("note", ""),
             ))
     flagged = sum(1 for r in rows if r["flags"])
-    print(f"{len(rows)} catalog items, {flagged} with controls flags")
+    undecoded = sum(1 for r in rows if r["legend"] in ("unreviewed", "unexplained"))
+    print(f"{len(rows)} catalog items, {flagged} with controls flags, "
+          f"{undecoded} with on-screen labels not yet explained")
     return rows
 
 # ── table view (plain strings: no f-string brace doubling) ──────────
@@ -219,6 +233,11 @@ TABLE_CSS = """
   .ctl b { color: #ffb74d; font-weight: normal; white-space: nowrap; }
   .ctl span { color: #aaa; }
   .none { color: #555; }
+  .legend { display: inline-block; border-radius: 8px; padding: 0 6px; margin-bottom: 3px; font-size: 10px; border: 1px solid #2a2a33; }
+  .legend-unexplained { color: #e57373; border-color: #e5737355; }
+  .legend-unreviewed { color: #ffb74d; border-color: #ffb74d55; }
+  .legend-site-only { color: #64b5f6; border-color: #64b5f655; }
+  .legend-on-panel, .legend-clear { color: #6fcf73; border-color: #6fcf7355; }
   .reads { color: #888; white-space: nowrap; }
   .flag { display: block; color: #e57373; margin-bottom: 2px; }
   .note { display: inline-block; color: #777; border: 1px solid #2a2a33;
@@ -235,6 +254,7 @@ TABLE_HTML = """
     <button class="filter-btn chip active" data-kind="game">games</button>
     <button class="filter-btn chip" id="t-flagged">flagged only</button>
     <button class="filter-btn chip" id="t-untouched">never refined</button>
+    <button class="filter-btn chip" id="t-undecoded">labels to decode</button>
     <span id="t-count"></span>
   </div>
   <table>
@@ -249,6 +269,8 @@ TABLE_HTML = """
       <th data-key="ncontrols">documented controls</th>
       <th data-key="nreads">code reads</th>
       <th data-key="nflags">parity flags</th>
+      <th data-key="nlabels" class="num" title="LABEL:value strings the code draws">on-screen labels</th>
+      <th data-key="legend" title="are those labels explained anywhere a viewer can see? (tools/legend_ledger.json)">legend</th>
     </tr></thead>
     <tbody id="t-body"></tbody>
   </table>
@@ -259,7 +281,7 @@ TABLE_JS = """
 // ── table view ──
 let tSort = { key: 'created', dir: 1 };
 let tKinds = { visual: true, game: true };
-let tFlagged = false, tUntouched = false, tQuery = '';
+let tFlagged = false, tUntouched = false, tUndecoded = false, tQuery = '';
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -270,8 +292,11 @@ ITEMS.forEach(r => {
   r.ncontrols = Object.keys(r.controls).length;
   r.nreads = r.reads.length;
   r.nflags = r.flags.length;
+  r.nlabels = r.labels.length;
   r.hay = [r.name, r.cls, r.module, r.cat, Object.keys(r.controls).join(' '),
-           Object.values(r.controls).join(' '), r.flags.join(' '), r.notes.join(' ')]
+           Object.values(r.controls).join(' '), r.flags.join(' '), r.notes.join(' '),
+           r.labels.join(' '), r.legend || '', Object.values(r.legend_labels).join(' '),
+           r.legend_note]
           .join(' ').toLowerCase();
 });
 const maxFocused = Math.max(1, ...ITEMS.map(r => r.focused));
@@ -279,6 +304,7 @@ const maxFocused = Math.max(1, ...ITEMS.map(r => r.focused));
 function tRows() {
   const rows = ITEMS.filter(r =>
     tKinds[r.kind] && (!tFlagged || r.nflags) && (!tUntouched || !r.focused) &&
+    (!tUndecoded || r.legend === 'unreviewed' || r.legend === 'unexplained') &&
     (!tQuery || r.hay.includes(tQuery)));
   const k = tSort.key;
   rows.sort((a, b) => {
@@ -291,12 +317,22 @@ function tRows() {
   return rows;
 }
 
+function legendCell(r) {
+  if (!r.legend) return '<span class="none">—</span>';
+  const meanings = Object.entries(r.legend_labels).map(([k, v]) =>
+    '<b>' + esc(k) + '</b><span>' + esc(v) + '</span>').join('');
+  return '<span class="legend legend-' + r.legend + '">' + r.legend + '</span>' +
+    (meanings ? '<div class="ctl">' + meanings + '</div>' : '') +
+    (r.legend_note ? '<div class="none">' + esc(r.legend_note) + '</div>' : '');
+}
+
 function drawTable() {
   const rows = tRows();
   document.getElementById('t-count').textContent =
     rows.length + ' of ' + ITEMS.length + ' items · ' +
     rows.filter(r => r.nflags).length + ' flagged · ' +
-    rows.filter(r => !r.focused).length + ' never refined';
+    rows.filter(r => !r.focused).length + ' never refined · ' +
+    rows.filter(r => r.legend === 'unreviewed' || r.legend === 'unexplained').length + ' labels to decode';
   document.querySelectorAll('thead th').forEach(th => {
     const on = th.dataset.key === tSort.key;
     th.classList.toggle('sorted', on);
@@ -322,6 +358,8 @@ function drawTable() {
       '<td class="reads">' + (r.nreads ? esc(r.reads.join(' ')) : '<span class="none">nothing</span>') + '</td>' +
       '<td>' + r.flags.map(f => '<span class="flag">' + esc(f) + '</span>').join('') +
         r.notes.map(n => '<span class="note">' + esc(n) + '</span>').join('') + '</td>' +
+      '<td class="reads">' + (r.nlabels ? esc(r.labels.join(' ')) : '<span class="none">—</span>') + '</td>' +
+      '<td>' + legendCell(r) + '</td>' +
       '</tr>';
   }).join('');
 }
@@ -343,6 +381,9 @@ function initTable() {
   });
   document.getElementById('t-untouched').addEventListener('click', e => {
     tUntouched = !tUntouched; e.target.classList.toggle('active', tUntouched); drawTable();
+  });
+  document.getElementById('t-undecoded').addEventListener('click', e => {
+    tUndecoded = !tUndecoded; e.target.classList.toggle('active', tUndecoded); drawTable();
   });
   document.getElementById('t-search').addEventListener('input', e => {
     tQuery = e.target.value.trim().toLowerCase(); drawTable();
