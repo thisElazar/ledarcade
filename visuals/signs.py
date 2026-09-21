@@ -178,7 +178,7 @@ def _load_sign_png(stem):
 _TYPE_LABELS = {
     'stop': 'STOP',
     'yield': 'YIELD',
-    'speed': 'SPEED 50',
+    'speed': 'SPEED LIMIT',
     'no_entry': 'NO ENTRY',
     'pedestrian': 'CROSSING',
     'warning': 'WARNING',

@@ -125,13 +125,13 @@ class Convection(Visual):
             self.temp_gradient = min(2.0, self.temp_gradient + 0.02)
             self.overlay_timer = 2.0
             ra = self._rayleigh()
-            self.overlay_lines = [f"dT {ra:.1f}"]
+            self.overlay_lines = [f"RAYLEIGH {ra:.1f}"]
             consumed = True
         if input_state.left:
             self.temp_gradient = max(0.2, self.temp_gradient - 0.02)
             self.overlay_timer = 2.0
             ra = self._rayleigh()
-            self.overlay_lines = [f"dT {ra:.1f}"]
+            self.overlay_lines = [f"RAYLEIGH {ra:.1f}"]
             consumed = True
 
         if input_state.up_pressed:

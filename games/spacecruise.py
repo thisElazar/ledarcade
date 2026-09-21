@@ -583,6 +583,10 @@ class SpaceCruise(Game):
                 px, py = x + dx, y + dy
                 if 0 <= px < GRID_SIZE and 0 <= py < GRID_SIZE:
                     self.display.set_pixel(px, py, color)
+        else:
+            # Not one of the digit/operator patterns above (e.g. the pending-
+            # number '?') - fall back to the display's normal small font.
+            self.display.draw_text_small(x, y, char, color)
 
     def _draw_number(self, x, y, num, color):
         """Draw a number."""
@@ -653,6 +657,10 @@ class SpaceCruise(Game):
                         for dy in range(4):
                             if 0 <= int(text.y) + dy < GRID_SIZE:
                                 self.display.set_pixel(x_pos + i * 4, int(text.y) + dy, color)
+                else:
+                    # Letters (e.g. "MISS!") aren't in the digit/operator patterns
+                    # above - fall back to the display's normal small font.
+                    self.display.draw_text_small(x_pos + i * 4, int(text.y), c, color)
 
         # Draw rocket
         bob_offset = math.sin(self.bob_phase) * 1.5

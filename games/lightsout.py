@@ -35,10 +35,14 @@ class LightsOut(Game):
     BOARD_BG = (0, 0, 0)         # True black
     CURSOR_COLOR = Colors.CYAN
 
+    # Best level reached. Class-level (not per-instance) because the shell
+    # builds a new LightsOut instance every time the game is launched from
+    # the menu; keeping it here lets it survive relaunches until power-off.
+    best_level = 0
+
     def __init__(self, display: Display):
         super().__init__(display)
         self.high_score = 0
-        self.best_level = 0
         self.reset()
 
     def reset(self):
@@ -167,7 +171,7 @@ class LightsOut(Game):
             if self.check_win():
                 self.score += max(1, 100 - self.moves * 5)  # Bonus for fewer moves
                 self.high_score = max(self.high_score, self.score)
-                self.best_level = max(self.best_level, self.level)
+                LightsOut.best_level = max(LightsOut.best_level, self.level)
                 self.solved = True
                 self.solved_lockout = 0.4
 

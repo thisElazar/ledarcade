@@ -418,11 +418,11 @@ class RushHour(Game):
             if i == self.difficulty_idx:
                 # Selected difficulty
                 self.display.draw_text_small(2, y, ">", Colors.WHITE)
-                self.display.draw_text_small(8, y, diff.upper()[:6], color)
+                self.display.draw_text_small(8, y, diff.upper(), color)
                 # Show level number
                 self.display.draw_text_small(44, y, f"L{self.level_idx + 1}", Colors.WHITE)
             else:
-                self.display.draw_text_small(8, y, diff.upper()[:6], (color[0]//2, color[1]//2, color[2]//2))
+                self.display.draw_text_small(8, y, diff.upper(), (color[0]//2, color[1]//2, color[2]//2))
             y += 8
 
         # Show best for selected level

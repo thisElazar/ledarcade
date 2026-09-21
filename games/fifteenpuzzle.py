@@ -39,9 +39,14 @@ class FifteenPuzzle(Game):
     BOARD_BG = (30, 30, 40)
     TEXT_COLOR = Colors.WHITE
 
+    # Best (fewest) moves to solve. Class-level (not per-instance) because the
+    # shell builds a new FifteenPuzzle instance every time the game is
+    # launched from the menu; keeping it here lets it survive relaunches
+    # until power-off.
+    best_moves = 999
+
     def __init__(self, display: Display):
         super().__init__(display)
-        self.best_moves = 999
         self.reset()
 
     def reset(self):
@@ -149,7 +154,7 @@ class FifteenPuzzle(Game):
                 if self.is_solved():
                     self.won = True
                     if self.moves < self.best_moves:
-                        self.best_moves = self.moves
+                        FifteenPuzzle.best_moves = self.moves
 
         # Reshuffle with button
         if input_state.action_l or input_state.action_r:

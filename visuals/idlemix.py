@@ -333,8 +333,8 @@ class IdleMix(Visual):
                 d.set_pixel(2, y + 2, arrow_color)
                 d.set_pixel(1, y + 3, arrow_color)
 
-            # Category name (truncated to 8 chars)
-            name = cat['name'][:8]
+            # Category name (all display names fit in the space before the weight bar)
+            name = cat['name']
             d.draw_text_small(5, y, name, color)
 
             # Weight bar at right side: 5 segments starting at x=47

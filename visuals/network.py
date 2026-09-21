@@ -511,9 +511,11 @@ class Network(Visual):
                             d.set_pixel(px, py, color)
 
         # --- HUD ---
-        # Bottom stats
-        p_str = f"p={self.rewire_p:.2f}"
-        d.draw_text_small(2, 57, p_str, (160, 160, 120))
+        # Bottom stats (rewire_p only means something for Watts-Strogatz;
+        # Barabasi-Albert never reads it)
+        if self.model == 0:
+            p_str = f"p={self.rewire_p:.2f}"
+            d.draw_text_small(2, 57, p_str, (160, 160, 120))
 
         if self.hops_display:
             # Show hops on right side

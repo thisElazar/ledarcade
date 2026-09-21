@@ -250,7 +250,7 @@ class ColorTheory(Visual):
         # Labels for primaries
         if labels:
             label_r = r_outer + 3
-            primaries = [(0, 'R'), (4, 'Y'), (8, 'B')]
+            primaries = [(0, 'R'), (2, 'Y'), (8, 'B')]
             for idx, lbl in primaries:
                 angle_rad = math.radians(idx * 30 - offset_deg)
                 lx = int(cx + label_r * math.cos(angle_rad)) - 1
@@ -488,8 +488,8 @@ class ColorTheory(Visual):
 
         # Show hue name
         hue_idx = (base_hue // 30) % 12
-        hue_labels = ['RED', 'ORG', 'YEL', 'YGR', 'GRN', 'CYN',
-                      'CYN', 'SKY', 'BLU', 'IND', 'VIO', 'MAG']
+        hue_labels = ['RED', 'ORG', 'YEL', 'YGR', 'GRN', 'SPR',
+                      'CYN', 'SKY', 'BLU', 'VIO', 'MAG', 'ROS']
         d.draw_text_small(2, 9, hue_labels[hue_idx], base_color)
 
         # Tint strip (pure -> white): y=16, height=8

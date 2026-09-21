@@ -507,9 +507,13 @@ class LunarLander(Game):
         score_str = str(self.score)
         self.display.draw_text_small(64 - len(score_str) * 4, 1, score_str, Colors.YELLOW)
 
-        # Velocity indicator
-        speed = math.sqrt(self.vx * self.vx + self.vy * self.vy)
-        speed_color = Colors.GREEN if speed < self.MAX_LANDING_SPEED else self.DANGER_COLOR
+        # Velocity indicator (mirrors the crash test's separate vy/vx checks,
+        # not the combined speed, so it can't show green on a lateral-only-unsafe landing)
+        safe_to_land = (
+            abs(self.vy) <= self.MAX_LANDING_SPEED
+            and abs(self.vx) <= self.MAX_LATERAL_SPEED
+        )
+        speed_color = Colors.GREEN if safe_to_land else self.DANGER_COLOR
 
         # Vertical speed indicator (arrow) - bottom left
         if self.vy > 2:

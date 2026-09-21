@@ -1004,7 +1004,11 @@ class Orbitals(Visual):
                                              scene.get('annotation', scene['mode'].upper()),
                                              (220, 200, 160))
             elif scene['type'] == 'hybrid':
-                self.display.draw_text_small(2, y_label, scene['mix'].upper(),
+                # 'mix' is an internal id like 'sp3_h2o' for the example-molecule
+                # scenes; the hybridization code is the part before the '_'
+                # (the molecule name itself is already shown in phase 0).
+                clean_mix = scene['mix'].split('_')[0]
+                self.display.draw_text_small(2, y_label, clean_mix.upper(),
                                              (220, 220, 160))
             elif scene['type'] == 'delocal':
                 self.display.draw_text_small(2, y_label,

@@ -521,10 +521,20 @@ class WiFiConfig(Visual):
 
             if idx < len(self._networks):
                 ssid, sig = self._networks[idx]
-                # Truncate SSID to fit (max ~12 chars at 4px each = 48px, leave room for bars)
+                # Window that fits (max ~12 chars at 4px each = 48px, leave room for bars)
                 max_chars = 12
-                label = ssid[:max_chars]
                 col = _HIGHLIGHT_COLOR if selected else _WHITE
+                if len(ssid) <= max_chars:
+                    label = ssid
+                elif selected:
+                    # Selected row: scroll to reveal the full SSID (same
+                    # 2 chars/sec pattern as _draw_scrolling_pw).
+                    offset = int(self.time * 2) % (len(ssid) - max_chars + 4)
+                    start = max(0, min(offset, len(ssid) - max_chars))
+                    label = ssid[start:start + max_chars]
+                else:
+                    # Not selected: mark visibly that the name is cut off.
+                    label = ssid[:max_chars - 1] + '>'
                 d.draw_text_small(2, row_y + 1, label, col)
                 # Signal bars (1-4 dots) at right edge
                 bars = max(1, min(4, sig // 25 + 1))

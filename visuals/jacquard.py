@@ -401,7 +401,7 @@ class Jacquard(Visual):
     def _draw_hud(self, d):
         """Draw speed and row counter."""
         rpm = int(SPEED_RPS[self.speed_level - 1] * 60)  # Rows per minute
-        d.draw_text_small(2, 2, f"{rpm}RPM", HUD_COLOR)
+        d.draw_text_small(2, 2, f"{rpm}ROW/MIN", HUD_COLOR)
 
         # Row counter (right side)
         d.draw_text_small(42, 2, f"{self.rows_read}", HUD_COLOR)

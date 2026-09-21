@@ -533,7 +533,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH CIRCU', 'script': 'LATIN', 'concept': 'A WITH CIRCU',
+        'name': 'A WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'A WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -553,7 +553,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH DIAER', 'script': 'LATIN', 'concept': 'A WITH DIAER',
+        'name': 'A WITH DIAERESIS', 'script': 'LATIN', 'concept': 'A WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -564,7 +564,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH RING ', 'script': 'LATIN', 'concept': 'A WITH RING ',
+        'name': 'A WITH RING ABOVE', 'script': 'LATIN', 'concept': 'A WITH RING ABOVE',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -584,7 +584,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'C WITH CEDIL', 'script': 'LATIN', 'concept': 'C WITH CEDIL',
+        'name': 'C WITH CEDILLA', 'script': 'LATIN', 'concept': 'C WITH CEDILLA',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -610,7 +610,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'E WITH CIRCU', 'script': 'LATIN', 'concept': 'E WITH CIRCU',
+        'name': 'E WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'E WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -619,7 +619,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'E WITH DIAER', 'script': 'LATIN', 'concept': 'E WITH DIAER',
+        'name': 'E WITH DIAERESIS', 'script': 'LATIN', 'concept': 'E WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -647,7 +647,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'I WITH CIRCU', 'script': 'LATIN', 'concept': 'I WITH CIRCU',
+        'name': 'I WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'I WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -656,7 +656,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'I WITH DIAER', 'script': 'LATIN', 'concept': 'I WITH DIAER',
+        'name': 'I WITH DIAERESIS', 'script': 'LATIN', 'concept': 'I WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -704,7 +704,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH CIRCU', 'script': 'LATIN', 'concept': 'O WITH CIRCU',
+        'name': 'O WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'O WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -724,7 +724,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH DIAER', 'script': 'LATIN', 'concept': 'O WITH DIAER',
+        'name': 'O WITH DIAERESIS', 'script': 'LATIN', 'concept': 'O WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -735,7 +735,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MULTIPLICATI', 'script': 'LATIN', 'concept': 'MULTIPLICATI',
+        'name': 'MULTIPLICATION SIGN', 'script': 'LATIN', 'concept': 'MULTIPLICATION SIGN',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -743,7 +743,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH STROK', 'script': 'LATIN', 'concept': 'O WITH STROK',
+        'name': 'O WITH STROKE', 'script': 'LATIN', 'concept': 'O WITH STROKE',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -771,7 +771,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'U WITH CIRCU', 'script': 'LATIN', 'concept': 'U WITH CIRCU',
+        'name': 'U WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'U WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -780,7 +780,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'U WITH DIAER', 'script': 'LATIN', 'concept': 'U WITH DIAER',
+        'name': 'U WITH DIAERESIS', 'script': 'LATIN', 'concept': 'U WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -836,7 +836,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH CIRCU', 'script': 'LATIN', 'concept': 'A WITH CIRCU',
+        'name': 'A WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'A WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -856,7 +856,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH DIAER', 'script': 'LATIN', 'concept': 'A WITH DIAER',
+        'name': 'A WITH DIAERESIS', 'script': 'LATIN', 'concept': 'A WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -867,7 +867,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'A WITH RING ', 'script': 'LATIN', 'concept': 'A WITH RING ',
+        'name': 'A WITH RING ABOVE', 'script': 'LATIN', 'concept': 'A WITH RING ABOVE',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -888,7 +888,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'C WITH CEDIL', 'script': 'LATIN', 'concept': 'C WITH CEDIL',
+        'name': 'C WITH CEDILLA', 'script': 'LATIN', 'concept': 'C WITH CEDILLA',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -916,7 +916,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'E WITH CIRCU', 'script': 'LATIN', 'concept': 'E WITH CIRCU',
+        'name': 'E WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'E WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -926,7 +926,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'E WITH DIAER', 'script': 'LATIN', 'concept': 'E WITH DIAER',
+        'name': 'E WITH DIAERESIS', 'script': 'LATIN', 'concept': 'E WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -955,7 +955,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'I WITH CIRCU', 'script': 'LATIN', 'concept': 'I WITH CIRCU',
+        'name': 'I WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'I WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -964,7 +964,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'I WITH DIAER', 'script': 'LATIN', 'concept': 'I WITH DIAER',
+        'name': 'I WITH DIAERESIS', 'script': 'LATIN', 'concept': 'I WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1012,7 +1012,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH CIRCU', 'script': 'LATIN', 'concept': 'O WITH CIRCU',
+        'name': 'O WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'O WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1032,7 +1032,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH DIAER', 'script': 'LATIN', 'concept': 'O WITH DIAER',
+        'name': 'O WITH DIAERESIS', 'script': 'LATIN', 'concept': 'O WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1043,7 +1043,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIVISION SIG', 'script': 'LATIN', 'concept': 'DIVISION SIG',
+        'name': 'DIVISION SIGN', 'script': 'LATIN', 'concept': 'DIVISION SIGN',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1053,7 +1053,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'O WITH STROK', 'script': 'LATIN', 'concept': 'O WITH STROK',
+        'name': 'O WITH STROKE', 'script': 'LATIN', 'concept': 'O WITH STROKE',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1081,7 +1081,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'U WITH CIRCU', 'script': 'LATIN', 'concept': 'U WITH CIRCU',
+        'name': 'U WITH CIRCUMFLEX', 'script': 'LATIN', 'concept': 'U WITH CIRCUMFLEX',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1090,7 +1090,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'U WITH DIAER', 'script': 'LATIN', 'concept': 'U WITH DIAER',
+        'name': 'U WITH DIAERESIS', 'script': 'LATIN', 'concept': 'U WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1118,7 +1118,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'Y WITH DIAER', 'script': 'LATIN', 'concept': 'Y WITH DIAER',
+        'name': 'Y WITH DIAERESIS', 'script': 'LATIN', 'concept': 'Y WITH DIAERESIS',
         'origin': 'PHOENICIAN ADAPTATION ~700 BC',
         'ink': (30, 30, 80), 'paper': (230, 228, 220),
         'strokes': [
@@ -1316,7 +1316,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER ONE', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER ONE',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1324,7 +1324,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER TEN', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER TEN',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1332,7 +1332,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER TWENTY', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER TWENTY',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1340,7 +1340,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER ONE HUNDRED', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER ONE HUNDRED',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1348,7 +1348,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER TWO', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER TWO',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1357,7 +1357,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PHOENICIAN N', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN N',
+        'name': 'PHOENICIAN NUMBER THREE', 'script': 'PHOENICIAN', 'concept': 'PHOENICIAN NUMBER THREE',
         'origin': 'BYBLOS ~1050 BC',
         'ink': (90, 50, 25), 'paper': (210, 190, 155),
         'strokes': [
@@ -1368,7 +1368,7 @@ CHARACTERS = [
     },
     # ── HEBREW ─────────────────────────────────────────────────
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ETNAHTA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ETNAHTA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1376,7 +1376,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT SEGOL', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT SEGOL',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1386,7 +1386,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT SHALSHELET', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT SHALSHELET',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1394,7 +1394,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ZAQEF QATAN', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ZAQEF QATAN',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1403,7 +1403,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ZAQEF GADOL', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ZAQEF GADOL',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1413,7 +1413,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT TIPEHA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT TIPEHA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1421,7 +1421,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT REVIA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT REVIA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1429,7 +1429,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ZARQA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ZARQA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1437,7 +1437,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT PASHTA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT PASHTA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1445,7 +1445,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT YETIV', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT YETIV',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1453,7 +1453,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT TEVIR', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT TEVIR',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1462,7 +1462,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT GERESH', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT GERESH',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1470,7 +1470,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT GERESH MUQDAM', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT GERESH MUQDAM',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1478,7 +1478,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT GERSHAYIM', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT GERSHAYIM',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1487,7 +1487,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT QARNEY PARA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT QARNEY PARA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1498,7 +1498,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT TELISHA GEDOLA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT TELISHA GEDOLA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1507,7 +1507,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT PAZER', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT PAZER',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1515,7 +1515,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT MUNAH', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT MUNAH',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1523,7 +1523,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT MAHAPAKH', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT MAHAPAKH',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1531,7 +1531,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT MERKHA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT MERKHA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1539,7 +1539,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT MERKHA KEFULA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT MERKHA KEFULA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1548,7 +1548,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT DARGA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT DARGA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1556,7 +1556,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT QADMA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT QADMA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1564,7 +1564,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT TELISHA QETANA', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT TELISHA QETANA',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1573,7 +1573,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT YERAH BEN YOMO', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT YERAH BEN YOMO',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1581,7 +1581,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT OLE', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT OLE',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1589,7 +1589,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ILUY', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ILUY',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1597,7 +1597,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT DEHI', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT DEHI',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1605,7 +1605,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW ACCEN', 'script': 'HEBREW', 'concept': 'HEBREW ACCEN',
+        'name': 'HEBREW ACCENT ZINOR', 'script': 'HEBREW', 'concept': 'HEBREW ACCENT ZINOR',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1613,7 +1613,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MASORA CIRCL', 'script': 'HEBREW', 'concept': 'MASORA CIRCL',
+        'name': 'MASORA CIRCLE', 'script': 'HEBREW', 'concept': 'MASORA CIRCLE',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1724,7 +1724,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DAGESH OR MA', 'script': 'HEBREW', 'concept': 'DAGESH OR MA',
+        'name': 'DAGESH OR MAPIQ', 'script': 'HEBREW', 'concept': 'DAGESH OR MAPIQ',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1740,7 +1740,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW PUNCT', 'script': 'HEBREW', 'concept': 'HEBREW PUNCT',
+        'name': 'HEBREW PUNCTUATION MAQAF', 'script': 'HEBREW', 'concept': 'HEBREW PUNCTUATION MAQAF',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1756,7 +1756,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW PUNCT', 'script': 'HEBREW', 'concept': 'HEBREW PUNCT',
+        'name': 'HEBREW PUNCTUATION PASEQ', 'script': 'HEBREW', 'concept': 'HEBREW PUNCTUATION PASEQ',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -1780,7 +1780,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW PUNCT', 'script': 'HEBREW', 'concept': 'HEBREW PUNCT',
+        'name': 'HEBREW PUNCTUATION SOF PASUQ', 'script': 'HEBREW', 'concept': 'HEBREW PUNCTUATION SOF PASUQ',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2017,7 +2017,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW LIGAT', 'script': 'HEBREW', 'concept': 'HEBREW LIGAT',
+        'name': 'HEBREW LIGATURE YIDDISH DOUBLE VAV', 'script': 'HEBREW', 'concept': 'HEBREW LIGATURE YIDDISH DOUBLE VAV',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2026,7 +2026,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW LIGAT', 'script': 'HEBREW', 'concept': 'HEBREW LIGAT',
+        'name': 'HEBREW LIGATURE YIDDISH VAV YOD', 'script': 'HEBREW', 'concept': 'HEBREW LIGATURE YIDDISH VAV YOD',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2035,7 +2035,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW LIGAT', 'script': 'HEBREW', 'concept': 'HEBREW LIGAT',
+        'name': 'HEBREW LIGATURE YIDDISH DOUBLE YOD', 'script': 'HEBREW', 'concept': 'HEBREW LIGATURE YIDDISH DOUBLE YOD',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2044,7 +2044,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW PUNCT', 'script': 'HEBREW', 'concept': 'HEBREW PUNCT',
+        'name': 'HEBREW PUNCTUATION GERESH', 'script': 'HEBREW', 'concept': 'HEBREW PUNCTUATION GERESH',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2052,7 +2052,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HEBREW PUNCT', 'script': 'HEBREW', 'concept': 'HEBREW PUNCT',
+        'name': 'HEBREW PUNCTUATION GERSHAYIM', 'script': 'HEBREW', 'concept': 'HEBREW PUNCTUATION GERSHAYIM',
         'origin': 'PALEO-HEBREW ~1000 BC',
         'ink': (30, 25, 20), 'paper': (225, 220, 200),
         'strokes': [
@@ -2070,7 +2070,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALEF WITH MA', 'script': 'ARABIC', 'concept': 'ALEF WITH MA',
+        'name': 'ALEF WITH MADDA ABOVE', 'script': 'ARABIC', 'concept': 'ALEF WITH MADDA ABOVE',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2079,7 +2079,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALEF WITH HA', 'script': 'ARABIC', 'concept': 'ALEF WITH HA',
+        'name': 'ALEF WITH HAMZA ABOVE', 'script': 'ARABIC', 'concept': 'ALEF WITH HAMZA ABOVE',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2088,7 +2088,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WAW WITH HAM', 'script': 'ARABIC', 'concept': 'WAW WITH HAM',
+        'name': 'WAW WITH HAMZA ABOVE', 'script': 'ARABIC', 'concept': 'WAW WITH HAMZA ABOVE',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2098,7 +2098,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALEF WITH HA', 'script': 'ARABIC', 'concept': 'ALEF WITH HA',
+        'name': 'ALEF WITH HAMZA BELOW', 'script': 'ARABIC', 'concept': 'ALEF WITH HAMZA BELOW',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2107,7 +2107,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'YEH WITH HAM', 'script': 'ARABIC', 'concept': 'YEH WITH HAM',
+        'name': 'YEH WITH HAMZA ABOVE', 'script': 'ARABIC', 'concept': 'YEH WITH HAMZA ABOVE',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2299,7 +2299,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARABIC TATWE', 'script': 'ARABIC', 'concept': 'ARABIC TATWE',
+        'name': 'ARABIC TATWEEL', 'script': 'ARABIC', 'concept': 'ARABIC TATWEEL',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2399,7 +2399,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARABIC FATHA', 'script': 'ARABIC', 'concept': 'ARABIC FATHA',
+        'name': 'ARABIC FATHATAN', 'script': 'ARABIC', 'concept': 'ARABIC FATHATAN',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2408,7 +2408,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARABIC DAMMA', 'script': 'ARABIC', 'concept': 'ARABIC DAMMA',
+        'name': 'ARABIC DAMMATAN', 'script': 'ARABIC', 'concept': 'ARABIC DAMMATAN',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2417,7 +2417,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARABIC KASRA', 'script': 'ARABIC', 'concept': 'ARABIC KASRA',
+        'name': 'ARABIC KASRATAN', 'script': 'ARABIC', 'concept': 'ARABIC KASRATAN',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2451,7 +2451,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARABIC SHADD', 'script': 'ARABIC', 'concept': 'ARABIC SHADD',
+        'name': 'ARABIC SHADDA', 'script': 'ARABIC', 'concept': 'ARABIC SHADDA',
         'origin': 'NABATAEAN SCRIPT ~400 AD',
         'ink': (30, 25, 20), 'paper': (225, 215, 190),
         'strokes': [
@@ -2469,7 +2469,7 @@ CHARACTERS = [
     },
     # ── GREEK ──────────────────────────────────────────────────
     {
-        'name': 'GREEK NUMERA', 'script': 'GREEK', 'concept': 'GREEK NUMERA',
+        'name': 'GREEK NUMERAL SIGN', 'script': 'GREEK', 'concept': 'GREEK NUMERAL SIGN',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2477,7 +2477,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK LOWER ', 'script': 'GREEK', 'concept': 'GREEK LOWER ',
+        'name': 'GREEK LOWER NUMERAL SIGN', 'script': 'GREEK', 'concept': 'GREEK LOWER NUMERAL SIGN',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2485,7 +2485,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK YPOGEG', 'script': 'GREEK', 'concept': 'GREEK YPOGEG',
+        'name': 'GREEK YPOGEGRAMMENI', 'script': 'GREEK', 'concept': 'GREEK YPOGEGRAMMENI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2493,7 +2493,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK QUESTI', 'script': 'GREEK', 'concept': 'GREEK QUESTI',
+        'name': 'GREEK QUESTION MARK', 'script': 'GREEK', 'concept': 'GREEK QUESTION MARK',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2510,7 +2510,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK DIALYT', 'script': 'GREEK', 'concept': 'GREEK DIALYT',
+        'name': 'GREEK DIALYTIKA TONOS', 'script': 'GREEK', 'concept': 'GREEK DIALYTIKA TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2520,7 +2520,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPHA WITH T', 'script': 'GREEK', 'concept': 'ALPHA WITH T',
+        'name': 'ALPHA WITH TONOS', 'script': 'GREEK', 'concept': 'ALPHA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2530,7 +2530,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK ANO TE', 'script': 'GREEK', 'concept': 'GREEK ANO TE',
+        'name': 'GREEK ANO TELEIA', 'script': 'GREEK', 'concept': 'GREEK ANO TELEIA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2538,7 +2538,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EPSILON WITH', 'script': 'GREEK', 'concept': 'EPSILON WITH',
+        'name': 'EPSILON WITH TONOS', 'script': 'GREEK', 'concept': 'EPSILON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2547,7 +2547,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ETA WITH TON', 'script': 'GREEK', 'concept': 'ETA WITH TON',
+        'name': 'ETA WITH TONOS', 'script': 'GREEK', 'concept': 'ETA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2556,7 +2556,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTA WITH TO', 'script': 'GREEK', 'concept': 'IOTA WITH TO',
+        'name': 'IOTA WITH TONOS', 'script': 'GREEK', 'concept': 'IOTA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2565,7 +2565,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMICRON WITH', 'script': 'GREEK', 'concept': 'OMICRON WITH',
+        'name': 'OMICRON WITH TONOS', 'script': 'GREEK', 'concept': 'OMICRON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2575,7 +2575,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'UPSILON WITH', 'script': 'GREEK', 'concept': 'UPSILON WITH',
+        'name': 'UPSILON WITH TONOS', 'script': 'GREEK', 'concept': 'UPSILON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2584,7 +2584,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMEGA WITH T', 'script': 'GREEK', 'concept': 'OMEGA WITH T',
+        'name': 'OMEGA WITH TONOS', 'script': 'GREEK', 'concept': 'OMEGA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2593,7 +2593,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTA WITH DI', 'script': 'GREEK', 'concept': 'IOTA WITH DI',
+        'name': 'IOTA WITH DIALYTIKA AND TONOS', 'script': 'GREEK', 'concept': 'IOTA WITH DIALYTIKA AND TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2808,7 +2808,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTA WITH DI', 'script': 'GREEK', 'concept': 'IOTA WITH DI',
+        'name': 'IOTA WITH DIALYTIKA', 'script': 'GREEK', 'concept': 'IOTA WITH DIALYTIKA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2818,7 +2818,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'UPSILON WITH', 'script': 'GREEK', 'concept': 'UPSILON WITH',
+        'name': 'UPSILON WITH DIALYTIKA', 'script': 'GREEK', 'concept': 'UPSILON WITH DIALYTIKA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2828,7 +2828,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPHA WITH T', 'script': 'GREEK', 'concept': 'ALPHA WITH T',
+        'name': 'ALPHA WITH TONOS', 'script': 'GREEK', 'concept': 'ALPHA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2838,7 +2838,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EPSILON WITH', 'script': 'GREEK', 'concept': 'EPSILON WITH',
+        'name': 'EPSILON WITH TONOS', 'script': 'GREEK', 'concept': 'EPSILON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2847,7 +2847,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ETA WITH TON', 'script': 'GREEK', 'concept': 'ETA WITH TON',
+        'name': 'ETA WITH TONOS', 'script': 'GREEK', 'concept': 'ETA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2856,7 +2856,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTA WITH TO', 'script': 'GREEK', 'concept': 'IOTA WITH TO',
+        'name': 'IOTA WITH TONOS', 'script': 'GREEK', 'concept': 'IOTA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -2865,7 +2865,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'UPSILON WITH', 'script': 'GREEK', 'concept': 'UPSILON WITH',
+        'name': 'UPSILON WITH DIALYTIKA AND TONOS', 'script': 'GREEK', 'concept': 'UPSILON WITH DIALYTIKA AND TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3085,7 +3085,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTA WITH DI', 'script': 'GREEK', 'concept': 'IOTA WITH DI',
+        'name': 'IOTA WITH DIALYTIKA', 'script': 'GREEK', 'concept': 'IOTA WITH DIALYTIKA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3095,7 +3095,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'UPSILON WITH', 'script': 'GREEK', 'concept': 'UPSILON WITH',
+        'name': 'UPSILON WITH DIALYTIKA', 'script': 'GREEK', 'concept': 'UPSILON WITH DIALYTIKA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3105,7 +3105,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMICRON WITH', 'script': 'GREEK', 'concept': 'OMICRON WITH',
+        'name': 'OMICRON WITH TONOS', 'script': 'GREEK', 'concept': 'OMICRON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3115,7 +3115,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'UPSILON WITH', 'script': 'GREEK', 'concept': 'UPSILON WITH',
+        'name': 'UPSILON WITH TONOS', 'script': 'GREEK', 'concept': 'UPSILON WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3124,7 +3124,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMEGA WITH T', 'script': 'GREEK', 'concept': 'OMEGA WITH T',
+        'name': 'OMEGA WITH TONOS', 'script': 'GREEK', 'concept': 'OMEGA WITH TONOS',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3133,7 +3133,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK BETA S', 'script': 'GREEK', 'concept': 'GREEK BETA S',
+        'name': 'GREEK BETA SYMBOL', 'script': 'GREEK', 'concept': 'GREEK BETA SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3142,7 +3142,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK THETA ', 'script': 'GREEK', 'concept': 'GREEK THETA ',
+        'name': 'GREEK THETA SYMBOL', 'script': 'GREEK', 'concept': 'GREEK THETA SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3151,7 +3151,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK UPSILO', 'script': 'GREEK', 'concept': 'GREEK UPSILO',
+        'name': 'GREEK UPSILON WITH HOOK SYMBOL', 'script': 'GREEK', 'concept': 'GREEK UPSILON WITH HOOK SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3159,7 +3159,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK UPSILO', 'script': 'GREEK', 'concept': 'GREEK UPSILO',
+        'name': 'GREEK UPSILON WITH ACUTE AND HOOK SYMBOL', 'script': 'GREEK', 'concept': 'GREEK UPSILON WITH ACUTE AND HOOK SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3168,7 +3168,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK UPSILO', 'script': 'GREEK', 'concept': 'GREEK UPSILO',
+        'name': 'GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL', 'script': 'GREEK', 'concept': 'GREEK UPSILON WITH DIAERESIS AND HOOK SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3178,7 +3178,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK PHI SY', 'script': 'GREEK', 'concept': 'GREEK PHI SY',
+        'name': 'GREEK PHI SYMBOL', 'script': 'GREEK', 'concept': 'GREEK PHI SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3188,7 +3188,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK PI SYM', 'script': 'GREEK', 'concept': 'GREEK PI SYM',
+        'name': 'GREEK PI SYMBOL', 'script': 'GREEK', 'concept': 'GREEK PI SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3230,7 +3230,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER SHEI', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER SHEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3238,7 +3238,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER SHEI', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER SHEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3246,7 +3246,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER FEI', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER FEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3254,7 +3254,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER FEI', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER FEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3262,7 +3262,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER KHEI', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER KHEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3270,7 +3270,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER KHEI', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER KHEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3279,7 +3279,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER HORI', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER HORI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3288,7 +3288,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER HORI', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER HORI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3297,7 +3297,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER GANGIA', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER GANGIA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3306,7 +3306,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER GANGIA', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER GANGIA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3315,7 +3315,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER SHIMA', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER SHIMA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3324,7 +3324,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER SHIMA', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER SHIMA',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3333,7 +3333,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC CAPIT', 'script': 'GREEK', 'concept': 'COPTIC CAPIT',
+        'name': 'COPTIC CAPITAL LETTER DEI', 'script': 'GREEK', 'concept': 'COPTIC CAPITAL LETTER DEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3341,7 +3341,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COPTIC SMALL', 'script': 'GREEK', 'concept': 'COPTIC SMALL',
+        'name': 'COPTIC SMALL LETTER DEI', 'script': 'GREEK', 'concept': 'COPTIC SMALL LETTER DEI',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3349,7 +3349,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK KAPPA ', 'script': 'GREEK', 'concept': 'GREEK KAPPA ',
+        'name': 'GREEK KAPPA SYMBOL', 'script': 'GREEK', 'concept': 'GREEK KAPPA SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3357,7 +3357,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK RHO SY', 'script': 'GREEK', 'concept': 'GREEK RHO SY',
+        'name': 'GREEK RHO SYMBOL', 'script': 'GREEK', 'concept': 'GREEK RHO SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3366,7 +3366,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GREEK LUNATE', 'script': 'GREEK', 'concept': 'GREEK LUNATE',
+        'name': 'GREEK LUNATE SIGMA SYMBOL', 'script': 'GREEK', 'concept': 'GREEK LUNATE SIGMA SYMBOL',
         'origin': 'ADAPTED FROM PHOENICIAN ~800 BC',
         'ink': (25, 40, 120), 'paper': (225, 220, 210),
         'strokes': [
@@ -3427,7 +3427,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BYELORUSSIAN', 'script': 'CYRILLIC', 'concept': 'BYELORUSSIAN',
+        'name': 'BYELORUSSIAN-UKRAINIAN I', 'script': 'CYRILLIC', 'concept': 'BYELORUSSIAN-UKRAINIAN I',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4094,7 +4094,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BYELORUSSIAN', 'script': 'CYRILLIC', 'concept': 'BYELORUSSIAN',
+        'name': 'BYELORUSSIAN-UKRAINIAN I', 'script': 'CYRILLIC', 'concept': 'BYELORUSSIAN-UKRAINIAN I',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4242,7 +4242,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTIFIED LIT', 'script': 'CYRILLIC', 'concept': 'IOTIFIED LIT',
+        'name': 'IOTIFIED LITTLE YUS', 'script': 'CYRILLIC', 'concept': 'IOTIFIED LITTLE YUS',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4251,7 +4251,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTIFIED LIT', 'script': 'CYRILLIC', 'concept': 'IOTIFIED LIT',
+        'name': 'IOTIFIED LITTLE YUS', 'script': 'CYRILLIC', 'concept': 'IOTIFIED LITTLE YUS',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4278,7 +4278,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTIFIED BIG', 'script': 'CYRILLIC', 'concept': 'IOTIFIED BIG',
+        'name': 'IOTIFIED BIG YUS', 'script': 'CYRILLIC', 'concept': 'IOTIFIED BIG YUS',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4287,7 +4287,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IOTIFIED BIG', 'script': 'CYRILLIC', 'concept': 'IOTIFIED BIG',
+        'name': 'IOTIFIED BIG YUS', 'script': 'CYRILLIC', 'concept': 'IOTIFIED BIG YUS',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4366,7 +4366,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IZHITSA WITH', 'script': 'CYRILLIC', 'concept': 'IZHITSA WITH',
+        'name': 'IZHITSA WITH DOUBLE GRAVE ACCENT', 'script': 'CYRILLIC', 'concept': 'IZHITSA WITH DOUBLE GRAVE ACCENT',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4376,7 +4376,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IZHITSA WITH', 'script': 'CYRILLIC', 'concept': 'IZHITSA WITH',
+        'name': 'IZHITSA WITH DOUBLE GRAVE ACCENT', 'script': 'CYRILLIC', 'concept': 'IZHITSA WITH DOUBLE GRAVE ACCENT',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4424,7 +4424,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMEGA WITH T', 'script': 'CYRILLIC', 'concept': 'OMEGA WITH T',
+        'name': 'OMEGA WITH TITLO', 'script': 'CYRILLIC', 'concept': 'OMEGA WITH TITLO',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4433,7 +4433,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OMEGA WITH T', 'script': 'CYRILLIC', 'concept': 'OMEGA WITH T',
+        'name': 'OMEGA WITH TITLO', 'script': 'CYRILLIC', 'concept': 'OMEGA WITH TITLO',
         'origin': 'SAINTS CYRIL & METHODIUS ~900 AD',
         'ink': (20, 20, 20), 'paper': (225, 225, 230),
         'strokes': [
@@ -4461,7 +4461,7 @@ CHARACTERS = [
     },
     # ── RUNIC ──────────────────────────────────────────────────
     {
-        'name': 'FEHU FEOH FE', 'script': 'RUNIC', 'concept': 'FEHU FEOH FE',
+        'name': 'FEHU FEOH FE F', 'script': 'RUNIC', 'concept': 'FEHU FEOH FE F',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4512,7 +4512,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'THURISAZ THU', 'script': 'RUNIC', 'concept': 'THURISAZ THU',
+        'name': 'THURISAZ THURS THORN', 'script': 'RUNIC', 'concept': 'THURISAZ THURS THORN',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4563,7 +4563,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LONG-BRANCH-', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-',
+        'name': 'LONG-BRANCH-OSS O', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-OSS O',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4571,7 +4571,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-O', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-O',
+        'name': 'SHORT-TWIG-OSS O', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-OSS O',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4603,7 +4603,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RAIDO RAD RE', 'script': 'RUNIC', 'concept': 'RAIDO RAD RE',
+        'name': 'RAIDO RAD REID R', 'script': 'RUNIC', 'concept': 'RAIDO RAD REID R',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4696,7 +4696,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LONG-BRANCH-', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-',
+        'name': 'LONG-BRANCH-HAGALL H', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-HAGALL H',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4704,7 +4704,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-H', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-H',
+        'name': 'SHORT-TWIG-HAGALL H', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-HAGALL H',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4712,7 +4712,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NAUDIZ NYD N', 'script': 'RUNIC', 'concept': 'NAUDIZ NYD N',
+        'name': 'NAUDIZ NYD NAUD N', 'script': 'RUNIC', 'concept': 'NAUDIZ NYD NAUD N',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4720,7 +4720,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-N', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-N',
+        'name': 'SHORT-TWIG-NAUD N', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-NAUD N',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4736,7 +4736,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ISAZ IS ISS ', 'script': 'RUNIC', 'concept': 'ISAZ IS ISS ',
+        'name': 'ISAZ IS ISS I', 'script': 'RUNIC', 'concept': 'ISAZ IS ISS I',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4771,7 +4771,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LONG-BRANCH-', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-',
+        'name': 'LONG-BRANCH-AR AE', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-AR AE',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4779,7 +4779,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-A', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-A',
+        'name': 'SHORT-TWIG-AR A', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-AR A',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4795,7 +4795,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'PERTHO PEORT', 'script': 'RUNIC', 'concept': 'PERTHO PEORT',
+        'name': 'PERTHO PEORTH P', 'script': 'RUNIC', 'concept': 'PERTHO PEORTH P',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4819,7 +4819,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SIGEL LONG-B', 'script': 'RUNIC', 'concept': 'SIGEL LONG-B',
+        'name': 'SIGEL LONG-BRANCH-SOL S', 'script': 'RUNIC', 'concept': 'SIGEL LONG-BRANCH-SOL S',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4827,7 +4827,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-S', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-S',
+        'name': 'SHORT-TWIG-SOL S', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-SOL S',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4851,7 +4851,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIWAZ TIR TY', 'script': 'RUNIC', 'concept': 'TIWAZ TIR TY',
+        'name': 'TIWAZ TIR TYR T', 'script': 'RUNIC', 'concept': 'TIWAZ TIR TYR T',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4859,7 +4859,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-T', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-T',
+        'name': 'SHORT-TWIG-TYR T', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-TYR T',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4875,7 +4875,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BERKANAN BEO', 'script': 'RUNIC', 'concept': 'BERKANAN BEO',
+        'name': 'BERKANAN BEORC BJARKAN B', 'script': 'RUNIC', 'concept': 'BERKANAN BEORC BJARKAN B',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4885,7 +4885,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-B', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-B',
+        'name': 'SHORT-TWIG-BJARKAN B', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-BJARKAN B',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4931,7 +4931,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LONG-BRANCH-', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-',
+        'name': 'LONG-BRANCH-MADR M', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-MADR M',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4939,7 +4939,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-M', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-M',
+        'name': 'SHORT-TWIG-MADR M', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-MADR M',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4947,7 +4947,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAUKAZ LAGU ', 'script': 'RUNIC', 'concept': 'LAUKAZ LAGU ',
+        'name': 'LAUKAZ LAGU LOGR L', 'script': 'RUNIC', 'concept': 'LAUKAZ LAGU LOGR L',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -4991,7 +4991,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OTHALAN ETHE', 'script': 'RUNIC', 'concept': 'OTHALAN ETHE',
+        'name': 'OTHALAN ETHEL O', 'script': 'RUNIC', 'concept': 'OTHALAN ETHEL O',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5055,7 +5055,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LONG-BRANCH-', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-',
+        'name': 'LONG-BRANCH-YR', 'script': 'RUNIC', 'concept': 'LONG-BRANCH-YR',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5063,7 +5063,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHORT-TWIG-Y', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-Y',
+        'name': 'SHORT-TWIG-YR', 'script': 'RUNIC', 'concept': 'SHORT-TWIG-YR',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5096,7 +5096,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC SINGLE', 'script': 'RUNIC', 'concept': 'RUNIC SINGLE',
+        'name': 'RUNIC SINGLE PUNCTUATION', 'script': 'RUNIC', 'concept': 'RUNIC SINGLE PUNCTUATION',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5104,7 +5104,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC MULTIP', 'script': 'RUNIC', 'concept': 'RUNIC MULTIP',
+        'name': 'RUNIC MULTIPLE PUNCTUATION', 'script': 'RUNIC', 'concept': 'RUNIC MULTIPLE PUNCTUATION',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5113,7 +5113,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC CROSS ', 'script': 'RUNIC', 'concept': 'RUNIC CROSS ',
+        'name': 'RUNIC CROSS PUNCTUATION', 'script': 'RUNIC', 'concept': 'RUNIC CROSS PUNCTUATION',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5121,7 +5121,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC ARLAUG', 'script': 'RUNIC', 'concept': 'RUNIC ARLAUG',
+        'name': 'RUNIC ARLAUG SYMBOL', 'script': 'RUNIC', 'concept': 'RUNIC ARLAUG SYMBOL',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5129,7 +5129,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC TVIMAD', 'script': 'RUNIC', 'concept': 'RUNIC TVIMAD',
+        'name': 'RUNIC TVIMADUR SYMBOL', 'script': 'RUNIC', 'concept': 'RUNIC TVIMADUR SYMBOL',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5137,7 +5137,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUNIC BELGTH', 'script': 'RUNIC', 'concept': 'RUNIC BELGTH',
+        'name': 'RUNIC BELGTHOR SYMBOL', 'script': 'RUNIC', 'concept': 'RUNIC BELGTHOR SYMBOL',
         'origin': 'ELDER FUTHARK ~150 AD',
         'ink': (20, 20, 20), 'paper': (200, 190, 170),
         'strokes': [
@@ -5148,7 +5148,7 @@ CHARACTERS = [
     },
     # ── OGHAM ──────────────────────────────────────────────────
     {
-        'name': 'OGHAM SPACE ', 'script': 'OGHAM', 'concept': 'OGHAM SPACE ',
+        'name': 'OGHAM SPACE MARK', 'script': 'OGHAM', 'concept': 'OGHAM SPACE MARK',
         'origin': 'IRELAND ~400 AD',
         'ink': (30, 40, 25), 'paper': (190, 185, 165),
         'strokes': [
@@ -5383,7 +5383,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OGHAM FEATHE', 'script': 'OGHAM', 'concept': 'OGHAM FEATHE',
+        'name': 'OGHAM FEATHER MARK', 'script': 'OGHAM', 'concept': 'OGHAM FEATHER MARK',
         'origin': 'IRELAND ~400 AD',
         'ink': (30, 40, 25), 'paper': (190, 185, 165),
         'strokes': [
@@ -5391,7 +5391,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'OGHAM REVERS', 'script': 'OGHAM', 'concept': 'OGHAM REVERS',
+        'name': 'OGHAM REVERSED FEATHER MARK', 'script': 'OGHAM', 'concept': 'OGHAM REVERSED FEATHER MARK',
         'origin': 'IRELAND ~400 AD',
         'ink': (30, 40, 25), 'paper': (190, 185, 165),
         'strokes': [
@@ -5721,7 +5721,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN MOD', 'script': 'ARMENIAN', 'concept': 'ARMENIAN MOD',
+        'name': 'ARMENIAN MODIFIER LETTER LEFT HALF RING', 'script': 'ARMENIAN', 'concept': 'ARMENIAN MODIFIER LETTER LEFT HALF RING',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5729,7 +5729,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN APO', 'script': 'ARMENIAN', 'concept': 'ARMENIAN APO',
+        'name': 'ARMENIAN APOSTROPHE', 'script': 'ARMENIAN', 'concept': 'ARMENIAN APOSTROPHE',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5737,7 +5737,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN EMP', 'script': 'ARMENIAN', 'concept': 'ARMENIAN EMP',
+        'name': 'ARMENIAN EMPHASIS MARK', 'script': 'ARMENIAN', 'concept': 'ARMENIAN EMPHASIS MARK',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5745,7 +5745,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN EXC', 'script': 'ARMENIAN', 'concept': 'ARMENIAN EXC',
+        'name': 'ARMENIAN EXCLAMATION MARK', 'script': 'ARMENIAN', 'concept': 'ARMENIAN EXCLAMATION MARK',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5753,7 +5753,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN COM', 'script': 'ARMENIAN', 'concept': 'ARMENIAN COM',
+        'name': 'ARMENIAN COMMA', 'script': 'ARMENIAN', 'concept': 'ARMENIAN COMMA',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5761,7 +5761,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN QUE', 'script': 'ARMENIAN', 'concept': 'ARMENIAN QUE',
+        'name': 'ARMENIAN QUESTION MARK', 'script': 'ARMENIAN', 'concept': 'ARMENIAN QUESTION MARK',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -5769,7 +5769,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN ABB', 'script': 'ARMENIAN', 'concept': 'ARMENIAN ABB',
+        'name': 'ARMENIAN ABBREVIATION MARK', 'script': 'ARMENIAN', 'concept': 'ARMENIAN ABBREVIATION MARK',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -6093,7 +6093,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN SMA', 'script': 'ARMENIAN', 'concept': 'ARMENIAN SMA',
+        'name': 'ARMENIAN SMALL LIGATURE ECH YIWN', 'script': 'ARMENIAN', 'concept': 'ARMENIAN SMALL LIGATURE ECH YIWN',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -6101,7 +6101,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ARMENIAN FUL', 'script': 'ARMENIAN', 'concept': 'ARMENIAN FUL',
+        'name': 'ARMENIAN FULL STOP', 'script': 'ARMENIAN', 'concept': 'ARMENIAN FULL STOP',
         'origin': 'MESROP MASHTOTS ~405 AD',
         'ink': (60, 30, 20), 'paper': (225, 218, 200),
         'strokes': [
@@ -6767,7 +6767,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GEORGIAN PAR', 'script': 'GEORGIAN', 'concept': 'GEORGIAN PAR',
+        'name': 'GEORGIAN PARAGRAPH SEPARATOR', 'script': 'GEORGIAN', 'concept': 'GEORGIAN PARAGRAPH SEPARATOR',
         'origin': 'ASOMTAVRULI ~430 AD',
         'ink': (40, 30, 20), 'paper': (225, 215, 200),
         'strokes': [
@@ -7408,7 +7408,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI O', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI O',
+        'name': 'DEVANAGARI OM', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI OM',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7418,7 +7418,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI S', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI S',
+        'name': 'DEVANAGARI STRESS SIGN UDATTA', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI STRESS SIGN UDATTA',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7426,7 +7426,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI S', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI S',
+        'name': 'DEVANAGARI STRESS SIGN ANUDATTA', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI STRESS SIGN ANUDATTA',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7434,7 +7434,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI G', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI G',
+        'name': 'DEVANAGARI GRAVE ACCENT', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI GRAVE ACCENT',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7442,7 +7442,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI A', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI A',
+        'name': 'DEVANAGARI ACUTE ACCENT', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI ACUTE ACCENT',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7560,7 +7560,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI D', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI D',
+        'name': 'DEVANAGARI DANDA', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI DANDA',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7568,7 +7568,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI D', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI D',
+        'name': 'DEVANAGARI DOUBLE DANDA', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI DOUBLE DANDA',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7662,7 +7662,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DEVANAGARI A', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI A',
+        'name': 'DEVANAGARI ABBREVIATION SIGN', 'script': 'DEVANAGARI', 'concept': 'DEVANAGARI ABBREVIATION SIGN',
         'origin': 'BRAHMI DESCENDANT ~700 AD',
         'ink': (160, 60, 20), 'paper': (230, 220, 200),
         'strokes': [
@@ -7756,7 +7756,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GUJARATI VOW', 'script': 'GUJARATI', 'concept': 'GUJARATI VOW',
+        'name': 'GUJARATI VOWEL CANDRA E', 'script': 'GUJARATI', 'concept': 'GUJARATI VOWEL CANDRA E',
         'origin': 'DEVANAGARI VARIANT ~1600 AD',
         'ink': (160, 50, 20), 'paper': (230, 222, 200),
         'strokes': [
@@ -7783,7 +7783,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GUJARATI VOW', 'script': 'GUJARATI', 'concept': 'GUJARATI VOW',
+        'name': 'GUJARATI VOWEL CANDRA O', 'script': 'GUJARATI', 'concept': 'GUJARATI VOWEL CANDRA O',
         'origin': 'DEVANAGARI VARIANT ~1600 AD',
         'ink': (160, 50, 20), 'paper': (230, 222, 200),
         'strokes': [
@@ -8954,7 +8954,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GURMUKHI TIP', 'script': 'GURMUKHI', 'concept': 'GURMUKHI TIP',
+        'name': 'GURMUKHI TIPPI', 'script': 'GURMUKHI', 'concept': 'GURMUKHI TIPPI',
         'origin': 'GURU ANGAD ~1540 AD',
         'ink': (30, 40, 120), 'paper': (225, 225, 215),
         'strokes': [
@@ -8962,7 +8962,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GURMUKHI ADD', 'script': 'GURMUKHI', 'concept': 'GURMUKHI ADD',
+        'name': 'GURMUKHI ADDAK', 'script': 'GURMUKHI', 'concept': 'GURMUKHI ADDAK',
         'origin': 'GURU ANGAD ~1540 AD',
         'ink': (30, 40, 120), 'paper': (225, 225, 215),
         'strokes': [
@@ -8990,7 +8990,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GURMUKHI EK ', 'script': 'GURMUKHI', 'concept': 'GURMUKHI EK ',
+        'name': 'GURMUKHI EK ONKAR', 'script': 'GURMUKHI', 'concept': 'GURMUKHI EK ONKAR',
         'origin': 'GURU ANGAD ~1540 AD',
         'ink': (30, 40, 120), 'paper': (225, 225, 215),
         'strokes': [
@@ -9518,7 +9518,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI AU L', 'script': 'BENGALI', 'concept': 'BENGALI AU L',
+        'name': 'BENGALI AU LENGTH MARK', 'script': 'BENGALI', 'concept': 'BENGALI AU LENGTH MARK',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9675,7 +9675,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RA WITH MIDD', 'script': 'BENGALI', 'concept': 'RA WITH MIDD',
+        'name': 'RA WITH MIDDLE DIAGONAL', 'script': 'BENGALI', 'concept': 'RA WITH MIDDLE DIAGONAL',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9685,7 +9685,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RA WITH LOWE', 'script': 'BENGALI', 'concept': 'RA WITH LOWE',
+        'name': 'RA WITH LOWER DIAGONAL', 'script': 'BENGALI', 'concept': 'RA WITH LOWER DIAGONAL',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9695,7 +9695,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI RUPE', 'script': 'BENGALI', 'concept': 'BENGALI RUPE',
+        'name': 'BENGALI RUPEE MARK', 'script': 'BENGALI', 'concept': 'BENGALI RUPEE MARK',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9703,7 +9703,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI RUPE', 'script': 'BENGALI', 'concept': 'BENGALI RUPE',
+        'name': 'BENGALI RUPEE SIGN', 'script': 'BENGALI', 'concept': 'BENGALI RUPEE SIGN',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9711,7 +9711,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY NUMERATOR ONE', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY NUMERATOR ONE',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9719,7 +9719,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY NUMERATOR TWO', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY NUMERATOR TWO',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9727,7 +9727,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY NUMERATOR THREE', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY NUMERATOR THREE',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9735,7 +9735,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY NUMERATOR FOUR', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY NUMERATOR FOUR',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9743,7 +9743,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY NUMERATOR ONE LESS THAN THE DENOMINATOR', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY NUMERATOR ONE LESS THAN THE DENOMINATOR',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9751,7 +9751,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI CURR', 'script': 'BENGALI', 'concept': 'BENGALI CURR',
+        'name': 'BENGALI CURRENCY DENOMINATOR SIXTEEN', 'script': 'BENGALI', 'concept': 'BENGALI CURRENCY DENOMINATOR SIXTEEN',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -9760,7 +9760,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BENGALI ISSH', 'script': 'BENGALI', 'concept': 'BENGALI ISSH',
+        'name': 'BENGALI ISSHAR', 'script': 'BENGALI', 'concept': 'BENGALI ISSHAR',
         'origin': 'EASTERN NAGARI ~1100 AD',
         'ink': (140, 40, 25), 'paper': (230, 225, 205),
         'strokes': [
@@ -10226,7 +10226,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAMIL AU LEN', 'script': 'TAMIL', 'concept': 'TAMIL AU LEN',
+        'name': 'TAMIL AU LENGTH MARK', 'script': 'TAMIL', 'concept': 'TAMIL AU LENGTH MARK',
         'origin': 'TAMIL BRAHMI ~300 BC',
         'ink': (20, 60, 20), 'paper': (225, 220, 210),
         'strokes': [
@@ -10317,7 +10317,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAMIL NUMBER', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER',
+        'name': 'TAMIL NUMBER TEN', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER TEN',
         'origin': 'TAMIL BRAHMI ~300 BC',
         'ink': (20, 60, 20), 'paper': (225, 220, 210),
         'strokes': [
@@ -10325,7 +10325,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAMIL NUMBER', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER',
+        'name': 'TAMIL NUMBER ONE HUNDRED', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER ONE HUNDRED',
         'origin': 'TAMIL BRAHMI ~300 BC',
         'ink': (20, 60, 20), 'paper': (225, 220, 210),
         'strokes': [
@@ -10333,7 +10333,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAMIL NUMBER', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER',
+        'name': 'TAMIL NUMBER ONE THOUSAND', 'script': 'TAMIL', 'concept': 'TAMIL NUMBER ONE THOUSAND',
         'origin': 'TAMIL BRAHMI ~300 BC',
         'ink': (20, 60, 20), 'paper': (225, 220, 210),
         'strokes': [
@@ -10942,7 +10942,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TELUGU LENGT', 'script': 'TELUGU', 'concept': 'TELUGU LENGT',
+        'name': 'TELUGU LENGTH MARK', 'script': 'TELUGU', 'concept': 'TELUGU LENGTH MARK',
         'origin': 'BHATTIPROLU ~400 AD',
         'ink': (30, 60, 130), 'paper': (230, 225, 210),
         'strokes': [
@@ -10950,7 +10950,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TELUGU AI LE', 'script': 'TELUGU', 'concept': 'TELUGU AI LE',
+        'name': 'TELUGU AI LENGTH MARK', 'script': 'TELUGU', 'concept': 'TELUGU AI LENGTH MARK',
         'origin': 'BHATTIPROLU ~400 AD',
         'ink': (30, 60, 130), 'paper': (230, 225, 210),
         'strokes': [
@@ -11661,7 +11661,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KANNADA LENG', 'script': 'KANNADA', 'concept': 'KANNADA LENG',
+        'name': 'KANNADA LENGTH MARK', 'script': 'KANNADA', 'concept': 'KANNADA LENGTH MARK',
         'origin': 'KADAMBA ~500 AD',
         'ink': (140, 40, 20), 'paper': (228, 222, 205),
         'strokes': [
@@ -11670,7 +11670,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KANNADA AI L', 'script': 'KANNADA', 'concept': 'KANNADA AI L',
+        'name': 'KANNADA AI LENGTH MARK', 'script': 'KANNADA', 'concept': 'KANNADA AI LENGTH MARK',
         'origin': 'KADAMBA ~500 AD',
         'ink': (140, 40, 20), 'paper': (228, 222, 205),
         'strokes': [
@@ -12400,7 +12400,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MALAYALAM AU', 'script': 'MALAYALAM', 'concept': 'MALAYALAM AU',
+        'name': 'MALAYALAM AU LENGTH MARK', 'script': 'MALAYALAM', 'concept': 'MALAYALAM AU LENGTH MARK',
         'origin': 'GRANTHA DESCENDANT ~830 AD',
         'ink': (20, 50, 20), 'paper': (225, 225, 210),
         'strokes': [
@@ -12719,7 +12719,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA K', 'script': 'SINHALA', 'concept': 'ALPAPRAANA K',
+        'name': 'ALPAPRAANA KAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA KAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12728,7 +12728,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA KAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA KAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12737,7 +12737,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA G', 'script': 'SINHALA', 'concept': 'ALPAPRAANA G',
+        'name': 'ALPAPRAANA GAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA GAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12745,7 +12745,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA GAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA GAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12754,7 +12754,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KANTAJA NAAS', 'script': 'SINHALA', 'concept': 'KANTAJA NAAS',
+        'name': 'KANTAJA NAASIKYAYA', 'script': 'SINHALA', 'concept': 'KANTAJA NAASIKYAYA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12763,7 +12763,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SANYAKA GAYA', 'script': 'SINHALA', 'concept': 'SANYAKA GAYA',
+        'name': 'SANYAKA GAYANNA', 'script': 'SINHALA', 'concept': 'SANYAKA GAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12771,7 +12771,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA C', 'script': 'SINHALA', 'concept': 'ALPAPRAANA C',
+        'name': 'ALPAPRAANA CAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA CAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12780,7 +12780,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA CAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA CAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12791,7 +12791,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA J', 'script': 'SINHALA', 'concept': 'ALPAPRAANA J',
+        'name': 'ALPAPRAANA JAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA JAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12800,7 +12800,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA JAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA JAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12809,7 +12809,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAALUJA NAAS', 'script': 'SINHALA', 'concept': 'TAALUJA NAAS',
+        'name': 'TAALUJA NAASIKYAYA', 'script': 'SINHALA', 'concept': 'TAALUJA NAASIKYAYA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12818,7 +12818,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAALUJA SANY', 'script': 'SINHALA', 'concept': 'TAALUJA SANY',
+        'name': 'TAALUJA SANYOOGA NAAKSIKYAYA', 'script': 'SINHALA', 'concept': 'TAALUJA SANYOOGA NAAKSIKYAYA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12826,7 +12826,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SANYAKA JAYA', 'script': 'SINHALA', 'concept': 'SANYAKA JAYA',
+        'name': 'SANYAKA JAYANNA', 'script': 'SINHALA', 'concept': 'SANYAKA JAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12835,7 +12835,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA T', 'script': 'SINHALA', 'concept': 'ALPAPRAANA T',
+        'name': 'ALPAPRAANA TTAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA TTAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12843,7 +12843,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA TTAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA TTAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12852,7 +12852,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA D', 'script': 'SINHALA', 'concept': 'ALPAPRAANA D',
+        'name': 'ALPAPRAANA DDAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA DDAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12861,7 +12861,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA DDAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA DDAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12871,7 +12871,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MUURDHAJA NA', 'script': 'SINHALA', 'concept': 'MUURDHAJA NA',
+        'name': 'MUURDHAJA NAYANNA', 'script': 'SINHALA', 'concept': 'MUURDHAJA NAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12882,7 +12882,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SANYAKA DDAY', 'script': 'SINHALA', 'concept': 'SANYAKA DDAY',
+        'name': 'SANYAKA DDAYANNA', 'script': 'SINHALA', 'concept': 'SANYAKA DDAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12890,7 +12890,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA T', 'script': 'SINHALA', 'concept': 'ALPAPRAANA T',
+        'name': 'ALPAPRAANA TAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA TAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12899,7 +12899,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA TAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA TAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12908,7 +12908,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA D', 'script': 'SINHALA', 'concept': 'ALPAPRAANA D',
+        'name': 'ALPAPRAANA DAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA DAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12916,7 +12916,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA DAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA DAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12924,7 +12924,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DANTAJA NAYA', 'script': 'SINHALA', 'concept': 'DANTAJA NAYA',
+        'name': 'DANTAJA NAYANNA', 'script': 'SINHALA', 'concept': 'DANTAJA NAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12933,7 +12933,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SANYAKA DAYA', 'script': 'SINHALA', 'concept': 'SANYAKA DAYA',
+        'name': 'SANYAKA DAYANNA', 'script': 'SINHALA', 'concept': 'SANYAKA DAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12941,7 +12941,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA P', 'script': 'SINHALA', 'concept': 'ALPAPRAANA P',
+        'name': 'ALPAPRAANA PAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA PAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12950,7 +12950,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA PAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA PAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12959,7 +12959,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALPAPRAANA B', 'script': 'SINHALA', 'concept': 'ALPAPRAANA B',
+        'name': 'ALPAPRAANA BAYANNA', 'script': 'SINHALA', 'concept': 'ALPAPRAANA BAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -12968,7 +12968,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MAHAAPRAANA ', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA ',
+        'name': 'MAHAAPRAANA BAYANNA', 'script': 'SINHALA', 'concept': 'MAHAAPRAANA BAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13011,7 +13011,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DANTAJA LAYA', 'script': 'SINHALA', 'concept': 'DANTAJA LAYA',
+        'name': 'DANTAJA LAYANNA', 'script': 'SINHALA', 'concept': 'DANTAJA LAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13027,7 +13027,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAALUJA SAYA', 'script': 'SINHALA', 'concept': 'TAALUJA SAYA',
+        'name': 'TAALUJA SAYANNA', 'script': 'SINHALA', 'concept': 'TAALUJA SAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13036,7 +13036,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MUURDHAJA SA', 'script': 'SINHALA', 'concept': 'MUURDHAJA SA',
+        'name': 'MUURDHAJA SAYANNA', 'script': 'SINHALA', 'concept': 'MUURDHAJA SAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13047,7 +13047,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DANTAJA SAYA', 'script': 'SINHALA', 'concept': 'DANTAJA SAYA',
+        'name': 'DANTAJA SAYANNA', 'script': 'SINHALA', 'concept': 'DANTAJA SAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13064,7 +13064,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MUURDHAJA LA', 'script': 'SINHALA', 'concept': 'MUURDHAJA LA',
+        'name': 'MUURDHAJA LAYANNA', 'script': 'SINHALA', 'concept': 'MUURDHAJA LAYANNA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13099,7 +13099,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KETTI AEDA-P', 'script': 'SINHALA', 'concept': 'KETTI AEDA-P',
+        'name': 'KETTI AEDA-PILLA', 'script': 'SINHALA', 'concept': 'KETTI AEDA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13107,7 +13107,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIGA AEDA-PI', 'script': 'SINHALA', 'concept': 'DIGA AEDA-PI',
+        'name': 'DIGA AEDA-PILLA', 'script': 'SINHALA', 'concept': 'DIGA AEDA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13115,7 +13115,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KETTI IS-PIL', 'script': 'SINHALA', 'concept': 'KETTI IS-PIL',
+        'name': 'KETTI IS-PILLA', 'script': 'SINHALA', 'concept': 'KETTI IS-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13123,7 +13123,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIGA IS-PILL', 'script': 'SINHALA', 'concept': 'DIGA IS-PILL',
+        'name': 'DIGA IS-PILLA', 'script': 'SINHALA', 'concept': 'DIGA IS-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13132,7 +13132,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KETTI PAA-PI', 'script': 'SINHALA', 'concept': 'KETTI PAA-PI',
+        'name': 'KETTI PAA-PILLA', 'script': 'SINHALA', 'concept': 'KETTI PAA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13140,7 +13140,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIGA PAA-PIL', 'script': 'SINHALA', 'concept': 'DIGA PAA-PIL',
+        'name': 'DIGA PAA-PILLA', 'script': 'SINHALA', 'concept': 'DIGA PAA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13200,7 +13200,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KOMBUVA HAA ', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA ',
+        'name': 'KOMBUVA HAA AELA-PILLA', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA AELA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13222,7 +13222,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KOMBUVA HAA ', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA ',
+        'name': 'KOMBUVA HAA DIGA AELA-PILLA', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA DIGA AELA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13245,7 +13245,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KOMBUVA HAA ', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA ',
+        'name': 'KOMBUVA HAA GAYANUKITTA', 'script': 'SINHALA', 'concept': 'KOMBUVA HAA GAYANUKITTA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13275,7 +13275,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIGA GAETTA-', 'script': 'SINHALA', 'concept': 'DIGA GAETTA-',
+        'name': 'DIGA GAETTA-PILLA', 'script': 'SINHALA', 'concept': 'DIGA GAETTA-PILLA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13286,7 +13286,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DIGA GAYANUK', 'script': 'SINHALA', 'concept': 'DIGA GAYANUK',
+        'name': 'DIGA GAYANUKITTA', 'script': 'SINHALA', 'concept': 'DIGA GAYANUKITTA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13295,7 +13295,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SINHALA PUNC', 'script': 'SINHALA', 'concept': 'SINHALA PUNC',
+        'name': 'SINHALA PUNCTUATION KUNDDALIYA', 'script': 'SINHALA', 'concept': 'SINHALA PUNCTUATION KUNDDALIYA',
         'origin': 'BRAHMI DESCENDANT ~300 BC',
         'ink': (120, 40, 30), 'paper': (228, 225, 210),
         'strokes': [
@@ -13304,7 +13304,7 @@ CHARACTERS = [
     },
     # ── TIBETAN ────────────────────────────────────────────────
     {
-        'name': 'TIBETAN SYLL', 'script': 'TIBETAN', 'concept': 'TIBETAN SYLL',
+        'name': 'TIBETAN SYLLABLE OM', 'script': 'TIBETAN', 'concept': 'TIBETAN SYLLABLE OM',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13315,7 +13315,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GTER YIG MGO', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO',
+        'name': 'GTER YIG MGO TRUNCATED A', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO TRUNCATED A',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13326,7 +13326,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GTER YIG MGO', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO',
+        'name': 'GTER YIG MGO -UM RNAM BCAD MA', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO -UM RNAM BCAD MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13341,7 +13341,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GTER YIG MGO', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO',
+        'name': 'GTER YIG MGO -UM GTER TSHEG MA', 'script': 'TIBETAN', 'concept': 'GTER YIG MGO -UM GTER TSHEG MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13357,7 +13357,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'INITIAL YIG ', 'script': 'TIBETAN', 'concept': 'INITIAL YIG ',
+        'name': 'INITIAL YIG MGO MDUN MA', 'script': 'TIBETAN', 'concept': 'INITIAL YIG MGO MDUN MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13366,7 +13366,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CLOSING YIG ', 'script': 'TIBETAN', 'concept': 'CLOSING YIG ',
+        'name': 'CLOSING YIG MGO SGAB MA', 'script': 'TIBETAN', 'concept': 'CLOSING YIG MGO SGAB MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13375,7 +13375,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CARET YIG MG', 'script': 'TIBETAN', 'concept': 'CARET YIG MG',
+        'name': 'CARET YIG MGO PHUR SHAD MA', 'script': 'TIBETAN', 'concept': 'CARET YIG MGO PHUR SHAD MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13386,7 +13386,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'YIG MGO TSHE', 'script': 'TIBETAN', 'concept': 'YIG MGO TSHE',
+        'name': 'YIG MGO TSHEG SHAD MA', 'script': 'TIBETAN', 'concept': 'YIG MGO TSHEG SHAD MA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13409,7 +13409,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BSKUR YIG MG', 'script': 'TIBETAN', 'concept': 'BSKUR YIG MG',
+        'name': 'BSKUR YIG MGO', 'script': 'TIBETAN', 'concept': 'BSKUR YIG MGO',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13418,7 +13418,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BKA- SHOG YI', 'script': 'TIBETAN', 'concept': 'BKA- SHOG YI',
+        'name': 'BKA- SHOG YIG MGO', 'script': 'TIBETAN', 'concept': 'BKA- SHOG YIG MGO',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13428,7 +13428,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'INTERSYLLABI', 'script': 'TIBETAN', 'concept': 'INTERSYLLABI',
+        'name': 'INTERSYLLABIC TSHEG', 'script': 'TIBETAN', 'concept': 'INTERSYLLABIC TSHEG',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13436,7 +13436,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'DELIMITER TS', 'script': 'TIBETAN', 'concept': 'DELIMITER TS',
+        'name': 'DELIMITER TSHEG BSTAR', 'script': 'TIBETAN', 'concept': 'DELIMITER TSHEG BSTAR',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13479,7 +13479,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NYIS TSHEG S', 'script': 'TIBETAN', 'concept': 'NYIS TSHEG S',
+        'name': 'NYIS TSHEG SHAD', 'script': 'TIBETAN', 'concept': 'NYIS TSHEG SHAD',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13489,7 +13489,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RIN CHEN SPU', 'script': 'TIBETAN', 'concept': 'RIN CHEN SPU',
+        'name': 'RIN CHEN SPUNGS SHAD', 'script': 'TIBETAN', 'concept': 'RIN CHEN SPUNGS SHAD',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13500,7 +13500,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RGYA GRAM SH', 'script': 'TIBETAN', 'concept': 'RGYA GRAM SH',
+        'name': 'RGYA GRAM SHAD', 'script': 'TIBETAN', 'concept': 'RGYA GRAM SHAD',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13517,7 +13517,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CARET -DZUD ', 'script': 'TIBETAN', 'concept': 'CARET -DZUD ',
+        'name': 'CARET -DZUD RTAGS ME LONG CAN', 'script': 'TIBETAN', 'concept': 'CARET -DZUD RTAGS ME LONG CAN',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13542,7 +13542,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN LOGO', 'script': 'TIBETAN', 'concept': 'TIBETAN LOGO',
+        'name': 'TIBETAN LOGOTYPE SIGN CHAD RTAGS', 'script': 'TIBETAN', 'concept': 'TIBETAN LOGOTYPE SIGN CHAD RTAGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13554,7 +13554,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN LOGO', 'script': 'TIBETAN', 'concept': 'TIBETAN LOGO',
+        'name': 'TIBETAN LOGOTYPE SIGN LHAG RTAGS', 'script': 'TIBETAN', 'concept': 'TIBETAN LOGOTYPE SIGN LHAG RTAGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13565,7 +13565,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN ASTR', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTR',
+        'name': 'TIBETAN ASTROLOGICAL SIGN SGRA GCAN -CHAR RTAGS', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTROLOGICAL SIGN SGRA GCAN -CHAR RTAGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13576,7 +13576,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN ASTR', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTR',
+        'name': 'TIBETAN ASTROLOGICAL SIGN -KHYUD PA', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTROLOGICAL SIGN -KHYUD PA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13586,7 +13586,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN ASTR', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTR',
+        'name': 'TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS', 'script': 'TIBETAN', 'concept': 'TIBETAN ASTROLOGICAL SIGN SDONG TSHUGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13594,7 +13594,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL DKAR GC', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GC',
+        'name': 'RDEL DKAR GCIG', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GCIG',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13603,7 +13603,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL DKAR GN', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GN',
+        'name': 'RDEL DKAR GNYIS', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GNYIS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13614,7 +13614,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL DKAR GS', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GS',
+        'name': 'RDEL DKAR GSUM', 'script': 'TIBETAN', 'concept': 'RDEL DKAR GSUM',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13627,7 +13627,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL NAG GCI', 'script': 'TIBETAN', 'concept': 'RDEL NAG GCI',
+        'name': 'RDEL NAG GCIG', 'script': 'TIBETAN', 'concept': 'RDEL NAG GCIG',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13635,7 +13635,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL NAG GNY', 'script': 'TIBETAN', 'concept': 'RDEL NAG GNY',
+        'name': 'RDEL NAG GNYIS', 'script': 'TIBETAN', 'concept': 'RDEL NAG GNYIS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13644,7 +13644,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RDEL DKAR RD', 'script': 'TIBETAN', 'concept': 'RDEL DKAR RD',
+        'name': 'RDEL DKAR RDEL NAG', 'script': 'TIBETAN', 'concept': 'RDEL DKAR RDEL NAG',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13835,7 +13835,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NGAS BZUNG N', 'script': 'TIBETAN', 'concept': 'NGAS BZUNG N',
+        'name': 'NGAS BZUNG NYI ZLA', 'script': 'TIBETAN', 'concept': 'NGAS BZUNG NYI ZLA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13845,7 +13845,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CARET -DZUD ', 'script': 'TIBETAN', 'concept': 'CARET -DZUD ',
+        'name': 'CARET -DZUD RTAGS BZHI MIG CAN', 'script': 'TIBETAN', 'concept': 'CARET -DZUD RTAGS BZHI MIG CAN',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13856,7 +13856,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NGAS BZUNG S', 'script': 'TIBETAN', 'concept': 'NGAS BZUNG S',
+        'name': 'NGAS BZUNG SGOR RTAGS', 'script': 'TIBETAN', 'concept': 'NGAS BZUNG SGOR RTAGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13881,7 +13881,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GUG RTAGS GY', 'script': 'TIBETAN', 'concept': 'GUG RTAGS GY',
+        'name': 'GUG RTAGS GYON', 'script': 'TIBETAN', 'concept': 'GUG RTAGS GYON',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13895,7 +13895,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GUG RTAGS GY', 'script': 'TIBETAN', 'concept': 'GUG RTAGS GY',
+        'name': 'GUG RTAGS GYAS', 'script': 'TIBETAN', 'concept': 'GUG RTAGS GYAS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13909,7 +13909,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ANG KHANG GY', 'script': 'TIBETAN', 'concept': 'ANG KHANG GY',
+        'name': 'ANG KHANG GYON', 'script': 'TIBETAN', 'concept': 'ANG KHANG GYON',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -13917,7 +13917,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ANG KHANG GY', 'script': 'TIBETAN', 'concept': 'ANG KHANG GY',
+        'name': 'ANG KHANG GYAS', 'script': 'TIBETAN', 'concept': 'ANG KHANG GYAS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14299,7 +14299,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN AA', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN AA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14307,7 +14307,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN I', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN I',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14315,7 +14315,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN II', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN II',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14324,7 +14324,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN U', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN U',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14332,7 +14332,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN UU', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN UU',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14341,7 +14341,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN VOCALIC R', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN VOCALIC R',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14350,7 +14350,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN VOCALIC RR', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN VOCALIC RR',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14360,7 +14360,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN VOCALIC L', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN VOCALIC L',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14369,7 +14369,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN VOCALIC LL', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN VOCALIC LL',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14379,7 +14379,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN E', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN E',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14387,7 +14387,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN EE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN EE',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14396,7 +14396,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN O', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN O',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14404,7 +14404,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN OO', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN OO',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14413,7 +14413,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RJES SU NGA ', 'script': 'TIBETAN', 'concept': 'RJES SU NGA ',
+        'name': 'RJES SU NGA RO', 'script': 'TIBETAN', 'concept': 'RJES SU NGA RO',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14433,7 +14433,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN REVERSED I', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN REVERSED I',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14441,7 +14441,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIBETAN VOWE', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWE',
+        'name': 'TIBETAN VOWEL SIGN REVERSED II', 'script': 'TIBETAN', 'concept': 'TIBETAN VOWEL SIGN REVERSED II',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14450,7 +14450,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NYI ZLA NAA ', 'script': 'TIBETAN', 'concept': 'NYI ZLA NAA ',
+        'name': 'NYI ZLA NAA DA', 'script': 'TIBETAN', 'concept': 'NYI ZLA NAA DA',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14520,7 +14520,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GRU CAN RGYI', 'script': 'TIBETAN', 'concept': 'GRU CAN RGYI',
+        'name': 'GRU CAN RGYINGS', 'script': 'TIBETAN', 'concept': 'GRU CAN RGYINGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -14528,7 +14528,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GRU MED RGYI', 'script': 'TIBETAN', 'concept': 'GRU MED RGYI',
+        'name': 'GRU MED RGYINGS', 'script': 'TIBETAN', 'concept': 'GRU MED RGYINGS',
         'origin': 'THONMI SAMBHOTA ~650 AD',
         'ink': (130, 30, 30), 'paper': (225, 220, 200),
         'strokes': [
@@ -15006,7 +15006,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'THO NANGMONT', 'script': 'THAI', 'concept': 'THO NANGMONT',
+        'name': 'THO NANGMONTHO', 'script': 'THAI', 'concept': 'THO NANGMONTHO',
         'origin': 'KHMER ADAPTATION ~1283 AD',
         'ink': (80, 30, 100), 'paper': (230, 225, 215),
         'strokes': [
@@ -15393,7 +15393,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'THAI CURRENC', 'script': 'THAI', 'concept': 'THAI CURRENC',
+        'name': 'THAI CURRENCY SYMBOL BAHT', 'script': 'THAI', 'concept': 'THAI CURRENCY SYMBOL BAHT',
         'origin': 'KHMER ADAPTATION ~1283 AD',
         'ink': (80, 30, 100), 'paper': (230, 225, 215),
         'strokes': [
@@ -15434,7 +15434,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SARA AI MAIM', 'script': 'THAI', 'concept': 'SARA AI MAIM',
+        'name': 'SARA AI MAIMUAN', 'script': 'THAI', 'concept': 'SARA AI MAIMUAN',
         'origin': 'KHMER ADAPTATION ~1283 AD',
         'ink': (80, 30, 100), 'paper': (230, 225, 215),
         'strokes': [
@@ -15444,7 +15444,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SARA AI MAIM', 'script': 'THAI', 'concept': 'SARA AI MAIM',
+        'name': 'SARA AI MAIMALAI', 'script': 'THAI', 'concept': 'SARA AI MAIMALAI',
         'origin': 'KHMER ADAPTATION ~1283 AD',
         'ink': (80, 30, 100), 'paper': (230, 225, 215),
         'strokes': [
@@ -16026,7 +16026,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO SEMIVOWE', 'script': 'LAO', 'concept': 'LAO SEMIVOWE',
+        'name': 'LAO SEMIVOWEL SIGN LO', 'script': 'LAO', 'concept': 'LAO SEMIVOWEL SIGN LO',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16035,7 +16035,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO SEMIVOWE', 'script': 'LAO', 'concept': 'LAO SEMIVOWE',
+        'name': 'LAO SEMIVOWEL SIGN NYO', 'script': 'LAO', 'concept': 'LAO SEMIVOWEL SIGN NYO',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16100,7 +16100,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO TONE MAI', 'script': 'LAO', 'concept': 'LAO TONE MAI',
+        'name': 'LAO TONE MAI EK', 'script': 'LAO', 'concept': 'LAO TONE MAI EK',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16108,7 +16108,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO TONE MAI', 'script': 'LAO', 'concept': 'LAO TONE MAI',
+        'name': 'LAO TONE MAI THO', 'script': 'LAO', 'concept': 'LAO TONE MAI THO',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16117,7 +16117,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO TONE MAI', 'script': 'LAO', 'concept': 'LAO TONE MAI',
+        'name': 'LAO TONE MAI TI', 'script': 'LAO', 'concept': 'LAO TONE MAI TI',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16125,7 +16125,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO TONE MAI', 'script': 'LAO', 'concept': 'LAO TONE MAI',
+        'name': 'LAO TONE MAI CATAWA', 'script': 'LAO', 'concept': 'LAO TONE MAI CATAWA',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16133,7 +16133,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO CANCELLA', 'script': 'LAO', 'concept': 'LAO CANCELLA',
+        'name': 'LAO CANCELLATION MARK', 'script': 'LAO', 'concept': 'LAO CANCELLATION MARK',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16142,7 +16142,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAO NIGGAHIT', 'script': 'LAO', 'concept': 'LAO NIGGAHIT',
+        'name': 'LAO NIGGAHITA', 'script': 'LAO', 'concept': 'LAO NIGGAHITA',
         'origin': 'THAI RELATED ~1400 AD',
         'ink': (80, 30, 100), 'paper': (228, 225, 215),
         'strokes': [
@@ -16792,7 +16792,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MEDIAL YA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MEDIAL YA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16800,7 +16800,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MEDIAL RA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MEDIAL RA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16808,7 +16808,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MEDIAL WA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MEDIAL WA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16817,7 +16817,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MEDIAL HA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MEDIAL HA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16918,7 +16918,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LITTLE SECTI', 'script': 'BURMESE', 'concept': 'LITTLE SECTI',
+        'name': 'LITTLE SECTION', 'script': 'BURMESE', 'concept': 'LITTLE SECTION',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16935,7 +16935,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SYMB', 'script': 'BURMESE', 'concept': 'MYANMAR SYMB',
+        'name': 'MYANMAR SYMBOL LOCATIVE', 'script': 'BURMESE', 'concept': 'MYANMAR SYMBOL LOCATIVE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16944,7 +16944,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SYMB', 'script': 'BURMESE', 'concept': 'MYANMAR SYMB',
+        'name': 'MYANMAR SYMBOL COMPLETED', 'script': 'BURMESE', 'concept': 'MYANMAR SYMBOL COMPLETED',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16954,7 +16954,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SYMB', 'script': 'BURMESE', 'concept': 'MYANMAR SYMB',
+        'name': 'MYANMAR SYMBOL AFOREMENTIONED', 'script': 'BURMESE', 'concept': 'MYANMAR SYMBOL AFOREMENTIONED',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -16962,7 +16962,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SYMB', 'script': 'BURMESE', 'concept': 'MYANMAR SYMB',
+        'name': 'MYANMAR SYMBOL GENITIVE', 'script': 'BURMESE', 'concept': 'MYANMAR SYMBOL GENITIVE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17100,7 +17100,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MON MEDIAL NA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MON MEDIAL NA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17109,7 +17109,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MON MEDIAL MA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MON MEDIAL MA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17117,7 +17117,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN MON MEDIAL LA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN MON MEDIAL LA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17125,7 +17125,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SGAW KAREN S', 'script': 'BURMESE', 'concept': 'SGAW KAREN S',
+        'name': 'SGAW KAREN SHA', 'script': 'BURMESE', 'concept': 'SGAW KAREN SHA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17134,7 +17134,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SGAW KAREN E', 'script': 'BURMESE', 'concept': 'SGAW KAREN E',
+        'name': 'SGAW KAREN EU', 'script': 'BURMESE', 'concept': 'SGAW KAREN EU',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17142,7 +17142,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR TONE', 'script': 'BURMESE', 'concept': 'MYANMAR TONE',
+        'name': 'MYANMAR TONE MARK SGAW KAREN HATHI', 'script': 'BURMESE', 'concept': 'MYANMAR TONE MARK SGAW KAREN HATHI',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17150,7 +17150,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR TONE', 'script': 'BURMESE', 'concept': 'MYANMAR TONE',
+        'name': 'MYANMAR TONE MARK SGAW KAREN KE PHO', 'script': 'BURMESE', 'concept': 'MYANMAR TONE MARK SGAW KAREN KE PHO',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17158,7 +17158,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN THA', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN THA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17166,7 +17166,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN PWA', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN PWA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17174,7 +17174,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN EU', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN EU',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17183,7 +17183,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN UE', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN UE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17193,7 +17193,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN TONE-1', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN TONE-1',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17201,7 +17201,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN TONE-2', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN TONE-2',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17209,7 +17209,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN TONE-3', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN TONE-3',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17217,7 +17217,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN TONE-4', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN TONE-4',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17225,7 +17225,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WESTERN PWO ', 'script': 'BURMESE', 'concept': 'WESTERN PWO ',
+        'name': 'WESTERN PWO KAREN TONE-5', 'script': 'BURMESE', 'concept': 'WESTERN PWO KAREN TONE-5',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17234,7 +17234,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EASTERN PWO ', 'script': 'BURMESE', 'concept': 'EASTERN PWO ',
+        'name': 'EASTERN PWO KAREN NNA', 'script': 'BURMESE', 'concept': 'EASTERN PWO KAREN NNA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17242,7 +17242,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EASTERN PWO ', 'script': 'BURMESE', 'concept': 'EASTERN PWO ',
+        'name': 'EASTERN PWO KAREN YWA', 'script': 'BURMESE', 'concept': 'EASTERN PWO KAREN YWA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17250,7 +17250,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EASTERN PWO ', 'script': 'BURMESE', 'concept': 'EASTERN PWO ',
+        'name': 'EASTERN PWO KAREN GHWA', 'script': 'BURMESE', 'concept': 'EASTERN PWO KAREN GHWA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17416,7 +17416,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR CONS', 'script': 'BURMESE', 'concept': 'MYANMAR CONS',
+        'name': 'MYANMAR CONSONANT SIGN SHAN MEDIAL WA', 'script': 'BURMESE', 'concept': 'MYANMAR CONSONANT SIGN SHAN MEDIAL WA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17497,7 +17497,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHAN COUNCIL', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL',
+        'name': 'SHAN COUNCIL TONE-2', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL TONE-2',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17506,7 +17506,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHAN COUNCIL', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL',
+        'name': 'SHAN COUNCIL TONE-3', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL TONE-3',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17517,7 +17517,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SHAN COUNCIL', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL',
+        'name': 'SHAN COUNCIL EMPHATIC TONE', 'script': 'BURMESE', 'concept': 'SHAN COUNCIL EMPHATIC TONE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17525,7 +17525,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUMAI PALAUN', 'script': 'BURMESE', 'concept': 'RUMAI PALAUN',
+        'name': 'RUMAI PALAUNG FA', 'script': 'BURMESE', 'concept': 'RUMAI PALAUNG FA',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17535,7 +17535,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RUMAI PALAUN', 'script': 'BURMESE', 'concept': 'RUMAI PALAUN',
+        'name': 'RUMAI PALAUNG TONE-5', 'script': 'BURMESE', 'concept': 'RUMAI PALAUNG TONE-5',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17546,7 +17546,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT ZERO', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT ZERO',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17555,7 +17555,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT ONE', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT ONE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17563,7 +17563,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT TWO', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT TWO',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17571,7 +17571,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT THREE', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT THREE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17579,7 +17579,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT FOUR', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT FOUR',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17587,7 +17587,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT FIVE', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT FIVE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17596,7 +17596,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT SIX', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT SIX',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17605,7 +17605,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT SEVEN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT SEVEN',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17613,7 +17613,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT EIGHT', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT EIGHT',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17622,7 +17622,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SHAN', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN',
+        'name': 'MYANMAR SHAN DIGIT NINE', 'script': 'BURMESE', 'concept': 'MYANMAR SHAN DIGIT NINE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17631,7 +17631,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHAMTI TONE-', 'script': 'BURMESE', 'concept': 'KHAMTI TONE-',
+        'name': 'KHAMTI TONE-1', 'script': 'BURMESE', 'concept': 'KHAMTI TONE-1',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17639,7 +17639,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHAMTI TONE-', 'script': 'BURMESE', 'concept': 'KHAMTI TONE-',
+        'name': 'KHAMTI TONE-3', 'script': 'BURMESE', 'concept': 'KHAMTI TONE-3',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17664,7 +17664,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MYANMAR SYMB', 'script': 'BURMESE', 'concept': 'MYANMAR SYMB',
+        'name': 'MYANMAR SYMBOL SHAN ONE', 'script': 'BURMESE', 'concept': 'MYANMAR SYMBOL SHAN ONE',
         'origin': 'MON ADAPTATION ~1050 AD',
         'ink': (30, 30, 30), 'paper': (230, 225, 200),
         'strokes': [
@@ -17964,7 +17964,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QAQ', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QAQ',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -17973,7 +17973,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QAA', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QAA',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -17982,7 +17982,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QI', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QI',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -17990,7 +17990,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QII', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QII',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -17999,7 +17999,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QU', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QU',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18007,7 +18007,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QUK', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QUK',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18016,7 +18016,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QUU', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QUU',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18025,7 +18025,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QUUV', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QUUV',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18033,7 +18033,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL RY', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL RY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18042,7 +18042,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL RYY', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL RYY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18051,7 +18051,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL LY', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL LY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18060,7 +18060,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL LYY', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL LYY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18069,7 +18069,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QE', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QE',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18077,7 +18077,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QAI', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QAI',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18087,7 +18087,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QOO TYPE ONE', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QOO TYPE ONE',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18095,7 +18095,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QOO TYPE TWO', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QOO TYPE TWO',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18103,7 +18103,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER INDEPE', 'script': 'KHMER', 'concept': 'KHMER INDEPE',
+        'name': 'KHMER INDEPENDENT VOWEL QAU', 'script': 'KHMER', 'concept': 'KHMER INDEPENDENT VOWEL QAU',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18111,7 +18111,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER VOWEL ', 'script': 'KHMER', 'concept': 'KHMER VOWEL ',
+        'name': 'KHMER VOWEL INHERENT AQ', 'script': 'KHMER', 'concept': 'KHMER VOWEL INHERENT AQ',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18120,7 +18120,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER VOWEL ', 'script': 'KHMER', 'concept': 'KHMER VOWEL ',
+        'name': 'KHMER VOWEL INHERENT AA', 'script': 'KHMER', 'concept': 'KHMER VOWEL INHERENT AA',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18578,7 +18578,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'YUUKALEAPINT', 'script': 'KHMER', 'concept': 'YUUKALEAPINT',
+        'name': 'YUUKALEAPINTU', 'script': 'KHMER', 'concept': 'YUUKALEAPINTU',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18772,7 +18772,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SAMYOK SANNY', 'script': 'KHMER', 'concept': 'SAMYOK SANNY',
+        'name': 'SAMYOK SANNYA', 'script': 'KHMER', 'concept': 'SAMYOK SANNYA',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18886,7 +18886,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CAMNUC PII K', 'script': 'KHMER', 'concept': 'CAMNUC PII K',
+        'name': 'CAMNUC PII KUUH', 'script': 'KHMER', 'concept': 'CAMNUC PII KUUH',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18935,7 +18935,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER CURREN', 'script': 'KHMER', 'concept': 'KHMER CURREN',
+        'name': 'KHMER CURRENCY SYMBOL RIEL', 'script': 'KHMER', 'concept': 'KHMER CURRENCY SYMBOL RIEL',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -18943,7 +18943,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'AVAKRAHASANY', 'script': 'KHMER', 'concept': 'AVAKRAHASANY',
+        'name': 'AVAKRAHASANYA', 'script': 'KHMER', 'concept': 'AVAKRAHASANYA',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19057,7 +19057,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK SON', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK SON',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19066,7 +19066,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK MUOY', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK MUOY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19074,7 +19074,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PII', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PII',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19082,7 +19082,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK BEI', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK BEI',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19090,7 +19090,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK BUON', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK BUON',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19098,7 +19098,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PRAM', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PRAM',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19107,7 +19107,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PRAM-MUOY', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PRAM-MUOY',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19115,7 +19115,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PRAM-PII', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PRAM-PII',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19123,7 +19123,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PRAM-BEI', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PRAM-BEI',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19131,7 +19131,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KHMER SYMBOL', 'script': 'KHMER', 'concept': 'KHMER SYMBOL',
+        'name': 'KHMER SYMBOL LEK ATTAK PRAM-BUON', 'script': 'KHMER', 'concept': 'KHMER SYMBOL LEK ATTAK PRAM-BUON',
         'origin': 'PALLAVA GRANTHA ~600 AD',
         'ink': (60, 40, 20), 'paper': (225, 218, 195),
         'strokes': [
@@ -19257,7 +19257,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RIEUL-THIEUT', 'script': 'KOREAN', 'concept': 'RIEUL-THIEUT',
+        'name': 'RIEUL-THIEUTH', 'script': 'KOREAN', 'concept': 'RIEUL-THIEUTH',
         'origin': 'KING SEJONG ~1443 AD',
         'ink': (20, 30, 80), 'paper': (225, 225, 230),
         'strokes': [
@@ -19266,7 +19266,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'RIEUL-PHIEUP', 'script': 'KOREAN', 'concept': 'RIEUL-PHIEUP',
+        'name': 'RIEUL-PHIEUPH', 'script': 'KOREAN', 'concept': 'RIEUL-PHIEUPH',
         'origin': 'KING SEJONG ~1443 AD',
         'ink': (20, 30, 80), 'paper': (225, 225, 230),
         'strokes': [
@@ -21759,7 +21759,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COMBINING KA', 'script': 'HIRAGANA', 'concept': 'COMBINING KA',
+        'name': 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK', 'script': 'HIRAGANA', 'concept': 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -21768,7 +21768,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'COMBINING KA', 'script': 'HIRAGANA', 'concept': 'COMBINING KA',
+        'name': 'COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK', 'script': 'HIRAGANA', 'concept': 'COMBINING KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -21777,7 +21777,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA-HIR', 'script': 'HIRAGANA', 'concept': 'KATAKANA-HIR',
+        'name': 'KATAKANA-HIRAGANA VOICED SOUND MARK', 'script': 'HIRAGANA', 'concept': 'KATAKANA-HIRAGANA VOICED SOUND MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -21786,7 +21786,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA-HIR', 'script': 'HIRAGANA', 'concept': 'KATAKANA-HIR',
+        'name': 'KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK', 'script': 'HIRAGANA', 'concept': 'KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -21795,7 +21795,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HIRAGANA ITE', 'script': 'HIRAGANA', 'concept': 'HIRAGANA ITE',
+        'name': 'HIRAGANA ITERATION MARK', 'script': 'HIRAGANA', 'concept': 'HIRAGANA ITERATION MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -21803,7 +21803,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HIRAGANA VOI', 'script': 'HIRAGANA', 'concept': 'HIRAGANA VOI',
+        'name': 'HIRAGANA VOICED ITERATION MARK', 'script': 'HIRAGANA', 'concept': 'HIRAGANA VOICED ITERATION MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -22625,7 +22625,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA MID', 'script': 'KATAKANA', 'concept': 'KATAKANA MID',
+        'name': 'KATAKANA MIDDLE DOT', 'script': 'KATAKANA', 'concept': 'KATAKANA MIDDLE DOT',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -22633,7 +22633,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA-HIR', 'script': 'KATAKANA', 'concept': 'KATAKANA-HIR',
+        'name': 'KATAKANA-HIRAGANA PROLONGED SOUND MARK', 'script': 'KATAKANA', 'concept': 'KATAKANA-HIRAGANA PROLONGED SOUND MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -22641,7 +22641,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA ITE', 'script': 'KATAKANA', 'concept': 'KATAKANA ITE',
+        'name': 'KATAKANA ITERATION MARK', 'script': 'KATAKANA', 'concept': 'KATAKANA ITERATION MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -22649,7 +22649,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KATAKANA VOI', 'script': 'KATAKANA', 'concept': 'KATAKANA VOI',
+        'name': 'KATAKANA VOICED ITERATION MARK', 'script': 'KATAKANA', 'concept': 'KATAKANA VOICED ITERATION MARK',
         'origin': 'HEIAN PERIOD ~800 AD',
         'ink': (20, 20, 20), 'paper': (230, 225, 215),
         'strokes': [
@@ -25055,7 +25055,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ETHIOPIC COM', 'script': 'ETHIOPIC', 'concept': 'ETHIOPIC COM',
+        'name': 'ETHIOPIC COMBINING GEMINATION AND VOWEL LENGTH MARK', 'script': 'ETHIOPIC', 'concept': 'ETHIOPIC COMBINING GEMINATION AND VOWEL LENGTH MARK',
         'origin': "GE'EZ SCRIPT ~500 BC",
         'ink': (40, 30, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -25065,7 +25065,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ETHIOPIC COM', 'script': 'ETHIOPIC', 'concept': 'ETHIOPIC COM',
+        'name': 'ETHIOPIC COMBINING VOWEL LENGTH MARK', 'script': 'ETHIOPIC', 'concept': 'ETHIOPIC COMBINING VOWEL LENGTH MARK',
         'origin': "GE'EZ SCRIPT ~500 BC",
         'ink': (40, 30, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -25123,7 +25123,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BERBER ACADE', 'script': 'TIFINAGH', 'concept': 'BERBER ACADE',
+        'name': 'BERBER ACADEMY YAJ', 'script': 'TIFINAGH', 'concept': 'BERBER ACADEMY YAJ',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25233,7 +25233,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'BERBER ACADE', 'script': 'TIFINAGH', 'concept': 'BERBER ACADE',
+        'name': 'BERBER ACADEMY YAH', 'script': 'TIFINAGH', 'concept': 'BERBER ACADEMY YAH',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25546,7 +25546,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAWELLEMET Y', 'script': 'TIFINAGH', 'concept': 'TAWELLEMET Y',
+        'name': 'TAWELLEMET YAZ', 'script': 'TIFINAGH', 'concept': 'TAWELLEMET YAZ',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25579,7 +25579,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIFINAGH MOD', 'script': 'TIFINAGH', 'concept': 'TIFINAGH MOD',
+        'name': 'TIFINAGH MODIFIER LETTER LABIALIZATION MARK', 'script': 'TIFINAGH', 'concept': 'TIFINAGH MODIFIER LETTER LABIALIZATION MARK',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25587,7 +25587,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIFINAGH SEP', 'script': 'TIFINAGH', 'concept': 'TIFINAGH SEP',
+        'name': 'TIFINAGH SEPARATOR MARK', 'script': 'TIFINAGH', 'concept': 'TIFINAGH SEPARATOR MARK',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25595,7 +25595,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TIFINAGH CON', 'script': 'TIFINAGH', 'concept': 'TIFINAGH CON',
+        'name': 'TIFINAGH CONSONANT JOINER', 'script': 'TIFINAGH', 'concept': 'TIFINAGH CONSONANT JOINER',
         'origin': 'LIBYCO-BERBER ~200 BC',
         'ink': (50, 35, 100), 'paper': (215, 205, 180),
         'strokes': [
@@ -25975,7 +25975,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING SHORT HIGH TONE', 'script': 'NKO', 'concept': 'NKO COMBINING SHORT HIGH TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -25983,7 +25983,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING SHORT LOW TONE', 'script': 'NKO', 'concept': 'NKO COMBINING SHORT LOW TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -25991,7 +25991,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING SHORT RISING TONE', 'script': 'NKO', 'concept': 'NKO COMBINING SHORT RISING TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -25999,7 +25999,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING LONG DESCENDING TONE', 'script': 'NKO', 'concept': 'NKO COMBINING LONG DESCENDING TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26007,7 +26007,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING LONG HIGH TONE', 'script': 'NKO', 'concept': 'NKO COMBINING LONG HIGH TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26015,7 +26015,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING LONG LOW TONE', 'script': 'NKO', 'concept': 'NKO COMBINING LONG LOW TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26023,7 +26023,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING LONG RISING TONE', 'script': 'NKO', 'concept': 'NKO COMBINING LONG RISING TONE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26031,7 +26031,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING NASALIZATION MARK', 'script': 'NKO', 'concept': 'NKO COMBINING NASALIZATION MARK',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26039,7 +26039,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO COMBININ', 'script': 'NKO', 'concept': 'NKO COMBININ',
+        'name': 'NKO COMBINING DOUBLE DOT ABOVE', 'script': 'NKO', 'concept': 'NKO COMBINING DOUBLE DOT ABOVE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26048,7 +26048,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO HIGH TON', 'script': 'NKO', 'concept': 'NKO HIGH TON',
+        'name': 'NKO HIGH TONE APOSTROPHE', 'script': 'NKO', 'concept': 'NKO HIGH TONE APOSTROPHE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26056,7 +26056,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO LOW TONE', 'script': 'NKO', 'concept': 'NKO LOW TONE',
+        'name': 'NKO LOW TONE APOSTROPHE', 'script': 'NKO', 'concept': 'NKO LOW TONE APOSTROPHE',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26064,7 +26064,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO SYMBOL O', 'script': 'NKO', 'concept': 'NKO SYMBOL O',
+        'name': 'NKO SYMBOL OO DENNEN', 'script': 'NKO', 'concept': 'NKO SYMBOL OO DENNEN',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26073,7 +26073,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO SYMBOL G', 'script': 'NKO', 'concept': 'NKO SYMBOL G',
+        'name': 'NKO SYMBOL GBAKURUNEN', 'script': 'NKO', 'concept': 'NKO SYMBOL GBAKURUNEN',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26094,7 +26094,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO EXCLAMAT', 'script': 'NKO', 'concept': 'NKO EXCLAMAT',
+        'name': 'NKO EXCLAMATION MARK', 'script': 'NKO', 'concept': 'NKO EXCLAMATION MARK',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -26104,7 +26104,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'NKO LAJANYAL', 'script': 'NKO', 'concept': 'NKO LAJANYAL',
+        'name': 'NKO LAJANYALAN', 'script': 'NKO', 'concept': 'NKO LAJANYALAN',
         'origin': 'SOLOMANA KANTE ~1949 AD',
         'ink': (50, 30, 20), 'paper': (225, 215, 185),
         'strokes': [
@@ -28454,7 +28454,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE WI', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WI',
+        'name': 'WEST-CREE WII', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WII',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28496,7 +28496,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE WO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WO',
+        'name': 'WEST-CREE WOO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WOO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28549,7 +28549,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE WA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WA',
+        'name': 'WEST-CREE WAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE WAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28615,7 +28615,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL BOTTOM', 'script': 'INUKTITUT', 'concept': 'FINAL BOTTOM',
+        'name': 'FINAL BOTTOM HALF RING', 'script': 'INUKTITUT', 'concept': 'FINAL BOTTOM HALF RING',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28623,7 +28623,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL TOP HA', 'script': 'INUKTITUT', 'concept': 'FINAL TOP HA',
+        'name': 'FINAL TOP HALF RING', 'script': 'INUKTITUT', 'concept': 'FINAL TOP HALF RING',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28631,7 +28631,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL RIGHT ', 'script': 'INUKTITUT', 'concept': 'FINAL RIGHT ',
+        'name': 'FINAL RIGHT HALF RING', 'script': 'INUKTITUT', 'concept': 'FINAL RIGHT HALF RING',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28648,7 +28648,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL DOUBLE', 'script': 'INUKTITUT', 'concept': 'FINAL DOUBLE',
+        'name': 'FINAL DOUBLE ACUTE', 'script': 'INUKTITUT', 'concept': 'FINAL DOUBLE ACUTE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28657,7 +28657,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL DOUBLE', 'script': 'INUKTITUT', 'concept': 'FINAL DOUBLE',
+        'name': 'FINAL DOUBLE SHORT VERTICAL STROKES', 'script': 'INUKTITUT', 'concept': 'FINAL DOUBLE SHORT VERTICAL STROKES',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28666,7 +28666,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL MIDDLE', 'script': 'INUKTITUT', 'concept': 'FINAL MIDDLE',
+        'name': 'FINAL MIDDLE DOT', 'script': 'INUKTITUT', 'concept': 'FINAL MIDDLE DOT',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28674,7 +28674,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL SHORT ', 'script': 'INUKTITUT', 'concept': 'FINAL SHORT ',
+        'name': 'FINAL SHORT HORIZONTAL STROKE', 'script': 'INUKTITUT', 'concept': 'FINAL SHORT HORIZONTAL STROKE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28690,7 +28690,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'FINAL DOWN T', 'script': 'INUKTITUT', 'concept': 'FINAL DOWN T',
+        'name': 'FINAL DOWN TACK', 'script': 'INUKTITUT', 'concept': 'FINAL DOWN TACK',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28844,7 +28844,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWE', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28862,7 +28862,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWI', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWI',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28881,7 +28881,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWII', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWII',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28900,7 +28900,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28919,7 +28919,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWOO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWOO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28938,7 +28938,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -28957,7 +28957,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE PW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PW',
+        'name': 'WEST-CREE PWAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE PWAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29107,7 +29107,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWE', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29125,7 +29125,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWI', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWI',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29144,7 +29144,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWII', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWII',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29163,7 +29163,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29182,7 +29182,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWOO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWOO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29201,7 +29201,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29220,7 +29220,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TW',
+        'name': 'WEST-CREE TWAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TWAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29382,7 +29382,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWE', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29402,7 +29402,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWI', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWI',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29423,7 +29423,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWII', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWII',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29444,7 +29444,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29465,7 +29465,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWOO', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWOO',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29486,7 +29486,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29507,7 +29507,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE KW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KW',
+        'name': 'WEST-CREE KWAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE KWAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29547,7 +29547,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SOUTH-SLAVEY', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY',
+        'name': 'SOUTH-SLAVEY KEH', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY KEH',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29557,7 +29557,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SOUTH-SLAVEY', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY',
+        'name': 'SOUTH-SLAVEY KIH', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY KIH',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29567,7 +29567,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SOUTH-SLAVEY', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY',
+        'name': 'SOUTH-SLAVEY KOH', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY KOH',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29577,7 +29577,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'SOUTH-SLAVEY', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY',
+        'name': 'SOUTH-SLAVEY KAH', 'script': 'INUKTITUT', 'concept': 'SOUTH-SLAVEY KAH',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29675,7 +29675,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE CW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CW',
+        'name': 'WEST-CREE CWE', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CWE',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29693,7 +29693,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE CW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CW',
+        'name': 'WEST-CREE CWI', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CWI',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29712,7 +29712,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE CW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CW',
+        'name': 'WEST-CREE CWII', 'script': 'INUKTITUT', 'concept': 'WEST-CREE CWII',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29834,7 +29834,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE FW', 'script': 'INUKTITUT', 'concept': 'WEST-CREE FW',
+        'name': 'WEST-CREE FWAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE FWAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -29959,7 +29959,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'WEST-CREE TH', 'script': 'INUKTITUT', 'concept': 'WEST-CREE TH',
+        'name': 'WEST-CREE THWAA', 'script': 'INUKTITUT', 'concept': 'WEST-CREE THWAA',
         'origin': 'JAMES EVANS ~1840 AD',
         'ink': (80, 100, 160), 'paper': (225, 230, 240),
         'strokes': [
@@ -30061,7 +30061,7 @@ CHARACTERS = [
     },
     # ── MONGOLIAN ──────────────────────────────────────────────
     {
-        'name': 'MONGOLIAN BI', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN BI',
+        'name': 'MONGOLIAN BIRGA', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN BIRGA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30069,7 +30069,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN EL', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN EL',
+        'name': 'MONGOLIAN ELLIPSIS', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN ELLIPSIS',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30080,7 +30080,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN CO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN CO',
+        'name': 'MONGOLIAN COMMA', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN COMMA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30088,7 +30088,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FU', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FU',
+        'name': 'MONGOLIAN FULL STOP', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FULL STOP',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30097,7 +30097,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN CO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN CO',
+        'name': 'MONGOLIAN COLON', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN COLON',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30106,7 +30106,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FO',
+        'name': 'MONGOLIAN FOUR DOTS', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FOUR DOTS',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30117,7 +30117,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN TO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN TO',
+        'name': 'MONGOLIAN TODO SOFT HYPHEN', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN TODO SOFT HYPHEN',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30125,7 +30125,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN SI', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN SI',
+        'name': 'MONGOLIAN SIBE SYLLABLE BOUNDARY MARKER', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN SIBE SYLLABLE BOUNDARY MARKER',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30133,7 +30133,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN MA', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN MA',
+        'name': 'MONGOLIAN MANCHU COMMA', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN MANCHU COMMA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30141,7 +30141,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN MA', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN MA',
+        'name': 'MONGOLIAN MANCHU FULL STOP', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN MANCHU FULL STOP',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30150,7 +30150,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN NI', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN NI',
+        'name': 'MONGOLIAN NIRUGU', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN NIRUGU',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30158,7 +30158,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FR',
+        'name': 'MONGOLIAN FREE VARIATION SELECTOR ONE', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FREE VARIATION SELECTOR ONE',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30186,7 +30186,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FR',
+        'name': 'MONGOLIAN FREE VARIATION SELECTOR TWO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FREE VARIATION SELECTOR TWO',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30214,7 +30214,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FR',
+        'name': 'MONGOLIAN FREE VARIATION SELECTOR THREE', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FREE VARIATION SELECTOR THREE',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30242,7 +30242,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN VO', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN VO',
+        'name': 'MONGOLIAN VOWEL SEPARATOR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN VOWEL SEPARATOR',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30270,7 +30270,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MONGOLIAN FR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FR',
+        'name': 'MONGOLIAN FREE VARIATION SELECTOR FOUR', 'script': 'MONGOLIAN', 'concept': 'MONGOLIAN FREE VARIATION SELECTOR FOUR',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -30676,7 +30676,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TODO LONG VO', 'script': 'MONGOLIAN', 'concept': 'TODO LONG VO',
+        'name': 'TODO LONG VOWEL SIGN', 'script': 'MONGOLIAN', 'concept': 'TODO LONG VOWEL SIGN',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31142,7 +31142,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'CHA WITH TWO', 'script': 'MONGOLIAN', 'concept': 'CHA WITH TWO',
+        'name': 'CHA WITH TWO DOTS', 'script': 'MONGOLIAN', 'concept': 'CHA WITH TWO DOTS',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31152,7 +31152,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI ANU', 'script': 'MONGOLIAN', 'concept': 'ALI GALI ANU',
+        'name': 'ALI GALI ANUSVARA ONE', 'script': 'MONGOLIAN', 'concept': 'ALI GALI ANUSVARA ONE',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31162,7 +31162,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI VIS', 'script': 'MONGOLIAN', 'concept': 'ALI GALI VIS',
+        'name': 'ALI GALI VISARGA ONE', 'script': 'MONGOLIAN', 'concept': 'ALI GALI VISARGA ONE',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31172,7 +31172,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI DAM', 'script': 'MONGOLIAN', 'concept': 'ALI GALI DAM',
+        'name': 'ALI GALI DAMARU', 'script': 'MONGOLIAN', 'concept': 'ALI GALI DAMARU',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31182,7 +31182,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI UBA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI UBA',
+        'name': 'ALI GALI UBADAMA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI UBADAMA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31190,7 +31190,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI INV', 'script': 'MONGOLIAN', 'concept': 'ALI GALI INV',
+        'name': 'ALI GALI INVERTED UBADAMA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI INVERTED UBADAMA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31198,7 +31198,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI BAL', 'script': 'MONGOLIAN', 'concept': 'ALI GALI BAL',
+        'name': 'ALI GALI BALUDA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI BALUDA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31206,7 +31206,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI THR', 'script': 'MONGOLIAN', 'concept': 'ALI GALI THR',
+        'name': 'ALI GALI THREE BALUDA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI THREE BALUDA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31265,7 +31265,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI TTH', 'script': 'MONGOLIAN', 'concept': 'ALI GALI TTH',
+        'name': 'ALI GALI TTHA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI TTHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31358,7 +31358,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TODO ALI GAL', 'script': 'MONGOLIAN', 'concept': 'TODO ALI GAL',
+        'name': 'TODO ALI GALI TA', 'script': 'MONGOLIAN', 'concept': 'TODO ALI GALI TA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31367,7 +31367,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TODO ALI GAL', 'script': 'MONGOLIAN', 'concept': 'TODO ALI GAL',
+        'name': 'TODO ALI GALI ZHA', 'script': 'MONGOLIAN', 'concept': 'TODO ALI GALI ZHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31376,7 +31376,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI GHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI GHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31387,7 +31387,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI NGA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI NGA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31397,7 +31397,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI CA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI CA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31407,7 +31407,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI JHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI JHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31417,7 +31417,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI TTA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI TTA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31427,7 +31427,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI DDHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI DDHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31439,7 +31439,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI TA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI TA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31449,7 +31449,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI DHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI DHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31461,7 +31461,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI SSA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI SSA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31471,7 +31471,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI CYA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI CYA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31479,7 +31479,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI ZHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI ZHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31490,7 +31490,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI ZA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI ZA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31500,7 +31500,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI HAL', 'script': 'MONGOLIAN', 'concept': 'ALI GALI HAL',
+        'name': 'ALI GALI HALF U', 'script': 'MONGOLIAN', 'concept': 'ALI GALI HALF U',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31509,7 +31509,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI HAL', 'script': 'MONGOLIAN', 'concept': 'ALI GALI HAL',
+        'name': 'ALI GALI HALF YA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI HALF YA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31517,7 +31517,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI BHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI BHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31528,7 +31528,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ALI GALI DAG', 'script': 'MONGOLIAN', 'concept': 'ALI GALI DAG',
+        'name': 'ALI GALI DAGALGA', 'script': 'MONGOLIAN', 'concept': 'ALI GALI DAGALGA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31536,7 +31536,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MANCHU ALI G', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI G',
+        'name': 'MANCHU ALI GALI LHA', 'script': 'MONGOLIAN', 'concept': 'MANCHU ALI GALI LHA',
         'origin': 'UYGHUR ADAPTATION ~1204 AD',
         'ink': (30, 30, 30), 'paper': (220, 215, 200),
         'strokes': [
@@ -31695,7 +31695,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAGALOG VOWE', 'script': 'BAYBAYIN', 'concept': 'TAGALOG VOWE',
+        'name': 'TAGALOG VOWEL SIGN I', 'script': 'BAYBAYIN', 'concept': 'TAGALOG VOWEL SIGN I',
         'origin': 'BRAHMI DESCENDANT ~1300 AD',
         'ink': (80, 40, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -31703,7 +31703,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAGALOG VOWE', 'script': 'BAYBAYIN', 'concept': 'TAGALOG VOWE',
+        'name': 'TAGALOG VOWEL SIGN U', 'script': 'BAYBAYIN', 'concept': 'TAGALOG VOWEL SIGN U',
         'origin': 'BRAHMI DESCENDANT ~1300 AD',
         'ink': (80, 40, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -31711,7 +31711,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAGALOG SIGN', 'script': 'BAYBAYIN', 'concept': 'TAGALOG SIGN',
+        'name': 'TAGALOG SIGN VIRAMA', 'script': 'BAYBAYIN', 'concept': 'TAGALOG SIGN VIRAMA',
         'origin': 'BRAHMI DESCENDANT ~1300 AD',
         'ink': (80, 40, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -31719,7 +31719,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'TAGALOG SIGN', 'script': 'BAYBAYIN', 'concept': 'TAGALOG SIGN',
+        'name': 'TAGALOG SIGN PAMUDPOD', 'script': 'BAYBAYIN', 'concept': 'TAGALOG SIGN PAMUDPOD',
         'origin': 'BRAHMI DESCENDANT ~1300 AD',
         'ink': (80, 40, 20), 'paper': (220, 210, 185),
         'strokes': [
@@ -32985,7 +32985,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'AB TIMES GAN', 'script': 'CUNEIFORM', 'concept': 'AB TIMES GAN',
+        'name': 'AB TIMES GAN2 TENU', 'script': 'CUNEIFORM', 'concept': 'AB TIMES GAN2 TENU',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33024,7 +33024,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'ASH OVER ASH', 'script': 'CUNEIFORM', 'concept': 'ASH OVER ASH',
+        'name': 'ASH OVER ASH OVER ASH', 'script': 'CUNEIFORM', 'concept': 'ASH OVER ASH OVER ASH',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33198,7 +33198,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EN CROSSING ', 'script': 'CUNEIFORM', 'concept': 'EN CROSSING ',
+        'name': 'EN CROSSING EN', 'script': 'CUNEIFORM', 'concept': 'EN CROSSING EN',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33227,7 +33227,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EZEN TIMES A', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES A',
+        'name': 'EZEN TIMES AN', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES AN',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33236,7 +33236,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EZEN TIMES K', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES K',
+        'name': 'EZEN TIMES KASKAL SQUARED', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES KASKAL SQUARED',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33274,7 +33274,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'EZEN TIMES K', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES K',
+        'name': 'EZEN TIMES KU3', 'script': 'CUNEIFORM', 'concept': 'EZEN TIMES KU3',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33298,7 +33298,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES A ', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES A ',
+        'name': 'GA2 TIMES A PLUS DA PLUS HA', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES A PLUS DA PLUS HA',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33330,7 +33330,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES EN', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES EN',
+        'name': 'GA2 TIMES EN TIMES GAN2 TENU', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES EN TIMES GAN2 TENU',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33349,7 +33349,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES GI', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES GI',
+        'name': 'GA2 TIMES GI4', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES GI4',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33367,7 +33367,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES HU', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES HU',
+        'name': 'GA2 TIMES HUB2', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES HUB2',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33379,7 +33379,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES IG', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES IG',
+        'name': 'GA2 TIMES IGI GUNU', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES IGI GUNU',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33390,7 +33390,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GA2 TIMES NU', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES NU',
+        'name': 'GA2 TIMES NUN', 'script': 'CUNEIFORM', 'concept': 'GA2 TIMES NUN',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33467,7 +33467,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GISH TIMES B', 'script': 'CUNEIFORM', 'concept': 'GISH TIMES B',
+        'name': 'GISH TIMES BAD', 'script': 'CUNEIFORM', 'concept': 'GISH TIMES BAD',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33476,7 +33476,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'GISH TIMES T', 'script': 'CUNEIFORM', 'concept': 'GISH TIMES T',
+        'name': 'GISH TIMES TAK4', 'script': 'CUNEIFORM', 'concept': 'GISH TIMES TAK4',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33553,7 +33553,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'HUB2 TIMES L', 'script': 'CUNEIFORM', 'concept': 'HUB2 TIMES L',
+        'name': 'HUB2 TIMES LISH', 'script': 'CUNEIFORM', 'concept': 'HUB2 TIMES LISH',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33590,7 +33590,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'IM OPPOSING ', 'script': 'CUNEIFORM', 'concept': 'IM OPPOSING ',
+        'name': 'IM OPPOSING IM', 'script': 'CUNEIFORM', 'concept': 'IM OPPOSING IM',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33654,7 +33654,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KA TIMES GIR', 'script': 'CUNEIFORM', 'concept': 'KA TIMES GIR',
+        'name': 'KA TIMES GIR2', 'script': 'CUNEIFORM', 'concept': 'KA TIMES GIR2',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33673,7 +33673,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KA TIMES GIS', 'script': 'CUNEIFORM', 'concept': 'KA TIMES GIS',
+        'name': 'KA TIMES GISH CROSSING GISH', 'script': 'CUNEIFORM', 'concept': 'KA TIMES GISH CROSSING GISH',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33794,7 +33794,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'KASKAL OVER ', 'script': 'CUNEIFORM', 'concept': 'KASKAL OVER ',
+        'name': 'KASKAL OVER KASKAL LAGAB TIMES U OVER LAGAB TIMES U', 'script': 'CUNEIFORM', 'concept': 'KASKAL OVER KASKAL LAGAB TIMES U OVER LAGAB TIMES U',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33863,7 +33863,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB TIMES ', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES ',
+        'name': 'LAGAB TIMES GUD', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES GUD',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33873,7 +33873,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB TIMES ', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES ',
+        'name': 'LAGAB TIMES KUL', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES KUL',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33882,7 +33882,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB TIMES ', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES ',
+        'name': 'LAGAB TIMES LUL', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES LUL',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33893,7 +33893,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB TIMES ', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES ',
+        'name': 'LAGAB TIMES NE', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES NE',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33904,7 +33904,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB TIMES ', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES ',
+        'name': 'LAGAB TIMES SHITA PLUS GISH TENU', 'script': 'CUNEIFORM', 'concept': 'LAGAB TIMES SHITA PLUS GISH TENU',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33913,7 +33913,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LAGAB SQUARE', 'script': 'CUNEIFORM', 'concept': 'LAGAB SQUARE',
+        'name': 'LAGAB SQUARED', 'script': 'CUNEIFORM', 'concept': 'LAGAB SQUARED',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -33960,7 +33960,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LU2 TIMES SI', 'script': 'CUNEIFORM', 'concept': 'LU2 TIMES SI',
+        'name': 'LU2 TIMES SI PLUS ASH', 'script': 'CUNEIFORM', 'concept': 'LU2 TIMES SI PLUS ASH',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -34037,7 +34037,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MUSH TIMES K', 'script': 'CUNEIFORM', 'concept': 'MUSH TIMES K',
+        'name': 'MUSH TIMES KUR', 'script': 'CUNEIFORM', 'concept': 'MUSH TIMES KUR',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -34051,7 +34051,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'MUSH OVER MU', 'script': 'CUNEIFORM', 'concept': 'MUSH OVER MU',
+        'name': 'MUSH OVER MUSH', 'script': 'CUNEIFORM', 'concept': 'MUSH OVER MUSH',
         'origin': 'SUMER ~3400 BC',
         'ink': (50, 40, 30), 'paper': (180, 160, 130),
         'strokes': [
@@ -34807,7 +34807,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B018', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B018',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34816,7 +34816,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B019', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B019',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34826,7 +34826,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B022', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B022',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34835,7 +34835,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B034', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B034',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34845,7 +34845,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B047', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B047',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34857,7 +34857,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B049', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B049',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34868,7 +34868,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B056', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B056',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34880,7 +34880,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B063', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B063',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34891,7 +34891,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B064', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B064',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34903,7 +34903,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B079', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B079',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34918,7 +34918,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B082', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B082',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34928,7 +34928,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B083', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B083',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34938,7 +34938,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B086', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B086',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -34948,7 +34948,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B SYM', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYM',
+        'name': 'LINEAR B SYMBOL B089', 'script': 'LINEAR_B', 'concept': 'LINEAR B SYMBOL B089',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35011,7 +35011,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B105M STALLI', 'script': 'LINEAR_B', 'concept': 'B105M STALLI',
+        'name': 'B105M STALLION', 'script': 'LINEAR_B', 'concept': 'B105M STALLION',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35040,7 +35040,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B107F SHE-GO', 'script': 'LINEAR_B', 'concept': 'B107F SHE-GO',
+        'name': 'B107F SHE-GOAT', 'script': 'LINEAR_B', 'concept': 'B107F SHE-GOAT',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35050,7 +35050,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B107M HE-GOA', 'script': 'LINEAR_B', 'concept': 'B107M HE-GOA',
+        'name': 'B107M HE-GOAT', 'script': 'LINEAR_B', 'concept': 'B107M HE-GOAT',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35143,7 +35143,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B127 KAPO', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B127 KAPO',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35155,7 +35155,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B128 KANAKO', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B128 KANAKO',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35206,7 +35206,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B133 AREPA', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B133 AREPA',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35218,7 +35218,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B135 MERI', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B135 MERI',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35343,7 +35343,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B156 TURO2', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B156 TURO2',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35684,7 +35684,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B220 FOOTSTO', 'script': 'LINEAR_B', 'concept': 'B220 FOOTSTO',
+        'name': 'B220 FOOTSTOOL', 'script': 'LINEAR_B', 'concept': 'B220 FOOTSTOOL',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35763,7 +35763,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B240 WHEELED', 'script': 'LINEAR_B', 'concept': 'B240 WHEELED',
+        'name': 'B240 WHEELED CHARIOT', 'script': 'LINEAR_B', 'concept': 'B240 WHEELED CHARIOT',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35807,7 +35807,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'B242 CHARIOT', 'script': 'LINEAR_B', 'concept': 'B242 CHARIOT',
+        'name': 'B242 CHARIOT FRAME', 'script': 'LINEAR_B', 'concept': 'B242 CHARIOT FRAME',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -35854,7 +35854,7 @@ CHARACTERS = [
         ],
     },
     {
-        'name': 'LINEAR B MON', 'script': 'LINEAR_B', 'concept': 'LINEAR B MON',
+        'name': 'LINEAR B MONOGRAM B247 DIPTE', 'script': 'LINEAR_B', 'concept': 'LINEAR B MONOGRAM B247 DIPTE',
         'origin': 'MYCENAEAN GREECE ~1450 BC',
         'ink': (50, 40, 100), 'paper': (215, 210, 195),
         'strokes': [
@@ -37106,7 +37106,10 @@ class Scripts(Visual):
         """Draw text at y, scrolling horizontally if wider than display."""
         d = self.display
         tw = len(text) * CHAR_W
-        if tw <= DISPLAY_W:
+        # The static branch draws from x=2, so it only truly fits within
+        # DISPLAY_W when there's room for that left margin too (otherwise
+        # the last glyph's rightmost column is silently clipped off-screen).
+        if tw + 2 <= DISPLAY_W:
             d.draw_text_small(2, y, text, color)
         else:
             total = tw + SCROLL_PAD
@@ -37194,9 +37197,10 @@ class Scripts(Visual):
         origin = ch['origin']
         self._draw_scrolling(origin, 59, VERY_DIM)
 
-        # Character name at y=7
+        # Character name at y=7 (scrolls if too long, same pattern as the
+        # header/origin lines below)
         char_label = ch['name']
-        d.draw_text_small(2, 7, char_label, DIM_GRAY)
+        self._draw_scrolling(char_label, 7, DIM_GRAY)
 
         # Overlay on character change
         if self.overlay_timer > 0:

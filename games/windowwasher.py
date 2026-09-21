@@ -962,7 +962,7 @@ class WindowWasher(Game):
         time_bonus = int(max(0, self.timer) * 5)
         par_bonus = window_pts if self.timer >= self.par_time else 0
 
-        self.display.draw_text_small(2, 28, f"CLEAN:{window_pts}", Colors.WHITE)
+        self.display.draw_text_small(2, 28, f"CLEAN:+{window_pts}", Colors.WHITE)
         self.display.draw_text_small(2, 36, f"TIME:+{time_bonus}", Colors.YELLOW)
         if par_bonus > 0:
             self.display.draw_text_small(2, 44, f"PAR:+{par_bonus}", Colors.CYAN)

@@ -25,28 +25,28 @@ SCALES = [
     {
         'name': 'MAJOR',
         'family': 'Major & Minor',
-        'subtitle': 'IONIAN - HAPPY BRIGHT',
+        'subtitle': 'IONIAN BRIGHT',
         'intervals': [0, 2, 4, 5, 7, 9, 11],
         'pattern': 'W W H W W W H',
     },
     {
         'name': 'NAT MINOR',
         'family': 'Major & Minor',
-        'subtitle': 'AEOLIAN - SAD DARK',
+        'subtitle': 'AEOLIAN DARK',
         'intervals': [0, 2, 3, 5, 7, 8, 10],
         'pattern': 'W H W W H W W',
     },
     {
         'name': 'HARM MINOR',
         'family': 'Major & Minor',
-        'subtitle': 'RAISED 7TH - EXOTIC',
+        'subtitle': 'RAISED 7TH',
         'intervals': [0, 2, 3, 5, 7, 8, 11],
         'pattern': 'W H W W H WH H',
     },
     {
         'name': 'MEL MINOR',
         'family': 'Major & Minor',
-        'subtitle': 'ASCENDING - JAZZ',
+        'subtitle': 'ASCENDING JAZZ',
         'intervals': [0, 2, 3, 5, 7, 9, 11],
         'pattern': 'W H W W W W H',
     },
@@ -55,14 +55,14 @@ SCALES = [
     {
         'name': 'MAJ PENT',
         'family': 'Pentatonic & Blues',
-        'subtitle': 'COUNTRY FOLK HAPPY',
+        'subtitle': 'COUNTRY FOLK',
         'intervals': [0, 2, 4, 7, 9],
         'pattern': 'W W WH W WH',
     },
     {
         'name': 'MIN PENT',
         'family': 'Pentatonic & Blues',
-        'subtitle': 'ROCK BLUES UNIVERSAL',
+        'subtitle': 'ROCK BLUES',
         'intervals': [0, 3, 5, 7, 10],
         'pattern': 'WH W W WH W',
     },
@@ -85,7 +85,7 @@ SCALES = [
     {
         'name': 'PHRYGIAN',
         'family': 'Modes',
-        'subtitle': 'SPANISH FLAMENCO',
+        'subtitle': 'FLAMENCO',
         'intervals': [0, 1, 3, 5, 7, 8, 10],
         'pattern': 'H W W W H W W',
     },
@@ -106,7 +106,7 @@ SCALES = [
     {
         'name': 'LOCRIAN',
         'family': 'Modes',
-        'subtitle': 'DIMINISHED UNSTABLE',
+        'subtitle': 'DIMINISHED',
         'intervals': [0, 1, 3, 5, 6, 8, 10],
         'pattern': 'H W W H W W W',
     },
@@ -306,8 +306,8 @@ class Scales(Visual):
         # Subtitle / character description
         subtitle = scale.get('subtitle', '')
         if subtitle:
-            if len(subtitle) > 14:
-                subtitle = subtitle[:14]
+            if len(subtitle) > 15:
+                subtitle = subtitle[:15]
             d.draw_text_raw(2, 9, subtitle, _dim(color, 0.4))
 
         # Thin separator line
@@ -406,9 +406,10 @@ class Scales(Visual):
         pos_text = f'{self.scale_idx + 1}/{len(SCALES)}'
         d.draw_text_raw(2, 59, pos_text, TEXT_DIM)
 
-        # Display mode indicator on right
-        mode_label = MODE_NAMES[self.display_mode][:3]
-        d.draw_text_raw(44, 59, mode_label, TEXT_DIM)
+        # Display mode indicator on right (full word - shifted left to fit
+        # the longest name, "NUMBERS"/"DEGREES", within the 64px row)
+        mode_label = MODE_NAMES[self.display_mode]
+        d.draw_text_raw(34, 59, mode_label, TEXT_DIM)
 
 def _dim(color, factor):
     """Dim a color by a factor (0.0 to 1.0)."""

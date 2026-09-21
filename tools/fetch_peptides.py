@@ -454,6 +454,14 @@ def main():
         pdb_text = fetch_pdb(pdb_id)
         if pdb_text:
             raw_coords = extract_ca_coords(pdb_text, chain)
+            if len(raw_coords) > len(sequence):
+                # The visual colours one bead per sequence letter, so extra CA
+                # atoms crash it. Assumes the extras are C-terminal (VIP/2RRH
+                # carries the amidation-donor Gly); check any new case by hand.
+                print(f"  WARNING: {name}: PDB has {len(raw_coords)} CA atoms, "
+                      f"sequence has {len(sequence)} AA. Dropping the last "
+                      f"{len(raw_coords) - len(sequence)}.", file=sys.stderr)
+                raw_coords = raw_coords[:len(sequence)]
             if len(raw_coords) >= 3:
                 coords = center_and_normalize(raw_coords)
                 source = 'PDB'
@@ -488,6 +496,7 @@ def main():
             n_models = count_nmr_models(pdb_text)
             if n_models >= 3:
                 nmr_raw = extract_all_nmr_models(pdb_text, chain, max_models=6)
+                nmr_raw = [m[:len(sequence)] for m in nmr_raw]
                 if len(nmr_raw) >= 2 and len(nmr_raw[0]) == len(coords):
                     # Align all models to model 1 (already centered)
                     ref = nmr_raw[0]

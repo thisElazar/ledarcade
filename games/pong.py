@@ -298,11 +298,11 @@ class Pong(Game):
     def draw_game_over(self):
         """Custom game over for Pong."""
         self.display.clear(Colors.BLACK)
-        
+
         if self.state == GameState.WIN:
             self.display.draw_text_small(12, 20, "YOU WIN!", Colors.GREEN)
         else:
             self.display.draw_text_small(12, 20, "YOU LOSE", Colors.RED)
-        
+
         self.display.draw_text_small(8, 35, f"FINAL:{self.score}-{self.ai_score}", Colors.WHITE)
         self.display.draw_text_small(4, 50, "BTN:RETRY", Colors.GRAY)

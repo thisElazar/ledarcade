@@ -7,10 +7,10 @@ until it fills the box evenly. Entropy climbs. That is the second law.
 But the rules the particles follow are *exactly reversible* (an HPP
 lattice gas: particles hop one pixel per tick, head-on pairs scatter
 sideways, everything else passes through - all in integer arithmetic).
-Press Action and every velocity flips: the haze un-mixes, pixel by
-pixel, back against the wall it came from, and the entropy meter
-falls. Nothing about the rules prefers "mixed" - there are simply
-astronomically more mixed arrangements than packed ones, so mixed is
+Let it run and every velocity reverses on its own: the haze
+un-mixes, pixel by pixel, back against the wall it came from, and the
+entropy meter falls. Nothing about the rules prefers "mixed" - there are
+simply astronomically more mixed arrangements than packed ones, so mixed is
 where a system spends its time.
 
 The meter is *coarse-grained* entropy: the box is divided into blocks,
@@ -93,10 +93,10 @@ class Entropy(Visual):
     category = "math"
     GUIDE = {
         'desc': 'A gas spreads from one wall until it fills the box - entropy '
-                'climbs. Press Action and every velocity reverses: the gas '
-                'un-mixes back to where it started. The rules never changed; '
-                'there are just vastly more mixed arrangements than ordered '
-                'ones.',
+                'climbs. Let it run and every velocity reverses on its own: '
+                'the gas un-mixes back to where it started. '
+                'The rules never changed; there are just vastly more mixed '
+                'arrangements than ordered ones.',
         'credit': 'Ludwig Boltzmann, 1877 / Claude Shannon, 1948',
         'controls': {
             'Action': 'Cycle particle colour',

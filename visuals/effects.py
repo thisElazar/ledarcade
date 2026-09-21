@@ -90,8 +90,14 @@ class Effects(Visual):
             else:
                 self.display.draw_rect(box_x, y + 1, 5, 5, Colors.DARK_GRAY, filled=False)
 
-            # Transition name (truncate if needed)
-            name = t.name[:10]
+            # Transition name: show in full when it fits in the row (up to 13
+            # chars at this x); otherwise fall back to just the first word,
+            # which is unique across every entry in TRANSITION_TYPES.
+            full_name = t.name
+            if len(full_name) <= 13:
+                name = full_name
+            else:
+                name = full_name.split(' ')[0]
             text_color = Colors.WHITE if is_selected else Colors.GRAY
             self.display.draw_text_small(10, y + 1, name, text_color)
 

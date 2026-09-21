@@ -186,6 +186,8 @@ class TuringMachine(Visual):
         # Overlay
         self.overlay_timer = 0.0
         self.overlay_text = ""
+        self.overlay_desc = ""
+        self._desc_scroll_x = 0.0
 
         # Halt state
         self.halted = False
@@ -275,9 +277,12 @@ class TuringMachine(Visual):
         self._record_history()
         return True
 
-    def _show_overlay(self, text):
+    def _show_overlay(self, text, desc=None):
         self.overlay_text = text
-        self.overlay_timer = 1.5
+        self.overlay_desc = desc or ""
+        # Give descriptions extra time on screen since the long ones scroll.
+        self.overlay_timer = 3.0 if desc else 1.5
+        self._desc_scroll_x = 0.0
 
     def handle_input(self, input_state) -> bool:
         consumed = False
@@ -288,14 +293,16 @@ class TuringMachine(Visual):
             self._load_program()
             self.paused = False
             self.speed = SPEED_DEFAULT
-            self._show_overlay(PROGRAMS[self.program_index][0])
+            self._show_overlay(PROGRAMS[self.program_index][0],
+                               PROGRAMS[self.program_index][1])
             consumed = True
         elif input_state.down_pressed:
             self.program_index = (self.program_index + 1) % len(PROGRAMS)
             self._load_program()
             self.paused = False
             self.speed = SPEED_DEFAULT
-            self._show_overlay(PROGRAMS[self.program_index][0])
+            self._show_overlay(PROGRAMS[self.program_index][0],
+                               PROGRAMS[self.program_index][1])
             consumed = True
 
         # Left/Right: speed (also unpauses)
@@ -327,7 +334,8 @@ class TuringMachine(Visual):
                 self.program_index = (self.program_index + 1) % len(PROGRAMS)
                 self._load_program()
                 self.paused = False
-                self._show_overlay(PROGRAMS[self.program_index][0])
+                self._show_overlay(PROGRAMS[self.program_index][0],
+                                   PROGRAMS[self.program_index][1])
             elif self.paused:
                 # Single step
                 self._step()
@@ -345,6 +353,13 @@ class TuringMachine(Visual):
         # Overlay fade
         if self.overlay_timer > 0:
             self.overlay_timer = max(0, self.overlay_timer - dt)
+            if self.overlay_desc:
+                desc_px = len(self.overlay_desc) * 4
+                if desc_px > 60:
+                    self._desc_scroll_x += dt * 16
+                    total = desc_px + 20
+                    if self._desc_scroll_x >= total:
+                        self._desc_scroll_x -= total
 
         # Halt auto-advance
         if self.halted:
@@ -352,7 +367,8 @@ class TuringMachine(Visual):
             if self.halt_timer > 4.0:
                 self.program_index = (self.program_index + 1) % len(PROGRAMS)
                 self._load_program()
-                self._show_overlay(PROGRAMS[self.program_index][0])
+                self._show_overlay(PROGRAMS[self.program_index][0],
+                                   PROGRAMS[self.program_index][1])
             return
 
         if self.paused:
@@ -431,6 +447,17 @@ class TuringMachine(Visual):
             alpha = min(1.0, self.overlay_timer / 0.5)
             oc = int(220 * alpha)
             d.draw_text_small(2, 28, self.overlay_text, (oc, oc, oc))
+            if self.overlay_desc:
+                dc = int(160 * alpha)
+                desc = self.overlay_desc
+                desc_px = len(desc) * 4
+                if desc_px <= 60:
+                    dx = max(2, (GRID_SIZE - desc_px) // 2)
+                    d.draw_text_small(dx, 34, desc, (dc, dc, dc))
+                else:
+                    total = desc_px + 20
+                    sx = int(self._desc_scroll_x) % total
+                    d.draw_text_clipped(2 - sx, 34, desc, (dc, dc, dc), 2, 62)
 
     def _draw_transition_table(self, d):
         """Draw the state transition rules, highlighting the active one.

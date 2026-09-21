@@ -119,8 +119,12 @@ class FroggerDemo(Visual):
             # Check turtles (only if not diving)
             for turtle in game.turtles:
                 if turtle['row'] == row and not turtle['diving']:
-                    # Also check if turtle might dive soon
-                    if turtle['dive_timer'] < 0.5:
+                    # Also check if turtle might dive soon (mirrors the
+                    # game's deterministic dive clock: 6s up, 1s warning,
+                    # 2s under, per-turtle phase offset)
+                    dive_t = (game.dive_clock + turtle['dive_phase']) % 9.0
+                    time_until_dive = 7.0 - dive_t
+                    if time_until_dive < 0.5:
                         continue  # About to dive, not safe
                     future_x = turtle['x'] + turtle['speed'] * look_ahead_time
                     turtle_left = future_x - 2

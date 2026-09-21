@@ -1139,7 +1139,7 @@ def _get_char_name(codepoint):
             if name.startswith(prefix):
                 name = name[len(prefix):]
                 break
-        return name.upper()[:12]  # Cap length
+        return name.upper()  # no length cap: scripts.py scrolls long names
     except ValueError:
         return f'U+{codepoint:04X}'
 
