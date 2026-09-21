@@ -411,8 +411,9 @@ def render_states(cls, a, out):
     """Carousel slides from one visual at several states: for each | group in
     --states, build a fresh instance, apply the group (see _apply_state), run
     --skip seconds, then save one 4:5 PNG — or, if --out ends in .mp4, record
-    --seconds of 4:5 video. A param_overlay_timer, if present, is re-armed so
-    the panel labels its own state."""
+    --seconds of 4:5 video. A param_overlay_timer or overlay_timer, if present,
+    is re-armed so the panel labels its own state. (Visuals that keep the label
+    in overlay_text only have one after a key press, not after attr=value.)"""
     from arcade import Display
     display = Display()
     dt = 1.0 / a.fps
@@ -423,8 +424,9 @@ def render_states(cls, a, out):
         vis = cls(display)
         _apply_state(vis, spec)
         _warm(vis, a.skip, dt)
-        if hasattr(vis, "param_overlay_timer"):
-            vis.param_overlay_timer = 2.0
+        for timer in ("param_overlay_timer", "overlay_timer"):
+            if hasattr(vis, timer):
+                setattr(vis, timer, 2.0)
         fn = f"{base}_{k}.mp4" if video else f"{base}_{k}.png"
         ff = _open_ffmpeg(fn, a.fps, comp.w, comp.h, not a.no_glow, (comp.px, comp.py))
         for _ in range(int(a.seconds * a.fps) if video else 1):
@@ -527,7 +529,8 @@ def main():
     elif a.name:
         cls = _find(a.name)
         if a.label:
-            a.title = catalog_label(cls, a.paper)
+            # stills and states are always the paper page, --paper or not
+            a.title = catalog_label(cls, a.paper or bool(a.stills or a.states))
         if a.stills or a.states:
             out = a.out or f"{cls.__name__.lower()}_slide.png"
             (render_states if a.states else render_stills)(cls, a, out)
