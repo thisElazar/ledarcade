@@ -227,8 +227,9 @@ class HardwareDisplay:
         self._color_lut = None         # (lut_r, lut_g, lut_b) or None
         self._epilepsy_guard = None    # EpilepsyGuard instance or None
 
-        # Live mirror for run_mirror.py on a laptop; off until set_mirror()
+        # Live mirror for run_mirror.py on a laptop, and HDMI output; off until set_mirror()
         self._mirror = None
+        self._hdmi = None
 
     @staticmethod
     def _build_lut(gamma, toe):
@@ -255,17 +256,24 @@ class HardwareDisplay:
         else:
             self._epilepsy_guard = None
 
-    def set_mirror(self, enabled, port):
-        """Open, move or close the live mirror tap (mirror.py). Takes effect at once."""
+    def set_mirror(self, enabled, port, hdmi=False):
+        """Open, move or close the live mirror tap and HDMI output (mirror.py).
+        Takes effect at once."""
+        if self._hdmi is not None:
+            self._hdmi.close()
+            self._hdmi = None
         if self._mirror is not None:
             self._mirror.close()
             self._mirror = None
-        if enabled:
+        if enabled or hdmi:
+            from mirror import MirrorTap, HdmiOutput
             try:
-                from mirror import MirrorTap
-                self._mirror = MirrorTap(port)
+                # HDMI alone needs no network: serve only the cabinet itself
+                self._mirror = MirrorTap(port, "" if enabled else "127.0.0.1")
             except OSError:
-                pass   # port taken: the panel runs without the mirror
+                return   # port taken: the panel runs without the mirror
+            if hdmi:
+                self._hdmi = HdmiOutput(port)
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
@@ -395,6 +403,8 @@ class HardwareDisplay:
         # Mirror the logical frame (before gamma, which is for the LEDs only)
         if self._mirror is not None:
             self._mirror.send(fb)
+        if self._hdmi is not None:
+            self._hdmi.poll()
 
         if HAS_PIL:
             # Bulk transfer: PIL Image from bytearray, single C call to matrix

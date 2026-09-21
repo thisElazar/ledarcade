@@ -6622,10 +6622,10 @@
      "name": "MIRROR",
      "cls": "Mirror",
      "module": "visuals/mirror.py",
-     "desc": "Lets a computer on the same network show what the panel is showing, live. Off until you switch it on here; the port can be changed if another device already uses it.",
+     "desc": "Shows what the panel is showing somewhere bigger, live: on a computer on the same network, or on a TV plugged into the HDMI port. Both are off until you switch them on here; the network port can be changed if another device already uses it.",
      "controls": {
       "Up/Down": "Navigate between options",
-      "Left/Right": "Toggle the mirror",
+      "Left/Right": "Toggle MIRROR or HDMI",
       "Button": "On PORT: edit the number; elsewhere: accept and return to menu"
      }
     },

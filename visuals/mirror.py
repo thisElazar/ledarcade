@@ -2,11 +2,12 @@
 Mirror - Live Display Mirror Settings
 =====================================
 Switches the live mirror (mirror.py) on or off and sets its network port, so
-run_mirror.py on a laptop can show what the panel is showing.
+run_mirror.py on a laptop can show what the panel is showing; and switches
+HDMI output, the same picture on a screen plugged into the Pi.
 
 Controls:
   Up/Down    - Navigate between options
-  Left/Right - Toggle the mirror
+  Left/Right - Toggle MIRROR or HDMI
   Button     - On PORT: edit the number; elsewhere: accept and return to menu
 
 Editing the port:
@@ -21,10 +22,10 @@ from mirror import PORT_RANGE
 
 class Mirror(Visual):
     name = "MIRROR"
-    description = "Watch the panel on a laptop"
+    description = "Watch the panel on a bigger screen"
     category = "utility"
     GUIDE = {
-        'desc': 'Lets a computer on the same network show what the panel is showing, live. Off until you switch it on here; the port can be changed if another device already uses it.',
+        'desc': 'Shows what the panel is showing somewhere bigger, live: on a computer on the same network, or on a TV plugged into the HDMI port. Both are off until you switch them on here; the network port can be changed if another device already uses it.',
     }
 
     def __init__(self, display: Display):
@@ -35,7 +36,8 @@ class Mirror(Visual):
         import settings as persistent
         self.enabled = persistent.get_mirror_enabled()
         self.port = persistent.get_mirror_port()
-        self.cursor = 0       # 0=mirror on/off, 1=port
+        self.hdmi = persistent.get_mirror_hdmi()
+        self.cursor = 0       # 0=mirror on/off, 1=port, 2=hdmi on/off
         self.digits = None    # the port's five digits while it is being edited
         self.digit = 0
 
@@ -44,15 +46,16 @@ class Mirror(Visual):
         import settings as persistent
         persistent.set_mirror_enabled(self.enabled)
         persistent.set_mirror_port(self.port)
+        persistent.set_mirror_hdmi(self.hdmi)
         if hasattr(self.display, 'set_mirror'):
-            self.display.set_mirror(self.enabled, self.port)
+            self.display.set_mirror(self.enabled, self.port, self.hdmi)
 
     def handle_input(self, input_state) -> bool:
         if self.digits is not None:
             return self._edit_port(input_state)
 
         if input_state.up_pressed or input_state.down_pressed:
-            self.cursor = 1 - self.cursor
+            self.cursor = (self.cursor + (1 if input_state.down_pressed else -1)) % 3
             return True
 
         if input_state.action_l or input_state.action_r:
@@ -63,8 +66,11 @@ class Mirror(Visual):
                 self.wants_exit = True
             return True
 
-        if (input_state.left_pressed or input_state.right_pressed) and self.cursor == 0:
-            self.enabled = not self.enabled
+        if (input_state.left_pressed or input_state.right_pressed) and self.cursor != 1:
+            if self.cursor == 0:
+                self.enabled = not self.enabled
+            else:
+                self.hdmi = not self.hdmi
             self._apply()
             return True
 
@@ -98,22 +104,22 @@ class Mirror(Visual):
         d.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
 
         editing = self.digits is not None
-        for i, (y, label) in enumerate(((14, "MIRROR"), (26, "PORT"))):
+        for i, (y, label) in enumerate(((14, "MIRROR"), (24, "PORT"), (34, "HDMI"))):
             selected = (i == self.cursor)
             if selected:
                 d.draw_text_small(2, y, ">", Colors.YELLOW)
             d.draw_text_small(8, y, label, Colors.WHITE if selected else Colors.GRAY)
 
-        d.draw_text_small(42, 14, "ON" if self.enabled else "OFF",
-                          Colors.GREEN if self.enabled else Colors.RED)
+        for y, on in ((14, self.enabled), (34, self.hdmi)):
+            d.draw_text_small(42, y, "ON" if on else "OFF", Colors.GREEN if on else Colors.RED)
 
         if editing:
-            d.draw_text_small(42, 26, "".join(map(str, self.digits)), Colors.YELLOW)
+            d.draw_text_small(42, 24, "".join(map(str, self.digits)), Colors.YELLOW)
             x = 42 + self.digit * 4
-            d.draw_line(x, 32, x + 2, 32, Colors.WHITE)
-            d.draw_text_small(2, 40, f"{PORT_RANGE[0]}-{PORT_RANGE[1]}", Colors.GRAY)
+            d.draw_line(x, 30, x + 2, 30, Colors.WHITE)
+            d.draw_text_small(2, 44, f"{PORT_RANGE[0]}-{PORT_RANGE[1]}", Colors.GRAY)
         else:
-            d.draw_text_small(42, 26, str(self.port),
+            d.draw_text_small(42, 24, str(self.port),
                               Colors.WHITE if self.cursor == 1 else Colors.GRAY)
 
         d.draw_line(0, 52, 63, 52, Colors.DARK_GRAY)

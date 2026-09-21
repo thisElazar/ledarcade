@@ -32,6 +32,7 @@ DEFAULTS = {
     "max_brightness_pct": 100,
     "mirror_enabled": False,
     "mirror_port": MIRROR_PORT,
+    "mirror_hdmi": False,
 }
 
 # In-memory settings cache
@@ -243,3 +244,13 @@ def get_mirror_port():
 def set_mirror_port(value):
     """Set the mirror's UDP port (1024-32767)."""
     set("mirror_port", max(PORT_RANGE[0], min(PORT_RANGE[1], int(value))))
+
+
+def get_mirror_hdmi():
+    """Get whether the panel is shown on a screen plugged into HDMI (bool)."""
+    return bool(get("mirror_hdmi", False))
+
+
+def set_mirror_hdmi(value):
+    """Set whether the panel is shown on a screen plugged into HDMI (bool)."""
+    set("mirror_hdmi", bool(value))

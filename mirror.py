@@ -14,9 +14,16 @@ once. With nobody watching, the cost is one non-blocking recvfrom per frame.
 
 UDP on purpose: a slow or vanished viewer can never stall the render loop, and
 a lost frame is simply skipped.
+
+HDMI output is one more viewer: HdmiOutput keeps run_hdmi.py running on the
+cabinet itself while a screen is plugged into the Pi.
 """
 
+import glob
+import os
 import socket
+import subprocess
+import sys
 import time
 
 MIRROR_PORT = 30203          # "WONDE", each letter turned until it is a digit; a palindrome, like a mirror
@@ -29,12 +36,13 @@ MAX_VIEWERS = 4        # each one costs the cabinet's Wi-Fi about 3 Mbit/s
 class MirrorTap:
     """Cabinet side: hand each rendered framebuffer to send()."""
 
-    def __init__(self, port=MIRROR_PORT):
+    def __init__(self, port=MIRROR_PORT, host=""):
+        """host "" serves the network; "127.0.0.1" only the cabinet's own HDMI output."""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # A frame is 12 KB; macOS refuses datagrams over 9 KB by default
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 65536)
-        self.sock.bind(("", port))
+        self.sock.bind((host, port))
         self.sock.setblocking(False)
         self.viewers = {}   # address -> time of its last hello
 
@@ -58,3 +66,48 @@ class MirrorTap:
                 self.sock.sendto(fb, addr)
             except OSError:
                 pass   # send buffer full or network down: drop the frame
+
+
+class HdmiOutput:
+    """Cabinet side: run_hdmi.py runs while a screen is plugged into the Pi."""
+
+    SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "run_hdmi.py")
+
+    def __init__(self, port):
+        self.port = port
+        self.proc = None
+        self.started = self.checked = 0.0
+        self.failures = 0
+
+    def poll(self):
+        """Call every frame; looks at the HDMI connector every two seconds."""
+        now = time.monotonic()
+        if now - self.checked < 2.0:
+            return
+        self.checked = now
+
+        plugged = False
+        for path in glob.glob("/sys/class/drm/card*-HDMI-A-*/status"):
+            with open(path) as f:
+                plugged = plugged or f.read().strip() == "connected"
+
+        if self.proc is not None and self.proc.poll() is not None:
+            # It quit on its own. Starting Python costs the game a second of CPU,
+            # so a viewer that keeps dying at once (no GPU, say) is given up on.
+            self.failures = self.failures + 1 if now - self.started < 10.0 else 0
+            self.proc = None
+        if plugged and self.proc is None and self.failures < 3:
+            # stdin is the viewer's lifeline: it exits when our end closes,
+            # which also covers a crash and the re-exec after UPDATE
+            self.proc = subprocess.Popen(
+                [sys.executable, self.SCRIPT, "--port", str(self.port), "--cabinet"],
+                stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
+            self.started = now
+        elif not plugged:
+            self.close()
+            self.failures = 0
+
+    def close(self):
+        if self.proc is not None:
+            self.proc.stdin.close()
+            self.proc = None
