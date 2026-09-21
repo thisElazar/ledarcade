@@ -3459,7 +3459,7 @@
      "name": "ASTROIDS",
      "cls": "AsteroidsDemo",
      "module": "visuals/asteroidsdemo.py",
-     "desc": "Asteroids plays itself using simple AI for idle screen demos. The AI navigates, shoots asteroids, and dodges threats. AI Strategy: - Find nearest asteroid (or UFO if present) - Rotate ship toward target - Thrust to approach (but not too close) - Shoot when aimed at target - Dodge when threats are very close",
+     "desc": "Asteroids plays itself using simple AI for idle screen demos. The AI navigates, shoots asteroids, and dodges threats. AI Strategy: - Hold position like a turret: drifting through a 64-pixel field is what kills - A rock is a threat only if its path crosses the ship; shoot the one that arrives soonest, leading the shot - With nothing incoming, shoot the UFO, then whichever rock is quickest to hit - If something cannot be shot in time, thrust out of its path; if even that is too late, hyperspace",
      "controls": {},
      "stub": true
     },
@@ -3571,7 +3571,7 @@
      "name": "FLAPPY",
      "cls": "FlappyDemo",
      "module": "visuals/flappydemo.py",
-     "desc": "Flappy plays itself by timing flaps to navigate through pipe gaps. AI Strategy: - Look at the next pipe gap - Flap when bird is below the gap center and falling - Account for gravity and upward velocity from flaps",
+     "desc": "Flappy plays itself by timing flaps to navigate through pipe gaps. AI Strategy: - Rule of thumb: flap when below the next gap's center and falling - Before trusting it, fly the bird's own physics ahead through the next pipes; if the rule's choice crashes and the other does not, take the other. (A gap lower than the last one has to be set up before the last pipe ends.)",
      "controls": {},
      "stub": true
     },
@@ -3579,7 +3579,7 @@
      "name": "FROGGY",
      "cls": "FroggerDemo",
      "module": "visuals/froggerdemo.py",
-     "desc": "Frogger plays itself using AI for idle screen demos. The AI navigates through traffic and across water platforms. AI Strategy: - Check safety of forward moves (avoid cars, land on platforms) - Look ahead to predict object positions - Prefer moving up when safe, dodge sideways when needed - Target unfilled home slots",
+     "desc": "Frogger plays itself using AI for idle screen demos. The AI navigates through traffic and across water platforms. AI Strategy: - Everything in the game moves in a straight line, so where it will be is known - Decide only at the moment a hop can happen; take a hop only if the frog survives the whole time it must sit there AND has a safe hop after that - Prefer up, then toward an open home, then waiting, then anything that lives",
      "controls": {},
      "stub": true
     },
@@ -3779,7 +3779,7 @@
      "name": "STICK RUNNER",
      "cls": "StickRunnerDemo",
      "module": "visuals/stickrunnerdemo.py",
-     "desc": "Stick Runner plays itself by timing jumps to cross rooftop gaps. AI Strategy: - Look ahead for gaps between buildings - Calculate when to jump based on gap distance and scroll speed - Account for building height differences (jump earlier for higher targets) - Use the game's physics to estimate jump distance",
+     "desc": "Stick Runner plays itself by timing jumps to cross rooftop gaps. AI Strategy: - The rooftops ahead are already built, so the only choice is when to jump - Each frame a jump is possible, run the runner's own physics forward both ways (jump now / wait) and jump once that is safe and waiting no longer is",
      "controls": {},
      "stub": true
     },
