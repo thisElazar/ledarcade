@@ -561,6 +561,7 @@ def main():
         epilepsy_safe=persistent.get_epilepsy_safe(),
         max_brightness_pct=persistent.get_max_brightness_pct(),
     )
+    display.set_mirror(persistent.get_mirror_enabled(), persistent.get_mirror_port())
 
     print("Initializing input...")
     input_handler = HardwareInput(use_gpio=True)

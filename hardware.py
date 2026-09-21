@@ -227,12 +227,8 @@ class HardwareDisplay:
         self._color_lut = None         # (lut_r, lut_g, lut_b) or None
         self._epilepsy_guard = None    # EpilepsyGuard instance or None
 
-        # Live mirror for run_mirror.py on a laptop; the panel runs without it
-        try:
-            from mirror import MirrorTap
-            self._mirror = MirrorTap()
-        except OSError:
-            self._mirror = None
+        # Live mirror for run_mirror.py on a laptop; off until set_mirror()
+        self._mirror = None
 
     @staticmethod
     def _build_lut(gamma, toe):
@@ -258,6 +254,18 @@ class HardwareDisplay:
                 self._epilepsy_guard = EpilepsyGuard(fps=30)
         else:
             self._epilepsy_guard = None
+
+    def set_mirror(self, enabled, port):
+        """Open, move or close the live mirror tap (mirror.py). Takes effect at once."""
+        if self._mirror is not None:
+            self._mirror.close()
+            self._mirror = None
+        if enabled:
+            try:
+                from mirror import MirrorTap
+                self._mirror = MirrorTap(port)
+            except OSError:
+                pass   # port taken: the panel runs without the mirror
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""

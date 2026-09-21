@@ -48,7 +48,7 @@ GRID = arcade.GRID_SIZE
 
 # Display methods that exist only to drive one platform's output device, so the
 # other layers legitimately lack them.
-PLATFORM_ONLY = {"set_safety", "set_gamma", "render"}
+PLATFORM_ONLY = {"set_safety", "set_gamma", "set_mirror", "render"}
 
 
 def _drawing_api(cls):

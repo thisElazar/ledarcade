@@ -9,6 +9,7 @@ cabinet.
     python run_mirror.py                  # cabinet at arcade.local
     python run_mirror.py 192.168.1.42
     python run_mirror.py --delay 0.4      # deeper buffer for rough Wi-Fi; 0 = none
+    python run_mirror.py --port 6464      # if the cabinet's MIRROR menu sets another port
 
 The window resizes, staying square; full screen centres the panel. ESC or closing it quits. See mirror.py for the protocol.
 """
@@ -64,8 +65,8 @@ def fit(display, side):
     return side
 
 
-def main(host="arcade.local", delay=0.2):
-    addr = (socket.gethostbyname(host), MIRROR_PORT)
+def main(host="arcade.local", delay=0.2, port=MIRROR_PORT):
+    addr = (socket.gethostbyname(host), port)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
 
@@ -133,5 +134,7 @@ if __name__ == "__main__":
     ap.add_argument("host", nargs="?", default="arcade.local")
     ap.add_argument("--delay", type=float, default=0.2,
                     help="seconds of playback buffer (default 0.2; 0 shows frames as they arrive)")
+    ap.add_argument("--port", type=int, default=MIRROR_PORT,
+                    help=f"the cabinet's MIRROR port (default {MIRROR_PORT})")
     args = ap.parse_args()
-    main(args.host, args.delay)
+    main(args.host, args.delay, args.port)

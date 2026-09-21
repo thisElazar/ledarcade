@@ -9,6 +9,7 @@ import os
 import json
 
 from atomic_io import write_json_atomic
+from mirror import MIRROR_PORT, PORT_RANGE
 
 # Settings file location (same directory as this script)
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,6 +30,8 @@ DEFAULTS = {
     "epilepsy_safe": False,
     "colorblind_mode": "none",  # "none", "protanopia", "deuteranopia", "tritanopia"
     "max_brightness_pct": 100,
+    "mirror_enabled": False,
+    "mirror_port": MIRROR_PORT,
 }
 
 # In-memory settings cache
@@ -220,3 +223,23 @@ def set_max_brightness_pct(value):
     """Set max brightness percentage (10-100)."""
     value = max(10, min(100, int(value)))
     set("max_brightness_pct", value)
+
+
+def get_mirror_enabled():
+    """Get whether the live display mirror (mirror.py) is on (bool)."""
+    return bool(get("mirror_enabled", False))
+
+
+def set_mirror_enabled(value):
+    """Set whether the live display mirror is on (bool)."""
+    set("mirror_enabled", bool(value))
+
+
+def get_mirror_port():
+    """Get the mirror's UDP port (1024-32767)."""
+    return max(PORT_RANGE[0], min(PORT_RANGE[1], int(get("mirror_port", MIRROR_PORT))))
+
+
+def set_mirror_port(value):
+    """Set the mirror's UDP port (1024-32767)."""
+    set("mirror_port", max(PORT_RANGE[0], min(PORT_RANGE[1], int(value))))

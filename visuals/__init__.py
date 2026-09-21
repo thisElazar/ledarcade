@@ -137,6 +137,7 @@ from .sandpile import Sandpile
 from .percolation import Percolation
 from .settings import Settings
 from .safety import Safety
+from .mirror import Mirror
 from .gamma import Gamma
 from .timers import Timers
 from .effects import Effects
@@ -421,6 +422,7 @@ ALL_VISUALS = [
     Percolation,
     Settings,
     Safety,
+    Mirror,
     Gamma,
     Timers,
     Effects,
@@ -764,6 +766,7 @@ __all__ = [
     'Percolation',
     'Settings',
     'Safety',
+    'Mirror',
     'Gamma',
     'Timers',
     'TestPattern',

@@ -5,7 +5,9 @@ Watch the cabinet's panel live in a window on a laptop:
 
     python run_mirror.py             # on the laptop; cabinet at arcade.local
 
-The viewer sends a small hello datagram to MIRROR_PORT once a second. While
+Off until it is switched on in the cabinet's MIRROR menu, which also sets the port.
+
+The viewer sends a small hello datagram to MIRROR_PORT a few times a second. While
 hellos keep arriving, the cabinet answers every rendered frame with one
 datagram holding the 64x64 RGB framebuffer. With nobody watching, the cost is
 one non-blocking recvfrom per frame.
@@ -17,7 +19,8 @@ a lost frame is simply skipped.
 import socket
 import time
 
-MIRROR_PORT = 6464
+MIRROR_PORT = 30203          # "WONDE", each letter turned until it is a digit; a palindrome, like a mirror
+PORT_RANGE = (1024, 32767)   # above the system ports, below the ones Linux hands out itself
 HELLO = b"WCMIRROR"
 VIEWER_TIMEOUT = 3.0   # seconds without a hello before the cabinet stops sending
 
@@ -34,6 +37,9 @@ class MirrorTap:
         self.sock.setblocking(False)
         self.viewer = None
         self.seen = 0.0
+
+    def close(self):
+        self.sock.close()
 
     def send(self, fb):
         try:
