@@ -227,6 +227,13 @@ class HardwareDisplay:
         self._color_lut = None         # (lut_r, lut_g, lut_b) or None
         self._epilepsy_guard = None    # EpilepsyGuard instance or None
 
+        # Live mirror for run_mirror.py on a laptop; the panel runs without it
+        try:
+            from mirror import MirrorTap
+            self._mirror = MirrorTap()
+        except OSError:
+            self._mirror = None
+
     @staticmethod
     def _build_lut(gamma, toe):
         """Build gamma lookup table with toe lift."""
@@ -374,7 +381,12 @@ class HardwareDisplay:
             corrected = fb.translate(self._gamma_lut)
         else:
             # Fast path: gamma only
-            corrected = self._fb.translate(self._gamma_lut)
+            fb = self._fb
+            corrected = fb.translate(self._gamma_lut)
+
+        # Mirror the logical frame (before gamma, which is for the LEDs only)
+        if self._mirror is not None:
+            self._mirror.send(fb)
 
         if HAS_PIL:
             # Bulk transfer: PIL Image from bytearray, single C call to matrix
