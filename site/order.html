@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Order · Wonder Cabinet</title>
-<meta name="description" content="Order a Wonder Cabinet. Custom made to order in hickory and birch.">
+<meta name="description" content="Order a Wonder Cabinet. Custom made to order in natural wood.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -55,11 +55,11 @@ form { border: 1px solid var(--rule); }
     <div class="sec-head" style="justify-content:center"><h2>Order</h2></div>
 
     <div class="tiers">
-      <div class="tier"><h3>Standard</h3><span class="price num">$495</span><p>Natural hickory. Your choice of stick and button colour.</p></div>
-      <div class="tier"><h3>Custom</h3><span class="price num">$595</span><p>Stained or painted from the menu of finishes.</p></div>
-      <div class="tier"><h3>Full Custom</h3><span class="price num">By discussion</span><p>Your colours, logos, and artwork throughout.</p></div>
-      <div class="terms">STANDARD: BUY OUTRIGHT · CUSTOM: $100 REFUNDABLE DEPOSIT HOLDS A BUILD SLOT<br>MADE TO ORDER · 4–6 WEEKS</div>
-      <div class="terms deposit"><a class="btn primary" data-goatcounter-click="buy-standard" href="https://buy.stripe.com/5kQ8wQ92r3RM0mx0CN63K01">Buy Standard — $495 →</a><a class="btn" data-goatcounter-click="deposit-button" href="https://buy.stripe.com/6oUdRa7Yn2NIedn1GR63K00">Hold a Custom slot — $100 →</a><br>OR SEND AN INQUIRY BELOW TO TALK FIRST</div>
+      <div class="tier"><h3>Standard</h3><span class="price num">$495</span><p>Natural wood. Your choice of stick and button colour.</p></div>
+      <div class="tier"><h3>Premium</h3><span class="price num">$595</span><p>One colour, stained or painted, matte or glossy. Your choice of stick and button colour.</p></div>
+      <div class="tier"><h3>Custom</h3><span class="price num">By discussion</span><p>Your colours, logos, and artwork throughout.</p></div>
+      <div class="terms">STANDARD AND PREMIUM: BUY OUTRIGHT · CUSTOM: $100 REFUNDABLE DEPOSIT HOLDS A BUILD SLOT<br>MADE TO ORDER · 4–6 WEEKS</div>
+      <div class="terms deposit"><a class="btn primary" data-goatcounter-click="buy-standard" href="https://buy.stripe.com/5kQ8wQ92r3RM0mx0CN63K01">Buy Standard — $495 →</a><a class="btn primary" data-goatcounter-click="buy-premium" href="https://buy.stripe.com/14A3cw2E3fAub1b5X763K02">Buy Premium — $595 →</a><a class="btn" data-goatcounter-click="deposit-button" href="https://buy.stripe.com/6oUdRa7Yn2NIedn1GR63K00">Hold a Custom slot — $100 →</a><br>OR SEND AN INQUIRY BELOW TO TALK FIRST</div>
     </div>
 
     <form action="submit-order.php" method="POST">
@@ -69,9 +69,9 @@ form { border: 1px solid var(--rule); }
       <div class="field"><label for="finish">Finish</label>
         <select id="finish" name="finish">
           <optgroup label="Standard · $495">
-            <option value="Natural">Natural hickory</option>
+            <option value="Natural">Natural wood</option>
           </optgroup>
-          <optgroup label="Custom · $595">
+          <optgroup label="Premium · $595">
             <option value="Walnut">Walnut stain</option>
             <option value="Ebony">Ebony stain</option>
             <option value="Cherry">Cherry stain</option>
@@ -81,8 +81,8 @@ form { border: 1px solid var(--rule); }
             <option value="Navy Blue">Navy blue paint</option>
             <option value="Forest Green">Forest green paint</option>
           </optgroup>
-          <optgroup label="Full Custom · by discussion">
-            <option value="Full Custom">Full custom</option>
+          <optgroup label="Custom · by discussion">
+            <option value="Custom">Custom</option>
           </optgroup>
         </select>
       </div>
@@ -111,7 +111,7 @@ form { border: 1px solid var(--rule); }
 </section>
 
 <script>
-// Sheen applies to stains and paints, not natural hickory.
+// Sheen applies to stains and paints, not natural wood.
 const finishEl = document.getElementById('finish'), sheenField = document.getElementById('sheenField');
 function syncSheen() { sheenField.hidden = finishEl.value === 'Natural'; }
 finishEl.addEventListener('change', syncSheen); syncSheen();
