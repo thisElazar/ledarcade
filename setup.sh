@@ -15,23 +15,10 @@ echo ""
 
 # --- Install systemd services ---
 
-cat > /etc/systemd/system/led-arcade.service <<EOF
-[Unit]
-Description=LED Arcade
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$REPO_DIR
-ExecStart=$REPO_DIR/start.sh
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# Install the unit from the repo (single source of truth — carries the
+# StartLimit* crash-loop guard), substituting this cabinet's repo path.
+sed "s#/home/thiselazar/led-arcade#$REPO_DIR#g" "$REPO_DIR/led-arcade.service" \
+    > /etc/systemd/system/led-arcade.service
 
 echo "Installed led-arcade.service"
 
