@@ -97,7 +97,10 @@ def main(host="arcade.local", delay=0.2, port=MIRROR_PORT):
         # trickle keeps the Pi's Wi-Fi out of power save. At one a second its
         # radio dozes, the send queue backs up, and 30 fps arrives as 8.
         if now - last_hello > 0.2:
-            sock.sendto(HELLO, addr)
+            try:
+                sock.sendto(HELLO, addr)
+            except OSError:
+                pass   # network down (laptop asleep, Wi-Fi dropped): keep waiting
             last_hello = now
 
         try:

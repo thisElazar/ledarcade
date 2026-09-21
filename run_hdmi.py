@@ -104,7 +104,10 @@ def main(host, port, window, cabinet):
 
         now = time.monotonic()
         if now - last_hello > 0.2:
-            sock.sendto(HELLO, addr)
+            try:
+                sock.sendto(HELLO, addr)
+            except OSError:
+                pass   # network down (laptop asleep, Wi-Fi dropped): keep waiting
             last_hello = now
 
         # Wait for a frame, then skip to the newest one waiting
