@@ -7,7 +7,7 @@ name: CI
 # stays a manual check on the dev cabinet.
 on:
   push:
-    branches: [main, stable]
+    branches: [main]
     # Also gate release tags: a `v*` tag is the deploy pointer for the fleet,
     # so verify the tagged commit is green before cabinets pull it.
     tags: ['v*']
