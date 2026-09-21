@@ -307,7 +307,7 @@ OBSTACLE_NAMES = [
     'circle', 'square', 'wedge',
     'airfoil', 'diamond', 'plate',
     'arrow', 'cross', 'elbow',
-    'tesla',
+    'tesla', 'tesla rev',
 ]
 
 
@@ -363,6 +363,10 @@ def _make_obstacle(shape_idx):
         # Hook 2: horizontal shelf at vane tip, extends right
         h2 = (np.abs(_JJ - 34) <= 1.5) & (_II >= 48) & (_II <= 56)
         obs[1:N+1, 1:N+1] = walls | v1 | h1 | v2 | h2
+    elif shape == 'tesla rev':
+        # The same valve installed backwards: the flow meets the hooks first
+        fwd = _make_obstacle(OBSTACLE_NAMES.index('tesla'))
+        obs[1:N+1, 1:N+1] = fwd[1:N+1, 1:N+1][::-1]
     return obs
 
 
@@ -1121,6 +1125,9 @@ def _make_obstacle_at(shape_idx, ox, oy):
     dy = _JJ - oy
 
     shape = OBSTACLE_NAMES[shape_idx % len(OBSTACLE_NAMES)]
+    if shape == 'tesla rev':   # the same valve installed backwards
+        dx = -dx
+        shape = 'tesla'
     if shape == 'circle':
         obs[1:N+1, 1:N+1] = (dx * dx + dy * dy) <= 12  # r~3.5
     elif shape == 'square':
@@ -1166,7 +1173,7 @@ class FluidSculpt(Visual):
             'VEL + palette name': 'Colour shows how fast the fluid is moving; the second word is the colour palette in use.',
             'DIR + palette name': 'Colour shows which way the fluid is flowing, brightness how fast.',
             'VORT + palette name': 'Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise.',
-            'TESLA': 'The Tesla-valve obstacle shape — one of ten shapes you can cycle through with both buttons.',
+            'TESLA': 'The Tesla-valve shape, one of eleven cycled with both buttons. TESLA REV is the same valve installed backwards.',
         },
     }
 

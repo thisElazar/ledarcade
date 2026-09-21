@@ -5569,7 +5569,7 @@
       "VEL + palette name": "Colour shows how fast the fluid is moving; the second word is the colour palette in use.",
       "DIR + palette name": "Colour shows which way the fluid is flowing, brightness how fast.",
       "VORT + palette name": "Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise.",
-      "TESLA": "The Tesla-valve obstacle shape \u2014 one of ten shapes you can cycle through with both buttons."
+      "TESLA": "The Tesla-valve shape, one of eleven cycled with both buttons. TESLA REV is the same valve installed backwards."
      },
      "controls": {
       "Up/Down": "Cycle color palette / viz mode",
