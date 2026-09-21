@@ -172,6 +172,9 @@ class LatinGrooves(Visual):
     category = "music"
     GUIDE = {
         'desc': 'Latin dance rhythms animated as layered percussion parts. Salsa, samba, bossa nova, cumbia, and more — each groove broken into its component instruments.',
+        'legend': {
+            'BPM': 'Tempo of the current groove in beats per minute.',
+        },
     }
 
     PAD_COLS = 16

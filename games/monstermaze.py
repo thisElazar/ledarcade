@@ -195,6 +195,12 @@ class MonsterMaze(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Escape a T-Rex stalking you through a first-person 3D maze. Based on one of the earliest survival horror games.',
+        'how': "Find the exit before the Rex finds you. Reaching the exit scores 100 points times your level plus a bonus for taking fewer steps, then drops you into a new maze where the Rex starts closer and moves faster. Getting caught ends the game.",
+        'legend': {
+            'L#': "Current maze level.",
+            'N, E, S, W': "Compass direction you are currently facing.",
+            'S:#': "Your score so far.",
+        },
     }
 
     STEP_COOLDOWN = 0.2

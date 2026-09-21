@@ -22,6 +22,16 @@ class RushHour(Game):
     category = "toys"
     GUIDE = {
         'desc': 'Slide cars and trucks on a grid to free the red car through the exit. Vehicles only move along their length. Puzzles range from easy to very hard.',
+        'how': "Steer the marked car out through the exit by sliding vehicles along their length. Your move count and the best (fewest) moves recorded for that level are tracked, and beating it earns a new best. Solving a puzzle unlocks the next level in that difficulty tier; there is no timer or lives.",
+        'legend': {
+            'RUSH HR': "The game's name, short for Rush Hour.",
+            'L#': 'Puzzle level number within the chosen difficulty.',
+            'M:#': 'Moves made so far on this puzzle.',
+            'B:#': 'Best (fewest) move count recorded for this level.',
+            'X': 'The car you must steer out the exit.',
+            'NEXT LVL': 'Shown after solving a puzzle when more levels remain in this difficulty.',
+            'vehicle letter B-O': "Each other vehicle's own identifying letter; the letters carry no size, direction, or order meaning.",
+        },
     }
 
     # Board is 6x6, exit is on right side at row 2 (0-indexed)

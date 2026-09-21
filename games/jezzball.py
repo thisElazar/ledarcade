@@ -69,6 +69,13 @@ class JezzBall(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Trap bouncing balls by building walls. Claim 75% of the area to advance. Don’t let a ball hit a wall while it’s forming.',
+        'how': "Build walls to trap the bouncing atoms; wall off 75% or more of the area to clear a level, with bonus points for extra fill. A wall hit while forming costs 2 lives, and an atom hitting your unshielded cursor costs 1. Running out of lives ends the game.",
+        'legend': {
+            'L#': 'Current level number.',
+            'H/V': 'Cursor is set to build a horizontal (H) or vertical (V) wall.',
+            'far-right number': "Seconds left on your starting shield, which absorbs atom hits; it briefly returns after an unshielded hit.",
+            '#%': 'Percentage of the play area walled off so far; reach 75% to clear the level.',
+        },
     }
 
     def __init__(self, display: Display):

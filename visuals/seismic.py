@@ -348,6 +348,11 @@ class Seismic(Visual):
     category = "science_macro"
     GUIDE = {
         'desc': 'Seismic wave propagation through layered earth. P-waves compress, S-waves shear, surface waves roll. Wavefronts refract at layer boundaries following Snell’s law.',
+        'legend': {
+            'P': 'P-wave (primary wave) - fast, compressive, arrives first.',
+            'S': 'S-wave (secondary wave) - slower, shear motion, blocked by liquid core.',
+            'PcP': 'P-wave reflecting off outer core boundary.',
+        },
     }
 
     # Source positions: angles around the crust (in radians)

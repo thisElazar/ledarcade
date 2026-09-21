@@ -226,6 +226,14 @@ class DrumRudiments(Visual):
             'Left/Right': 'Adjust tempo (BPM)',
             'Button': 'Play / pause',
         },
+        'legend': {
+            'R': 'Right-hand stroke.',
+            'L': 'Left-hand stroke.',
+            'PAS #': 'This rudiment\'s official number in the PAS 40 International Drum Rudiments.',
+            '#/#': 'Current rudiment\'s position out of the 40 total rudiments.',
+            'II': 'Playback is paused.',
+            'Tempo #': 'Sticking pattern tempo in beats per minute.',
+        },
     }
 
     # Auto-scroll: initial delay before repeat, then repeat interval

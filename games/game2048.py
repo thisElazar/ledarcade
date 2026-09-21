@@ -18,6 +18,10 @@ class Game2048(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Slide numbered tiles on a 4×4 grid. Matching tiles merge and double. Reach the 2048 tile to win. Game ends when the board fills with no moves left.',
+        'how': 'Reaching the 2048 tile counts as a win, but the run keeps going so you can merge for a higher score. Each merge adds the new tile\'s value to your score, and the run only ends when the board fills up with no merges left to make.',
+        'legend': {
+            'top-left number': 'Running score - the total of every tile merge so far.',
+        },
     }
 
     # Grid layout - sized to fit 64x64 with HUD

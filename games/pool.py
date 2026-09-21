@@ -100,7 +100,8 @@ class Pool(Game):
     description = "Billiards with Video Hustler scoring"
     category = "bar"
     GUIDE = {
-        'desc': '8-ball billiards. Aim with the joystick, set power, and shoot. Pocket all your balls (stripes or solids) then sink the 8-ball to win.',
+        'desc': 'Six-ball points pool: Video Hustler scoring with Side Pocket aiming. Aim with the joystick, set power, and shoot. Play alone for a high score on limited shots, or take turns with a second player.',
+        'how': 'Each of the 6 numbered balls scores 10 times its number, doubled in a side pocket. One-player mode starts with 10 shots, gains one back per ball potted, and loses one for scratching; clearing the table adds 200 points, 5 more shots, and a re-rack. Two-player mode has no shot limit - turns alternate on a miss or scratch, ending when the table clears, with the higher score winning.',
     }
 
     def __init__(self, display: Display):

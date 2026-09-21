@@ -45,6 +45,9 @@ class BML(Visual):
     GUIDE = {
         'desc': 'The BML traffic model. Cars move east or north on alternating steps. Below a critical density, traffic flows. Above it, the system jams completely. A phase transition you can see.',
         'credit': 'Biham, Middleton & Levine, 1992',
+        'legend': {
+            'D#': 'Traffic density: fraction of intersections occupied by cars.',
+        },
     }
 
     # Roadway greys are split by axis rather than dashed: the eastbound

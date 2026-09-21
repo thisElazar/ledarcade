@@ -22,6 +22,10 @@
      "cls": "Asteroids",
      "module": "games/asteroids.py",
      "desc": "Rotate and thrust your ship, shoot asteroids that split large-medium-small \u2014 the small ones score the most (20/50/100). Down triggers hyperspace: a random teleport with a death risk that grows with rock count. Extra ship every 10,000 points. Screen wraps. Inspired by the 1979 vector arcade classic.",
+     "how": "You start with 3 ships; losing all of them ends the game. A saucer periodically drifts across the screen and fires at you, adding danger beyond the asteroids themselves.",
+     "legend": {
+      "top-left number": "Your score."
+     },
      "controls": {
       "Left/Right": "Rotate ship",
       "Up": "Thrust forward",
@@ -34,6 +38,13 @@
      "cls": "Bomberman",
      "module": "games/bomberman.py",
      "desc": "Place bombs on a grid to destroy walls and enemies. Bombs turn solid once you step off them - you can wall yourself in. Collect power-ups for range, speed, and extra bombs, but blasting a revealed power-up or the exit destroys it and spawns angry reinforcements. Clear all enemies to open the exit, and beat the 200-second timer or a swarm of fast chasers floods the level.",
+     "how": "Destroying a brick scores 10 points, defeating an enemy scores 100, and picking up a power-up scores 50. You start with 3 lives, shown as dots in the HUD; losing all three ends the game. Reaching the exit after every enemy is gone advances the level and banks a bonus of 500 times the new level number.",
+     "legend": {
+      "top-left number": "Your score. It rises as you destroy bricks, collect power-ups, and defeat enemies.",
+      "number left of L#": "Seconds left in the level; turns red under 30 seconds, and running it out unleashes a swarm of fast enemies.",
+      "L#": "The current level number.",
+      "B#": "Bombs you can still place at once, out of your current bomb capacity."
+     },
      "controls": {
       "Arrow Keys": "Move",
       "Space": "Place bomb"
@@ -44,6 +55,7 @@
      "cls": "Breakout",
      "module": "games/breakout.py",
      "desc": "Move a paddle to bounce a ball into rows of bricks. Clear all bricks to win. Ball speeds up; paddle shrinks after hitting the ceiling.",
+     "how": "You get 3 lives; missing the ball costs one and the run ends when they run out. Yellow bricks earn 1 point, green 3, orange 5, and red 7, with the ball moving fastest once it reaches the orange and red rows. Clear every brick across both screens to win, for a maximum possible score of 896.",
      "controls": {
       "Left/Right": "Move paddle",
       "Space": "Launch ball"
@@ -54,6 +66,12 @@
      "cls": "BurgerTime",
      "module": "games/burgertime.py",
      "desc": "Walk across burger ingredients to drop them down platforms \u2014 each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.",
+     "how": "You start with 3 lives and 5 peppers. Dropping an ingredient scores 50 points per floor it falls, and catching an enemy under it multiplies that score. Clearing every burger on a level scores extra points and moves you to the next level; losing all 3 lives ends the game.",
+     "legend": {
+      "top-left number": "Your score.",
+      "L#": "Current level number.",
+      "P#": "Peppers left \u2014 throw one with the action button to stun an enemy."
+     },
      "controls": {
       "Arrow Keys": "Move (4-way on platforms/ladders)",
       "Space": "Throw pepper (limited supply)"
@@ -64,6 +82,7 @@
      "cls": "Centipede",
      "module": "games/centipede.py",
      "desc": "Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Scorpions poison mushrooms \u2014 a segment that touches one dives straight down at you. Spiders score more the closer you shoot them (300/600/900). Losing a life repairs the field at +5 a mushroom. Extra life every 12,000. Clear the wave to advance.",
+     "how": "Destroying a mushroom outright earns 1 point, shooting a centipede head is worth 100 and a body segment 10, a scorpion is worth 1000, and a flea (which takes two hits and speeds up after the first) is worth 200. You start with 3 lives, and the run ends when the last one is gone.",
      "controls": {
       "Arrow Keys": "Move (full movement in lower area)",
       "Space": "Fire"
@@ -74,6 +93,7 @@
      "cls": "Defender",
      "module": "games/defender.py",
      "desc": "Side-scrolling shooter. Shoot aliens and rescue falling humanoids: catch one and fly low to set it down for bonus points. Lose every humanoid and the planet is destroyed. Baiters hunt you if a wave drags on; every 5th wave restores the planet. Extra ship and smart bomb every 10000 points. Radar shows the full map. Hold both buttons for a smart bomb.",
+     "how": "Catching a falling human as it drops earns 500 points, and killing enemies pays out per type: landers, mutants, and swarmers 150, baiters 200, bombers 250, and pods 1000. You start with 3 lives and 3 smart bombs, and the run ends once your last life is lost.",
      "controls": {
       "Left/Right": "Thrust + set facing direction",
       "Up/Down": "Vertical movement",
@@ -86,6 +106,7 @@
      "cls": "DigDug",
      "module": "games/digdug.py",
      "desc": "Dig tunnels underground and inflate enemies with your pump until they pop \u2014 each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; Fygars pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.",
+     "how": "You start with 3 lives, and the run ends once they are gone. Clearing all enemies on a level sends you deeper, where fire-breathing Fygars attack more often and their flames reach farther, and each new level packs in more enemies and more rocks to work with.",
      "controls": {
       "Arrow Keys": "Move/Dig",
       "Space": "Pump (hold to inflate enemies)"
@@ -96,6 +117,7 @@
      "cls": "Frogger",
      "module": "games/frogger.py",
      "desc": "Cross five lanes of traffic, then hop across logs and turtles to reach home. Points come only from new forward progress; turtles dive on a fixed rhythm (they dim just before going under). Flies in home slots are bonus food, crocodile heads are death. Carry the purple lady frog home for extra points, and mind the snake on the median from level 3.",
+     "how": "You start with 3 lives and a 30-second timer per frog; reaching a new row earns 10 points, clearing the halfway safe zone adds 50, and every frog you get home pays 50 plus 20 for each second left on the clock. Filling all five home slots scores 1000 and advances the level, while running out of time or lives ends the game.",
      "controls": {
       "Arrow Keys": "Hop one cell in direction"
      }
@@ -105,6 +127,7 @@
      "cls": "Galaga",
      "module": "games/galaga.py",
      "desc": "Fixed-position shooter. Enemies swoop in along entrance arcs, form up, then dive \u2014 and dodged divers loop back into formation. Bosses take two hits and can trap your ship in a tractor beam; shoot the captor while it dives to free the ship and fight as a dual fighter. Every 4th level from level 3 is a no-fire bonus challenge stage.",
+     "how": "You get 3 lives, and getting hit costs one and drops any dual-ship bonus, ending the run at zero. Enemies pay more shot mid-dive than sitting in formation: bees 50 in formation versus 100 diving, butterflies 80 versus 160, bosses 150 versus 400. Wiping out a whole entrance flight adds 1000, and a flawless bonus stage pays 10000.",
      "controls": {
       "Left/Right": "Move ship",
       "Space": "Fire"
@@ -115,6 +138,10 @@
      "cls": "LodeRunner",
      "module": "games/loderunner.py",
      "desc": "Collect all gold on each level, then escape to the top. Dig holes to trap guards \u2014 they can pick up gold and carry it. Endless procedurally generated levels that get harder as you go.",
+     "how": "Each gold piece you collect scores 250 points, and once every piece on the level is collected an escape ladder opens; reaching it scores a 500-point bonus and starts a new level. You have 3 lives, and a guard catching you costs one; the run ends when your last life is gone.",
+     "legend": {
+      "G:#": "Gold pieces still left to collect on this level."
+     },
      "controls": {
       "Arrow Keys": "Move (Left/Right/Climb)",
       "Space": "Dig (in direction you're facing)"
@@ -125,6 +152,7 @@
      "cls": "Invaders",
      "module": "games/invaders.py",
      "desc": "Shoot rows of aliens before they reach the bottom. One shot on screen at a time; the rack marches faster as it thins, and invaders grind through your shields. Saucer bonus depends on how many shots you have fired. Inspired by the 1978 classic.",
+     "how": "You start with 3 lives, and losing your last one, or letting the invaders reach the bottom row, ends the game. Killing a top-row invader pays 50 points, dropping 10 per row down to 20 for the bottom row.",
      "controls": {
       "Left/Right": "Move ship",
       "Space": "Fire"
@@ -135,6 +163,15 @@
      "cls": "LunarLander",
      "module": "games/lunarlander.py",
      "desc": "Fly attempt after attempt on one shared fuel tank. Left button is a gentle low burn, right button a full burn. Soft-land upright on a pad for full points and a fuel payout (harder pads pay more); land hard for half points. Crashes score nothing and drain 30 fuel from the tank \u2014 the game ends when the tank runs dry. The view zooms 2x for the final approach.",
+     "how": "Soft landings pay 50 points times the pad's multiplier (1x, 2x, or 5x for smaller pads); hard landings pay half that. Landing always refuels the tank by 50 fuel times the multiplier, while crashing drains a flat 30 fuel with no refund. There are no separate lives \u2014 only that one shared fuel tank keeps you flying.",
+     "legend": {
+      "L#": "The level (difficulty round) you are descending on.",
+      "top-right number": "Your total score, the sum of every landing bonus earned so far.",
+      "v / ^": "Vertical speed marker: v means you're falling, ^ means you're rising. Green means your speed is safe to land on, red means it isn't.",
+      "< / >": "Tilt marker: shows which way the lander is leaning, and turns red once tilted too far to land safely.",
+      "+#": "Points awarded for the landing you just made.",
+      "NEXT:LV#": "The level you'll fly next after this landing."
+     },
      "controls": {
       "Left/Right": "Rotate lander",
       "Left button": "Low burn",
@@ -146,6 +183,11 @@
      "cls": "DonkeyKong",
      "module": "games/donkeykong.py",
      "desc": "Climb platforms, jump over barrels, and beat the bonus timer to the top. Barrels steer down ladders toward you, a fireball prowls the girders, and the hammer smashes both \u2014 but you can\u2019t jump or climb while holding it. Even levels are rivet boards: run over all 8 rivets to drop DK.",
+     "how": "You start with 3 lives; the bonus timer begins at 4,000-8,000 depending on level and reaching zero costs a life, same as a barrel or the fireball. Reaching the top banks whatever bonus remains, plus 500 points per level on a rivet board. Losing your last life ends the game.",
+     "legend": {
+      "top-left number": "Player's score.",
+      "top-right number": "Countdown bonus timer; reaching zero costs a life. Whatever remains when you reach the top is banked as score."
+     },
      "controls": {
       "Arrow Keys": "Move (Left/Right), Climb (Up/Down)",
       "Space": "Jump"
@@ -156,6 +198,7 @@
      "cls": "MsPacMan",
      "module": "games/mspacman.py",
      "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.",
+     "how": "Power pellets turn the ghosts frightened and edible for a few seconds; eating one scores 200, and each ghost eaten during the same pellet doubles that value up to 1600. Regular dots are worth 10 each, and fruit pays 100 up to 5000 depending on type. You start with 3 lives, and touching a ghost that is not frightened costs one, ending the run at zero.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)"
      }
@@ -165,6 +208,14 @@
      "cls": "NightDriver",
      "module": "games/nightdriver.py",
      "desc": "A 90-second timed run inspired by one of the earliest first-person driving games: only white posts and oncoming headlights pierce the dark. Pick NOVICE, PRO, or EXPERT - each is a fixed curve script, not random. Shift up through 4 gears to build speed; the road visibly swings in turns and drifting off it costs a 2-second stall. Score is distance; 4000 earns +15 seconds. The run ends only at 0:00.",
+     "how": "The 4000-distance bonus is awarded only once per run, not every time you cross it again. Each gear raises the top speed you can reach, from 30 up to 120 in top gear, so shifting up is needed to keep accelerating.",
+     "legend": {
+      "top-left number": "Distance traveled so far - this is your score.",
+      "top-center number": "Seconds left in the 90-second run; turns red under 10 seconds and flashes green when bonus time is awarded.",
+      "number left of gear": "Current speed, in game units.",
+      "G#": "Current gear (1-4); shifting up raises your speed cap.",
+      "DIST:#": "Total distance traveled, shown briefly on the game-over screen."
+     },
      "controls": {
       "Left/Right": "Steer (and choose course before start)",
       "Up/Down": "Shift gear (1-4)",
@@ -176,6 +227,7 @@
      "cls": "PacMan",
      "module": "games/pacman.py",
      "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.",
+     "how": "Every dot is worth 10 points and a power pellet is worth 50. Eating a frightened ghost scores 200 points, doubling with each ghost eaten during the same power pellet. You start with 3 lives, losing one when a ghost catches you outside frightened mode; losing your last life ends the game. Clearing all dots advances the level, refilling the maze and speeding up the ghosts.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)"
      }
@@ -184,7 +236,11 @@
      "name": "PING",
      "cls": "Pong",
      "module": "games/pong.py",
-     "desc": "Two paddles, one ball. First to 11 wins. The simplest game that\u2019s still fun.",
+     "desc": "Two paddles, one ball. First to 11 wins. A true classic.",
+     "how": "The AI gets faster and more accurate as your score climbs, making points harder to win as the match goes on. The ball also speeds up after the 4th and 12th hit of a rally, and where it strikes your paddle sets the angle it bounces off at.",
+     "legend": {
+      "FINAL:#-#": "Final score when the match ends: your points first, then the AI's."
+     },
      "controls": {
       "Up/Down": "Move paddle",
       "Space": "Start game / Restart"
@@ -195,6 +251,12 @@
      "cls": "QBert",
      "module": "games/qbert.py",
      "desc": "Hop on cubes in an isometric pyramid to change their colors \u2014 later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.",
+     "how": "Changing a cube's color scores 25 points, riding an escape disc scores 50, and catching the green ball scores 100 and freezes every enemy. Clearing the whole pyramid scores 1000 plus 250 per level and starts a new, harder one. You start with 3 lives, and the run ends when a fall or an enemy costs you your last one.",
+     "legend": {
+      "L#": "Current level - the pyramid round you are on.",
+      "curse-bubble symbols": "Comic-strip curse symbols shown beside Q*bert during the pause after he dies.",
+      "top-left number": "Your score, climbing with every cube colored, disc ride, green ball catch, and finished pyramid."
+     },
      "controls": {
       "Arrow Keys": "Hop diagonally (Up=up-right, Right=down-right, Down=down-left, Left=up-left)"
      }
@@ -204,6 +266,10 @@
      "cls": "Snake",
      "module": "games/snake.py",
      "desc": "Eat food, grow longer, don\u2019t hit yourself or the walls. One of the most widely played games ever made.",
+     "how": "You start 3 segments long; each food eaten grows the snake by one segment and speeds the game up slightly, down to a minimum. Hitting a wall or your own body ends the run.",
+     "legend": {
+      "LEN:#": "Your snake's current length, in segments."
+     },
      "controls": {
       "Arrow Keys": "Change direction"
      }
@@ -213,6 +279,13 @@
      "cls": "Tetris",
      "module": "games/tetris.py",
      "desc": "Stack falling tetrominoes, clear complete lines. NES-style speed curve: gravity ramps up with every level. Left button rotates, right button hard-drops.",
+     "how": "Fill a horizontal row completely to clear it. Clearing 1, 2, 3, or 4 lines at once scores 100, 300, 500, or 800 points times your current level, and every 10 lines cleared raises the level. The game ends when a new piece has nowhere to spawn.",
+     "legend": {
+      "SC": "Your score.",
+      "LV": "Current level - pieces fall faster and score more as it rises.",
+      "LN": "Total lines you have completed and cleared.",
+      "NX": "Preview of the next piece."
+     },
      "controls": {
       "Left/Right": "Move piece",
       "Up": "Rotate CW",
@@ -238,6 +311,10 @@
      "cls": "Arkanoid",
      "module": "games/arkanoid.py",
      "desc": "Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, catch, extra lives. Power-ups last until you catch the next capsule or lose the ball. Clear all the bricks to advance through the levels.",
+     "how": "Clear every breakable brick to advance a level; each brick scores 50 to 120 points depending on its color. You start with 3 lives, lose one whenever your last ball drops, and earn a bonus life at 20,000 points and every 60,000 points after that. Running out of lives ends the game.",
+     "legend": {
+      "E/L/S/M/P/C": "Falling capsule: E=wider paddle, L=laser, S=slower ball, M=splits into 3 balls, P=extra life, C=catch (sticks, fire releases)."
+     },
      "controls": {
       "Left/Right": "Move paddle (Vaus)",
       "Space": "Launch ball / Fire laser"
@@ -248,6 +325,11 @@
      "cls": "DnD",
      "module": "games/dnd.py",
      "desc": "Explore rooms, fight monsters, collect treasure. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.",
+     "how": "You start with 3 hearts and 10 arrows; losing all your hearts ends the run. Arrows score points when they kill a monster \u2014 25 for a rat, up to 200 for a dragon \u2014 but spiders steal arrows instead of hurting you, and blobs can't be hurt by arrows at all. The exit ladder stays locked until you defeat the level's boss.",
+     "legend": {
+      "A#": "Arrows left in your quiver; you can't fire when it hits zero.",
+      "D#": "How many levels deep into the dungeon you have descended."
+     },
      "controls": {
       "Arrow Keys": "Move through dungeon",
       "Space": "Shoot arrow in facing direction"
@@ -258,6 +340,13 @@
      "cls": "Indy500",
      "module": "games/indy500.py",
      "desc": "Head-to-head racing against a drone car - first to 4 laps wins the track. Beat the drone on all 6 tracks for victory; if it finishes first, the race is over. Walls and bumping the drone send cars spinning, the steering snaps to 16 rotary detents on release, and the final ice track has barely any grip.",
+     "how": "Your score is the total laps you've completed across every track you've already won, shown as LAPS:# on the end screen. Winning all 6 tracks scores a full victory; losing any track ends the run there, with the track number shown.",
+     "legend": {
+      "T#": "The track you are racing, out of 6 tracks total.",
+      "P#/#": "Your laps completed out of the 4 needed to win the track.",
+      "D#/#": "The drone opponent's laps completed out of the 4 needed to win the track.",
+      "TRK:#/6": "The track you were on when the drone beat you to 4 laps."
+     },
      "controls": {
       "Left/Right": "Steer",
       "Space": "Gas"
@@ -268,6 +357,13 @@
      "cls": "JezzBall",
      "module": "games/jezzball.py",
      "desc": "Trap bouncing balls by building walls. Claim 75% of the area to advance. Don\u2019t let a ball hit a wall while it\u2019s forming.",
+     "how": "Build walls to trap the bouncing atoms; wall off 75% or more of the area to clear a level, with bonus points for extra fill. A wall hit while forming costs 2 lives, and an atom hitting your unshielded cursor costs 1. Running out of lives ends the game.",
+     "legend": {
+      "L#": "Current level number.",
+      "H/V": "Cursor is set to build a horizontal (H) or vertical (V) wall.",
+      "far-right number": "Seconds left on your starting shield, which absorbs atom hits; it briefly returns after an unshielded hit.",
+      "#%": "Percentage of the play area walled off so far; reach 75% to clear the level."
+     },
      "controls": {
       "Arrow Keys": "Move cursor and set wall direction",
       "Space": "Build wall in current direction"
@@ -278,6 +374,12 @@
      "cls": "PipeDream",
      "module": "games/pipedream.py",
      "desc": "Place pipe segments before the water arrives. Keep the flow going as long as you can - every pipe the water passes through scores.",
+     "how": "Lay pipe pieces from the queue before the water starts flowing, then keep the path going. Each pipe the flow fills scores 10 points; swapping out an unfilled pipe costs 5. The flow running off the end of the track ends the game, with a bonus of 5 points per pipe filled once you reach 10.",
+     "legend": {
+      "S:#": "Player's score.",
+      "number beside score": "Seconds left before the water starts flowing; turns red at 2 seconds or less.",
+      "P:#": "Count of pipe segments the water has filled so far."
+     },
      "controls": {
       "Arrow Keys": "Move cursor",
       "Space": "Place pipe piece"
@@ -288,6 +390,11 @@
      "cls": "SkiFree",
      "module": "games/skifree.py",
      "desc": "Ski downhill, dodging trees, rocks, wandering dogs, and rival skiers. Hold a turn to carve hard. Slalom gates and ramp flips (press the button mid-air, land it clean) build STYLE points. The Abominable Snowman appears at 750m and sprints faster than plain skiing - boost is your only escape.",
+     "how": "Crashing into a tree, rock, dog, or rival skier just costs you speed and briefly stuns you \u2014 it doesn't end the run. Clearing a slalom gate cleanly is worth 10 style points, missing one nearby costs 5, and sticking a ramp flip is worth 25. The only way the run actually ends is getting caught by the yeti after it spawns at 750 meters.",
+     "legend": {
+      "S#": "Style points earned from landing ramp flips and passing through slalom gates.",
+      "Y!": "The Abominable Snowman is chasing you; only a boost can outrun him."
+     },
      "controls": {
       "Left/Right": "Steer (hold ~0.4s to carve into a hard turn)",
       "Up/Down": "Hang back up the slope / push ahead down it",
@@ -299,7 +406,12 @@
      "name": "SPACE CRUISE",
      "cls": "SpaceCruise",
      "module": "games/spacecruise.py",
-     "desc": "Side-scrolling starship game. Navigate asteroid fields, manage shields, fire lasers. Survive as long as possible.",
+     "desc": "Shoot floating numbers and operators to build a math equation: a number loads it, an operator sets the operation, and a following number computes the result and banks it as score. Rack up as many equations as you can before the two-minute clock runs out.",
+     "how": "Completing an equation banks its result as points (subtraction never goes below zero); shooting a second number before setting an operator instead banks just that first number, and shooting a stray operator with no combo open scores a 1-point consolation.",
+     "legend": {
+      "#+": "Your equation building up: a number loads it, an operator (+, -, or x) sets the operation, then a number banks the result.",
+      "MISS!": "Flashes at the crosshair when three shots in a row miss while a combo is open, dropping it."
+     },
      "controls": {
       "Up/Down": "Move rocket vertically",
       "Left/Right": "Move crosshair horizontally",
@@ -310,7 +422,8 @@
      "name": "TRASHBLASTER",
      "cls": "TrashBlaster",
      "module": "games/trashblaster.py",
-     "desc": "Shoot upward to blast falling garbage before it stacks to the top.",
+     "desc": "You are piloting through a debris field. Steer the crosshair across the cockpit window and blast the trash drifting past from every side. One minute on the clock.",
+     "how": "Smaller pieces of trash are worth more: 30 points for small scraps, 20 for medium cans and bottles, and 10 for large boxes. You have 60 seconds on the clock, and every 30 seconds new trash spawns more often, capping out at one every half second. The round ends the moment the timer hits zero, so keep blasting for the highest score.",
      "controls": {
       "Arrow Keys": "Move targeting crosshair",
       "Space/Action": "Fire laser at crosshair position"
@@ -321,6 +434,12 @@
      "cls": "MonsterMaze",
      "module": "games/monstermaze.py",
      "desc": "Escape a T-Rex stalking you through a first-person 3D maze. Based on one of the earliest survival horror games.",
+     "how": "Find the exit before the Rex finds you. Reaching the exit scores 100 points times your level plus a bonus for taking fewer steps, then drops you into a new maze where the Rex starts closer and moves faster. Getting caught ends the game.",
+     "legend": {
+      "L#": "Current maze level.",
+      "N, E, S, W": "Compass direction you are currently facing.",
+      "S:#": "Your score so far."
+     },
      "controls": {
       "Left/Right": "Turn 90 degrees",
       "Up": "Step forward one cell (0.2s cooldown)",
@@ -344,6 +463,11 @@
      "cls": "Agario",
      "module": "games/agario.py",
      "desc": "Absorb smaller cells, avoid bigger ones. L button boosts speed, R button ejects mass. Based on the browser game that launched the .io genre.",
+     "how": "You have 3 minutes to grow: eating a food pellet adds 1 point, and absorbing a smaller cell adds points equal to its mass. Boosting or ejecting mass shrinks your cell, but your score never drops. Getting touched by a bigger cell ends the game immediately, and running out of time ends the round too.",
+     "legend": {
+      "top-left number": "Your score: +1 per food pellet eaten, plus the absorbed cell's mass when you eat a smaller cell. It never decreases.",
+      "#:##": "Time left in the 3-minute round, shown as minutes:seconds; turns red under 30 seconds left."
+     },
      "controls": {
       "Arrow Keys": "Move direction (held = continuous)",
       "Space": "Speed boost (3s, costs 10% mass)",
@@ -355,6 +479,11 @@
      "cls": "Bloons",
      "module": "games/bloons.py",
      "desc": "Pop waves of balloons by throwing darts. Aim and time your throws to clear each round.",
+     "how": "Throw darts to pop balloon clusters; popping one scores points and can reveal a smaller balloon inside. Reach the pop target shown for each of the 15 levels before your darts run out, or the run ends there.",
+     "legend": {
+      "L#": "Current level, out of 15.",
+      "#/#": "Balloons popped so far / balloons needed to clear the level."
+     },
      "controls": {
       "Up/Down": "Adjust aim angle",
       "Button (hold)": "Hold to charge power, release to fire"
@@ -365,6 +494,13 @@
      "cls": "BloonsTD",
      "module": "games/bloonstd.py",
      "desc": "Tower defense. Place and upgrade towers along the path to pop waves of balloons before they reach the end. The bottom bar shows all four tower types as colour swatches with the price of the highlighted one; swatches dim and the price turns red when you cannot afford it. Left button places the highlighted type on an empty square, or selects a tower you already own \u2014 press it again on that tower to buy its upgrade. Right button switches which tower type is highlighted, and the name of the new type flashes above the swatches. Waves start automatically on the countdown.",
+     "how": "You start with 500 coins and 20 lives. Popping a bloon earns coins and score; a bloon that reaches the end costs you lives equal to its remaining toughness. Survive all 20 waves without your lives reaching 0 to win.",
+     "legend": {
+      "L:#": "Lives left. Reach zero and the game is over.",
+      "W#": "Current wave number, out of 20 total waves.",
+      "#S": "Seconds until the next wave starts automatically.",
+      "UP$#": "Cost in coins to upgrade the tower you have selected."
+     },
      "controls": {
       "Arrows": "Move placement cursor",
       "Left button": "Place tower / select tower / upgrade selected tower",
@@ -376,6 +512,10 @@
      "cls": "Flappy",
      "module": "games/flappy.py",
      "desc": "Press a button to flap, thread through pipes. One hit and you\u2019re done.",
+     "how": "Each pipe you clear scores 1 point and nudges the pipes faster, up to a cap, so the run gets harder the longer you last. Touching a pipe or the ground ends the run immediately.",
+     "legend": {
+      "top-center number": "Number of pipes you've passed."
+     },
      "controls": {
       "Space": "Flap (gain upward velocity)"
      }
@@ -385,6 +525,10 @@
      "cls": "GeometryDash",
      "module": "games/geometrydash.py",
      "desc": "One-button platformer. Hold the button to jump; the level scrolls at a fixed speed. Hit any obstacle and you restart.",
+     "how": "Your score is the distance traveled, one point for every 5 pixels scrolled. Touching a spike or a block from the side, or falling off the bottom of the screen, ends the run immediately.",
+     "legend": {
+      "top-left number": "Your score \u2014 distance traveled, one point per 5 pixels scrolled."
+     },
      "controls": {
       "Space": "Jump (tap or hold for repeated jumps)"
      }
@@ -394,6 +538,12 @@
      "cls": "Portal",
      "module": "games/portal.py",
      "desc": "Navigate puzzle rooms using portals. L button places a blue portal, R button places an orange one. Walk into one, emerge from the other. Reach the exit to clear each room.",
+     "how": "Reach each chamber's exit before its timer runs out, using portals to cross gaps and reach ledges. Clearing a chamber scores points that rise with each chamber, plus a bonus for time left, then advances you to a tougher chamber with a shorter clock. Getting caught by a turret, touching goo, or letting the timer hit zero ends the run.",
+     "legend": {
+      "CH#": "Chamber (room) number, counted from 1.",
+      "top-left number": "Your current score.",
+      "top-right number": "Seconds left to clear this chamber before it counts as a timeout; turns orange, then red, as time runs low."
+     },
      "controls": {
       "Left/Right": "Rotate view",
       "Up/Down": "Move forward/backward",
@@ -405,7 +555,8 @@
      "name": "POWDER GAME",
      "cls": "SandGame",
      "module": "games/sandgame.py",
-     "desc": "Falling-sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal \u2014 a creative toy.",
+     "desc": "Falling-sand particle physics sandbox. Place 17 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal \u2014 a creative toy.",
+     "how": "You paint with a 2x2 brush and can scroll through 17 materials plus an eraser to pick what goes down next. Heat and cold drive phase changes: ice melts above 5 degrees, water freezes below -5 and boils past 105, turning to steam. There is no score, win condition, or game over - the simulation just keeps running for you to experiment with.",
      "controls": {
       "Joystick": "Move cursor",
       "Button (tap)": "Toggle material select mode"
@@ -416,6 +567,11 @@
      "cls": "Stack",
      "module": "games/stack.py",
      "desc": "Press the button to drop a sliding block onto the stack. Misalignment shrinks the next platform. Game ends when the block gets too small. Score by stacking as high as possible.",
+     "how": "Landing a block perfectly two or more times in a row slightly widens the next block, giving a bit more margin for error - it does not multiply your score. Height goes up by one for each block you land, and that height is your final score when the tower falls or a block gets too small to keep going.",
+     "legend": {
+      "H:#": "Tower height (blocks stacked) - this is your score.",
+      "X#": "Consecutive perfect drops in a row; not a score multiplier. Two or more in a row widens the next block slightly."
+     },
      "controls": {
       "Space": "Drop block"
      }
@@ -425,6 +581,11 @@
      "cls": "StickRunner",
      "module": "games/stickrunner.py",
      "desc": "Endless runner with a stick figure. Press the button to jump over obstacles. Score by distance. Procedurally generated levels.",
+     "how": "Score rises as you run, and clearing the gaps between rooftops is what keeps you going. Falling off the bottom of the screen ends the run. Running speed climbs as your score grows, up to a cap.",
+     "legend": {
+      "#M": "Distance traveled so far - this is your score, in an arbitrary game unit.",
+      "#%": "Running speed, from 0% at the start to 100% at top speed; it climbs as your distance grows."
+     },
      "controls": {
       "Space": "Jump"
      }
@@ -434,6 +595,10 @@
      "cls": "Game2048",
      "module": "games/game2048.py",
      "desc": "Slide numbered tiles on a 4\u00d74 grid. Matching tiles merge and double. Reach the 2048 tile to win. Game ends when the board fills with no moves left.",
+     "how": "Reaching the 2048 tile counts as a win, but the run keeps going so you can merge for a higher score. Each merge adds the new tile's value to your score, and the run only ends when the board fills up with no merges left to make.",
+     "legend": {
+      "top-left number": "Running score - the total of every tile merge so far."
+     },
      "controls": {
       "Arrow Keys": "Slide all tiles in that direction",
       "Space": "Restart (when game over)"
@@ -456,6 +621,13 @@
      "cls": "LightsOut",
      "module": "games/lightsout.py",
      "desc": "Press a light and its neighbors toggle. Turn all lights off to win. Solvable with linear algebra over GF(2), but trial and error works too.",
+     "how": "Clearing a puzzle scores bonus points based on how few moves it took, then starts a harder puzzle with more toggles to undo. There is no life count or time limit - you keep leveling up until you stop playing.",
+     "legend": {
+      "L#": "Current level; puzzles need more toggles to solve, and get harder, as levels rise.",
+      "M:#": "Moves made on this puzzle.",
+      "top-right number": "Lights still lit; the goal is to get this to zero.",
+      "BEST:L#": "Highest level cleared since the cabinet was last powered on."
+     },
      "controls": {
       "Arrow Keys": "Move cursor",
       "Space": "Toggle light (and adjacent lights)"
@@ -466,6 +638,7 @@
      "cls": "Mastermind",
      "module": "games/mastermind.py",
      "desc": "Guess a hidden color code in limited tries. Each guess gets feedback: right color in right place, or right color in wrong place. Deduce the code before your guesses run out.",
+     "how": "You are cycling through 6 possible peg colors across 4 positions, and colors can repeat in the secret code. You get 10 guesses total; each one returns white pegs for correct colors in the wrong spot and black pegs for correct color and position. Solving it in fewer guesses than your best sets a new best score. Running out of guesses ends the round and reveals the secret code.",
      "controls": {
       "Left/Right": "Move cursor",
       "Up/Down": "Change color at cursor",
@@ -477,6 +650,16 @@
      "cls": "RushHour",
      "module": "games/rushhour.py",
      "desc": "Slide cars and trucks on a grid to free the red car through the exit. Vehicles only move along their length. Puzzles range from easy to very hard.",
+     "how": "Steer the marked car out through the exit by sliding vehicles along their length. Your move count and the best (fewest) moves recorded for that level are tracked, and beating it earns a new best. Solving a puzzle unlocks the next level in that difficulty tier; there is no timer or lives.",
+     "legend": {
+      "RUSH HR": "The game's name, short for Rush Hour.",
+      "L#": "Puzzle level number within the chosen difficulty.",
+      "M:#": "Moves made so far on this puzzle.",
+      "B:#": "Best (fewest) move count recorded for this level.",
+      "X": "The car you must steer out the exit.",
+      "NEXT LVL": "Shown after solving a puzzle when more levels remain in this difficulty.",
+      "vehicle letter B-O": "Each other vehicle's own identifying letter; the letters carry no size, direction, or order meaning."
+     },
      "controls": {
       "Arrow Keys": "Move cursor / Select vehicle",
       "Action": "Select vehicle, then direction to slide"
@@ -487,6 +670,12 @@
      "cls": "Simon",
      "module": "games/simon.py",
      "desc": "Four colored quadrants flash in sequence - each color has its own flash signature. Repeat the pattern, but hesitate more than 3 seconds and you lose. Left/Right at idle picks the goal (8/14/20/31 signals); reach it for the victory salute. Playback tempo lurches faster at 6 and 14 signals, just like the original.",
+     "how": "There's no separate score \u2014 the sequence length itself is what you're chasing, growing by one color each round you repeat correctly.",
+     "legend": {
+      "</>: GOAL": "Press Left/Right to change the goal length shown in cyan above (cycles through 8, 14, 20, 31).",
+      "center number": "How many colors are in the sequence this round; goes up by one each time you succeed.",
+      "!!": "Shown instead of WIN for beating the hardest goal (31)."
+     },
      "controls": {
       "Up": "Green (top)",
       "Right": "Red (right)",
@@ -501,6 +690,11 @@
      "cls": "BopIt",
      "module": "games/bopit.py",
      "desc": "Follow commands (bop, twist, pull) using button presses and directional inputs. Commands get faster each round. Miss one and you\u2019re out.",
+     "how": "Each correct command scores one point, and your best run is kept as a high score. Responding wrong, or not fast enough, ends the run immediately - there are no extra lives. The response window starts at 2 seconds and shrinks toward a 0.6-second floor as you keep succeeding.",
+     "legend": {
+      "L-R": "Shorthand for the twist motion: press Left then Right, or Right then Left.",
+      "U-D": "Shorthand for the pull motion: press Up then Down, or Down then Up."
+     },
      "controls": {
       "Button": "Bop It",
       "Left/Right": "Twist It (L\u2192R or R\u2192L)",
@@ -512,6 +706,11 @@
      "cls": "FifteenPuzzle",
      "module": "games/fifteenpuzzle.py",
      "desc": "Slide 15 numbered tiles into order using the single empty space. The \u201c14-15\u201d variant is mathematically impossible.",
+     "how": "Solving the puzzle records your move count as a new best if it beats the current one. You can reshuffle for a fresh puzzle at any time before solving. There's no time limit, lives, or way to lose - only to solve faster.",
+     "legend": {
+      "M:#": "Moves made since the puzzle was last shuffled.",
+      "B:#": "Best: fewest moves used to solve a puzzle since the cabinet was last powered on."
+     },
      "controls": {
       "Arrow Keys": "Slide tile into empty space",
       "Space": "Shuffle / New game (when solved)"
@@ -534,6 +733,13 @@
      "cls": "Bowling",
      "module": "games/bowling.py",
      "desc": "Ten-pin bowling. Time your release and aim your angle. Standard scoring \u2014 strikes, spares, and splits over 10 frames.",
+     "how": "Play solo or against a second player, alternating turns frame by frame. The game ends once all 10 frames are complete for every player, and in two-player mode the higher total score wins.",
+     "legend": {
+      "F#": "Current frame, out of 10.",
+      "top-left number": "Running score total, in one-player mode.",
+      "P1: / P2:": "Each player's running score in two-player mode; the active player's label lights up, the other stays gray.",
+      "P# TURN": "Whose turn is coming up, shown briefly between turns."
+     },
      "controls": {
       "Space": "Lock position / confirm aim / confirm power / navigate",
       "Joystick": "Cancel aim\u2192position / cancel power\u2192aim / navigate"
@@ -544,6 +750,11 @@
      "cls": "Darts",
      "module": "games/darts.py",
      "desc": "Timing-based darts: press the button to lock the sweeping aim, first across then down. Five rounds, highest total wins - hit double and triple tiles for bonus points.",
+     "how": "Each wedge scores its face value, doubles and triples multiply that by 2 or 3, and a hidden bonus tile is worth 75 points. You throw 3 darts per round, for 5 rounds total; the higher score when the rounds end wins, or is your final score alone.",
+     "legend": {
+      "R#/#": "Current round out of the 5 total rounds.",
+      "top-left number": "Your running point total (2-player mode labels this P1: / P2: instead)."
+     },
      "controls": {
       "Space": "Lock aim axis / confirm selection",
       "Joystick": "Cancel Y-aim back to X-aim / navigate mode select"
@@ -554,6 +765,7 @@
      "cls": "Pinball",
      "module": "games/pinball.py",
      "desc": "Pinball with flippers, bumpers, ramps, and a plunger. L button controls the left flipper, R button the right. Hit targets to score; don\u2019t let the ball drain.",
+     "how": "You get 3 balls; draining the last one ends the game. Bumpers score 500 points apiece, rollover lanes 500, the spinner 75, and slingshots 25. Clearing all 3 drop targets pays a 5,000 point bonus and raises your score multiplier (2x, 3x, 5x, then 10x), while lighting all 3 rollover lanes temporarily upgrades the bumpers to a higher-scoring tier.",
      "controls": {
       "Space (held)": "Left flipper",
       "Z (held)": "Right flipper",
@@ -565,7 +777,8 @@
      "name": "POOL",
      "cls": "Pool",
      "module": "games/pool.py",
-     "desc": "8-ball billiards. Aim with the joystick, set power, and shoot. Pocket all your balls (stripes or solids) then sink the 8-ball to win.",
+     "desc": "Six-ball points pool: Video Hustler scoring with Side Pocket aiming. Aim with the joystick, set power, and shoot. Play alone for a high score on limited shots, or take turns with a second player.",
+     "how": "Each of the 6 numbered balls scores 10 times its number, doubled in a side pocket. One-player mode starts with 10 shots, gains one back per ball potted, and loses one for scratching; clearing the table adds 200 points, 5 more shots, and a re-rack. Two-player mode has no shot limit - turns alternate on a miss or scratch, ending when the table clears, with the higher score winning.",
      "controls": {
       "Left/Right": "Aim cue ball direction",
       "Up/Down": "Fine/coarse aim adjustment",
@@ -577,6 +790,12 @@
      "cls": "Shuffleboard",
      "module": "games/shuffleboard.py",
      "desc": "Slide pucks down a board to land in the highest-scoring zone. Set angle and power. Knock opponents off if you can.",
+     "how": "The board's zones are marked 4, 3, 2, and 1, and landing a puck there scores that many points; sliding past the last zone or off the board scores nothing. Each player gets 4 pucks per round over 4 rounds total, and the higher score when the rounds end wins (or is just your final score alone).",
+     "legend": {
+      "R#": "Current round out of the 4 total rounds.",
+      "top-left number": "Your total score (2-player mode labels this P1: / P2: instead).",
+      "+# PTS": "Points you scored this round, shown after all pucks stop sliding."
+     },
      "controls": {
       "Space": "Lock aim / confirm power / navigate mode select",
       "Joystick": "Cancel power back to aim / navigate mode select"
@@ -599,6 +818,10 @@
      "cls": "Checkers",
      "module": "games/checkers.py",
      "desc": "Jump and capture diagonally. Reach the far side to king a piece. Capture all opponent pieces or block all their moves to win. Solved in 2007 \u2014 perfect play always draws.",
+     "how": "If a capture is available you must take it, and landing in position for another jump lets you keep capturing in the same turn. A king moves and captures diagonally in any direction; a regular piece only moves forward.",
+     "legend": {
+      "P#": "Whose turn it is: P1 is red (starts at the bottom), P2 is blue (starts at the top). Also names the winner."
+     },
      "controls": {
       "Arrow Keys": "Move cursor",
       "Space": "Select piece / Confirm move"
@@ -609,6 +832,10 @@
      "cls": "Chess",
      "module": "games/chess.py",
      "desc": "64 squares, 32 pieces. Checkmate the opponent\u2019s king to win. Each piece type rendered as a recognizable sprite on the LED grid.",
+     "how": "If the player to move has no legal move but isn't in check, the game ends in a stalemate with no winner instead of a checkmate.",
+     "legend": {
+      "P#": "Whose turn it is \u2014 P1 is white, P2 is black."
+     },
      "controls": {
       "Joystick": "Move cursor",
       "Button": "Select piece / Confirm move (press same piece to deselect)"
@@ -619,6 +846,10 @@
      "cls": "Connect4",
      "module": "games/connect4.py",
      "desc": "Drop colored discs into columns. Connect four in a row (horizontal, vertical, or diagonal) to win. Solved in 1988 \u2014 first player wins with perfect play.",
+     "how": "The board is 7 columns wide and 6 rows tall. The game ends the instant a player completes a four-in-a-row, or in a draw if every column fills up first.",
+     "legend": {
+      "P#": "Whose turn it is: P1 drops red discs, P2 drops yellow. Also names the winner."
+     },
      "controls": {
       "Left/Right": "Choose column",
       "Space": "Drop piece"
@@ -629,6 +860,15 @@
      "cls": "Go",
      "module": "games/go.py",
      "desc": "Place black or white stones to surround territory. The player controlling more territory wins. Simple rules, deep strategy.",
+     "how": "Surround empty points and enemy stone groups to claim them; a group with no open liberties left is captured and removed. Passing twice in a row ends the game, and your final score is your captures plus surrounded territory, with White getting a 6.5-point bonus. Whoever has the higher score wins.",
+     "legend": {
+      "B": "It is Black's turn to place a stone.",
+      "W": "It is White's turn to place a stone.",
+      "top-right number": "White stones Black has captured.",
+      "second top-right number": "Black stones White has captured.",
+      "B:#": "Black's final score: territory plus captures.",
+      "W:#": "White's final score: territory plus captures, plus a 6.5-point bonus."
+     },
      "controls": {
       "Joystick": "Move cursor (up past top = PASS zone)",
       "Button": "Place stone / Confirm pass"
@@ -639,6 +879,12 @@
      "cls": "Mancala",
      "module": "games/mancala.py",
      "desc": "Sow seeds around pits, capture your opponent\u2019s. The player with the most seeds wins. One of the oldest known games.",
+     "how": "Each pit starts with 4 seeds; sowing scoops them out and drops one in each pit going counter-clockwise, skipping your opponent's store. Land your last seed in your own empty pit to capture it and everything opposite it, or land it in your own store for another turn. The game ends once one side's pits are empty.",
+     "legend": {
+      "P#": "Shows whose turn it is at the top of the board, labels each side's store, and names the winner at the end ('P1 WINS!').",
+      "top HUD numbers": "Store totals: the left number is P2's seeds, the right is P1's.",
+      "P#:#": "Final seed count in each player's store \u2014 whoever has more wins."
+     },
      "controls": {
       "Left/Right": "Select pit",
       "Space": "Sow seeds from selected pit"
@@ -649,6 +895,11 @@
      "cls": "Othello",
      "module": "games/othello.py",
      "desc": "Place discs to outflank your opponent\u2019s and flip them to your color. The player with the most discs when the board is full wins. Corner control is key.",
+     "how": "If you have no legal move your turn is skipped automatically. If neither player can move, the game ends right there instead of waiting for the board to fill.",
+     "legend": {
+      "P#: #": "Each player's disc count on the board right now.",
+      "P# WINS!": "Announces the winner \u2014 whoever has more discs when the game ends."
+     },
      "controls": {
       "Arrow Keys": "Move cursor",
       "Space": "Place piece"
@@ -671,6 +922,7 @@
      "cls": "Drift",
      "module": "games/drift.py",
      "desc": "Terrain-sculpting sandbox. One button cycles the tool - raise, lower, smooth, spring, water - and the other applies it at the cursor. Watch the water find its level.",
+     "how": "Raising, lowering, and smoothing reshape the terrain; placing a spring adds a running water source, while the water tool drops standing water directly. Water flows downhill and slowly evaporates over time, and two springs already run on the highest peaks when you start. There is no score or goal - it runs indefinitely as an open-ended terrain and water toy.",
      "controls": {
       "Joystick": "Move cursor",
       "Space": "Cycle tool: Raise / Lower / Smooth / Spring / Water",
@@ -682,6 +934,10 @@
      "cls": "Fishing",
      "module": "games/fishing.py",
      "desc": "Drop your line and reel in as many fish as you can before the 90-second timer runs out.",
+     "how": "Your score is the total weight in pounds of every fish you land, not how many you catch. Pressing the button during a nibble scares the fish off; once it truly bites, hold or mash the button to fill the catch meter before it drains and the fish escapes. Bigger fish resist harder and take longer to land, but weigh more.",
+     "legend": {
+      "top-right number": "Seconds left in the 90-second round; turns red at 10 seconds or under."
+     },
      "controls": {
       "Up/Down": "Adjust lure depth",
       "Space/Z": "Hook fish (hold or mash to reel)"
@@ -692,6 +948,13 @@
      "cls": "LaserMirrors",
      "module": "games/lasermirrors.py",
      "desc": "Rotate and place mirrors to redirect the laser beam to its target. A puzzle of angles and reflection.",
+     "how": "Rotate and place mirrors to steer the beam onto its target and clear the level; clearing scores 100 points plus 10 for every second still left on the par timer. Levels keep coming and grow harder, later ones adding switches and doors.",
+     "legend": {
+      "L#": "Current level (puzzle) number.",
+      "top-right number": "Your accumulated score across levels.",
+      "bottom-right number": "Seconds left to clear the level within its par time for a bonus; reaching zero just misses the bonus, it doesn't end the level.",
+      "TIME:+#": "Bonus points on the level-clear screen: 10 for every second left under par, added to the 100-point base."
+     },
      "controls": {
       "Left/Right": "Rotate view",
       "Up/Down": "Move forward/backward",
@@ -703,6 +966,16 @@
      "cls": "WindowWasher",
      "module": "games/windowwasher.py",
      "desc": "Clean every window on the building before time runs out. Ride the scaffold and scrub.",
+     "how": "Each window cleaned scores 10 points, plus a bonus of 5 points per second left when you finish. Finish with a quarter of the level's time still on the clock and you double the points earned from windows that level. Run out of time before every window is clean and you get fired, ending the game.",
+     "legend": {
+      "L#": "The building (level) you are on.",
+      "top-left number": "Seconds left to finish cleaning; turns orange under 20s, red under 10s.",
+      "top-right number": "Your score so far.",
+      "bottom-right number": "Windows on this building still dirty; turns green once all are clean.",
+      "CLEAN:+#": "Points earned for the windows cleaned this level \u2014 10 points each.",
+      "TIME:+#": "Bonus points for time left when you finish \u2014 5 points per second remaining.",
+      "PAR:+#": "Extra bonus, doubling your CLEAN points, for finishing with a quarter of the level's time still left."
+     },
      "controls": {
       "Arrows": "Move washer",
       "Space (hold)": "Clean window"
@@ -2494,6 +2767,10 @@
      "module": "visuals/boidslab.py",
      "desc": "The Boids flocking model turned into an explorable parameter space. The joystick sweeps separation against cohesion; watch tight schools loosen into scattered wandering and back.",
      "credit": "Craig Reynolds, 1987",
+     "legend": {
+      "sep=": "Separation weight: how strongly boids steer away from neighbors.",
+      "coh=": "Cohesion weight: how strongly boids steer toward the group center."
+     },
      "controls": {
       "Left/Right": "Adjust separation weight",
       "Up/Down": "Adjust cohesion weight",
@@ -2518,6 +2795,9 @@
      "module": "visuals/cycliclab.py",
      "desc": "Explore the cyclic cellular automaton by hand. The joystick adjusts the number of states and the neighbor threshold, tuning between still noise and sweeping demon spirals.",
      "credit": "David Griffeath",
+     "legend": {
+      "thresh=": "Neighbor threshold \u2014 how many neighbors must show next state before this cell advances."
+     },
      "controls": {
       "Left/Right": "Adjust num_states (number of cyclic states)",
       "Up/Down": "Adjust threshold (neighbors needed to advance)",
@@ -2553,6 +2833,11 @@
      "module": "visuals/turing.py",
      "desc": "Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.",
      "credit": "Alan Turing, 1952",
+     "legend": {
+      "F=#": "Chemical feed rate \u2014 controls how fast pattern U is replenished.",
+      "K=#": "Chemical removal rate \u2014 controls how fast pattern V is removed.",
+      "LAMBDA": "Pearson pattern classification (ALPHA\u2013SIGMA) \u2014 identifies the morphology at the current parameters."
+     },
      "controls": {
       "Up/Down": "Cycle color palette",
       "Left/Right": "Adjust F parameter within family range",
@@ -2588,6 +2873,11 @@
      "module": "visuals/hodgelab.py",
      "desc": "A hands-on version of the Hodgepodge Machine. Adjust the growth rate and maximum state count to steer the Belousov-Zhabotinsky spiral waves between calm and chaotic.",
      "credit": "Gerhardt & Schuster",
+     "legend": {
+      "BZ CLASSIC": "Belousov-Zhabotinsky reaction \u2014 produces the spiral wave pattern.",
+      "g=": "Growth rate: controls spread speed (higher = faster, bolder patterns).",
+      "n=": "Max state count: number of infection stages cells pass through."
+     },
      "controls": {
       "Left/Right": "Adjust g (infection growth constant)",
       "Up/Down": "Adjust n (max states / ill state)",
@@ -2624,6 +2914,10 @@
      "module": "visuals/lenia.py",
      "desc": "Steer Lenia's continuous life forms directly. The joystick moves the growth center and width, morphing the smooth kernel so creatures grow, dissolve, or hold their shape.",
      "credit": "Bert Chan, 2018",
+     "legend": {
+      "mu=": "Growth center \u2014 the potential value at which cells grow fastest.",
+      "sig=": "Growth width \u2014 how wide a range of potential values supports growth."
+     },
      "controls": {
       "Left/Right": "Adjust mu (growth center)",
       "Up/Down": "Adjust sigma (growth width)",
@@ -2651,6 +2945,11 @@
      "module": "visuals/lifelab.py",
      "desc": "A bench for Conway's Life. Load a famous seed \u2014 Gosper's glider gun, the R-pentomino, a diehard \u2014 choose a life-like rule, and set it running. The same seed under a different rule behaves nothing like itself.",
      "credit": "John Conway, 1970",
+     "legend": {
+      "LWSS": "Light-Weight Spaceship: a small pattern that glides steadily.",
+      "G#": "Generation count: simulation steps run since pattern was seeded.",
+      "B#/S#": "Life-like rulestring: B digits = birth, S digits = survival by neighbor count."
+     },
      "controls": {
       "Left/Right": "Cycle seed pattern",
       "Up/Down": "Cycle rule",
@@ -2675,6 +2974,10 @@
      "cls": "MitosisLab",
      "module": "visuals/mitosislab.py",
      "desc": "The cell-division simulation opened up for tinkering. Trade growth rate against competition strength and watch colonies bloom, crowd, and pinch apart.",
+     "legend": {
+      "grow=#": "Base multiplier on how fast cell colonies expand.",
+      "comp=#": "How aggressively overlapping colonies drain energy from each other."
+     },
      "controls": {
       "Left/Right": "Adjust growth rate",
       "Up/Down": "Adjust competition strength",
@@ -2698,6 +3001,10 @@
      "cls": "QuarksLab",
      "module": "visuals/quarkslab.py",
      "desc": "Explore the Quarks automaton's parameter space. The joystick sets particle count and interaction radius, tuning how charge-like cells bond and break.",
+     "legend": {
+      "q=": "Number of quarks \u2014 energy-injecting hotspots driving the automaton.",
+      "r=": "Roam radius \u2014 how far each quark hotspot wanders from its base position."
+     },
      "controls": {
       "Left/Right": "Adjust number of quarks (hotspots)",
       "Up/Down": "Adjust roam radius",
@@ -2732,6 +3039,9 @@
      "cls": "RugLab",
      "module": "visuals/ruglab.py",
      "desc": "The averaging 'rug' automaton, made adjustable. Sweep the increment and state count to weave different symmetric, textile-like patterns.",
+     "legend": {
+      "inc=#": "Amount added to each cell's value each step (rule increment)."
+     },
      "controls": {
       "Left/Right": "Adjust increment (the +N in the rug rule)",
       "Up/Down": "Adjust num_states (mod value)",
@@ -2768,6 +3078,10 @@
      "module": "visuals/slimelab.py",
      "desc": "Two slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.",
      "credit": "after Jeff Jones, 2010",
+     "legend": {
+      "grow=#": "Probability per step that empty cells next to a colony get colonized.",
+      "atk=#": "Aggressiveness of a colony's takeover of enemy cells."
+     },
      "controls": {
       "Left/Right": "Adjust growth chance (frontier expansion rate)",
       "Up/Down": "Adjust attack power (border takeover rate)",
@@ -2815,6 +3129,13 @@
      "cls": "Baking",
      "module": "visuals/baking.py",
      "desc": "Baking ratios and formulas displayed as baker\u2019s percentages with proportional ingredient bars. 14 recipes across 4 families: bread, pizza, pastry, and quick breads.",
+     "legend": {
+      "top-left number": "Current recipe number in the master list of 14.",
+      "bottom-left #/#": "Current recipe position out of 14 recipes.",
+      "bottom-right #/#": "Current recipe position within its family.",
+      "ratio-line numbers": "Parts by weight. For bread and pizza they are baker's percentages: flour is always 100.",
+      "24-72H, 900F": "In the notes, H is hours of fermentation and F is oven temperature in Fahrenheit."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between families",
@@ -2836,6 +3157,15 @@
      "cls": "Flavors",
      "module": "visuals/flavors.py",
      "desc": "Regional cuisine flavor profiles showing key ingredients and five intensity bars (sweet, sour, salty, spicy, umami). 13 cuisines across 6 regions from East Asia to the Middle East.",
+     "legend": {
+      "SWT": "Sweetness intensity.",
+      "SOR": "Sourness intensity.",
+      "SLT": "Saltiness intensity.",
+      "SPC": "Spiciness intensity.",
+      "UMA": "Umami intensity.",
+      "#/#": "Right: position within region. Left: overall position (1-13).",
+      "cuisine # in header": "Cuisine's number in the overall 1-13 list."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between regions",
@@ -2847,6 +3177,10 @@
      "cls": "Knife",
      "module": "visuals/knife.py",
      "desc": "A knife-skills flipbook. Each cut animates on the cutting board and holds on the finished result, with dimensions and best uses. Nine cuts across three families: strips, dice, and special.",
+     "legend": {
+      "Cut #": "The cut's number in the full 1-9 list.",
+      "bottom-right #/#": "The cut's place within its family. The bottom-left #/# counts across all 9 cuts."
+     },
      "controls": {
       "Left/Right": "Cycle through cuts",
       "Up/Down": "Jump between families",
@@ -2858,6 +3192,13 @@
      "cls": "Pantry",
      "module": "visuals/pantry.py",
      "desc": "Cooking building blocks \u2014 aromatics, roux, stocks, and herb bundles with ratio blocks showing component proportions. 14 items across 4 families with method and use descriptions.",
+     "legend": {
+      "header number": "Catalogue number (1\u201314) of this item, printed in the family's color.",
+      "ingredient parts": "Number of parts that component contributes to the ratio.",
+      "MIRPX": "Diced onion, carrot, and celery aromatic base \u2014 used as one part in stocks.",
+      "PPPRCN": "Peppercorn, one of the herbs in a sachet d'epices bundle.",
+      "bottom-right #/#": "Item position within its family \u2014 each family has its own count."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between families",
@@ -2869,6 +3210,10 @@
      "cls": "Pasta",
      "module": "visuals/pasta.py",
      "desc": "Pixel art pasta shape reference. 20 shapes, each rendered as a small illustration with name, Italian meaning, region of origin, and sauce pairings. 5 families: long, tube, shaped, filled, and sheet.",
+     "legend": {
+      "top-left #": "Shape number in the 20-shape catalog.",
+      "#/#": "Position within the current pasta family."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between families",
@@ -2880,6 +3225,10 @@
      "cls": "Sauces",
      "module": "visuals/sauces.py",
      "desc": "Mother sauce reference guide. 38 sauces organized into 7 families, each showing its parent sauce and the ingredient you add to create it. From b\u00e9chamel to hollandaise and beyond.",
+     "legend": {
+      "header number": "Sauce catalogue number (1\u201338), displayed in the header's dimmed color.",
+      "bottom-right #/#": "Sauce position within its family \u2014 each family has its own count."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between families",
@@ -2891,6 +3240,10 @@
      "cls": "Spices",
      "module": "visuals/spices.py",
      "desc": "The recipes behind the world's great spice blends. Each shows its origin, meaning, component spices, and the dishes it belongs in \u2014 the micro view of what's actually inside ras el hanout, garam masala, and more.",
+     "legend": {
+      "top-left #": "Blend number in the 20-blend catalog.",
+      "#/#": "Position within the current spice region."
+     },
      "controls": {
       "Left/Right": "Cycle through entries",
       "Up/Down": "Jump between regions",
@@ -2914,6 +3267,9 @@
      "cls": "Coins",
      "module": "visuals/coins.py",
      "desc": "Historical coins rendered from Wikimedia Commons and the Met Museum Open Access collection. Ancient Greek, Roman, medieval, and early modern currency.",
+     "legend": {
+      "C.": "Before a date, circa (about). Inside a date, century: C. 3RD C. BCE is about the 3rd century BCE."
+     },
      "controls": {
       "Left/Right": "Cycle coins within era",
       "Up/Down": "Toggle info overlay",
@@ -2948,6 +3304,9 @@
      "cls": "Language",
      "module": "visuals/language.py",
      "desc": "World languages and their relationships. Script samples, language family trees, and translation comparisons.",
+     "legend": {
+      "#/#": "Current greeting language out of 67 total languages."
+     },
      "controls": {
       "Left/Right": "Previous / next language",
       "Up/Down": "Jump five at a time",
@@ -2960,6 +3319,9 @@
      "module": "visuals/pottery.py",
      "desc": "World ceramic traditions photographed from the Metropolitan Museum of Art's Open Access collection. Real vessels shown at 64\u00d764 with their culture, date, and technique.",
      "credit": "Met Museum Open Access (CC0)",
+     "legend": {
+      "#/#": "Which vessel you are looking at, out of the whole collection."
+     },
      "controls": {
       "Left/Right": "Cycle vessels",
       "Up/Down": "Toggle info overlay",
@@ -2971,6 +3333,15 @@
      "cls": "Scripts",
      "module": "visuals/scripts.py",
      "desc": "Writing systems from around the world \u2014 Latin, Arabic, Devanagari, Chinese, Japanese, Korean, and more. Rendered using fontTools. Each script shown with sample glyphs and stroke animations.",
+     "legend": {
+      "#/#": "Current glyph position within its script family out of the total glyphs.",
+      "B#": "Linear B syllabogram catalog number with its transliterated sound value.",
+      "DOTS-#": "Which of the 6 positions in a braille cell are raised for this character.",
+      "X TIMES Y": "A compound cuneiform sign: two signs combined into one.",
+      "4E00 (four-digit codes)": "Chinese characters are labelled by their Unicode number; the header line gives the meaning.",
+      "A001 (letter + number)": "Hieroglyphs use Gardiner sign-list codes: the letter is the category, the number the sign.",
+      "DARA3 (trailing digit)": "Cuneiform signs that share a reading are numbered: DARA3 is the third sign read \"dara\"."
+     },
      "controls": {
       "Up/Down": "Switch writing system",
       "Left/Right": "Step through glyphs",
@@ -3444,7 +3815,8 @@
      "controls": {},
      "stub": true
     }
-   ]
+   ],
+   "desc": "The cabinet playing itself. Each demo is the real game with a simple AI at the controls, part of what the cabinet shows when nobody is playing. Rules and scoring are in the game's own entry."
   },
   {
    "name": "DIGITAL",
@@ -3757,6 +4129,10 @@
      "cls": "Knots",
      "module": "visuals/knots.py",
      "desc": "Animated knot tying. Step-by-step demonstrations of bowline, cleat hitch, figure-eight, and more \u2014 rendered as colored rope on the LED grid.",
+     "legend": {
+      "header number": "This knot's number in the list of 10.",
+      "#/#": "Current knot position out of 10 total knots."
+     },
      "controls": {
       "Up/Down": "Previous / next knot",
       "Left/Right": "Slow down / speed up",
@@ -3844,8 +4220,15 @@
      "name": "ENTROPY",
      "cls": "Entropy",
      "module": "visuals/entropy.py",
-     "desc": "A gas spreads from one wall until it fills the box - entropy climbs. Press Action and every velocity reverses: the gas un-mixes back to where it started. The rules never changed; there are just vastly more mixed arrangements than ordered ones.",
+     "desc": "A gas spreads from one wall until it fills the box - entropy climbs. Let it run and every velocity reverses on its own: the gas un-mixes back to where it started. The rules never changed; there are just vastly more mixed arrangements than ordered ones.",
      "credit": "Ludwig Boltzmann, 1877 / Claude Shannon, 1948",
+     "legend": {
+      "FWD": "Simulation is running forward in time.",
+      "REV": "Simulation is running backward (un-mixing).",
+      "BLOCK #": "Block size for entropy calculation (4, 8, or 16 pixels).",
+      "DENSITY #": "Gas fill fraction as a percentage.",
+      "ORDER": "Run has returned to its starting state."
+     },
      "controls": {
       "Action": "Cycle particle colour",
       "Up/Down": "Block size for the entropy meter",
@@ -3880,6 +4263,11 @@
      "module": "visuals/gametheory.py",
      "desc": "Iterated Prisoner\u2019s Dilemma tournament on a spatial grid. Strategies \u2014 cooperate, defect, tit-for-tat \u2014 compete and evolve. Cooperation can emerge from selfishness.",
      "credit": "Robert Axelrod, 1984",
+     "legend": {
+      "G:#": "Number of simulation rounds since the last reset (generation counter).",
+      "T=#": "Payoff for defecting when opponent cooperates (higher means less cooperation survives).",
+      "TFT": "Tit-for-Tat strategy preset \u2014 starts with half the grid cooperating, half defecting."
+     },
      "controls": {
       "Left/Right": "Temptation payoff (defection reward)",
       "Up/Down": "Cycle initial strategy mix",
@@ -3892,6 +4280,9 @@
      "module": "visuals/maxwell.py",
      "desc": "A thought experiment made visible. A demon sorts fast and slow gas particles between two chambers, seemingly violating the second law of thermodynamics.",
      "credit": "James Clerk Maxwell, 1867",
+     "legend": {
+      "SELECT #": "The demon's speed cutoff, as a multiple of the median speed: faster particles pass right, slower pass left."
+     },
      "controls": {
       "Button": "Toggle the demon on / off",
       "Up/Down": "Adjust the demon\u2019s selectivity",
@@ -3914,6 +4305,9 @@
      "cls": "Network",
      "module": "visuals/network.py",
      "desc": "Graph theory and network dynamics. Nodes connect, signals propagate, and emergent structure forms from simple connection rules.",
+     "legend": {
+      "p=#": "Rewiring probability: fraction of edges rewired into shortcuts (0=regular ring, higher=more random)."
+     },
      "controls": {
       "Left/Right": "Adjust rewiring probability p",
       "Up/Down": "Toggle Watts-Strogatz / Barabasi-Albert",
@@ -3926,6 +4320,9 @@
      "module": "visuals/percolation.py",
      "desc": "A phase transition in connectivity. Below a critical threshold, clusters stay isolated. Above it, a spanning cluster suddenly connects the entire grid.",
      "credit": "Broadbent & Hammersley, 1957",
+     "legend": {
+      "P#": "Current value of p, the fraction of lattice sites that have been opened."
+     },
      "controls": {
       "Left/Right": "Raise / lower p",
       "Action": "Deal a fresh lattice"
@@ -3958,6 +4355,9 @@
      "cls": "Solids",
      "module": "visuals/solids.py",
      "desc": "The five Platonic solids \u2014 tetrahedron, cube, octahedron, dodecahedron, icosahedron \u2014 rotating in 3D wireframe. The only regular convex polyhedra that exist.",
+     "legend": {
+      "V# E# F#": "Vertex count, edge count, and face count of the currently shown solid."
+     },
      "controls": {
       "Up/Down": "Cycle solid within current family",
       "Left/Right": "Adjust rotation speed",
@@ -3969,6 +4369,11 @@
      "cls": "Sorting",
      "module": "visuals/sorting.py",
      "desc": "Sorting algorithms visualized. Bubble sort, quicksort, merge sort, and more \u2014 each algorithm\u2019s strategy made visible as bars rearrange themselves.",
+     "legend": {
+      "C:": "Number of element comparisons performed so far by the algorithm.",
+      "S:": "Number of swaps performed so far by the algorithm.",
+      "SPD #": "Current algorithm speed (steps executed per frame tick)."
+     },
      "controls": {
       "Left/Right": "Adjust speed (steps per tick)",
       "Up/Down": "Cycle algorithm",
@@ -4046,6 +4451,9 @@
      "module": "visuals/beamengine.py",
      "desc": "Watt\u2019s separate condenser transformed Newcomen\u2019s earlier engine into the workhorse of the Industrial Revolution. The rocking beam links piston to flywheel.",
      "credit": "1769",
+     "legend": {
+      "#SPM": "Engine speed in strokes per minute."
+     },
      "controls": {
       "Left/Right": "Adjust engine speed (slower/faster)"
      }
@@ -4065,6 +4473,10 @@
      "module": "visuals/curta.py",
      "desc": "Curt Herzstark's handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing.",
      "credit": "1948",
+     "legend": {
+      "counter number": "The running total in the result register; each full crank turn adds to it.",
+      "#OPM": "Crank speed measured in operations per minute."
+     },
      "controls": {
       "Left/Right": "Adjust crank speed (5 levels)"
      }
@@ -4085,6 +4497,10 @@
      "module": "visuals/gutenberg.py",
      "desc": "Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.",
      "credit": "c. 1440",
+     "legend": {
+      "# PPM": "Press cycles completed per minute (current press-speed setting).",
+      "PG #": "Pages printed so far (press cycles completed)."
+     },
      "controls": {
       "Left/Right": "Adjust press speed (6 levels)"
      }
@@ -4094,6 +4510,10 @@
      "cls": "Gyroscope",
      "module": "visuals/gyroscope.py",
      "desc": "A spinning rotor that resists changes to its orientation. Demonstrates precession, nutation, and conservation of angular momentum.",
+     "legend": {
+      "PREC": "Precession rate shown as a percentage of maximum.",
+      "SPIN #": "Rotor spin speed shown as a percentage of maximum."
+     },
      "controls": {
       "Left/Right": "Adjust precession rate",
       "Up/Down": "Adjust spin speed"
@@ -4105,6 +4525,10 @@
      "module": "visuals/jacquard.py",
      "desc": "Punch cards controlling a weaving loom \u2014 the direct ancestor of computer programming. Babbage modeled his Analytical Engine on its logic; Lovelace saw the deeper computational implications.",
      "credit": "1804",
+     "legend": {
+      "rows read": "Count of card rows read so far.",
+      "#ROW/MIN": "Rows per minute: current loom speed."
+     },
      "controls": {
       "Left/Right": "Adjust speed (6 levels)"
      }
@@ -4123,6 +4547,10 @@
      "cls": "Loom",
      "module": "visuals/loom.py",
      "desc": "A working weaving loom. The shuttle passes through the warp threads, the heddles lift, the beater presses. Cloth forms row by row.",
+     "legend": {
+      "# PPM": "Shuttle passes per minute (weaving speed).",
+      "pass #": "Count of completed shuttle passes (rows woven)."
+     },
      "controls": {
       "Left/Right": "Adjust weaving speed (6 levels)"
      }
@@ -4162,6 +4590,10 @@
      "cls": "Singer",
      "module": "visuals/singer.py",
      "desc": "A sewing machine with needle, bobbin, and feed dog. The needle plunges, the thread loops, the fabric advances.",
+     "legend": {
+      "# SPM": "Stitches per minute: hand-wheel speed.",
+      "# ST": "Total stitches completed since reset."
+     },
      "controls": {
       "Left/Right": "Adjust stitch speed (6 levels)"
      }
@@ -4172,6 +4604,13 @@
      "module": "visuals/turingmachine.py",
      "desc": "A working Turing machine running real programs on a tape. The read/write head shuttles back and forth, writing symbols and switching states \u2014 the abstract foundation of all computation, made mechanical.",
      "credit": "Alan Turing, 1936",
+     "legend": {
+      "rule rows (A,0>1,R,B)": "In state A reading 0: write 1, move right, go to state B.",
+      "Q:": "Current machine state; Q is the automata-theory symbol for state.",
+      "SPD #": "Current simulation speed (steps executed per frame batch).",
+      "CTR": "Counter program selected (increments a binary number on tape).",
+      "BB-#": "Busy Beaver problem with given state count (named computability theory problem)."
+     },
      "controls": {
       "Left/Right": "Speed",
       "Up/Down": "Cycle program",
@@ -4183,6 +4622,9 @@
      "cls": "Typewriter",
      "module": "visuals/typewriter.py",
      "desc": "A mechanical typewriter with type bars striking an inked ribbon against paper. The carriage advances, the bell rings at the margin, the return lever sweeps back.",
+     "legend": {
+      "# CPM": "Typing speed in characters per minute."
+     },
      "controls": {
       "Left/Right": "Adjust typing speed (6 levels)",
       "Up": "Monkey mode (infinite monkeys easter egg)"
@@ -4203,6 +4645,14 @@
      "module": "visuals/modelt.py",
      "desc": "Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.",
      "credit": "1908, Henry Ford",
+     "legend": {
+      "INTK": "The intake stroke phase of the 4-stroke engine cycle.",
+      "COMP": "The compression stroke phase of the 4-stroke engine cycle.",
+      "POWR": "The power stroke phase of the 4-stroke engine cycle.",
+      "EXHT": "The exhaust stroke phase of the 4-stroke engine cycle.",
+      "I": "The intake valve above the cylinder head.",
+      "E": "The exhaust valve above the cylinder head."
+     },
      "controls": {
       "Left/Right": "Adjust RPM (6 speed levels)"
      }
@@ -4224,6 +4674,11 @@
      "cls": "ChordChart",
      "module": "visuals/chordchart.py",
      "desc": "Guitar and ukulele chord reference. Browse chord voicings with fingering diagrams. Joystick selects chord and variant; button switches instrument. Data from tombatossals/chords-db.",
+     "legend": {
+      "GTR/UKE": "Current instrument: guitar or ukulele.",
+      "FR#": "The fret where this chord shape starts: fret 1 on the diagram sits here on the neck.",
+      "number by the nut": "The same starting fret as FR#, shown beside the fretboard."
+     },
      "controls": {
       "Up/Down": "Cycle chord type",
       "Left/Right": "Cycle voicing",
@@ -4237,6 +4692,9 @@
      "cls": "CircleOfFifths",
      "module": "visuals/circle5ths.py",
      "desc": "The circle of fifths as an interactive wheel. Rotate to any key to see its name, sharps and flats, relative minor, and the chords that live in it \u2014 the map every musician keeps in their head.",
+     "legend": {
+      "sharps/flats": "Number of sharps (#) or flats (b) in the selected key."
+     },
      "controls": {
       "Left/Right": "Rotate selection around the circle (by fifths)",
       "Up/Down": "Cycle view: key names / key signatures / chord progressions",
@@ -4248,6 +4706,9 @@
      "cls": "DrumMachine",
      "module": "visuals/drummachine.py",
      "desc": "A Roland TR-808-style step sequencer. 16 steps, multiple tracks for kick, snare, hi-hat, and more. Beat patterns scroll and animate.",
+     "legend": {
+      "top-right number": "Tempo in beats per minute."
+     },
      "controls": {
       "Left/Right": "Adjust BPM (40-230)",
       "Up/Down": "Cycle song pattern"
@@ -4269,6 +4730,10 @@
      "cls": "HurdyGurdy",
      "module": "visuals/hurdygurdy.py",
      "desc": "Medieval string instrument where a rosined wheel acts as a continuous bow. Keys press tangents against the strings. Drone notes sustain while the melody plays above.",
+     "legend": {
+      "NPM": "Notes per minute \u2014 the current tempo.",
+      "NOTE:": "Current melody pitch as a musical note (A\u2013G)."
+     },
      "controls": {
       "Left/Right": "Adjust tempo (6 levels)"
      }
@@ -4278,6 +4743,13 @@
      "cls": "LatinDNA",
      "module": "visuals/latindna.py",
      "desc": "The rhythmic DNA of Latin music. Clave patterns \u2014 son, rumba, bossa nova \u2014 shown as timeline grids with accent markers. The two-bar key that unlocks an entire tradition.",
+     "legend": {
+      "+": "Off-beat marker in the rhythm grid.",
+      "II": "Playback is paused.",
+      "pattern # in header": "Pattern's number in the 10-pattern catalog.",
+      "#/# position": "Current pattern's position out of the total.",
+      "tempo # (right)": "Playback speed in beats per minute."
+     },
      "controls": {
       "Up/Down": "Cycle patterns (hold to auto-scroll)",
       "Left/Right": "Adjust BPM",
@@ -4289,6 +4761,9 @@
      "cls": "LatinGrooves",
      "module": "visuals/latingrooves.py",
      "desc": "Latin dance rhythms animated as layered percussion parts. Salsa, samba, bossa nova, cumbia, and more \u2014 each groove broken into its component instruments.",
+     "legend": {
+      "BPM": "Tempo of the current groove in beats per minute."
+     },
      "controls": {
       "Left/Right": "Adjust BPM (40-230)",
       "Up/Down": "Cycle genre pattern"
@@ -4299,6 +4774,11 @@
      "cls": "Metronome",
      "module": "visuals/metronome.py",
      "desc": "A mechanical metronome with swinging pendulum and sliding weight. Sets the tempo for practice and performance.",
+     "legend": {
+      "bottom-left number": "Which beat of the measure is sounding now.",
+      "#:4": "Time signature: beats per measure over 4 (4:4 is 4/4 time).",
+      "# BPM": "Beats per minute \u2014 the tempo (adjustable 20\u2013240)."
+     },
      "controls": {
       "Left/Right": "Adjust BPM by 1",
       "Up/Down": "Adjust BPM by 10",
@@ -4330,6 +4810,14 @@
      "module": "visuals/rudiments.py",
      "desc": "All 40 international drum rudiments. Animated sticking patterns with R/L hand indicators and accent marks. The fundamental vocabulary of percussion.",
      "credit": "PAS, Percussive Arts Society",
+     "legend": {
+      "R": "Right-hand stroke.",
+      "L": "Left-hand stroke.",
+      "PAS #": "This rudiment's official number in the PAS 40 International Drum Rudiments.",
+      "#/#": "Current rudiment's position out of the 40 total rudiments.",
+      "II": "Playback is paused.",
+      "Tempo #": "Sticking pattern tempo in beats per minute."
+     },
      "controls": {
       "Up/Down": "Change rudiment",
       "Left/Right": "Adjust tempo (BPM)",
@@ -4341,6 +4829,13 @@
      "cls": "Scales",
      "module": "visuals/scales.py",
      "desc": "A scale reference over a piano keyboard. Cycle through scales and modes, transpose to any root, and toggle between note names, interval numbers, and scale degrees.",
+     "legend": {
+      "#/#": "Current scale position out of all scales.",
+      "R": "Root note marker (scale degree 1).",
+      "b#": "Flatted scale degree (lowered a half step).",
+      "numbers on the keys": "In NUMBERS mode, the note's place in the scale; in DEGREES mode, its scale degree.",
+      "NAT / HARM / MEL / PENT": "Short scale names: natural, harmonic and melodic minor; MAJ PENT and MIN PENT are the pentatonic scales."
+     },
      "controls": {
       "Up/Down": "Cycle through scales",
       "Left/Right": "Transpose root note (C, C#, D, ... B)",
@@ -4352,6 +4847,12 @@
      "cls": "Synthesizer",
      "module": "visuals/synthesizer.py",
      "desc": "A modular synthesizer with oscillators, filters, and patch cables. Waveforms morph on screen as parameters change.",
+     "legend": {
+      "SIN": "Sine-wave oscillator.",
+      "SAW": "Sawtooth-wave oscillator.",
+      "SQR": "Square-wave oscillator.",
+      "VU": "Volume unit meter showing output level."
+     },
      "controls": {
       "Left/Right": "Adjust master frequency",
       "Up/Down": "Cycle patch cable preset"
@@ -4363,6 +4864,10 @@
      "module": "visuals/theremin.py",
      "desc": "The only instrument you play without touching. Side view with pitch antenna, volume loop, and electromagnetic field arcs. Waveform display shows the output.",
      "credit": "L\u00e9on Theremin, 1920",
+     "legend": {
+      "F=#": "Pitch frequency readout (range 1-8).",
+      "SAW": "Sawtooth waveform is selected."
+     },
      "controls": {
       "Button": "Switch between auto mode and user mode (you move the hands)",
       "Left/Right": "Auto: hand oscillation speed. User: volume hand (left hand)",
@@ -4408,6 +4913,11 @@
      "cls": "Clouds",
      "module": "visuals/clouds.py",
      "desc": "Procedurally generated clouds drifting across the sky. Perlin noise fields produce layered formations that shift and dissolve.",
+     "legend": {
+      "number by the name": "This cloud's number in the list of 13, ordered roughly from highest to lowest.",
+      "VERT": "Altitude band for clouds spanning multiple layers (unlike single-layer HIGH/MID/LOW).",
+      "1/4X to 4X": "How fast the sky is running, from quarter speed to four times."
+     },
      "controls": {
       "Button": "Toggle sky / detail view",
       "Up/Down": "Cycle cloud type",
@@ -4500,6 +5010,9 @@
      "module": "visuals/plates.py",
      "desc": "Pierre-Joseph Redout\u00e9's botanical watercolors \u2014 the roses and lilies painted for Empress Jos\u00e9phine's garden at Malmaison.",
      "credit": "Pierre-Joseph Redout\u00e9, early 19th c.",
+     "legend": {
+      "#/#": "Current plate out of the total in this collection."
+     },
      "controls": {
       "Left/Right": "Cycle between plates",
       "Up/Down held": "Manual pan",
@@ -4575,6 +5088,9 @@
      "cls": "GreenWave",
      "module": "visuals/greenwave.py",
      "desc": "Traffic signals timed so that a car traveling at the speed limit hits green lights all the way down a corridor.",
+     "legend": {
+      "T-S": "Time-space diagram: horizontal axis is time, vertical is position along the corridor."
+     },
      "controls": {
       "Up/Down": "Adjust platoon speed",
       "Space": "Toggle time-space diagram view"
@@ -4586,6 +5102,9 @@
      "module": "visuals/bml.py",
      "desc": "The BML traffic model. Cars move east or north on alternating steps. Below a critical density, traffic flows. Above it, the system jams completely. A phase transition you can see.",
      "credit": "Biham, Middleton & Levine, 1992",
+     "legend": {
+      "D#": "Traffic density: fraction of intersections occupied by cars."
+     },
      "controls": {
       "Up/Down": "Adjust density",
       "Action": "Reset with current density"
@@ -4672,6 +5191,18 @@
      "cls": "Cell",
      "module": "visuals/cell.py",
      "desc": "A data-driven cross-section of a living cell. 14 real biochemical pathways: ATP synthase spinning, ribosomes translating mRNA, protein complexes cycling through conformational states.",
+     "legend": {
+      "IMS": "Intermembrane space \u2014 the region between a mitochondrion's inner and outer membranes.",
+      "INTRA": "Intracellular side of the membrane (inside the cell).",
+      "EXTRA": "Extracellular side of the membrane (outside the cell).",
+      "PRE": "Presynaptic side of a synapse \u2014 the signal-sending neuron.",
+      "POST": "Postsynaptic side of a synapse \u2014 the signal-receiving neuron.",
+      "CYT C/CYT B6F/COQ/FADH2": "Molecules in the scrolling notes: cytochrome c, cytochrome b6f complex, coenzyme Q, reduced flavin adenine dinucleotide.",
+      "E1/E2/E3/UB": "Ubiquitin-pathway proteins in the scrolling notes: E1/E2/E3 enzyme classes and UB (ubiquitin).",
+      "PAM": "Protospacer adjacent motif \u2014 the DNA sequence Cas9 locates next to its target.",
+      "TFIID/TATA/sites/strand": "Transcription and translation notation: TFIID (factor), TATA (promoter), A/P/E SITE (tRNA sites), 5 TO 3 (strand direction).",
+      "GPCR": "G-protein coupled receptor."
+     },
      "controls": {
       "Up/Down": "Switch pathway group",
       "Left/Right": "Step through pathways",
@@ -4683,6 +5214,13 @@
      "cls": "DNA",
      "module": "visuals/dna.py",
      "desc": "The central dogma of molecular biology, animated. Six scenarios: double helix structure, replication, transcription, codon reading, mutation, and chromatin packing.",
+     "legend": {
+      "5'": "Five-prime end of a DNA strand, the chemical start point.",
+      "3'": "Three-prime end of a DNA strand, the chemical end point.",
+      "MRNA": "Messenger RNA, the copy of DNA that carries genetic code to the ribosome.",
+      "three letters (AUG)": "The codon the ribosome is reading: three RNA letters that spell one amino acid.",
+      "three letters (MET)": "The amino acid that codon stands for, by its standard short name (MET is methionine)."
+     },
      "controls": {
       "Left/Right": "Adjust animation speed",
       "Up/Down": "Cycle color palette",
@@ -4695,6 +5233,22 @@
      "cls": "Electrons",
      "module": "visuals/electrons.py",
      "desc": "What electrons actually do. A tour of physics experiments, energy transitions, chemical reactions, quantum phenomena, and semiconductor devices \u2014 each a looping scene with electrons and photons in motion.",
+     "legend": {
+      "hf > WORK FN": "Photon energy exceeds the metal's work function \u2014 the threshold for the photoelectric effect.",
+      "+ / -": "Charge marks: + for anode/positive plate or collector; - for cathode/negative plate.",
+      "N": "A neutron in BETA DECAY; the N-type region in P-N JUNCTION and SOLAR CELL.",
+      "P": "A proton in BETA DECAY; the P-type region in P-N JUNCTION and SOLAR CELL.",
+      "E-": "An electron \u2014 the negatively charged particle.",
+      "VE": "Electron antineutrino \u2014 a ghostly particle released in beta decay.",
+      "N EMITS E + NU": "A neutron decays into an electron and an antineutrino.",
+      "E-GUN": "Electron gun \u2014 source of the primary electron beam.",
+      "SECONDARY E": "Secondary electrons knocked out of the sample by the primary beam.",
+      "Shell/orbital": "Spectroscopic notation for electron energy level (shell number + orbital letter, e.g., 3P).",
+      "GND": "Ground state \u2014 the lowest, most stable electron energy level.",
+      "PN": "The depletion zone between the N-type and P-type regions.",
+      "PSI LEAKS": "The electron's wavefunction has nonzero amplitude past the barrier.",
+      "N>n TO N=n": "Electrons fall to shell n from higher shells: n=2 in BALMER, n=1 in LYMAN."
+     },
      "controls": {
       "Up/Down": "Cycle through groups",
       "Left/Right": "Browse scenes in current group",
@@ -4706,6 +5260,9 @@
      "cls": "Periodic",
      "module": "visuals/periodic.py",
      "desc": "Animated Bohr models for all 118 elements. Electrons orbit on shells, nuclei pulse. Element categories color-coded: alkali metals, noble gases, transition metals, lanthanides.",
+     "legend": {
+      "element and number": "Element symbol and atomic number (protons in nucleus)."
+     },
      "controls": {
       "Up/Down": "Switch element category",
       "Left/Right": "Step through elements",
@@ -4717,6 +5274,9 @@
      "cls": "Lattice",
      "module": "visuals/lattice.py",
      "desc": "3D rotating unit cells of real crystalline structures: diamond, salt, ice, metals. Tiled cells with edge fading show infinite periodicity.",
+     "legend": {
+      "chemical formula": "The crystal's formula, each element's letters coloured to match its atoms."
+     },
      "controls": {
       "Up/Down": "Cycle through categories",
       "Left/Right": "Browse structures in current category",
@@ -4750,6 +5310,9 @@
      "cls": "Molecule",
      "module": "visuals/molecule.py",
      "desc": "3D ball-and-stick models with CPK coloring (carbon black, oxygen red, nitrogen blue). Real molecules rotating in space: amino acids, sugars, neurotransmitters.",
+     "legend": {
+      "chemical formula": "The molecule's formula, each element's letters coloured like its atoms. It alternates with the molecule's name."
+     },
      "controls": {
       "Up/Down": "Cycle through groups (ALL, BASICS, DNA, etc.)",
       "Left/Right": "Browse molecules in current group",
@@ -4761,6 +5324,10 @@
      "cls": "Orbitals",
      "module": "visuals/orbitals.py",
      "desc": "The shapes electrons take around atoms. Hydrogen-like s, p, d, and f orbitals, sigma and pi bonds, sp/sp\u00b2/sp\u00b3 hybrids, and the delocalized clouds of benzene and metals \u2014 rendered from real wavefunctions.",
+     "legend": {
+      "N=/L=/ML=": "Quantum numbers: N is shell, L is orbital type (0=s, 1=p, 2=d, 3=f), ML is orientation.",
+      "SP/SP#": "Orbital hybridization: mixing of s, p, and d atomic orbitals."
+     },
      "controls": {
       "Up/Down": "Cycle through groups",
       "Left/Right": "Browse scenes in current group",
@@ -4772,6 +5339,9 @@
      "cls": "Peptides",
      "module": "visuals/peptides.py",
      "desc": "Amino acids and peptides as rotating 3D bead-on-chain models. Each residue is a shaded sphere linked by backbone bonds, with disulfide bridges and ring closures, alongside a calculator-style info panel.",
+     "legend": {
+      "letters in the chain": "One letter per amino acid (A alanine, K lysine, R arginine...). O is ornithine. Long chains show only their first 16 or so."
+     },
      "controls": {
       "Joystick": "Manual 3D rotation",
       "Button": "Cycle peptides",
@@ -4783,6 +5353,9 @@
      "cls": "Proteins",
      "module": "visuals/proteins.py",
      "desc": "Real protein backbone structures from the RCSB Protein Data Bank. C\u03b1 coordinates with color-coded secondary structure: helices in red, sheets in yellow, coils in gray.",
+     "legend": {
+      "PDB:": "Protein accession code in the RCSB Protein Data Bank."
+     },
      "controls": {
       "Joystick": "Rotate protein in 3D (pauses auto-cycle to let you explore)",
       "Button": "Cycle through proteins in current category (resumes auto-cycle)",
@@ -4795,6 +5368,12 @@
      "module": "visuals/radioactive.py",
      "desc": "A single nucleus drawn as the protons and neutrons it contains, stepping down a real decay chain. Alpha decay throws off two protons and two neutrons; beta decay turns a neutron into a proton. Uranium-238 needs fourteen decays to reach stable lead-206.",
      "credit": "Henri Becquerel, 1896",
+     "legend": {
+      "#P #N": "Proton and neutron count in the nucleus.",
+      "time value (4.5E9 Y)": "The isotope's half-life. Units: NS, US, MS, S, MIN, H, D, Y, KY (thousand years); E9 means times a billion (ten to the 9th).",
+      "A/B/-": "Decay mode in chain view: A=alpha, B=beta, -=stable.",
+      "Element-#": "Isotope notation: element symbol and mass number."
+     },
      "controls": {
       "Left/Right": "Step through the chain",
       "Up/Down": "Change decay chain",
@@ -4807,6 +5386,9 @@
      "cls": "Spectroscope",
      "module": "visuals/spectroscope.py",
      "desc": "Real element emission spectra at their correct wavelengths. Each element has a unique fingerprint of spectral lines \u2014 this is how we know what distant stars are made of.",
+     "legend": {
+      "H SPECTRUM": "The letters before SPECTRUM are the element's chemical symbol (H is hydrogen)."
+     },
      "controls": {
       "Up/Down": "Cycle element groups (ALL, NOBLE, ALKALI, etc.)",
       "Left/Right": "Browse elements within group",
@@ -4831,6 +5413,9 @@
      "module": "visuals/chladni.py",
      "desc": "Sand on a vibrating plate collects at the nodes, revealing standing wave patterns. Each frequency produces a unique geometric figure.",
      "credit": "Ernst Chladni, 1787",
+     "legend": {
+      "MODE #.#": "Vibration mode indices (n, m) of the standing wave pattern."
+     },
      "controls": {
       "Left/Right (held)": "Sweep frequency continuously",
       "Up/Down (pressed)": "Cycle plate shape",
@@ -4853,6 +5438,12 @@
      "cls": "ColorTheory",
      "module": "visuals/colortheory.py",
      "desc": "Color wheel, complementary colors, and color mixing. Additive and subtractive models side by side on the LED grid.",
+     "legend": {
+      "V:#%": "Brightness setting, as a percentage.",
+      "RED ORG YEL ... ROS": "Three-letter hue names around the wheel: red, orange, yellow, yellow-green, green, spring, cyan, sky, blue, violet, magenta, rose.",
+      "R/Y/B": "Primary colors (red, yellow, blue) marked on the color wheel.",
+      "SUBTRACT": "Subtractive mixing: how pigments and inks combine (cyan, magenta, yellow), the partner of the ADDITIVE page."
+     },
      "controls": {
       "Up/Down": "Switch page",
       "Left/Right": "Adjust the current page",
@@ -4865,6 +5456,10 @@
      "module": "visuals/convection.py",
      "desc": "Rayleigh-B\u00e9nard convection cells. Heated fluid rises, cool fluid sinks, forming rolling convection cells with characteristic aspect ratios.",
      "credit": "Lord Rayleigh, 1916",
+     "legend": {
+      "RAYLEIGH #": "Rayleigh number: how strongly heating drives the convection.",
+      "TEMP": "Temperature visualization mode (shows the heat field)."
+     },
      "controls": {
       "Left/Right": "Temperature gradient (Rayleigh number)",
       "Up/Down": "Cycle viz mode (TEMP / FLOW)",
@@ -4889,6 +5484,11 @@
      "module": "visuals/fluid.py",
      "desc": "Stir a real fluid with the joystick. Jos Stam's Stable Fluids solver runs live \u2014 drag the cursor and colored density swirls, folds, and diffuses behind it.",
      "credit": "Jos Stam, SIGGRAPH 1999",
+     "legend": {
+      "VEL + palette name": "Colour shows how fast the fluid is moving; the second word is the colour palette in use.",
+      "DIR + palette name": "Colour shows which way the fluid is flowing, brightness how fast.",
+      "VORT + palette name": "Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise."
+     },
      "controls": {
       "Up/Down": "Cycle color palette / viz mode",
       "Left/Right": "Adjust viscosity (Tunnel/Ink) / move cursor (Play/Sculpt)",
@@ -4923,6 +5523,9 @@
      "cls": "Oscilloscope",
      "module": "visuals/oscilloscope.py",
      "desc": "Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios \u2014 the same patterns used to calibrate TV broadcasts.",
+     "legend": {
+      "F=#.#": "Waveform frequency: cycles visible per trace (0.5-8.0, or auto-sweep 1.0-4.0)."
+     },
      "controls": {
       "Up/Down": "Cycle modes (sine, Lissajous, superposition, sweep)",
       "Left/Right": "Adjust frequency ratio / frequency (held = continuous)",
@@ -4947,6 +5550,9 @@
      "module": "visuals/fluid.py",
      "desc": "Computational fluid dynamics with obstacles. Semi-Lagrangian advection shows vortex shedding, turbulence, and flow separation around objects. Real aerodynamics at 64\u00d764.",
      "credit": "Jos Stam, SIGGRAPH 1999",
+     "legend": {
+      "Re=#": "Reynolds number \u2014 a measure of how much the flow tends to swirl and form eddies (higher means more turbulent, swirling flow)."
+     },
      "controls": {
       "Up/Down": "Cycle color palette / viz mode",
       "Left/Right": "Adjust viscosity (Tunnel/Ink) / move cursor (Play/Sculpt)",
@@ -4959,6 +5565,12 @@
      "module": "visuals/fluid.py",
      "desc": "Move a solid obstacle through a flowing wind tunnel and watch the wake respond \u2014 vortices shed and reattach as you reshape the flow. Powered by Stam's Stable Fluids solver.",
      "credit": "Jos Stam, SIGGRAPH 1999",
+     "legend": {
+      "VEL + palette name": "Colour shows how fast the fluid is moving; the second word is the colour palette in use.",
+      "DIR + palette name": "Colour shows which way the fluid is flowing, brightness how fast.",
+      "VORT + palette name": "Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise.",
+      "TESLA": "The Tesla-valve obstacle shape \u2014 one of ten shapes you can cycle through with both buttons."
+     },
      "controls": {
       "Up/Down": "Cycle color palette / viz mode",
       "Left/Right": "Adjust viscosity (Tunnel/Ink) / move cursor (Play/Sculpt)",
@@ -5015,6 +5627,12 @@
      "cls": "Evolution",
      "module": "visuals/evolution.py",
      "desc": "Natural selection in action. Organisms compete for resources, reproduce with mutation, and adapt over generations. Fitness landscapes shift as populations explore genetic space.",
+     "legend": {
+      "MUT #": "Mutation rate: offspring variation. Higher explores more, lower exploits more.",
+      "G#": "Generation count: simulation steps elapsed, roughly 10 per second.",
+      "N#": "Current population size: number of living organisms.",
+      "POP #": "Survivors after mass extinction: roughly 20% of the population."
+     },
      "controls": {
       "Left/Right": "Mutation rate (low = exploitation, high = exploration)",
       "Up/Down": "Cycle landscape type",
@@ -5048,6 +5666,12 @@
      "module": "visuals/predprey.py",
      "desc": "Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation \u2014 more prey means more predators, more predators means fewer prey, and the cycle repeats.",
      "credit": "Alfred Lotka, 1910",
+     "legend": {
+      "PREY #": "Prey reproduction rate \u2014 probability a rabbit spreads each step.",
+      "HUNT #": "Predator hunting efficiency \u2014 probability a fox catches prey each step.",
+      "R:": "Current rabbit (prey) population count.",
+      "F:": "Current fox (predator) population count."
+     },
      "controls": {
       "Left/Right": "Prey reproduction rate",
       "Up/Down": "Predator hunting efficiency",
@@ -5059,6 +5683,11 @@
      "cls": "Seismic",
      "module": "visuals/seismic.py",
      "desc": "Seismic wave propagation through layered earth. P-waves compress, S-waves shear, surface waves roll. Wavefronts refract at layer boundaries following Snell\u2019s law.",
+     "legend": {
+      "P": "P-wave (primary wave) - fast, compressive, arrives first.",
+      "S": "S-wave (secondary wave) - slower, shear motion, blocked by liquid core.",
+      "PcP": "P-wave reflecting off outer core boundary."
+     },
      "controls": {
       "Left/Right": "Aim epicenter cursor on crust",
       "Up/Down": "Cycle focus mode (WAVES / SHADOW / REFLECT)",
@@ -5673,7 +6302,8 @@
      "controls": {},
      "stub": true
     }
-   ]
+   ],
+   "desc": "Title cards for the Wonder Cabinet: the name redrawn in the style of old games, films, ads and machines. They turn up in the idle rotation between visuals."
   },
   {
    "name": "VISUAL MIX",
@@ -6516,6 +7146,9 @@
      "cls": "About",
      "module": "visuals/about.py",
      "desc": "Hardware and build details for the cabinet \u2014 what's inside and who made it. A second page hides a retro terminal HELLO WORLD easter egg.",
+     "legend": {
+      "HUB75": "Ribbon-cable connector standard for RGB LED matrix panels."
+     },
      "controls": {
       "Button": "Exit to menu",
       "Joystick": "Hidden second page"
@@ -6547,6 +7180,10 @@
      "cls": "Credits",
      "module": "visuals/credits.py",
      "desc": "A scrolling roll of every source, inspiration, and attribution behind the cabinet's games and visuals.",
+     "legend": {
+      "345/2/4": "The Star Wars automaton's rule: a cell survives with 3, 4 or 5 neighbours, is born with 2, and has 4 states.",
+      "SIR MODEL": "Epidemic model (Susceptible-Infected-Recovered)."
+     },
      "controls": {
       "Up/Down": "Slow down / speed up scroll",
       "Button": "Exit to menu"
@@ -6557,6 +7194,11 @@
      "cls": "Effects",
      "module": "visuals/effects.py",
      "desc": "Choose which transition effects the idle screensaver uses when it cross-fades between visuals. Toggle any you don't like off.",
+     "legend": {
+      "Dither": "The Dither Dissolve transition, listed by its first word.",
+      "Random": "The Random Dissolve transition, listed by its first word.",
+      "Horizontal": "The Horizontal Wipe transition, listed by its first word."
+     },
      "controls": {
       "Up/Down": "Navigate transitions",
       "Left/Right": "Toggle on/off",
@@ -6568,6 +7210,9 @@
      "cls": "Gamma",
      "module": "visuals/gamma.py",
      "desc": "Fine-tune the panel's gamma curve and toe-lift so dark tones read correctly, with a live before/after preview. A calibration control, not a toy.",
+     "legend": {
+      "TOE": "Shadow toe-lift amount added to the gamma curve, brightening near-black tones."
+     },
      "controls": {
       "Up/Down": "Select parameter (GAMMA or TOE)",
       "Left/Right": "Adjust selected value",
@@ -6579,6 +7224,12 @@
      "cls": "IdleMix",
      "module": "visuals/idlemix.py",
      "desc": "Curate what the idle screensaver shows. Set how heavily each category is weighted, and mark individual visuals as favorites or blacklist them entirely.",
+     "legend": {
+      "LR:WT": "Left/Right adjusts how often this category plays in the idle rotation.",
+      "SCI MICRO": "The science / micro idle-visual category.",
+      "SCI BENCH": "The science / bench idle-visual category.",
+      "SCI MACRO": "The science / macro idle-visual category."
+     },
      "controls": {
       "Up/Down": "Navigate visuals",
       "Left/Right": "Adjust weight (0=off, 1-5)",
@@ -6591,6 +7242,14 @@
      "cls": "Timers",
      "module": "visuals/timers.py",
      "desc": "Set the cabinet's timing: how long before the idle screensaver kicks in, how fast idle visuals cycle, and when the panel sleeps.",
+     "legend": {
+      "#S": "Seconds.",
+      "#M": "Whole minutes.",
+      "#M##": "Minutes then seconds, run together: 3M05 is 3 min 5 sec.",
+      "#H##": "Hours then minutes, run together: 2H30 is 2 hr 30 min.",
+      "#H": "Whole hours.",
+      "OFF": "Sleep timer is disabled."
+     },
      "controls": {
       "Up/Down": "Select parameter",
       "Left/Right": "Adjust value",
@@ -6602,6 +7261,13 @@
      "cls": "SysInfo",
      "module": "visuals/sysinfo.py",
      "desc": "Live Raspberry Pi vitals \u2014 CPU temperature, IP address, uptime, and memory use. Handy for setup and troubleshooting.",
+     "legend": {
+      "TEMP:": "CPU temperature in Celsius.",
+      "UP:": "Time since last boot.",
+      "MEM:": "Memory used, as a percentage.",
+      "PY:": "Python interpreter version.",
+      "VER:": "Deployed code version and release tag."
+     },
      "controls": {
       "Any input": "Back to menu (stats refresh on their own)"
      }
@@ -6611,6 +7277,13 @@
      "cls": "WiFiConfig",
      "module": "visuals/wifi_config.py",
      "desc": "Join a WiFi network using only the joystick and buttons. Scan for networks, enter the password on a scroll-wheel keyboard, and connect \u2014 no keyboard needed.",
+     "legend": {
+      "PW:": "The password submitted for this connection attempt.",
+      "CHAR:": "Character wheel label on the password entry screen.",
+      "SPC": "Stands in for space on the character wheel.",
+      "NO CONN": "Not currently connected to any WiFi network.",
+      "name ending in >": "A network name too long for its row. Select it and the full name scrolls past."
+     },
      "controls": {
       "Up/Down": "Navigate list / cycle characters",
       "Left": "(PASSWORD) backspace",
@@ -6634,6 +7307,9 @@
      "cls": "Paint",
      "module": "visuals/paint.py",
      "desc": "A digital painting canvas. Move the cursor to paint with light. Brush color and size cycle through palettes.",
+     "legend": {
+      "top-right letter": "Tool: P pencil, M marker, B brush, E eraser, F fill, D dropper, U undo, R redo, S save, L load, C clear, W stamp, N new, G export."
+     },
      "controls": {
       "Joystick": "Move cursor (2px steps)",
       "Button (hold)": "Paint with current tool",
@@ -6646,6 +7322,18 @@
      "cls": "PaintGif",
      "module": "visuals/paint_gif.py",
      "desc": "A frame-by-frame animation studio. Draw 64\u00d764 pixel art with per-frame undo, onion-skinning, and live preview, then export an animated GIF. Your creations show up in the CUSTOMS mix.",
+     "legend": {
+      "top-right symbol": "Current tool: P pencil, M marker, B brush, E eraser, F fill, D eyedropper, U undo, R redo, W stamp, C clear, S save, L load, G export.",
+      "F#/#": "The frame you are on, then how many frames the animation has.",
+      "O": "Onion skin is on: a dim ghost of the previous frame shows through.",
+      "<#/#>": "Scrubbing through frames: the frame shown, then the total.",
+      "+F, DUP, DEL, MOVED #/#": "Confirms a frame was added, duplicated, deleted or moved; the numbers are your frame and the new total.",
+      "CANT MOVE": "The frame is already first or last, so it cannot move that way.",
+      "SAVED ###": "Save confirmed. Project slot number shown.",
+      "LOADED #F": "Load confirmed. F is frame count.",
+      "P#": "Saved project slot number in load list.",
+      "EMPTY PROJ": "Selected project contains no frames."
+     },
      "controls": {
       "Joystick": "Move cursor",
       "Button (hold)": "Paint with current tool",
@@ -6658,6 +7346,10 @@
      "cls": "TestPattern",
      "module": "visuals/testpattern.py",
      "desc": "A diagnostic that exercises every one of the 4,096 LEDs across all primary colors \u2014 a marching cursor, quadrant tests, and full-field fills \u2014 to catch dead or miswired pixels.",
+     "legend": {
+      "P:#": "Current pixel index in the march sequence (raster order 0-4095).",
+      "# PX/S": "March cursor speed in pixels per second."
+     },
      "controls": {
       "Button": "Cycle mode (March -> Quadrant -> Full White)",
       "Left/Right": "Adjust speed (March/Quadrant modes)",
@@ -6669,6 +7361,10 @@
      "cls": "Safety",
      "module": "visuals/safety.py",
      "desc": "Accessibility settings in one place: reduce flashing for photosensitivity, switch on colorblind-friendly palettes, and other display-comfort options.",
+     "legend": {
+      "COLOR": "Colorblind filter (NONE=off, PROT=protanopia, DEUT=deuteranopia, TRIT=tritanopia).",
+      "MAX BRT": "Maximum brightness percentage the panel is allowed to use."
+     },
      "controls": {
       "Up/Down": "Navigate between options",
       "Left/Right": "Toggle/cycle/adjust the selected option",
@@ -6702,6 +7398,14 @@
      "cls": "Refresh",
      "module": "visuals/refresh.py",
      "desc": "Update the cabinet to the latest software over the internet and restart, or roll back to the version it ran before the last update if something goes wrong.",
+     "legend": {
+      "UPD": "Tab to check for and install updates.",
+      "RLBK": "Tab to revert to the version before the last update.",
+      "NOW:": "Version code currently running.",
+      "NEW:": "Version code of the available update.",
+      "OLD:": "Version code to restore with rollback.",
+      "=LATEST": "No update available\u2014already the newest."
+     },
      "controls": {
       "Left/Right": "Switch page",
       "Up/Down": "Select YES/NO",

@@ -21,6 +21,15 @@ class Go(Game):
     category = "2_player"
     GUIDE = {
         'desc': 'Place black or white stones to surround territory. The player controlling more territory wins. Simple rules, deep strategy.',
+        'how': "Surround empty points and enemy stone groups to claim them; a group with no open liberties left is captured and removed. Passing twice in a row ends the game, and your final score is your captures plus surrounded territory, with White getting a 6.5-point bonus. Whoever has the higher score wins.",
+        'legend': {
+            'B': "It is Black's turn to place a stone.",
+            'W': "It is White's turn to place a stone.",
+            'top-right number': "White stones Black has captured.",
+            'second top-right number': "Black stones White has captured.",
+            'B:#': "Black's final score: territory plus captures.",
+            'W:#': "White's final score: territory plus captures, plus a 6.5-point bonus.",
+        },
     }
 
     # Board layout

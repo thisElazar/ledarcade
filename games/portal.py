@@ -290,6 +290,12 @@ class Portal(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Navigate puzzle rooms using portals. L button places a blue portal, R button places an orange one. Walk into one, emerge from the other. Reach the exit to clear each room.',
+        'how': "Reach each chamber's exit before its timer runs out, using portals to cross gaps and reach ledges. Clearing a chamber scores points that rise with each chamber, plus a bonus for time left, then advances you to a tougher chamber with a shorter clock. Getting caught by a turret, touching goo, or letting the timer hit zero ends the run.",
+        'legend': {
+            'CH#': 'Chamber (room) number, counted from 1.',
+            'top-left number': 'Your current score.',
+            'top-right number': 'Seconds left to clear this chamber before it counts as a timeout; turns orange, then red, as time runs low.',
+        },
     }
 
     def __init__(self, display: Display):

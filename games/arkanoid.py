@@ -48,6 +48,10 @@ class Arkanoid(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Brick-breaking with power-ups: extended paddle, lasers, slow ball, multi-ball, catch, extra lives. Power-ups last until you catch the next capsule or lose the ball. Clear all the bricks to advance through the levels.',
+        'how': 'Clear every breakable brick to advance a level; each brick scores 50 to 120 points depending on its color. You start with 3 lives, lose one whenever your last ball drops, and earn a bonus life at 20,000 points and every 60,000 points after that. Running out of lives ends the game.',
+        'legend': {
+            'E/L/S/M/P/C': 'Falling capsule: E=wider paddle, L=laser, S=slower ball, M=splits into 3 balls, P=extra life, C=catch (sticks, fire releases).',
+        },
     }
 
     # Brick types

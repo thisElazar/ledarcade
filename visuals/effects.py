@@ -19,6 +19,11 @@ class Effects(Visual):
     category = "utility"
     GUIDE = {
         'desc': "Choose which transition effects the idle screensaver uses when it cross-fades between visuals. Toggle any you don't like off.",
+        'legend': {
+            'Dither': 'The Dither Dissolve transition, listed by its first word.',
+            'Random': 'The Random Dissolve transition, listed by its first word.',
+            'Horizontal': 'The Horizontal Wipe transition, listed by its first word.',
+        },
     }
 
     def __init__(self, display: Display):

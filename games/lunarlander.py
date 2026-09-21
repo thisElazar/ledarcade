@@ -33,6 +33,15 @@ class LunarLander(Game):
             'Left button': 'Low burn',
             'Right button': 'Full burn',
         },
+        'how': "Soft landings pay 50 points times the pad's multiplier (1x, 2x, or 5x for smaller pads); hard landings pay half that. Landing always refuels the tank by 50 fuel times the multiplier, while crashing drains a flat 30 fuel with no refund. There are no separate lives — only that one shared fuel tank keeps you flying.",
+        'legend': {
+            'L#': 'The level (difficulty round) you are descending on.',
+            'top-right number': 'Your total score, the sum of every landing bonus earned so far.',
+            'v / ^': "Vertical speed marker: v means you're falling, ^ means you're rising. Green means your speed is safe to land on, red means it isn't.",
+            '< / >': 'Tilt marker: shows which way the lander is leaning, and turns red once tilted too far to land safely.',
+            '+#': 'Points awarded for the landing you just made.',
+            'NEXT:LV#': "The level you'll fly next after this landing.",
+        },
     }
 
     # Base physics (modified by level)

@@ -21,6 +21,12 @@ class Mancala(Game):
     category = "2_player"
     GUIDE = {
         'desc': 'Sow seeds around pits, capture your opponent’s. The player with the most seeds wins. One of the oldest known games.',
+        'how': "Each pit starts with 4 seeds; sowing scoops them out and drops one in each pit going counter-clockwise, skipping your opponent's store. Land your last seed in your own empty pit to capture it and everything opposite it, or land it in your own store for another turn. The game ends once one side's pits are empty.",
+        'legend': {
+            'P#': "Shows whose turn it is at the top of the board, labels each side's store, and names the winner at the end ('P1 WINS!').",
+            'top HUD numbers': "Store totals: the left number is P2's seeds, the right is P1's.",
+            'P#:#': "Final seed count in each player's store — whoever has more wins.",
+        },
     }
 
     # Layout constants

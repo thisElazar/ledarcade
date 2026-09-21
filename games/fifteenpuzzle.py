@@ -19,6 +19,11 @@ class FifteenPuzzle(Game):
     category = "toys"
     GUIDE = {
         'desc': 'Slide 15 numbered tiles into order using the single empty space. The “14-15” variant is mathematically impossible.',
+        'how': "Solving the puzzle records your move count as a new best if it beats the current one. You can reshuffle for a fresh puzzle at any time before solving. There's no time limit, lives, or way to lose - only to solve faster.",
+        'legend': {
+            'M:#': 'Moves made since the puzzle was last shuffled.',
+            'B:#': 'Best: fewest moves used to solve a puzzle since the cabinet was last powered on.',
+        },
     }
 
     # Board layout (matching demo style)

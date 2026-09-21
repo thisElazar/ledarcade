@@ -49,6 +49,9 @@ class Network(Visual):
     category = "math"
     GUIDE = {
         'desc': 'Graph theory and network dynamics. Nodes connect, signals propagate, and emergent structure forms from simple connection rules.',
+        'legend': {
+            'p=#': 'Rewiring probability: fraction of edges rewired into shortcuts (0=regular ring, higher=more random).',
+        },
     }
 
     def __init__(self, display: Display):

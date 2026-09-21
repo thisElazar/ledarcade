@@ -129,6 +129,13 @@ class DNA(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'The central dogma of molecular biology, animated. Six scenarios: double helix structure, replication, transcription, codon reading, mutation, and chromatin packing.',
+        'legend': {
+            '5\'': 'Five-prime end of a DNA strand, the chemical start point.',
+            '3\'': 'Three-prime end of a DNA strand, the chemical end point.',
+            'MRNA': 'Messenger RNA, the copy of DNA that carries genetic code to the ribosome.',
+            'three letters (AUG)': 'The codon the ribosome is reading: three RNA letters that spell one amino acid.',
+            'three letters (MET)': 'The amino acid that codon stands for, by its standard short name (MET is methionine).',
+        },
     }
 
     def __init__(self, display: Display):

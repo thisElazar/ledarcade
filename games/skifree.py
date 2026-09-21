@@ -22,6 +22,11 @@ class SkiFree(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Ski downhill, dodging trees, rocks, wandering dogs, and rival skiers. Hold a turn to carve hard. Slalom gates and ramp flips (press the button mid-air, land it clean) build STYLE points. The Abominable Snowman appears at 750m and sprints faster than plain skiing - boost is your only escape.',
+        'how': "Crashing into a tree, rock, dog, or rival skier just costs you speed and briefly stuns you — it doesn't end the run. Clearing a slalom gate cleanly is worth 10 style points, missing one nearby costs 5, and sticking a ramp flip is worth 25. The only way the run actually ends is getting caught by the yeti after it spawns at 750 meters.",
+        'legend': {
+            'S#': 'Style points earned from landing ramp flips and passing through slalom gates.',
+            'Y!': 'The Abominable Snowman is chasing you; only a boost can outrun him.',
+        },
     }
 
     # Player constants

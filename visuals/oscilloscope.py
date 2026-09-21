@@ -58,6 +58,9 @@ class Oscilloscope(Visual):
     category = "science_bench"
     GUIDE = {
         'desc': 'Phosphor-green vintage oscilloscope with sine, square, triangle, and sawtooth waveforms. Lissajous mode draws figures from frequency ratios — the same patterns used to calibrate TV broadcasts.',
+        'legend': {
+            'F=#.#': 'Waveform frequency: cycles visible per trace (0.5-8.0, or auto-sweep 1.0-4.0).',
+        },
     }
 
     def reset(self):

@@ -5252,6 +5252,9 @@ class Molecule(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': '3D ball-and-stick models with CPK coloring (carbon black, oxygen red, nitrogen blue). Real molecules rotating in space: amino acids, sugars, neurotransmitters.',
+        'legend': {
+            'chemical formula': "The molecule's formula, each element's letters coloured like its atoms. It alternates with the molecule's name.",
+        },
     }
 
     _saved_group_idx = None

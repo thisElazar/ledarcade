@@ -131,3 +131,35 @@ def test_legend_is_a_short_string_to_string_dict_when_present(entry):
             f"{module}:{cls} GUIDE['legend'] key too long: {key!r}")
         assert len(value) <= 140, (
             f"{module}:{cls} GUIDE['legend'] value too long: {value!r}")
+
+
+# ── the glossary ledger and the Field Guide stay in step ──────────────
+
+# Items whose only undecoded labels are developer error screens, which the
+# Field Guide deliberately does not explain.
+_NO_LEGEND_NEEDED = {
+    "visuals/usb_share.py::UsbShare",   # 'NO PIL' (missing dependency)
+    # TITLES are listed by name only on the page; their text is set dressing.
+    "visuals/wondercabinet.py::WonderDOS",
+    "visuals/wondercabinet.py::WonderInsertCoin",
+    "visuals/wondercabinet.py::WonderVHS",
+}
+
+
+def test_every_item_the_ledger_flags_has_a_legend():
+    """tools/legend_ledger.json lists on-screen labels a viewer has to decode.
+
+    Any item with a label the panel itself never spells out must explain it in
+    GUIDE['legend'], so the Field Guide gives players what the cabinet doesn't.
+    """
+    import json
+    with open(os.path.join(ROOT, "tools", "legend_ledger.json")) as f:
+        entries = json.load(f)["entries"]
+    have = {f"{module}::{cls}" for module, cls, guide in _GUIDES
+            if guide.get("legend")}
+    missing = sorted(
+        key for key, entry in entries.items()
+        if any(not rec["explained_same_screen"]
+               for rec in entry["labels"].values())
+        and key not in have and key not in _NO_LEGEND_NEEDED)
+    assert not missing, f"ledger items with no GUIDE['legend']: {missing}"

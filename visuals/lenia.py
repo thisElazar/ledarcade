@@ -215,6 +215,10 @@ class LeniaLab(Visual):
             'Button': 'Cycle palette + reseed',
             'Both': 'Commit params to settings',
         },
+        'legend': {
+            'mu=': 'Growth center — the potential value at which cells grow fastest.',
+            'sig=': 'Growth width — how wide a range of potential values supports growth.',
+        },
     }
 
     def __init__(self, display: Display):

@@ -66,6 +66,12 @@ class IdleMix(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'Curate what the idle screensaver shows. Set how heavily each category is weighted, and mark individual visuals as favorites or blacklist them entirely.',
+        'legend': {
+            'LR:WT': 'Left/Right adjusts how often this category plays in the idle rotation.',
+            'SCI MICRO': 'The science / micro idle-visual category.',
+            'SCI BENCH': 'The science / bench idle-visual category.',
+            'SCI MACRO': 'The science / macro idle-visual category.',
+        },
     }
 
     def __init__(self, display: Display):

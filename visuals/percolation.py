@@ -190,6 +190,9 @@ class Percolation(Visual):
     GUIDE = {
         'desc': 'A phase transition in connectivity. Below a critical threshold, clusters stay isolated. Above it, a spanning cluster suddenly connects the entire grid.',
         'credit': 'Broadbent & Hammersley, 1957',
+        'legend': {
+            'P#': 'Current value of p, the fraction of lattice sites that have been opened.',
+        },
     }
 
     def __init__(self, display: Display):

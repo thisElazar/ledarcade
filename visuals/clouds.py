@@ -485,6 +485,11 @@ class Clouds(Visual):
             'Up/Down': 'Cycle cloud type',
             'Left/Right': 'Adjust time speed',
         },
+        'legend': {
+            'number by the name': "This cloud's number in the list of 13, ordered roughly from highest to lowest.",
+            'VERT': 'Altitude band for clouds spanning multiple layers (unlike single-layer HIGH/MID/LOW).',
+            '1/4X to 4X': 'How fast the sky is running, from quarter speed to four times.',
+        },
     }
 
     SCROLL_DELAY = 0.4

@@ -36,6 +36,10 @@ class Gyroscope(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'A spinning rotor that resists changes to its orientation. Demonstrates precession, nutation, and conservation of angular momentum.',
+        'legend': {
+            'PREC': 'Precession rate shown as a percentage of maximum.',
+            'SPIN #': 'Rotor spin speed shown as a percentage of maximum.',
+        },
     }
 
     # Layout

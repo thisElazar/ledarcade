@@ -59,6 +59,10 @@ class MitosisLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'The cell-division simulation opened up for tinkering. Trade growth rate against competition strength and watch colonies bloom, crowd, and pinch apart.',
+        'legend': {
+            'grow=#': 'Base multiplier on how fast cell colonies expand.',
+            'comp=#': 'How aggressively overlapping colonies drain energy from each other.',
+        },
     }
 
     def __init__(self, display: Display):

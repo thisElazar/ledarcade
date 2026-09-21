@@ -18,6 +18,7 @@ class Centipede(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Shoot a centipede weaving down through a mushroom field. Hit a segment and it splits in two. Scorpions poison mushrooms — a segment that touches one dives straight down at you. Spiders score more the closer you shoot them (300/600/900). Losing a life repairs the field at +5 a mushroom. Extra life every 12,000. Clear the wave to advance.',
+        'how': 'Destroying a mushroom outright earns 1 point, shooting a centipede head is worth 100 and a body segment 10, a scorpion is worth 1000, and a flea (which takes two hits and speeds up after the first) is worth 200. You start with 3 lives, and the run ends when the last one is gone.',
     }
 
     # Player constants

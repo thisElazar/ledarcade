@@ -42,6 +42,7 @@ class Defender(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Side-scrolling shooter. Shoot aliens and rescue falling humanoids: catch one and fly low to set it down for bonus points. Lose every humanoid and the planet is destroyed. Baiters hunt you if a wave drags on; every 5th wave restores the planet. Extra ship and smart bomb every 10000 points. Radar shows the full map. Hold both buttons for a smart bomb.',
+        'how': 'Catching a falling human as it drops earns 500 points, and killing enemies pays out per type: landers, mutants, and swarmers 150, baiters 200, bombers 250, and pods 1000. You start with 3 lives and 3 smart bombs, and the run ends once your last life is lost.',
     }
 
     def __init__(self, display: Display):

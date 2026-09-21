@@ -19,6 +19,13 @@ class Bomberman(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Place bombs on a grid to destroy walls and enemies. Bombs turn solid once you step off them - you can wall yourself in. Collect power-ups for range, speed, and extra bombs, but blasting a revealed power-up or the exit destroys it and spawns angry reinforcements. Clear all enemies to open the exit, and beat the 200-second timer or a swarm of fast chasers floods the level.',
+        'how': 'Destroying a brick scores 10 points, defeating an enemy scores 100, and picking up a power-up scores 50. You start with 3 lives, shown as dots in the HUD; losing all three ends the game. Reaching the exit after every enemy is gone advances the level and banks a bonus of 500 times the new level number.',
+        'legend': {
+            'top-left number': 'Your score. It rises as you destroy bricks, collect power-ups, and defeat enemies.',
+            'number left of L#': 'Seconds left in the level; turns red under 30 seconds, and running it out unleashes a swarm of fast enemies.',
+            'L#': 'The current level number.',
+            'B#': 'Bombs you can still place at once, out of your current bomb capacity.',
+        },
     }
 
     # Grid dimensions

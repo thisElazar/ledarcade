@@ -17,6 +17,10 @@ class GeometryDash(Game):
     category = "modern"
     GUIDE = {
         'desc': 'One-button platformer. Hold the button to jump; the level scrolls at a fixed speed. Hit any obstacle and you restart.',
+        'how': 'Your score is the distance traveled, one point for every 5 pixels scrolled. Touching a spike or a block from the side, or falling off the bottom of the screen, ends the run immediately.',
+        'legend': {
+            'top-left number': 'Your score — distance traveled, one point per 5 pixels scrolled.',
+        },
     }
 
     # Physics

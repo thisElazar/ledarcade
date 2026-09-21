@@ -39,6 +39,10 @@ class TestPattern(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'A diagnostic that exercises every one of the 4,096 LEDs across all primary colors — a marching cursor, quadrant tests, and full-field fills — to catch dead or miswired pixels.',
+        'legend': {
+            'P:#': 'Current pixel index in the march sequence (raster order 0-4095).',
+            '# PX/S': 'March cursor speed in pixels per second.',
+        },
     }
     custom_exit = True  # handle own exit via hold-both-buttons
 

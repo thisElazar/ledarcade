@@ -131,7 +131,12 @@ class SpaceCruise(Game):
     description = "Math shooter!"
     category = "retro"
     GUIDE = {
-        'desc': 'Side-scrolling starship game. Navigate asteroid fields, manage shields, fire lasers. Survive as long as possible.',
+        'desc': 'Shoot floating numbers and operators to build a math equation: a number loads it, an operator sets the operation, and a following number computes the result and banks it as score. Rack up as many equations as you can before the two-minute clock runs out.',
+        'how': "Completing an equation banks its result as points (subtraction never goes below zero); shooting a second number before setting an operator instead banks just that first number, and shooting a stray operator with no combo open scores a 1-point consolation.",
+        'legend': {
+            '#+': 'Your equation building up: a number loads it, an operator (+, -, or x) sets the operation, then a number banks the result.',
+            'MISS!': 'Flashes at the crosshair when three shots in a row miss while a combo is open, dropping it.',
+        },
     }
 
     # Colors

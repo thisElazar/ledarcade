@@ -26,6 +26,11 @@ class BopIt(Game):
             'Left/Right': 'Twist It (L→R or R→L)',
             'Up/Down': 'Pull It (U→D or D→U)',
         },
+        'how': 'Each correct command scores one point, and your best run is kept as a high score. Responding wrong, or not fast enough, ends the run immediately - there are no extra lives. The response window starts at 2 seconds and shrinks toward a 0.6-second floor as you keep succeeding.',
+        'legend': {
+            'L-R': 'Shorthand for the twist motion: press Left then Right, or Right then Left.',
+            'U-D': 'Shorthand for the pull motion: press Up then Down, or Down then Up.',
+        },
     }
 
     # Commands

@@ -103,6 +103,13 @@ class Entropy(Visual):
             'Up/Down': 'Block size for the entropy meter',
             'Left/Right': 'Gas density',
         },
+        'legend': {
+            'FWD': 'Simulation is running forward in time.',
+            'REV': 'Simulation is running backward (un-mixing).',
+            'BLOCK #': 'Block size for entropy calculation (4, 8, or 16 pixels).',
+            'DENSITY #': 'Gas fill fraction as a percentage.',
+            'ORDER': 'Run has returned to its starting state.',
+        },
     }
 
     def __init__(self, display: Display):

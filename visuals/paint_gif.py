@@ -98,6 +98,18 @@ class PaintGif(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'A frame-by-frame animation studio. Draw 64×64 pixel art with per-frame undo, onion-skinning, and live preview, then export an animated GIF. Your creations show up in the CUSTOMS mix.',
+        'legend': {
+            'top-right symbol': 'Current tool: P pencil, M marker, B brush, E eraser, F fill, D eyedropper, U undo, R redo, W stamp, C clear, S save, L load, G export.',
+            'F#/#': 'The frame you are on, then how many frames the animation has.',
+            'O': 'Onion skin is on: a dim ghost of the previous frame shows through.',
+            '<#/#>': 'Scrubbing through frames: the frame shown, then the total.',
+            '+F, DUP, DEL, MOVED #/#': 'Confirms a frame was added, duplicated, deleted or moved; the numbers are your frame and the new total.',
+            'CANT MOVE': 'The frame is already first or last, so it cannot move that way.',
+            'SAVED ###': 'Save confirmed. Project slot number shown.',
+            'LOADED #F': 'Load confirmed. F is frame count.',
+            'P#': 'Saved project slot number in load list.',
+            'EMPTY PROJ': 'Selected project contains no frames.',
+        },
     }
     custom_exit = True
 

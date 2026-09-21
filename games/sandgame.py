@@ -116,7 +116,8 @@ class SandGame(Game):
     description = "Falling sand physics sandbox"
     category = "modern"
     GUIDE = {
-        'desc': 'Falling-sand particle physics sandbox. Place 13 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal — a creative toy.',
+        'desc': 'Falling-sand particle physics sandbox. Place 17 materials and watch them interact: sand piles, water flows, fire spreads through oil, gunpowder explodes. No score or goal — a creative toy.',
+        'how': 'You paint with a 2x2 brush and can scroll through 17 materials plus an eraser to pick what goes down next. Heat and cold drive phase changes: ice melts above 5 degrees, water freezes below -5 and boils past 105, turning to steam. There is no score, win condition, or game over - the simulation just keeps running for you to experiment with.',
     }
 
     def __init__(self, display: Display):

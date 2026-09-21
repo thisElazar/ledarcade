@@ -140,6 +140,12 @@ class Evolution(Visual):
     category = "science_macro"
     GUIDE = {
         'desc': 'Natural selection in action. Organisms compete for resources, reproduce with mutation, and adapt over generations. Fitness landscapes shift as populations explore genetic space.',
+        'legend': {
+            'MUT #': 'Mutation rate: offspring variation. Higher explores more, lower exploits more.',
+            'G#': 'Generation count: simulation steps elapsed, roughly 10 per second.',
+            'N#': 'Current population size: number of living organisms.',
+            'POP #': 'Survivors after mass extinction: roughly 20% of the population.',
+        },
     }
 
     def __init__(self, display: Display):

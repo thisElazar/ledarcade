@@ -23,6 +23,13 @@ class SysInfo(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'Live Raspberry Pi vitals — CPU temperature, IP address, uptime, and memory use. Handy for setup and troubleshooting.',
+        'legend': {
+            'TEMP:': 'CPU temperature in Celsius.',
+            'UP:': 'Time since last boot.',
+            'MEM:': 'Memory used, as a percentage.',
+            'PY:': 'Python interpreter version.',
+            'VER:': 'Deployed code version and release tag.',
+        },
     }
 
     def __init__(self, display: Display):

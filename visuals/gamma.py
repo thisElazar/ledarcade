@@ -18,6 +18,9 @@ class Gamma(Visual):
     category = "utility"
     GUIDE = {
         'desc': "Fine-tune the panel's gamma curve and toe-lift so dark tones read correctly, with a live before/after preview. A calibration control, not a toy.",
+        'legend': {
+            'TOE': 'Shadow toe-lift amount added to the gamma curve, brightening near-black tones.',
+        },
     }
     custom_exit = True  # We handle our own exit via wants_exit
 

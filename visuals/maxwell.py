@@ -108,6 +108,9 @@ class MaxwellDemon(Visual):
             'Up/Down': 'Adjust the demon’s selectivity',
             'Left/Right': 'Slow down / speed up the simulation',
         },
+        'legend': {
+            'SELECT #': "The demon's speed cutoff, as a multiple of the median speed: faster particles pass right, slower pass left.",
+        },
     }
 
     def __init__(self, display: Display):

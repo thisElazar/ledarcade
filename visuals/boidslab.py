@@ -51,6 +51,10 @@ class BoidsLab(Visual):
     GUIDE = {
         'desc': 'The Boids flocking model turned into an explorable parameter space. The joystick sweeps separation against cohesion; watch tight schools loosen into scattered wandering and back.',
         'credit': 'Craig Reynolds, 1987',
+        'legend': {
+            'sep=': 'Separation weight: how strongly boids steer away from neighbors.',
+            'coh=': 'Cohesion weight: how strongly boids steer toward the group center.',
+        },
     }
 
     NUM_BOIDS = 80

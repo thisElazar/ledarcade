@@ -112,6 +112,10 @@ class Loom(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'A working weaving loom. The shuttle passes through the warp threads, the heddles lift, the beater presses. Cloth forms row by row.',
+        'legend': {
+            '# PPM': 'Shuttle passes per minute (weaving speed).',
+            'pass #': 'Count of completed shuttle passes (rows woven).',
+        },
     }
 
     def __init__(self, display: Display):

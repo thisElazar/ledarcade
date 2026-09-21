@@ -34,6 +34,7 @@ class Breakout(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Move a paddle to bounce a ball into rows of bricks. Clear all bricks to win. Ball speeds up; paddle shrinks after hitting the ceiling.',
+        'how': 'You get 3 lives; missing the ball costs one and the run ends when they run out. Yellow bricks earn 1 point, green 3, orange 5, and red 7, with the ball moving fastest once it reaches the orange and red rows. Clear every brick across both screens to win, for a maximum possible score of 896.',
     }
 
     # Authentic color scheme (bottom to top): Yellow, Green, Orange, Red

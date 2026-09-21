@@ -32,6 +32,12 @@ class PredPrey(Visual):
     GUIDE = {
         'desc': 'Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation — more prey means more predators, more predators means fewer prey, and the cycle repeats.',
         'credit': 'Alfred Lotka, 1910',
+        'legend': {
+            'PREY #': 'Prey reproduction rate — probability a rabbit spreads each step.',
+            'HUNT #': 'Predator hunting efficiency — probability a fox catches prey each step.',
+            'R:': 'Current rabbit (prey) population count.',
+            'F:': 'Current fox (predator) population count.',
+        },
     }
 
     def __init__(self, display: Display):

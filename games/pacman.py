@@ -18,6 +18,7 @@ class PacMan(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.',
+        'how': 'Every dot is worth 10 points and a power pellet is worth 50. Eating a frightened ghost scores 200 points, doubling with each ghost eaten during the same power pellet. You start with 3 lives, losing one when a ghost catches you outside frightened mode; losing your last life ends the game. Clearing all dots advances the level, refilling the maze and speeding up the ghosts.',
     }
 
     # Simplified maze for 64x64 display (21x19 tiles at 3px each = 63x57)

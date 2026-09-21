@@ -187,6 +187,11 @@ class Bloons(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Pop waves of balloons by throwing darts. Aim and time your throws to clear each round.',
+        'how': "Throw darts to pop balloon clusters; popping one scores points and can reveal a smaller balloon inside. Reach the pop target shown for each of the 15 levels before your darts run out, or the run ends there.",
+        'legend': {
+            'L#': 'Current level, out of 15.',
+            '#/#': 'Balloons popped so far / balloons needed to clear the level.',
+        },
     }
 
     def __init__(self, display: Display):

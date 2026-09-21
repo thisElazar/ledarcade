@@ -86,6 +86,9 @@ class Chladni(Visual):
     GUIDE = {
         'desc': 'Sand on a vibrating plate collects at the nodes, revealing standing wave patterns. Each frequency produces a unique geometric figure.',
         'credit': 'Ernst Chladni, 1787',
+        'legend': {
+            'MODE #.#': 'Vibration mode indices (n, m) of the standing wave pattern.',
+        },
     }
 
     # Square/rect modes sorted by ascending frequency f ∝ (n² + m²).

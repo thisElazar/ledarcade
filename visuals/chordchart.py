@@ -444,6 +444,11 @@ class ChordChart(Visual):
             'Action R': 'Next key (root)',
             'Both': 'Switch instrument',
         },
+        'legend': {
+            'GTR/UKE': 'Current instrument: guitar or ukulele.',
+            'FR#': 'The fret where this chord shape starts: fret 1 on the diagram sits here on the neck.',
+            'number by the nut': 'The same starting fret as FR#, shown beside the fretboard.',
+        },
     }
 
     def reset(self):

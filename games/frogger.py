@@ -18,6 +18,7 @@ class Frogger(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Cross five lanes of traffic, then hop across logs and turtles to reach home. Points come only from new forward progress; turtles dive on a fixed rhythm (they dim just before going under). Flies in home slots are bonus food, crocodile heads are death. Carry the purple lady frog home for extra points, and mind the snake on the median from level 3.',
+        'how': 'You start with 3 lives and a 30-second timer per frog; reaching a new row earns 10 points, clearing the halfway safe zone adds 50, and every frog you get home pays 50 plus 20 for each second left on the clock. Filling all five home slots scores 1000 and advances the level, while running out of time or lives ends the game.',
     }
 
     def __init__(self, display: Display):

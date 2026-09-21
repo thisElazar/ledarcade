@@ -120,6 +120,10 @@ class Singer(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'A sewing machine with needle, bobbin, and feed dog. The needle plunges, the thread loops, the fabric advances.',
+        'legend': {
+            '# SPM': 'Stitches per minute: hand-wheel speed.',
+            '# ST': 'Total stitches completed since reset.',
+        },
     }
 
     def __init__(self, display: Display):

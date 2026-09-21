@@ -116,6 +116,9 @@ class Paint(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'A digital painting canvas. Move the cursor to paint with light. Brush color and size cycle through palettes.',
+        'legend': {
+            'top-right letter': 'Tool: P pencil, M marker, B brush, E eraser, F fill, D dropper, U undo, R redo, S save, L load, C clear, W stamp, N new, G export.',
+        },
     }
     custom_exit = True
 

@@ -232,6 +232,9 @@ class Periodic(Visual):
             'Left/Right': 'Step through elements',
             'Button': 'Toggle auto-cycle',
         },
+        'legend': {
+            'element and number': 'Element symbol and atomic number (protons in nucleus).',
+        },
     }
 
     def reset(self):

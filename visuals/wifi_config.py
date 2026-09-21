@@ -59,6 +59,13 @@ class WiFiConfig(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'Join a WiFi network using only the joystick and buttons. Scan for networks, enter the password on a scroll-wheel keyboard, and connect — no keyboard needed.',
+        'legend': {
+            'PW:': 'The password submitted for this connection attempt.',
+            'CHAR:': 'Character wheel label on the password entry screen.',
+            'SPC': 'Stands in for space on the character wheel.',
+            'NO CONN': 'Not currently connected to any WiFi network.',
+            'name ending in >': 'A network name too long for its row. Select it and the full name scrolls past.',
+        },
     }
 
     def __init__(self, display: Display):

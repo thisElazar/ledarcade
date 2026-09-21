@@ -33,6 +33,11 @@ class Metronome(Visual):
     category = "music"
     GUIDE = {
         'desc': 'A mechanical metronome with swinging pendulum and sliding weight. Sets the tempo for practice and performance.',
+        'legend': {
+            'bottom-left number': 'Which beat of the measure is sounding now.',
+            '#:4': 'Time signature: beats per measure over 4 (4:4 is 4/4 time).',
+            '# BPM': 'Beats per minute — the tempo (adjustable 20–240).',
+        },
     }
 
     # Layout

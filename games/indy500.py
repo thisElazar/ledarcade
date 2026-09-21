@@ -128,6 +128,13 @@ class Indy500(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Head-to-head racing against a drone car - first to 4 laps wins the track. Beat the drone on all 6 tracks for victory; if it finishes first, the race is over. Walls and bumping the drone send cars spinning, the steering snaps to 16 rotary detents on release, and the final ice track has barely any grip.',
+        'how': "Your score is the total laps you've completed across every track you've already won, shown as LAPS:# on the end screen. Winning all 6 tracks scores a full victory; losing any track ends the run there, with the track number shown.",
+        'legend': {
+            'T#': 'The track you are racing, out of 6 tracks total.',
+            'P#/#': 'Your laps completed out of the 4 needed to win the track.',
+            'D#/#': "The drone opponent's laps completed out of the 4 needed to win the track.",
+            'TRK:#/6': 'The track you were on when the drone beat you to 4 laps.',
+        },
     }
 
     TRACK_WIDTH = 12

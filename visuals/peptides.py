@@ -5410,6 +5410,9 @@ class Peptides(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'Amino acids and peptides as rotating 3D bead-on-chain models. Each residue is a shaded sphere linked by backbone bonds, with disulfide bridges and ring closures, alongside a calculator-style info panel.',
+        'legend': {
+            'letters in the chain': 'One letter per amino acid (A alanine, K lysine, R arginine...). O is ornithine. Long chains show only their first 16 or so.',
+        },
     }
 
     def __init__(self, display: Display):

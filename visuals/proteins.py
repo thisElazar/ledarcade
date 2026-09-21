@@ -3570,6 +3570,9 @@ class Proteins(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'Real protein backbone structures from the RCSB Protein Data Bank. Cα coordinates with color-coded secondary structure: helices in red, sheets in yellow, coils in gray.',
+        'legend': {
+            'PDB:': 'Protein accession code in the RCSB Protein Data Bank.',
+        },
     }
 
     def __init__(self, display: Display):

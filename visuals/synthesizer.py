@@ -102,6 +102,12 @@ class Synthesizer(Visual):
     category = "music"
     GUIDE = {
         'desc': 'A modular synthesizer with oscillators, filters, and patch cables. Waveforms morph on screen as parameters change.',
+        'legend': {
+            'SIN': 'Sine-wave oscillator.',
+            'SAW': 'Sawtooth-wave oscillator.',
+            'SQR': 'Square-wave oscillator.',
+            'VU': 'Volume unit meter showing output level.',
+        },
     }
 
     def __init__(self, display: Display):

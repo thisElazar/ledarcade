@@ -389,6 +389,11 @@ class TuringPatterns(_TuringBase):
     GUIDE = {
         'desc': 'Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.',
         'credit': 'Alan Turing, 1952',
+        'legend': {
+            'F=#': 'Chemical feed rate — controls how fast pattern U is replenished.',
+            'K=#': 'Chemical removal rate — controls how fast pattern V is removed.',
+            'LAMBDA': 'Pearson pattern classification (ALPHA–SIGMA) — identifies the morphology at the current parameters.',
+        },
     }
     _f_center = 0.035
     _k_center = 0.065

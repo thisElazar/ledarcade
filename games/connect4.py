@@ -22,6 +22,10 @@ class Connect4(Game):
     category = "2_player"
     GUIDE = {
         'desc': 'Drop colored discs into columns. Connect four in a row (horizontal, vertical, or diagonal) to win. Solved in 1988 — first player wins with perfect play.',
+        'how': "The board is 7 columns wide and 6 rows tall. The game ends the instant a player completes a four-in-a-row, or in a draw if every column fills up first.",
+        'legend': {
+            'P#': "Whose turn it is: P1 drops red discs, P2 drops yellow. Also names the winner.",
+        },
     }
 
     # Board dimensions

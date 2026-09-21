@@ -35,6 +35,7 @@ class Drift(Game):
     category = "unique"
     GUIDE = {
         'desc': 'Terrain-sculpting sandbox. One button cycles the tool - raise, lower, smooth, spring, water - and the other applies it at the cursor. Watch the water find its level.',
+        'how': 'Raising, lowering, and smoothing reshape the terrain; placing a spring adds a running water source, while the water tool drops standing water directly. Water flows downhill and slowly evaporates over time, and two springs already run on the highest peaks when you start. There is no score or goal - it runs indefinitely as an open-ended terrain and water toy.',
     }
 
     def __init__(self, display: Display):

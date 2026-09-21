@@ -1229,6 +1229,18 @@ class Cell(Visual):
             'Left/Right': 'Step through pathways',
             'Button': 'Toggle auto-cycle',
         },
+        'legend': {
+            'IMS': 'Intermembrane space — the region between a mitochondrion\'s inner and outer membranes.',
+            'INTRA': 'Intracellular side of the membrane (inside the cell).',
+            'EXTRA': 'Extracellular side of the membrane (outside the cell).',
+            'PRE': 'Presynaptic side of a synapse — the signal-sending neuron.',
+            'POST': 'Postsynaptic side of a synapse — the signal-receiving neuron.',
+            'CYT C/CYT B6F/COQ/FADH2': 'Molecules in the scrolling notes: cytochrome c, cytochrome b6f complex, coenzyme Q, reduced flavin adenine dinucleotide.',
+            'E1/E2/E3/UB': 'Ubiquitin-pathway proteins in the scrolling notes: E1/E2/E3 enzyme classes and UB (ubiquitin).',
+            'PAM': 'Protospacer adjacent motif — the DNA sequence Cas9 locates next to its target.',
+            'TFIID/TATA/sites/strand': 'Transcription and translation notation: TFIID (factor), TATA (promoter), A/P/E SITE (tRNA sites), 5 TO 3 (strand direction).',
+            'GPCR': 'G-protein coupled receptor.',
+        },
     }
 
     def reset(self):

@@ -123,6 +123,10 @@ class HurdyGurdy(Visual):
     category = "music"
     GUIDE = {
         'desc': 'Medieval string instrument where a rosined wheel acts as a continuous bow. Keys press tangents against the strings. Drone notes sustain while the melody plays above.',
+        'legend': {
+            'NPM': 'Notes per minute — the current tempo.',
+            'NOTE:': 'Current melody pitch as a musical note (A–G).',
+        },
     }
 
     def __init__(self, display: Display):

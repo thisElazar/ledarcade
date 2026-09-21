@@ -171,6 +171,13 @@ class TuringMachine(Visual):
     GUIDE = {
         'desc': 'A working Turing machine running real programs on a tape. The read/write head shuttles back and forth, writing symbols and switching states — the abstract foundation of all computation, made mechanical.',
         'credit': 'Alan Turing, 1936',
+        'legend': {
+            'rule rows (A,0>1,R,B)': 'In state A reading 0: write 1, move right, go to state B.',
+            'Q:': 'Current machine state; Q is the automata-theory symbol for state.',
+            'SPD #': 'Current simulation speed (steps executed per frame batch).',
+            'CTR': 'Counter program selected (increments a binary number on tape).',
+            'BB-#': 'Busy Beaver problem with given state count (named computability theory problem).',
+        },
     }
 
     def __init__(self, display: Display):

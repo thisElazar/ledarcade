@@ -19,6 +19,9 @@ class About(Visual):
     category = "utility"
     GUIDE = {
         'desc': "Hardware and build details for the cabinet — what's inside and who made it. A second page hides a retro terminal HELLO WORLD easter egg.",
+        'legend': {
+            'HUB75': 'Ribbon-cable connector standard for RGB LED matrix panels.',
+        },
     }
 
     def __init__(self, display: Display):

@@ -96,6 +96,12 @@ class ColorTheory(Visual):
             'Left/Right': 'Adjust the current page',
             'Button': 'Toggle related view',
         },
+        'legend': {
+            'V:#%': 'Brightness setting, as a percentage.',
+            'RED ORG YEL ... ROS': 'Three-letter hue names around the wheel: red, orange, yellow, yellow-green, green, spring, cyan, sky, blue, violet, magenta, rose.',
+            'R/Y/B': 'Primary colors (red, yellow, blue) marked on the color wheel.',
+            'SUBTRACT': 'Subtractive mixing: how pigments and inks combine (cyan, magenta, yellow), the partner of the ADDITIVE page.',
+        },
     }
 
     def reset(self):

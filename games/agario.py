@@ -59,6 +59,11 @@ class Agario(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Absorb smaller cells, avoid bigger ones. L button boosts speed, R button ejects mass. Based on the browser game that launched the .io genre.',
+        'how': "You have 3 minutes to grow: eating a food pellet adds 1 point, and absorbing a smaller cell adds points equal to its mass. Boosting or ejecting mass shrinks your cell, but your score never drops. Getting touched by a bigger cell ends the game immediately, and running out of time ends the round too.",
+        'legend': {
+            'top-left number': "Your score: +1 per food pellet eaten, plus the absorbed cell's mass when you eat a smaller cell. It never decreases.",
+            '#:##': 'Time left in the 3-minute round, shown as minutes:seconds; turns red under 30 seconds left.',
+        },
     }
 
     NUM_FOOD = 120

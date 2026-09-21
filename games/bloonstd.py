@@ -177,6 +177,13 @@ class BloonsTD(Game):
             'Left button': 'Place tower / select tower / upgrade selected tower',
             'Right button': 'Switch tower type',
         },
+        'how': 'You start with 500 coins and 20 lives. Popping a bloon earns coins and score; a bloon that reaches the end costs you lives equal to its remaining toughness. Survive all 20 waves without your lives reaching 0 to win.',
+        'legend': {
+            'L:#': 'Lives left. Reach zero and the game is over.',
+            'W#': 'Current wave number, out of 20 total waves.',
+            '#S': 'Seconds until the next wave starts automatically.',
+            'UP$#': 'Cost in coins to upgrade the tower you have selected.',
+        },
     }
 
     def __init__(self, display: Display):

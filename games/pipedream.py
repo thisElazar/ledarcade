@@ -46,6 +46,12 @@ class PipeDream(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Place pipe segments before the water arrives. Keep the flow going as long as you can - every pipe the water passes through scores.',
+        'how': "Lay pipe pieces from the queue before the water starts flowing, then keep the path going. Each pipe the flow fills scores 10 points; swapping out an unfilled pipe costs 5. The flow running off the end of the track ends the game, with a bonus of 5 points per pipe filled once you reach 10.",
+        'legend': {
+            'S:#': "Player's score.",
+            'number beside score': 'Seconds left before the water starts flowing; turns red at 2 seconds or less.',
+            'P:#': 'Count of pipe segments the water has filled so far.',
+        },
     }
 
     # Grid layout

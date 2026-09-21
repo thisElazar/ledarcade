@@ -1230,6 +1230,9 @@ class Language(Visual):
             'Up/Down': 'Jump five at a time',
             'Button': 'Toggle auto-advance',
         },
+        'legend': {
+            '#/#': 'Current greeting language out of 67 total languages.',
+        },
     }
 
     def reset(self):

@@ -107,6 +107,15 @@ class Flavors(Visual):
             'Up/Down': 'Jump between regions',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'SWT': 'Sweetness intensity.',
+            'SOR': 'Sourness intensity.',
+            'SLT': 'Saltiness intensity.',
+            'SPC': 'Spiciness intensity.',
+            'UMA': 'Umami intensity.',
+            '#/#': 'Right: position within region. Left: overall position (1-13).',
+            'cuisine # in header': 'Cuisine\'s number in the overall 1-13 list.',
+        },
     }
 
     SCROLL_DELAY = 0.4

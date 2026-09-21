@@ -97,6 +97,14 @@ class Refresh(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'Update the cabinet to the latest software over the internet and restart, or roll back to the version it ran before the last update if something goes wrong.',
+        'legend': {
+            'UPD': 'Tab to check for and install updates.',
+            'RLBK': 'Tab to revert to the version before the last update.',
+            'NOW:': 'Version code currently running.',
+            'NEW:': 'Version code of the available update.',
+            'OLD:': 'Version code to restore with rollback.',
+            '=LATEST': 'No update available—already the newest.',
+        },
     }
 
     def __init__(self, display: Display):

@@ -641,6 +641,13 @@ class LaserMirrors(Game):
     category = "unique"
     GUIDE = {
         'desc': 'Rotate and place mirrors to redirect the laser beam to its target. A puzzle of angles and reflection.',
+        'how': "Rotate and place mirrors to steer the beam onto its target and clear the level; clearing scores 100 points plus 10 for every second still left on the par timer. Levels keep coming and grow harder, later ones adding switches and doors.",
+        'legend': {
+            'L#': 'Current level (puzzle) number.',
+            'top-right number': 'Your accumulated score across levels.',
+            'bottom-right number': "Seconds left to clear the level within its par time for a bonus; reaching zero just misses the bonus, it doesn't end the level.",
+            'TIME:+#': 'Bonus points on the level-clear screen: 10 for every second left under par, added to the 100-point base.',
+        },
     }
 
     def __init__(self, display: Display):

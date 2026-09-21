@@ -112,6 +112,11 @@ class LifeLab(Visual):
     GUIDE = {
         'desc': 'A bench for Conway\'s Life. Load a famous seed — Gosper\'s glider gun, the R-pentomino, a diehard — choose a life-like rule, and set it running. The same seed under a different rule behaves nothing like itself.',
         'credit': 'John Conway, 1970',
+        'legend': {
+            'LWSS': 'Light-Weight Spaceship: a small pattern that glides steadily.',
+            'G#': 'Generation count: simulation steps run since pattern was seeded.',
+            'B#/S#': 'Life-like rulestring: B digits = birth, S digits = survival by neighbor count.',
+        },
     }
 
     def __init__(self, display: Display):

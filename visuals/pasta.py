@@ -443,6 +443,10 @@ class Pasta(Visual):
             'Up/Down': 'Jump between families',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'top-left #': 'Shape number in the 20-shape catalog.',
+            '#/#': 'Position within the current pasta family.',
+        },
     }
 
     SCROLL_DELAY = 0.4

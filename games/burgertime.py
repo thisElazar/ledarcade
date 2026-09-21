@@ -177,6 +177,12 @@ class BurgerTime(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Walk across burger ingredients to drop them down platforms — each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.',
+        'how': 'You start with 3 lives and 5 peppers. Dropping an ingredient scores 50 points per floor it falls, and catching an enemy under it multiplies that score. Clearing every burger on a level scores extra points and moves you to the next level; losing all 3 lives ends the game.',
+        'legend': {
+            'top-left number': 'Your score.',
+            'L#': 'Current level number.',
+            'P#': 'Peppers left — throw one with the action button to stun an enemy.',
+        },
     }
 
     # Colors

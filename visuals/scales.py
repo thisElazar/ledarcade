@@ -230,6 +230,13 @@ class Scales(Visual):
     category = "music"
     GUIDE = {
         'desc': 'A scale reference over a piano keyboard. Cycle through scales and modes, transpose to any root, and toggle between note names, interval numbers, and scale degrees.',
+        'legend': {
+            '#/#': 'Current scale position out of all scales.',
+            'R': 'Root note marker (scale degree 1).',
+            'b#': 'Flatted scale degree (lowered a half step).',
+            'numbers on the keys': "In NUMBERS mode, the note's place in the scale; in DEGREES mode, its scale degree.",
+            'NAT / HARM / MEL / PENT': 'Short scale names: natural, harmonic and melodic minor; MAJ PENT and MIN PENT are the pentatonic scales.',
+        },
     }
 
     def reset(self):

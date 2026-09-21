@@ -31,6 +31,9 @@ class Solids(Visual):
     category = "math"
     GUIDE = {
         'desc': 'The five Platonic solids — tetrahedron, cube, octahedron, dodecahedron, icosahedron — rotating in 3D wireframe. The only regular convex polyhedra that exist.',
+        'legend': {
+            'V# E# F#': 'Vertex count, edge count, and face count of the currently shown solid.',
+        },
     }
 
     def reset(self):

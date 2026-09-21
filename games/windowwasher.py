@@ -566,6 +566,16 @@ class WindowWasher(Game):
     category = "unique"
     GUIDE = {
         'desc': 'Clean every window on the building before time runs out. Ride the scaffold and scrub.',
+        'how': 'Each window cleaned scores 10 points, plus a bonus of 5 points per second left when you finish. Finish with a quarter of the level\'s time still on the clock and you double the points earned from windows that level. Run out of time before every window is clean and you get fired, ending the game.',
+        'legend': {
+            'L#': 'The building (level) you are on.',
+            'top-left number': 'Seconds left to finish cleaning; turns orange under 20s, red under 10s.',
+            'top-right number': 'Your score so far.',
+            'bottom-right number': 'Windows on this building still dirty; turns green once all are clean.',
+            'CLEAN:+#': 'Points earned for the windows cleaned this level — 10 points each.',
+            'TIME:+#': 'Bonus points for time left when you finish — 5 points per second remaining.',
+            'PAR:+#': "Extra bonus, doubling your CLEAN points, for finishing with a quarter of the level's time still left.",
+        },
     }
 
     def __init__(self, display: Display):

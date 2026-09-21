@@ -364,6 +364,10 @@ class Knots(Visual):
             'Left/Right': 'Slow down / speed up',
             'Button': 'Restart the tie',
         },
+        'legend': {
+            'header number': "This knot's number in the list of 10.",
+            '#/#': 'Current knot position out of 10 total knots.',
+        },
     }
 
     SCROLL_DELAY = 0.4

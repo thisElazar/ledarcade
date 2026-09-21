@@ -21,6 +21,10 @@ class Asteroids(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Rotate and thrust your ship, shoot asteroids that split large-medium-small — the small ones score the most (20/50/100). Down triggers hyperspace: a random teleport with a death risk that grows with rock count. Extra ship every 10,000 points. Screen wraps. Inspired by the 1979 vector arcade classic.',
+        'how': 'You start with 3 ships; losing all of them ends the game. A saucer periodically drifts across the screen and fires at you, adding danger beyond the asteroids themselves.',
+        'legend': {
+            'top-left number': 'Your score.',
+        },
     }
 
     # Authentic 1979 scoring — small rocks are worth the most

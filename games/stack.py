@@ -17,6 +17,11 @@ class Stack(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Press the button to drop a sliding block onto the stack. Misalignment shrinks the next platform. Game ends when the block gets too small. Score by stacking as high as possible.',
+        'how': "Landing a block perfectly two or more times in a row slightly widens the next block, giving a bit more margin for error - it does not multiply your score. Height goes up by one for each block you land, and that height is your final score when the tower falls or a block gets too small to keep going.",
+        'legend': {
+            'H:#': 'Tower height (blocks stacked) - this is your score.',
+            'X#': 'Consecutive perfect drops in a row; not a score multiplier. Two or more in a row widens the next block slightly.',
+        },
     }
 
     # Game constants

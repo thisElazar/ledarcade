@@ -18,6 +18,10 @@ class Credits(Visual):
     category = "utility"
     GUIDE = {
         'desc': "A scrolling roll of every source, inspiration, and attribution behind the cabinet's games and visuals.",
+        'legend': {
+            '345/2/4': "The Star Wars automaton's rule: a cell survives with 3, 4 or 5 neighbours, is born with 2, and has 4 states.",
+            'SIR MODEL': 'Epidemic model (Susceptible-Infected-Recovered).',
+        },
     }
 
     def __init__(self, display: Display):

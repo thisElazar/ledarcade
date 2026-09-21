@@ -18,7 +18,11 @@ class Pong(Game):
     description = "Beat the AI!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Two paddles, one ball. First to 11 wins. The simplest game that’s still fun.',
+        'desc': 'Two paddles, one ball. First to 11 wins. A true classic.',
+        'how': 'The AI gets faster and more accurate as your score climbs, making points harder to win as the match goes on. The ball also speeds up after the 4th and 12th hit of a rally, and where it strikes your paddle sets the angle it bounces off at.',
+        'legend': {
+            'FINAL:#-#': "Final score when the match ends: your points first, then the AI's.",
+        },
     }
 
     # 8-segment quantized deflection angles (Alcorn's hardware design):

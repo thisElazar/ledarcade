@@ -125,6 +125,9 @@ class CyclicLab(Visual):
     GUIDE = {
         'desc': 'Explore the cyclic cellular automaton by hand. The joystick adjusts the number of states and the neighbor threshold, tuning between still noise and sweeping demon spirals.',
         'credit': 'David Griffeath',
+        'legend': {
+            'thresh=': 'Neighbor threshold — how many neighbors must show next state before this cell advances.',
+        },
     }
 
     def __init__(self, display: Display):

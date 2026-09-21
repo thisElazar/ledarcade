@@ -22,6 +22,11 @@ class Othello(Game):
     category = "2_player"
     GUIDE = {
         'desc': 'Place discs to outflank your opponent’s and flip them to your color. The player with the most discs when the board is full wins. Corner control is key.',
+        'how': "If you have no legal move your turn is skipped automatically. If neither player can move, the game ends right there instead of waiting for the board to fill.",
+        'legend': {
+            'P#: #': "Each player's disc count on the board right now.",
+            'P# WINS!': 'Announces the winner — whoever has more discs when the game ends.',
+        },
     }
 
     # Board layout

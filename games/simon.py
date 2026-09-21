@@ -25,6 +25,12 @@ class Simon(Game):
     category = "toys"
     GUIDE = {
         'desc': 'Four colored quadrants flash in sequence - each color has its own flash signature. Repeat the pattern, but hesitate more than 3 seconds and you lose. Left/Right at idle picks the goal (8/14/20/31 signals); reach it for the victory salute. Playback tempo lurches faster at 6 and 14 signals, just like the original.',
+        'how': "There's no separate score — the sequence length itself is what you're chasing, growing by one color each round you repeat correctly.",
+        'legend': {
+            '</>: GOAL': 'Press Left/Right to change the goal length shown in cyan above (cycles through 8, 14, 20, 31).',
+            'center number': 'How many colors are in the sequence this round; goes up by one each time you succeed.',
+            '!!': 'Shown instead of WIN for beating the hardest goal (31).',
+        },
     }
 
     # Colors for the four buttons (dim and lit versions)

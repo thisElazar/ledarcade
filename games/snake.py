@@ -17,6 +17,10 @@ class Snake(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Eat food, grow longer, don’t hit yourself or the walls. One of the most widely played games ever made.',
+        'how': "You start 3 segments long; each food eaten grows the snake by one segment and speeds the game up slightly, down to a minimum. Hitting a wall or your own body ends the run.",
+        'legend': {
+            'LEN:#': "Your snake's current length, in segments.",
+        },
     }
 
     # Scale factor - each game unit is 2x2 pixels

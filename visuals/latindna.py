@@ -115,6 +115,13 @@ class LatinDNA(Visual):
     category = "music"
     GUIDE = {
         'desc': 'The rhythmic DNA of Latin music. Clave patterns — son, rumba, bossa nova — shown as timeline grids with accent markers. The two-bar key that unlocks an entire tradition.',
+        'legend': {
+            '+': 'Off-beat marker in the rhythm grid.',
+            'II': 'Playback is paused.',
+            'pattern # in header': 'Pattern\'s number in the 10-pattern catalog.',
+            '#/# position': 'Current pattern\'s position out of the total.',
+            'tempo # (right)': 'Playback speed in beats per minute.',
+        },
     }
 
     SCROLL_DELAY = 0.4

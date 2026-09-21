@@ -36994,6 +36994,15 @@ class Scripts(Visual):
             'Left/Right': 'Step through glyphs',
             'Button': 'Next glyph (resume auto-advance)',
         },
+        'legend': {
+            '#/#': 'Current glyph position within its script family out of the total glyphs.',
+            'B#': 'Linear B syllabogram catalog number with its transliterated sound value.',
+            'DOTS-#': 'Which of the 6 positions in a braille cell are raised for this character.',
+            'X TIMES Y': 'A compound cuneiform sign: two signs combined into one.',
+            '4E00 (four-digit codes)': 'Chinese characters are labelled by their Unicode number; the header line gives the meaning.',
+            'A001 (letter + number)': 'Hieroglyphs use Gardiner sign-list codes: the letter is the category, the number the sign.',
+            'DARA3 (trailing digit)': 'Cuneiform signs that share a reading are numbered: DARA3 is the third sign read "dara".',
+        },
     }
 
     def reset(self):

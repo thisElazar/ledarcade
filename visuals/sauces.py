@@ -214,6 +214,10 @@ class Sauces(Visual):
             'Up/Down': 'Jump between families',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'header number': 'Sauce catalogue number (1–38), displayed in the header\'s dimmed color.',
+            'bottom-right #/#': 'Sauce position within its family — each family has its own count.',
+        },
     }
 
     SCROLL_DELAY = 0.4

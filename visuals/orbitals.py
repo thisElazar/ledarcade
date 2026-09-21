@@ -529,6 +529,10 @@ class Orbitals(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'The shapes electrons take around atoms. Hydrogen-like s, p, d, and f orbitals, sigma and pi bonds, sp/sp²/sp³ hybrids, and the delocalized clouds of benzene and metals — rendered from real wavefunctions.',
+        'legend': {
+            'N=/L=/ML=': 'Quantum numbers: N is shell, L is orbital type (0=s, 1=p, 2=d, 3=f), ML is orientation.',
+            'SP/SP#': 'Orbital hybridization: mixing of s, p, and d atomic orbitals.',
+        },
     }
 
     _saved_group_idx = None

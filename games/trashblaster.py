@@ -166,7 +166,8 @@ class TrashBlaster(Game):
     description = "Blast the trash!"
     category = "retro"
     GUIDE = {
-        'desc': 'Shoot upward to blast falling garbage before it stacks to the top.',
+        'desc': 'You are piloting through a debris field. Steer the crosshair across the cockpit window and blast the trash drifting past from every side. One minute on the clock.',
+        'how': 'Smaller pieces of trash are worth more: 30 points for small scraps, 20 for medium cans and bottles, and 10 for large boxes. You have 60 seconds on the clock, and every 30 seconds new trash spawns more often, capping out at one every half second. The round ends the moment the timer hits zero, so keep blasting for the highest score.',
     }
 
     TRASH_COLORS = [

@@ -161,6 +161,10 @@ class Knife(Visual):
             'Up/Down': 'Jump between families',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'Cut #': 'The cut\'s number in the full 1-9 list.',
+            'bottom-right #/#': "The cut's place within its family. The bottom-left #/# counts across all 9 cuts.",
+        },
     }
 
     SCROLL_DELAY = 0.4

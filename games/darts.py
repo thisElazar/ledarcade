@@ -72,6 +72,11 @@ class Darts(Game):
     category = "bar"
     GUIDE = {
         'desc': 'Timing-based darts: press the button to lock the sweeping aim, first across then down. Five rounds, highest total wins - hit double and triple tiles for bonus points.',
+        'how': "Each wedge scores its face value, doubles and triples multiply that by 2 or 3, and a hidden bonus tile is worth 75 points. You throw 3 darts per round, for 5 rounds total; the higher score when the rounds end wins, or is your final score alone.",
+        'legend': {
+            'R#/#': "Current round out of the 5 total rounds.",
+            'top-left number': "Your running point total (2-player mode labels this P1: / P2: instead).",
+        },
     }
 
     def __init__(self, display: Display):

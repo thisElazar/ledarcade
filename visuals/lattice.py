@@ -1107,6 +1107,9 @@ class Lattice(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': '3D rotating unit cells of real crystalline structures: diamond, salt, ice, metals. Tiled cells with edge fading show infinite periodicity.',
+        'legend': {
+            'chemical formula': 'The crystal\'s formula, each element\'s letters coloured to match its atoms.',
+        },
     }
 
     def __init__(self, display: Display):

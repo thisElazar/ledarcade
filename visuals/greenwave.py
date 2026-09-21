@@ -36,6 +36,9 @@ class GreenWave(Visual):
     category = "road_rail"
     GUIDE = {
         'desc': 'Traffic signals timed so that a car traveling at the speed limit hits green lights all the way down a corridor.',
+        'legend': {
+            'T-S': 'Time-space diagram: horizontal axis is time, vertical is position along the corridor.',
+        },
     }
 
     ROAD_COLOR = (50, 50, 55)

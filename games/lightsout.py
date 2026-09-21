@@ -19,6 +19,13 @@ class LightsOut(Game):
     category = "toys"
     GUIDE = {
         'desc': 'Press a light and its neighbors toggle. Turn all lights off to win. Solvable with linear algebra over GF(2), but trial and error works too.',
+        'how': 'Clearing a puzzle scores bonus points based on how few moves it took, then starts a harder puzzle with more toggles to undo. There is no life count or time limit - you keep leveling up until you stop playing.',
+        'legend': {
+            'L#': 'Current level; puzzles need more toggles to solve, and get harder, as levels rise.',
+            'M:#': 'Moves made on this puzzle.',
+            'top-right number': 'Lights still lit; the goal is to get this to zero.',
+            'BEST:L#': 'Highest level cleared since the cabinet was last powered on.',
+        },
     }
 
     # Grid layout

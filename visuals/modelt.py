@@ -71,6 +71,14 @@ class ModelT(Visual):
     GUIDE = {
         'desc': 'Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.',
         'credit': '1908, Henry Ford',
+        'legend': {
+            'INTK': 'The intake stroke phase of the 4-stroke engine cycle.',
+            'COMP': 'The compression stroke phase of the 4-stroke engine cycle.',
+            'POWR': 'The power stroke phase of the 4-stroke engine cycle.',
+            'EXHT': 'The exhaust stroke phase of the 4-stroke engine cycle.',
+            'I': 'The intake valve above the cylinder head.',
+            'E': 'The exhaust valve above the cylinder head.',
+        },
     }
 
     def __init__(self, display: Display):

@@ -40,6 +40,9 @@ class RugLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': "The averaging 'rug' automaton, made adjustable. Sweep the increment and state count to weave different symmetric, textile-like patterns.",
+        'legend': {
+            'inc=#': 'Amount added to each cell\'s value each step (rule increment).',
+        },
     }
 
     def __init__(self, display: Display):

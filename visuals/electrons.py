@@ -223,6 +223,22 @@ class Electrons(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'What electrons actually do. A tour of physics experiments, energy transitions, chemical reactions, quantum phenomena, and semiconductor devices — each a looping scene with electrons and photons in motion.',
+        'legend': {
+            'hf > WORK FN': 'Photon energy exceeds the metal\'s work function — the threshold for the photoelectric effect.',
+            '+ / -': 'Charge marks: + for anode/positive plate or collector; - for cathode/negative plate.',
+            'N': 'A neutron in BETA DECAY; the N-type region in P-N JUNCTION and SOLAR CELL.',
+            'P': 'A proton in BETA DECAY; the P-type region in P-N JUNCTION and SOLAR CELL.',
+            'E-': 'An electron — the negatively charged particle.',
+            'VE': 'Electron antineutrino — a ghostly particle released in beta decay.',
+            'N EMITS E + NU': 'A neutron decays into an electron and an antineutrino.',
+            'E-GUN': 'Electron gun — source of the primary electron beam.',
+            'SECONDARY E': 'Secondary electrons knocked out of the sample by the primary beam.',
+            'Shell/orbital': 'Spectroscopic notation for electron energy level (shell number + orbital letter, e.g., 3P).',
+            'GND': 'Ground state — the lowest, most stable electron energy level.',
+            'PN': 'The depletion zone between the N-type and P-type regions.',
+            'PSI LEAKS': 'The electron\'s wavefunction has nonzero amplitude past the barrier.',
+            'N>n TO N=n': 'Electrons fall to shell n from higher shells: n=2 in BALMER, n=1 in LYMAN.',
+        },
     }
 
     _saved_group_idx = None

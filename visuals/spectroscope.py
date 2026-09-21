@@ -173,6 +173,9 @@ class Spectroscope(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'Real element emission spectra at their correct wavelengths. Each element has a unique fingerprint of spectral lines — this is how we know what distant stars are made of.',
+        'legend': {
+            'H SPECTRUM': "The letters before SPECTRUM are the element's chemical symbol (H is hydrogen).",
+        },
     }
 
     def reset(self):

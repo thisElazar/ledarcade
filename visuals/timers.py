@@ -18,6 +18,14 @@ class Timers(Visual):
     category = "utility"
     GUIDE = {
         'desc': "Set the cabinet's timing: how long before the idle screensaver kicks in, how fast idle visuals cycle, and when the panel sleeps.",
+        'legend': {
+            '#S': 'Seconds.',
+            '#M': 'Whole minutes.',
+            '#M##': 'Minutes then seconds, run together: 3M05 is 3 min 5 sec.',
+            '#H##': 'Hours then minutes, run together: 2H30 is 2 hr 30 min.',
+            '#H': 'Whole hours.',
+            'OFF': 'Sleep timer is disabled.',
+        },
     }
     custom_exit = True
 

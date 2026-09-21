@@ -119,6 +119,9 @@ class CircleOfFifths(Visual):
     category = "music"
     GUIDE = {
         'desc': 'The circle of fifths as an interactive wheel. Rotate to any key to see its name, sharps and flats, relative minor, and the chords that live in it — the map every musician keeps in their head.',
+        'legend': {
+            'sharps/flats': 'Number of sharps (#) or flats (b) in the selected key.',
+        },
     }
 
     def reset(self):

@@ -24,6 +24,10 @@ class Safety(Visual):
     category = "utility"
     GUIDE = {
         'desc': 'Accessibility settings in one place: reduce flashing for photosensitivity, switch on colorblind-friendly palettes, and other display-comfort options.',
+        'legend': {
+            'COLOR': 'Colorblind filter (NONE=off, PROT=protanopia, DEUT=deuteranopia, TRIT=tritanopia).',
+            'MAX BRT': 'Maximum brightness percentage the panel is allowed to use.',
+        },
     }
 
     def __init__(self, display: Display):

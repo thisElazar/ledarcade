@@ -90,6 +90,10 @@ class Chess(Game):
     category = "2_player"
     GUIDE = {
         'desc': '64 squares, 32 pieces. Checkmate the opponent’s king to win. Each piece type rendered as a recognizable sprite on the LED grid.',
+        'how': "If the player to move has no legal move but isn't in check, the game ends in a stalemate with no winner instead of a checkmate.",
+        'legend': {
+            'P#': 'Whose turn it is — P1 is white, P2 is black.',
+        },
     }
 
     # Board layout

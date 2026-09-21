@@ -232,6 +232,11 @@ class Sorting(Visual):
     category = "math"
     GUIDE = {
         'desc': 'Sorting algorithms visualized. Bubble sort, quicksort, merge sort, and more — each algorithm’s strategy made visible as bars rearrange themselves.',
+        'legend': {
+            'C:': 'Number of element comparisons performed so far by the algorithm.',
+            'S:': 'Number of swaps performed so far by the algorithm.',
+            'SPD #': 'Current algorithm speed (steps executed per frame tick).',
+        },
     }
 
     def __init__(self, display: Display):

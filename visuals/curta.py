@@ -65,6 +65,10 @@ class Curta(Visual):
     GUIDE = {
         'desc': "Curt Herzstark's handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing.",
         'credit': '1948',
+        'legend': {
+            'counter number': 'The running total in the result register; each full crank turn adds to it.',
+            '#OPM': 'Crank speed measured in operations per minute.',
+        },
     }
 
     def __init__(self, display: Display):

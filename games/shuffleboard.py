@@ -117,6 +117,12 @@ class Shuffleboard(Game):
     category = "bar"
     GUIDE = {
         'desc': 'Slide pucks down a board to land in the highest-scoring zone. Set angle and power. Knock opponents off if you can.',
+        'how': "The board's zones are marked 4, 3, 2, and 1, and landing a puck there scores that many points; sliding past the last zone or off the board scores nothing. Each player gets 4 pucks per round over 4 rounds total, and the higher score when the rounds end wins (or is just your final score alone).",
+        'legend': {
+            'R#': "Current round out of the 4 total rounds.",
+            'top-left number': "Your total score (2-player mode labels this P1: / P2: instead).",
+            '+# PTS': "Points you scored this round, shown after all pucks stop sliding.",
+        },
     }
 
     def __init__(self, display: Display):

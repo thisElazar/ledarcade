@@ -159,6 +159,10 @@ class Spices(Visual):
             'Up/Down': 'Jump between regions',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'top-left #': 'Blend number in the 20-blend catalog.',
+            '#/#': 'Position within the current spice region.',
+        },
     }
 
     SCROLL_DELAY = 0.4

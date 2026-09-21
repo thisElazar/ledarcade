@@ -30,6 +30,10 @@ class Checkers(Game):
     category = "2_player"
     GUIDE = {
         'desc': 'Jump and capture diagonally. Reach the far side to king a piece. Capture all opponent pieces or block all their moves to win. Solved in 2007 — perfect play always draws.',
+        'how': "If a capture is available you must take it, and landing in position for another jump lets you keep capturing in the same turn. A king moves and captures diagonally in any direction; a regular piece only moves forward.",
+        'legend': {
+            'P#': "Whose turn it is: P1 is red (starts at the bottom), P2 is blue (starts at the top). Also names the winner.",
+        },
     }
 
     # Board layout

@@ -18,6 +18,7 @@ class Invaders(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Shoot rows of aliens before they reach the bottom. One shot on screen at a time; the rack marches faster as it thins, and invaders grind through your shields. Saucer bonus depends on how many shots you have fired. Inspired by the 1978 classic.',
+        'how': 'You start with 3 lives, and losing your last one, or letting the invaders reach the bottom row, ends the game. Killing a top-row invader pays 50 points, dropping 10 per row down to 20 for the bottom row.',
     }
 
     # Authentic saucer score table, indexed by player shot count mod 15

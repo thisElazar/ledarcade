@@ -121,6 +121,10 @@ class GutenbergPress(Visual):
     GUIDE = {
         'desc': 'Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.',
         'credit': 'c. 1440',
+        'legend': {
+            '# PPM': 'Press cycles completed per minute (current press-speed setting).',
+            'PG #': 'Pages printed so far (press cycles completed).',
+        },
     }
 
     def __init__(self, display: Display):

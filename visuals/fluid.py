@@ -375,6 +375,9 @@ class FluidTunnel(Visual):
     GUIDE = {
         'desc': 'Computational fluid dynamics with obstacles. Semi-Lagrangian advection shows vortex shedding, turbulence, and flow separation around objects. Real aerodynamics at 64×64.',
         'credit': 'Jos Stam, SIGGRAPH 1999',
+        'legend': {
+            'Re=#': 'Reynolds number — a measure of how much the flow tends to swirl and form eddies (higher means more turbulent, swirling flow).',
+        },
     }
 
     def __init__(self, display: Display):
@@ -866,6 +869,11 @@ class FluidPlay(Visual):
     GUIDE = {
         'desc': "Stir a real fluid with the joystick. Jos Stam's Stable Fluids solver runs live — drag the cursor and colored density swirls, folds, and diffuses behind it.",
         'credit': 'Jos Stam, SIGGRAPH 1999',
+        'legend': {
+            'VEL + palette name': 'Colour shows how fast the fluid is moving; the second word is the colour palette in use.',
+            'DIR + palette name': 'Colour shows which way the fluid is flowing, brightness how fast.',
+            'VORT + palette name': 'Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise.',
+        },
     }
 
     # Viz modes: 3 velocity, 3 direction, 3 vorticity
@@ -1154,6 +1162,12 @@ class FluidSculpt(Visual):
     GUIDE = {
         'desc': "Move a solid obstacle through a flowing wind tunnel and watch the wake respond — vortices shed and reattach as you reshape the flow. Powered by Stam's Stable Fluids solver.",
         'credit': 'Jos Stam, SIGGRAPH 1999',
+        'legend': {
+            'VEL + palette name': 'Colour shows how fast the fluid is moving; the second word is the colour palette in use.',
+            'DIR + palette name': 'Colour shows which way the fluid is flowing, brightness how fast.',
+            'VORT + palette name': 'Colour shows spin (vorticity): one colour for clockwise swirl, the other for counter-clockwise.',
+            'TESLA': 'The Tesla-valve obstacle shape — one of ten shapes you can cycle through with both buttons.',
+        },
     }
 
     _VIZ_MODES = (

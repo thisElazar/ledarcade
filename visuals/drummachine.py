@@ -198,6 +198,9 @@ class DrumMachine(Visual):
     category = "music"
     GUIDE = {
         'desc': 'A Roland TR-808-style step sequencer. 16 steps, multiple tracks for kick, snare, hi-hat, and more. Beat patterns scroll and animate.',
+        'legend': {
+            'top-right number': 'Tempo in beats per minute.',
+        },
     }
 
     # Grid layout constants

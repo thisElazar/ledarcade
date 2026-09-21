@@ -18,6 +18,11 @@ class DonkeyKong(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Climb platforms, jump over barrels, and beat the bonus timer to the top. Barrels steer down ladders toward you, a fireball prowls the girders, and the hammer smashes both — but you can’t jump or climb while holding it. Even levels are rivet boards: run over all 8 rivets to drop DK.',
+        'how': "You start with 3 lives; the bonus timer begins at 4,000-8,000 depending on level and reaching zero costs a life, same as a barrel or the fireball. Reaching the top banks whatever bonus remains, plus 500 points per level on a rivet board. Losing your last life ends the game.",
+        'legend': {
+            'top-left number': "Player's score.",
+            'top-right number': 'Countdown bonus timer; reaching zero costs a life. Whatever remains when you reach the top is banked as score.',
+        },
     }
 
     # Colors

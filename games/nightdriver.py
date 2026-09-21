@@ -22,6 +22,14 @@ class NightDriver(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'A 90-second timed run inspired by one of the earliest first-person driving games: only white posts and oncoming headlights pierce the dark. Pick NOVICE, PRO, or EXPERT - each is a fixed curve script, not random. Shift up through 4 gears to build speed; the road visibly swings in turns and drifting off it costs a 2-second stall. Score is distance; 4000 earns +15 seconds. The run ends only at 0:00.',
+        'how': 'The 4000-distance bonus is awarded only once per run, not every time you cross it again. Each gear raises the top speed you can reach, from 30 up to 120 in top gear, so shifting up is needed to keep accelerating.',
+        'legend': {
+            'top-left number': 'Distance traveled so far - this is your score.',
+            'top-center number': 'Seconds left in the 90-second run; turns red under 10 seconds and flashes green when bonus time is awarded.',
+            'number left of gear': 'Current speed, in game units.',
+            'G#': 'Current gear (1-4); shifting up raises your speed cap.',
+            'DIST:#': 'Total distance traveled, shown briefly on the game-over screen.',
+        },
     }
 
     # Road parameters

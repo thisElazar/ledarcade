@@ -107,6 +107,13 @@ class Pantry(Visual):
             'Up/Down': 'Jump between families',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'header number': 'Catalogue number (1–14) of this item, printed in the family\'s color.',
+            'ingredient parts': 'Number of parts that component contributes to the ratio.',
+            'MIRPX': 'Diced onion, carrot, and celery aromatic base — used as one part in stocks.',
+            'PPPRCN': 'Peppercorn, one of the herbs in a sachet d\'epices bundle.',
+            'bottom-right #/#': 'Item position within its family — each family has its own count.',
+        },
     }
 
     SCROLL_DELAY = 0.4

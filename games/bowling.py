@@ -148,6 +148,13 @@ class Bowling(Game):
     category = "bar"
     GUIDE = {
         'desc': 'Ten-pin bowling. Time your release and aim your angle. Standard scoring — strikes, spares, and splits over 10 frames.',
+        'how': 'Play solo or against a second player, alternating turns frame by frame. The game ends once all 10 frames are complete for every player, and in two-player mode the higher total score wins.',
+        'legend': {
+            'F#': 'Current frame, out of 10.',
+            'top-left number': "Running score total, in one-player mode.",
+            'P1: / P2:': "Each player's running score in two-player mode; the active player's label lights up, the other stays gray.",
+            'P# TURN': 'Whose turn is coming up, shown briefly between turns.',
+        },
     }
 
     def __init__(self, display: Display):

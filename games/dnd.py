@@ -20,6 +20,11 @@ class DnD(Game):
     category = "retro"
     GUIDE = {
         'desc': 'Explore rooms, fight monsters, collect treasure. Real-time dungeon crawl: move with the joystick, shoot arrows with the button, and keep an eye on your arrow supply.',
+        'how': "You start with 3 hearts and 10 arrows; losing all your hearts ends the run. Arrows score points when they kill a monster — 25 for a rat, up to 200 for a dragon — but spiders steal arrows instead of hurting you, and blobs can't be hurt by arrows at all. The exit ladder stays locked until you defeat the level's boss.",
+        'legend': {
+            'A#': "Arrows left in your quiver; you can't fire when it hits zero.",
+            'D#': 'How many levels deep into the dungeon you have descended.',
+        },
     }
 
     # Display layout

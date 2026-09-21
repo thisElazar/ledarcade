@@ -150,6 +150,13 @@ class Baking(Visual):
             'Up/Down': 'Jump between families',
             'Button': 'Reset scrolling to start',
         },
+        'legend': {
+            'top-left number': 'Current recipe number in the master list of 14.',
+            'bottom-left #/#': 'Current recipe position out of 14 recipes.',
+            'bottom-right #/#': 'Current recipe position within its family.',
+            'ratio-line numbers': 'Parts by weight. For bread and pizza they are baker\'s percentages: flour is always 100.',
+            '24-72H, 900F': 'In the notes, H is hours of fermentation and F is oven temperature in Fahrenheit.',
+        },
     }
 
     SCROLL_DELAY = 0.4

@@ -41,6 +41,11 @@ class HodgeLab(Visual):
     GUIDE = {
         'desc': 'A hands-on version of the Hodgepodge Machine. Adjust the growth rate and maximum state count to steer the Belousov-Zhabotinsky spiral waves between calm and chaotic.',
         'credit': 'Gerhardt & Schuster',
+        'legend': {
+            'BZ CLASSIC': 'Belousov-Zhabotinsky reaction — produces the spiral wave pattern.',
+            'g=': 'Growth rate: controls spread speed (higher = faster, bolder patterns).',
+            'n=': 'Max state count: number of infection stages cells pass through.',
+        },
     }
 
     def __init__(self, display: Display):

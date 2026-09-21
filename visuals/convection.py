@@ -79,6 +79,10 @@ class Convection(Visual):
     GUIDE = {
         'desc': 'Rayleigh-Bénard convection cells. Heated fluid rises, cool fluid sinks, forming rolling convection cells with characteristic aspect ratios.',
         'credit': 'Lord Rayleigh, 1916',
+        'legend': {
+            'RAYLEIGH #': 'Rayleigh number: how strongly heating drives the convection.',
+            'TEMP': 'Temperature visualization mode (shows the heat field).',
+        },
     }
 
     def __init__(self, display: Display):

@@ -19,6 +19,7 @@ class Galaga(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Fixed-position shooter. Enemies swoop in along entrance arcs, form up, then dive — and dodged divers loop back into formation. Bosses take two hits and can trap your ship in a tractor beam; shoot the captor while it dives to free the ship and fight as a dual fighter. Every 4th level from level 3 is a no-fire bonus challenge stage.',
+        'how': 'You get 3 lives, and getting hit costs one and drops any dual-ship bonus, ending the run at zero. Enemies pay more shot mid-dive than sitting in formation: bees 50 in formation versus 100 diving, butterflies 80 versus 160, bosses 150 versus 400. Wiping out a whole entrance flight adds 1000, and a flawless bonus stage pays 10000.',
     }
 
     # Player constants

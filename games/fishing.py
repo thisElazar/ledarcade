@@ -123,6 +123,10 @@ class Fishing(Game):
     category = "unique"
     GUIDE = {
         'desc': 'Drop your line and reel in as many fish as you can before the 90-second timer runs out.',
+        'how': "Your score is the total weight in pounds of every fish you land, not how many you catch. Pressing the button during a nibble scares the fish off; once it truly bites, hold or mash the button to fill the catch meter before it drains and the fish escapes. Bigger fish resist harder and take longer to land, but weigh more.",
+        'legend': {
+            'top-right number': 'Seconds left in the 90-second round; turns red at 10 seconds or under.',
+        },
     }
 
     def __init__(self, display: Display):

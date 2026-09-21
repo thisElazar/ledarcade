@@ -356,6 +356,9 @@ class Redoute(_PlatesBase):
     GUIDE = {
         'desc': "Pierre-Joseph Redouté's botanical watercolors — the roses and lilies painted for Empress Joséphine's garden at Malmaison.",
         'credit': 'Pierre-Joseph Redouté, early 19th c.',
+        'legend': {
+            '#/#': 'Current plate out of the total in this collection.',
+        },
     }
     _collection = "redoute"
     _manifest_file = "redoute_plates.json"

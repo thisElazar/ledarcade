@@ -40,6 +40,10 @@ class QuarksLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': "Explore the Quarks automaton's parameter space. The joystick sets particle count and interaction radius, tuning how charge-like cells bond and break.",
+        'legend': {
+            'q=': 'Number of quarks — energy-injecting hotspots driving the automaton.',
+            'r=': 'Roam radius — how far each quark hotspot wanders from its base position.',
+        },
     }
 
     def __init__(self, display: Display):

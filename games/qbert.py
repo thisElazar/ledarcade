@@ -17,6 +17,12 @@ class QBert(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Hop on cubes in an isometric pyramid to change their colors — later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.',
+        'how': "Changing a cube's color scores 25 points, riding an escape disc scores 50, and catching the green ball scores 100 and freezes every enemy. Clearing the whole pyramid scores 1000 plus 250 per level and starts a new, harder one. You start with 3 lives, and the run ends when a fall or an enemy costs you your last one.",
+        'legend': {
+            'L#': "Current level - the pyramid round you are on.",
+            'curse-bubble symbols': "Comic-strip curse symbols shown beside Q*bert during the pause after he dies.",
+            'top-left number': "Your score, climbing with every cube colored, disc ride, green ball catch, and finished pyramid.",
+        },
     }
 
     # Pyramid dimensions

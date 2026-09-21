@@ -89,6 +89,13 @@ class Tetris(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Stack falling tetrominoes, clear complete lines. NES-style speed curve: gravity ramps up with every level. Left button rotates, right button hard-drops.',
+        'how': "Fill a horizontal row completely to clear it. Clearing 1, 2, 3, or 4 lines at once scores 100, 300, 500, or 800 points times your current level, and every 10 lines cleared raises the level. The game ends when a new piece has nowhere to spawn.",
+        'legend': {
+            'SC': "Your score.",
+            'LV': "Current level - pieces fall faster and score more as it rises.",
+            'LN': "Total lines you have completed and cleared.",
+            'NX': "Preview of the next piece.",
+        },
     }
 
     # Playfield dimensions (standard Tetris is 10 wide, 20 tall)

@@ -98,6 +98,9 @@ class BeamEngine(Visual):
     GUIDE = {
         'desc': 'Watt’s separate condenser transformed Newcomen’s earlier engine into the workhorse of the Industrial Revolution. The rocking beam links piston to flywheel.',
         'credit': '1769',
+        'legend': {
+            '#SPM': 'Engine speed in strokes per minute.',
+        },
     }
 
     def __init__(self, display: Display):

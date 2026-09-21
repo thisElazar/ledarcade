@@ -17,6 +17,11 @@ class StickRunner(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Endless runner with a stick figure. Press the button to jump over obstacles. Score by distance. Procedurally generated levels.',
+        'how': 'Score rises as you run, and clearing the gaps between rooftops is what keeps you going. Falling off the bottom of the screen ends the run. Running speed climbs as your score grows, up to a cap.',
+        'legend': {
+            '#M': 'Distance traveled so far - this is your score, in an arbitrary game unit.',
+            '#%': 'Running speed, from 0% at the start to 100% at top speed; it climbs as your distance grows.',
+        },
     }
 
     # Physics constants

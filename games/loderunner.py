@@ -18,6 +18,10 @@ class LodeRunner(Game):
     category = "arcade"
     GUIDE = {
         'desc': 'Collect all gold on each level, then escape to the top. Dig holes to trap guards — they can pick up gold and carry it. Endless procedurally generated levels that get harder as you go.',
+        'how': "Each gold piece you collect scores 250 points, and once every piece on the level is collected an escape ladder opens; reaching it scores a 500-point bonus and starts a new level. You have 3 lives, and a guard catching you costs one; the run ends when your last life is gone.",
+        'legend': {
+            'G:#': "Gold pieces still left to collect on this level.",
+        },
     }
 
     # Tile types

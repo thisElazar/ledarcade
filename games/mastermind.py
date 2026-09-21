@@ -21,6 +21,7 @@ class Mastermind(Game):
     category = "toys"
     GUIDE = {
         'desc': 'Guess a hidden color code in limited tries. Each guess gets feedback: right color in right place, or right color in wrong place. Deduce the code before your guesses run out.',
+        'how': 'You are cycling through 6 possible peg colors across 4 positions, and colors can repeat in the secret code. You get 10 guesses total; each one returns white pegs for correct colors in the wrong spot and black pegs for correct color and position. Solving it in fewer guesses than your best sets a new best score. Running out of guesses ends the round and reveals the secret code.',
     }
 
     # Available colors (6 colors like the original)

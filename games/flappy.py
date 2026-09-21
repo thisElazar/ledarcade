@@ -17,6 +17,10 @@ class Flappy(Game):
     category = "modern"
     GUIDE = {
         'desc': 'Press a button to flap, thread through pipes. One hit and you’re done.',
+        'how': "Each pipe you clear scores 1 point and nudges the pipes faster, up to a cap, so the run gets harder the longer you last. Touching a pipe or the ground ends the run immediately.",
+        'legend': {
+            'top-center number': "Number of pipes you've passed.",
+        },
     }
 
     def __init__(self, display: Display):

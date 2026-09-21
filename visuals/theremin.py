@@ -38,6 +38,10 @@ class Theremin(Visual):
     GUIDE = {
         'desc': 'The only instrument you play without touching. Side view with pitch antenna, volume loop, and electromagnetic field arcs. Waveform display shows the output.',
         'credit': 'Léon Theremin, 1920',
+        'legend': {
+            'F=#': 'Pitch frequency readout (range 1-8).',
+            'SAW': 'Sawtooth waveform is selected.',
+        },
     }
 
     def __init__(self, display: Display):
