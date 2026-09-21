@@ -263,9 +263,9 @@ class Frogger(Game):
             elif turtle['speed'] < 0 and turtle['x'] < -turtle['length'] * self.cell_size:
                 turtle['x'] = GRID_SIZE
 
-            # Deterministic dive cycle: 6s up, 1s warning (drawn dim), 2s under
+            # Deterministic dive cycle: 4s up, 3s warning (drawn dim), 2s under
             t = (self.dive_clock + turtle['dive_phase']) % 9.0
-            turtle['warning'] = 6.0 <= t < 7.0
+            turtle['warning'] = 4.0 <= t < 7.0
             turtle['diving'] = t >= 7.0
 
         # Home-slot inhabitants: a fly (bonus) or, from level 2, a croc head
