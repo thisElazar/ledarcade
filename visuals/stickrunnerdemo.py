@@ -4,10 +4,9 @@ Stick Runner Demo - AI Attract Mode
 Stick Runner plays itself by timing jumps to cross rooftop gaps.
 
 AI Strategy:
-- Look ahead for gaps between buildings
-- Calculate when to jump based on gap distance and scroll speed
-- Account for building height differences (jump earlier for higher targets)
-- Use the game's physics to estimate jump distance
+- The rooftops ahead are already built, so the only choice is when to jump
+- Each frame a jump is possible, run the runner's own physics forward both
+  ways (jump now / wait) and jump once that is safe and waiting no longer is
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -17,6 +16,11 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.stickrunner import StickRunner
+
+
+HORIZON = 70  # frames of lookahead: a jump (about 23), the landing, and the next jump
+SLACK = 2     # frames left in hand: jump this long before the last safe moment
+LOST = 64     # player_y past every roof's reach: the fall cannot be saved
 
 
 class StickRunnerDemo(Visual):
@@ -35,6 +39,7 @@ class StickRunnerDemo(Visual):
         self.decision_timer = 0.0
         self.decision_interval = 0.02  # Check frequently for responsive jumping
         self.game_over_timer = 0.0
+        self.frame_dt = 1 / 30  # smoothed; the lookahead plans in frames this long
 
     def handle_input(self, input_state):
         return False
@@ -49,6 +54,8 @@ class StickRunnerDemo(Visual):
                 self.game.reset()
                 self.game_over_timer = 0.0
             return
+
+        self.frame_dt += (dt - self.frame_dt) * 0.1
 
         # Make AI decisions
         self.decision_timer += dt
@@ -72,96 +79,72 @@ class StickRunnerDemo(Visual):
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
     def _should_jump(self):
-        """Decide whether to jump based on upcoming gaps and building heights."""
+        """Jump when that is safe and waiting SLACK more frames is not."""
         game = self.game
-
-        # Can only jump when on ground or near ground
-        can_jump_now = game.on_ground or game._near_ground()
-        if not can_jump_now:
+        if not (game.on_ground or game._near_ground()):
             return False
 
-        player_x = game.PLAYER_X
-        player_y = game.player_y
-
-        # Find the current building we're on
-        current_building = None
-        for b in game.buildings:
-            if b['x'] <= player_x <= b['x'] + b['width']:
-                current_building = b
-                break
-
-        if current_building is None:
-            # Not on a building - we're falling, can't do much
-            return False
-
-        # Find the next building (the one we need to jump to)
-        next_building = None
-        current_end = current_building['x'] + current_building['width']
-
-        for b in game.buildings:
-            # Building starts after our current building ends
-            if b['x'] > current_building['x'] + current_building['width'] - 5:
-                if next_building is None or b['x'] < next_building['x']:
-                    next_building = b
-
-        if next_building is None:
-            # No upcoming building
-            return False
-
-        # Calculate the gap distance
-        gap_start = current_end
-        gap_end = next_building['x']
-        gap_width = gap_end - gap_start
-
-        # Distance from player to the gap
-        dist_to_gap = gap_start - player_x
-
-        # Get the jump distance from game physics
-        jump_dist = game._get_jump_distance()
-
-        # Calculate height difference
-        current_height = game._get_landing_y(current_building, player_x)
-        next_height = next_building['y']  # Landing Y at start of next building
-        height_diff = next_height - current_height  # Negative means jumping UP
-
-        # Calculate optimal jump timing
-        # We need to jump so we land on the next building
-        # Jump distance tells us how far we travel horizontally during a jump
-
-        # Ideal jump point: we want to land about 3-5 pixels into the next building
-        target_landing = gap_end + 4
-        ideal_jump_dist = target_landing - player_x
-
-        # Adjust for height - jumping UP requires earlier jump
-        if height_diff < -3:  # Jumping up significantly
-            # Jump earlier when going up
-            trigger_dist = ideal_jump_dist - jump_dist * 0.1
-        elif height_diff > 3:  # Jumping down
-            # Can jump a bit later when going down (more air time)
-            trigger_dist = ideal_jump_dist - jump_dist * 0.05
-        else:
-            trigger_dist = ideal_jump_dist - jump_dist * 0.08
-
-        # Safety margin - don't wait until the very edge
-        # Jump when we're within optimal range
-        min_trigger = trigger_dist - 6
-        max_trigger = trigger_dist + 3
-
-        # Emergency jump - very close to edge
-        edge_dist = gap_start - player_x
-        if edge_dist < 5 and edge_dist > 0:
-            return True
-
-        # Check if we're in the jump window
-        if min_trigger <= dist_to_gap <= max_trigger:
-            return True
-
-        # Account for scroll speed changes - at higher speeds, need to jump earlier
-        speed_factor = game.scroll_speed / 40.0  # Base speed is 40
-        if speed_factor > 1.2:
-            # At higher speeds, expand the trigger window
-            early_trigger = min_trigger - (speed_factor - 1.0) * 5
-            if early_trigger <= dist_to_gap <= max_trigger:
+        start = (game.player_y, game.velocity_y, game.on_ground)
+        self.known = max(b['x'] + b['width'] for b in game.buildings)
+        # Careful first; if that finds no way through, plan tighter
+        for hold in (SLACK, 0):
+            plan = (hold, {})
+            wait = self._survive(plan, 0, start, False)
+            if wait >= HORIZON:
+                return False
+            jump = self._survive(plan, 0, start, True)
+            if jump >= HORIZON:
                 return True
+        return jump > wait
 
-        return False
+    def _survive(self, plan, k, state, jump):
+        """Frames survived (up to HORIZON) from frame k, given this frame's
+        choice and the best choices after it. No jumps on frames 1..hold."""
+        hold, memo = plan
+        state = self._step(k, *state, jump)
+        if state is None:
+            return k
+        if k + 1 >= HORIZON or state == 'unknown':
+            return HORIZON
+        key = (k,) + state
+        if key not in memo:
+            best = self._survive(plan, k + 1, state, False)
+            if best < HORIZON and k + 1 > hold:
+                best = max(best, self._survive(plan, k + 1, state, True))
+            memo[key] = best
+        return memo[key]
+
+    def _step(self, k, y, vy, on_ground, jump):
+        """One frame of StickRunner.update for the runner alone, in the same
+        order. Building x is as of frame 0. Returns (y, vy, on_ground), None
+        for a fall that cannot be saved, or 'unknown' past the last building
+        generated so far."""
+        game = self.game
+        dt = self.frame_dt
+        x = game.PLAYER_X + game.scroll_speed * dt * k  # where the runner is over frame-0 ground
+
+        if jump:
+            roof = self._roof(x)
+            if on_ground or (roof is not None and abs(y + 4 - roof) <= 6):
+                vy = game.JUMP_VELOCITY
+        vy = min(vy + game.GRAVITY * dt, game.MAX_FALL_SPEED)
+        y += vy * dt
+
+        x += game.scroll_speed * dt
+        if x > self.known:
+            return 'unknown'
+        on_ground = False
+        roof = self._roof(x)
+        if roof is not None and vy >= 0 and roof <= y + 4 <= roof + 10:
+            y, vy, on_ground = roof - 4, 0.0, True
+        if y > LOST:
+            return None
+        return (y, vy, on_ground)
+
+    def _roof(self, x):
+        """Landing height of the building under frame-0 position x, or None."""
+        game = self.game
+        for b in game.buildings:
+            if b['x'] <= x <= b['x'] + b['width']:
+                return game._get_landing_y(b, x)
+        return None
