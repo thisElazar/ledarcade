@@ -418,7 +418,7 @@ class WonderSpin(Visual):
 
 class WonderPacMan(Visual):
     name = "WONDER CHOMP"
-    description = "Pac-Man reveals title"
+    description = "Pak-Man reveals title"
     category = "titles"
 
     def __init__(self, display: Display):

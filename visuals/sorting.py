@@ -97,7 +97,7 @@ def insertion_sort(arr):
 
 
 def merge_sort(arr):
-    """In-place merge sort using auxiliary merge, yielding each step."""
+    """In-place merge sort (rotation merge, no extra array), yielding each step."""
     yield from _merge_sort_rec(arr, 0, len(arr) - 1)
     yield ('done',)
 

@@ -189,10 +189,15 @@ class PredPrey(Visual):
         if self.overlay_timer > 0:
             self.overlay_timer -= dt
 
-        # Auto-reseed when both populations are very low
-        if self.rabbit_count < 10 and self.fox_count < 10:
+        # Auto-reseed when both populations are very low (2 s), or when the foxes
+        # are gone and rabbits have filled the field (4 s) -- without the second
+        # case the screen sits solid green forever.
+        collapsed = self.rabbit_count < 10 and self.fox_count < 10
+        overrun = (self.fox_count == 0
+                   and self.rabbit_count >= 0.98 * GRID_SIZE * GRID_SIZE)
+        if collapsed or overrun:
             self.reseed_delay += dt
-            if self.reseed_delay >= 2.0:
+            if self.reseed_delay >= (2.0 if collapsed else 4.0):
                 self.grid = [[EMPTY] * GRID_SIZE for _ in range(GRID_SIZE)]
                 self.energy = [[0] * GRID_SIZE for _ in range(GRID_SIZE)]
                 self._seed()

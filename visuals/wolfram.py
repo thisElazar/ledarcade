@@ -63,6 +63,7 @@ class Wolfram(Visual):
 
         # Current generation (bottom row of display)
         self.current_gen = [0 for _ in range(GRID_SIZE)]
+        self.blank_rows = 0
 
         self.init_pattern()
 
@@ -177,6 +178,17 @@ class Wolfram(Visual):
             self.history[GRID_SIZE - 1][x] = next_gen[x]
 
         self.current_gen = next_gen
+
+        # Some rules wipe the row out (rule 90 cancels itself after 32 rows on a
+        # 64-cell ring), which would leave the panel black for good. After a
+        # short gap, plant the single cell again.
+        if any(next_gen):
+            self.blank_rows = 0
+        else:
+            self.blank_rows += 1
+            if self.blank_rows >= 8:
+                self.blank_rows = 0
+                self._reset_current_gen()
 
     def draw(self):
         for y in range(GRID_SIZE):

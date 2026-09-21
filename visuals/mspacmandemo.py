@@ -1,7 +1,7 @@
 """
 Ms. Pac-Man Demo - AI Attract Mode
 ==================================
-Ms. Pac-Man plays itself using simple AI for idle screen demos.
+Ms. Pak-Man plays itself using simple AI for idle screen demos.
 The AI navigates toward pellets while avoiding ghosts.
 
 AI Strategy:
@@ -25,7 +25,7 @@ from games.mspacman import MsPacMan
 
 class MsPacManDemo(Visual):
     name = "MS. PAK-MAN"
-    description = "AI plays Ms. Pac-Man"
+    description = "AI plays Ms. Pak-Man"
     category = "demos"
 
     def __init__(self, display: Display):

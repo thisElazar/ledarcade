@@ -3667,7 +3667,7 @@
      "name": "MS. PAK-MAN",
      "cls": "MsPacManDemo",
      "module": "visuals/mspacmandemo.py",
-     "desc": "Ms. Pac-Man plays itself using simple AI for idle screen demos. The AI navigates toward pellets while avoiding ghosts. AI Strategy: - Find nearest reachable pellet using BFS - Avoid tiles near ghosts (unless powered up) - Chase frightened ghosts for bonus points - Grab power pellets when ghosts are close",
+     "desc": "Ms. Pak-Man plays itself using simple AI for idle screen demos. The AI navigates toward pellets while avoiding ghosts. AI Strategy: - Find nearest reachable pellet using BFS - Avoid tiles near ghosts (unless powered up) - Chase frightened ghosts for bonus points - Grab power pellets when ghosts are close",
      "controls": {},
      "stub": true
     },
@@ -3683,7 +3683,7 @@
      "name": "PAK-MAN",
      "cls": "PacManDemo",
      "module": "visuals/pacmandemo.py",
-     "desc": "Pac-Man plays itself using simple AI for idle screen demos. The AI navigates toward pellets while avoiding ghosts. AI Strategy: - Find nearest reachable pellet using BFS - Avoid tiles near ghosts (unless powered up) - Chase frightened ghosts for bonus points - Grab power pellets when ghosts are close",
+     "desc": "Pak-Man plays itself using simple AI for idle screen demos. The AI navigates toward pellets while avoiding ghosts. AI Strategy: - Find nearest reachable pellet using BFS - Avoid tiles near ghosts (unless powered up) - Chase frightened ghosts for bonus points - Grab power pellets when ghosts are close",
      "controls": {},
      "stub": true
     },
