@@ -727,7 +727,7 @@ class MonsterMaze(Game):
         if self.phase == 'escaped':
             self.display.draw_text_small(2, STATUS_Y, "ESCAPED!", Colors.GREEN)
             lbl = f"L{self.level}"
-            self.display.draw_text_small(50, STATUS_Y, lbl, Colors.CYAN)
+            self.display.draw_text_small(GRID_SIZE - 4 * len(lbl), STATUS_Y, lbl, Colors.CYAN)
             return
 
         msg = REX_MESSAGES.get(self.rex_state, "")
@@ -741,8 +741,9 @@ class MonsterMaze(Game):
                 color = Colors.YELLOW
 
         self.display.draw_text_small(2, STATUS_Y, msg, color)
+        # Right-aligned: the 13-character status lines run to x=54
         lbl = f"L{self.level}"
-        self.display.draw_text_small(50, STATUS_Y, lbl, Colors.CYAN)
+        self.display.draw_text_small(GRID_SIZE - 4 * len(lbl), STATUS_Y, lbl, Colors.CYAN)
 
     def _draw_hud(self):
         """Draw bottom HUD: facing direction and score."""
