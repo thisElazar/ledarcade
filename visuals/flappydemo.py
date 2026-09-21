@@ -4,9 +4,10 @@ Flappy Bird Demo - AI Attract Mode
 Flappy plays itself by timing flaps to navigate through pipe gaps.
 
 AI Strategy:
-- Look at the next pipe gap
-- Flap when bird is below the gap center and falling
-- Account for gravity and upward velocity from flaps
+- Rule of thumb: flap when below the next gap's center and falling
+- Before trusting it, fly the bird's own physics ahead through the next
+  pipes; if the rule's choice crashes and the other does not, take the other.
+  (A gap lower than the last one has to be set up before the last pipe ends.)
 """
 
 from . import Visual, Display, Colors, GRID_SIZE
@@ -16,6 +17,12 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.flappy import Flappy
+
+
+HORIZON = 45   # frames flown ahead: the pipe at hand and the one after
+FLAP_EVERY = 3 # the plan only considers a flap every this many frames
+MARGIN = 1.0   # px of room the plan wants from a pipe or the ground (1.5 leaves no way through)
+BUDGET = 1500  # frames simulated per decision, at most
 
 
 class FlappyDemo(Visual):
@@ -33,6 +40,7 @@ class FlappyDemo(Visual):
         self.should_flap = False
         self.decision_timer = 0.0
         self.decision_interval = 0.05  # Check frequently
+        self.frame_dt = 1 / 30  # smoothed; the plan flies in frames this long
 
     def handle_input(self, input_state):
         return False
@@ -47,6 +55,8 @@ class FlappyDemo(Visual):
                 self.game.reset()
                 self.decision_timer = 0.0
             return
+
+        self.frame_dt += (dt - self.frame_dt) * 0.1
 
         # Make AI decisions
         self.decision_timer += dt
@@ -70,53 +80,68 @@ class FlappyDemo(Visual):
             self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
 
     def _should_flap(self):
-        """Decide whether to flap based on upcoming pipe gap."""
+        """The rule of thumb's choice, unless flying ahead says otherwise."""
         game = self.game
-
-        # Auto-start the game
         if not game.started:
-            return True
+            return True  # Auto-start the game
 
-        bird_y = game.bird_y
-        bird_vy = game.bird_vy
+        self.budget = BUDGET
+        first = self._rule(0, game.bird_y, game.bird_vy)
+        results = {}
+        for flap in (first, not first):
+            results[flap] = self._fly(0, game.bird_y, game.bird_vy, flap)
+            if results[flap] >= HORIZON:
+                return flap
+        return max(results, key=results.get)
 
-        # Find the next pipe to navigate
-        next_pipe = None
+    def _rule(self, k, y, vy):
+        """Flap when below the next gap's center (a bit low is safer) and falling."""
+        game = self.game
+        shift = game.pipe_speed * self.frame_dt * k
+        ahead = [p for p in game.pipes if p['x'] - shift + game.pipe_width > game.bird_x]
+        if not ahead:
+            return y > 30 and vy > 0
+        gap_y = min(ahead, key=lambda p: p['x'])['gap_y']
+        return y > gap_y + game.gap_height / 2 + 2 and vy >= 0
+
+    def _fly(self, k, y, vy, flap):
+        """Frames survived (up to HORIZON) taking this choice at frame k and
+        the best choices after it, trying the rule of thumb's first."""
+        self.budget -= 1
+        state = self._step(k, y, vy, flap)
+        if state is None:
+            return k
+        k += 1
+        if k >= HORIZON:
+            return HORIZON
+        y, vy = state
+        if k % FLAP_EVERY:
+            return self._fly(k, y, vy, False)
+        first = self._rule(k, y, vy)
+        best = self._fly(k, y, vy, first)
+        if best < HORIZON and self.budget > 0:
+            best = max(best, self._fly(k, y, vy, not first))
+        return best
+
+    def _step(self, k, y, vy, flap):
+        """One frame of Flappy.update for the bird alone. Pipe x is as of
+        frame 0. Returns (y, vy), or None for a crash."""
+        game = self.game
+        dt = self.frame_dt
+        if flap:
+            vy = game.flap_strength
+        vy = min(vy + game.gravity * dt, game.max_fall_speed)
+        y += vy * dt
+        if y >= game.ground_y - 2 - MARGIN:
+            return None
+        if y < 8:
+            y, vy = 8, 0.0
+
+        shift = game.pipe_speed * dt * (k + 1)
+        top, bottom = int(y) - 1, int(y) + 2
         for pipe in game.pipes:
-            if pipe['x'] + game.pipe_width > game.bird_x:
-                if next_pipe is None or pipe['x'] < next_pipe['x']:
-                    next_pipe = pipe
-
-        if next_pipe is None:
-            # No pipes ahead, stay in middle
-            return bird_y > 30 and bird_vy > 0
-
-        # Gap boundaries
-        gap_top = next_pipe['gap_y']
-        gap_bottom = next_pipe['gap_y'] + game.gap_height
-        gap_center = (gap_top + gap_bottom) / 2
-
-        # Simple approach: aim to be at gap_center + a bit lower (safer)
-        target_y = gap_center + 2  # Aim slightly below center
-
-        # Don't flap if above target and not falling fast
-        if bird_y < target_y - 3:
-            return False
-
-        # Don't flap if moving up
-        if bird_vy < -20:
-            return False
-
-        # Flap if below target and falling
-        if bird_y > target_y and bird_vy >= 0:
-            return True
-
-        # Flap if falling fast
-        if bird_vy > 40:
-            return True
-
-        # Critical: don't hit ground
-        if bird_y > game.ground_y - 8:
-            return True
-
-        return False
+            px = int(pipe['x'] - shift)
+            if game.bird_x - 1 < px + game.pipe_width + MARGIN and game.bird_x + 2 > px - MARGIN:
+                if top < pipe['gap_y'] + MARGIN or bottom > pipe['gap_y'] + game.gap_height - MARGIN:
+                    return None
+        return y, vy
