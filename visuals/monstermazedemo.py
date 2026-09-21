@@ -12,7 +12,7 @@ from arcade import InputState, GameState
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from games.monstermaze import MonsterMaze, MAZE_SIZE, DX, DY, RexState
+from games.monstermaze import MonsterMaze, MAZE_SIZE, HUD_Y, DX, DY, RexState
 
 
 class MonsterMazeDemo(Visual):
@@ -29,6 +29,7 @@ class MonsterMazeDemo(Visual):
         self.game.reset()
         self.decision_timer = 0.0
         self.decision_interval = 0.55
+        self.flee_interval = 0.25  # running pace while the Rex is after us
         self.pending_input = None  # single-frame input to send next frame
         self.game_over_timer = 0.0
 
@@ -53,20 +54,26 @@ class MonsterMazeDemo(Visual):
 
         # Tick with blank input between decisions
         self.decision_timer += dt
-        if self.decision_timer >= self.decision_interval:
+        pursued = self.game.rex_state in PURSUIT_STATES
+        interval = self.flee_interval if pursued else self.decision_interval
+        if self.decision_timer >= interval:
             self.decision_timer = 0.0
             self.pending_input = self._decide()
 
         self.game.update(InputState(), dt)
 
     def draw(self):
+        blink = int(self.time * 2) % 2 == 0
         if self.game.state == GameState.GAME_OVER:
             self.game.draw_game_over(0)
+            if blink:
+                self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
         else:
             self.game.draw()
-
-        if int(self.time * 2) % 2 == 0:
-            self.display.draw_text_small(46, STATUS_Y, "DEMO", Colors.GRAY)
+            # The 3D view runs to white walls; the HUD row has a gap
+            # between the score and the minimap
+            if blink:
+                self.display.draw_text_small(35, HUD_Y, "DEMO", Colors.GRAY)
 
     def _decide(self):
         """AI: BFS to exit, flee Rex when close."""
@@ -80,16 +87,13 @@ class MonsterMazeDemo(Visual):
         px, py = g.px, g.py
         facing = g.facing
 
-        # Find BFS path to exit
+        # Head for the exit; once the Rex is after us, only if we get there first
         target_x, target_y = g.exit_x, g.exit_y
-
-        # If Rex is close and in pursuit, flee
-        if g.rex_state in (RexState.SEEN, RexState.BEHIND):
-            rex_dist = _bfs_dist(g.walls, px, py, g.rex_x, g.rex_y)
-            if rex_dist != -1 and rex_dist <= 3:
-                flee_target = self._flee_target(g)
-                if flee_target:
-                    target_x, target_y = flee_target
+        if g.rex_state in PURSUIT_STATES:
+            mine = _bfs_map(g.walls, px, py)
+            rex = _bfs_map(g.walls, g.rex_x, g.rex_y)
+            if mine[target_x, target_y] >= rex[target_x, target_y]:
+                target_x, target_y = self._flee_target(mine, rex)
 
         # BFS next step toward target
         nxt = _bfs_next(g.walls, px, py, target_x, target_y)
@@ -120,45 +124,30 @@ class MonsterMazeDemo(Visual):
 
         return inp
 
-    def _flee_target(self, g):
-        """Find an open cell far from Rex to flee toward."""
-        best = None
-        best_dist = -1
-        for y in range(MAZE_SIZE):
-            for x in range(MAZE_SIZE):
-                if g.walls[y][x]:
-                    continue
-                rd = abs(x - g.rex_x) + abs(y - g.rex_y)
-                pd = abs(x - g.px) + abs(y - g.py)
-                score = rd - pd
-                if score > best_dist:
-                    best_dist = score
-                    best = (x, y)
-        return best
+    def _flee_target(self, mine, rex):
+        """The cell farthest from the Rex that we can reach before it does.
+
+        The maze has no loops, so a cell we reach first is never past the Rex.
+        """
+        safe = [c for c in mine if mine[c] < rex[c]]
+        return max(safe, key=rex.get)
 
 
-# Status bar y for "DEMO" overlay
-STATUS_Y = 44
+PURSUIT_STATES = (RexState.APPROACHING, RexState.SEEN, RexState.BEHIND)
 
 
-def _bfs_dist(walls, sx, sy, tx, ty):
-    if walls[sy][sx] or walls[ty][tx]:
-        return -1
-    if sx == tx and sy == ty:
-        return 0
-    visited = set()
-    visited.add((sx, sy))
-    q = deque([(sx, sy, 0)])
+def _bfs_map(walls, sx, sy):
+    """BFS distance from (sx,sy) to every reachable open cell."""
+    dist = {(sx, sy): 0}
+    q = deque([(sx, sy)])
     while q:
-        cx, cy, d = q.popleft()
+        cx, cy = q.popleft()
         for i in range(4):
             nx, ny = cx + DX[i], cy + DY[i]
-            if 0 <= nx < MAZE_SIZE and 0 <= ny < MAZE_SIZE and not walls[ny][nx] and (nx, ny) not in visited:
-                if nx == tx and ny == ty:
-                    return d + 1
-                visited.add((nx, ny))
-                q.append((nx, ny, d + 1))
-    return -1
+            if 0 <= nx < MAZE_SIZE and 0 <= ny < MAZE_SIZE and not walls[ny][nx] and (nx, ny) not in dist:
+                dist[(nx, ny)] = dist[(cx, cy)] + 1
+                q.append((nx, ny))
+    return dist
 
 
 def _bfs_next(walls, sx, sy, tx, ty):
