@@ -61,12 +61,27 @@ section .wrap { max-width: 800px; }
 .entry .origin b { font-weight: 500; }
 .entry .members { font-size: 15px; color: var(--ink-2); margin-top: 6px; line-height: 1.6; }
 .entry .members span + span::before { content: "·"; margin: 0 7px; color: var(--rule-2); }
-.entry .controls { margin-top: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; }
-.entry .controls b { font-weight: 500; color: var(--ink-3); text-transform: uppercase; }
+.entry .controls, .entry .legend { margin-top: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; }
+.entry .controls b, .entry .legend b { font-weight: 500; color: var(--ink-3); text-transform: uppercase; }
+.entry .legend b { text-transform: none; }  /* on-screen text, shown as the panel draws it */
 .entry .year { color: var(--ink-3); }
+
+/* "How it works" per-entry disclosure: Controls / How to play / On screen / More */
+.entry .how { margin-top: 10px; }
+.entry .how summary { list-style: none; cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.entry .how summary::-webkit-details-marker { display: none; }
+.entry .how summary::before { content: "+ "; }
+.entry .how[open] summary::before { content: "\2212 "; }
+.entry .how summary:hover { color: var(--rubric); }
+.entry .how-body { padding: 10px 0 12px; }
+.entry .how-sec + .how-sec { margin-top: 14px; }
+.entry .how-sec h3 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-weight: 400; margin: 0 0 6px; }
+.entry .how-sec p { font-size: 15px; line-height: 1.55; }
+.entry .how-sec p + p { margin-top: 8px; }
 
 .compact { columns: 3; column-gap: 32px; font-size: 16px; line-height: 1.7; border-top: 1px solid var(--rule-2); padding-top: 12px; }
 .compact span { display: block; }
+.accordion .cat-desc { font-size: 16px; line-height: 1.55; color: var(--ink-2); max-width: 60ch; margin: 0 0 14px; }
 
 
 .loading, .error { text-align: center; font-style: italic; color: var(--ink-3); padding-block: 32px; }
@@ -378,6 +393,63 @@ section .wrap { max-width: 800px; }
     return wrap;
   }
 
+  // GUIDE['legend']: what the player SEES -> a short plain meaning. Same
+  // two-column mono grid as controlRows(), but the left column is shown
+  // verbatim (it's on-screen text, not a panel input) and order is preserved.
+  function legendRows(legend) {
+    if (!legend) return null;
+    var keys = Object.keys(legend);
+    if (!keys.length) return null;
+    var wrap = el('div', 'legend');
+    keys.forEach(function(k) {
+      wrap.appendChild(el('b', null, esc(k)));
+      wrap.appendChild(el('span', null, esc(legend[k])));
+    });
+    return wrap;
+  }
+
+  // GUIDE['how'] / GUIDE['notes']: blank-line-separated paragraphs of prose.
+  function textParagraphs(text) {
+    if (!text) return null;
+    var paras = String(text).split(/\n\s*\n/).map(function(p) {
+      return p.replace(/\s+/g, ' ').trim();
+    }).filter(Boolean);
+    if (!paras.length) return null;
+    var wrap = document.createDocumentFragment();
+    paras.forEach(function(p) { wrap.appendChild(el('p', null, esc(p))); });
+    return wrap;
+  }
+
+  // One labeled section inside the "How it works" disclosure, or null if
+  // there is no content for it (callers filter nulls out).
+  function howSection(title, content) {
+    if (!content) return null;
+    var sec = el('div', 'how-sec');
+    sec.appendChild(el('h3', null, esc(title)));
+    sec.appendChild(content);
+    return sec;
+  }
+
+  // The one collapsed disclosure per entry: Controls, How to play, On
+  // screen, More — only the sections that have content, in that order.
+  // Closed by default (native <details>), so entries with none of these
+  // show no disclosure at all and take up no extra space.
+  function howDisclosure(item) {
+    var sections = [
+      howSection('Controls', controlRows(item.controls)),
+      howSection('How to play', textParagraphs(item.how)),
+      howSection('On screen', legendRows(item.legend)),
+      howSection('More', textParagraphs(item.notes))
+    ].filter(Boolean);
+    if (!sections.length) return null;
+    var det = el('details', 'how');
+    det.appendChild(el('summary', null, 'How it works'));
+    var body = el('div', 'how-body');
+    sections.forEach(function(s) { body.appendChild(s); });
+    det.appendChild(body);
+    return det;
+  }
+
   function renderEntry(item) {
     var entry = el('div', 'entry');
     entry.appendChild(el('span', 'name', esc(item.name)));
@@ -395,8 +467,8 @@ section .wrap { max-width: 800px; }
       item.members.forEach(function(n) { mem.appendChild(el('span', null, esc(n))); });
       body.appendChild(mem);
     }
-    var rows = controlRows(item.controls);
-    if (rows) body.appendChild(rows);
+    var disclosure = howDisclosure(item);
+    if (disclosure) body.appendChild(disclosure);
     entry.appendChild(body);
     return entry;
   }
@@ -437,6 +509,7 @@ section .wrap { max-width: 800px; }
     sum.appendChild(el('span', 'count num', fmt(catCount(cat))));
     d.appendChild(sum);
     var body = el('div', 'body');
+    if (cat.desc) body.appendChild(el('p', 'cat-desc', esc(cat.desc)));
     if (cat.key === 'art' && cat.paintings) {
       var ent = el('div', 'entries'); ent.appendChild(renderPaintings(cat.paintings)); body.appendChild(ent);
     } else if (COMPACT[cat.key]) {

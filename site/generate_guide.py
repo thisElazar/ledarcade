@@ -11,7 +11,13 @@ For every class registered in games/__init__.py / visuals/__init__.py:
            "year":    "Optional year or era string (e.g. '1979', 'c. 100 BC').",
            "credit":  "Optional creator credit (e.g. 'Craig Reynolds').",
            "controls": {"Joystick": "Steer", "Button": "Fire"},  # optional override
+           "how":     "Optional how-to-play prose. Blank line(s) separate "
+                      "paragraphs, e.g. 'First paragraph.\\n\\nSecond paragraph.'",
+           "legend":  {"C:": "combo counter"},  # optional: on-screen text -> meaning
+           "notes":   "Optional extra trivia/detail, shown last.",
        }
+     Controls/how/legend/notes render inside one collapsed disclosure on the
+     Field Guide page ("How it works"); each is only shown if non-empty.
   2. Otherwise the entry falls back to the module docstring: the prose
      paragraph(s) become desc, and the 'Controls:' block is parsed into
      a controls mapping. Fallback entries are flagged "stub": true so we
@@ -33,6 +39,18 @@ from generate_catalog import (  # noqa: E402
     GAME_CATEGORIES, VISUAL_CATEGORIES, ROOT,
     scan_exported_classes, scan_file, scan_painting_entries,
 )
+
+
+# The page lists these categories as bare names (no per-entry text), so what a
+# reader needs to know about them is said once, for the whole category.
+CATEGORY_DESC = {
+    'demos': 'The cabinet playing itself. Each demo is the real game with a '
+             'simple AI at the controls, part of what the cabinet shows when '
+             'nobody is playing. Rules and scoring are in the game\'s own entry.',
+    'titles': 'Title cards for the Wonder Cabinet: the name redrawn in the '
+              'style of old games, films, ads and machines. They turn up in '
+              'the idle rotation between visuals.',
+}
 
 
 def parse_docstring(doc):
@@ -121,7 +139,7 @@ def build_entry(item, doc_parts, guide):
 
     if guide:
         entry['desc'] = guide.get('desc', '')
-        for key in ('origin', 'year', 'credit'):
+        for key in ('origin', 'year', 'credit', 'how', 'legend', 'notes'):
             if guide.get(key):
                 entry[key] = guide[key]
         entry['controls'] = guide.get('controls', doc_controls)
@@ -284,6 +302,8 @@ def main():
             }
             if key == 'art' and painting_groups:
                 cat['paintings'] = painting_groups
+            if key in CATEGORY_DESC:
+                cat['desc'] = CATEGORY_DESC[key]
             categories.append(cat)
 
     meta = build_meta(categories, painting_groups)
