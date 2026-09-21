@@ -415,6 +415,9 @@ class Tetris(Game):
                 py = 12 + block_dy * 2
                 self.display.draw_rect(px, py, 2, 2, color)
     
+    def game_over_stat(self):
+        return f"LINES:{self.lines}"
+
     def draw_game_over(self):
         """Custom game over for Tetris."""
         self.display.clear(Colors.BLACK)

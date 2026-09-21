@@ -823,6 +823,9 @@ class Bomberman(Game):
             lx = 58 - i * 4
             self.display.set_pixel(lx, 2, self.PLAYER_COLOR)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self):
         """Draw game over screen."""
         self.display.clear(Colors.BLACK)

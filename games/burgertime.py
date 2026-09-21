@@ -1195,6 +1195,9 @@ class BurgerTime(Game):
             self.display.set_pixel(lx, 2, self.CHEF_HAT)
             self.display.set_pixel(lx, 3, self.CHEF_BODY)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self, selection: int = 0):
         """Draw game over screen."""
         self.display.clear(Colors.BLACK)

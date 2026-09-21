@@ -483,7 +483,11 @@ class Game(ABC):
     def draw_score(self, y: int = 1):
         """Draw score at top of screen."""
         self.display.draw_text_small(1, y, f"{self.score}", Colors.WHITE)
-    
+
+    def game_over_stat(self):
+        """Return a short stat (<=16 chars, e.g. 'LEVEL:3') for the game-over screen, or None."""
+        return None
+
     def draw_game_over(self, selection: int = 0):
         """Draw game over screen with menu options.
 
@@ -493,6 +497,11 @@ class Game(ABC):
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(8, 20, "GAME OVER", Colors.RED)
         self.display.draw_text_small(12, 30, f"SCORE:{self.score}", Colors.WHITE)
+
+        stat = self.game_over_stat()
+        if stat:
+            x = max(0, (GRID_SIZE - (len(stat) * 4 - 1)) // 2)
+            self.display.draw_text_small(x, 37, stat, Colors.GRAY)
 
         # Draw selection options
         if selection == 0:

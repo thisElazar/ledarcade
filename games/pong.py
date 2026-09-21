@@ -295,6 +295,9 @@ class Pong(Game):
         if self.serving:
             self.display.draw_text_small(12, 30, "GET READY", Colors.YELLOW)
     
+    def game_over_stat(self):
+        return f"FINAL:{self.score}-{self.ai_score}"
+
     def draw_game_over(self):
         """Custom game over for Pong."""
         self.display.clear(Colors.BLACK)

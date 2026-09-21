@@ -699,6 +699,9 @@ class QBert(Game):
             self.display.set_pixel(lx, 2, self.QBERT_COLOR)
             self.display.set_pixel(lx + 1, 2, self.QBERT_COLOR)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self):
         """Draw game over screen."""
         self.display.clear(Colors.BLACK)

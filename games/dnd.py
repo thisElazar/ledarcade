@@ -804,6 +804,9 @@ class DnD(Game):
         # Dungeon level (right)
         self.display.draw_text_small(50, 2, f"D{self.level}", Colors.CYAN)
 
+    def game_over_stat(self):
+        return f"DEPTH:{self.level}"
+
     def draw_game_over(self, selection: int = 0):
         """Draw game over screen."""
         self.display.clear(Colors.BLACK)

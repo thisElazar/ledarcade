@@ -794,6 +794,9 @@ class BloonsTD(Game):
         self.display.draw_text_small(6, 38, f"LIVES:{self.lives}", Colors.GREEN)
         self.display.draw_text_small(4, 52, "BTN:MENU", Colors.GRAY)
 
+    def game_over_stat(self):
+        return f"WAVE:{self.wave_num}"
+
     def draw_game_over(self, selection=0):
         """Override game over to show TD-specific stats."""
         self.display.clear(Colors.BLACK)

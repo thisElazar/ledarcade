@@ -780,6 +780,9 @@ class MonsterMaze(Game):
                       self.rex_state in (RexState.SEEN, RexState.BEHIND)):
                     self.display.set_pixel(sx, sy, Colors.RED)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self, selection: int = 0):
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(4, 10, "GAME OVER", Colors.RED)

@@ -968,6 +968,9 @@ class WindowWasher(Game):
             self.display.draw_text_small(2, 44, f"PAR:+{par_bonus}", Colors.CYAN)
         self.display.draw_text_small(2, 54, f"TOTAL:{self.score}", Colors.ORANGE)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self, selection: int = 0):
         """Game over screen."""
         self._draw_fired()

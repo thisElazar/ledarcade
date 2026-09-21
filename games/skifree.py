@@ -948,6 +948,9 @@ class SkiFree(Game):
         if fuel_w > 0:
             self.display.draw_rect(bar_x, bar_y, fuel_w, bar_h, self.BOOST_COLOR)
 
+    def game_over_stat(self):
+        return f"STYLE:{self.style}"
+
     def draw_game_over(self):
         self.display.clear(Colors.BLACK)
         self.display.draw_text_small(8, 16, "GAME OVER", Colors.RED)

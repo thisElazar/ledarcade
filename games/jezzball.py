@@ -670,6 +670,9 @@ class JezzBall(Game):
                 # Center dot
                 self.display.set_pixel(cx, cy, cursor_color)
 
+    def game_over_stat(self):
+        return f"LEVEL:{self.level}"
+
     def draw_game_over(self):
         """Custom game over screen."""
         self.display.clear(Colors.BLACK)

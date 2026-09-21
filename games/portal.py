@@ -1129,6 +1129,9 @@ class Portal(Game):
         if self.score > 0:
             self.display.draw_text_small(2, 50, str(self.score), Colors.YELLOW)
 
+    def game_over_stat(self):
+        return f"CHAMBER {self.chamber + 1}"
+
     def draw_game_over(self, selection: int = 0):
         self.display.clear((30, 5, 5))
         self.display.draw_text_small(2, 8, "TESTING", Colors.RED)

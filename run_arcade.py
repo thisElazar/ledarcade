@@ -128,7 +128,7 @@ def draw_initials_entry(display, initials, cursor_pos, score):
     display.draw_text_small(4, 58, "BTN:NEXT", Colors.GRAY)
 
 
-def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1, first_option="PLAY AGAIN", won=False):
+def draw_action_selection(display, selection, score, made_leaderboard=False, rank=-1, first_option="PLAY AGAIN", won=False, stat=None):
     """Draw the PLAY AGAIN / MENU selection.
 
     Args:
@@ -139,6 +139,7 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         rank: Player's rank if they made leaderboard
         first_option: Text for the first option (default "PLAY AGAIN")
         won: True when the run ended in a win rather than a loss
+        stat: Optional short stat line (<=16 chars) to draw under the score, or None
     """
     display.clear(Colors.BLACK)
 
@@ -153,6 +154,9 @@ def draw_action_selection(display, selection, score, made_leaderboard=False, ran
         display.draw_text_small(center_x(header), 12, header, color)
         score_text = f"SCORE:{score}"
         display.draw_text_small(center_x(score_text), 22, score_text, Colors.WHITE)
+
+    if stat:
+        display.draw_text_small(center_x(stat), 30, stat, Colors.GRAY)
 
     # Draw selection options
     if selection == 0:
@@ -1066,7 +1070,8 @@ def main(display_class=Display):
                                     first_opt = "NEXT GAME" if in_shuffle_mode else "PLAY AGAIN"
                                     draw_action_selection(display, game_over_selection, final_score,
                                                           player_made_leaderboard, player_rank,
-                                                          first_option=first_opt, won=game_won)
+                                                          first_option=first_opt, won=game_won,
+                                                          stat=getattr(current_item, 'game_over_stat', lambda: None)())
                     else:
                         current_item.update(input_state, dt)
                         current_item.draw()
