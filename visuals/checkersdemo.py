@@ -3,17 +3,14 @@ Checkers Demo - AI vs AI Attract Mode
 =====================================
 Two AIs play checkers against each other for idle screen demos.
 
-AI emulates Arthur Samuel's Checkers Program (1959) - the pioneering
-machine learning program developed at IBM that beat a Connecticut
-state champion in 1962.
+The evaluation features echo the ones Arthur Samuel described for his
+Checkers Program (1959) - piece count, kings, advancement, centre control.
+The resemblance stops there: Samuel's program was famous for *learning* its
+feature weights through self-play, and nothing here learns. The weights are
+fixed constants and the search is plain alpha-beta.
 
-Historical AI Strategy:
-- Alpha-beta search with 4-6 ply depth
-- Evaluation features: piece count, kings, advancement, center control
-- "Piece advantage" and "denial of occupancy" heuristics
-- Original learned feature weights through self-play
-
-Reference: https://en.wikipedia.org/wiki/Arthur_Samuel#Checkers_program
+Reference for the original, not for this implementation:
+https://en.wikipedia.org/wiki/Arthur_Samuel#Checkers_program
 """
 
 import random
@@ -26,14 +23,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.checkers import Checkers, PLAYER_1, PLAYER_2
 
 
-class SamuelAI:
+class CheckersAI:
     """
-    Checkers AI emulating Arthur Samuel's program (1959).
+    Checkers AI with fixed weights over Samuel-style features.
 
-    Samuel's key innovations:
-    - One of the first programs to use machine learning
-    - Evaluated positions using weighted features
-    - Used alpha-beta pruning for efficient search
+    What Samuel's 1959 program actually did, and this does not:
+    - learned its feature weights by playing itself
+    Shared with it:
+    - weighted positional features, and alpha-beta search
     """
 
     SEARCH_DEPTH = 4  # 4-ply search
@@ -298,7 +295,7 @@ class CheckersDemo(Visual):
         self.time = 0.0
         self.game = Checkers(self.display)
         self.game.reset()
-        self.ai = SamuelAI()
+        self.ai = CheckersAI()
         self.move_timer = 0.0
         self.move_delay = 0.8  # Time between moves
         self.game_over_timer = 0.0

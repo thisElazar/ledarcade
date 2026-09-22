@@ -3,14 +3,17 @@ Chess Demo - AI vs AI Attract Mode
 ==================================
 Two chess AIs play against each other for idle screen demos.
 
-AI emulates the Bernstein Chess Program (1957) - one of the first
-complete chess programs, developed by Alex Bernstein at IBM.
+The AI borrows one idea from the Bernstein Chess Program (1957), Alex
+Bernstein's at IBM: only the seven "most plausible" moves are searched,
+rather than every legal one. It is not a reconstruction of that program.
 
-Historical AI Strategy:
-- 4-ply minimax search (2 moves ahead per side)
-- Only considers 7 "most plausible" moves per position
+What this one does:
+- 2-ply alpha-beta search (1 move ahead per side), for speed on a Pi
+- Only considers 7 "most plausible" moves per position (Bernstein's idea)
 - Evaluation: material, mobility, area control, king defense
-- Original ran on IBM 704, took ~8 minutes per move
+
+What the original did that this does not: a 4-ply minimax on an IBM 704,
+taking about eight minutes per move.
 
 Reference: https://www.chessprogramming.org/The_Bernstein_Chess_Program
 """
@@ -25,7 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.chess import Chess, WHITE, BLACK, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN
 
 
-# Piece values - classic Bernstein style (simple integer values)
+# Piece values - simple integers, as the early programs used
 PIECE_VALUES = {
     PAWN: 1,
     KNIGHT: 3,
@@ -36,9 +39,9 @@ PIECE_VALUES = {
 }
 
 
-class BernsteinAI:
+class ChessAI:
     """
-    Fast Chess AI inspired by Bernstein Chess Program (1957).
+    Fast chess AI, with the plausible-move filter from Bernstein (1957).
 
     Optimized for Pi 3 real-time play:
     - 2-ply search (1 move ahead per side)
@@ -344,7 +347,7 @@ class ChessDemo(Visual):
         self.time = 0.0
         self.game = Chess(self.display)
         self.game.reset()
-        self.ai = BernsteinAI()  # Historical 1957 AI
+        self.ai = ChessAI()
         self.move_timer = 0.0
         self.move_delay = 1.0  # Time between moves
         self.game_over_timer = 0.0

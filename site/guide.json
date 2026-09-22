@@ -3523,7 +3523,7 @@
      "name": "CHECKERS",
      "cls": "CheckersDemo",
      "module": "visuals/checkersdemo.py",
-     "desc": "Two AIs play checkers against each other for idle screen demos. AI emulates Arthur Samuel's Checkers Program (1959) - the pioneering machine learning program developed at IBM that beat a Connecticut state champion in 1962. Historical AI Strategy: - Alpha-beta search with 4-6 ply depth - Evaluation features: piece count, kings, advancement, center control - \"Piece advantage\" and \"denial of occupancy\" heuristics - Original learned feature weights through self-play Reference: https://en.wikipedia.org/wiki/Arthur_Samuel#Checkers_program",
+     "desc": "Two AIs play checkers against each other for idle screen demos. The evaluation features echo the ones Arthur Samuel described for his Checkers Program (1959) - piece count, kings, advancement, centre control. The resemblance stops there: Samuel's program was famous for *learning* its feature weights through self-play, and nothing here learns. The weights are fixed constants and the search is plain alpha-beta. Reference for the original, not for this implementation: https://en.wikipedia.org/wiki/Arthur_Samuel#Checkers_program",
      "controls": {},
      "stub": true
     },
@@ -3531,7 +3531,7 @@
      "name": "CHESS",
      "cls": "ChessDemo",
      "module": "visuals/chessdemo.py",
-     "desc": "Two chess AIs play against each other for idle screen demos. AI emulates the Bernstein Chess Program (1957) - one of the first complete chess programs, developed by Alex Bernstein at IBM. Historical AI Strategy: - 4-ply minimax search (2 moves ahead per side) - Only considers 7 \"most plausible\" moves per position - Evaluation: material, mobility, area control, king defense - Original ran on IBM 704, took ~8 minutes per move Reference: https://www.chessprogramming.org/The_Bernstein_Chess_Program",
+     "desc": "Two chess AIs play against each other for idle screen demos. The AI borrows one idea from the Bernstein Chess Program (1957), Alex Bernstein's at IBM: only the seven \"most plausible\" moves are searched, rather than every legal one. It is not a reconstruction of that program. What this one does: - 2-ply alpha-beta search (1 move ahead per side), for speed on a Pi - Only considers 7 \"most plausible\" moves per position (Bernstein's idea) - Evaluation: material, mobility, area control, king defense What the original did that this does not: a 4-ply minimax on an IBM 704, taking about eight minutes per move. Reference: https://www.chessprogramming.org/The_Bernstein_Chess_Program",
      "controls": {},
      "stub": true
     },
@@ -3731,7 +3731,7 @@
      "name": "REVERSI",
      "cls": "OthelloDemo",
      "module": "visuals/othellodemo.py",
-     "desc": "Two AIs play Othello against each other for idle screen demos. AI emulates Iago/Logistello style programs from the 1980s - the era when Othello programs first achieved master-level play. Historical AI Strategy: - Corner control is paramount (corners can never be flipped) - Edge stability - pieces on edges are hard to flip - Mobility - having more moves available is good - Disc count only matters in endgame - Avoid \"X-squares\" (diagonal to corners) and \"C-squares\" (adjacent to corners) Reference: https://en.wikipedia.org/wiki/Computer_Othello",
+     "desc": "Two AIs play Othello against each other for idle screen demos. The AI uses the positional knowledge Othello programs settled on in the 1980s, the era when they first reached master-level play. It is not a reconstruction of Iago or Logistello, which searched far deeper and (in Logistello's case) learned their evaluation from millions of games. The heuristics: - Corner control is paramount (corners can never be flipped) - Edge stability - pieces on edges are hard to flip - Mobility - having more moves available is good - Disc count only matters in endgame - Avoid \"X-squares\" (diagonal to corners) and \"C-squares\" (adjacent to corners) Reference: https://en.wikipedia.org/wiki/Computer_Othello",
      "controls": {},
      "stub": true
     },

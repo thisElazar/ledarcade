@@ -1,7 +1,7 @@
 """
 CONSTELLATIONS - Night Sky Star Map
 ====================================
-28 constellations with real star positions from Hipparcos catalog (VizieR I/239),
+All 88 constellations with real star positions from Hipparcos catalog (VizieR I/239),
 gnomonic-projected onto a 50x50 working area. Constellation lines from Stellarium
 modern_st sky culture. Grouped by zodiac and season.
 Stars fade in, constellation lines draw, then hold.

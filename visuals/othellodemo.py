@@ -3,10 +3,12 @@ Othello Demo - AI vs AI Attract Mode
 ====================================
 Two AIs play Othello against each other for idle screen demos.
 
-AI emulates Iago/Logistello style programs from the 1980s - the era
-when Othello programs first achieved master-level play.
+The AI uses the positional knowledge Othello programs settled on in the
+1980s, the era when they first reached master-level play. It is not a
+reconstruction of Iago or Logistello, which searched far deeper and (in
+Logistello's case) learned their evaluation from millions of games.
 
-Historical AI Strategy:
+The heuristics:
 - Corner control is paramount (corners can never be flipped)
 - Edge stability - pieces on edges are hard to flip
 - Mobility - having more moves available is good
@@ -26,9 +28,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from games.othello import Othello, PLAYER_1, PLAYER_2
 
 
-class IagoAI:
+class OthelloAI:
     """
-    Othello AI emulating 1980s programs like Iago and Logistello.
+    Othello AI using the standard 1980s positional heuristics.
 
     Key insight: Position matters more than piece count until endgame.
     Corners are worth ~25 pieces. X-squares (diagonal to corner) are
@@ -263,7 +265,7 @@ class OthelloDemo(Visual):
         self.time = 0.0
         self.game = Othello(self.display)
         self.game.reset()
-        self.ai = IagoAI()
+        self.ai = OthelloAI()
         self.move_timer = 0.0
         self.move_delay = 0.6  # Time between moves
         self.game_over_timer = 0.0

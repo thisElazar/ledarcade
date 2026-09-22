@@ -2,8 +2,7 @@
 COINS OF THE WORLD -- Historic Coinage on 64x64 LED Matrix
 ============================================================
 29 historic coins from world civilizations spanning ancient to modern eras.
-Photographs sourced from Wikimedia Commons (CC BY-SA / CC0) and the
-Metropolitan Museum of Art Open Access API (CC0).
+Photographs sourced from Wikimedia Commons (CC BY-SA / CC0).
 
 Images are pre-built by tools/build_coins.py.
 
