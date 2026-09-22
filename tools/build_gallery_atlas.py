@@ -261,6 +261,22 @@ def main():
         atlas["GallerySprites"] = sprites
         print(f"  {len(sprites)} textures")
 
+    # Every source this script reads for these two galleries is gitignored
+    # (copyright), so a checkout that has never had them produces a valid-looking
+    # atlas with entries quietly missing — and writing it would overwrite the
+    # tracked one, which is the last copy outside git history. A short build is
+    # always a missing-source problem, never something to ship.
+    missing = [f"GalleryArt cell {c}" for c in GALLERY_ART_PAINTINGS if str(c) not in art]
+    missing += [f"GallerySprites cell {c}" for c in GALLERY_SPRITES_PAINTINGS
+                if str(c) not in sprites]
+    if missing:
+        print(f"\nRefusing to write {OUT_PATH.name}: {len(missing)} source(s) missing")
+        for item in missing:
+            print(f"  {item}")
+        print("The sources are gitignored, so they are not in a fresh clone.")
+        print(f"Recover the current atlas with: git checkout -- {OUT_PATH}")
+        raise SystemExit(1)
+
     # Main gallery atlas (small galleries only)
     with open(OUT_PATH, 'w') as f:
         json.dump(atlas, f)
