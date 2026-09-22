@@ -25,6 +25,7 @@ To try it on a desktop against a cabinet:
 """
 
 import argparse
+import ipaddress
 import os
 import socket
 import threading
@@ -36,7 +37,9 @@ from mirror import MIRROR_PORT, HELLO, exit_with_parent
 GRID_SIZE = 64
 FRAME_BYTES = GRID_SIZE * GRID_SIZE * 3
 SITE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site")
-STILL_RESEND = 10.0   # seconds; a still screen still proves the browser is there
+STILL_RESEND = 2.0    # seconds; a still screen still proves the browser is there.
+                      # Must stay under the page's idle threshold below, or a
+                      # screen that simply is not moving reads as a dead cabinet.
 
 PAGE = b"""<!doctype html>
 <html lang="en">
@@ -87,6 +90,7 @@ function frame(bytes) {
 // The stream is 12288-byte frames end to end; chunks arrive at any boundary.
 async function watch() {
   const res = await fetch('stream', { cache: 'no-store' });
+  if (!res.ok) throw new Error('stream ' + res.status);
   const reader = res.body.getReader();
   let held = new Uint8Array(0);
   for (;;) {
@@ -147,14 +151,28 @@ class Feed:
 
 
 def subscribe(feed, host, port):
-    """Cabinet side of the mirror protocol: hello in, frames out (mirror.py)."""
+    """Cabinet side of the mirror protocol: hello in, frames out (mirror.py).
+
+    Nothing watches this thread — WebOutput only sees that the process is
+    alive — so if it ever died the page would sit on "waiting for the cabinet"
+    for good. Every error here therefore ends in another turn of the loop.
+    """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(0.25)
-    addr = (socket.gethostbyname(host), port)
-    last_hello = 0.0
+    addr, next_resolve, last_hello, last_frame = None, 0.0, 0.0, 0.0
     while True:
         now = time.monotonic()
-        if now - last_hello > 0.2:
+        # Resolving an mDNS name can block for hundreds of milliseconds, and
+        # this is the thread draining the socket, so only look the cabinet up
+        # while nothing is arriving from it anyway — which is also exactly when
+        # it is worth looking up again, after a new lease moved it.
+        if now >= next_resolve and now - last_frame > 5.0:
+            try:
+                addr = (socket.gethostbyname(host), port)
+            except OSError:
+                addr = None   # no DNS yet
+            next_resolve = now + 5.0
+        if addr is not None and now - last_hello > 0.2:
             try:
                 sock.sendto(HELLO, addr)
             except OSError:
@@ -162,9 +180,13 @@ def subscribe(feed, host, port):
             last_hello = now
         try:
             data = sock.recv(65535)
-        except OSError:
+        except TimeoutError:
             continue   # nothing for 250 ms
+        except OSError:
+            time.sleep(0.25)   # a broken socket must not spin a core of a Pi 3B
+            continue
         if len(data) == FRAME_BYTES:
+            last_frame = now
             feed.publish(data)
 
 
@@ -173,8 +195,10 @@ class Server(ThreadingHTTPServer):
 
     daemon_threads = True
     # The default backlog of 5 is easy to overflow when several screens open the
-    # page together, and a BSD kernel answers the overflow with a reset: one
-    # phone in six was refused outright. It must be set before the socket listens.
+    # page together. macOS answers the overflow with a reset — one phone in six
+    # was refused outright in testing; Linux, which is what the cabinet runs,
+    # drops the SYN and makes the client wait instead. Neither is good. It must
+    # be set before the socket listens.
     request_queue_size = 64
     # A viewer that cannot take a 12 KB frame in this long is asleep or gone.
     # Its thread ends, and the page reconnects by itself when it comes back.
@@ -183,14 +207,44 @@ class Server(ThreadingHTTPServer):
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
+    # Without this the stdlib never arms a socket timeout, and a connection that
+    # goes quiet — a phone carried out of range mid-page-load, or anything that
+    # opens a socket and says nothing — holds its thread for the life of the
+    # process. The cabinet runs for weeks; threads cost 8 MB of stack each.
+    timeout = 30.0
+
+    def allowed_host(self):
+        """An address, localhost or a .local name — never someone else's name.
+
+        A page on the open web, served under a name that re-resolves to this
+        cabinet, would otherwise become same-origin with it and could read the
+        panel from outside the house. This is not authentication; it is the
+        one hole a browser can open in "same Wi-Fi only".
+        """
+        host = self.headers.get("Host", "")
+        if host.startswith("["):               # [::1]:30203
+            host = host[1:].split("]")[0]
+        elif host.count(":") == 1:             # 192.168.1.16:30203
+            host = host.rsplit(":", 1)[0]
+        host = host.lower()
+        if host in ("", "localhost") or host.endswith(".local"):
+            return True
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            return False
+        return True
 
     def do_GET(self):
+        if not self.allowed_host():
+            self.send_error(403)
+            return
         if self.path == "/":
             self.body("text/html; charset=utf-8", PAGE)
-        elif self.path == "/shared.js":
+        elif self.path.split("?")[0] == "/shared.js":
             with open(os.path.join(SITE_DIR, "shared.js"), "rb") as f:
                 self.body("text/javascript", f.read())
-        elif self.path.startswith("/stream"):
+        elif self.path.split("?")[0] == "/stream":
             self.stream()
         else:
             self.send_error(404)
@@ -201,7 +255,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
-        self.wfile.write(data)
+        try:
+            self.wfile.write(data)
+        except OSError:
+            pass   # browser went away mid-load; a traceback would reach the console
 
     def stream(self):
         self.send_response(200)
@@ -220,6 +277,9 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(frame)
             except OSError:
                 return   # the tab was closed, the phone slept: let the thread go
+
+    def version_string(self):
+        return "Wonder Cabinet"   # not the Pi's exact CPython patch level
 
     def log_message(self, *args):
         pass   # the cabinet's console belongs to the game

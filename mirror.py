@@ -138,7 +138,14 @@ class WebOutput:
         if self.proc is not None and self.proc.poll() is not None:
             # As with HdmiOutput: a server that keeps dying at once (its port
             # already taken, say) is given up on rather than restarted forever.
-            self.failures = self.failures + 1 if now - self.started < 10.0 else 0
+            # Counting only deaths inside 10 s was wrong: a child that lived 11 s
+            # zeroed the count every time, so the cabinet re-forked CPython every
+            # 2 s for ever. Now an instant death is a strike, a long run forgives
+            # the earlier ones, and anything in between leaves the count alone.
+            if now - self.started > 60.0:
+                self.failures = 0
+            elif now - self.started < 10.0:
+                self.failures += 1
             self.proc = None
         if self.proc is None and self.failures < 3:
             # stdin is the server's lifeline, as for run_hdmi.py
