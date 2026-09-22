@@ -31,8 +31,10 @@ class LightsOut(Game):
     # Grid layout
     GRID_CELLS = 5
     CELL_SIZE = 10  # 10x10 per cell
-    GAP = 2
-    BOARD_SIZE = CELL_SIZE * GRID_CELLS + GAP * (GRID_CELLS + 1)  # 62
+    # A 2 px gap made the board 62 px, and the HUD offset pushed its bottom
+    # row off the 64 px panel; 1 px keeps the 10 px cells and fits exactly.
+    GAP = 1
+    BOARD_SIZE = CELL_SIZE * GRID_CELLS + GAP * (GRID_CELLS + 1)  # 56
     BOARD_X = (GRID_SIZE - BOARD_SIZE) // 2
     BOARD_Y = (GRID_SIZE - BOARD_SIZE) // 2 + 4  # Offset down for HUD
 
