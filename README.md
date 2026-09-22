@@ -77,7 +77,32 @@ Ambient art, simulations, and demos. Many "visuals" are whole collections of sce
 | Science (micro/macro/bench) | ~40 | Cells, DNA, orbits, tectonics, lab instruments |
 | Math · Music · Nature · Household · Gallery · Culture · Cooking · Sprites · Superheroes · … | the rest | |
 
-Utility screens live here too — including **SYSTEM INFO**, which shows the cabinet's IP, temperature, Python version, and deployed release (e.g. `VER: v1.0`).
+Utility screens live here too — including **SYSTEM INFO**, which shows the cabinet's IP, temperature, Python version, and deployed release (e.g. `VER: v1.0`), and **MIRROR**, which puts the panel on a bigger screen (below).
+
+---
+
+## Watching the cabinet
+
+The panel is 64×64 and lives on a cabinet, which makes it awkward to show
+anyone. **MIRROR** (a utility screen on the cabinet) sends each rendered frame
+off the Pi so it can be watched elsewhere, in the same look as the marketing
+clips. All three outputs are **off by default** and switched on from that
+screen; it also sets the port, `30203` unless you change it.
+
+| Output | How to watch | Notes |
+|--------|--------------|-------|
+| **MIRROR** | `python run_mirror.py` on a laptop | A resizable window. Defaults to `arcade.local`; `--delay` buffers rough Wi-Fi. |
+| **WEB** | Open `http://<cabinet-ip>:30203` in any browser | Phones included. The MIRROR screen shows the address to type. |
+| **HDMI** | Plug a screen into the Pi | Starts by itself while a screen is connected. |
+
+Watch-only: play on the cabinet. The frame feed is UDP and the browser page is
+TCP, so both use that one port without colliding. Several browsers can watch at
+once; each costs the Pi up to ~2.9 Mbit/s of Wi-Fi on moving content, and
+almost nothing on a still screen.
+
+> **Same Wi-Fi only.** There is no authentication — never port-forward the
+> mirror or expose it to the internet. For watching from elsewhere, put the
+> cabinet on a private network (Tailscale or similar) instead.
 
 ---
 
@@ -180,6 +205,10 @@ led-arcade/
 ├── run_visuals.py       # desktop visuals-only launcher
 ├── main.py              # desktop games-only launcher
 ├── run_hardware.py      # hardware entry point (Raspberry Pi)
+├── mirror.py            # live frame tap + supervisors for the viewers below
+├── run_mirror.py        # desktop viewer for the cabinet's panel
+├── run_web_mirror.py    # serves the panel to browsers (MIRROR > WEB)
+├── run_hdmi.py          # full-screen viewer on a screen plugged into the Pi
 ├── arcade.py            # core framework + PyGame display/input (the shared interface)
 ├── hardware.py          # LED matrix + GPIO driver (same interface as arcade.py)
 ├── catalog.py           # menu categories / registration
