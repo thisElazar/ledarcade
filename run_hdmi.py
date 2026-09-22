@@ -23,12 +23,11 @@ To try it on a desktop against a cabinet:
 import argparse
 import os
 import socket
-import threading
 import time
 
 import numpy as np
 
-from mirror import MIRROR_PORT, HELLO
+from mirror import MIRROR_PORT, HELLO, exit_with_parent
 
 GRID_SIZE = 64
 FRAME_BYTES = GRID_SIZE * GRID_SIZE * 3
@@ -37,16 +36,6 @@ FRAME_BYTES = GRID_SIZE * GRID_SIZE * 3
 # dst = src * (1 - dst) + dst, which is "screen". pygame doesn't wrap the call,
 # but the mode is only this packed integer.
 BLENDMODE_SCREEN = 0x1 | 0x8 << 4 | 0x2 << 8 | 0x1 << 16 | 0x1 << 20 | 0x2 << 24
-
-
-def exit_with_parent():
-    """The cabinet holds the other end of stdin. It closes when the cabinet
-    exits, crashes, or re-execs itself after UPDATE; leave with it."""
-    def wait():
-        while os.read(0, 4096):   # the raw fd: a buffered read would hold a lock at shutdown
-            pass
-        os._exit(0)
-    threading.Thread(target=wait, daemon=True).start()
 
 
 def main(host, port, window, cabinet):

@@ -227,9 +227,11 @@ class HardwareDisplay:
         self._color_lut = None         # (lut_r, lut_g, lut_b) or None
         self._epilepsy_guard = None    # EpilepsyGuard instance or None
 
-        # Live mirror for run_mirror.py on a laptop, and HDMI output; off until set_mirror()
+        # Live mirror for run_mirror.py on a laptop, HDMI output and the web
+        # mirror browsers open; all off until set_mirror()
         self._mirror = None
         self._hdmi = None
+        self._web = None
 
     @staticmethod
     def _build_lut(gamma, toe):
@@ -256,24 +258,29 @@ class HardwareDisplay:
         else:
             self._epilepsy_guard = None
 
-    def set_mirror(self, enabled, port, hdmi=False):
-        """Open, move or close the live mirror tap and HDMI output (mirror.py).
-        Takes effect at once."""
-        if self._hdmi is not None:
-            self._hdmi.close()
-            self._hdmi = None
+    def set_mirror(self, enabled, port, hdmi=False, web=False):
+        """Open, move or close the live mirror tap, HDMI output and web mirror
+        (mirror.py). Takes effect at once."""
+        for name in ("_hdmi", "_web"):
+            child = getattr(self, name)
+            if child is not None:
+                child.close()
+                setattr(self, name, None)
         if self._mirror is not None:
             self._mirror.close()
             self._mirror = None
-        if enabled or hdmi:
-            from mirror import MirrorTap, HdmiOutput
+        if enabled or hdmi or web:
+            from mirror import MirrorTap, HdmiOutput, WebOutput
             try:
-                # HDMI alone needs no network: serve only the cabinet itself
+                # HDMI and the web mirror watch over 127.0.0.1: alone, they need
+                # no network, so serve only the cabinet itself
                 self._mirror = MirrorTap(port, "" if enabled else "127.0.0.1")
             except OSError:
                 return   # port taken: the panel runs without the mirror
             if hdmi:
                 self._hdmi = HdmiOutput(port)
+            if web:
+                self._web = WebOutput(port)
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""
@@ -405,6 +412,8 @@ class HardwareDisplay:
             self._mirror.send(fb)
         if self._hdmi is not None:
             self._hdmi.poll()
+        if self._web is not None:
+            self._web.poll()
 
         if HAS_PIL:
             # Bulk transfer: PIL Image from bytearray, single C call to matrix

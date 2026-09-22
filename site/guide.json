@@ -7270,10 +7270,10 @@
      "name": "MIRROR",
      "cls": "Mirror",
      "module": "visuals/mirror.py",
-     "desc": "Shows what the panel is showing somewhere bigger, live: on a computer on the same network, or on a TV plugged into the HDMI port. Both are off until you switch them on here; the network port can be changed if another device already uses it.",
+     "desc": "Shows what the panel is showing somewhere bigger, live: on a computer on the same network, in a web browser on any phone or laptop there, or on a TV plugged into the HDMI port. All three are off until you switch them on here; the network port can be changed if another device already uses it. With WEB on, open the address shown at the bottom, followed by that port, in a browser.",
      "controls": {
       "Up/Down": "Navigate between options",
-      "Left/Right": "Toggle MIRROR or HDMI",
+      "Left/Right": "Toggle MIRROR, HDMI or WEB",
       "Button": "On PORT: edit the number; elsewhere: accept and return to menu"
      }
     },

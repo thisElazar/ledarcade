@@ -33,6 +33,7 @@ DEFAULTS = {
     "mirror_enabled": False,
     "mirror_port": MIRROR_PORT,
     "mirror_hdmi": False,
+    "mirror_web": False,
 }
 
 # In-memory settings cache
@@ -244,6 +245,16 @@ def get_mirror_port():
 def set_mirror_port(value):
     """Set the mirror's UDP port (1024-32767)."""
     set("mirror_port", max(PORT_RANGE[0], min(PORT_RANGE[1], int(value))))
+
+
+def get_mirror_web():
+    """Get whether the panel is served to browsers on the network (bool)."""
+    return bool(get("mirror_web", False))
+
+
+def set_mirror_web(value):
+    """Set whether the panel is served to browsers on the network (bool)."""
+    set("mirror_web", bool(value))
 
 
 def get_mirror_hdmi():
