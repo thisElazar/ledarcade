@@ -48,6 +48,15 @@ def main():
                 meta[key] = (item["name"], cat["key"])
                 order.append(key)
 
+    # A visual hidden from the catalog (dev_only) still runs on a dev cabinet,
+    # so the ledger, not the guide, decides what has been audited. Without this
+    # its labels vanished from every table here and its name fell back to the
+    # raw "module.py::Class" key — which is what hiding CELL did.
+    for key in entries:
+        if key not in meta:
+            meta[key] = (f"{key.split('::')[-1].upper()} (hidden)", "hidden")
+            order.append(key)
+
     audited = [k for k in order if k in entries]
     with_labels = [k for k in audited if entries[k]["labels"]]
     records = [(k, label, rec) for k in with_labels
