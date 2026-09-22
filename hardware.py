@@ -260,7 +260,8 @@ class HardwareDisplay:
 
     def set_mirror(self, enabled, port, hdmi=False, web=False):
         """Open, move or close the live mirror tap, HDMI output and web mirror
-        (mirror.py). Takes effect at once."""
+        (mirror.py). Takes effect at once. False if the port was already taken,
+        so the settings screen can say so rather than reading ON to no effect."""
         for name in ("_hdmi", "_web"):
             child = getattr(self, name)
             if child is not None:
@@ -276,11 +277,12 @@ class HardwareDisplay:
                 # no network, so serve only the cabinet itself
                 self._mirror = MirrorTap(port, "" if enabled else "127.0.0.1")
             except OSError:
-                return   # port taken: the panel runs without the mirror
+                return False   # port taken: the panel runs without the mirror
             if hdmi:
                 self._hdmi = HdmiOutput(port)
             if web:
                 self._web = WebOutput(port)
+        return True
 
     def clear(self, color=Colors.BLACK):
         """Clear the display to a solid color."""

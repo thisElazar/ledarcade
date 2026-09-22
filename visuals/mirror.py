@@ -42,6 +42,7 @@ class Mirror(Visual):
         self.hdmi = persistent.get_mirror_hdmi()
         self.web = persistent.get_mirror_web()
         self.address = lan_address() if self.web else ""
+        self.busy = False     # the port was already taken
         self.cursor = 0       # 0=mirror on/off, 1=port, 2=hdmi, 3=web
         self.digits = None    # the port's five digits while it is being edited
         self.digit = 0
@@ -55,7 +56,8 @@ class Mirror(Visual):
         persistent.set_mirror_web(self.web)
         self.address = lan_address() if self.web else ""
         if hasattr(self.display, 'set_mirror'):
-            self.display.set_mirror(self.enabled, self.port, self.hdmi, self.web)
+            self.busy = self.display.set_mirror(self.enabled, self.port,
+                                                self.hdmi, self.web) is False
 
     def handle_input(self, input_state) -> bool:
         if self.digits is not None:
@@ -133,10 +135,14 @@ class Mirror(Visual):
             d.draw_text_small(2, 44, f"{PORT_RANGE[0]}-{PORT_RANGE[1]}", Colors.GRAY)
         else:
             d.draw_text_small(42, 24, str(self.port),
+                              Colors.RED if self.busy else
                               Colors.WHITE if self.cursor == 1 else Colors.GRAY)
 
         d.draw_line(0, 52, 63, 52, Colors.DARK_GRAY)
-        if self.cursor == 3 and self.web and self.address and not editing:
+        if self.busy and not editing:
+            # Nothing is mirrored at all, so the address below would be a lie
+            d.draw_text_small(2, 55, "PORT IN USE", Colors.RED)
+        elif self.cursor == 3 and self.web and self.address and not editing:
             # 15 characters fit from x=2, and 255.255.255.255 is exactly 15
             d.draw_text_small(2, 55, self.address, Colors.CYAN)
         else:

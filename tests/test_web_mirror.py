@@ -80,3 +80,29 @@ def test_only_addresses_and_local_names_are_served():
         assert _host_allowed(host), host
     for host in ("evil.attacker.com", "evil.attacker.com:30203", "wondercabinet.example"):
         assert not _host_allowed(host), host
+
+
+def test_the_settings_screen_says_when_the_port_is_taken():
+    """MIRROR used to read ON after a failed bind, with nothing mirrored."""
+    import settings as persistent
+    from visuals.mirror import Mirror
+
+    class Panel:
+        def __init__(self, opened):
+            self.opened, self.text = opened, []
+        def clear(self, *a): self.text = []
+        def draw_line(self, *a): pass
+        def draw_text_small(self, x, y, s, c): self.text.append(s)
+        def set_mirror(self, *a): return self.opened
+
+    saved, persistent.set = persistent.set, lambda k, v: None
+    try:
+        for opened, expected in ((True, False), (False, True)):
+            screen = Mirror(Panel(opened))
+            screen.reset()
+            screen.display = Panel(opened)
+            screen._apply()
+            screen.draw()
+            assert ("PORT IN USE" in screen.display.text) is expected, opened
+    finally:
+        persistent.set = saved
