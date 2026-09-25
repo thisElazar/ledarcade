@@ -401,6 +401,7 @@ class Knitting(Visual):
     name = "KNITTING"
     description = "World knitting traditions"
     category = "culture"
+    dev_only = True  # charts are invented, and it overlaps WEAVING; hidden until grounded in real patterns
     GUIDE = {
         'desc': 'Stranded-knitting stitch charts rendered as pixel grids. Each two-color pattern tiles across the panel and animates row by row, a knitting needle tracking the active line.',
     }

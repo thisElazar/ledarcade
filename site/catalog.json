@@ -2670,12 +2670,6 @@
           "is_game": false
         },
         {
-          "name": "KNITTING",
-          "cls": "Knitting",
-          "module": "visuals/knitting.py",
-          "is_game": false
-        },
-        {
           "name": "LANGUAGE",
           "cls": "Language",
           "module": "visuals/language.py",
@@ -6291,11 +6285,6 @@
               "name": "FLAGS",
               "cls": "Flags",
               "module": "visuals/flags.py"
-            },
-            {
-              "name": "KNITTING",
-              "cls": "Knitting",
-              "module": "visuals/knitting.py"
             },
             {
               "name": "LANGUAGE",

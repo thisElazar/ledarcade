@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 182,
+  "visuals": 181,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -3289,17 +3289,6 @@
      }
     },
     {
-     "name": "KNITTING",
-     "cls": "Knitting",
-     "module": "visuals/knitting.py",
-     "desc": "Stranded-knitting stitch charts rendered as pixel grids. Each two-color pattern tiles across the panel and animates row by row, a knitting needle tracking the active line.",
-     "controls": {
-      "Left/Right": "Adjust knitting speed",
-      "Up/Down": "Cycle color palette",
-      "Action": "Next stitch pattern"
-     }
-    },
-    {
      "name": "LANGUAGE",
      "cls": "Language",
      "module": "visuals/language.py",
@@ -6479,7 +6468,6 @@
       "WEATHER",
       "COINS",
       "FLAGS",
-      "KNITTING",
       "LANGUAGE",
       "POTTERY",
       "SCRIPTS",
