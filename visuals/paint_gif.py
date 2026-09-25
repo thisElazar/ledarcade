@@ -67,8 +67,10 @@ TOOL_INITIALS = [
 # Draw tools (tools that paint on canvas)
 _DRAW_TOOLS = {TOOL_PENCIL, TOOL_MARKER, TOOL_BRUSH, TOOL_ERASER, TOOL_FILL, TOOL_EYEDROP}
 
-# Per-frame undo limit (reduced to manage memory across frames)
-FRAME_UNDO_MAX = 16
+# Undo limits. A snapshot is a 64x64 list-of-lists, roughly 37 KB, so the
+# global cap bounds the whole project at ~20 MB on the Pi Zero 2 W's 512 MB.
+FRAME_UNDO_MAX = 64
+TOTAL_UNDO_MAX = 512
 
 # Modes
 MODE_DRAW = 0
@@ -156,6 +158,8 @@ class PaintGif(Visual):
         self.btn_hold_time = 0.0
         self.btn_was_held = False
         self.painting = False
+        # One-shot tools (fill, eyedropper) fire once per button press
+        self.tool_fired = False
 
         # Exit hold (both buttons)
         self.exit_hold = 0.0
@@ -272,7 +276,7 @@ class PaintGif(Visual):
         btn_now = inp.action_l_held or inp.action_r_held
         if btn_now:
             self.btn_hold_time += dt
-            if self.btn_hold_time >= 0.15:
+            if self.btn_hold_time >= 0.15 and not self.tool_fired:
                 if not self.painting:
                     if self.tool in _DRAW_TOOLS:
                         self._snapshot()
@@ -285,6 +289,7 @@ class PaintGif(Visual):
                 self.menu_color = self.color_idx
             self.btn_hold_time = 0.0
             self.painting = False
+            self.tool_fired = False
         self.btn_was_held = btn_now
 
         if self.painting:
@@ -307,6 +312,7 @@ class PaintGif(Visual):
         elif self.tool == TOOL_FILL:
             self._flood_fill(self.cx, self.cy)
             self.painting = False
+            self.tool_fired = True
         elif self.tool == TOOL_EYEDROP:
             pixel = self.canvas[self.cy][self.cx]
             if pixel:
@@ -320,6 +326,7 @@ class PaintGif(Visual):
                 self.color_idx = best
             self.tool = TOOL_MARKER
             self.painting = False
+            self.tool_fired = True
 
     def _flood_fill(self, sx, sy):
         canvas = self.canvas
@@ -351,10 +358,18 @@ class PaintGif(Visual):
     def _snapshot(self):
         idx = self.frame_idx
         stack = self.undo_stacks.setdefault(idx, [])
+        if stack and stack[-1] == self.canvas:
+            return  # nothing changed since the last snapshot
         stack.append([row[:] for row in self.canvas])
         if len(stack) > FRAME_UNDO_MAX:
             stack.pop(0)
         self.redo_stacks.pop(idx, None)
+        # Global cap: drop the oldest snapshot from the deepest stack
+        total = sum(len(s) for s in self.undo_stacks.values())
+        while total > TOTAL_UNDO_MAX:
+            deepest = max(self.undo_stacks.values(), key=len)
+            deepest.pop(0)
+            total -= 1
 
     def _do_undo(self):
         idx = self.frame_idx
