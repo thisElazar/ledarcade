@@ -39,7 +39,7 @@ The claim on the left is what the cabinet and the Field Guide show today. Nothin
 | JACQUARD | 1804 | **Joseph-Marie Jacquard, 1804** | UPHELD. | `visuals/jacquard.py:102` |
 | JELLYFISH | Jeffrey Ventrella, 2007 | **Jeffrey Ventrella, c. 2016** | Upheld. | `visuals/particlelife.py:45` |
 | LATIN DNA | The clave, bossa and samba grids are transcribed, not invented | **Traditional Afro-Latin timelines** | OVERTURNED on two material points, though the verdict label itself survives. | `visuals/latindna.py:40` |
-| MOLECULES | Atom positions are real 3D conformers, one CID per molecule | **PubChem 3D conformers; 10 entries hand-built** | OVERTURNED on the numbers and the corrected line. | `visuals/molecule.py:72` |
+| MOLECULES | Atom positions are real 3D conformers, one CID per molecule | **PubChem 3D conformers; 9 entries hand-built** | OVERTURNED on the numbers and the corrected line. | `visuals/molecule.py:72` |
 | ORRERY | 1713 | **Graham & Tompion, 1704** | Upheld on both legs, each fetched independently. | `visuals/orrery.py:64` |
 | PEPTIDES | C-alpha coordinates of the peptide backbones | **Cα coords: RCSB PDB (35 of 42 entries)** | Upheld, and independently reproduced rather than re-read. | `visuals/peptides.py:169` |
 | PREDATOR-PREY | Lotka 1925 · Volterra 1926 | **Lotka 1920 · Volterra 1926** | Upheld, and the priority point is now primary-source proven rather than asserted. | `visuals/predprey.py:34` |
