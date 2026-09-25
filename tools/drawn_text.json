@@ -3094,7 +3094,7 @@
    "#",
    "DEMO"
   ],
-  "visuals/demonspirals.py::DemonSpirals": [],
+  "visuals/cyclic.py::Cyclic": [],
   "visuals/digdugdemo.py::DigDugDemo": [
    "#",
    "DEMO"

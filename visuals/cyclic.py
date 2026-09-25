@@ -1,7 +1,7 @@
 """
-Demon Spirals - Cyclic Cellular Automaton
-=========================================
-Cyclic CA from David Griffeath. N states cycle around, cells advance
+Cyclic - Cyclic Cellular Automaton
+==================================
+Cyclic cellular automaton (Fisch, Gravner & Griffeath, 1991). N states cycle around, cells advance
 when neighbors have successor state. Self-organizes from random noise
 into mesmerizing rotating spiral patterns.
 
@@ -16,12 +16,13 @@ import math
 from . import Visual, Display, Colors, GRID_SIZE
 
 
-class DemonSpirals(Visual):
+class Cyclic(Visual):
     name = "CYCLIC"
     description = "Cyclic CA spirals"
     category = "automata"
     GUIDE = {
-        'desc': 'Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures. Also known as Demon Spirals.',
+        'desc': 'Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures.',
+        'credit': 'Fisch, Gravner & Griffeath, 1991',
     }
 
     # Moore neighborhood offsets (8 surrounding cells)

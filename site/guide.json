@@ -2780,9 +2780,10 @@
     },
     {
      "name": "CYCLIC",
-     "cls": "DemonSpirals",
-     "module": "visuals/demonspirals.py",
-     "desc": "Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures. Also known as Demon Spirals.",
+     "cls": "Cyclic",
+     "module": "visuals/cyclic.py",
+     "desc": "Each state can only be consumed by the next state in the cycle. Produces rotating spirals and expanding amoeba-like structures.",
+     "credit": "Fisch, Gravner & Griffeath, 1991",
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust speed",
@@ -2832,7 +2833,7 @@
      "cls": "TuringPatterns",
      "module": "visuals/turing.py",
      "desc": "Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.",
-     "credit": "Gray & Scott 1984; Pearson 1993",
+     "credit": "Gray & Scott 1983; Pearson 1993",
      "legend": {
       "F=#": "Chemical feed rate \u2014 controls how fast pattern U is replenished.",
       "K=#": "Chemical removal rate \u2014 controls how fast pattern V is removed.",
@@ -6394,8 +6395,8 @@
       "RUCKER PAINT",
       "BOIDS",
       "BOIDS LAB",
-      "CYCLIC LAB",
       "CYCLIC",
+      "CYCLIC LAB",
       "FADERS",
       "GRAY-SCOTT",
       "GYRE",

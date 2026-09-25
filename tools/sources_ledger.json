@@ -1,6 +1,6 @@
 {
- "_about": "Audited record of where the catalog's factual claims come from. Keyed by 'module::cls', one entry per item, one record per claim. Fields: kind (credit = the attribution line the cabinet and the Field Guide show; data = figures or tables typed or generated from somewhere else; experiment = a result of our own); claim (what the cabinet asserts TODAY); verdict (correct | imprecise | wrong | not_an_attribution | unverifiable); source + url (the citation that was actually fetched, not recalled); proposed_claim (what the line should read — a PROPOSAL, not applied to the code); code_matches + code_note (whether the implementation is the thing being credited); ruling (the adversarial checker's reasoning); checked (ISO date a source was read against what ships; null = still unverified). Edit this file, then run tools/build_sources.py to regenerate SOURCES.md.",
- "_coverage": "Seeded 2026-09-22 from the 56 catalog entries that carry a 'credit', plus 6 items whose data comes from outside the repo and which carry no credit at all. Extended 2026-09-24 with 5 data-provenance entries for items that assert nothing checkable in a credit field but whose data tables come from identifiable traditions. Not covered: the 236 paintings and 70 wondercabinet titles (their provenance is in the gallery data, not in code), the 48 demos (they replay their game's own claims), and every item that asserts nothing checkable.",
+ "_about": "Audited record of where the catalog's factual claims come from. Keyed by 'module::cls', one entry per item, one record per claim. Fields: kind (credit = the attribution line the cabinet and the Field Guide show; data = figures or tables typed or generated from somewhere else; experiment = a result of our own); claim (what the cabinet asserts TODAY); verdict (correct | imprecise | wrong | not_an_attribution | unverifiable); source + url (the citation that was actually fetched, not recalled); proposed_claim (what the line should read — a PROPOSAL, not applied to the code); code_matches + code_note (whether the implementation is the thing being credited); ruling (the adversarial checker's reasoning); checked (ISO date a source was read against what ships; null = still unverified). Edit this file, then run tools/build_sources.py to regenerate SOURCES.md. tools/build_credits.py renders the credit claims into the cabinet's CREDITS roll, and tools/build_history.py checks tools/history.json (the public timeline) against them.",
+ "_coverage": "Seeded 2026-09-22 from the 56 catalog entries that carry a 'credit', plus 6 items whose data comes from outside the repo and which carry no credit at all. Extended 2026-09-24 with 5 data-provenance entries for items that assert nothing checkable in a credit field but whose data tables come from identifiable traditions. Not covered: the 236 paintings and 70 wondercabinet titles (their provenance is in the gallery data, not in code), the 48 demos (they replay their game's own claims), and every item that asserts nothing checkable. Extended 2026-09-25 with 19 entries for attributions the CREDITS roll made that no module's credit field carried (checked null: not verified).",
  "entries": {
   "visuals/boids.py::Boids": {
    "name": "BOIDS",
@@ -88,7 +88,7 @@
    "claims": [
     {
      "kind": "credit",
-     "claim": "Gray & Scott 1984; Pearson 1993",
+     "claim": "Gray & Scott 1983; Pearson 1993",
      "source": "John E. Pearson, \"Complex Patterns in a Simple System\", arXiv:patt-sol/9304003 (submitted 17 Apr 1993), published in Science 261(5118):189-192, 1993 (DOI 10.1126/science.261.5118.189). Pearson p.2: \"The system is a variant of the autocatalytic Selkov model of glycolysis [2] and is due to Gray and Scott [3]\"; his ref [3] is \"Gray, P. and Scott, S.K., Chem. Eng. Sci. 38 29 (1983); 39, 1087 (1984); J. Phys. Chem. 89 22 (1985)\". Idea credited by the current line: A. M. Turing, \"The Chemical Basis of Morphogenesis\", Philosophical Transactions of the Royal Society of London, Series B, Biological Sciences, Vol. 237, No. 641 (Aug. 14, 1952), pp. 37-72.",
      "evidence": "visuals/turing.py:391",
      "checked": "2026-09-22",
@@ -97,7 +97,7 @@
      "proposed_claim": "",
      "code_matches": "partly",
      "code_note": "visuals/turing.py:84-107 implements the Gray–Scott system verbatim: u += Du·∇²u − uv² + F(1−u); v += Dv·∇²v + uv² − (F+k)v, on a toroidal grid, with DU=0.16/DV=0.08. Lines 130-162 carry a `_PEARSON_POINTS` table whose own comment reads \"From Pearson 1993 'Complex Patterns in a Simple System' + Munafo extensions\" and the GUIDE legend labels LAMBDA as \"Pearson pattern classification (ALPHA–SIGMA)\". So the code implements Gray–Scott with Pearson's greek-letter taxonomy; it does not implement anything from Turing's 1952 paper (no linear-instability analysis, no Turing morphogen equations).",
-     "ruling": "Verdict upheld, correction overturned. I fetched the arXiv PDF (not just the abstract page) and read Pearson's text: he explicitly says the model \"is due to Gray and Scott\", and his eq. (2) is character-for-character what visuals/turing.py:100-101 computes (u += Du*lap - uv^2 + F(1-u); v += Dv*lap + uv^2 - (F+k)v). I also opened the Caltech-hosted JSTOR scan of Turing 1952 and read its title page: Phil. Trans. R. Soc. Lond. B 237(641), Aug 14 1952, pp. 37-72 — real, and correctly cited. So \"Alan Turing, 1952\" is indeed imprecise: the code implements no Turing equation or instability analysis. But the researcher's replacement, \"Pearson 1993, after Turing 1952\", commits the same originator-vs-populariser error one step over — it fronts the man who mapped the parameter space and drops the two who formulated the model, on a visual literally named GRAY-SCOTT LAB. Pearson's own sentence is the primary source against his own correction. Additional defect the researcher missed: Pearson p.4 and his Figure 2 caption define exactly twelve Greek-letter patterns (alpha through mu); NU, XI, PI, RHO and SIGMA in _PEARSON_POINTS (turing.py:130-162) are Munafo additions, as the code's own comment admits — yet the GUIDE legend at turing.py:395 calls the whole range \"Pearson pattern classification (ALPHA-SIGMA)\". That legend line also needs fixing, and so does the in-panel about-text \"ALAN TURING 1952\" at turing.py:381. I did not open a publisher page for Gray & Scott 1984; I am citing it as Pearson prints it, which is a primary source citing it.",
+     "ruling": "Verdict upheld, correction overturned. I fetched the arXiv PDF (not just the abstract page) and read Pearson's text: he explicitly says the model \"is due to Gray and Scott\", and his eq. (2) is character-for-character what visuals/turing.py:100-101 computes (u += Du*lap - uv^2 + F(1-u); v += Dv*lap + uv^2 - (F+k)v). I also opened the Caltech-hosted JSTOR scan of Turing 1952 and read its title page: Phil. Trans. R. Soc. Lond. B 237(641), Aug 14 1952, pp. 37-72 — real, and correctly cited. So \"Alan Turing, 1952\" is indeed imprecise: the code implements no Turing equation or instability analysis. But the researcher's replacement, \"Pearson 1993, after Turing 1952\", commits the same originator-vs-populariser error one step over — it fronts the man who mapped the parameter space and drops the two who formulated the model, on a visual literally named GRAY-SCOTT LAB. Pearson's own sentence is the primary source against his own correction. Additional defect the researcher missed: Pearson p.4 and his Figure 2 caption define exactly twelve Greek-letter patterns (alpha through mu); NU, XI, PI, RHO and SIGMA in _PEARSON_POINTS (turing.py:130-162) are Munafo additions, as the code's own comment admits — yet the GUIDE legend at turing.py:395 calls the whole range \"Pearson pattern classification (ALPHA-SIGMA)\". That legend line also needs fixing, and so does the in-panel about-text \"ALAN TURING 1952\" at turing.py:381. I did not open a publisher page for Gray & Scott 1984; I am citing it as Pearson prints it, which is a primary source citing it. 2026-09-25: the year was taken from Pearson's citation and read 1984; the owner read the Gray & Scott paper itself, Chem. Eng. Sci. 38(1):29-43, 1983, the same record the GRAY-SCOTT entry verified via Crossref, so the claim now reads 1983.",
      "researcher_note": "Turing 1952 is real and I verified it (JSTOR title page of the Caltech-hosted scan: Phil. Trans. R. Soc. Lond. B 237(641), Aug 14 1952, pp. 37–72). The problem is which question the credit line answers. Turing originated the idea that reaction + diffusion can break symmetry and make patterns; he did not originate this model. The model on screen is Gray–Scott (Gray & Scott 1983/84), and the parameter-space map the visual actually navigates — the ALPHA–SIGMA families, the F/k ranges — is Pearson's 1993 Science paper, which the code cites in its own comments. The item is even called GRAY-SCOTT LAB and the desc already names Gray-Scott, so the credit line is the one place that says something different. Recommend the corrected line, or \"Gray–Scott; Pearson 1993\" if you would rather not name Turing at all. Note the sibling in-panel about-text at visuals/turing.py:381 reads \"ALAN TURING 1952\" as its last line and has the same issue. I verified the Gray & Scott 1984 citation via Semantic Scholar's record for DOI 10.1016/0009-2509(84)87017-7 (title/journal/volume/pages/year), not via the publisher page, which is paywalled; and I did not verify the earlier 1983 Gray–Scott paper at all, so do not print a 1983 date."
     }
    ]
@@ -1328,6 +1328,406 @@
      "code_matches": "partly",
      "code_note": "visuals/yoga.py:57-72 POSES dict, 14 poses as baked pixel coordinates for 14 joints on a 64x64 grid. The docstring (line 5) says 'Poses sourced from MediaPipe datasets' but MediaPipe outputs 33 landmarks with different names (nose, wrist, ankle) and the code uses 14 joints (head, hand, foot) with no neck in MediaPipe's scheme. The docstring also says 'Vitruvian proportions', contradicting a MediaPipe source. The pixel positions appear hand-authored for the LED display, possibly using MediaPipe as a rough reference. The 14 pose names (Mountain, Warrior, Tree, etc.) are standard yoga asanas.",
      "ruling": "The MediaPipe claim is imprecise. MediaPipe Pose Landmarker outputs 33 landmarks; the code uses a 14-joint skeleton with renamed joints and baked pixel coordinates, not raw landmark data. The docstring's own 'Vitruvian proportions' phrase contradicts 'sourced from MediaPipe'. The pose names are standard yoga asanas with no attribution issue. The data claim should be softened."
+    }
+   ]
+  },
+  "visuals/aurora.py::Aurora": {
+   "name": "RUCKER PAINT",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/aurora.py:8",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/faders.py::Faders": {
+   "name": "FADERS",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/faders.py:8",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/gyre.py::Gyre": {
+   "name": "GYRE",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Gosper; Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/gyre.py:10",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/rug.py::Rug": {
+   "name": "RUG",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/rug.py:9",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/quarks.py::Quarks": {
+   "name": "QUARKS",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/quarks.py:9",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/ripples.py::Ripples": {
+   "name": "RIPPLES",
+   "category": "nature",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Rucker & Walker, CelLab",
+     "source": "",
+     "evidence": "visuals/ripples.py:8",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/starwarsca.py::StarWarsCA": {
+   "name": "STARWARS",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Mirek Wojtowicz, Generations 345/2/4",
+     "source": "",
+     "evidence": "visuals/starwarsca.py:4",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/fireflies.py::Fireflies": {
+   "name": "FIREFLIES",
+   "category": "nature",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Kuramoto model",
+     "source": "",
+     "evidence": "visuals/fireflies.py:6",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/flux.py::Flux": {
+   "name": "FLUX",
+   "category": "digital",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Robert Bridson, 2007",
+     "source": "",
+     "evidence": "visuals/flux.py:11",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/orbits.py::OrbitsSolar": {
+   "name": "SOLAR SYSTEM",
+   "category": "science_macro",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Kepler & Newton",
+     "source": "",
+     "evidence": "credits roll only; visuals/orbits.py:4 says only Newtonian gravity",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/optics.py::Optics": {
+   "name": "OPTICS",
+   "category": "science_bench",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Newton 1704; Snell's law",
+     "source": "",
+     "evidence": "visuals/optics.py:176",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/fractals.py::Fractals": {
+   "name": "FRACTALS",
+   "category": "math",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Mandelbrot · Julia · Sierpinski · Koch · Barnsley",
+     "source": "",
+     "evidence": "visuals/fractals.py:4 (Barnsley: credits roll only)",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/constellations.py::Constellations": {
+   "name": "CONSTELLATIONS",
+   "category": "science_macro",
+   "claims": [
+    {
+     "kind": "data",
+     "claim": "Hipparcos catalog (ESA) · Stellarium lines",
+     "source": "",
+     "evidence": "visuals/constellations.py:4",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/flags.py::Flags": {
+   "name": "FLAGS",
+   "category": "culture",
+   "claims": [
+    {
+     "kind": "data",
+     "claim": "flagcdn.com",
+     "source": "",
+     "evidence": "visuals/flags.py:5",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/highway.py::Highway": {
+   "name": "HIGHWAY",
+   "category": "road_rail",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Nagel & Schreckenberg, 1992",
+     "source": "",
+     "evidence": "visuals/highway.py:2",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/moire.py::Moire": {
+   "name": "MOIRE",
+   "category": "digital",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Lord Rayleigh",
+     "source": "",
+     "evidence": "credits roll only; no mention in visuals/moire.py",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/seismic.py::Seismic": {
+   "name": "SEISMIC",
+   "category": "science_macro",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Snell's law",
+     "source": "",
+     "evidence": "visuals/seismic.py:6",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/erosion.py::Erosion": {
+   "name": "EROSION",
+   "category": "nature",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Hydraulic erosion model",
+     "source": "",
+     "evidence": "visuals/erosion.py:2",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/singer.py::Singer": {
+   "name": "SINGER",
+   "category": "mechanics",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "1851",
+     "source": "",
+     "evidence": "credits roll only; no date in visuals/singer.py",
+     "checked": null,
+     "verdict": null,
+     "url": "",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Carried over 2026-09-25 from the hand-typed CREDITS roll when the roll became generated from this ledger. Not verified."
+    }
+   ]
+  },
+  "visuals/cyclic.py::Cyclic": {
+   "name": "CYCLIC",
+   "category": "automata",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Fisch, Gravner & Griffeath, 1991",
+     "source": "R. Fisch, J. Gravner and D. Griffeath, \"Threshold-range scaling of excitable cellular automata\", Statistics and Computing 1 (1991), 23–39; Chapman and Hall; received December 1990, accepted May 1991.",
+     "evidence": "visuals/cyclic.py:25",
+     "checked": null,
+     "verdict": null,
+     "url": "https://www.math.ucdavis.edu/~gravner/papers/fgg.pdf",
+     "proposed_claim": "",
+     "code_matches": "",
+     "code_note": "",
+     "ruling": "",
+     "researcher_note": "Added 2026-09-25 when the visual (formerly DemonSpirals, docstring 'Cyclic CA from David Griffeath') got the credit line its LAB already carried. The citation is the one verified for CYCLIC LAB; nobody has yet checked that this module's step rule is the same threshold CCA."
     }
    ]
   }

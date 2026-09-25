@@ -70,8 +70,10 @@ jobs:
           python3 site/generate_catalog.py
           python3 site/generate_guide.py
           python3 tools/build_sources.py
-          if ! git diff --exit-code -- site/catalog.json site/guide.json SOURCES.md; then
+          python3 tools/build_history.py
+          python3 tools/build_credits.py
+          if ! git diff --exit-code -- site/catalog.json site/guide.json SOURCES.md site/history.html visuals/credits_data.py; then
             echo "::error::A generated file is stale."
-            echo "Run 'python3 site/generate_catalog.py && python3 site/generate_guide.py && python3 tools/build_sources.py' and commit the result."
+            echo "Run 'python3 site/generate_catalog.py && python3 site/generate_guide.py && python3 tools/build_sources.py && python3 tools/build_history.py && python3 tools/build_credits.py' and commit the result."
             exit 1
           fi

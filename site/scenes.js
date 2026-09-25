@@ -1291,11 +1291,11 @@ class Lorenz {
   }
 }
 
-// ----- Cyclic CA (Demon Spirals) -----
+// ----- Cyclic CA -----
 class CyclicCA {
   constructor(display) {
     this.display = display;
-    this.name = 'DEMON SPIRALS';
+    this.name = 'CYCLIC';
     this.desc = 'Cyclic cellular automaton';
     this.category = 'AUTOMATA';
   }
