@@ -27,7 +27,7 @@ class Attractors(Visual):
     category = "math"
     GUIDE = {
         'desc': 'The Lorenz “butterfly” attractor, the Rössler attractor, and the Thomas attractor. Trajectories that fold through space without ever crossing themselves.',
-        'credit': 'Edward Lorenz, 1963',
+        'credit': "Lorenz '63 · Rossler '76 · Thomas '99",
     }
 
     def __init__(self, display: Display):

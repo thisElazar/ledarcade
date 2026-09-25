@@ -42,7 +42,7 @@ class ParticleLife(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'Particle Life: several species with a random asymmetric attraction/repulsion matrix. Clusters, chasers and drifting membranes emerge — some runs look like jellyfish, every reset is different.',
-        'credit': 'Jeffrey Ventrella, 2007',
+        'credit': 'Jeffrey Ventrella, c. 2016',
     }
 
     # Bright, saturated species colors

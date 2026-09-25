@@ -32,7 +32,7 @@ class Slime(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'Six slime-mold colonies spread across the grid and fight for territory. Each cell grows into empty neighbours and can be overrun by a stronger rival — frontiers advance, stall, and get swallowed until one colony wins or they settle into a truce.',
-        'credit': 'Colony-competition cellular automaton',
+        'credit': 'Original model, no published source',
     }
 
     def __init__(self, display: Display):

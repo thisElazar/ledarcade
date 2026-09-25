@@ -220,7 +220,7 @@ class DrumRudiments(Visual):
     category = "music"
     GUIDE = {
         'desc': 'All 40 international drum rudiments. Animated sticking patterns with R/L hand indicators and accent marks. The fundamental vocabulary of percussion.',
-        'credit': 'PAS, Percussive Arts Society',
+        'credit': 'Percussive Arts Society, 1984',
         'controls': {
             'Up/Down': 'Change rudiment',
             'Left/Right': 'Adjust tempo (BPM)',

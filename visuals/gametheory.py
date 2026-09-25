@@ -55,7 +55,7 @@ class GameTheory(Visual):
     category = "math"
     GUIDE = {
         'desc': 'Iterated Prisoner’s Dilemma tournament on a spatial grid. Strategies — cooperate, defect, tit-for-tat — compete and evolve. Cooperation can emerge from selfishness.',
-        'credit': 'Robert Axelrod, 1984',
+        'credit': 'Axelrod 1984; Nowak & May 1992',
         'legend': {
             'G:#': 'Number of simulation rounds since the last reset (generation counter).',
             'T=#': 'Payoff for defecting when opponent cooperates (higher means less cooperation survives).',

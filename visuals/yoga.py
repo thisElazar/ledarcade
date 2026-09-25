@@ -2,8 +2,7 @@
 YOGA - Yoga Flows
 ==================
 A stick figure flows through yoga poses with smooth interpolation.
-14 joints, Vitruvian proportions. Poses sourced from MediaPipe datasets
-(Manoj-2702) with hand-authored corrections.
+14-joint stick figure with Vitruvian proportions. Standard yoga asanas.
 
 Controls:
   Action       - Cycle flow (Sun Salute, Warrior, Balance)

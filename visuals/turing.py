@@ -388,7 +388,7 @@ class TuringPatterns(_TuringBase):
     category = "automata"
     GUIDE = {
         'desc': 'Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.',
-        'credit': 'Alan Turing, 1952',
+        'credit': 'Gray & Scott 1984; Pearson 1993',
         'legend': {
             'F=#': 'Chemical feed rate — controls how fast pattern U is replenished.',
             'K=#': 'Chemical removal rate — controls how fast pattern V is removed.',

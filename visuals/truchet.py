@@ -22,7 +22,7 @@ class Truchet(Visual):
     category = "digital"
     GUIDE = {
         'desc': 'Quarter-circle tiles placed randomly create flowing organic curves. Discovered by a Dominican priest over 300 years ago.',
-        'credit': 'Sébastien Truchet, 1704',
+        'credit': 'Truchet 1704 · arcs: Smith 1987',
     }
 
     # Available tile sizes (in pixels)

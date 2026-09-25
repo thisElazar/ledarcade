@@ -2794,7 +2794,7 @@
      "cls": "CyclicLab",
      "module": "visuals/cycliclab.py",
      "desc": "Explore the cyclic cellular automaton by hand. The joystick adjusts the number of states and the neighbor threshold, tuning between still noise and sweeping demon spirals.",
-     "credit": "David Griffeath",
+     "credit": "Fisch, Gravner & Griffeath, 1991",
      "legend": {
       "thresh=": "Neighbor threshold \u2014 how many neighbors must show next state before this cell advances."
      },
@@ -2832,7 +2832,7 @@
      "cls": "TuringPatterns",
      "module": "visuals/turing.py",
      "desc": "Reaction-diffusion patterns computed on a grid. Four pattern families: spots, stripes, coral, and worms. The mechanism Turing proposed for how leopards get their spots.",
-     "credit": "Alan Turing, 1952",
+     "credit": "Gray & Scott 1984; Pearson 1993",
      "legend": {
       "F=#": "Chemical feed rate \u2014 controls how fast pattern U is replenished.",
       "K=#": "Chemical removal rate \u2014 controls how fast pattern V is removed.",
@@ -2860,7 +2860,7 @@
      "cls": "Hodge",
      "module": "visuals/hodge.py",
      "desc": "Models the Belousov-Zhabotinsky chemical reaction, a real oscillator that produces spiral waves in a petri dish. Self-organizing spirals emerge from random initial conditions.",
-     "credit": "Gerhardt & Schuster",
+     "credit": "Gerhardt & Schuster, 1989",
      "controls": {
       "Up/Down": "Change color palette",
       "Left/Right": "Adjust infection rate (g parameter)",
@@ -2872,7 +2872,7 @@
      "cls": "HodgeLab",
      "module": "visuals/hodgelab.py",
      "desc": "A hands-on version of the Hodgepodge Machine. Adjust the growth rate and maximum state count to steer the Belousov-Zhabotinsky spiral waves between calm and chaotic.",
-     "credit": "Gerhardt & Schuster",
+     "credit": "Gerhardt & Schuster, 1989",
      "legend": {
       "BZ CLASSIC": "Belousov-Zhabotinsky reaction \u2014 produces the spiral wave pattern.",
       "g=": "Growth rate: controls spread speed (higher = faster, bolder patterns).",
@@ -2890,7 +2890,7 @@
      "cls": "ParticleLife",
      "module": "visuals/particlelife.py",
      "desc": "Particle Life: several species with a random asymmetric attraction/repulsion matrix. Clusters, chasers and drifting membranes emerge \u2014 some runs look like jellyfish, every reset is different.",
-     "credit": "Jeffrey Ventrella, 2007",
+     "credit": "Jeffrey Ventrella, c. 2016",
      "controls": {
       "Up/Down": "Adjust species count (changes colors)",
       "Left/Right": "Adjust speed",
@@ -3066,7 +3066,7 @@
      "cls": "Slime",
      "module": "visuals/slime.py",
      "desc": "Six slime-mold colonies spread across the grid and fight for territory. Each cell grows into empty neighbours and can be overrun by a stronger rival \u2014 frontiers advance, stall, and get swallowed until one colony wins or they settle into a truce.",
-     "credit": "Colony-competition cellular automaton",
+     "credit": "Original model, no published source",
      "controls": {
       "Left/Right": "Adjust growth speed",
       "Space": "Reset with new random colonies"
@@ -3077,7 +3077,7 @@
      "cls": "SlimeLab",
      "module": "visuals/slimelab.py",
      "desc": "Six slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.",
-     "credit": "Colony-competition cellular automaton",
+     "credit": "Original rule",
      "legend": {
       "grow=#": "Probability per step that empty cells next to a colony get colonized.",
       "atk=#": "Aggressiveness of a colony's takeover of enemy cells."
@@ -3832,7 +3832,7 @@
      "name": "CRYSTALLIZE",
      "cls": "Crystallize",
      "module": "visuals/crystallize.py",
-     "desc": "Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model \u2014 a generalization of the Ising model to multiple spin states. Inspired by an introspection experiment (docs/introspection-experiment-log.md) where 84 Claude agents across three model tiers independently reported the same phenomenon: ideas crystallizing into competing domains with grain boundaries at their edges. The Potts update rule is a Boltzmann distribution \u2014 the same equation as the softmax that samples each token \u2014 so the annealing cycle is a literal, not metaphorical, picture of that process.",
+     "desc": "Competing crystal domains grow from random seeds using Monte Carlo dynamics. Grain boundaries form where domains meet. Based on the Potts model \u2014 a generalization of the Ising model to multiple spin states. Inspired by an unpublished internal introspection log. The Potts update rule is a Boltzmann distribution \u2014 the same equation as the softmax that samples each token \u2014 so the annealing cycle is a literal, not metaphorical, picture of that process.",
      "credit": "R.B. Potts, 1952",
      "controls": {
       "Action (L or R)": "Cycle FIELD / SEQUENCE / STREAM views",
@@ -3983,7 +3983,7 @@
      "cls": "Truchet",
      "module": "visuals/truchet.py",
      "desc": "Quarter-circle tiles placed randomly create flowing organic curves. Discovered by a Dominican priest over 300 years ago.",
-     "credit": "S\u00e9bastien Truchet, 1704",
+     "credit": "Truchet 1704 \u00b7 arcs: Smith 1987",
      "controls": {
       "Up/Down": "Cycle color palette",
       "Left/Right": "Adjust speed",
@@ -4187,7 +4187,7 @@
      "cls": "Attractors",
      "module": "visuals/attractors.py",
      "desc": "The Lorenz \u201cbutterfly\u201d attractor, the R\u00f6ssler attractor, and the Thomas attractor. Trajectories that fold through space without ever crossing themselves.",
-     "credit": "Edward Lorenz, 1963",
+     "credit": "Lorenz '63 \u00b7 Rossler '76 \u00b7 Thomas '99",
      "controls": {
       "Up/Down": "Cycle color palette",
       "Left/Right": "Adjust simulation speed",
@@ -4210,7 +4210,7 @@
      "cls": "Entropy",
      "module": "visuals/entropy.py",
      "desc": "A gas spreads from one wall until it fills the box - entropy climbs. Let it run and every velocity reverses on its own: the gas un-mixes back to where it started. The rules never changed; there are just vastly more mixed arrangements than ordered ones.",
-     "credit": "Ludwig Boltzmann, 1877 / Claude Shannon, 1948",
+     "credit": "Boltzmann 1877 \u00b7 Shannon 1948 \u00b7 HPP 1973",
      "legend": {
       "FWD": "Simulation is running forward in time.",
       "REV": "Simulation is running backward (un-mixing).",
@@ -4251,7 +4251,7 @@
      "cls": "GameTheory",
      "module": "visuals/gametheory.py",
      "desc": "Iterated Prisoner\u2019s Dilemma tournament on a spatial grid. Strategies \u2014 cooperate, defect, tit-for-tat \u2014 compete and evolve. Cooperation can emerge from selfishness.",
-     "credit": "Robert Axelrod, 1984",
+     "credit": "Axelrod 1984; Nowak & May 1992",
      "legend": {
       "G:#": "Number of simulation rounds since the last reset (generation counter).",
       "T=#": "Payoff for defecting when opponent cooperates (higher means less cooperation survives).",
@@ -4374,7 +4374,7 @@
      "cls": "Spirograph",
      "module": "visuals/spirograph.py",
      "desc": "Hypotrochoid and epitrochoid curves from rolling circles. The plastic drawing toy that taught a generation about roulette curves.",
-     "credit": "Denys Fischer, 1965",
+     "credit": "Denys Fisher, 1965",
      "controls": {
       "Up/Down": "Cycle preset",
       "Left/Right": "Drawing speed",
@@ -4419,7 +4419,7 @@
      "cls": "Archimedes",
      "module": "visuals/archimedes.py",
      "desc": "A helical surface inside a cylinder, turned by hand to raise water. Still used today for irrigation and wastewater.",
-     "credit": "c. 250 BC",
+     "credit": "Attrib. Archimedes, 3rd c. BC",
      "controls": {
       "Left/Right": "Adjust rotation speed (6 levels)"
      }
@@ -4429,7 +4429,7 @@
      "cls": "Astrolabe",
      "module": "visuals/astrolabe.py",
      "desc": "A brass instrument for telling time, finding latitude, predicting sunrise/sunset, and locating stars. Used by astronomers and navigators for over a thousand years.",
-     "credit": "c. 200 BC \u2013 1600s",
+     "credit": "Greek roots; Islamic/European, 900\u20131600s",
      "controls": {
       "Left/Right": "Adjust rotation speed"
      }
@@ -4439,7 +4439,7 @@
      "cls": "BeamEngine",
      "module": "visuals/beamengine.py",
      "desc": "Watt\u2019s separate condenser transformed Newcomen\u2019s earlier engine into the workhorse of the Industrial Revolution. The rocking beam links piston to flywheel.",
-     "credit": "1769",
+     "credit": "James Watt, 1769\u20131788",
      "legend": {
       "#SPM": "Engine speed in strokes per minute."
      },
@@ -4461,7 +4461,7 @@
      "cls": "Curta",
      "module": "visuals/curta.py",
      "desc": "Curt Herzstark's handheld mechanical calculator, designed while imprisoned in Buchenwald. Cylindrical Leibniz wheels inside a pepper-grinder housing.",
-     "credit": "1948",
+     "credit": "Curt Herzstark, 1948",
      "legend": {
       "counter number": "The running total in the result register; each full crank turn adds to it.",
       "#OPM": "Crank speed measured in operations per minute."
@@ -4475,7 +4475,7 @@
      "cls": "GrandfatherClock",
      "module": "visuals/grandfather.py",
      "desc": "Longcase pendulum clock with escapement mechanism. The pendulum swings, the escape wheel ticks, the hands turn.",
-     "credit": "Christiaan Huygens, 1656",
+     "credit": "Pendulum clock: Huygens, 1656",
      "controls": {
       "Left/Right": "Adjust BPM (pendulum speed)"
      }
@@ -4485,7 +4485,7 @@
      "cls": "GutenbergPress",
      "module": "visuals/gutenberg.py",
      "desc": "Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.",
-     "credit": "c. 1440",
+     "credit": "Johannes Gutenberg, Mainz, 1450s",
      "legend": {
       "# PPM": "Press cycles completed per minute (current press-speed setting).",
       "PG #": "Pages printed so far (press cycles completed)."
@@ -4513,7 +4513,7 @@
      "cls": "Jacquard",
      "module": "visuals/jacquard.py",
      "desc": "Punch cards controlling a weaving loom \u2014 the direct ancestor of computer programming. Babbage modeled his Analytical Engine on its logic; Lovelace saw the deeper computational implications.",
-     "credit": "1804",
+     "credit": "Joseph-Marie Jacquard, 1804",
      "legend": {
       "rows read": "Count of card rows read so far.",
       "#ROW/MIN": "Rows per minute: current loom speed."
@@ -4560,7 +4560,7 @@
      "cls": "Orrery",
      "module": "visuals/orrery.py",
      "desc": "A clockwork model of the solar system. Brass arms carry planets at their correct relative orbital speeds, with gears visible at the base. Named after the 4th Earl of Orrery.",
-     "credit": "1713",
+     "credit": "Graham & Tompion, 1704",
      "controls": {
       "Left/Right": "Adjust time scale"
      }
@@ -4633,7 +4633,7 @@
      "cls": "ModelT",
      "module": "visuals/modelt.py",
      "desc": "Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.",
-     "credit": "1908, Henry Ford",
+     "credit": "Nicolaus Otto, 1876",
      "legend": {
       "INTK": "The intake stroke phase of the 4-stroke engine cycle.",
       "COMP": "The compression stroke phase of the 4-stroke engine cycle.",
@@ -4798,7 +4798,7 @@
      "cls": "DrumRudiments",
      "module": "visuals/rudiments.py",
      "desc": "All 40 international drum rudiments. Animated sticking patterns with R/L hand indicators and accent marks. The fundamental vocabulary of percussion.",
-     "credit": "PAS, Percussive Arts Society",
+     "credit": "Percussive Arts Society, 1984",
      "legend": {
       "R": "Right-hand stroke.",
       "L": "Left-hand stroke.",
@@ -4951,7 +4951,7 @@
      "cls": "Gould",
      "module": "visuals/plates.py",
      "desc": "Plates from John Gould's ornithological folios \u2014 hummingbirds, toucans, and the birds of Australia \u2014 auto-panning across the grid.",
-     "credit": "John Gould, 19th c.",
+     "credit": "John Gould & H.C. Richter, 1849-61",
      "controls": {
       "Left/Right": "Cycle between plates",
       "Up/Down held": "Manual pan",
@@ -4998,7 +4998,7 @@
      "cls": "Redoute",
      "module": "visuals/plates.py",
      "desc": "Pierre-Joseph Redout\u00e9's botanical watercolors \u2014 the roses and lilies painted for Empress Jos\u00e9phine's garden at Malmaison.",
-     "credit": "Pierre-Joseph Redout\u00e9, early 19th c.",
+     "credit": "Pierre-Joseph Redout\u00e9, Les Roses, 1817\u201324",
      "legend": {
       "#/#": "Current plate out of the total in this collection."
      },
@@ -5168,7 +5168,7 @@
      "cls": "Neurons",
      "module": "visuals/neurons.py",
      "desc": "A spiking neural network with excitatory and inhibitory neurons. Regular spiking, chattering, and bursting patterns. Membrane potential dynamics with real spike generation.",
-     "credit": "Izhikevich model",
+     "credit": "Eugene Izhikevich, 2003",
      "controls": {
       "Up/Down": "Cycle color palette",
       "Left/Right": "Adjust stimulation level",
@@ -5333,7 +5333,7 @@
      "cls": "Radioactive",
      "module": "visuals/radioactive.py",
      "desc": "A single nucleus drawn as the protons and neutrons it contains, stepping down a real decay chain. Alpha decay throws off two protons and two neutrons; beta decay turns a neutron into a proton. Uranium-238 needs fourteen decays to reach stable lead-206.",
-     "credit": "Henri Becquerel, 1896",
+     "credit": "Rutherford & Soddy, 1902",
      "legend": {
       "#P #N": "Proton and neutron count in the nucleus.",
       "time value (4.5E9 Y)": "The isotope's half-life. Units: NS, US, MS, S, MIN, H, D, Y, KY (thousand years); E9 means times a billion (ten to the 9th).",
@@ -5421,7 +5421,7 @@
      "cls": "Convection",
      "module": "visuals/convection.py",
      "desc": "Rayleigh-B\u00e9nard convection cells. Heated fluid rises, cool fluid sinks, forming rolling convection cells with characteristic aspect ratios.",
-     "credit": "Lord Rayleigh, 1916",
+     "credit": "B\u00e9nard 1900 \u00b7 Rayleigh 1916",
      "legend": {
       "RAYLEIGH #": "Rayleigh number: how strongly heating drives the convection.",
       "TEMP": "Temperature visualization mode (shows the heat field)."
@@ -5631,7 +5631,7 @@
      "cls": "PredPrey",
      "module": "visuals/predprey.py",
      "desc": "Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation \u2014 more prey means more predators, more predators means fewer prey, and the cycle repeats.",
-     "credit": "Lotka 1925 \u00b7 Volterra 1926",
+     "credit": "Lotka 1920 \u00b7 Volterra 1926",
      "legend": {
       "PREY #": "Prey reproduction rate \u2014 probability a rabbit spreads each step.",
       "HUNT #": "Predator hunting efficiency \u2014 probability a fox catches prey each step.",
@@ -5677,7 +5677,7 @@
      "cls": "Tectonic",
      "module": "visuals/tectonic.py",
      "desc": "Tectonic plates shifting, colliding, and diverging. Subduction zones, rift valleys, and mountain building driven by convection currents in the mantle.",
-     "credit": "Alfred Wegener, 1912",
+     "credit": "Wegener 1912; Hess 1962",
      "controls": {
       "Left/Right": "Cycle scenes manually (pauses auto-cycle 15s)",
       "Up/Down": "Adjust animation speed",

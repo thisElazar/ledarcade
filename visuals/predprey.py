@@ -31,7 +31,7 @@ class PredPrey(Visual):
     category = "science_macro"
     GUIDE = {
         'desc': 'Lotka-Volterra predator-prey dynamics. Two populations locked in oscillation — more prey means more predators, more predators means fewer prey, and the cycle repeats.',
-        'credit': 'Lotka 1925 · Volterra 1926',
+        'credit': 'Lotka 1920 · Volterra 1926',
         'legend': {
             'PREY #': 'Prey reproduction rate — probability a rabbit spreads each step.',
             'HUNT #': 'Predator hunting efficiency — probability a fox catches prey each step.',

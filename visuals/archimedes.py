@@ -51,7 +51,7 @@ class Archimedes(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'A helical surface inside a cylinder, turned by hand to raise water. Still used today for irrigation and wastewater.',
-        'credit': 'c. 250 BC',
+        'credit': 'Attrib. Archimedes, 3rd c. BC',
     }
 
     def __init__(self, display: Display):

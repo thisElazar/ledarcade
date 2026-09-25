@@ -99,7 +99,7 @@ class Jacquard(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'Punch cards controlling a weaving loom — the direct ancestor of computer programming. Babbage modeled his Analytical Engine on its logic; Lovelace saw the deeper computational implications.',
-        'credit': '1804',
+        'credit': 'Joseph-Marie Jacquard, 1804',
         'legend': {
             'rows read': 'Count of card rows read so far.',
             '#ROW/MIN': 'Rows per minute: current loom speed.',

@@ -140,7 +140,7 @@ class Neurons(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'A spiking neural network with excitatory and inhibitory neurons. Regular spiking, chattering, and bursting patterns. Membrane potential dynamics with real spike generation.',
-        'credit': 'Izhikevich model',
+        'credit': 'Eugene Izhikevich, 2003',
     }
 
     def __init__(self, display: Display):

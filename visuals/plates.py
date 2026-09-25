@@ -355,7 +355,7 @@ class Redoute(_PlatesBase):
     description = "Les Roses"
     GUIDE = {
         'desc': "Pierre-Joseph Redouté's botanical watercolors — the roses and lilies painted for Empress Joséphine's garden at Malmaison.",
-        'credit': 'Pierre-Joseph Redouté, early 19th c.',
+        'credit': 'Pierre-Joseph Redouté, Les Roses, 1817–24',
         'legend': {
             '#/#': 'Current plate out of the total in this collection.',
         },
@@ -369,7 +369,7 @@ class Gould(_PlatesBase):
     description = "Hummingbirds"
     GUIDE = {
         'desc': "Plates from John Gould's ornithological folios — hummingbirds, toucans, and the birds of Australia — auto-panning across the grid.",
-        'credit': 'John Gould, 19th c.',
+        'credit': 'John Gould & H.C. Richter, 1849-61',
     }
     _collection = "gould"
     _manifest_file = "gould_plates.json"

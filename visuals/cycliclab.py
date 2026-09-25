@@ -124,7 +124,7 @@ class CyclicLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'Explore the cyclic cellular automaton by hand. The joystick adjusts the number of states and the neighbor threshold, tuning between still noise and sweeping demon spirals.',
-        'credit': 'David Griffeath',
+        'credit': 'Fisch, Gravner & Griffeath, 1991',
         'legend': {
             'thresh=': 'Neighbor threshold — how many neighbors must show next state before this cell advances.',
         },

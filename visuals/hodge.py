@@ -25,7 +25,7 @@ class Hodge(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'Models the Belousov-Zhabotinsky chemical reaction, a real oscillator that produces spiral waves in a petri dish. Self-organizing spirals emerge from random initial conditions.',
-        'credit': 'Gerhardt & Schuster',
+        'credit': 'Gerhardt & Schuster, 1989',
     }
 
     def __init__(self, display: Display):

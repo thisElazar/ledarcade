@@ -40,7 +40,7 @@ class HodgeLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'A hands-on version of the Hodgepodge Machine. Adjust the growth rate and maximum state count to steer the Belousov-Zhabotinsky spiral waves between calm and chaotic.',
-        'credit': 'Gerhardt & Schuster',
+        'credit': 'Gerhardt & Schuster, 1989',
         'legend': {
             'BZ CLASSIC': 'Belousov-Zhabotinsky reaction — produces the spiral wave pattern.',
             'g=': 'Growth rate: controls spread speed (higher = faster, bolder patterns).',

@@ -79,7 +79,7 @@ class Tectonic(Visual):
     category = "science_macro"
     GUIDE = {
         'desc': 'Tectonic plates shifting, colliding, and diverging. Subduction zones, rift valleys, and mountain building driven by convection currents in the mantle.',
-        'credit': 'Alfred Wegener, 1912',
+        'credit': 'Wegener 1912; Hess 1962',
     }
 
     def __init__(self, display: Display):

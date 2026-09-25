@@ -97,7 +97,7 @@ class Entropy(Visual):
                 'the gas un-mixes back to where it started. '
                 'The rules never changed; there are just vastly more mixed '
                 'arrangements than ordered ones.',
-        'credit': 'Ludwig Boltzmann, 1877 / Claude Shannon, 1948',
+        'credit': 'Boltzmann 1877 · Shannon 1948 · HPP 1973',
         'controls': {
             'Action': 'Cycle particle colour',
             'Up/Down': 'Block size for the entropy meter',

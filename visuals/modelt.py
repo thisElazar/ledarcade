@@ -70,7 +70,7 @@ class ModelT(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'Animated cross-section showing the engine, transmission, and drive train of the car that introduced mass production to automobiles.',
-        'credit': '1908, Henry Ford',
+        'credit': 'Nicolaus Otto, 1876',
         'legend': {
             'INTK': 'The intake stroke phase of the 4-stroke engine cycle.',
             'COMP': 'The compression stroke phase of the 4-stroke engine cycle.',

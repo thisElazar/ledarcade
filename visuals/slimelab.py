@@ -49,7 +49,7 @@ class SlimeLab(Visual):
     category = "automata"
     GUIDE = {
         'desc': 'Six slime-mold colonies compete under your control. Adjust growth chance against attack power to decide whether one colony overruns the other or they reach a truce.',
-        'credit': 'Colony-competition cellular automaton',
+        'credit': 'Original rule',
         'legend': {
             'grow=#': 'Probability per step that empty cells next to a colony get colonized.',
             'atk=#': 'Aggressiveness of a colony\'s takeover of enemy cells.',

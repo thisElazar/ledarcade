@@ -120,7 +120,7 @@ class GutenbergPress(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'Movable type printing press. The full mechanical cycle: inking, bed slide, press down, impression, release.',
-        'credit': 'c. 1440',
+        'credit': 'Johannes Gutenberg, Mainz, 1450s',
         'legend': {
             '# PPM': 'Press cycles completed per minute (current press-speed setting).',
             'PG #': 'Pages printed so far (press cycles completed).',

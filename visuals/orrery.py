@@ -61,7 +61,7 @@ class Orrery(Visual):
     category = "mechanics"
     GUIDE = {
         'desc': 'A clockwork model of the solar system. Brass arms carry planets at their correct relative orbital speeds, with gears visible at the base. Named after the 4th Earl of Orrery.',
-        'credit': '1713',
+        'credit': 'Graham & Tompion, 1704',
     }
 
     def __init__(self, display: Display):

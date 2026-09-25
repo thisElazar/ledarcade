@@ -129,7 +129,7 @@ class Radioactive(Visual):
     category = "science_micro"
     GUIDE = {
         'desc': 'A single nucleus drawn as the protons and neutrons it contains, stepping down a real decay chain. Alpha decay throws off two protons and two neutrons; beta decay turns a neutron into a proton. Uranium-238 needs fourteen decays to reach stable lead-206.',
-        'credit': 'Henri Becquerel, 1896',
+        'credit': 'Rutherford & Soddy, 1902',
         'legend': {
             '#P #N': 'Proton and neutron count in the nucleus.',
             'time value (4.5E9 Y)': "The isotope's half-life. Units: NS, US, MS, S, MIN, H, D, Y, KY (thousand years); E9 means times a billion (ten to the 9th).",
