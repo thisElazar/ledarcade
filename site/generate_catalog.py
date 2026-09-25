@@ -5,6 +5,7 @@ Matches the arcade machine's catalog.py registration logic:
   - Only includes classes imported in each package's __init__.py
   - Resolves category inheritance (subclasses inherit parent's category)
   - Skips dev_only classes (hidden on production arcade)
+  - Skips DIST_HIDDEN classes (filtered off distribution cabinets at import time)
 """
 
 import ast
@@ -13,6 +14,10 @@ import os
 import unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Classes visuals/__init__.py drops from ALL_VISUALS when the .dev flag is absent
+# (the _DEV_CABINET block). Keep in sync: the site shows the distribution cabinet.
+DIST_HIDDEN = {'Testament'}
 
 
 def strip_accents(s):
@@ -238,7 +243,7 @@ def scan_file(filepath, pkg, exported_classes=None):
     for cls_name, info in class_info.items():
         if exported_classes is not None and cls_name not in exported_classes:
             continue
-        if info['dev_only']:
+        if info['dev_only'] or cls_name in DIST_HIDDEN:
             continue
         classes.append({
             'cls': info['cls'],

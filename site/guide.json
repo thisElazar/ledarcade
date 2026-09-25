@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 180,
+  "visuals": 179,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -3324,17 +3324,6 @@
      }
     },
     {
-     "name": "TESTAMENT",
-     "cls": "Testament",
-     "module": "visuals/testament.py",
-     "desc": "Ambient scenes from the world\u2019s sacred stories \u2014 the burning bush, Noah\u2019s ark, the star of Bethlehem, and moments from Hindu, Buddhist, Islamic and Sikh tradition \u2014 each a stable, gently animated symbol.",
-     "controls": {
-      "Up/Down": "Switch scene",
-      "Left/Right": "Adjust speed",
-      "Space/Z": "Scene action"
-     }
-    },
-    {
      "name": "WEAVING",
      "cls": "Weaving",
      "module": "visuals/weaving.py",
@@ -6498,7 +6487,6 @@
       "LANGUAGE",
       "POTTERY",
       "SCRIPTS",
-      "TESTAMENT",
       "WEAVING",
       "SALON",
       "GRAND MUSEUM",

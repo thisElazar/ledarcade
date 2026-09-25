@@ -289,4 +289,4 @@ ATTRIBUTIONS = [
 ]
 
 # How many of each thing ships: guide.json meta plus items per category.
-COUNTS = {"2_player": 6, "arcade": 20, "art": 0, "automata": 27, "bar": 5, "cooking": 8, "culture": 6, "demos": 48, "digital": 18, "gallery": 2, "game_mix": 6, "games": 60, "household": 10, "math": 16, "mechanics": 20, "modern": 10, "music": 15, "nature": 13, "paintings": 236, "retro": 9, "road_rail": 9, "science_bench": 12, "science_macro": 11, "science_micro": 13, "titles": 70, "toys": 6, "unique": 4, "utility": 19, "visual_mix": 12, "visuals": 180}
+COUNTS = {"2_player": 6, "arcade": 20, "art": 0, "automata": 27, "bar": 5, "cooking": 8, "culture": 5, "demos": 48, "digital": 18, "gallery": 2, "game_mix": 6, "games": 60, "household": 10, "math": 16, "mechanics": 20, "modern": 10, "music": 15, "nature": 13, "paintings": 236, "retro": 9, "road_rail": 9, "science_bench": 12, "science_macro": 11, "science_micro": 13, "titles": 70, "toys": 6, "unique": 4, "utility": 19, "visual_mix": 12, "visuals": 179}

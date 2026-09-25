@@ -2682,12 +2682,6 @@
           "is_game": false
         },
         {
-          "name": "TESTAMENT",
-          "cls": "Testament",
-          "module": "visuals/testament.py",
-          "is_game": false
-        },
-        {
           "name": "WEAVING",
           "cls": "Weaving",
           "module": "visuals/weaving.py",
@@ -6507,11 +6501,6 @@
               "name": "SCRIPTS",
               "cls": "Scripts",
               "module": "visuals/scripts.py"
-            },
-            {
-              "name": "TESTAMENT",
-              "cls": "Testament",
-              "module": "visuals/testament.py"
             },
             {
               "name": "WEAVING",

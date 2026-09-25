@@ -171,10 +171,28 @@ body, .masthead, .lab-display, .rule { transition: background-color 2s, color 2s
   const emuFrame = document.getElementById('emuFrame');
   const emuOverlay = document.getElementById('emuClickOverlay');
 
-  // Local dev (serve the repo root, open /site/emulator.html) runs the working-tree games
-  const GITHUB_RAW = ['localhost', '127.0.0.1'].includes(location.hostname)
-    ? '../'
-    : 'https://raw.githubusercontent.com/thisElazar/ledarcade/main/';
+  // Local dev (serve the repo root, open /site/emulator.html) runs the working-tree games.
+  // The public site runs what distribution cabinets run: the highest vMAJOR.MINOR tag
+  // (start.sh), not the tip of main. Resolved in init(); main is the fallback.
+  const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+  const RAW_BASE = 'https://raw.githubusercontent.com/thisElazar/ledarcade/';
+  let GITHUB_RAW = IS_LOCAL ? '../' : RAW_BASE + 'main/';
+
+  async function latestReleaseTag() {
+    const resp = await fetch('https://api.github.com/repos/thisElazar/ledarcade/tags?per_page=100');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const vers = (await resp.json()).map(t => t.name).filter(n => /^v\d+(\.\d+)*$/.test(n));
+    const key = n => n.slice(1).split('.').map(Number);
+    vers.sort((a, b) => {
+      const ka = key(a), kb = key(b);
+      for (let i = 0; i < Math.max(ka.length, kb.length); i++) {
+        const d = (ka[i] || 0) - (kb[i] || 0);
+        if (d) return d;
+      }
+      return 0;
+    });
+    return vers.pop() || null;
+  }
 
   const pyRenderer = new LEDRenderer(pyLedCanvas);
   const pyDisplay = new Display();
@@ -517,6 +535,15 @@ body, .masthead, .lab-display, .rule { transition: background-color 2s, color 2s
   } catch (e) {
     setStatus('failed to load: ' + e.message, 'error');
     return;
+  }
+
+  if (!IS_LOCAL) {
+    try {
+      const tag = await latestReleaseTag();
+      if (tag) GITHUB_RAW = RAW_BASE + tag + '/';
+    } catch (e) {
+      console.warn('Release tag lookup failed, using main:', e);
+    }
   }
 
   setStatus('loading catalog...', 'loading');
