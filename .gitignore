@@ -92,6 +92,9 @@ assets/kidicarus_*.png
 # Atlas data (auto-downloaded from GitHub Releases on first launch)
 assets/atlas/
 
+# COINS photos: CC BY-SA with no author recorded; withdrawn until rebuilt (tools/build_coins.py)
+assets/coins/
+
 # Copyrighted gallery atlas files
 site/gallery_GallerySMB3.json
 site/gallery_GalleryKirby.json

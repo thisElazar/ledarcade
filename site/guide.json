@@ -1,7 +1,7 @@
 {
  "meta": {
   "games": 60,
-  "visuals": 181,
+  "visuals": 180,
   "paintings": 236,
   "demos": 48,
   "titles": 70
@@ -3264,21 +3264,6 @@
    "group": "visuals",
    "items": [
     {
-     "name": "COINS",
-     "cls": "Coins",
-     "module": "visuals/coins.py",
-     "desc": "Historical coins rendered from Wikimedia Commons photographs. Ancient Greek, Roman, medieval, and early modern currency.",
-     "legend": {
-      "C.": "Before a date, circa (about). Inside a date, century: C. 3RD C. BCE is about the 3rd century BCE."
-     },
-     "controls": {
-      "Left/Right": "Cycle coins within era",
-      "Up/Down": "Toggle info overlay",
-      "Action L or R": "Toggle auto-cycle (slideshow) on/off",
-      "Action L + R": "Cycle eras (ANCIENT / MEDIEVAL / MODERN)"
-     }
-    },
-    {
      "name": "FLAGS",
      "cls": "Flags",
      "module": "visuals/flags.py",
@@ -6467,13 +6452,6 @@
       "RIPPLES",
       "WATER CYCLE",
       "WEATHER",
-      "COINS",
-      "FLAGS",
-      "LANGUAGE",
-      "POTTERY",
-      "SCRIPTS",
-      "TESTAMENT",
-      "WEAVING",
       "CONSTELLATIONS",
       "ECOSYSTEM",
       "EVOLUTION",
@@ -6516,6 +6494,12 @@
       "PROTEINS",
       "RADIOACTIVE",
       "SPECTROSCOPE",
+      "FLAGS",
+      "LANGUAGE",
+      "POTTERY",
+      "SCRIPTS",
+      "TESTAMENT",
+      "WEAVING",
       "SALON",
       "GRAND MUSEUM",
       "WONDER GLOW",

@@ -2658,12 +2658,6 @@
       "key": "culture",
       "items": [
         {
-          "name": "COINS",
-          "cls": "Coins",
-          "module": "visuals/coins.py",
-          "is_game": false
-        },
-        {
           "name": "FLAGS",
           "cls": "Flags",
           "module": "visuals/flags.py",
@@ -6277,41 +6271,6 @@
               "module": "visuals/weather.py"
             },
             {
-              "name": "COINS",
-              "cls": "Coins",
-              "module": "visuals/coins.py"
-            },
-            {
-              "name": "FLAGS",
-              "cls": "Flags",
-              "module": "visuals/flags.py"
-            },
-            {
-              "name": "LANGUAGE",
-              "cls": "Language",
-              "module": "visuals/language.py"
-            },
-            {
-              "name": "POTTERY",
-              "cls": "Pottery",
-              "module": "visuals/pottery.py"
-            },
-            {
-              "name": "SCRIPTS",
-              "cls": "Scripts",
-              "module": "visuals/scripts.py"
-            },
-            {
-              "name": "TESTAMENT",
-              "cls": "Testament",
-              "module": "visuals/testament.py"
-            },
-            {
-              "name": "WEAVING",
-              "cls": "Weaving",
-              "module": "visuals/weaving.py"
-            },
-            {
               "name": "CONSTELLATIONS",
               "cls": "Constellations",
               "module": "visuals/constellations.py"
@@ -6528,6 +6487,36 @@
               "name": "SPECTROSCOPE",
               "cls": "Spectroscope",
               "module": "visuals/spectroscope.py"
+            },
+            {
+              "name": "FLAGS",
+              "cls": "Flags",
+              "module": "visuals/flags.py"
+            },
+            {
+              "name": "LANGUAGE",
+              "cls": "Language",
+              "module": "visuals/language.py"
+            },
+            {
+              "name": "POTTERY",
+              "cls": "Pottery",
+              "module": "visuals/pottery.py"
+            },
+            {
+              "name": "SCRIPTS",
+              "cls": "Scripts",
+              "module": "visuals/scripts.py"
+            },
+            {
+              "name": "TESTAMENT",
+              "cls": "Testament",
+              "module": "visuals/testament.py"
+            },
+            {
+              "name": "WEAVING",
+              "cls": "Weaving",
+              "module": "visuals/weaving.py"
             },
             {
               "name": "SALON",
