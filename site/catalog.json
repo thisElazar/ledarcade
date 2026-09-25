@@ -2423,8 +2423,8 @@
         },
         {
           "name": "CYCLIC",
-          "cls": "DemonSpirals",
-          "module": "visuals/demonspirals.py",
+          "cls": "Cyclic",
+          "module": "visuals/cyclic.py",
           "is_game": false
         },
         {
@@ -5888,14 +5888,14 @@
               "module": "visuals/boidslab.py"
             },
             {
+              "name": "CYCLIC",
+              "cls": "Cyclic",
+              "module": "visuals/cyclic.py"
+            },
+            {
               "name": "CYCLIC LAB",
               "cls": "CyclicLab",
               "module": "visuals/cycliclab.py"
-            },
-            {
-              "name": "CYCLIC",
-              "cls": "DemonSpirals",
-              "module": "visuals/demonspirals.py"
             },
             {
               "name": "FADERS",
@@ -8437,8 +8437,8 @@
             },
             {
               "name": "CYCLIC",
-              "cls": "DemonSpirals",
-              "module": "visuals/demonspirals.py"
+              "cls": "Cyclic",
+              "module": "visuals/cyclic.py"
             },
             {
               "name": "LIFE",
@@ -10014,7 +10014,10 @@
           "name": "CREDITS",
           "cls": "Credits",
           "module": "visuals/credits.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/credits_data.py"
+          ]
         },
         {
           "name": "EFFECTS",

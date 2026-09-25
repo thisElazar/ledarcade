@@ -286,10 +286,10 @@ class Complexity(Slideshow):
 
     def _get_visual_classes(self):
         from visuals import (Rug, Quarks, Hodge, Ripples, Flux, Slime,
-                             DemonSpirals, Life, ParticleLife, Aurora,
+                             Cyclic, Life, ParticleLife, Aurora,
                              Gyre, Boids, Sandpile, Fireflies)
         return [Rug, Quarks, Hodge, Ripples, Flux, Slime,
-                DemonSpirals, Life, ParticleLife, Aurora,
+                Cyclic, Life, ParticleLife, Aurora,
                 Gyre, Boids, Sandpile, Fireflies]
 
 

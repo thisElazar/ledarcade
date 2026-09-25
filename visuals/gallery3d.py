@@ -686,7 +686,7 @@ class GalleryAutomata(_Gallery3DBase):
         [1,10,0,0,10,10,1,0,0,1,11,11,0,0,11,1], # 6
         [1,10,10,10,10,1,1,0,0,1,1,11,11,11,11,1],# 7
         [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],       # 8 corridor
-        [1,12,12,12,12,1,1,0,0,1,1,13,13,13,13,1],# 9 DemonSpirals (L) / Coral (R)
+        [1,12,12,12,12,1,1,0,0,1,1,13,13,13,13,1],# 9 Cyclic (L) / Coral (R)
         [1,12,0,0,12,12,1,0,0,1,13,13,0,0,13,1], # 10
         [1,12,0,0,0,0,0,0,0,0,0,0,0,0,13,1],     # 11 doorways
         [1,12,0,0,12,12,1,0,0,1,13,13,0,0,13,1], # 12
@@ -702,7 +702,7 @@ class GalleryAutomata(_Gallery3DBase):
     IMMERSIVE = {
         10: ("life",         "Life",         (10, 15, 10), (15, 20, 15)),
         11: ("hodge",        "Hodge",        (30, 15, 40), (40, 20, 50)),
-        12: ("demonspirals", "DemonSpirals", (40, 10, 40), (50, 15, 50)),
+        12: ("cyclic",       "Cyclic",       (40, 10, 40), (50, 15, 50)),
         13: ("turing",       "TuringCoral",  (15, 25, 30), (20, 35, 40)),
         14: ("aurora",       "Aurora",       (20, 10, 30), (25, 15, 40)),
         15: ("ripples",      "Ripples",      (10, 10, 30), (15, 15, 40)),
@@ -720,8 +720,8 @@ class GalleryAutomata(_Gallery3DBase):
         (11.0, 5.5),  # exit
         (7.5, 5.5),   # corridor
         (7.5, 8.5),   # corridor south
-        # DemonSpirals (left)
-        (5.0, 11.5),  # enter DemonSpirals room
+        # Cyclic (left)
+        (5.0, 11.5),  # enter Cyclic room
         (3.0, 11.5),  # center
         (5.0, 11.5),  # exit
         # Coral (right)

@@ -253,26 +253,33 @@ def test_circumflex_glyph_label_scrolls_to_reveal_full_word(monkeypatch):
 
 # ── Task 4: visuals/credits.py ──────────────────────────────────────────
 
+def test_credits_every_line_fits_the_panel():
+    """15 chars at x=2 with a 4px advance is the most the 64px panel shows."""
+    c = Credits(get_sim_display())
+    too_wide = [t for (t, _color) in c.lines if len(t) > 15]
+    assert too_wide == []
+
+
 def test_credits_nagel_schreckenberg_shown_in_full():
     display = get_sim_display()
     c = Credits(display)
     texts = [t for (t, _color) in c.lines]
     assert 'NAGEL-SCHRECK.' not in texts
     # Split across two lines in the file's existing multi-line-credit style.
-    idx = texts.index('NAGEL-')
-    assert texts[idx + 1] == 'SCHRECKENBERG'
+    idx = texts.index('SCHRECKENBERG')
+    assert texts[idx - 1] == 'NAGEL &' and texts[idx + 1] == '1992'
 
 
 def test_credits_nagel_schreckenberg_draws_within_bounds(monkeypatch):
     display = get_sim_display()
     c = Credits(display)
-    idx = [t for (t, _c) in c.lines].index('NAGEL-')
+    idx = [t for (t, _c) in c.lines].index('NAGEL &')
     # Position the reel so this line (and the one after it) is on screen.
     c.scroll_y = DISPLAY_W + (idx * c.line_height) - 10
     recorded = _spy(display, monkeypatch, "draw_text_small")
     c.draw()
     texts = [t for (_, _, t) in recorded]
-    assert 'NAGEL-' in texts
+    assert 'NAGEL &' in texts
     assert 'SCHRECKENBERG' in texts
     for x, y, text in recorded:
         assert x >= 0

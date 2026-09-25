@@ -127,7 +127,7 @@ from .gallery3d import (GalleryArt, GallerySprites, GalleryAutomata,
                         GallerySalon, GalleryMuseum,
                         GalleryArt as Gallery3D)
 from .win95maze import Win95Maze
-from .demonspirals import DemonSpirals
+from .cyclic import Cyclic
 from .particlelife import ParticleLife
 from .particlelifelab import ParticleLifeLab
 from .fireflies import Fireflies
@@ -413,7 +413,7 @@ ALL_VISUALS = [
     Redoute,
     Gould,
     Win95Maze,
-    DemonSpirals,
+    Cyclic,
     ParticleLife,
     Fireflies,
     StarWarsCA,
@@ -757,7 +757,7 @@ __all__ = [
     'GalleryMuseum',
     'Gallery3D',
     'Win95Maze',
-    'DemonSpirals',
+    'Cyclic',
     'ParticleLife',
     'Fireflies',
     'StarWarsCA',
