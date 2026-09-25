@@ -37,10 +37,8 @@ DESC_Y = 37        # description text y
 # 16-step = 2 bars of 4/4  (beats 1+2+3+4+ | 1+2+3+4+)
 # 12-step = 1 bar of 12/8  (4 dotted-quarter pulses, 3 subdivisions each)
 #
-# Transcribed from docs/latin-rhythms-reference.md, which cites Wikipedia
-# (Clave rhythm), Berklee PULSE, Ethan Hein and standard percussion
-# pedagogy sources. Known issue: bossa clave 2-side is off by one there and
-# here (see the provenance audit); fix the reference first, then this grid.
+# Traditional Afro-Latin timelines; sources in tools/sources_ledger.json.
+# Known issue: bossa clave 2-side is off by one (see the provenance audit).
 
 PATTERNS = [
     # ── FOUNDATIONS (cat 0) ─────────────────────────────────
