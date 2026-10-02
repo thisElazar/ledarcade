@@ -21,13 +21,13 @@ import time
 
 import numpy as np
 
-from arcade import Game, GameState, InputState, Display, GRID_SIZE
+from arcade import Game, GameState, InputState, Display, GRID_SIZE, _FONT_3X5
 
 # Doom's native resolution
 _W, _H, _VIEW_H = 320, 200, 168
 
 # Frame pipe header: int16 fields
-_HDR_FIELDS = 36
+_HDR_FIELDS = 40
 _FRAME_BYTES = _W * _H * 4
 _MSG_BYTES = 64
 
@@ -37,7 +37,7 @@ _DK_STRAFE_L, _DK_STRAFE_R, _DK_USE, _DK_FIRE = 0xa0, 0xa1, 0xa2, 0xa3
 _DK_RUN = 0x80 + 0x36
 
 _WEAPON_AMMO = {1: 0, 2: 1, 3: 0, 4: 3, 5: 2, 6: 2, 8: 1}
-_SLOT = {0: 1, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 5}
+_SLOT = {0: 1, 7: 1, 1: 2, 2: 3, 8: 3, 3: 4, 4: 5, 5: 6, 6: 7}   # weapontype_t -> key 1-7
 
 # Engine location (sibling to the led-arcade repo)
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,34 +50,35 @@ def _available():
     return os.path.isfile(_EXE) and os.path.isfile(_WAD)
 
 
-# ── Scaling (from viewer.py, with caching) ──────────────────────
+# ── Scaling ──────────────────────────────────────────────────────
+# Same area-average as viewer.py, without einsum: the Pi's numpy uses
+# reference BLAS, where einsum/matmul took ~80 ms per frame.
 
 import functools
 
-@functools.lru_cache(maxsize=8)
-def _box_weights(n_in, n_out):
-    s = n_in / n_out
-    w = np.zeros((n_out, n_in), dtype=np.float32)
-    for o in range(n_out):
-        a, b = o * s, (o + 1) * s
-        for i in range(int(a), min(n_in, int(np.ceil(b)))):
-            w[o, i] = min(b, i + 1) - max(a, i)
-    return w / s
+@functools.lru_cache(maxsize=16)
+def _edges(n_in, n_out):
+    """Source positions of the n_out + 1 output edges: whole part, fraction."""
+    x = np.arange(n_out + 1) * (n_in / n_out)
+    i = np.minimum(x.astype(np.intp), n_in - 1)
+    return i, (x - i).astype(np.float32).reshape(-1, 1, 1)
 
-_float_buf = {}
 
 def _area(img, out_w, out_h):
-    wy, wx = _box_weights(img.shape[0], out_h), _box_weights(img.shape[1], out_w)
-    key = img.shape
-    buf = _float_buf.get(key)
-    if buf is None or buf.shape != img.shape:
-        buf = _float_buf[key] = np.empty(img.shape, dtype=np.float32)
-    np.copyto(buf, img, casting='unsafe')
-    flat = buf.ndim == 2
-    if flat:
-        buf = buf[..., None]
-    out = np.einsum("pj,ojc->opc", wx, np.einsum("oi,ijc->ojc", wy, buf))
-    return out[..., 0] if flat else out
+    """Area-average to (out_h, out_w, c) float32. Columns must divide evenly
+    (zoomed view 256->64, full screen 320->64, face 24->12); rows may not."""
+    r = img.shape[1] // out_w
+    if img.ndim == 2:
+        img = img[..., None]
+    acc = img[:, 0::r].astype(np.float32)
+    for j in range(1, r):
+        acc += img[:, j::r]
+    # rows: difference of the running sum, read at fractional edges
+    i, f = _edges(acc.shape[0], out_h)
+    c = np.zeros((acc.shape[0] + 1,) + acc.shape[1:], np.float32)
+    np.cumsum(acc, axis=0, out=c[1:])
+    at = c[i] + f * acc[i]
+    return (at[1:] - at[:-1]) * np.float32(out_h / (img.shape[0] * r))
 
 
 def _blur3(a):
@@ -101,9 +102,10 @@ def _render_view(view, mask):
     out = out + _SHARPEN * (out - _blur3(out))
     if mask is not None:
         for tag, target in ((2, 170), (1, 235)):
-            cov = _area((mask == tag).astype(np.float32), 64, 40)
-            if not cov.any():
+            hit = mask == tag
+            if not hit.any():
                 continue
+            cov = _area(hit, 64, 40)[..., 0]
             pop = np.clip(cov * 3, 0, 1)[..., None]
             gain = np.clip(target / np.maximum(out.max(-1, keepdims=True), 1), 1, 4)
             out = out * (1 - pop) + out * gain * pop
@@ -117,46 +119,148 @@ def _render_view(view, mask):
     return np.clip(out + 0.5, 0, 255).astype(np.uint8)
 
 
-# ── HUD (minimal status strip) ──────────────────────────────────
+# ── HUD (viewer.py's STATUS style) ──────────────────────────────
+# Rows 40-63: numbers left, Doomguy's face centre, ammo gauges + keys right;
+# rows 58-62 are the weapon row, replaced by a message when Doom posts one.
 
-_FONT = {
-    '0': [0x7c, 0x82, 0x82, 0x82, 0x7c], '1': [0x00, 0x42, 0xfe, 0x02, 0x00],
-    '2': [0x46, 0x8a, 0x92, 0x92, 0x62], '3': [0x44, 0x82, 0x92, 0x92, 0x6c],
-    '4': [0xf8, 0x08, 0x08, 0x08, 0xfe], '5': [0xe4, 0xa2, 0xa2, 0xa2, 0x9c],
-    '6': [0x7c, 0x92, 0x92, 0x92, 0x4c], '7': [0x80, 0x80, 0x8e, 0xb0, 0xc0],
-    '8': [0x6c, 0x92, 0x92, 0x92, 0x6c], '9': [0x64, 0x92, 0x92, 0x92, 0x7c],
-    '%': [0xc6, 0xc8, 0x10, 0x26, 0xc6],
+KEY_COLORS = [(40, 90, 255), (255, 220, 0), (230, 20, 20)]      # blue, yellow, red
+AMMO_COLORS = [(230, 200, 60), (240, 120, 40), (60, 200, 230), (210, 60, 40)]  # clip shell cell rocket
+DIM, LABEL, TRACK = (35, 35, 35), (110, 110, 110), (30, 30, 30)
+FACE = (slice(170, 200), slice(148, 172))       # Doom's status-bar face, 24x30
+MSG_SPEED = 40                                   # marquee px per second
+MSG_HOLD = 2.5                                   # s a short message stays up
+HEALTH_C, ARMOR_C, AMMO_C, WEAPON_C, POWER_C = ((60, 220, 60), (80, 160, 255), (255, 170, 60),
+                                               (255, 255, 255), (220, 120, 255))
+SHORT = {   # Doom's pickup messages (d_englsh.h) -> panel text; 16 chars fit without scrolling
+    "Picked up the armor.": ("ARMOR", ARMOR_C),
+    "Picked up the MegaArmor!": ("MEGA ARMOR", ARMOR_C),
+    "Picked up a health bonus.": ("+1 HEALTH", HEALTH_C),
+    "Picked up an armor bonus.": ("+1 ARMOR", ARMOR_C),
+    "Picked up a stimpack.": ("+10 HEALTH", HEALTH_C),
+    "Picked up a medikit that you REALLY need!": ("+25 HEALTH", HEALTH_C),
+    "Picked up a medikit.": ("+25 HEALTH", HEALTH_C),
+    "Supercharge!": ("SUPERCHARGE", HEALTH_C),
+    "Picked up a blue keycard.": ("BLUE KEY", KEY_COLORS[0]),
+    "Picked up a yellow keycard.": ("YELLOW KEY", KEY_COLORS[1]),
+    "Picked up a red keycard.": ("RED KEY", KEY_COLORS[2]),
+    "Picked up a blue skull key.": ("BLUE SKULL", KEY_COLORS[0]),
+    "Picked up a yellow skull key.": ("YELLOW SKULL", KEY_COLORS[1]),
+    "Picked up a red skull key.": ("RED SKULL", KEY_COLORS[2]),
+    "Invulnerability!": ("INVULNERABLE", POWER_C),
+    "Berserk!": ("BERSERK", POWER_C),
+    "Partial Invisibility": ("INVISIBLE", POWER_C),
+    "Radiation Shielding Suit": ("RAD SUIT", POWER_C),
+    "Computer Area Map": ("MAP", POWER_C),
+    "Light Amplification Visor": ("LIGHT AMP", POWER_C),
+    "MegaSphere!": ("MEGASPHERE", POWER_C),
+    "Picked up a clip.": ("CLIP", AMMO_COLORS[0]),
+    "Picked up a box of bullets.": ("BULLET BOX", AMMO_COLORS[0]),
+    "Picked up a rocket.": ("ROCKET", AMMO_COLORS[3]),
+    "Picked up a box of rockets.": ("ROCKET BOX", AMMO_COLORS[3]),
+    "Picked up an energy cell.": ("CELL", AMMO_COLORS[2]),
+    "Picked up an energy cell pack.": ("CELL PACK", AMMO_COLORS[2]),
+    "Picked up 4 shotgun shells.": ("4 SHELLS", AMMO_COLORS[1]),
+    "Picked up a box of shotgun shells.": ("SHELL BOX", AMMO_COLORS[1]),
+    "Picked up a backpack full of ammo!": ("BACKPACK", AMMO_C),
+    "You got the BFG9000! Oh, yes.": ("BFG9000!", WEAPON_C),
+    "You got the chaingun!": ("CHAINGUN!", WEAPON_C),
+    "A chainsaw! Find some meat!": ("CHAINSAW!", WEAPON_C),
+    "You got the rocket launcher!": ("ROCKET LAUNCHER!", WEAPON_C),
+    "You got the plasma gun!": ("PLASMA GUN!", WEAPON_C),
+    "You got the shotgun!": ("SHOTGUN!", WEAPON_C),
+    "You got the super shotgun!": ("SUPER SHOTGUN!", WEAPON_C),
 }
-
-def _tiny_text(buf, x, y, text, color):
-    for ch in text:
-        glyph = _FONT.get(ch)
-        if glyph is None:
-            x += 3
-            continue
-        for col, bits in enumerate(glyph):
-            cx = x + col
-            if 0 <= cx < 64:
-                for row in range(7):
-                    if bits >> (7 - row) & 1:
-                        ry = y + row
-                        if 0 <= ry < 64:
-                            buf[ry, cx] = color
-        x += 6
+KEY_NAMES = ["blue", "yellow", "red"]
 
 
-def _draw_hud(buf, state):
-    """Minimal status in the bottom 24 rows (rows 40-63)."""
-    if state is None or not state.get('in_level'):
-        return
-    buf[40:] = 0
-    hp = max(0, state['health'])
-    armor = max(0, state['armor'])
-    ammo = max(0, state['ammo'])
-    hp_col = (0, 255, 0) if hp > 50 else (255, 255, 0) if hp > 25 else (255, 40, 40)
-    _tiny_text(buf, 1, 42, f"{hp}%", hp_col)
-    _tiny_text(buf, 1, 52, f"{armor}%", (100, 100, 255))
-    _tiny_text(buf, 40, 42, str(ammo), (255, 200, 80))
+def _text(buf, x, y, text, color):
+    """3x5 cabinet font, clipped to the panel (so it can scroll off an edge)."""
+    for j, ch in enumerate(text):
+        for r, row in enumerate(_FONT_3X5.get(ch, [])):
+            for c, px in enumerate(row):
+                xx = x + j * 4 + c
+                if px == "1" and 0 <= xx < 64:
+                    buf[y + r, xx] = color
+
+
+def _hp_color(hp):
+    return (60, 220, 60) if hp > 50 else (255, 200, 0) if hp > 25 else (255, 40, 40)
+
+
+def _armor_color(s):
+    return [(90, 90, 90), (60, 200, 60), (80, 140, 255)][min(s["armortype"], 2)]
+
+
+def _bar(buf, x, y, w, h, frac, col):
+    buf[y:y + h, x:x + w] = TRACK
+    n = int(round(w * max(0.0, min(1.0, frac))))
+    buf[y:y + h, x:x + n] = col
+
+
+def _short_message(msg):
+    """(panel text, colour, needed-key index or None) for a Doom message."""
+    if msg in SHORT:
+        return (*SHORT[msg], None)
+    for i, name in enumerate(KEY_NAMES):
+        if msg.startswith(f"You need a {name} key"):
+            return f"NEED {name.upper()} KEY", KEY_COLORS[i], i
+    return msg.upper(), (230, 230, 230), None
+
+
+class _Hud:
+    """STATUS HUD; remembers the message marquee between frames."""
+
+    def __init__(self):
+        self.serial, self.msg, self.msg_t = 0, "", 0.0
+        self.msg_col, self.need_key = (230, 230, 230), None
+
+    def draw(self, buf, frame, s, now):
+        if s["msg_serial"] != self.serial:
+            self.serial, self.msg_t = s["msg_serial"], now
+            self.msg, self.msg_col, self.need_key = _short_message(s["msg"])
+        _text(buf, 1, 41, "H", LABEL)
+        _text(buf, 6, 41, f"{max(s['health'], 0):3d}", _hp_color(s["health"]))
+        _text(buf, 1, 47, "A", LABEL)
+        _text(buf, 6, 47, f"{s['armor']:3d}", _armor_color(s))
+        if s["ammo_type"] < 4 and s["ammo"] >= 0:
+            buf[54:56, 1:4] = AMMO_COLORS[s["ammo_type"]]
+            _text(buf, 6, 53, f"{s['ammo']:3d}", AMMO_COLORS[s["ammo_type"]])
+        buf[41:56, 22:34] = np.clip(_area(frame[FACE], 12, 15) + 0.5, 0, 255).astype(np.uint8)
+        for i in range(4):
+            y = 41 + i * 3
+            if s["ammo_type"] == i:
+                buf[y:y + 2, 37] = (255, 255, 255)
+            _bar(buf, 39, y, 24, 2, s["ammo_all"][i] / max(1, s["ammo_max"][i]), AMMO_COLORS[i])
+        for i, col in enumerate(KEY_COLORS):     # card = solid block, skull key = dark centre
+            card, skull = s["keys"] >> i & 1, s["keys"] >> (i + 3) & 1
+            if card or skull:
+                x = 39 + i * 8
+                buf[54:57, x:x + 5] = col
+                if skull and not card:
+                    buf[55, x + 1:x + 4] = 0
+        self._bottom_row(buf, s, now)
+        if self.need_key is not None and now - self.msg_t < MSG_HOLD and (now * 4) % 2 < 1:
+            x = 39 + 8 * self.need_key           # blink the empty key slot the door asked for
+            buf[54:57, x:x + 5] = KEY_COLORS[self.need_key]
+
+    def _bottom_row(self, buf, s, now):
+        """Scrolling message if one is up, else weapons 1-7 (owned grey, held white)."""
+        if self.msg:
+            if len(self.msg) <= 16:              # fits: hold it still, centred
+                if now - self.msg_t < MSG_HOLD:
+                    _text(buf, (65 - 4 * len(self.msg)) // 2, 58, self.msg, self.msg_col)
+                    return
+            else:
+                x = 64 - int((now - self.msg_t) * MSG_SPEED)
+                if x + 4 * len(self.msg) > 0:
+                    _text(buf, x, 58, self.msg, self.msg_col)
+                    return
+            self.msg = ""
+        owned = {_SLOT[w] for w in range(9) if s["owned"] >> w & 1}
+        held = _SLOT.get(s["weapon"])
+        for n in range(1, 8):
+            col = (255, 255, 255) if n == held else LABEL if n in owned else DIM
+            _text(buf, 1 + (n - 1) * 5, 58, str(n), col)
 
 
 # ── Cabinet controls adapter ────────────────────────────────────
@@ -257,16 +361,17 @@ class _Engine:
                 if self._read_exact(4) != b'DOOM':
                     continue
                 h = np.frombuffer(self._read_exact(_HDR_FIELDS * 2), dtype=np.int16).tolist()
-                self._read_exact(_MSG_BYTES)  # message
+                msg = self._read_exact(_MSG_BYTES).split(b'\0')[0].decode('latin-1')
                 self._read_exact(64)          # level names
                 px = np.frombuffer(self._read_exact(_FRAME_BYTES), dtype=np.uint8)
                 bgrx = px.reshape(_H, _W, 4)
                 self.state = dict(
                     in_level=bool(h[0]), health=h[1], armor=h[2], ammo=h[3],
                     keys=h[4], weapon=h[5], damage=h[6], owned=h[7],
-                    ammo_all=h[8:12], ammo_max=h[12:16], gamestate=h[23])
+                    ammo_all=h[8:12], ammo_max=h[12:16], armortype=h[16],
+                    ammo_type=h[18], msg_serial=h[19], msg=msg, gamestate=h[23])
                 self.mask = np.frombuffer(self._read_exact(_W * _H), dtype=np.uint8).reshape(_H, _W)
-                self.frame = bgrx[..., 2::-1].copy()
+                self.frame = bgrx[..., 2::-1]   # RGB view; _area copies
         except (EOFError, OSError):
             self.frame = None
 
@@ -303,6 +408,7 @@ class Doom(Game):
         self._engine = None
         self._controls = _Controls()
         self._panel = np.zeros((64, 64, 3), dtype=np.uint8)
+        self._hud = _Hud()
         self.reset()
 
     def reset(self):
@@ -340,7 +446,7 @@ class Doom(Game):
         self._panel[:] = 0
         if es and es.get('gamestate') == 0 and es.get('in_level'):
             self._panel[:40] = _render_view(frame[:_VIEW_H], self._engine.mask[:_VIEW_H] if self._engine.mask is not None else None)
-            _draw_hud(self._panel, es)
+            self._hud.draw(self._panel, frame, es, time.monotonic())
         else:
             scaled = _area(frame, 64, 48)
             self._panel[8:56] = np.clip(scaled + 0.5, 0, 255).astype(np.uint8)
@@ -349,15 +455,7 @@ class Doom(Game):
         panel = self._panel
         fb = getattr(self.display, '_fb', None)
         if fb is not None:
-            for y in range(GRID_SIZE):
-                row = panel[y]
-                off = y * GRID_SIZE * 3
-                for x in range(GRID_SIZE):
-                    px = row[x]
-                    fb[off] = px[0]
-                    fb[off + 1] = px[1]
-                    fb[off + 2] = px[2]
-                    off += 3
+            fb[:] = panel.tobytes()
         else:
             buf = self.display.buffer
             for y in range(GRID_SIZE):
