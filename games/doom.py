@@ -346,8 +346,22 @@ class Doom(Game):
             self._panel[8:56] = np.clip(scaled + 0.5, 0, 255).astype(np.uint8)
 
     def draw(self):
-        for y in range(GRID_SIZE):
-            row = self._panel[y]
-            for x in range(GRID_SIZE):
-                px = row[x]
-                self.display.buffer[y][x] = (int(px[0]), int(px[1]), int(px[2]))
+        panel = self._panel
+        fb = getattr(self.display, '_fb', None)
+        if fb is not None:
+            for y in range(GRID_SIZE):
+                row = panel[y]
+                off = y * GRID_SIZE * 3
+                for x in range(GRID_SIZE):
+                    px = row[x]
+                    fb[off] = px[0]
+                    fb[off + 1] = px[1]
+                    fb[off + 2] = px[2]
+                    off += 3
+        else:
+            buf = self.display.buffer
+            for y in range(GRID_SIZE):
+                row = panel[y]
+                for x in range(GRID_SIZE):
+                    px = row[x]
+                    buf[y][x] = (int(px[0]), int(px[1]), int(px[2]))
