@@ -120,6 +120,44 @@ def _render_view(view, mask, zoom=True):
     return np.clip(out + 0.5, 0, 255).astype(np.uint8)
 
 
+# ── View overlay + quit bar (from viewer.py) ────────────────────
+
+HIT_FADE = 0.7                 # s the damage-direction glow lasts after a hit
+EXIT_BAR_AFTER = 0.3           # s both buttons are held before the quit bar shows (fire + use is normal play)
+
+
+def _view_overlay(buf, s, mask, hud, now):
+    """On the 64x40 view: red glow on the edge you're being hit from, and a
+    crosshair that lights up when a monster is in the line of fire (Doom
+    auto-aims vertically, so any monster in the centre column counts)."""
+    if s.get("hit") and s["damage"] > 0:
+        hud.hit_t, hud.hit_angle = now, s["hit_angle"]      # Doom's own count drains in ~0.2 s
+    fade = 1 - (now - hud.hit_t) / HIT_FADE
+    if fade > 0:
+        yy, xx = np.mgrid[0:40, 0:64]
+        dx, dy = xx - 31.5, yy - 19.5
+        edge = np.minimum(np.minimum(xx, 63 - xx), np.minimum(yy, 39 - yy))
+        ring = np.where(edge == 0, 1.0, np.where(edge == 1, 0.5, 0.0))
+        rel = np.arctan2(-dx, -dy) - hud.hit_angle * 2 * np.pi / 4096   # 0 = ahead
+        w = np.clip(np.cos(rel), 0, 1) ** 3 * ring * fade
+        view = buf[:40].astype(np.float32)
+        buf[:40] = (view * (1 - w[..., None]) + np.array([255, 40, 20]) * w[..., None]).astype(np.uint8)
+    on_target = mask is not None and (mask[:_VIEW_H, 157:163] == 1).any()
+    if on_target:
+        buf[20, 32] = (255, 255, 255)
+        buf[20, 30] = buf[20, 34] = (255, 60, 40)
+    else:
+        buf[20, 32] = (120, 120, 120)
+
+
+def _draw_exit_bar(buf, frac):
+    """Hold-both-buttons quit progress across the top of the panel."""
+    buf[:3] = 0
+    n = int(round(64 * min(1.0, frac)))
+    buf[1, :64] = (40, 40, 40)
+    buf[1, :n] = (255, 255, 255) if frac < 1 else (255, 60, 40)
+
+
 # ── HUD (viewer.py's STATUS style) ──────────────────────────────
 # Rows 40-63: numbers left, Doomguy's face centre, ammo gauges + keys right;
 # rows 58-62 are the weapon row, replaced by a message when Doom posts one.
@@ -217,6 +255,7 @@ class _Hud:
     def __init__(self):
         self.serial, self.msg, self.msg_t = 0, "", 0.0
         self.msg_col, self.need_key = (230, 230, 230), None
+        self.hit_t, self.hit_angle = -1e9, 0
 
     def draw(self, buf, frame, s, now):
         if s["msg_serial"] != self.serial:
@@ -430,7 +469,8 @@ class _Engine:
                     keys=h[4], weapon=h[5], damage=h[6], owned=h[7],
                     ammo_all=h[8:12], ammo_max=h[12:16], armortype=h[16],
                     ammo_type=h[18], msg_serial=h[19], msg=msg, gamestate=h[23],
-                    wi=dict(zip(WI_FIELDS, h[24:34]), names=names))
+                    wi=dict(zip(WI_FIELDS, h[24:34]), names=names),
+                    hit=h[34], hit_angle=h[35])
                 self.mask = np.frombuffer(self._read_exact(_W * _H), dtype=np.uint8).reshape(_H, _W)
                 self.frame = bgrx[..., 2::-1]   # RGB view; _area copies
         except (EOFError, OSError):
@@ -503,17 +543,19 @@ class Doom(Game):
         frame = self._engine.frame
         if frame is None:
             return
-        es = self._engine.state
+        es, mask = self._engine.state, self._engine.mask
+        now = time.monotonic()
         self._panel[:] = 0
         if es and es.get('gamestate') == 0 and es.get('in_level'):
-            self._panel[:40] = _render_view(frame[:_VIEW_H], self._engine.mask[:_VIEW_H] if self._engine.mask is not None else None)
-            self._hud.draw(self._panel, frame, es, time.monotonic())
-        elif es and es.get('gamestate') == 1:   # level-end tally: picture on top, stats below
+            self._panel[:40] = _render_view(frame[:_VIEW_H], None if mask is None else mask[:_VIEW_H])
+            _view_overlay(self._panel, es, mask, self._hud, now)
+            self._hud.draw(self._panel, frame, es, now)
+        else:   # tally / text / title screens: unzoomed picture, no highlight
             self._panel[:40] = _render_view(frame[:_VIEW_H], None, zoom=False)
-            self._hud.intermission(self._panel, es['wi'])
-        else:
-            scaled = _area(frame, 64, 48)
-            self._panel[8:56] = np.clip(scaled + 0.5, 0, 255).astype(np.uint8)
+            if es and es.get('gamestate') == 1:
+                self._hud.intermission(self._panel, es['wi'])
+        if self._controls.both_t > EXIT_BAR_AFTER:
+            _draw_exit_bar(self._panel, self._controls.both_t / self._controls.EXIT_HOLD)
 
     def draw(self):
         panel = self._panel
