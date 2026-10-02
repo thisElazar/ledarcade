@@ -484,6 +484,10 @@ class Game(ABC):
         """Draw score at top of screen."""
         self.display.draw_text_small(1, y, f"{self.score}", Colors.WHITE)
 
+    def close(self):
+        """Clean up resources (subprocess, threads, etc.) before the shell drops this instance."""
+        pass
+
     def game_over_stat(self):
         """Return a short stat (<=16 chars, e.g. 'LEVEL:3') for the game-over screen, or None."""
         return None

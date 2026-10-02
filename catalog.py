@@ -15,7 +15,9 @@ from dataclasses import dataclass, field
 from typing import List, Tuple, Dict, Any
 from arcade import Colors
 
-DEV_MODE = os.environ.get('LED_DEV', '') == '1'
+DEV_MODE = (os.environ.get('LED_DEV', '') == '1'
+            or os.path.exists(os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), '.dev')))
 
 
 @dataclass
@@ -109,15 +111,24 @@ _CONDITIONAL: List[Tuple[Any, Category]] = []
 
 def register_games(game_classes):
     """Register game classes into their categories."""
+    from games.shuffle import AllGames
     for cat in GAME_CATEGORIES:
         cat.items = []
 
+    registered = []
     for game_class in game_classes:
+        if not DEV_MODE and getattr(game_class, 'dev_only', False):
+            continue
         category_key = getattr(game_class, 'category', 'arcade')
         if category_key in GAME_CATEGORY_MAP:
             GAME_CATEGORY_MAP[category_key].add(game_class)
         else:
             GAME_CATEGORY_MAP['arcade'].add(game_class)
+        registered.append(game_class)
+
+    AllGames.games = [g for g in registered
+                      if getattr(g, 'category', '') != '2_player'
+                      and not hasattr(g, 'games')]
 
 
 def register_visuals(visual_classes):

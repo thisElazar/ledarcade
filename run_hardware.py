@@ -917,6 +917,8 @@ def main():
                             exit_hold += dt
                             if exit_hold >= 2.0:
                                 in_menu = True
+                                if hasattr(current_item, 'close'):
+                                    current_item.close()
                                 current_item = None
                                 game_over_initialized = False
                                 in_shuffle_mode = False
@@ -1034,6 +1036,8 @@ def main():
                                                 player_rank = -1
                                             else:
                                                 in_menu = True
+                                                if hasattr(current_item, 'close'):
+                                                    current_item.close()
                                                 current_item = None
                                                 final_score = 0
                                                 game_over_initialized = False
@@ -1117,6 +1121,11 @@ def main():
                 traceback.print_exc()
                 try:
                     display.clear()
+                except Exception:
+                    pass
+                try:
+                    if current_item and hasattr(current_item, 'close'):
+                        current_item.close()
                 except Exception:
                     pass
                 in_menu = True

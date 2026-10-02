@@ -64,6 +64,7 @@ from .drift import Drift
 from .lasermirrors import LaserMirrors
 from .windowwasher import WindowWasher
 from .fishing import Fishing
+from .doom import Doom
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -130,6 +131,7 @@ ALL_GAMES = [
     LaserMirrors,
     WindowWasher,
     Fishing,
+    Doom,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -138,10 +140,8 @@ ALL_GAMES = [
     Classics,
 ]
 
-# Populate AllGames with all single-player, non-playlist games
-AllGames.games = [g for g in ALL_GAMES
-                  if getattr(g, 'category', '') != '2_player'
-                  and not hasattr(g, 'games')]
+# AllGames.games is populated by catalog.register_games() after dev_only
+# filtering, so dev_only games don't leak into the shuffle playlist.
 
 __all__ = [
     'Snake',
@@ -204,6 +204,7 @@ __all__ = [
     'LaserMirrors',
     'WindowWasher',
     'Fishing',
+    'Doom',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
