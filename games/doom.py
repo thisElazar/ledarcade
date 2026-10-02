@@ -91,13 +91,14 @@ def _blur3(a):
 _ZOOM = 0.8
 _SHARPEN = 0.6
 
-def _render_view(view, mask):
-    """320x168 Doom view -> 64x40 uint8 RGB with highlight."""
-    h, w = view.shape[:2]
-    ch, cw = round(h * _ZOOM), round(w * _ZOOM)
-    y0, x0 = (h - ch) // 2, (w - cw) // 2
-    view = view[y0:y0 + ch, x0:x0 + cw]
-    mask = None if mask is None else mask[y0:y0 + ch, x0:x0 + cw]
+def _render_view(view, mask, zoom=True):
+    """320x168 Doom view -> 64x40 uint8 RGB with highlight (mask None: no highlight)."""
+    if zoom:
+        h, w = view.shape[:2]
+        ch, cw = round(h * _ZOOM), round(w * _ZOOM)
+        y0, x0 = (h - ch) // 2, (w - cw) // 2
+        view = view[y0:y0 + ch, x0:x0 + cw]
+        mask = None if mask is None else mask[y0:y0 + ch, x0:x0 + cw]
     out = _area(view, 64, 40)
     out = out + _SHARPEN * (out - _blur3(out))
     if mask is not None:
@@ -171,6 +172,9 @@ SHORT = {   # Doom's pickup messages (d_englsh.h) -> panel text; 16 chars fit wi
     "You got the super shotgun!": ("SUPER SHOTGUN!", WEAPON_C),
 }
 KEY_NAMES = ["blue", "yellow", "red"]
+WI_FIELDS = ("state", "sp_state", "kills", "items", "secret", "time", "par", "episode", "last", "next")
+WI_ROWS = [("KILLS", "kills", (255, 80, 60)), ("ITEMS", "items", (255, 210, 60)),
+           ("SECRET", "secret", (80, 200, 255))]
 
 
 def _text(buf, x, y, text, color):
@@ -242,6 +246,38 @@ class _Hud:
         if self.need_key is not None and now - self.msg_t < MSG_HOLD and (now * 4) % 2 < 1:
             x = 39 + 8 * self.need_key           # blink the empty key slot the door asked for
             buf[54:57, x:x + 5] = KEY_COLORS[self.need_key]
+
+    def intermission(self, buf, wi):
+        """Level-end tally: title band over the picture, stats in the HUD strip.
+        Values count up with Doom's own animation (-1 = not reached yet)."""
+        def right(y, text, col):
+            _text(buf, 64 - 4 * len(text), y, text, col)
+        ep, done = wi["episode"] + 1, wi["state"] == 0
+        title = f"E{ep}M{wi['last'] + 1} CLEAR" if done else f"NEXT E{ep}M{wi['next'] + 1}"
+        name = wi["names"][0 if done else 1].split(":", 1)[-1].strip().upper()
+        lines, cur = [], ""
+        for w in name.split():                   # wrap to 16-char lines, max 2
+            if cur and len(cur) + 1 + len(w) > 16:
+                lines.append(cur)
+                cur = w
+            else:
+                cur = f"{cur} {w}".strip()
+        lines = (lines + [cur])[:2]
+        band = 8 + 7 * len(lines)
+        buf[:band] = (buf[:band] * 0.2).astype(np.uint8)
+        _text(buf, (65 - 4 * len(title)) // 2, 1, title, (255, 255, 255))
+        for i, ln in enumerate(lines):
+            _text(buf, (65 - 4 * len(ln[:16])) // 2, 8 + 7 * i, ln[:16], (255, 200, 90))
+        for i, (label, key, col) in enumerate(WI_ROWS):
+            y = 41 + i * 6
+            _text(buf, 1, y, label, LABEL)
+            if wi[key] >= 0:
+                right(y, f"{wi[key]}%", (80, 255, 120) if wi[key] >= 100 else col)
+        _text(buf, 1, 59, "TIME", LABEL)
+        if wi["time"] >= 0:
+            _text(buf, 19, 59, f"{wi['time'] // 60}:{wi['time'] % 60:02d}", (255, 255, 255))
+        if wi["par"] >= 0:
+            right(59, f"/{wi['par'] // 60}:{wi['par'] % 60:02d}", LABEL)
 
     def _bottom_row(self, buf, s, now):
         """Scrolling message if one is up, else weapons 1-7 (owned grey, held white)."""
@@ -325,6 +361,27 @@ class _Controls:
 
 # ── Engine subprocess ────────────────────────────────────────────
 
+def _wad_level_names(iwad):
+    """Level names from the WAD's DEHACKED lump ({"E1M1": "E1M1: Outer Prison"}).
+    doomgeneric is built without DEHACKED, so the engine only knows id's names."""
+    import struct
+    with open(iwad, 'rb') as f:
+        n, off = struct.unpack('<ii', f.read(12)[4:])
+        f.seek(off)
+        directory = f.read(16 * n)
+        for i in range(n):
+            o, size, name = struct.unpack_from('<ii8s', directory, 16 * i)
+            if name.rstrip(b'\0') == b'DEHACKED':
+                f.seek(o)
+                names = {}
+                for line in f.read(size).decode('latin-1').splitlines():
+                    key, eq, val = line.partition('=')
+                    if eq and key.strip().startswith('HUSTR_') and ':' in val:
+                        names[val.split(':')[0].strip().upper()] = val.strip()
+                return names
+    return {}
+
+
 class _Engine:
     """Runs doom_pipe, keeps the latest frame + state."""
 
@@ -340,6 +397,7 @@ class _Engine:
         self.frame = None
         self.mask = None
         self.state = None
+        self.level_names = _wad_level_names(iwad)
         self._send(5, 4)   # light +4
         self._send(6, 0)   # not full bright
         self._send(9, 0)   # damage tint off
@@ -362,14 +420,17 @@ class _Engine:
                     continue
                 h = np.frombuffer(self._read_exact(_HDR_FIELDS * 2), dtype=np.int16).tolist()
                 msg = self._read_exact(_MSG_BYTES).split(b'\0')[0].decode('latin-1')
-                self._read_exact(64)          # level names
+                names = [n.split(b'\0')[0].decode('latin-1') for n in
+                         (self._read_exact(32), self._read_exact(32))]
+                names = [self.level_names.get(n.split(':')[0].strip().upper(), n) for n in names]
                 px = np.frombuffer(self._read_exact(_FRAME_BYTES), dtype=np.uint8)
                 bgrx = px.reshape(_H, _W, 4)
                 self.state = dict(
                     in_level=bool(h[0]), health=h[1], armor=h[2], ammo=h[3],
                     keys=h[4], weapon=h[5], damage=h[6], owned=h[7],
                     ammo_all=h[8:12], ammo_max=h[12:16], armortype=h[16],
-                    ammo_type=h[18], msg_serial=h[19], msg=msg, gamestate=h[23])
+                    ammo_type=h[18], msg_serial=h[19], msg=msg, gamestate=h[23],
+                    wi=dict(zip(WI_FIELDS, h[24:34]), names=names))
                 self.mask = np.frombuffer(self._read_exact(_W * _H), dtype=np.uint8).reshape(_H, _W)
                 self.frame = bgrx[..., 2::-1]   # RGB view; _area copies
         except (EOFError, OSError):
@@ -447,6 +508,9 @@ class Doom(Game):
         if es and es.get('gamestate') == 0 and es.get('in_level'):
             self._panel[:40] = _render_view(frame[:_VIEW_H], self._engine.mask[:_VIEW_H] if self._engine.mask is not None else None)
             self._hud.draw(self._panel, frame, es, time.monotonic())
+        elif es and es.get('gamestate') == 1:   # level-end tally: picture on top, stats below
+            self._panel[:40] = _render_view(frame[:_VIEW_H], None, zoom=False)
+            self._hud.intermission(self._panel, es['wi'])
         else:
             scaled = _area(frame, 64, 48)
             self._panel[8:56] = np.clip(scaled + 0.5, 0, 255).astype(np.uint8)
