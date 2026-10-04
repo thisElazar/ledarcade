@@ -64,6 +64,7 @@ def sandbox(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "_save", lambda: None)
     import levers                                  # AFTER HOURS lives in memory
     monkeypatch.setattr(levers, "_after_hours", False)
+    monkeypatch.setitem(settings._settings, "backstage", False)  # not this machine's lever
 
     monkeypatch.setattr(visuals.paint, "SAVE_DIR", str(tmp_path / "paint"))
     monkeypatch.setattr(visuals.paint, "GIF_DIR", str(tmp_path / "paint_gif"))
