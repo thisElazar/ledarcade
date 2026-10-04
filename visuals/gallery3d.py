@@ -14,6 +14,7 @@ Controls:
   (starts in auto-walk mode; any input takes manual control)
 """
 
+import colorsys
 import math
 import os
 import pickle
@@ -1478,6 +1479,16 @@ class GalleryMuseum(_Gallery3DBase):
     _LEVER_NAMES = {901: "BACKSTAGE", 902: "AFTER HOURS"}
     _BACKSTAGE_WALL = (95, 90, 85)
     _PLATE_HOLD = 1.5             # s a LOCKED message stays on the plate
+    # Its look: dark, lit by torches either side of each lever; a conduit runs
+    # round the walls from each lever and glows while that lever is on; and on
+    # the wall behind you as you walk in, a nod to the first easter egg
+    # (Adventure's secret room, "Created by Warren Robinett").
+    _TORCH, _PLAQUE = 903, 904
+    _TORCH_CELLS = ((0, 18), (0, 20), (8, 18), (8, 20))
+    _TORCH_LIGHTS = ((1.0, 18.5), (1.0, 20.5), (8.0, 18.5), (8.0, 20.5))
+    _PLAQUE_CELL = (2, 15)
+    _AMBIENT = 0.16
+    _WIRE_OFF, _WIRE_ON = (130, 80, 45), (60, 230, 90)
 
     def __init__(self, display):
         import random as _rng
@@ -1641,6 +1652,9 @@ class GalleryMuseum(_Gallery3DBase):
         assert cell_id < min(self._LEVER_CELLS)
         for cid, (x, y) in self._LEVER_CELLS.items():
             grid[y][x] = cid
+        for x, y in self._TORCH_CELLS:
+            grid[y][x] = self._TORCH
+        grid[self._PLAQUE_CELL[1]][self._PLAQUE_CELL[0]] = self._PLAQUE
 
         self.MAP = grid
 
@@ -1907,16 +1921,25 @@ class GalleryMuseum(_Gallery3DBase):
 
     def _render_frame(self):
         half = GRID_SIZE // 2
-        ceil = (220, 215, 200)
+        inside = self.py > self._PUSH_Y + 1       # in the switch room: dark stone
+        ceil = (10, 8, 8) if inside else (220, 215, 200)
         for y in range(half):
             for x in range(GRID_SIZE):
                 self.display.set_pixel(x, y, ceil)
         for y in range(half, GRID_SIZE):
             f = (y - half) / (GRID_SIZE - half)
-            v = int(160 + 60 * f)
-            marble = (v, v, v - 5)
+            if inside:
+                v = int(14 + 34 * f)
+                marble = (v + 8, v, v - 6)
+            else:
+                v = int(160 + 60 * f)
+                marble = (v, v, v - 5)
             for x in range(GRID_SIZE):
                 self.display.set_pixel(x, y, marble)
+        t = self.time
+        self._torch_lum = [0.85 + 0.15 * math.sin(t * 11 + i * 2.1) * math.sin(t * 7.3 + i)
+                           for i in range(len(self._TORCH_LIGHTS))]
+        self._egg_col = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(t * 0.25 % 1.0, 0.85, 1.0))
         for col in range(GRID_SIZE):
             self._cast_ray(col, self.pa + self.ray_offsets[col])
 
@@ -2003,10 +2026,31 @@ class GalleryMuseum(_Gallery3DBase):
 
         is_painting = cell >= 2 and cell in self.textures
         lever = _lever_texture(self._lever_on(cell)) if cell in self._LEVER_CELLS else None
-        if map_y > self._PUSH_Y and (map_x, map_y) != self._rest:
+        back = map_y > self._PUSH_Y               # switch room and its corridor
+        if back and (map_x, map_y) != self._rest:
             wall_color = self._BACKSTAGE_WALL
         else:
             wall_color = self._get_wall_color(map_x)
+        plaque = wire = None
+        if back:
+            # torchlight replaces the museum's distance fog
+            hx, hy = self.px + perp_dist * cos_a, self.py + perp_dist * sin_a
+            light = self._AMBIENT
+            for (tx, ty), lum in zip(self._TORCH_LIGHTS, self._torch_lum):
+                light += lum / (1.0 + 1.2 * ((hx - tx) ** 2 + (hy - ty) ** 2))
+            if side == 1:
+                light *= 0.85
+            light = min(light, 1.35)
+            lit = (light, light * 0.84, light * 0.6)
+            if cell == self._TORCH:
+                lever = _torch_texture(int(self.time * 9 + map_y) % 3)
+            elif cell == self._PLAQUE:
+                plaque = _plaque_mask()
+            wire = self._WIRE_ON if self._lever_on(901 if hx < 4.5 else 902) else None
+            # conduit: a band 1.2 cells up, at least a pixel thick at any distance
+            wire_y = int(draw_bot - 1.22 * unit_h) if (map_x, map_y) != self._rest else -99
+            wire_n = max(1, int(unit_h / 32))
+            drop = cell in self._LEVER_CELLS and 31 <= tex_col <= 32
 
         for y in range(ds, de + 1):
             world_h = (draw_bot - y) / unit_h
@@ -2032,6 +2076,19 @@ class GalleryMuseum(_Gallery3DBase):
             else:
                 r, g, b = wall_color
 
+            if back:
+                if wire_y <= y < wire_y + wire_n or (drop and panel == 1 and y > wire_y):
+                    if wire:                              # live conduit glows
+                        self.display.set_pixel(col, y, wire)
+                        continue
+                    r, g, b = self._WIRE_OFF
+                elif plaque is not None and panel == 0 and plaque[tex_y * GRID_SIZE + tex_col]:
+                    self.display.set_pixel(col, y, self._egg_col)
+                    continue
+                self.display.set_pixel(col, y, (min(255, int(r * lit[0])),
+                                                min(255, int(g * lit[1])),
+                                                min(255, int(b * lit[2]))))
+                continue
             r = int(r * fog)
             g = int(g * fog)
             b = int(b * fog)
@@ -2057,8 +2114,59 @@ def _lever_texture(on):
         rect(30, min(knob_y, 32), 34, max(knob_y, 32), (170, 170, 175))   # handle
         rect(26, knob_y, 38, knob_y + 8, (210, 40, 30))        # knob
         rect(28, 52, 36, 56, (60, 230, 90) if on else (40, 60, 45))      # lamp
+        rect(31, 0, 33, 6, GalleryMuseum._WIRE_ON if on else GalleryMuseum._WIRE_OFF)  # conduit
         _LEVER_TEX[on] = px
     return _LEVER_TEX[on]
+
+
+_TORCH_TEX = {}
+
+
+def _torch_texture(frame):
+    """64x64 wall torch: iron bracket, flame in one of 3 flicker frames."""
+    if frame not in _TORCH_TEX:
+        px = [GalleryMuseum._BACKSTAGE_WALL] * (GRID_SIZE * GRID_SIZE)
+
+        def rect(x0, y0, x1, y1, col):
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    px[y * GRID_SIZE + x] = col
+        rect(30, 34, 34, 54, (40, 36, 34))                     # stem
+        rect(24, 52, 40, 56, (40, 36, 34))                     # wall plate
+        rect(26, 30, 38, 35, (60, 54, 50))                     # cup
+        lean = (-2, 0, 2)[frame]
+        top = (10, 6, 12)[frame]
+        for y in range(top, 30):                               # flame: narrow tip, wide base
+            f = (y - top) / (30 - top)
+            half_w = 1 + int(5 * f)
+            cx = 32 + int(lean * (1 - f))
+            for x in range(cx - half_w, cx + half_w):
+                core = abs(x - cx) < half_w * 0.5 and f > 0.35
+                px[y * GRID_SIZE + x] = (255, 235, 150) if core else (255, 140 + int(60 * f), 30)
+        _TORCH_TEX[frame] = px
+    return _TORCH_TEX[frame]
+
+
+_PLAQUE_MASK = []
+
+
+def _plaque_mask():
+    """64x64 mask of the tribute's lettering (3x5 font at 2x)."""
+    if not _PLAQUE_MASK:
+        from arcade import _FONT_3X5
+        px = [False] * (GRID_SIZE * GRID_SIZE)
+        for line, text in enumerate(("AFTER", "WARREN", "ROBINETT")):
+            x0 = (GRID_SIZE - (len(text) * 8 - 2)) // 2
+            y0 = 12 + line * 15
+            for i, ch in enumerate(text):
+                for gy, row in enumerate(_FONT_3X5[ch]):
+                    for gx, bit in enumerate(row):
+                        if bit == '1':
+                            for sy in (0, 1):
+                                for sx in (0, 1):
+                                    px[(y0 + gy * 2 + sy) * GRID_SIZE + x0 + i * 8 + gx * 2 + sx] = True
+        _PLAQUE_MASK.extend(px)
+    return _PLAQUE_MASK
 
 
 # Legacy alias — keep old import working

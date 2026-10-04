@@ -150,3 +150,17 @@ def test_web_emulator_without_levers_keeps_the_wall_shut(museum, monkeypatch):
     _push(m)
     _step(m, 30, up=True, action_l=True)
     assert m.MAP[13][4] == 1 and m._block_y is None
+
+
+def test_switch_room_draws_lit_and_unlit(museum):
+    m = museum
+    _push(m)
+    _step(m, 120)
+    assert all(m.MAP[y][x] == m._TORCH for x, y in m._TORCH_CELLS)
+    for on in (False, True):
+        levers.set_backstage(on)
+        levers.set_after_hours(on)
+        for pose in [(4.5, 17.0, math.pi / 2), (5.5, 19.5, math.pi), (3.0, 19.5, 0.0),
+                     (2.5, 17.2, -math.pi / 2), (4.5, 12.0, math.pi / 2)]:
+            m.px, m.py, m.pa = pose
+            m.draw()                                   # torches, conduit, plaque, levers
