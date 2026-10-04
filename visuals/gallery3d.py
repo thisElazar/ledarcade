@@ -1476,11 +1476,12 @@ class GalleryMuseum(_Gallery3DBase):
     _PUSH_X, _PUSH_Y = 4, 13
     _PUSH_SPEED = 2.5             # cells per second; slides until it hits a wall
     _LEVER_CELLS = {901: (0, 19), 902: (8, 19)}
-    _LEVER_NAMES = {901: "BACKSTAGE", 902: "AFTER HOURS"}
-    _BACKSTAGE_WALL = (95, 90, 85)
+    _LEVER_NAMES = {901: "PARTY", 902: "AFTER HOURS"}     # 901 is a button, not a lever
+    _ROOM_WALL = (95, 90, 85)
     _PLATE_HOLD = 1.5             # s a LOCKED message stays on the plate
-    # Its look: dark, lit by torches either side of each lever; a conduit runs
-    # round the walls from each lever and glows while that lever is on; and
+    # Its look: dark, lit by torches either side of each switch; a conduit runs
+    # round the walls from each switch and glows while it is on; the PARTY
+    # button turns the floor into a disco floor and colours the light; and
     # across the wall behind you as you walk in, WARREN left of the corridor and
     # ROBINETT right of it, in cycling colours: Adventure's secret room, the
     # first easter egg ("Created by Warren Robinett").
@@ -1644,7 +1645,7 @@ class GalleryMuseum(_Gallery3DBase):
 
         # Secret switch room under the starting chamber: the plain wall between
         # its 2nd and 3rd south paintings is a push-wall; a corridor runs south
-        # to a room with the BACKSTAGE (west) and AFTER HOURS (east) levers.
+        # to a room with the PARTY button (west) and AFTER HOURS lever (east).
         grid.extend([1] * W for _ in range(9))          # rows 15-23
         self.MAP_H = len(grid)
         grid[14][self._PUSH_X] = grid[15][self._PUSH_X] = 0
@@ -1753,6 +1754,7 @@ class GalleryMuseum(_Gallery3DBase):
             self.MAP[self._rest[1]][self._rest[0]] = 0
         self._block_y = None      # top edge of the sliding push-wall
         self._rest = None         # (x, y) cell where it came to rest
+        self._party = False       # PARTY button; like the wall, forgotten on leaving
         self._code = None         # AFTER HOURS code being entered: list of moves
         self._stick_wait = False  # code entry just ended: ignore the stick until released
         self._plate_msg, self._plate_t = None, 0.0
@@ -1807,9 +1809,8 @@ class GalleryMuseum(_Gallery3DBase):
                 return cid
         return None
 
-    @staticmethod
-    def _lever_on(cid):
-        return _levers.backstage() if cid == 901 else _levers.after_hours()
+    def _lever_on(self, cid):
+        return self._party if cid == 901 else _levers.after_hours()
 
     def handle_input(self, input_state) -> bool:
         levers = _levers
@@ -1830,7 +1831,7 @@ class GalleryMuseum(_Gallery3DBase):
         cid = self._facing_lever()
         if cid and (input_state.action_l or input_state.action_r):
             if cid == 901:
-                levers.set_backstage(not levers.backstage())
+                self._party = not self._party
             elif levers.after_hours():
                 levers.set_after_hours(False)
             else:
@@ -1859,6 +1860,26 @@ class GalleryMuseum(_Gallery3DBase):
             text = f"{self._LEVER_NAMES[cid]} {'ON' if on else 'OFF'}"
             col = (80, 255, 120) if on else (200, 200, 200)
         d.draw_text_small((65 - 4 * len(text)) // 2, 58, text, col)
+
+    _DISCO = [tuple(int(c * 255) for c in colorsys.hsv_to_rgb(h / 6, 0.9, 0.85)) for h in range(6)]
+
+    def _disco_floor(self):
+        """Floor-cast the switch room as half-cell tiles that change colour twice a second."""
+        half = GRID_SIZE // 2
+        beat = int(self.time * 2)
+        set_pixel = self.display.set_pixel
+        disco = self._DISCO
+        rays = [(math.cos(self.pa + o), math.sin(self.pa + o)) for o in self.ray_offsets]
+        for y in range(half + 1, GRID_SIZE):
+            dist = half / (y - half)
+            shade = min(1.0, 0.35 + (y - half) / half)
+            row = [(int(r * shade), int(g * shade), int(b * shade)) for r, g, b in disco]
+            for x, (ca, sa) in enumerate(rays):
+                wy = self.py + dist * sa
+                if wy < 16 or wy >= 22:            # only the room, not the corridor
+                    continue
+                tx, ty = int((self.px + dist * ca) * 2), int(wy * 2)
+                set_pixel(x, y, row[((tx * 73856093) ^ (ty * 19349663) ^ (beat * 83492791)) % 6])
 
     def _block_hit(self, cos_a, sin_a):
         """(distance, wall_x, side) where this ray meets the sliding push-wall."""
@@ -1941,9 +1962,11 @@ class GalleryMuseum(_Gallery3DBase):
             for x in range(GRID_SIZE):
                 self.display.set_pixel(x, y, marble)
         t = self.time
+        self._egg_col = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(t * 0.25 % 1.0, 0.85, 1.0))
+        if inside and self._party:
+            self._disco_floor()
         self._torch_lum = [0.85 + 0.15 * math.sin(t * 11 + i * 2.1) * math.sin(t * 7.3 + i)
                            for i in range(len(self._TORCH_LIGHTS))]
-        self._egg_col = tuple(int(c * 255) for c in colorsys.hsv_to_rgb(t * 0.25 % 1.0, 0.85, 1.0))
         for col in range(GRID_SIZE):
             self._cast_ray(col, self.pa + self.ray_offsets[col])
 
@@ -2029,10 +2052,12 @@ class GalleryMuseum(_Gallery3DBase):
         de = min(GRID_SIZE - 1, int(draw_bot))
 
         is_painting = cell >= 2 and cell in self.textures
-        lever = _lever_texture(self._lever_on(cell)) if cell in self._LEVER_CELLS else None
+        lever = None
+        if cell in self._LEVER_CELLS:
+            lever = (_button_texture if cell == 901 else _lever_texture)(self._lever_on(cell))
         back = map_y > self._PUSH_Y               # switch room and its corridor
         if back and (map_x, map_y) != self._rest:
-            wall_color = self._BACKSTAGE_WALL
+            wall_color = self._ROOM_WALL
         else:
             wall_color = self._get_wall_color(map_x)
         plaque = wire = None
@@ -2045,14 +2070,21 @@ class GalleryMuseum(_Gallery3DBase):
             if side == 1:
                 light *= 0.85
             light = min(light, 1.35)
-            lit = (light, light * 0.84, light * 0.6)
+            if self._party:
+                pr, pg, pb = self._egg_col
+                lit = (light * (0.45 + pr / 400), light * (0.45 + pg / 400), light * (0.45 + pb / 400))
+            else:
+                lit = (light, light * 0.84, light * 0.6)
             if cell == self._TORCH:
                 lever = _torch_texture(int(self.time * 9 + map_y) % 3)
             elif cell == self._PLAQUE and side == 1:
                 word = "WARREN" if map_x < self._PUSH_X else "ROBINETT"
                 plaque = _plaque_mask(word)
                 tex_u = (map_x - self._PLAQUE_SPANS[word]) * GRID_SIZE + tex_col
-            wire = self._WIRE_ON if self._lever_on(901 if hx < 4.5 else 902) else None
+            if hx < 4.5:
+                wire = self._egg_col if self._party else None
+            else:
+                wire = self._WIRE_ON if _levers.after_hours() else None
             # conduit: a band 1.2 cells up, at least a pixel thick at any distance
             wire_y = int(draw_bot - 1.22 * unit_h) if (map_x, map_y) != self._rest else -99
             wire_n = max(1, int(unit_h / 32))
@@ -2107,7 +2139,7 @@ _LEVER_TEX = {}
 def _lever_texture(on):
     """64x64 switch-room lever: steel plate, slot, handle up (on) or down (off)."""
     if on not in _LEVER_TEX:
-        px = [GalleryMuseum._BACKSTAGE_WALL] * (GRID_SIZE * GRID_SIZE)
+        px = [GalleryMuseum._ROOM_WALL] * (GRID_SIZE * GRID_SIZE)
 
         def rect(x0, y0, x1, y1, col):
             for y in range(y0, y1):
@@ -2125,13 +2157,40 @@ def _lever_texture(on):
     return _LEVER_TEX[on]
 
 
+_BUTTON_TEX = {}
+
+
+def _button_texture(on):
+    """64x64 PARTY button: steel plate, big round button, lit when on."""
+    if on not in _BUTTON_TEX:
+        px = [GalleryMuseum._ROOM_WALL] * (GRID_SIZE * GRID_SIZE)
+        for y in range(14, 54):
+            for x in range(12, 52):
+                edge = x < 14 or x >= 50 or y < 16 or y >= 52
+                px[y * GRID_SIZE + x] = (55, 55, 62) if edge else (75, 75, 84)
+        for y in range(20, 48):
+            for x in range(18, 46):
+                d2 = (x - 31.5) ** 2 + (y - 33.5) ** 2
+                if d2 < 13 ** 2:
+                    if on:
+                        col = (255, 150, 240) if d2 < 6 ** 2 else (255, 40, 200)
+                    else:
+                        col = (150, 60, 130) if d2 < 10 ** 2 else (90, 30, 80)
+                    px[y * GRID_SIZE + x] = col
+        for y in range(0, 14):                                 # conduit
+            for x in (31, 32):
+                px[y * GRID_SIZE + x] = (255, 40, 200) if on else GalleryMuseum._WIRE_OFF
+        _BUTTON_TEX[on] = px
+    return _BUTTON_TEX[on]
+
+
 _TORCH_TEX = {}
 
 
 def _torch_texture(frame):
     """64x64 wall torch: iron bracket, flame in one of 3 flicker frames."""
     if frame not in _TORCH_TEX:
-        px = [GalleryMuseum._BACKSTAGE_WALL] * (GRID_SIZE * GRID_SIZE)
+        px = [GalleryMuseum._ROOM_WALL] * (GRID_SIZE * GRID_SIZE)
 
         def rect(x0, y0, x1, y1, col):
             for y in range(y0, y1):

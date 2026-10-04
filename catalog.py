@@ -105,23 +105,20 @@ VISUAL_CATEGORY_MAP: Dict[str, Category] = {cat.key: cat for cat in VISUAL_CATEG
 
 
 # Items that come and go while the cabinet runs: a menu_visible() hook (USB SHARE
-# lists itself only while a stick is in), `mature` items (shown by the AFTER HOURS
-# lever) and, off the dev cabinet, `dev_only` items (shown by the BACKSTAGE lever).
+# lists itself only while a stick is in) and `mature` items (shown by the AFTER
+# HOURS lever).
 # The menu loop re-checks them via sync_conditional_items().
 _CONDITIONAL: List[Tuple[Any, Category]] = []
 
 
 def _is_conditional(cls):
-    return (getattr(cls, 'mature', False) or hasattr(cls, 'menu_visible')
-            or (getattr(cls, 'dev_only', False) and not DEV_MODE))
+    return getattr(cls, 'mature', False) or hasattr(cls, 'menu_visible')
 
 
 def _listed(cls):
     """Whether a conditional item belongs in the menu right now."""
     import levers
     if getattr(cls, 'mature', False) and not levers.after_hours():
-        return False
-    if getattr(cls, 'dev_only', False) and not (DEV_MODE or levers.backstage()):
         return False
     visible = getattr(cls, 'menu_visible', None)
     return visible() if visible else True
@@ -141,6 +138,8 @@ def register_games(game_classes):
 
     registered = []
     for game_class in game_classes:
+        if not DEV_MODE and getattr(game_class, 'dev_only', False):
+            continue
         category_key = getattr(game_class, 'category', 'arcade')
         cat = GAME_CATEGORY_MAP.get(category_key, GAME_CATEGORY_MAP['arcade'])
         if _is_conditional(game_class):
@@ -162,6 +161,8 @@ def register_visuals(visual_classes):
     _drop_conditional(VISUAL_CATEGORIES)
 
     for visual_class in visual_classes:
+        if not DEV_MODE and getattr(visual_class, 'dev_only', False):
+            continue
         category_key = getattr(visual_class, 'category', 'nature')
         cat = VISUAL_CATEGORY_MAP.get(category_key, VISUAL_CATEGORY_MAP['nature'])
         if _is_conditional(visual_class):

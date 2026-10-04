@@ -74,22 +74,6 @@ def test_mature_items_need_after_hours_and_never_shuffle(sandbox, monkeypatch):
         catalog.register_games(ALL_GAMES)
 
 
-def test_backstage_lists_dev_only_off_the_dev_cabinet(sandbox, monkeypatch):
-    from visuals import ALL_VISUALS
-    hidden = next(v for v in ALL_VISUALS if getattr(v, "dev_only", False))
-    cat = catalog.VISUAL_CATEGORY_MAP.get(hidden.category, catalog.VISUAL_CATEGORY_MAP["nature"])
-    monkeypatch.setattr(catalog, "DEV_MODE", False)
-    try:
-        catalog.register_visuals(ALL_VISUALS)
-        assert hidden not in cat.items
-        levers.set_backstage(True)
-        catalog.sync_conditional_items()
-        assert hidden in cat.items
-    finally:
-        monkeypatch.undo()
-        catalog.register_visuals(ALL_VISUALS)
-
-
 def test_push_wall_slides_to_the_back_wall_and_closes_on_reset(museum):
     m = museum
     assert m.MAP[13][4] == 1
@@ -97,8 +81,10 @@ def test_push_wall_slides_to_the_back_wall_and_closes_on_reset(museum):
     assert m._block_y is not None and m.MAP[13][4] == 0
     _step(m, 120)
     assert m._block_y is None and m._rest == (4, 21) and m.MAP[21][4] == 1
+    m._party = True
     m.reset()                                         # leaving the museum
     assert m.MAP[13][4] == 1 and m.MAP[21][4] == 0 and m._rest is None
+    assert not m._party
 
 
 def test_auto_walk_never_opens_it(museum):
@@ -122,9 +108,9 @@ def test_levers(museum):
     m = museum
     _push(m)
     _step(m, 120)
-    m.px, m.py, m.pa = 2.5, 19.5, math.pi              # BACKSTAGE, west wall
+    m.px, m.py, m.pa = 2.5, 19.5, math.pi              # PARTY button, west wall
     _step(m, 1, action_l=True)
-    assert levers.backstage()
+    assert m._party
     m.px, m.py, m.pa = 6.5, 19.5, 0.0                  # AFTER HOURS, east wall
     _step(m, 1, action_l=True)
     for d in ["up"] * 8:
@@ -158,7 +144,7 @@ def test_switch_room_draws_lit_and_unlit(museum):
     _step(m, 120)
     assert all(m.MAP[y][x] == m._TORCH for x, y in m._TORCH_CELLS)
     for on in (False, True):
-        levers.set_backstage(on)
+        m._party = on
         levers.set_after_hours(on)
         for pose in [(4.5, 17.0, math.pi / 2), (5.5, 19.5, math.pi), (3.0, 19.5, 0.0),
                      (2.5, 17.2, -math.pi / 2), (4.5, 12.0, math.pi / 2)]:
