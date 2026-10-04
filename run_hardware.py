@@ -20,6 +20,7 @@ from enum import Enum, auto
 # Hardware display and input
 from hardware import HardwareDisplay, HardwareInput, Colors, GRID_SIZE
 import update_checker
+import levers
 
 # Game/visual catalogs
 from catalog import register_games, register_visuals, get_all_categories, sync_conditional_items, VISUAL_CATEGORY_MAP
@@ -191,6 +192,8 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
         display.set_pixel(x, 9, color)
 
     sep_color = (80, 60, 0) if update_checker.available else Colors.DARK_GRAY
+    if levers.after_hours():           # red while the AFTER HOURS lever is on
+        sep_color = (120, 0, 0)
     display.draw_line(0, 11, 63, 11, sep_color)
 
     items = category.items

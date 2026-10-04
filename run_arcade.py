@@ -21,6 +21,7 @@ import random
 from enum import Enum, auto
 from arcade import Display, InputHandler, Colors, GRID_SIZE, Game, GameState, TERMINAL_STATES
 import update_checker
+import levers
 from catalog import (
     register_games, register_visuals, get_all_categories, sync_conditional_items,
     GAME_CATEGORIES, VISUAL_CATEGORIES, VISUAL_CATEGORY_MAP
@@ -227,6 +228,8 @@ def draw_menu(display, categories, cat_index, item_index, name_scroll_x=0):
         display.set_pixel(x, 9, color)
 
     sep_color = (80, 60, 0) if update_checker.available else Colors.DARK_GRAY
+    if levers.after_hours():           # red while the AFTER HOURS lever is on
+        sep_color = (120, 0, 0)
     display.draw_line(0, 11, 63, 11, sep_color)
 
     # Item list
