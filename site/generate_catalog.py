@@ -4,7 +4,7 @@
 Matches the arcade machine's catalog.py registration logic:
   - Only includes classes imported in each package's __init__.py
   - Resolves category inheritance (subclasses inherit parent's category)
-  - Skips dev_only classes (hidden on production arcade)
+  - Skips dev_only and mature classes (hidden on production arcade)
   - Skips DIST_HIDDEN classes (filtered off distribution cabinets at import time)
 """
 
@@ -195,6 +195,7 @@ def scan_file(filepath, pkg, exported_classes=None):
         name_val = None
         cat_val = None
         dev_only = False
+        mature = False
 
         for item in node.body:
             if isinstance(item, ast.Assign):
@@ -206,6 +207,8 @@ def scan_file(filepath, pkg, exported_classes=None):
                             cat_val = extract_string(item.value)
                         elif target.id == 'dev_only':
                             dev_only = extract_bool(item.value) or False
+                        elif target.id == 'mature':
+                            mature = extract_bool(item.value) or False
 
         if name_val:
             class_info[node.name] = {
@@ -214,6 +217,7 @@ def scan_file(filepath, pkg, exported_classes=None):
                 'category': cat_val,
                 'bases': bases,
                 'dev_only': dev_only,
+                'mature': mature,
             }
 
     # Second pass: resolve category inheritance (walk up base chain)
@@ -238,12 +242,12 @@ def scan_file(filepath, pkg, exported_classes=None):
         if info['category'] is None:
             info['category'] = resolve_category(cls_name)
 
-    # Build result list, filtering to exported classes and skipping dev_only
+    # Build result list, filtering to exported classes and skipping dev_only / mature
     classes = []
     for cls_name, info in class_info.items():
         if exported_classes is not None and cls_name not in exported_classes:
             continue
-        if info['dev_only'] or cls_name in DIST_HIDDEN:
+        if info['dev_only'] or info['mature'] or cls_name in DIST_HIDDEN:
             continue
         classes.append({
             'cls': info['cls'],

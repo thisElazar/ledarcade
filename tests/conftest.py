@@ -62,6 +62,8 @@ def sandbox(monkeypatch, tmp_path):
     settings.get("brightness")  # force the lazy load before snapshotting
     monkeypatch.setattr(settings, "_settings", copy.deepcopy(settings._settings))
     monkeypatch.setattr(settings, "_save", lambda: None)
+    import levers                                  # AFTER HOURS lives in memory
+    monkeypatch.setattr(levers, "_after_hours", False)
 
     monkeypatch.setattr(visuals.paint, "SAVE_DIR", str(tmp_path / "paint"))
     monkeypatch.setattr(visuals.paint, "GIF_DIR", str(tmp_path / "paint_gif"))

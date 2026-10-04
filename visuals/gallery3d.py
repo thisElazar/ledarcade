@@ -25,6 +25,11 @@ try:
 except ImportError:
     HAS_PIL = False
 
+try:
+    import levers as _levers
+except ImportError:           # web emulator: no levers, so no secret room either
+    _levers = None
+
 # Pre-loaded texture data for emulator mode (injected before this module loads)
 _PRELOADED_GALLERY = globals().get('_GALLERY_PIXELS', {})
 # Painting atlas (shared with painting.py, for Salon)
@@ -1465,6 +1470,15 @@ class GalleryMuseum(_Gallery3DBase):
 
     _WALL_SCALE = 2  # Normal-height walls: painting on bottom, plaster above
 
+    # Secret switch room (see __init__). Nothing about it is saved: leaving
+    # the museum closes the push-wall again.
+    _PUSH_X, _PUSH_Y = 4, 13
+    _PUSH_SPEED = 2.5             # cells per second; slides until it hits a wall
+    _LEVER_CELLS = {901: (0, 19), 902: (8, 19)}
+    _LEVER_NAMES = {901: "BACKSTAGE", 902: "AFTER HOURS"}
+    _BACKSTAGE_WALL = (95, 90, 85)
+    _PLATE_HOLD = 1.5             # s a LOCKED message stays on the plate
+
     def __init__(self, display):
         import random as _rng
         import json as _json
@@ -1615,6 +1629,19 @@ class GalleryMuseum(_Gallery3DBase):
                 else:
                     grid[7][c] = 1
 
+        # Secret switch room under the starting chamber: the plain wall between
+        # its 2nd and 3rd south paintings is a push-wall; a corridor runs south
+        # to a room with the BACKSTAGE (west) and AFTER HOURS (east) levers.
+        grid.extend([1] * W for _ in range(9))          # rows 15-23
+        self.MAP_H = len(grid)
+        grid[14][self._PUSH_X] = grid[15][self._PUSH_X] = 0
+        for r in range(16, 22):
+            for c in range(1, 8):
+                grid[r][c] = 0
+        assert cell_id < min(self._LEVER_CELLS)
+        for cid, (x, y) in self._LEVER_CELLS.items():
+            grid[y][x] = cid
+
         self.MAP = grid
 
         # ── Serpentine waypoints ──────────────────────────────────
@@ -1703,6 +1730,130 @@ class GalleryMuseum(_Gallery3DBase):
         super().reset()
         self.move_speed = 1.6
         self._face_angle = None
+        self.MAP[self._PUSH_Y][self._PUSH_X] = 1
+        if getattr(self, "_rest", None):
+            self.MAP[self._rest[1]][self._rest[0]] = 0
+        self._block_y = None      # top edge of the sliding push-wall
+        self._rest = None         # (x, y) cell where it came to rest
+        self._code = None         # AFTER HOURS code being entered: list of moves
+        self._stick_wait = False  # code entry just ended: ignore the stick until released
+        self._plate_msg, self._plate_t = None, 0.0
+
+    # ------------------------------------------------------------------
+    # Secret switch room
+    # ------------------------------------------------------------------
+
+    def update(self, dt):
+        super().update(dt)
+        if self._block_y is not None:
+            stop = self._PUSH_Y
+            while self.MAP[stop + 1][self._PUSH_X] == 0:
+                stop += 1
+            self._block_y = min(stop, self._block_y + self._PUSH_SPEED * dt)
+            if self._block_y >= stop:
+                self.MAP[stop][self._PUSH_X] = 1
+                self._block_y, self._rest = None, (self._PUSH_X, stop)
+
+    def _manual_move(self, dt):
+        if self._code is not None:            # the stick is the keypad
+            return
+        inp = getattr(self, "_input", None)
+        if self._stick_wait:                  # the last code move must not walk or turn you
+            if inp is not None and inp.any_direction:
+                return
+            self._stick_wait = False
+        if (_levers is not None and inp is not None and inp.up
+                and self._rest is None and self._block_y is None
+                and math.sin(self.pa) > 0.7
+                and int(self.px + math.cos(self.pa) * 0.6) == self._PUSH_X
+                and int(self.py + math.sin(self.pa) * 0.6) == self._PUSH_Y):
+            self.MAP[self._PUSH_Y][self._PUSH_X] = 0
+            self._block_y = float(self._PUSH_Y)
+        super()._manual_move(dt)
+
+    def _solid(self, x, y, margin):
+        by = self._block_y
+        if (by is not None and self._PUSH_X - margin < x < self._PUSH_X + 1 + margin
+                and by - margin < y < by + 1 + margin):
+            return True
+        return super()._solid(x, y, margin)
+
+    def _facing_lever(self):
+        """Lever cell id when standing close and facing it (manual mode only)."""
+        if self.auto_walk:
+            return None
+        for cid, (x, y) in self._LEVER_CELLS.items():
+            dx, dy = x + 0.5 - self.px, y + 0.5 - self.py
+            diff = (math.atan2(dy, dx) - self.pa + math.pi) % (2 * math.pi) - math.pi
+            if math.hypot(dx, dy) < 2.6 and abs(diff) < 0.6:
+                return cid
+        return None
+
+    @staticmethod
+    def _lever_on(cid):
+        return _levers.backstage() if cid == 901 else _levers.after_hours()
+
+    def handle_input(self, input_state) -> bool:
+        levers = _levers
+        if self._code is not None:
+            for d in ("up", "down", "left", "right"):
+                if getattr(input_state, d + "_pressed"):
+                    self._code.append(d)
+            if input_state.action_l or input_state.action_r:
+                self._code, self._stick_wait = None, True    # cancel
+            elif len(self._code) >= levers.CODE_LENGTH:
+                if levers.code_matches(self._code):
+                    levers.set_after_hours(True)
+                else:
+                    self._plate_msg, self._plate_t = "LOCKED", self.time
+                self._code, self._stick_wait = None, True
+            self._input = input_state
+            return True
+        cid = self._facing_lever()
+        if cid and (input_state.action_l or input_state.action_r):
+            if cid == 901:
+                levers.set_backstage(not levers.backstage())
+            elif levers.after_hours():
+                levers.set_after_hours(False)
+            else:
+                self._code = []
+            self._input = input_state
+            return True
+        return super().handle_input(input_state)
+
+    def draw(self):
+        super().draw()
+        cid = self._facing_lever()
+        if cid is None and self._code is None:
+            return
+        d = self.display
+        d.draw_rect(0, 56, GRID_SIZE, 8, (0, 0, 0))
+        if self._code is not None:
+            d.draw_text_small(1, 58, "CODE", (200, 200, 200))
+            for i in range(8):
+                col = (255, 210, 60) if i < len(self._code) else (60, 60, 60)
+                d.draw_rect(20 + i * 5, 58, 3, 5, col)
+            return
+        if self._plate_msg and self.time - self._plate_t < self._PLATE_HOLD:
+            text, col = self._plate_msg, (255, 60, 40)
+        else:
+            on = self._lever_on(cid)
+            text = f"{self._LEVER_NAMES[cid]} {'ON' if on else 'OFF'}"
+            col = (80, 255, 120) if on else (200, 200, 200)
+        d.draw_text_small((65 - 4 * len(text)) // 2, 58, text, col)
+
+    def _block_hit(self, cos_a, sin_a):
+        """(distance, wall_x, side) where this ray meets the sliding push-wall."""
+        x0, y0 = self._PUSH_X, self._block_y
+        tx1, tx2 = (x0 - self.px) / cos_a, (x0 + 1 - self.px) / cos_a
+        ty1, ty2 = (y0 - self.py) / sin_a, (y0 + 1 - self.py) / sin_a
+        tx_in, ty_in = min(tx1, tx2), min(ty1, ty2)
+        t_in, t_out = max(tx_in, ty_in), min(max(tx1, tx2), max(ty1, ty2))
+        if t_out < t_in or t_in <= 0:
+            return None
+        if tx_in > ty_in:
+            return t_in, self.py + t_in * sin_a - y0, 0
+        return t_in, self.px + t_in * cos_a - x0, 1
 
     def _auto_walk(self, dt):
         if not self.WAYPOINTS:
@@ -1815,21 +1966,24 @@ class GalleryMuseum(_Gallery3DBase):
                 hit = True
                 break
 
+        if hit:
+            if side == 0:
+                perp_dist = (map_x - self.px + (1 - step_x) / 2) / cos_a
+            else:
+                perp_dist = (map_y - self.py + (1 - step_y) / 2) / sin_a
+            if side == 0:
+                wall_x = self.py + perp_dist * sin_a
+            else:
+                wall_x = self.px + perp_dist * cos_a
+            wall_x -= int(wall_x)
+        blk = self._block_hit(cos_a, sin_a) if self._block_y is not None else None
+        if blk and (not hit or blk[0] < perp_dist):
+            perp_dist, wall_x, side = blk
+            cell, map_x, map_y, hit = 1, self._PUSH_X, self._PUSH_Y, True
         if not hit:
             return
-
-        if side == 0:
-            perp_dist = (map_x - self.px + (1 - step_x) / 2) / cos_a
-        else:
-            perp_dist = (map_y - self.py + (1 - step_y) / 2) / sin_a
         if perp_dist < 0.01:
             perp_dist = 0.01
-
-        if side == 0:
-            wall_x = self.py + perp_dist * sin_a
-        else:
-            wall_x = self.px + perp_dist * cos_a
-        wall_x -= int(wall_x)
         tex_col = int(wall_x * GRID_SIZE)
         if tex_col >= GRID_SIZE:
             tex_col = GRID_SIZE - 1
@@ -1848,7 +2002,11 @@ class GalleryMuseum(_Gallery3DBase):
         de = min(GRID_SIZE - 1, int(draw_bot))
 
         is_painting = cell >= 2 and cell in self.textures
-        wall_color = self._get_wall_color(map_x)
+        lever = _lever_texture(self._lever_on(cell)) if cell in self._LEVER_CELLS else None
+        if map_y > self._PUSH_Y and (map_x, map_y) != self._rest:
+            wall_color = self._BACKSTAGE_WALL
+        else:
+            wall_color = self._get_wall_color(map_x)
 
         for y in range(ds, de + 1):
             world_h = (draw_bot - y) / unit_h
@@ -1864,7 +2022,9 @@ class GalleryMuseum(_Gallery3DBase):
                 if frames:
                     tex = frames[0]
 
-            if tex is not None:
+            if lever is not None and panel == 0:
+                r, g, b = lever[tex_y * GRID_SIZE + tex_col]
+            elif tex is not None:
                 r, g, b = tex[tex_y * GRID_SIZE + tex_col]
                 if (tex_col <= 1 or tex_col >= GRID_SIZE - 2
                         or tex_y <= 1 or tex_y >= GRID_SIZE - 2):
@@ -1876,6 +2036,29 @@ class GalleryMuseum(_Gallery3DBase):
             g = int(g * fog)
             b = int(b * fog)
             self.display.set_pixel(col, y, (r, g, b))
+
+
+_LEVER_TEX = {}
+
+
+def _lever_texture(on):
+    """64x64 switch-room lever: steel plate, slot, handle up (on) or down (off)."""
+    if on not in _LEVER_TEX:
+        px = [GalleryMuseum._BACKSTAGE_WALL] * (GRID_SIZE * GRID_SIZE)
+
+        def rect(x0, y0, x1, y1, col):
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    px[y * GRID_SIZE + x] = col
+        rect(14, 6, 50, 60, (55, 55, 62))                      # plate
+        rect(16, 8, 48, 58, (75, 75, 84))
+        rect(29, 14, 35, 52, (15, 15, 15))                     # slot
+        knob_y = 12 if on else 44
+        rect(30, min(knob_y, 32), 34, max(knob_y, 32), (170, 170, 175))   # handle
+        rect(26, knob_y, 38, knob_y + 8, (210, 40, 30))        # knob
+        rect(28, 52, 36, 56, (60, 230, 90) if on else (40, 60, 45))      # lamp
+        _LEVER_TEX[on] = px
+    return _LEVER_TEX[on]
 
 
 # Legacy alias — keep old import working

@@ -499,7 +499,8 @@ class Doom(Game):
     name = 'DOOM'
     description = 'Freedoom on 64 LEDs'
     category = 'unique'
-    dev_only = True
+    mature = True                          # listed only while the AFTER HOURS lever is on
+    menu_visible = staticmethod(_available)  # ...and the engine is installed
     GUIDE = {
         'desc': 'The original 1993 first-person shooter, rendered on a 64x64 LED grid via Freedoom.',
     }
@@ -517,9 +518,13 @@ class Doom(Game):
         self.score = 0
         if self._engine is not None:
             self._engine.close()
-        if _available():
-            self._engine = _Engine(_EXE, _WAD)
-        else:
+        self._engine = None
+        try:
+            if _available():
+                self._engine = _Engine(_EXE, _WAD)
+        except OSError:                    # engine won't start (wrong build, no memory)
+            pass
+        if self._engine is None:
             self.state = GameState.GAME_OVER
 
     def close(self):
