@@ -1480,13 +1480,15 @@ class GalleryMuseum(_Gallery3DBase):
     _BACKSTAGE_WALL = (95, 90, 85)
     _PLATE_HOLD = 1.5             # s a LOCKED message stays on the plate
     # Its look: dark, lit by torches either side of each lever; a conduit runs
-    # round the walls from each lever and glows while that lever is on; and on
-    # the wall behind you as you walk in, a nod to the first easter egg
-    # (Adventure's secret room, "Created by Warren Robinett").
+    # round the walls from each lever and glows while that lever is on; and
+    # across the wall behind you as you walk in, WARREN left of the corridor and
+    # ROBINETT right of it, in cycling colours: Adventure's secret room, the
+    # first easter egg ("Created by Warren Robinett").
     _TORCH, _PLAQUE = 903, 904
     _TORCH_CELLS = ((0, 18), (0, 20), (8, 18), (8, 20))
     _TORCH_LIGHTS = ((1.0, 18.5), (1.0, 20.5), (8.0, 18.5), (8.0, 20.5))
-    _PLAQUE_CELL = (2, 15)
+    _PLAQUE_Y = 15
+    _PLAQUE_SPANS = {"WARREN": 1, "ROBINETT": 5}      # first cell x; each spans 3 cells
     _AMBIENT = 0.16
     _WIRE_OFF, _WIRE_ON = (130, 80, 45), (60, 230, 90)
 
@@ -1654,7 +1656,9 @@ class GalleryMuseum(_Gallery3DBase):
             grid[y][x] = cid
         for x, y in self._TORCH_CELLS:
             grid[y][x] = self._TORCH
-        grid[self._PLAQUE_CELL[1]][self._PLAQUE_CELL[0]] = self._PLAQUE
+        for x0 in self._PLAQUE_SPANS.values():
+            for x in range(x0, x0 + 3):
+                grid[self._PLAQUE_Y][x] = self._PLAQUE
 
         self.MAP = grid
 
@@ -2044,8 +2048,10 @@ class GalleryMuseum(_Gallery3DBase):
             lit = (light, light * 0.84, light * 0.6)
             if cell == self._TORCH:
                 lever = _torch_texture(int(self.time * 9 + map_y) % 3)
-            elif cell == self._PLAQUE:
-                plaque = _plaque_mask()
+            elif cell == self._PLAQUE and side == 1:
+                word = "WARREN" if map_x < self._PUSH_X else "ROBINETT"
+                plaque = _plaque_mask(word)
+                tex_u = (map_x - self._PLAQUE_SPANS[word]) * GRID_SIZE + tex_col
             wire = self._WIRE_ON if self._lever_on(901 if hx < 4.5 else 902) else None
             # conduit: a band 1.2 cells up, at least a pixel thick at any distance
             wire_y = int(draw_bot - 1.22 * unit_h) if (map_x, map_y) != self._rest else -99
@@ -2082,7 +2088,7 @@ class GalleryMuseum(_Gallery3DBase):
                         self.display.set_pixel(col, y, wire)
                         continue
                     r, g, b = self._WIRE_OFF
-                elif plaque is not None and panel == 0 and plaque[tex_y * GRID_SIZE + tex_col]:
+                elif plaque is not None and panel == 0 and plaque[tex_y * _PLAQUE_W + tex_u]:
                     self.display.set_pixel(col, y, self._egg_col)
                     continue
                 self.display.set_pixel(col, y, (min(255, int(r * lit[0])),
@@ -2147,26 +2153,27 @@ def _torch_texture(frame):
     return _TORCH_TEX[frame]
 
 
-_PLAQUE_MASK = []
+_PLAQUE_W = 3 * GRID_SIZE
+_PLAQUE_MASKS = {}
 
 
-def _plaque_mask():
-    """64x64 mask of the tribute's lettering (3x5 font at 2x)."""
-    if not _PLAQUE_MASK:
+def _plaque_mask(word):
+    """Three cells wide, one tall: the word in the 3x5 font at 6x."""
+    if word not in _PLAQUE_MASKS:
         from arcade import _FONT_3X5
-        px = [False] * (GRID_SIZE * GRID_SIZE)
-        for line, text in enumerate(("AFTER", "WARREN", "ROBINETT")):
-            x0 = (GRID_SIZE - (len(text) * 8 - 2)) // 2
-            y0 = 12 + line * 15
-            for i, ch in enumerate(text):
-                for gy, row in enumerate(_FONT_3X5[ch]):
-                    for gx, bit in enumerate(row):
-                        if bit == '1':
-                            for sy in (0, 1):
-                                for sx in (0, 1):
-                                    px[(y0 + gy * 2 + sy) * GRID_SIZE + x0 + i * 8 + gx * 2 + sx] = True
-        _PLAQUE_MASK.extend(px)
-    return _PLAQUE_MASK
+        k = 6
+        px = [False] * (_PLAQUE_W * GRID_SIZE)
+        x0 = (_PLAQUE_W - (len(word) * 4 - 1) * k) // 2
+        y0 = (GRID_SIZE - 5 * k) // 2
+        for i, ch in enumerate(word):
+            for gy, row in enumerate(_FONT_3X5[ch]):
+                for gx, bit in enumerate(row):
+                    if bit == '1':
+                        for sy in range(k):
+                            for sx in range(k):
+                                px[(y0 + gy * k + sy) * _PLAQUE_W + x0 + (i * 4 + gx) * k + sx] = True
+        _PLAQUE_MASKS[word] = px
+    return _PLAQUE_MASKS[word]
 
 
 # Legacy alias — keep old import working
