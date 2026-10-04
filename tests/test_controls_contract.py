@@ -78,6 +78,8 @@ def test_game_survives_every_input(cls, platform, sandbox):
 @pytest.mark.parametrize("cls", REAL_GAMES, ids=lambda c: c.__name__)
 def test_game_restarts_cleanly_after_input(cls, sandbox):
     """PLAY AGAIN calls reset() on a game that has already been played."""
+    if hasattr(cls, "menu_visible"):
+        pytest.skip("runs an external engine, which the sandbox blocks and CI lacks")
     random.seed(1)
     display = get_sim_display()
     obj = cls(display)

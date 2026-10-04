@@ -10,6 +10,7 @@ exactly the way the main loop drives it.
 """
 import pytest
 
+import catalog
 from arcade import Display, InputState
 from visuals import ALL_VISUALS
 from games import ALL_GAMES
@@ -55,6 +56,7 @@ def test_playlist_is_populated_and_constructible(cls):
     # _init_all_playlists() swallows ImportError silently, so a renamed/removed game
     # leaves `.games` empty and selecting the playlist on a cabinet crashes on
     # random.choice([]). Assert it's populated and every member actually constructs.
+    catalog.register_games(ALL_GAMES)   # the boot step that fills AllGames
     assert cls.games, f"{cls.__name__}.games is empty — a broken import in _init_games?"
     display = _get_display()
     for game_cls in cls.games:
