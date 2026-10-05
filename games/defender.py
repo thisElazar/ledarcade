@@ -17,9 +17,21 @@ from arcade import Game, GameState, InputState, Display, Colors, GRID_SIZE
 # World constants
 WORLD_WIDTH = 256
 VIEW_WIDTH = 64
-VIEW_HEIGHT = 56  # Playfield above scanner
-SCANNER_Y = 57    # Scanner starts at row 57
+VIEW_HEIGHT = 56  # Playfield rows; entity y is playfield-local, drawn PLAY_TOP rows down
+SCANNER_Y = 0     # Scanner band across the top, as on the original cabinet
 SCANNER_HEIGHT = 7
+PLAY_TOP = SCANNER_Y + SCANNER_HEIGHT + 1   # separator row, then the playfield
+
+# Palette (the original's thin orange mountain line, pink humanoids,
+# purple pods, red swarmers)
+TERRAIN_COLOR = (200, 100, 30)
+SCANNER_BG = (0, 20, 0)
+SCANNER_LINE = (0, 60, 0)
+HUMAN_COLOR = (255, 130, 220)
+POD_COLOR = (200, 60, 255)
+SWARMER_COLOR = (255, 60, 30)
+MINE_COLOR = (255, 90, 160)
+MAX_MINES = 12
 
 # Player constants
 PLAYER_ACCEL = 160.0
@@ -191,7 +203,7 @@ class Defender(Game):
         dx = self._world_dist_x(self.cam_x, wx)
         if dx < -2 or dx >= VIEW_WIDTH + 2:
             return None
-        return int(dx), int(wy)
+        return int(dx), int(wy) + PLAY_TOP
 
     def _is_visible(self, wx):
         """Check if world x is within the visible area."""
@@ -307,7 +319,6 @@ class Defender(Game):
         # Update bullets
         for b in self.bullets:
             b['wx'] = self._wrap_x(b['wx'] + b['dir'] * BULLET_SPEED * dt)
-        self.bullets = [b for b in self.bullets if self._bullet_alive(b)]
 
         # Update enemy bullets
         for b in self.enemy_bullets:
@@ -379,29 +390,28 @@ class Defender(Game):
             self.smart_bombs += 1
             self.next_bonus_score += 10000
 
-    def _bullet_alive(self, b):
-        """Check if a bullet has traveled too far (>80px)."""
-        # Simple lifetime check: we track by checking if still on-ish screen
-        # Bullets travel fast, just keep them for ~0.5s worth of travel
-        return True  # cleaned by collision or off-screen check in draw
-
     def _smart_bomb(self):
-        """Kill all visible enemies."""
-        for e in self.enemies:
-            if self._is_visible(e['wx']):
-                pts = {'lander': 150, 'mutant': 150, 'bomber': 250,
-                       'pod': 1000, 'swarmer': 150, 'baiter': 200}.get(e['type'], 100)
-                self.score += pts
-                # Release captured humans
-                for h in self.humans:
-                    if h['captor'] is e:
-                        h['state'] = 'falling'
-                        h['captor'] = None
-                if e['type'] == 'pod':
-                    pass  # No swarmers from smart bomb
-                e['alive'] = False
+        """Kill every enemy on screen. A bombed pod still bursts into swarmers,
+        as in the original (iterate a copy so they survive this bomb)."""
+        for e in list(self.enemies):
+            if e['alive'] and self._is_visible(e['wx']):
+                self._kill_enemy(e)
         self.enemy_bullets = [b for b in self.enemy_bullets
                               if not self._is_visible(b['wx'])]
+
+    def _kill_enemy(self, e):
+        """Score an enemy, free any humanoid it carries, burst a pod."""
+        self.score += {'lander': 150, 'mutant': 150, 'bomber': 250,
+                       'pod': 1000, 'swarmer': 150, 'baiter': 200}.get(e['type'], 100)
+        for h in self.humans:
+            if h['captor'] is e:
+                h['state'] = 'falling'
+                h['captor'] = None
+        if e['type'] == 'pod':
+            for _ in range(3):
+                self._spawn_enemy('swarmer', e['wx'] + random.uniform(-3, 3),
+                                  e['wy'] + random.uniform(-3, 3))
+        e['alive'] = False
 
     def _update_humans(self, dt):
         for h in self.humans:
@@ -457,8 +467,8 @@ class Defender(Game):
             elif e['type'] == 'baiter':
                 self._update_baiter(e, dt)
 
-            # Shooting (landers, mutants, bombers, baiters)
-            if e['type'] in ('lander', 'mutant', 'bomber', 'baiter'):
+            # Shooting (landers, mutants, baiters; bombers only lay mines)
+            if e['type'] in ('lander', 'mutant', 'baiter'):
                 e['shoot_timer'] -= dt
                 if e['shoot_timer'] <= 0 and self._is_visible(e['wx']):
                     self._enemy_shoot(e)
@@ -538,15 +548,15 @@ class Defender(Game):
         e['wy'] = max(3, min(VIEW_HEIGHT - 3, e['wy'] + e['vy'] * dt))
 
     def _update_bomber(self, e, dt):
-        """Bomber: flies horizontally, drops mines."""
+        """Bomber: flies horizontally, laying mines that hang where dropped."""
         e['wx'] = self._wrap_x(e['wx'] + e['vx'] * dt)
         e['vy'] *= 0.98
         e['wy'] = max(5, min(40, e['wy'] + e['vy'] * dt))
-        # Occasionally drop a mine
-        if random.random() < 0.01 and self._is_visible(e['wx']):
+        mines = sum(1 for b in self.enemy_bullets if b.get('mine'))
+        if random.random() < 0.01 and mines < MAX_MINES and self._is_visible(e['wx']):
             self.enemy_bullets.append({
                 'wx': e['wx'], 'wy': e['wy'],
-                'vx': 0, 'vy': 15,
+                'vx': 0, 'vy': 0, 'mine': True,
             })
 
     def _update_pod(self, e, dt):
@@ -589,24 +599,7 @@ class Defender(Game):
                 dist_y = abs(b['wy'] - e['wy'])
                 size = 1 if e['type'] == 'swarmer' else 3
                 if dist_x < size + 1 and dist_y < size + 1:
-                    # Hit!
-                    pts = {'lander': 150, 'mutant': 150, 'bomber': 250,
-                           'pod': 1000, 'swarmer': 150, 'baiter': 200}.get(e['type'], 100)
-                    self.score += pts
-
-                    # Release captured human
-                    for h in self.humans:
-                        if h['captor'] is e:
-                            h['state'] = 'falling'
-                            h['captor'] = None
-
-                    # Pod releases swarmers
-                    if e['type'] == 'pod':
-                        for _ in range(3):
-                            self._spawn_enemy('swarmer', e['wx'] + random.uniform(-3, 3),
-                                              e['wy'] + random.uniform(-3, 3))
-
-                    e['alive'] = False
+                    self._kill_enemy(e)
                     if b in self.bullets:
                         self.bullets.remove(b)
                     hit = True
@@ -641,7 +634,7 @@ class Defender(Game):
         for _ in range(20):
             sx = random.randint(0, 63)
             sy = random.randint(0, VIEW_HEIGHT - 1)
-            self.display.set_pixel(sx, sy, (40, 40, 60))
+            self.display.set_pixel(sx, sy + PLAY_TOP, (40, 40, 60))
         random.seed()
 
         # Draw terrain (gone once the planet is destroyed — just stars)
@@ -655,7 +648,7 @@ class Defender(Game):
             pos = self._world_to_screen(h['wx'], h['wy'])
             if pos:
                 sx, sy = pos
-                color = Colors.GREEN if h['state'] == 'walking' else Colors.WHITE
+                color = HUMAN_COLOR if h['state'] == 'walking' else Colors.WHITE
                 if h['state'] == 'falling':
                     color = Colors.YELLOW
                 self.display.set_pixel(sx, sy - 1, color)
@@ -679,12 +672,16 @@ class Defender(Game):
                 self.display.set_pixel(sx + b['dir'], sy, Colors.YELLOW)
                 self.display.set_pixel(sx + b['dir'] * 2, sy, Colors.YELLOW)
 
-        # Draw enemy bullets
+        # Draw enemy bullets and mines
         for b in self.enemy_bullets:
             pos = self._world_to_screen(b['wx'], b['wy'])
             if pos:
                 sx, sy = pos
-                self.display.set_pixel(sx, sy, Colors.RED)
+                if b.get('mine'):
+                    for ox, oy in ((0, -1), (-1, 0), (1, 0), (0, 1)):
+                        self.display.set_pixel(sx + ox, sy + oy, MINE_COLOR)
+                else:
+                    self.display.set_pixel(sx, sy, Colors.RED)
 
         # Draw player (blink if invincible)
         if self.invincible <= 0 or int(self.invincible * 10) % 2 == 0:
@@ -693,37 +690,35 @@ class Defender(Game):
         # Draw scanner
         self._draw_scanner()
 
-        # HUD
-        self.display.draw_text_small(1, 1, f"{self.score}", Colors.WHITE)
+        # HUD, just under the scanner
+        y = PLAY_TOP + 1
+        self.display.draw_text_small(1, y, f"{self.score}", Colors.WHITE)
         # Lives
         for i in range(self.lives - 1):
-            self.display.set_pixel(50 - i * 4, 1, Colors.CYAN)
-            self.display.set_pixel(49 - i * 4, 2, Colors.CYAN)
-            self.display.set_pixel(51 - i * 4, 2, Colors.CYAN)
+            self.display.set_pixel(50 - i * 4, y, Colors.CYAN)
+            self.display.set_pixel(49 - i * 4, y + 1, Colors.CYAN)
+            self.display.set_pixel(51 - i * 4, y + 1, Colors.CYAN)
         # Smart bombs
         for i in range(self.smart_bombs):
-            self.display.set_pixel(60 - i * 3, 1, Colors.ORANGE)
-            self.display.set_pixel(59 - i * 3, 2, Colors.ORANGE)
-            self.display.set_pixel(61 - i * 3, 2, Colors.ORANGE)
+            self.display.set_pixel(60 - i * 3, y, Colors.ORANGE)
+            self.display.set_pixel(59 - i * 3, y + 1, Colors.ORANGE)
+            self.display.set_pixel(61 - i * 3, y + 1, Colors.ORANGE)
 
     def _draw_terrain(self):
-        """Draw visible terrain as a mountain silhouette."""
+        """The planet surface as the original's one-pixel mountain line,
+        joined vertically so steps between columns don't leave gaps."""
+        prev = None
         for sx in range(VIEW_WIDTH):
-            wx = self._wrap_x(self.cam_x + sx)
-            ty = self._terrain_y(wx)
-            # Draw terrain from ty to VIEW_HEIGHT as dark green
-            for sy in range(int(ty), VIEW_HEIGHT):
-                self.display.set_pixel(sx, sy, (0, 60, 0))
-            # Mountain top highlight
-            self.display.set_pixel(sx, int(ty), (0, 100, 0))
+            ty = self._terrain_y(self.cam_x + sx) + PLAY_TOP
+            lo, hi = (ty, ty) if prev is None else (min(prev, ty), max(prev, ty))
+            for sy in range(lo, hi + 1):
+                self.display.set_pixel(sx, sy, TERRAIN_COLOR)
+            prev = ty
 
     def _draw_player(self):
         """Draw the player ship."""
-        sx = int(VIEW_WIDTH / 2 + self.facing * 0)  # Player at center-ish
-        # Recalculate: player screen x from camera
-        dx = self._world_dist_x(self.cam_x, self.px)
-        sx = int(dx)
-        sy = int(self.py)
+        sx = int(self._world_dist_x(self.cam_x, self.px))
+        sy = int(self.py) + PLAY_TOP
 
         if self.facing == 1:
             # Pointing right: >=>
@@ -769,13 +764,13 @@ class Defender(Game):
             self.display.set_pixel(sx, sy + 1, c)
             self.display.set_pixel(sx + 1, sy, c)
         elif etype == 'pod':
-            c = Colors.YELLOW
+            c = POD_COLOR
             self.display.set_pixel(sx, sy, c)
             self.display.set_pixel(sx + 1, sy, c)
             self.display.set_pixel(sx, sy + 1, c)
             self.display.set_pixel(sx + 1, sy + 1, c)
         elif etype == 'swarmer':
-            self.display.set_pixel(sx, sy, Colors.YELLOW)
+            self.display.set_pixel(sx, sy, SWARMER_COLOR)
         elif etype == 'baiter':
             # Flat, fast dart
             self.display.set_pixel(sx - 1, sy, Colors.GREEN)
@@ -783,55 +778,45 @@ class Defender(Game):
             self.display.set_pixel(sx + 1, sy, Colors.GREEN)
 
     def _draw_scanner(self):
-        """Draw the radar/scanner at the bottom of the screen."""
-        # Dark green background
-        for sy in range(SCANNER_Y, 64):
+        """The scanner band across the top: the whole world at 1/4 width and
+        1/8 height, terrain line included, every dot in its own colour, and
+        the visible window marked on the separator below it."""
+        for sy in range(SCANNER_Y, SCANNER_Y + SCANNER_HEIGHT):
             for sx in range(64):
-                self.display.set_pixel(sx, sy, (0, 20, 0))
-        # Separator line
+                self.display.set_pixel(sx, sy, SCANNER_BG)
         for sx in range(64):
-            self.display.set_pixel(sx, SCANNER_Y - 1, (0, 60, 0))
+            self.display.set_pixel(sx, PLAY_TOP - 1, SCANNER_LINE)
 
-        # Scale: 256px world -> 64px scanner
         scale = VIEW_WIDTH / WORLD_WIDTH  # 0.25
+        ystep = VIEW_HEIGHT / SCANNER_HEIGHT
 
-        # Terrain on scanner (stars instead once the planet is destroyed)
+        def dot(wx, wy, color):
+            self.display.set_pixel(int(wx * scale) % 64,
+                                   SCANNER_Y + min(SCANNER_HEIGHT - 1, int(wy / ystep)), color)
+
+        # Terrain (stars instead once the planet is destroyed)
         if self.planet_alive:
             for sx in range(64):
-                wx = int(sx / scale) % WORLD_WIDTH
-                ty = self._terrain_y(wx)
-                scanner_ty = SCANNER_Y + int((ty / VIEW_HEIGHT) * SCANNER_HEIGHT)
-                for sy in range(scanner_ty, 64):
-                    self.display.set_pixel(sx, sy, (0, 40, 0))
+                dot(sx / scale, self._terrain_y(sx / scale), TERRAIN_COLOR)
         else:
             random.seed(7)
             for _ in range(12):
                 self.display.set_pixel(random.randint(0, 63),
-                                       random.randint(SCANNER_Y + 1, 62),
+                                       random.randint(SCANNER_Y + 1, SCANNER_Y + SCANNER_HEIGHT - 2),
                                        (50, 50, 70))
             random.seed()
 
-        # Player on scanner
-        psx = int((self.px * scale) % 64)
-        self.display.set_pixel(psx, SCANNER_Y + 3, Colors.WHITE)
-
-        # Humans on scanner
         for h in self.humans:
-            if h['state'] == 'dead':
-                continue
-            hsx = int((h['wx'] * scale) % 64)
-            self.display.set_pixel(hsx, SCANNER_Y + 4, Colors.GREEN)
-
-        # Enemies on scanner
+            if h['state'] != 'dead':
+                dot(h['wx'], h['wy'], HUMAN_COLOR)
         for e in self.enemies:
-            if not e['alive']:
-                continue
-            esx = int((e['wx'] * scale) % 64)
-            self.display.set_pixel(esx, SCANNER_Y + 2, Colors.RED)
+            if e['alive']:
+                dot(e['wx'], e['wy'], {'lander': Colors.GREEN, 'mutant': Colors.PURPLE,
+                                       'bomber': Colors.BLUE, 'pod': POD_COLOR,
+                                       'swarmer': SWARMER_COLOR, 'baiter': Colors.CYAN}[e['type']])
+        dot(self.px, self.py, Colors.WHITE)
 
-        # View window indicator
+        # Visible window, brightened on the separator line
         cam_sx = int((self.cam_x * scale) % 64)
-        view_w = max(1, int(VIEW_WIDTH * scale))
-        for i in range(view_w):
-            sx = (cam_sx + i) % 64
-            self.display.set_pixel(sx, SCANNER_Y, (0, 80, 0))
+        for i in range(max(1, int(VIEW_WIDTH * scale))):
+            self.display.set_pixel((cam_sx + i) % 64, PLAY_TOP - 1, (0, 140, 0))

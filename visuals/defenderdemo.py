@@ -78,7 +78,7 @@ class DefenderDemo(Visual):
         self.game.draw()
 
         if int(self.time * 2) % 2 == 0:
-            self.display.draw_text_small(46, 1, "DEMO", Colors.GRAY)
+            self.display.draw_text_small(46, 15, "DEMO", Colors.GRAY)  # below the scanner + HUD
 
     def _decide_action(self):
         g = self.game
