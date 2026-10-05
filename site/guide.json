@@ -5595,10 +5595,11 @@
      "name": "MOVEMENT",
      "cls": "Walk",
      "module": "visuals/walk.py",
-     "desc": "The mechanics of how a body moves. A stick figure built on Vitruvian proportions cycles through walk, run, and sneak gaits, driven by procedural biomechanical models \u2014 14 joints and 15 bones in motion.",
+     "desc": "The mechanics of how a body moves. A stick figure built on Vitruvian proportions cycles through gaits from a walk to a sprint, driven by procedural biomechanical models, and a set of exercises \u2014 14 joints and 15 bones in motion.",
      "controls": {
+      "Up/Down": "Cycle category (GAIT, EXERCISE)",
       "Left/Right": "Slow down / speed up playback",
-      "Action": "Cycle movement (WALK, RUN, SNEAK)"
+      "Action": "Cycle movement within the category"
      }
     },
     {
