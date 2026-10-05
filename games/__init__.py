@@ -64,6 +64,7 @@ from .drift import Drift
 from .lasermirrors import LaserMirrors
 from .windowwasher import WindowWasher
 from .fishing import Fishing
+from .fortress import Fortress
 from .doom import Doom
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
@@ -131,6 +132,7 @@ ALL_GAMES = [
     LaserMirrors,
     WindowWasher,
     Fishing,
+    Fortress,
     Doom,
     AllGames,
     ArcadeMix,
@@ -204,6 +206,7 @@ __all__ = [
     'LaserMirrors',
     'WindowWasher',
     'Fishing',
+    'Fortress',
     'Doom',
     'ALL_GAMES',
     'AllGames',
