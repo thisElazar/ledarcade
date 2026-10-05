@@ -4139,9 +4139,9 @@
      "name": "YOGA",
      "cls": "Yoga",
      "module": "visuals/yoga.py",
-     "desc": "Yoga pose sequences. Animated figures flowing through asanas \u2014 sun salutations, warrior poses, and balancing sequences.",
+     "desc": "Yoga pose sequences. Animated figures flowing through asanas \u2014 sun and moon salutations, warrior poses, balances, and inversions.",
      "controls": {
-      "Action": "Cycle flow (Sun Salute, Warrior, Balance)",
+      "Action": "Cycle flow (Sun Salute, Moon Salute, Warrior, Balance, Inversion)",
       "Left/Right": "Slow down / speed up"
      }
     }

@@ -5,7 +5,7 @@ A stick figure flows through yoga poses with smooth interpolation.
 14-joint stick figure with Vitruvian proportions. Standard yoga asanas.
 
 Controls:
-  Action       - Cycle flow (Sun Salute, Warrior, Balance)
+  Action       - Cycle flow (Sun Salute, Moon Salute, Warrior, Balance, Inversion)
   Left/Right   - Slow down / speed up
 """
 
@@ -54,20 +54,30 @@ SHADOW_COLOR = (30, 25, 18)
 # ── Baked poses (pixel coords on 64x64 grid) ─────────────────────
 # fmt: off
 POSES = {
-    'Bound Angle': {'head':(32,10), 'neck':(32,22), 'l_shoulder':(43,22), 'r_shoulder':(22,22), 'l_elbow':(41,39), 'r_elbow':(23,39), 'l_hand':(38,52), 'r_hand':(27,53), 'l_hip':(38,47), 'r_hip':(26,47), 'l_knee':(60,47), 'r_knee':(2,49), 'l_foot':(37,55), 'r_foot':(27,56)},
+    'Bound Angle': {'head':(32,31), 'neck':(32,34), 'l_shoulder':(28,37), 'r_shoulder':(36,37), 'l_elbow':(26,45), 'r_elbow':(38,45), 'l_hand':(30,52), 'r_hand':(34,52), 'l_hip':(29,52), 'r_hip':(35,52), 'l_knee':(18,54), 'r_knee':(46,54), 'l_foot':(31,56), 'r_foot':(33,56)},
     'Chair': {'head':(32,10), 'neck':(32,13), 'l_shoulder':(28,16), 'r_shoulder':(36,16), 'l_elbow':(28,9), 'r_elbow':(36,9), 'l_hand':(30,3), 'r_hand':(34,3), 'l_hip':(29,31), 'r_hip':(35,31), 'l_knee':(26,42), 'r_knee':(38,42), 'l_foot':(29,54), 'r_foot':(35,54)},
-    'Dancer': {'head':(46,12), 'neck':(41,17), 'l_shoulder':(45,19), 'r_shoulder':(37,15), 'l_elbow':(54,19), 'r_elbow':(28,13), 'l_hand':(62,17), 'r_hand':(20,10), 'l_hip':(33,32), 'r_hip':(31,28), 'l_knee':(32,44), 'r_knee':(18,24), 'l_foot':(34,56), 'r_foot':(19,12)},
-    'Downward Dog': {'head':(46,43), 'neck':(48,32), 'l_shoulder':(47,32), 'r_shoulder':(48,32), 'l_elbow':(52,42), 'r_elbow':(55,46), 'l_hand':(58,49), 'r_hand':(62,56), 'l_hip':(32,11), 'r_hip':(32,10), 'l_knee':(23,31), 'r_knee':(22,31), 'l_foot':(15,49), 'r_foot':(13,52)},
+    "Child's Pose": {'head':(43,54), 'neck':(40,52), 'l_shoulder':(40,52), 'r_shoulder':(39,52), 'l_elbow':(48,54), 'r_elbow':(47,54), 'l_hand':(55,56), 'r_hand':(54,56), 'l_hip':(22,51), 'r_hip':(23,51), 'l_knee':(33,56), 'r_knee':(34,56), 'l_foot':(20,56), 'r_foot':(21,56)},
+    'Cobra': {'head':(48,37), 'neck':(46,41), 'l_shoulder':(46,41), 'r_shoulder':(45,41), 'l_elbow':(44,49), 'r_elbow':(43,49), 'l_hand':(47,56), 'r_hand':(46,56), 'l_hip':(34,55), 'r_hip':(33,55), 'l_knee':(22,55), 'r_knee':(21,55), 'l_foot':(9,56), 'r_foot':(8,56)},
+    'Crescent': {'head':(37,11), 'neck':(36,14), 'l_shoulder':(31,16), 'r_shoulder':(39,18), 'l_elbow':(36,9), 'r_elbow':(44,11), 'l_hand':(43,5), 'r_hand':(44,5), 'l_hip':(27,31), 'r_hip':(33,31), 'l_knee':(28,43), 'r_knee':(34,43), 'l_foot':(29,56), 'r_foot':(35,56)},
+    'Dancer': {'head':(46,12), 'neck':(41,17), 'l_shoulder':(37,15), 'r_shoulder':(45,19), 'l_elbow':(28,13), 'r_elbow':(54,19), 'l_hand':(20,10), 'r_hand':(62,17), 'l_hip':(31,28), 'r_hip':(33,32), 'l_knee':(18,24), 'r_knee':(32,44), 'l_foot':(19,12), 'r_foot':(34,56)},
+    'Downward Dog': {'head':(40,50), 'neck':(41,46), 'l_shoulder':(41,46), 'r_shoulder':(40,46), 'l_elbow':(47,51), 'r_elbow':(46,51), 'l_hand':(52,56), 'r_hand':(50,56), 'l_hip':(27,34), 'r_hip':(28,34), 'l_knee':(21,45), 'r_knee':(22,45), 'l_foot':(14,56), 'r_foot':(16,56)},
     'Forward Fold': {'head':(32,42), 'neck':(32,38), 'l_shoulder':(29,35), 'r_shoulder':(35,35), 'l_elbow':(29,42), 'r_elbow':(35,42), 'l_hand':(30,50), 'r_hand':(34,50), 'l_hip':(30,31), 'r_hip':(34,31), 'l_knee':(30,43), 'r_knee':(34,43), 'l_foot':(30,56), 'r_foot':(34,56)},
-    'Goddess': {'head':(32,10), 'neck':(32,18), 'l_shoulder':(39,18), 'r_shoulder':(25,18), 'l_elbow':(49,20), 'r_elbow':(15,20), 'l_hand':(50,10), 'r_hand':(14,10), 'l_hip':(36,36), 'r_hip':(28,36), 'l_knee':(49,42), 'r_knee':(14,42), 'l_foot':(49,56), 'r_foot':(14,56)},
+    'Garland': {'head':(32,29), 'neck':(32,32), 'l_shoulder':(28,35), 'r_shoulder':(36,35), 'l_elbow':(24,42), 'r_elbow':(40,42), 'l_hand':(31,39), 'r_hand':(33,39), 'l_hip':(29,50), 'r_hip':(35,50), 'l_knee':(20,46), 'r_knee':(44,46), 'l_foot':(26,56), 'r_foot':(38,56)},
+    'Goddess': {'head':(32,10), 'neck':(32,18), 'l_shoulder':(25,18), 'r_shoulder':(39,18), 'l_elbow':(15,20), 'r_elbow':(49,20), 'l_hand':(14,10), 'r_hand':(50,10), 'l_hip':(28,36), 'r_hip':(36,36), 'l_knee':(14,42), 'r_knee':(49,42), 'l_foot':(14,56), 'r_foot':(49,56)},
     'Half Lift': {'head':(32,27), 'neck':(32,28), 'l_shoulder':(29,30), 'r_shoulder':(35,30), 'l_elbow':(29,36), 'r_elbow':(35,36), 'l_hand':(30,42), 'r_hand':(34,42), 'l_hip':(30,31), 'r_hip':(34,31), 'l_knee':(30,43), 'r_knee':(34,43), 'l_foot':(30,56), 'r_foot':(34,56)},
-    'Half Moon': {'head':(51,34), 'neck':(46,32), 'l_shoulder':(44,37), 'r_shoulder':(48,27), 'l_elbow':(44,47), 'r_elbow':(48,18), 'l_hand':(44,54), 'r_hand':(49,10), 'l_hip':(32,28), 'r_hip':(32,22), 'l_knee':(31,42), 'r_knee':(19,18), 'l_foot':(32,56), 'r_foot':(8,13)},
+    'Half Moon': {'head':(51,34), 'neck':(46,32), 'l_shoulder':(48,27), 'r_shoulder':(44,37), 'l_elbow':(48,18), 'r_elbow':(44,47), 'l_hand':(49,10), 'r_hand':(44,54), 'l_hip':(32,22), 'r_hip':(32,28), 'l_knee':(19,18), 'r_knee':(31,42), 'l_foot':(8,13), 'r_foot':(32,56)},
+    'Headstand': {'head':(32,54), 'neck':(32,51), 'l_shoulder':(28,48), 'r_shoulder':(36,48), 'l_elbow':(23,54), 'r_elbow':(41,54), 'l_hand':(30,56), 'r_hand':(34,56), 'l_hip':(29,33), 'r_hip':(35,33), 'l_knee':(29,21), 'r_knee':(35,21), 'l_foot':(29,8), 'r_foot':(35,8)},
     'Low Lunge': {'head':(32,12), 'neck':(32,16), 'l_shoulder':(28,19), 'r_shoulder':(36,19), 'l_elbow':(26,27), 'r_elbow':(38,27), 'l_hand':(27,33), 'r_hand':(37,33), 'l_hip':(30,33), 'r_hip':(34,33), 'l_knee':(24,44), 'r_knee':(38,48), 'l_foot':(20,56), 'r_foot':(42,56)},
     'Mountain': {'head':(32,10), 'neck':(32,13), 'l_shoulder':(28,16), 'r_shoulder':(36,16), 'l_elbow':(27,24), 'r_elbow':(37,24), 'l_hand':(28,31), 'r_hand':(36,31), 'l_hip':(29,31), 'r_hip':(35,31), 'l_knee':(29,43), 'r_knee':(35,43), 'l_foot':(29,56), 'r_foot':(35,56)},
-    'Tree': {'head':(32,18), 'neck':(33,22), 'l_shoulder':(38,22), 'r_shoulder':(27,22), 'l_elbow':(42,15), 'r_elbow':(23,16), 'l_hand':(33,10), 'r_hand':(30,10), 'l_hip':(36,36), 'r_hip':(28,36), 'l_knee':(34,47), 'r_knee':(16,42), 'l_foot':(32,56), 'r_foot':(30,45)},
-    'Triangle': {'head':(46,25), 'neck':(43,31), 'l_shoulder':(44,36), 'r_shoulder':(42,26), 'l_elbow':(44,44), 'r_elbow':(41,18), 'l_hand':(44,53), 'r_hand':(42,10), 'l_hip':(33,36), 'r_hip':(31,33), 'l_knee':(39,46), 'r_knee':(26,44), 'l_foot':(44,55), 'r_foot':(23,56)},
+    'Plank': {'head':(52,39), 'neck':(49,41), 'l_shoulder':(49,41), 'r_shoulder':(48,41), 'l_elbow':(49,49), 'r_elbow':(48,49), 'l_hand':(49,56), 'r_hand':(48,56), 'l_hip':(32,47), 'r_hip':(31,47), 'l_knee':(21,51), 'r_knee':(20,51), 'l_foot':(9,56), 'r_foot':(8,56)},
+    'Plow': {'head':(34,54), 'neck':(30,54), 'l_shoulder':(30,54), 'r_shoulder':(29,54), 'l_elbow':(22,55), 'r_elbow':(21,55), 'l_hand':(15,56), 'r_hand':(14,56), 'l_hip':(32,37), 'r_hip':(33,37), 'l_knee':(40,46), 'r_knee':(41,46), 'l_foot':(48,56), 'r_foot':(49,56)},
+    'Shoulder Stand': {'head':(34,54), 'neck':(30,54), 'l_shoulder':(30,54), 'r_shoulder':(29,54), 'l_elbow':(23,55), 'r_elbow':(22,55), 'l_hand':(29,49), 'r_hand':(28,49), 'l_hip':(30,36), 'r_hip':(29,36), 'l_knee':(30,24), 'r_knee':(29,24), 'l_foot':(30,11), 'r_foot':(29,11)},
+    'Side Lunge': {'head':(26,23), 'neck':(26,26), 'l_shoulder':(22,29), 'r_shoulder':(30,29), 'l_elbow':(19,36), 'r_elbow':(33,36), 'l_hand':(25,33), 'r_hand':(27,33), 'l_hip':(23,44), 'r_hip':(29,44), 'l_knee':(15,46), 'r_knee':(40,50), 'l_foot':(21,56), 'r_foot':(51,56)},
+    'Star': {'head':(32,12), 'neck':(32,15), 'l_shoulder':(28,18), 'r_shoulder':(36,18), 'l_elbow':(21,14), 'r_elbow':(43,14), 'l_hand':(15,10), 'r_hand':(49,10), 'l_hip':(29,33), 'r_hip':(35,33), 'l_knee':(24,44), 'r_knee':(40,44), 'l_foot':(19,56), 'r_foot':(45,56)},
+    'Tree': {'head':(32,18), 'neck':(33,22), 'l_shoulder':(27,22), 'r_shoulder':(38,22), 'l_elbow':(23,16), 'r_elbow':(42,15), 'l_hand':(30,10), 'r_hand':(33,10), 'l_hip':(28,36), 'r_hip':(36,36), 'l_knee':(16,42), 'r_knee':(34,47), 'l_foot':(30,45), 'r_foot':(32,56)},
+    'Triangle': {'head':(46,25), 'neck':(43,31), 'l_shoulder':(42,26), 'r_shoulder':(44,36), 'l_elbow':(41,18), 'r_elbow':(44,44), 'l_hand':(42,10), 'r_hand':(44,53), 'l_hip':(31,33), 'r_hip':(33,36), 'l_knee':(26,44), 'r_knee':(39,46), 'l_foot':(23,56), 'r_foot':(44,55)},
     'Upward Salute': {'head':(32,8), 'neck':(32,12), 'l_shoulder':(28,16), 'r_shoulder':(36,16), 'l_elbow':(29,8), 'r_elbow':(35,8), 'l_hand':(31,2), 'r_hand':(33,2), 'l_hip':(29,31), 'r_hip':(35,31), 'l_knee':(29,43), 'r_knee':(35,43), 'l_foot':(29,56), 'r_foot':(35,56)},
-    'Warrior': {'head':(29,10), 'neck':(32,18), 'l_shoulder':(37,18), 'r_shoulder':(27,18), 'l_elbow':(45,18), 'r_elbow':(20,16), 'l_hand':(52,18), 'r_hand':(12,15), 'l_hip':(35,37), 'r_hip':(29,37), 'l_knee':(43,46), 'r_knee':(18,40), 'l_foot':(53,56), 'r_foot':(18,55)},
+    'Warrior': {'head':(29,10), 'neck':(32,18), 'l_shoulder':(27,18), 'r_shoulder':(37,18), 'l_elbow':(20,16), 'r_elbow':(45,18), 'l_hand':(12,15), 'r_hand':(52,18), 'l_hip':(29,37), 'r_hip':(35,37), 'l_knee':(18,40), 'r_knee':(43,46), 'l_foot':(18,55), 'r_foot':(53,56)},
 }
 # fmt: on
 
@@ -75,8 +85,15 @@ POSES = {
 FLOWS = [
     ('SUN SALUTE', [
         ('Mountain', 2.5), ('Upward Salute', 2.0), ('Forward Fold', 2.0),
-        ('Half Lift', 1.5), ('Low Lunge', 2.0), ('Half Lift', 1.5),
+        ('Half Lift', 1.5), ('Low Lunge', 2.0), ('Plank', 2.0),
+        ('Cobra', 2.0), ('Downward Dog', 3.0), ('Low Lunge', 2.0),
         ('Forward Fold', 2.0), ('Upward Salute', 2.0), ('Mountain', 2.5),
+    ]),
+    ('MOON SALUTE', [
+        ('Mountain', 2.0), ('Upward Salute', 2.0), ('Crescent', 2.5),
+        ('Goddess', 2.5), ('Star', 2.5), ('Triangle', 2.5),
+        ('Low Lunge', 2.0), ('Side Lunge', 2.5), ('Garland', 3.0),
+        ('Goddess', 2.5), ('Upward Salute', 2.0), ('Mountain', 2.0),
     ]),
     ('WARRIOR', [
         ('Mountain', 2.0), ('Warrior', 3.0), ('Triangle', 3.0),
@@ -87,6 +104,11 @@ FLOWS = [
         ('Mountain', 2.0), ('Tree', 3.0), ('Dancer', 3.0),
         ('Half Moon', 3.0), ('Warrior', 2.0),
         ('Upward Salute', 1.5), ('Mountain', 2.0),
+    ]),
+    ('INVERSION', [
+        ('Mountain', 2.0), ('Forward Fold', 2.0), ('Downward Dog', 2.5),
+        ('Headstand', 4.0), ("Child's Pose", 3.0), ('Shoulder Stand', 4.0),
+        ('Plow', 3.0), ("Child's Pose", 2.5), ('Mountain', 2.0),
     ]),
 ]
 
@@ -119,7 +141,7 @@ class Yoga(Visual):
     description = "Yoga flows"
     category = "household"
     GUIDE = {
-        'desc': 'Yoga pose sequences. Animated figures flowing through asanas — sun salutations, warrior poses, and balancing sequences.',
+        'desc': 'Yoga pose sequences. Animated figures flowing through asanas — sun and moon salutations, warrior poses, balances, and inversions.',
     }
 
     def reset(self):
@@ -276,4 +298,4 @@ class Yoga(Visual):
             alpha = min(1.0, self._overlay_timer / 0.5)
             spd = f'{self._speed:.1f}x' if self._speed != int(self._speed) else f'{int(self._speed)}x'
             oc = (int(200 * alpha), int(200 * alpha), int(200 * alpha))
-            d.draw_text_small(2, 57, f"{flow_name} {spd}", oc)
+            d.draw_text_small(1, 57, f"{flow_name} {spd}", oc)
