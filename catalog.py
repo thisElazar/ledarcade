@@ -124,6 +124,14 @@ def _listed(cls):
     return visible() if visible else True
 
 
+def listed_now(cls):
+    """Whether an item may be shown right now: unconditional items always,
+    conditional ones (mature / menu_visible) only while their condition holds.
+    The idle screensaver and the catch-all slideshow use this so AFTER HOURS
+    items stay out of them too."""
+    return not _is_conditional(cls) or _listed(cls)
+
+
 def _drop_conditional(categories):
     _CONDITIONAL[:] = [(c, cat) for c, cat in _CONDITIONAL if cat not in categories]
 

@@ -58,10 +58,17 @@ class Slideshow(Visual):
             random.shuffle(self._queue)
         if self._queue:
             cls = self._queue.pop()
+            self.close()
             self._child = cls(self.display)
             self._child.reset()
             _randomize_style(self._child)
             self._cycle_timer = 0.0
+
+    def close(self):
+        child = getattr(self, '_child', None)
+        if child is not None:
+            child.close()
+            self._child = None
 
     def update(self, dt):
         self.time += dt
@@ -123,6 +130,7 @@ class AllVisuals(Slideshow):
     }
 
     def _get_visual_classes(self):
+        import catalog
         from visuals import ALL_VISUALS
         result = []
         for v in ALL_VISUALS:
@@ -130,6 +138,8 @@ class AllVisuals(Slideshow):
                 continue
             cat = getattr(v, 'category', '')
             if cat == 'utility':
+                continue
+            if not catalog.listed_now(v):      # AFTER HOURS items, USB SHARE
                 continue
             weight = self.CATEGORY_WEIGHTS.get(cat, 2)
             result.extend([v] * weight)

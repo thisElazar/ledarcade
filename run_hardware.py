@@ -462,11 +462,23 @@ def has_any_input(input_state):
             input_state.action_l_held or input_state.action_r_held)
 
 
+def _close_visual(visual):
+    """Release an idle visual the shell is done with (DOOM's attract mode runs an
+    engine process that must not outlive its slot)."""
+    close = getattr(visual, 'close', None)
+    if close is not None:
+        try:
+            close()
+        except Exception:
+            pass
+
+
 def _pick_idle_visual(display):
     """Pick a weighted random visual for idle screen."""
     from visuals import ALL_VISUALS
     from visuals.slideshow import Slideshow, AllVisuals, _randomize_style
     import settings
+    import catalog
 
     # Load user overrides
     user_weights = settings.get_idle_category_weights()
@@ -485,6 +497,8 @@ def _pick_idle_visual(display):
         if cat == 'utility':
             continue
         if getattr(v, 'idle_exclude', False):
+            continue
+        if not catalog.listed_now(v):     # AFTER HOURS items, USB SHARE
             continue
 
         name = v.__name__
@@ -695,6 +709,7 @@ def main():
                     last_time = time.time()
                     idle_timer = 0.0
                     in_idle = False
+                    _close_visual(idle_visual)
                     idle_visual = None
 
                 if in_menu:
@@ -702,6 +717,7 @@ def main():
                     if in_idle:
                         if has_any_input(input_state):
                             in_idle = False
+                            _close_visual(idle_visual)
                             idle_visual = None
                             idle_timer = 0.0
                             idle_transition.transitioning = False
@@ -725,6 +741,7 @@ def main():
                                         # Draw first transition frame to mask preload flash
                                         idle_transition.draw(display)
                                     idle_visual = new_visual
+                                    _close_visual(old_visual)
                                     idle_cycle_timer = 0.0
                                 if idle_visual and not idle_transition.transitioning:
                                     idle_visual.update(dt)
@@ -1135,6 +1152,7 @@ def main():
                 current_item = None
                 game_over_initialized = False
                 in_idle = False
+                _close_visual(idle_visual)
                 idle_visual = None
                 in_shuffle_mode = False
                 shuffle_playlist = None

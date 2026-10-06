@@ -5,7 +5,8 @@ Subprocess-based: runs the patched doomgeneric engine and pipes frames
 through a numpy downscale pipeline into the cabinet's display buffer.
 
 Controls:
-  Stick       - Move / turn (always run)
+  Stick       - Move / turn (always run); in the menu, pick game, skill and map
+  L or R      - Start (in the menu)
   L           - Fire (use when dead)
   R tap       - Use / open doors
   R + L/R     - Strafe
@@ -14,6 +15,7 @@ Controls:
 """
 
 import os
+import re
 import sys
 import subprocess
 import threading
@@ -21,6 +23,7 @@ import time
 
 import numpy as np
 
+import settings
 from arcade import Game, GameState, InputState, Display, GRID_SIZE, _FONT_3X5
 
 # Doom's native resolution
@@ -43,11 +46,24 @@ _SLOT = {0: 1, 7: 1, 1: 2, 2: 3, 8: 3, 3: 4, 4: 5, 5: 6, 6: 7}   # weapontype_t 
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _DOOM_DIR = os.path.join(os.path.dirname(_HERE), 'doom_preview')
 _EXE = os.path.join(_DOOM_DIR, 'doomgeneric', 'doomgeneric', 'doom_pipe')
-_WAD = os.path.join(_DOOM_DIR, 'freedoom-0.13.0', 'freedoom1.wad')
+_WAD_DIR = os.path.join(_DOOM_DIR, 'freedoom-0.13.0')
+# Freedoom Phase 1 is episodic (E1M1 style, Doom I rules), Phase 2 is one long
+# campaign (MAP01 style, Doom II rules). Either or both may be installed.
+_WADS = (('PHASE 1', 'freedoom1.wad'), ('PHASE 2', 'freedoom2.wad'))
+
+
+def _installed_wads():
+    """[(label, path)] of the Freedoom IWADs present on disk."""
+    found = []
+    for label, name in _WADS:
+        path = os.path.join(_WAD_DIR, name)
+        if os.path.isfile(path):
+            found.append((label, path))
+    return found
 
 
 def _available():
-    return os.path.isfile(_EXE) and os.path.isfile(_WAD)
+    return os.path.isfile(_EXE) and bool(_installed_wads())
 
 
 # ── Scaling ──────────────────────────────────────────────────────
@@ -400,34 +416,63 @@ class _Controls:
 
 # ── Engine subprocess ────────────────────────────────────────────
 
-def _wad_level_names(iwad):
-    """Level names from the WAD's DEHACKED lump ({"E1M1": "E1M1: Outer Prison"}).
-    doomgeneric is built without DEHACKED, so the engine only knows id's names."""
+def _wad_directory(iwad):
+    """[(lump name, offset, size)] from the WAD's directory."""
     import struct
     with open(iwad, 'rb') as f:
         n, off = struct.unpack('<ii', f.read(12)[4:])
         f.seek(off)
         directory = f.read(16 * n)
-        for i in range(n):
-            o, size, name = struct.unpack_from('<ii8s', directory, 16 * i)
-            if name.rstrip(b'\0') == b'DEHACKED':
+    return [(name.rstrip(b'\0').decode('latin-1'), o, size)
+            for o, size, name in (struct.unpack_from('<ii8s', directory, 16 * i) for i in range(n))]
+
+
+def _wad_level_names(iwad):
+    """Level names from the WAD's DEHACKED lump ({"E1M1": "E1M1: Outer Prison"}).
+    doomgeneric is built without DEHACKED, so the engine only knows id's names."""
+    for name, o, size in _wad_directory(iwad):
+        if name == 'DEHACKED':
+            with open(iwad, 'rb') as f:
                 f.seek(o)
-                names = {}
-                for line in f.read(size).decode('latin-1').splitlines():
-                    key, eq, val = line.partition('=')
-                    if eq and key.strip().startswith('HUSTR_') and ':' in val:
-                        names[val.split(':')[0].strip().upper()] = val.strip()
-                return names
+                text = f.read(size).decode('latin-1')
+            names = {}
+            for line in text.splitlines():
+                key, eq, val = line.partition('=')
+                if eq and key.strip().startswith('HUSTR_') and ':' in val:
+                    names[val.split(':')[0].strip().upper()] = val.strip()
+            return names
     return {}
 
 
-class _Engine:
-    """Runs doom_pipe, keeps the latest frame + state."""
+_MAP_LUMP = re.compile(r'^(?:E(\d)M(\d)|MAP(\d\d))$')
 
-    def __init__(self, exe, iwad):
+
+@functools.lru_cache(maxsize=4)
+def _wad_maps(iwad):
+    """{episode: map count}; episode 0 for a Doom II style WAD (MAP01...)."""
+    maps = {}
+    for name, _, _ in _wad_directory(iwad):
+        m = _MAP_LUMP.match(name)
+        if m:
+            ep = int(m.group(1)) if m.group(1) else 0
+            maps[ep] = maps.get(ep, 0) + 1
+    return maps
+
+
+@functools.lru_cache(maxsize=4)
+def _wad_demos(iwad):
+    """Names of the WAD's recorded demo lumps (DEMO1...), lower-case for -playdemo."""
+    return [name.lower() for name, _, _ in _wad_directory(iwad) if re.match(r'^DEMO\d$', name)]
+
+
+class _Engine:
+    """Runs doom_pipe, keeps the latest frame + state.
+    args: the rest of the command line ('-skill 3 -warp 1 1', or '-playdemo demo1')."""
+
+    def __init__(self, exe, iwad, args):
         r, w = os.pipe()
         self.proc = subprocess.Popen(
-            [exe, '-iwad', iwad, '-skill', '3', '-warp', '1', '1'],
+            [exe, '-iwad', iwad] + list(args),
             cwd=_DOOM_DIR, stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL, pass_fds=(w,),
             env={**os.environ, 'DOOM_FRAME_FD': str(w)})
@@ -461,7 +506,7 @@ class _Engine:
                 msg = self._read_exact(_MSG_BYTES).split(b'\0')[0].decode('latin-1')
                 names = [n.split(b'\0')[0].decode('latin-1') for n in
                          (self._read_exact(32), self._read_exact(32))]
-                names = [self.level_names.get(n.split(':')[0].strip().upper(), n) for n in names]
+                names = [self._level_name(n) for n in names]
                 px = np.frombuffer(self._read_exact(_FRAME_BYTES), dtype=np.uint8)
                 bgrx = px.reshape(_H, _W, 4)
                 self.state = dict(
@@ -475,6 +520,15 @@ class _Engine:
                 self.frame = bgrx[..., 2::-1]   # RGB view; _area copies
         except (EOFError, OSError):
             self.frame = None
+
+    def _level_name(self, engine_name):
+        """Freedoom's name for a level the engine calls by id's name ("E1M1: Hangar",
+        "level 1: entryway"); the DEHACKED keys are E1M1 / MAP01."""
+        key = engine_name.split(':')[0].strip().upper()
+        m = re.match(r'LEVEL (\d+)$', key)
+        if m:
+            key = f"MAP{int(m.group(1)):02d}"
+        return self.level_names.get(key, engine_name)
 
     def _send(self, a, b):
         try:
@@ -493,6 +547,155 @@ class _Engine:
             pass
 
 
+def compose(panel, engine, hud, now):
+    """Latest engine frame -> the 64x64 panel: view + HUD in a level, the tally
+    at level end, else the unzoomed picture (title, text screens). Returns False
+    while no frame has arrived yet. Shared with the attract-mode visual."""
+    frame = engine.frame
+    if frame is None:
+        return False
+    es, mask = engine.state, engine.mask
+    panel[:] = 0
+    if es and es.get('gamestate') == 0 and es.get('in_level'):
+        panel[:40] = _render_view(frame[:_VIEW_H], None if mask is None else mask[:_VIEW_H])
+        _view_overlay(panel, es, mask, hud, now)
+        hud.draw(panel, frame, es, now)
+    else:   # tally / text / title screens: unzoomed picture, no highlight
+        panel[:40] = _render_view(frame[:_VIEW_H], None, zoom=False)
+        if es and es.get('gamestate') == 1:
+            hud.intermission(panel, es['wi'])
+    return True
+
+
+def blit(display, panel):
+    """Copy a 64x64 uint8 panel into the display (fast path on the cabinet)."""
+    fb = getattr(display, '_fb', None)
+    if fb is not None:
+        fb[:] = panel.tobytes()
+    else:
+        buf = display.buffer
+        for y in range(GRID_SIZE):
+            row = panel[y]
+            for x in range(GRID_SIZE):
+                px = row[x]
+                buf[y][x] = (int(px[0]), int(px[1]), int(px[2]))
+
+
+def start_engine(iwad, args):
+    """An _Engine, or None when the engine won't start (wrong build, no memory,
+    or the test sandbox)."""
+    try:
+        return _Engine(_EXE, iwad, args)
+    except OSError:
+        return None
+
+
+# ── Pre-game menu ────────────────────────────────────────────────
+# Doom's own menu is unreadable at 64 pixels, so the game, skill and starting
+# map are picked here and passed on the command line. Choices and the furthest
+# map reached per game persist in settings under 'doom'.
+
+SKILLS = ("TOO YOUNG", "NOT ROUGH", "HURT ME", "ULTRA", "NIGHTMARE")   # Doom's five, shortened
+_SETTINGS_KEY = 'doom'
+
+
+class _Choice:
+    """One entry of the GAME row: a Phase 1 episode or the whole of Phase 2."""
+
+    def __init__(self, label, iwad, episode, maps):
+        self.label, self.iwad, self.episode, self.maps = label, iwad, episode, maps
+        self.key = f"{os.path.basename(iwad)}:{episode}"          # progress key in settings
+
+    def map_name(self, m):
+        return f"E{self.episode}M{m}" if self.episode else f"MAP{m:02d}"
+
+    def warp(self, m):
+        return ['-warp', str(self.episode), str(m)] if self.episode else ['-warp', str(m)]
+
+
+def _choices():
+    out = []
+    for label, path in _installed_wads():
+        maps = _wad_maps(path)
+        if 0 in maps:
+            out.append(_Choice(label, path, 0, maps[0]))
+        for ep in sorted(e for e in maps if e):
+            out.append(_Choice(f"{label} E{ep}", path, ep, maps[ep]))
+    return out
+
+
+class _Menu:
+    """GAME / SKILL / MAP rows; stick moves, either button starts."""
+    ROWS = ("GAME", "SKILL", "MAP")
+
+    def __init__(self, choices):
+        self.choices = choices
+        saved = settings.get(_SETTINGS_KEY, {}) or {}
+        self.progress = dict(saved.get('progress', {}))
+        self.row = 0
+        self.game = min(max(saved.get('game', 0), 0), len(choices) - 1)
+        self.skill = min(max(saved.get('skill', 3), 1), 5)
+        self.map = min(max(saved.get('map', 1), 1), self.furthest())
+
+    @property
+    def choice(self):
+        return self.choices[self.game]
+
+    def furthest(self):
+        """Highest map worth offering: the furthest reached, capped by the WAD."""
+        return min(max(self.progress.get(self.choice.key, 1), 1), self.choice.maps)
+
+    def move(self, dx, dy):
+        if dy:
+            self.row = (self.row + dy) % len(self.ROWS)
+        if dx:
+            if self.row == 0:
+                self.game = (self.game + dx) % len(self.choices)
+                self.map = min(self.map, self.furthest())
+            elif self.row == 1:
+                self.skill = (self.skill - 1 + dx) % 5 + 1
+            else:
+                self.map = (self.map - 1 + dx) % self.furthest() + 1
+
+    def value(self, row):
+        if row == 0:
+            return self.choice.label
+        if row == 1:
+            return SKILLS[self.skill - 1]
+        return self.choice.map_name(self.map)
+
+    def launch_args(self):
+        return ['-skill', str(self.skill)] + self.choice.warp(self.map)
+
+    def record_cleared(self, next_map):
+        """A level ended: the next map (1-based) is reachable from the menu now."""
+        if next_map > self.progress.get(self.choice.key, 1):
+            self.progress[self.choice.key] = next_map
+            self.save()
+
+    def save(self):
+        settings.set(_SETTINGS_KEY, {'game': self.game, 'skill': self.skill,
+                                     'map': self.map, 'progress': self.progress})
+
+    def draw(self, panel, now):
+        panel[:] = 0
+        _text(panel, 24, 3, "DOOM", (255, 50, 30))
+        panel[10, 8:56] = (90, 20, 10)
+        for i, label in enumerate(self.ROWS):
+            y = 16 + 10 * i
+            sel = i == self.row
+            _text(panel, 2, y, label, (255, 255, 255) if sel else LABEL)
+            val = self.value(i)
+            col = (255, 210, 60) if sel else (170, 170, 170)
+            _text(panel, 63 - 4 * len(val) + 1, y, val, col)
+            if sel and (now * 2) % 1 < 0.7:                    # blinking cursor
+                panel[y + 2, 25] = col
+        _text(panel, 2, 52, "L OR R", LABEL)
+        _text(panel, 30, 52, "START", (255, 255, 255))
+        _text(panel, 2, 58, "STICK", LABEL)
+        _text(panel, 26, 58, "CHANGE", (170, 170, 170))
+
+
 # ── Game class ───────────────────────────────────────────────────
 
 class Doom(Game):
@@ -508,23 +711,30 @@ class Doom(Game):
     def __init__(self, display: Display):
         super().__init__(display)
         self._engine = None
+        self._menu = None
         self._controls = _Controls()
         self._panel = np.zeros((64, 64, 3), dtype=np.uint8)
         self._hud = _Hud()
         self.reset()
 
     def reset(self):
+        """Back to the pre-game menu; the engine starts when the player does."""
         self.state = GameState.PLAYING
         self.score = 0
-        if self._engine is not None:
-            self._engine.close()
-        self._engine = None
-        try:
-            if _available():
-                self._engine = _Engine(_EXE, _WAD)
-        except OSError:                    # engine won't start (wrong build, no memory)
-            pass
-        if self._engine is None:
+        self.close()
+        self._controls = _Controls()
+        self._hud = _Hud()
+        self._cleared = None               # msg_serial-like guard: tally already recorded
+        choices = _choices() if _available() else []
+        if not choices:
+            self.state = GameState.GAME_OVER
+            return
+        self._menu = _Menu(choices)
+
+    def _start(self):
+        self._menu.save()
+        self._engine = start_engine(self._menu.choice.iwad, self._menu.launch_args())
+        if self._engine is None:           # engine won't start (wrong build, no memory)
             self.state = GameState.GAME_OVER
 
     def close(self):
@@ -533,44 +743,44 @@ class Doom(Game):
             self._engine = None
 
     def update(self, input_state: InputState, dt: float):
-        if self._engine is None or self._engine.proc.poll() is not None:
-            self.state = GameState.GAME_OVER
+        if self.state != GameState.PLAYING:
             return
+        now = time.monotonic()
         inp = dict(
             up=input_state.up, down=input_state.down,
             left=input_state.left, right=input_state.right,
             L=input_state.action_l_held, R=input_state.action_r_held)
-        for pressed, k in self._controls.update(inp, self._engine.state, dt):
-            self._engine.key(pressed, k)
+        events = self._controls.update(inp, self._engine.state if self._engine else None, dt)
         if self._controls.exit:
             self.state = GameState.GAME_OVER
             return
-        frame = self._engine.frame
-        if frame is None:
-            return
-        es, mask = self._engine.state, self._engine.mask
-        now = time.monotonic()
-        self._panel[:] = 0
-        if es and es.get('gamestate') == 0 and es.get('in_level'):
-            self._panel[:40] = _render_view(frame[:_VIEW_H], None if mask is None else mask[:_VIEW_H])
-            _view_overlay(self._panel, es, mask, self._hud, now)
-            self._hud.draw(self._panel, frame, es, now)
-        else:   # tally / text / title screens: unzoomed picture, no highlight
-            self._panel[:40] = _render_view(frame[:_VIEW_H], None, zoom=False)
-            if es and es.get('gamestate') == 1:
-                self._hud.intermission(self._panel, es['wi'])
+        if self._engine is None:           # in the menu
+            m = self._menu
+            m.move((1 if input_state.right_pressed else 0) - (1 if input_state.left_pressed else 0),
+                   (1 if input_state.down_pressed else 0) - (1 if input_state.up_pressed else 0))
+            m.draw(self._panel, now)
+            if input_state.action_l or input_state.action_r:
+                self._start()
+        else:
+            if self._engine.proc.poll() is not None:
+                self.state = GameState.GAME_OVER
+                return
+            for pressed, k in events:
+                self._engine.key(pressed, k)
+            compose(self._panel, self._engine, self._hud, now)
+            self._track_progress(self._engine.state)
         if self._controls.both_t > EXIT_BAR_AFTER:
             _draw_exit_bar(self._panel, self._controls.both_t / self._controls.EXIT_HOLD)
 
+    def _track_progress(self, es):
+        """At the level-end tally, remember the next map for the menu's MAP row."""
+        if not es or es.get('gamestate') != 1:
+            self._cleared = None
+            return
+        wi = es['wi']
+        if wi['state'] == 0 and wi['next'] >= 0 and self._cleared != wi['next']:
+            self._cleared = wi['next']
+            self._menu.record_cleared(wi['next'] + 1)
+
     def draw(self):
-        panel = self._panel
-        fb = getattr(self.display, '_fb', None)
-        if fb is not None:
-            fb[:] = panel.tobytes()
-        else:
-            buf = self.display.buffer
-            for y in range(GRID_SIZE):
-                row = panel[y]
-                for x in range(GRID_SIZE):
-                    px = row[x]
-                    buf[y][x] = (int(px[0]), int(px[1]), int(px[2]))
+        blit(self.display, self._panel)

@@ -50,6 +50,11 @@ class Visual(ABC):
         """
         return False
 
+    def close(self):
+        """Optional: release what reset() acquired (DOOM's attract mode runs an
+        engine process). The shells and slideshows call it when they drop a visual."""
+        pass
+
     def _draw_loading(self, progress, label=""):
         """Draw a universal loading screen with green progress bar.
 
@@ -297,6 +302,7 @@ from .pinballdemo import PinballDemo
 from .pipedreamdemo import PipeDreamDemo
 from .pooldemo import PoolDemo
 from .pongdemo import PongDemo
+from .doomdemo import DoomDemo
 from .qbertdemo import QBertDemo
 from .shuffleboarddemo import ShuffleboardDemo
 from .skifreedemo import SkiFreeDemo
@@ -684,6 +690,7 @@ ALL_VISUALS = [
     PipeDreamDemo,
     PoolDemo,
     PongDemo,
+    DoomDemo,
     QBertDemo,
     ShuffleboardDemo,
     SkiFreeDemo,
@@ -905,6 +912,7 @@ __all__ = [
     'Education',
     'Naturalist',
     'Demos',
+    'DoomDemo',
     'AgarioDemo',
     'DefenderDemo',
     'MonsterMazeDemo',
