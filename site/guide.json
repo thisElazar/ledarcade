@@ -4690,13 +4690,14 @@
      "name": "DRUM MACHINE",
      "cls": "DrumMachine",
      "module": "visuals/drummachine.py",
-     "desc": "A Roland TR-808-style step sequencer. 16 steps, multiple tracks for kick, snare, hi-hat, and more. Beat patterns scroll and animate.",
+     "desc": "A Roland TR-808-style step sequencer. 16 steps, one row each for kick, snare, hi-hat, and more. Step through the core beats that popular music is built on \u2014 backbeat, four on the floor, funk, one drop, blast beat \u2014 and watch what changes from one to the next.",
      "legend": {
+      "top-left name": "The beat or style now playing.",
       "top-right number": "Tempo in beats per minute."
      },
      "controls": {
       "Left/Right": "Adjust BPM (40-230)",
-      "Up/Down": "Cycle song pattern"
+      "Up/Down": "Cycle beat / style"
      }
     },
     {

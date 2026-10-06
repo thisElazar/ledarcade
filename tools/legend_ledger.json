@@ -2896,7 +2896,7 @@
      "meaning": "current tempo of the pattern, in beats per minute",
      "kind": "bare-number",
      "where": "top-right of header, no unit or label shown",
-     "evidence": "visuals/drummachine.py:292-294",
+     "evidence": "visuals/drummachine.py:245-249",
      "explained_same_screen": false,
      "spelled_out_elsewhere": "",
      "on_site": true,
@@ -2905,11 +2905,11 @@
     }
    },
    "other_encodings": [
-    "pad row color = drum instrument, with no on-screen text legend at all (kick=red, snare=yellow, hi-hat=cyan, open hi-hat=green, clap=pink, tom=orange, rim=purple, perc/ride=white/gray) (visuals/drummachine.py:18-27)",
-    "vertical pulsing white line = the playhead / current step in the 16-step pattern (visuals/drummachine.py:329-349)"
+    "pad row color = drum instrument, with no on-screen text legend at all (kick=red, snare=yellow, hi-hat=cyan, open hi-hat=green, clap=pink, tom=orange, rim=purple, ride=white/gray) (visuals/drummachine.py:18-27)",
+    "vertical pulsing white line = the playhead / current step in the 16-step pattern (visuals/drummachine.py:284-304)"
    ],
    "confidence": "medium",
-   "notes": "Instrument names (KICK, SNARE, HAT, ...) are never drawn as text anywhere — the only way to tell rows apart is pad color, which is why it's listed under other_encodings rather than as a text label. guide_controls says 'Left/Right: Adjust BPM (40-230)', which matches this exact value and range, so on_site=true for the bare BPM number even though no 'BPM' text is ever drawn on the panel. Row 7 is named 'PERC' in INSTRUMENTS but every pattern's inline comment calls it 'ride' — an internal naming inconsistency, invisible to the viewer since the name is never displayed."
+   "notes": "Instrument names (KICK, SNARE, HAT, ...) are never drawn as text anywhere — the only way to tell rows apart is pad color, which is why it's listed under other_encodings rather than as a text label. guide_controls says 'Left/Right: Adjust BPM (40-230)', which matches this exact value and range, so on_site=true for the bare BPM number even though no 'BPM' text is ever drawn on the panel. Oct 5 2026: the song presets were replaced with core beats and styles (BACKBEAT, 4 ON FLOOR, ONE DROP...); the top-left name is plain English and is covered by the GUIDE legend's 'top-left name'. Row 7 was renamed PERC -> RIDE to match how every pattern uses it."
   },
   "visuals/ecosystem.py::Ecosystem": {
    "found": "2026-09-20",

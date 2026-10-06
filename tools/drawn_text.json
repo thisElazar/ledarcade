@@ -3148,9 +3148,9 @@
   ],
   "visuals/drummachine.py::DrumMachine": [
    "#",
-   "BILLIE JEAN",
-   "ENTER SANDMAN",
-   "SANDSTORM"
+   "BACKBEAT",
+   "BLAST BEAT",
+   "PUNK"
   ],
   "visuals/dvd.py::DVD": [],
   "visuals/ecosystem.py::Ecosystem": [
