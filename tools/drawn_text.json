@@ -3939,7 +3939,9 @@
    "DEMO"
   ],
   "visuals/musicbox.py::MusicBox": [
-   "# BPM"
+   "# BPM",
+   "JOPLIN",
+   "THE ENTERTAINER"
   ],
   "visuals/network.py::Network": [
    "BARABASI-ALBERT",
@@ -4186,10 +4188,10 @@
    "RAINBOW"
   ],
   "visuals/pianoroll.py::PianoRoll": [
-   "#BPM",
-   "CLASSICAL",
-   "JAZZ",
-   "RAGTIME"
+   "# BPM",
+   "BACH",
+   "GYMNOPEDIE NO #",
+   "INVENTION NO #"
   ],
   "visuals/pinballdemo.py::PinballDemo": [
    "#",

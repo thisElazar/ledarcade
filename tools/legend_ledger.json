@@ -4326,11 +4326,12 @@
    "found": "2026-09-20",
    "labels": {},
    "other_encodings": [
-    "tine color/brightness = how recently that tine was plucked (white flash fading down to base metal color)",
-    "pin dot brightness = whether that pin currently faces the viewer (pure cosmetic shading)"
+    "tooth brightness = how recently that tooth was plucked (pale flash fading down to base steel)",
+    "tooth position and length = pitch: one tooth per pitch the tune uses, bass (long) at the left, treble (short) at the right",
+    "pin dot brightness = how squarely that pin faces the viewer (cosmetic shading); pin distance from the comb = how soon it will sound"
    ],
    "confidence": "high",
-   "notes": "No abbreviations or unlabeled numbers on screen; the only text is \"{n} BPM\", which is self-labeled and BPM is a standard unit. speed_level (1-6) is never shown directly, only via its resulting BPM."
+   "notes": "Rewritten Oct 5 2026: the arbitrary pin pattern was replaced with Joplin's The Entertainer from a Mutopia Project score. The header shows THE ENTERTAINER alternating with JOPLIN (plain words), and '{n} BPM' for two seconds after a tempo change, which is self-labeled. Not re-audited by the legend audit since the rewrite."
   },
   "visuals/network.py::Network": {
    "found": "2026-09-20",
@@ -4739,11 +4740,12 @@
    "found": "2026-09-20",
    "labels": {},
    "other_encodings": [
-    "falling note-bar color = pitch class (12-color rainbow, C=red … B=pink, repeating each octave)",
-    "note-bar brightness fades the farther it is from the keyboard (distance cue only)"
+    "perforation and held-key color = staff the note is written on (red = upper staff / right hand, blue = lower staff / left hand) — visuals/pianoroll.py HAND_COLORS, HAND_KEY_COLORS; explained in the GUIDE legend ('red / blue')",
+    "horizontal position = pitch, one pixel per key over 64 keys; the darker paper columns mark every C",
+    "perforation length = note length at constant paper speed; the brass line under the paper is the tracker bar, where a note sounds"
    ],
    "confidence": "high",
-   "notes": "No abbreviations or unlabeled numbers on screen; BPM (\"{n}BPM\") is self-labeled and the pattern name (CLASSICAL/RAGTIME/JAZZ/POP) is a plain word."
+   "notes": "Rewritten Oct 5 2026: the invented CLASSICAL/RAGTIME/JAZZ/POP patterns were replaced with eight real pieces from Mutopia Project scores. The header shows the roll's title alternating with its composer (plain words: GYMNOPEDIE NO 1 / SATIE ...), and '{n} BPM' for two seconds after a tempo change, which is self-labeled. Not re-audited by the legend audit since the rewrite."
   },
   "visuals/plates.py::Audubon": {
    "found": "2026-09-20",

@@ -1730,6 +1730,46 @@
      "researcher_note": "Added 2026-09-25 when the visual (formerly DemonSpirals, docstring 'Cyclic CA from David Griffeath') got the credit line its LAB already carried. The citation is the one verified for CYCLIC LAB; nobody has yet checked that this module's step rule is the same threshold CCA."
     }
    ]
+  },
+  "visuals/pianoroll.py::PianoRoll": {
+   "name": "PIANO ROLL",
+   "category": "music",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Scores: Mutopia Project",
+     "source": "Mutopia Project piece metadata (.rdf) for the eight pieces, each giving licence \"Public Domain\": Mutopia-2014/12/14-37 (Satie, Gymnopédie No. 1, from the Dover edition), Mutopia-2011/09/12-5 (Bach, WTC I Praeludium I, BWV 846), Mutopia-2008/06/15-61 (Bach, Invention 8, BWV 779, from the Bach-Gesellschaft edition), Mutopia-2015/08/18-931 (Beethoven, Für Elise, WoO 59, from Breitkopf & Härtel 1888), Mutopia-2011/06/19-472 (Chopin, Prelude Op. 28 No. 20, from Edition Peters), Mutopia-2015/01/17-483 (Chopin, Valse Op. 64 No. 1, from Edition Peters), Mutopia-2017/11/06-626 (Sousa, The Stars and Stripes Forever, from the John Church Company 1897 edition), Mutopia-2011/11/13-23 (Joplin, Maple Leaf Rag, from a reproduction of the 1899 original edition)",
+     "evidence": "visuals/pianoroll.py:86",
+     "checked": "2026-10-05",
+     "verdict": "correct",
+     "url": "https://www.mutopiaproject.org/",
+     "proposed_claim": "",
+     "code_matches": "yes",
+     "code_note": "The notes are not typed in: tools/build_piano_rolls.py converts the eight Mutopia MIDI files kept in assets/pianoroll/ into visuals/pianoroll_data.py. It keeps every note's pitch, start, length and staff; it rounds times to 1/24 of a quarter note, plays written repeats once (as the MIDI does), and moves 3 of 9,070 notes an octave inward to fit the 64-key roll (2 in Für Elise, 1 in the Minute Waltz).",
+     "ruling": "",
+     "researcher_note": "Added 2026-10-05 when the invented CLASSICAL/RAGTIME/JAZZ/POP patterns were replaced with real pieces. The metadata was read from the hatch library's mirror of the Mutopia tree, not re-fetched from mutopiaproject.org, and no adversarial check has been run on this entry."
+    }
+   ]
+  },
+  "visuals/musicbox.py::MusicBox": {
+   "name": "MUSIC BOX",
+   "category": "music",
+   "claims": [
+    {
+     "kind": "credit",
+     "claim": "Score: Mutopia Project",
+     "source": "Mutopia Project piece metadata (.rdf) for Mutopia-2016/11/25-263: title \"The Entertainer\", composer JoplinS, date \"c. 1902\", source \"Reproduction of original edition (1902)\", licence \"Public Domain\", maintainer Chris Sawer",
+     "evidence": "visuals/musicbox.py:97",
+     "checked": "2026-10-05",
+     "verdict": "correct",
+     "url": "https://www.mutopiaproject.org/",
+     "proposed_claim": "",
+     "code_matches": "yes",
+     "code_note": "The pins are the piece: tools/build_music_box.py converts the Mutopia MIDI file kept in assets/musicbox/ into visuals/musicbox_data.py, one pin per note (2,621) on a comb with one tooth per pitch used (55), nothing transposed or dropped, repeats played out as the MIDI plays them. Note lengths are discarded because a comb tooth cannot hold a note. The mechanism is a drawing, not a model: a real cylinder carries its tune in one revolution, while this one turns about once every 11 seconds and takes some 22 turns to play the piece (stated in the module's TURN_SPEED comment).",
+     "ruling": "",
+     "researcher_note": "Added 2026-10-05 when the arbitrary pin pattern was replaced with a real tune. The metadata was read from the hatch library's mirror of the Mutopia tree, not re-fetched from mutopiaproject.org, and no adversarial check has been run on this entry."
+    }
+   ]
   }
  },
  "_audit": "Verified 2026-09-22 by a 17-agent sweep: 8 researchers, one adversarial checker per batch re-fetching every URL, and a completeness critic. 10 of 62 rulings overturned the researcher. No citation was written from memory: a claim nobody could settle from a primary source is recorded as unverifiable with an empty source, not filled in."

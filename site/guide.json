@@ -4775,7 +4775,12 @@
      "name": "MUSIC BOX",
      "cls": "MusicBox",
      "module": "visuals/musicbox.py",
-     "desc": "A rotating cylinder with pins plucking a metal comb. Each pin triggers a note as the barrel turns. The original mechanical music player.",
+     "desc": "A rotating brass cylinder with pins plucking a steel comb, seen from above. The pins are a real tune, Scott Joplin's \"The Entertainer\", and the comb is cut for it: one tooth for each of the 55 notes the piece uses, long bass teeth at the left, short treble teeth at the right. The original mechanical music player.",
+     "credit": "Score: Mutopia Project",
+     "legend": {
+      "top line": "Title of the tune, alternating with its composer.",
+      "# BPM": "Tempo in quarter notes per minute, shown after you change it."
+     },
      "controls": {
       "Left/Right": "Adjust tempo (6 levels)"
      }
@@ -4784,10 +4789,16 @@
      "name": "PIANO ROLL",
      "cls": "PianoRoll",
      "module": "visuals/pianoroll.py",
-     "desc": "A scrolling piano roll showing notes in time. Colored bars descend onto a keyboard. The format dates back to player pianos of the 1900s and is still used in MIDI editors.",
+     "desc": "A player piano with 64 keys. Real pieces - Satie, Bach, Beethoven, Chopin, Sousa, Joplin - scroll past as perforations in a paper roll; each one fires a hammer and presses its key as it crosses the brass tracker bar. Watch what the left hand does: a slow bass-and-chord sway in the Gymnopedie, broken chords in the Bach prelude, the leaping stride of a rag.",
+     "credit": "Scores: Mutopia Project",
+     "legend": {
+      "top line": "Title of the roll, alternating with its composer.",
+      "# BPM": "Tempo in quarter notes per minute, shown after you change it.",
+      "red / blue": "Notes written on the upper staff (right hand) / lower staff (left hand)."
+     },
      "controls": {
       "Left/Right": "Adjust tempo (6 levels)",
-      "Up/Down": "Cycle song pattern (Classical, Ragtime, Jazz, Pop)"
+      "Up/Down": "Change roll"
      }
     },
     {

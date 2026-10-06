@@ -4128,13 +4128,19 @@
           "name": "MUSIC BOX",
           "cls": "MusicBox",
           "module": "visuals/musicbox.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/musicbox_data.py"
+          ]
         },
         {
           "name": "PIANO ROLL",
           "cls": "PianoRoll",
           "module": "visuals/pianoroll.py",
-          "is_game": false
+          "is_game": false,
+          "deps": [
+            "visuals/pianoroll_data.py"
+          ]
         },
         {
           "name": "RUDIMENTS",
@@ -6175,12 +6181,18 @@
             {
               "name": "MUSIC BOX",
               "cls": "MusicBox",
-              "module": "visuals/musicbox.py"
+              "module": "visuals/musicbox.py",
+              "deps": [
+                "visuals/musicbox_data.py"
+              ]
             },
             {
               "name": "PIANO ROLL",
               "cls": "PianoRoll",
-              "module": "visuals/pianoroll.py"
+              "module": "visuals/pianoroll.py",
+              "deps": [
+                "visuals/pianoroll_data.py"
+              ]
             },
             {
               "name": "RUDIMENTS",
@@ -9155,7 +9167,10 @@
             {
               "name": "MUSIC BOX",
               "cls": "MusicBox",
-              "module": "visuals/musicbox.py"
+              "module": "visuals/musicbox.py",
+              "deps": [
+                "visuals/musicbox_data.py"
+              ]
             },
             {
               "name": "METRONOME",
@@ -9175,7 +9190,10 @@
             {
               "name": "PIANO ROLL",
               "cls": "PianoRoll",
-              "module": "visuals/pianoroll.py"
+              "module": "visuals/pianoroll.py",
+              "deps": [
+                "visuals/pianoroll_data.py"
+              ]
             },
             {
               "name": "DRUM MACHINE",

@@ -1,86 +1,91 @@
 """
 Music Box
 =========
-Side-view brass cylinder with pins rotating past a steel comb. Tines
-extend LEFT from the comb spine toward the cylinder. Pins pluck tines
-at the contact point (rightmost cylinder edge) with a flash and ±1px
-vibration that decays.
+Looking down into a cylinder music box. The brass cylinder turns toward the
+steel comb; each pin that comes round to the comb plucks one tooth, which
+flashes and rings down.
+
+The pins are a real tune - Scott Joplin's "The Entertainer", converted note
+for note from a public-domain Mutopia Project score by tools/build_music_box.py.
+As in a real box, the comb is cut for the tune: one tooth for each of the 55
+pitches the piece uses, long bass teeth on the left, short treble on the right.
+
+Regions:
+  y=0-4:   Title of the tune, alternating with its composer
+  y=8-33:  Cylinder; pins ride down its face toward the comb
+  y=34+:   Comb; tooth tips meet the cylinder, roots run diagonally
 
 Controls:
   Left/Right - Adjust tempo (6 levels)
 """
 
 import math
+from bisect import bisect_left, bisect_right
+
 from . import Visual, Display, Colors, GRID_SIZE
+from .musicbox_data import TITLE, COMPOSER, BPM, TICKS_PER_BEAT, COMB, PINS
 
 
 # --- Color Palette ---
-CYLINDER_COLOR = (180, 150, 50)
-CYLINDER_DARK = (130, 110, 35)
-CYLINDER_EDGE = (100, 85, 25)
-PIN_COLOR = (255, 230, 120)
-PIN_DIM = (200, 175, 70)
+CYLINDER_COLOR = (150, 118, 36)
+CYLINDER_EDGE = (50, 38, 10)
+PIN_COLOR = (255, 240, 170)
 
-COMB_SPINE = (160, 160, 170)
-COMB_DARK = (120, 120, 130)
-TINE_COLOR = (180, 180, 190)
-TINE_BRIGHT = (220, 220, 230)
-TINE_BASE = (140, 140, 150)
-
+TOOTH_LIGHT = (150, 150, 162)
+TOOTH_DARK = (104, 104, 116)
+COMB_PLATE = (78, 78, 90)
+COMB_SCREW = (30, 30, 36)
 PLUCK_FLASH = (255, 255, 200)
 
 BOX_COLOR = (100, 65, 25)
-BOX_DARK = (70, 45, 15)
-BOX_LIGHT = (130, 85, 35)
-BOX_EDGE = (60, 40, 12)
-
-LID_COLOR = (120, 80, 30)
-LID_HIGHLIGHT = (150, 100, 40)
+BOX_DARK = (34, 22, 8)
+AXLE_COLOR = (160, 160, 170)
 
 HUD_COLOR = (160, 160, 170)
 
 # --- Layout ---
-CYLINDER_CX = 16
-CYLINDER_CY = 32
-CYLINDER_R = 10
+NUM_TEETH = len(COMB)
+COMB_LEFT = (GRID_SIZE - NUM_TEETH) // 2   # one pixel per tooth, centred
 
-# Comb: spine on right, tines extend LEFT toward cylinder
-COMB_SPINE_X = 46
-TINE_TIP_X = CYLINDER_CX + CYLINDER_R + 1  # tine tips touch cylinder edge
-NUM_TINES = 12
-TINE_TOP = CYLINDER_CY - NUM_TINES // 2 + 1
+CYLINDER_TOP = 8
+CYLINDER_BOTTOM = 33
+CYLINDER_R = (CYLINDER_BOTTOM - CYLINDER_TOP + 1) / 2.0
+CYLINDER_CY = (CYLINDER_TOP + CYLINDER_BOTTOM) / 2.0
 
-# Pin grid
-PIN_ROWS = 12
-PIN_COLS = 16
+TOOTH_TIP = CYLINDER_BOTTOM + 1
+TOOTH_LONG = 20      # bass tooth length
+TOOTH_SHORT = 7      # treble tooth length
+PLATE_BOTTOM = 58
 
-# Box housing
-BOX_TOP = CYLINDER_CY + CYLINDER_R + 3
-BOX_LEFT = 2
-BOX_RIGHT = 60
+BOX_TOP = 6
 
-# Lid
-LID_Y = CYLINDER_CY - CYLINDER_R - 6
-LID_LEFT = 1
-LID_RIGHT = 61
+# The cylinder turns at one speed for the whole tune. A real one would carry
+# the tune in a single turn; at this size that would smear the pins together,
+# so this one turns faster and the tune takes many turns.
+TURN_SPEED = 0.55   # radians per second at the tune's own tempo
+TEMPO_SCALES = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
 
-SPEED_BPMS = [30, 60, 90, 120, 160, 200]
+TITLE_SECONDS = 4.0    # header alternates title / composer this often
+TEMPO_SECONDS = 2.0    # header shows the tempo this long after a change
+TAIL_SECONDS = 3.0     # silence after the last note, before it starts over
 
-# Pin pattern (sparse melody)
-PIN_PATTERN = [
-    [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-    [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-    [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
-]
+PIN_STARTS = [p[0] for p in PINS]
+TUNE_END = PINS[-1][0]
+# Ticks of music per radian of cylinder, and how much of it is on view
+TICKS_PER_RADIAN = BPM / 60.0 * TICKS_PER_BEAT / TURN_SPEED
+VISIBLE_TICKS = math.pi * TICKS_PER_RADIAN
+
+# Brass shading per cylinder row: bright along the top of the curve
+CYLINDER_ROWS = []
+for _y in range(CYLINDER_TOP, CYLINDER_BOTTOM + 1):
+    _lit = math.sqrt(max(0.0, 1.0 - ((_y - CYLINDER_CY) / CYLINDER_R) ** 2))
+    CYLINDER_ROWS.append(tuple(
+        int(e + (c - e) * _lit) for c, e in zip(CYLINDER_COLOR, CYLINDER_EDGE)))
+
+# Tooth lengths: graded from the long bass tooth to the short treble one
+TOOTH_LENGTHS = [
+    round(TOOTH_LONG - (TOOTH_LONG - TOOTH_SHORT) * i / (NUM_TEETH - 1))
+    for i in range(NUM_TEETH)]
 
 
 class MusicBox(Visual):
@@ -88,7 +93,12 @@ class MusicBox(Visual):
     description = "Cylinder music box"
     category = "music"
     GUIDE = {
-        'desc': 'A rotating cylinder with pins plucking a metal comb. Each pin triggers a note as the barrel turns. The original mechanical music player.',
+        'desc': 'A rotating brass cylinder with pins plucking a steel comb, seen from above. The pins are a real tune, Scott Joplin\'s "The Entertainer", and the comb is cut for it: one tooth for each of the 55 notes the piece uses, long bass teeth at the left, short treble teeth at the right. The original mechanical music player.',
+        'credit': 'Score: Mutopia Project',
+        'legend': {
+            'top line': 'Title of the tune, alternating with its composer.',
+            '# BPM': 'Tempo in quarter notes per minute, shown after you change it.',
+        },
     }
 
     def __init__(self, display: Display):
@@ -96,177 +106,119 @@ class MusicBox(Visual):
 
     def reset(self):
         self.time = 0.0
-        self.speed_level = 3
-        self.cylinder_angle = 0.0
-        self.tine_energy = [0.0] * NUM_TINES
-        self.tine_phase = [0.0] * NUM_TINES
-        self.last_col = -1
+        self.speed_level = 3       # 1-6
+        self.tempo_shown = 0.0     # seconds left to show the tempo
+        self._rewind()
+
+    def _rewind(self):
+        """Start the tune over: first pins just coming over the cylinder."""
+        self.pos = -VISIBLE_TICKS          # tick now at the comb
+        self.next_pin = 0
+        self.tooth_energy = [0.0] * NUM_TEETH   # 0..1, rings down
+
+    def _bpm(self):
+        return round(BPM * TEMPO_SCALES[self.speed_level - 1])
 
     def handle_input(self, input_state):
         consumed = False
         if input_state.right_pressed:
             self.speed_level = min(6, self.speed_level + 1)
+            self.tempo_shown = TEMPO_SECONDS
             consumed = True
         elif input_state.left_pressed:
             self.speed_level = max(1, self.speed_level - 1)
+            self.tempo_shown = TEMPO_SECONDS
             consumed = True
         return consumed
 
     def update(self, dt):
         self.time += dt
+        self.tempo_shown = max(0.0, self.tempo_shown - dt)
 
-        bpm = SPEED_BPMS[self.speed_level - 1]
-        beats_per_sec = bpm / 60.0
-        rads_per_sec = (beats_per_sec / PIN_COLS) * 2.0 * math.pi
+        ticks_per_sec = self._bpm() / 60.0 * TICKS_PER_BEAT
+        self.pos += ticks_per_sec * dt
 
-        self.cylinder_angle += rads_per_sec * dt
+        # Pluck the tooth of every pin that has come round to the comb
+        while self.next_pin < len(PINS) and PINS[self.next_pin][0] <= self.pos:
+            self.tooth_energy[PINS[self.next_pin][1]] = 1.0
+            self.next_pin += 1
 
-        # Which column is at the contact point (rightmost edge)?
-        # Pin at col_angle = pi/2 is at x = cx + r (rightmost).
-        # col_angle = (col/PIN_COLS)*2pi - cylinder_angle
-        # Setting col_angle = pi/2:
-        #   col = (cylinder_angle + pi/2) * PIN_COLS / (2*pi)
-        contact_frac = ((self.cylinder_angle + math.pi / 2) / (2.0 * math.pi)) * PIN_COLS
-        current_col = int(contact_frac) % PIN_COLS
+        for i in range(NUM_TEETH):
+            if self.tooth_energy[i] > 0.0:
+                self.tooth_energy[i] = max(0.0, self.tooth_energy[i] - 2.5 * dt)
 
-        if current_col != self.last_col:
-            self.last_col = current_col
-            for row in range(PIN_ROWS):
-                if PIN_PATTERN[row][current_col]:
-                    self.tine_energy[row] = 1.0
-                    self.tine_phase[row] = 0.0
-
-        # Decay tine vibrations
-        for i in range(NUM_TINES):
-            if self.tine_energy[i] > 0:
-                self.tine_energy[i] *= (1.0 - 4.0 * dt)
-                if self.tine_energy[i] < 0.02:
-                    self.tine_energy[i] = 0.0
-                self.tine_phase[i] += dt * 25.0
+        if self.pos > TUNE_END + TAIL_SECONDS * ticks_per_sec:
+            self._rewind()
 
     def draw(self):
         d = self.display
         d.clear(Colors.BLACK)
         self._draw_box(d)
-        self._draw_lid(d)
         self._draw_cylinder(d)
         self._draw_comb(d)
         self._draw_hud(d)
 
     def _draw_box(self, d):
-        d.draw_rect(BOX_LEFT, BOX_TOP, BOX_RIGHT - BOX_LEFT, GRID_SIZE - BOX_TOP, BOX_COLOR)
-        d.draw_line(BOX_LEFT, BOX_TOP, BOX_RIGHT - 1, BOX_TOP, BOX_LIGHT)
-        d.draw_line(BOX_LEFT, BOX_TOP, BOX_LEFT, 63, BOX_EDGE)
-        d.draw_line(BOX_RIGHT - 1, BOX_TOP, BOX_RIGHT - 1, 63, BOX_EDGE)
-        d.draw_line(BOX_LEFT + 1, BOX_TOP - 1, BOX_RIGHT - 2, BOX_TOP - 1, BOX_DARK)
-
-    def _draw_lid(self, d):
-        d.draw_line(LID_LEFT, LID_Y, LID_RIGHT, LID_Y, LID_COLOR)
-        d.draw_line(LID_LEFT, LID_Y + 1, LID_RIGHT, LID_Y + 1, LID_HIGHLIGHT)
-        d.draw_line(LID_LEFT, LID_Y, BOX_LEFT, CYLINDER_CY - CYLINDER_R - 2, LID_COLOR)
-        d.draw_line(LID_RIGHT, LID_Y, BOX_RIGHT - 1, CYLINDER_CY - CYLINDER_R - 2, LID_COLOR)
+        """Draw the wooden case: dark interior inside a lighter rim."""
+        d.draw_rect(0, BOX_TOP, GRID_SIZE, GRID_SIZE - BOX_TOP, BOX_DARK)
+        d.draw_rect(0, BOX_TOP, GRID_SIZE, GRID_SIZE - BOX_TOP, BOX_COLOR, filled=False)
 
     def _draw_cylinder(self, d):
-        cx, cy, r = CYLINDER_CX, CYLINDER_CY, CYLINDER_R
-
-        # Cylinder body
-        for py in range(cy - r, cy + r + 1):
-            if py < 0 or py >= GRID_SIZE:
-                continue
-            dy = py - cy
-            dx_max_sq = r * r - dy * dy
-            if dx_max_sq < 0:
-                continue
-            dx_max = math.sqrt(dx_max_sq)
-
-            for px in range(int(cx - dx_max), int(cx + dx_max) + 1):
-                if px < 0 or px >= GRID_SIZE:
-                    continue
-                dist = math.sqrt((px - cx) ** 2 + dy ** 2)
-                if dist > r:
-                    continue
-                if dist > r - 1.2:
-                    d.set_pixel(px, py, CYLINDER_EDGE)
-                elif dist > r - 2.5:
-                    d.set_pixel(px, py, CYLINDER_DARK)
-                else:
-                    d.set_pixel(px, py, CYLINDER_COLOR)
-
-        # Pins on visible face
-        for col in range(PIN_COLS):
-            # Pin angle: col_angle = 0 at top, pi/2 at right (contact)
-            col_angle = (col / PIN_COLS) * 2.0 * math.pi - self.cylinder_angle
-            col_angle = col_angle % (2.0 * math.pi)
-            if col_angle > math.pi:
-                col_angle -= 2.0 * math.pi
-
-            # Only draw front-facing pins
-            if abs(col_angle) > math.pi * 0.48:
-                continue
-
-            pin_x = cx + int(round(r * math.sin(col_angle)))
-            facing = math.cos(col_angle)
-            if facing < 0.1:
-                continue
-            color = PIN_COLOR if facing > 0.5 else PIN_DIM
-
-            for row in range(PIN_ROWS):
-                if not PIN_PATTERN[row][col]:
-                    continue
-                pin_y = TINE_TOP + row
-                if 0 <= pin_x < GRID_SIZE and 0 <= pin_y < GRID_SIZE:
-                    d.set_pixel(pin_x, pin_y, color)
+        """Draw the cylinder and the pins on the half of it facing up."""
+        left, right = COMB_LEFT, COMB_LEFT + NUM_TEETH - 1
+        for row, color in enumerate(CYLINDER_ROWS):
+            y = CYLINDER_TOP + row
+            for x in range(left, right + 1):
+                d.set_pixel(x, y, color)
 
         # Axle ends
-        d.set_pixel(cx - r - 1, cy, COMB_SPINE)
-        d.set_pixel(cx + r + 1, cy, COMB_SPINE)
+        axle_y = int(CYLINDER_CY)
+        for x in (left - 2, left - 1, right + 1, right + 2):
+            d.set_pixel(x, axle_y, AXLE_COLOR)
+            d.set_pixel(x, axle_y + 1, AXLE_COLOR)
+
+        # Pins: one that is due now is at the comb edge, later ones further
+        # back over the top of the cylinder
+        first = bisect_left(PIN_STARTS, self.pos)
+        last = bisect_right(PIN_STARTS, self.pos + VISIBLE_TICKS)
+        for start, tooth in PINS[first:last]:
+            angle = math.pi / 2 - (start - self.pos) / TICKS_PER_RADIAN
+            y = int(CYLINDER_CY + CYLINDER_R * math.sin(angle))
+            y = max(CYLINDER_TOP, min(CYLINDER_BOTTOM, y))
+            # Dimmer toward the edges, where the pin is seen side-on
+            lit = 0.45 + 0.55 * math.cos(angle)
+            d.set_pixel(COMB_LEFT + tooth, y, (
+                int(PIN_COLOR[0] * lit), int(PIN_COLOR[1] * lit), int(PIN_COLOR[2] * lit)))
 
     def _draw_comb(self, d):
-        """Draw comb: spine on right, tines extending LEFT toward cylinder."""
-        # Spine (vertical bar on right side)
-        spine_top = TINE_TOP - 2
-        spine_bot = TINE_TOP + NUM_TINES + 1
-        d.draw_line(COMB_SPINE_X, spine_top, COMB_SPINE_X, spine_bot, COMB_SPINE)
-        d.draw_line(COMB_SPINE_X + 1, spine_top, COMB_SPINE_X + 1, spine_bot, COMB_DARK)
+        """Draw the comb: tips at the cylinder, roots on a diagonal, plate below."""
+        for i in range(NUM_TEETH):
+            x = COMB_LEFT + i
+            root = TOOTH_TIP + TOOTH_LENGTHS[i]
+            base = TOOTH_LIGHT if i % 2 == 0 else TOOTH_DARK
+            energy = self.tooth_energy[i]
+            if energy > 0.0:
+                color = (
+                    int(base[0] + (PLUCK_FLASH[0] - base[0]) * energy),
+                    int(base[1] + (PLUCK_FLASH[1] - base[1]) * energy),
+                    int(base[2] + (PLUCK_FLASH[2] - base[2]) * energy))
+            else:
+                color = base
+            for y in range(TOOTH_TIP, root):
+                d.set_pixel(x, y, color)
+            for y in range(root, PLATE_BOTTOM + 1):
+                d.set_pixel(x, y, COMB_PLATE)
 
-        for i in range(NUM_TINES):
-            tine_y = TINE_TOP + i
-            energy = self.tine_energy[i]
-
-            # Vibration offset
-            dy_offset = 0
-            if energy > 0.02:
-                dy_offset = int(round(energy * math.sin(self.tine_phase[i])))
-
-            # All tines same length — tips align at contact point
-            tine_len = COMB_SPINE_X - TINE_TIP_X
-            tine_start_x = COMB_SPINE_X - 1  # just left of spine
-
-            for tx_offset in range(tine_len):
-                tx = tine_start_x - tx_offset
-                # Vibration increases toward the tip (left end)
-                tip_frac = tx_offset / max(1, tine_len)
-                vy = tine_y + int(round(dy_offset * tip_frac))
-
-                if 0 <= tx < GRID_SIZE and 0 <= vy < GRID_SIZE:
-                    if energy > 0.5:
-                        d.set_pixel(tx, vy, TINE_BRIGHT)
-                    elif energy > 0.1:
-                        d.set_pixel(tx, vy, TINE_COLOR)
-                    else:
-                        d.set_pixel(tx, vy, TINE_BASE)
-
-            # Pluck flash at tine tip (left end, near cylinder)
-            if energy > 0.7:
-                bright = (energy - 0.7) / 0.3
-                fr = int(PLUCK_FLASH[0] * bright)
-                fg = int(PLUCK_FLASH[1] * bright)
-                fb = int(PLUCK_FLASH[2] * bright)
-                flash = (min(255, fr), min(255, fg), min(255, fb))
-                tip_x = tine_start_x - tine_len + 1
-                d.set_pixel(tip_x, tine_y, flash)
-                d.set_pixel(tip_x + 1, tine_y, flash)
+        # Screws holding the plate to the bedplate
+        for i in (NUM_TEETH // 6, NUM_TEETH // 2, NUM_TEETH - NUM_TEETH // 6):
+            d.set_pixel(COMB_LEFT + i, PLATE_BOTTOM - 2, COMB_SCREW)
 
     def _draw_hud(self, d):
-        bpm = SPEED_BPMS[self.speed_level - 1]
-        d.draw_text_small(2, 2, f"{bpm} BPM", HUD_COLOR)
+        """Draw the tune's title / composer, or the tempo just after a change."""
+        if self.tempo_shown > 0.0:
+            text = f"{self._bpm()} BPM"
+        elif int(self.time / TITLE_SECONDS) % 2 == 0:
+            text = TITLE
+        else:
+            text = COMPOSER
+        d.draw_text_small(1, 0, text, HUD_COLOR)
