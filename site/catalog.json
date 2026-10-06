@@ -52,6 +52,12 @@
           "is_game": true
         },
         {
+          "name": "FORTRESS",
+          "cls": "Fortress",
+          "module": "games/fortress.py",
+          "is_game": true
+        },
+        {
           "name": "FROGGY",
           "cls": "Frogger",
           "module": "games/frogger.py",
@@ -595,6 +601,11 @@
               "name": "MONKEY KONG",
               "cls": "DonkeyKong",
               "module": "games/donkeykong.py"
+            },
+            {
+              "name": "FORTRESS",
+              "cls": "Fortress",
+              "module": "games/fortress.py"
             },
             {
               "name": "FROGGY",

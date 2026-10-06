@@ -1,6 +1,6 @@
 {
  "meta": {
-  "games": 60,
+  "games": 61,
   "visuals": 179,
   "paintings": 236,
   "demos": 48,
@@ -110,6 +110,26 @@
      "controls": {
       "Arrow Keys": "Move/Dig",
       "Space": "Pump (hold to inflate enemies)"
+     }
+    },
+    {
+     "name": "FORTRESS",
+     "cls": "Fortress",
+     "module": "games/fortress.py",
+     "desc": "Castle siege in three timed phases: place cannons inside your walls, shell the ships bombarding you, then patch the breaches with falling-block wall pieces before the clock runs out. Fail to wall off a castle from the sea and you surrender. Left button rotates a wall piece and right button places it; either button fires or sets a cannon.",
+     "how": "Pick a castle, then each round runs cannons, battle, build. Cannons go on your territory, one more per castle you hold. In battle, aim the crosshair and fire: sloops sink in one hit, galleons in three, and red troop ships land grunts who squat on your land so you cannot build there. Wall pieces go anywhere on land, but rubble from cannon hits cannot be built on until the next round. The map edge counts as a wall; only the sea side must be closed. Each castle walled off scores 1000 plus 10 per tile of territory, enclosed grunts are captured for 100, and ships pay 100, 300 or 500. Every round adds ships and shortens the build clock.",
+     "legend": {
+      "R2": "Round number.",
+      "C2": "Cannons still to place.",
+      "S4": "Ships still afloat.",
+      "bar under the score": "Phase timer.",
+      "green tint": "Your territory: cannons may go here.",
+      "grey crumbs": "Rubble: cannot be built on this round."
+     },
+     "controls": {
+      "Joystick": "Move the cursor or crosshair",
+      "Space": "Rotate the wall piece (build); fire or place a cannon",
+      "Z": "Place the wall piece (build); fire or place a cannon"
      }
     },
     {
@@ -1027,6 +1047,7 @@
       "DEFENDR",
       "DIG DIG",
       "MONKEY KONG",
+      "FORTRESS",
       "FROGGY",
       "GALAXA",
       "INVADERS",
