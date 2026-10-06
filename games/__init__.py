@@ -66,6 +66,7 @@ from .windowwasher import WindowWasher
 from .fishing import Fishing
 from .fortress import Fortress
 from .doom import Doom
+from .handheld import Handheld
 from .shuffle import (
     AllGames, ArcadeMix, QuickPlay, Shooters, Puzzle, Classics,
 )
@@ -134,6 +135,7 @@ ALL_GAMES = [
     Fishing,
     Fortress,
     Doom,
+    Handheld,
     AllGames,
     ArcadeMix,
     QuickPlay,
@@ -208,6 +210,7 @@ __all__ = [
     'Fishing',
     'Fortress',
     'Doom',
+    'Handheld',
     'ALL_GAMES',
     'AllGames',
     'ArcadeMix',
