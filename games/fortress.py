@@ -394,7 +394,7 @@ class Fortress(Game):
             self.ships.append({
                 'kind': kind, 'hp': SHIP_HP[kind], 'ty': ty,
                 'x': float(PW + 8 + i * 7), 'y': float(ty * TILE),
-                'station': min(station, PW - 2), 'fire': random.uniform(3.0, 5.0),
+                'station': min(station, PW - 2), 'fire': random.uniform(1.5, 3.0),
                 'unload': 3.0, 'landed': 0, 'sink': None,
             })
         cx, cy = self._castle_centre()
@@ -430,19 +430,19 @@ class Fortress(Game):
                 s['sink'] += dt
                 continue
             if s['x'] > s['station']:
-                s['x'] = max(s['station'], s['x'] - 6 * dt)
+                s['x'] = max(s['station'], s['x'] - 9 * dt)
                 continue
             s['fire'] -= dt
             if s['fire'] <= 0:
-                s['fire'] = max(2.5, random.uniform(5.0, 7.0) - 0.3 * self.round)
+                s['fire'] = max(1.4, random.uniform(2.6, 3.8) - 0.25 * self.round)
                 walls = self._player_walls()
-                if self.cannons and random.random() < 0.25:
+                if self.cannons and random.random() < 0.1:
                     c = random.choice(self.cannons)
                     tgt = (c['tx'] + random.randint(0, 1), c['ty'] + random.randint(0, 1))
                 elif walls:
                     # Ships pound the stretch of wall facing them, so damage
                     # concentrates into a breach rather than scattered holes
-                    picks = random.sample(walls, min(4, len(walls)))
+                    picks = random.sample(walls, min(8, len(walls)))
                     tgt = min(picks, key=lambda w: abs(w[0] * TILE - s['x']) + abs(w[1] * TILE - s['y']))
                 else:
                     cx, cy = self._castle_centre()
