@@ -5,8 +5,8 @@ Subprocess-based: runs the patched doomgeneric engine and pipes frames
 through a numpy downscale pipeline into the cabinet's display buffer.
 
 Controls:
-  Stick       - Move / turn (always run); in the menu, pick game, skill and map
-  L or R      - Start (in the menu)
+  Stick       - Move / turn (always run); in the menu, pick a row and change it
+  L or R      - Start or load (in the menu)
   L           - Fire (use when dead)
   R tap       - Use / open doors
   R + L/R     - Strafe
@@ -14,11 +14,14 @@ Controls:
   Hold L+R 2s - Quit to menu (the game is saved first)
 
 Saves: the engine writes a real Doom save about a second into each level and
-when you quit, one slot per GAME choice; the menu's CONTINUE row loads it.
+when you quit. A new game saves to AUTO; the menu can store AUTO into FILE 1-3
+(R on a FILE row) and load any of the four, and a loaded game keeps saving to
+the slot it came from.
 """
 
 import os
 import re
+import shutil
 import sys
 import subprocess
 import threading
@@ -605,13 +608,24 @@ def start_engine(iwad, args):
 # ── Pre-game menu ────────────────────────────────────────────────
 # Doom's own menu is unreadable at 64 pixels, so the game, skill and starting
 # map are picked here and passed on the command line. Choices, the furthest map
-# reached per game and which games have a save persist in settings under 'doom'.
+# reached per game and what each save slot holds persist in settings under 'doom'.
 
 SKILLS = ("TOO YOUNG", "NOT ROUGH", "HURT ME", "ULTRA", "NIGHTMARE")   # Doom's five, shortened
 _SETTINGS_KEY = 'doom'
 AUTOSAVE_AFTER = 1.0      # s into a new level before the level-start save
 QUIT_SAVE_WAIT = 1.0      # s the quit waits for the engine to finish saving (it takes ~0.1)
-LOAD_TIMEOUT = 3.0        # s a CONTINUE may take to reach its level before the save is given up
+LOAD_TIMEOUT = 3.0        # s a load may take to reach its level before the save is given up
+
+# Save slots. The engine keeps every save in one folder whichever WAD is loaded,
+# so what a slot holds (which game, which level) is recorded in settings.
+AUTO = 0                  # where a new game saves itself
+SLOTS = (0, 1, 2, 3)      # AUTO, then the three game files
+SLOT_NAMES = ("AUTO", "FILE 1", "FILE 2", "FILE 3")
+
+
+def _save_path(slot):
+    """Where the engine writes a slot (its config dir is its cwd)."""
+    return os.path.join(_DOOM_DIR, '.savegame', f'doomsav{slot}.dsg')
 
 
 class _Choice:
@@ -620,12 +634,6 @@ class _Choice:
     def __init__(self, label, iwad, episode, maps):
         self.label, self.iwad, self.episode, self.maps = label, iwad, episode, maps
         self.key = f"{os.path.basename(iwad)}:{episode}"          # progress key in settings
-        self.slot = episode       # save slot: both WADs share one save folder, so 0 = Phase 2, 1-4 = episodes
-
-    @property
-    def save_path(self):
-        """Where the engine writes this choice's save (its config dir is its cwd)."""
-        return os.path.join(_DOOM_DIR, '.savegame', f'doomsav{self.slot}.dsg')
 
     def map_name(self, m):
         return f"E{self.episode}M{m}" if self.episode else f"MAP{m:02d}"
@@ -646,40 +654,59 @@ def _choices():
 
 
 class _Menu:
-    """GAME / SKILL / MAP rows for a new game, plus CONTINUE while the picked
-    game has a save. Stick moves; either button starts, or resumes on CONTINUE."""
-    ROWS = ("GAME", "SKILL", "MAP", "CONTINUE")
+    """Rows 0-2, GAME / SKILL / MAP, set up a new game, which saves itself to
+    AUTO. Rows 3-6 appear once anything is saved: AUTO and FILE 1-3. A game
+    loaded from a slot keeps saving to that slot.
+
+    Stick moves. Either button starts a new game, or loads the row's save. On a
+    FILE row, while AUTO holds a save, L loads the file and R stores a copy of
+    AUTO in it (R twice to replace a file that is in use)."""
+    NEW_ROWS = ("GAME", "SKILL", "MAP")
 
     def __init__(self, choices):
         self.choices = choices
         saved = settings.get(_SETTINGS_KEY, {}) or {}
         self.progress = dict(saved.get('progress', {}))
-        self.saves = dict(saved.get('saves', {}))          # choice key -> level label
+        self.saves = {int(k): dict(v) for k, v in (saved.get('saves') or {}).items()
+                      if str(k) in ('0', '1', '2', '3') and isinstance(v, dict)}
+        self.last = saved.get('last')                # slot played most recently
         self.game = min(max(saved.get('game', 0), 0), len(choices) - 1)
         self.skill = min(max(saved.get('skill', 3), 1), 5)
         self.map = min(max(saved.get('map', 1), 1), self.furthest())
-        self.row = 3 if self.saved() else 0
+        self.armed = None                            # FILE slot waiting for the second R to be replaced
+        self.row = 3 + self.last if self.last in SLOTS and self.held(self.last) else 0
 
     @property
     def choice(self):
         return self.choices[self.game]
 
-    def saved(self):
-        """Level label of the picked game's save ("E1M3"), or None without one."""
-        label = self.saves.get(self.choice.key)
-        return label if label and os.path.isfile(self.choice.save_path) else None
+    def held(self, slot):
+        """(choice, level label) of the save in a slot, or None: nothing
+        recorded, the file is gone, or its WAD is not installed."""
+        entry = self.saves.get(slot)
+        if not entry or not os.path.isfile(_save_path(slot)):
+            return None
+        for c in self.choices:
+            if c.key == entry.get('game'):
+                return c, entry.get('label', '')
+        return None
 
-    @property
-    def continuing(self):
-        return self.row == 3 and self.saved() is not None
+    def _rows(self):
+        """Rows the cursor can land on: the new-game rows, slots holding a save,
+        and empty FILE rows while there is an AUTO save to store in them."""
+        auto = self.held(AUTO)
+        return [0, 1, 2] + [3 + s for s in SLOTS if self.held(s) or (s != AUTO and auto)]
 
     def furthest(self):
         """Highest map worth offering: the furthest reached, capped by the WAD."""
         return min(max(self.progress.get(self.choice.key, 1), 1), self.choice.maps)
 
     def move(self, dx, dy):
-        if dy:                                   # CONTINUE is a row only while there is a save
-            self.row = (self.row + dy) % (4 if self.saved() else 3)
+        self.armed = None
+        if dy:
+            rows = self._rows()
+            at = rows.index(self.row) if self.row in rows else 0
+            self.row = rows[(at + dy) % len(rows)]
         if dx:
             if self.row == 0:
                 self.game = (self.game + dx) % len(self.choices)
@@ -696,52 +723,103 @@ class _Menu:
             return SKILLS[self.skill - 1]
         if row == 2:
             return self.choice.map_name(self.map)
-        return self.saved() or ""
+        if self.armed == row - 3:
+            return "REPLACE?"
+        held = self.held(row - 3)
+        return held[1] if held else "EMPTY"
 
-    def launch_args(self):
-        if self.continuing:
-            return ['-loadgame', str(self.choice.slot)]
+    def hint(self):
+        """What the buttons do on the current row."""
+        if self.row < 3:
+            return "L OR R START"
+        slot = self.row - 3
+        if self.armed == slot:
+            return "R AGAIN REPLACES"
+        if slot == AUTO or not self.held(AUTO):
+            return "L OR R LOAD"
+        return "L LOAD  R STORE" if self.held(slot) else "R STORE AUTO"
+
+    def new_game_args(self):
         return ['-skill', str(self.skill)] + self.choice.warp(self.map)
 
-    def record_save(self, label):
-        """The engine wrote the picked game's save; label is the level it is in."""
-        if self.saves.get(self.choice.key) != label:
-            self.saves[self.choice.key] = label
+    def press(self, l, r):
+        """A button went down. Returns (choice, slot to save in, engine args) when
+        that starts or loads a game, else None (nothing to do, or a FILE was stored)."""
+        if not (l or r):
+            return None
+        if self.row < 3:
+            self.save()
+            return self.choice, AUTO, self.new_game_args()
+        slot = self.row - 3
+        held = self.held(slot)
+        if slot != AUTO and r and self.held(AUTO):
+            if held and self.armed != slot:
+                self.armed = slot                    # in use: ask first
+            else:
+                self.store(slot)
+            return None
+        if held:
+            return held[0], slot, ['-loadgame', str(slot)]
+        return None
+
+    def store(self, slot):
+        """Copy the AUTO save into a FILE slot."""
+        self.armed = None
+        try:
+            shutil.copyfile(_save_path(AUTO), _save_path(slot))
+        except OSError:
+            return
+        self.saves[slot] = dict(self.saves[AUTO])
+        self.save()
+
+    def record_save(self, slot, choice, label):
+        """The engine wrote a slot: remember which game and level it holds."""
+        entry = {'game': choice.key, 'label': label}
+        if self.saves.get(slot) != entry or self.last != slot:
+            self.saves[slot], self.last = entry, slot
             self.save()
 
-    def forget_save(self):
-        if self.saves.pop(self.choice.key, None) is not None:
+    def forget_save(self, slot):
+        if self.saves.pop(slot, None) is not None:
             self.save()
 
-    def record_cleared(self, next_map):
+    def record_cleared(self, choice, next_map):
         """A level ended: the next map (1-based) is reachable from the menu now."""
-        if next_map > self.progress.get(self.choice.key, 1):
-            self.progress[self.choice.key] = next_map
+        if next_map > self.progress.get(choice.key, 1):
+            self.progress[choice.key] = next_map
             self.save()
 
     def save(self):
-        settings.set(_SETTINGS_KEY, {'game': self.game, 'skill': self.skill, 'map': self.map,
-                                     'progress': self.progress, 'saves': self.saves})
+        settings.set(_SETTINGS_KEY, {
+            'game': self.game, 'skill': self.skill, 'map': self.map, 'progress': self.progress,
+            'saves': {str(k): v for k, v in self.saves.items()}, 'last': self.last})
 
     def draw(self, panel, now):
         panel[:] = 0
-        _text(panel, 24, 3, "DOOM", (255, 50, 30))
-        panel[10, 8:56] = (90, 20, 10)
-        for i, label in enumerate(self.ROWS):
-            if i == 3 and not self.saved():
-                break
-            y = 14 + 9 * i
+        with_saves = any(self.held(s) for s in SLOTS)
+        _text(panel, 24, 1 if with_saves else 3, "DOOM", (255, 50, 30))
+        panel[7 if with_saves else 10, 8:56] = (90, 20, 10)
+        for i, label in enumerate(self.NEW_ROWS):
+            y = 10 + 6 * i if with_saves else 16 + 10 * i
             sel = i == self.row
             _text(panel, 2, y, label, (255, 255, 255) if sel else LABEL)
             val = self.value(i)
             col = (255, 210, 60) if sel else (170, 170, 170)
-            _text(panel, 63 - 4 * len(val) + 1, y, val, col)
-            if sel and i < 3 and (now * 2) % 1 < 0.7:          # blinking cursor
+            _text(panel, 64 - 4 * len(val), y, val, col)
+            if sel and (now * 2) % 1 < 0.7:                    # blinking cursor
                 panel[y + 2, 25] = col
-        _text(panel, 2, 52, "L OR R", LABEL)
-        _text(panel, 30, 52, "START", (255, 255, 255))
-        _text(panel, 2, 58, "STICK", LABEL)
-        _text(panel, 26, 58, "CHANGE", (170, 170, 170))
+        if with_saves:
+            panel[29, 2:62] = (45, 45, 45)
+            for slot in SLOTS:
+                y = 32 + 6 * slot
+                sel = 3 + slot == self.row
+                _text(panel, 2, y, SLOT_NAMES[slot], (255, 255, 255) if sel else LABEL)
+                val = self.value(3 + slot)
+                col = ((255, 60, 40) if self.armed == slot else (255, 210, 60) if sel
+                       else (170, 170, 170) if self.held(slot) else DIM)
+                _text(panel, 64 - 4 * len(val), y, val, col)
+        hint = self.hint()
+        _text(panel, (65 - 4 * len(hint)) // 2, 58, hint, LABEL)
 
 
 # ── Game class ───────────────────────────────────────────────────
@@ -772,8 +850,10 @@ class Doom(Game):
         self.close()
         self._controls = _Controls()
         self._hud = _Hud()
+        self._choice = None                # the game being played (a _Choice)
+        self._slot = AUTO                  # the save slot this game writes to
         self._cleared = None               # msg_serial-like guard: tally already recorded
-        self._loading = None               # when a CONTINUE load was launched, until it is in its level
+        self._loading = None               # when a load was launched, until it is in its level
         self._save_seen = 0                # the engine's save count already noted in the menu
         self._saved_level = None           # (episode, map) the level-start autosave covered
         self._level_t = 0.0
@@ -783,17 +863,34 @@ class Doom(Game):
             return
         self._menu = _Menu(choices)
 
-    def _start(self):
-        self._menu.save()
-        self._loading = time.monotonic() if self._menu.continuing else None
-        self._engine = start_engine(self._menu.choice.iwad, self._menu.launch_args())
+    def _start(self, choice, slot, args):
+        self._choice, self._slot = choice, slot
+        self._loading = time.monotonic() if args[0] == '-loadgame' else None
+        self._engine = start_engine(choice.iwad, args)
         if self._engine is None:           # engine won't start (wrong build, no memory)
             self.state = GameState.GAME_OVER
 
     def close(self):
-        if self._engine is not None:
-            self._engine.close()
-            self._engine = None
+        """Stop the engine, saving first where the player stands (alive, in a
+        level); dead or between levels, the level-start save stands. The save
+        lives here because the shell's own hold-both exit calls close() before
+        update() ever sees ours."""
+        engine, self._engine = self._engine, None
+        if engine is None:
+            return
+        es = engine.state
+        if (es and es.get('can_save') and es['gamestate'] == 0 and es['in_level']
+                and es['health'] > 0 and engine.proc.poll() is None):
+            before = es['save_serial']
+            engine.save(self._slot)
+            deadline = time.monotonic() + QUIT_SAVE_WAIT
+            while time.monotonic() < deadline and engine.proc.poll() is None:
+                if engine.state['save_serial'] != before:
+                    self._menu.record_save(self._slot, self._choice,
+                                           self._choice.map_name(engine.state['map']))
+                    break
+                time.sleep(0.01)
+        engine.close()
 
     def update(self, input_state: InputState, dt: float):
         if self.state != GameState.PLAYING:
@@ -805,15 +902,17 @@ class Doom(Game):
             L=input_state.action_l_held, R=input_state.action_r_held)
         events = self._controls.update(inp, self._engine.state if self._engine else None, dt)
         if self._controls.exit:
-            self._save_and_quit()
+            self.close()
+            self.state = GameState.GAME_OVER
             return
         if self._engine is None:           # in the menu
             m = self._menu
             m.move((1 if input_state.right_pressed else 0) - (1 if input_state.left_pressed else 0),
                    (1 if input_state.down_pressed else 0) - (1 if input_state.up_pressed else 0))
+            launch = m.press(input_state.action_l, input_state.action_r)
             m.draw(self._panel, now)
-            if input_state.action_l or input_state.action_r:
-                self._start()
+            if launch:
+                self._start(*launch)
         else:
             if self._engine.proc.poll() is not None:
                 self.state = GameState.GAME_OVER
@@ -836,52 +935,35 @@ class Doom(Game):
         wi = es['wi']
         if wi['state'] == 0 and wi['next'] >= 0 and self._cleared != wi['next']:
             self._cleared = wi['next']
-            self._menu.record_cleared(wi['next'] + 1)
+            self._menu.record_cleared(self._choice, wi['next'] + 1)
 
     def _track_saves(self, es, dt):
         """Autosave AUTOSAVE_AFTER seconds into each new level, and note every
-        save the engine finishes so the menu can offer CONTINUE. An engine built
-        before the save command reports can_save 0 and is left alone."""
+        save the engine finishes so the menu can list it. An engine built before
+        the save command reports can_save 0 and is left alone."""
         if not es or not es.get('can_save'):
             return
         if es['save_serial'] != self._save_seen:
             self._save_seen = es['save_serial']
-            self._menu.record_save(self._menu.choice.map_name(es['map']))
+            self._menu.record_save(self._slot, self._choice, self._choice.map_name(es['map']))
         level = (es['episode'], es['map'])
         if es['gamestate'] == 0 and es['in_level'] and es['health'] > 0 and level != self._saved_level:
             self._level_t += dt
             if self._level_t >= AUTOSAVE_AFTER:
-                self._engine.save(self._menu.choice.slot)
+                self._engine.save(self._slot)
                 self._saved_level, self._level_t = level, 0.0
         else:
             self._level_t = 0.0
 
-    def _save_and_quit(self):
-        """Hold-both exit: save where the player stands (alive, in a level), then
-        stop the engine. Dead or between levels, the level-start save stands."""
-        engine = self._engine
-        es = engine.state if engine else None
-        if es and es.get('can_save') and es['gamestate'] == 0 and es['in_level'] and es['health'] > 0:
-            before = es['save_serial']
-            engine.save(self._menu.choice.slot)
-            deadline = time.monotonic() + QUIT_SAVE_WAIT
-            while time.monotonic() < deadline and engine.proc.poll() is None:
-                if engine.state['save_serial'] != before:
-                    self._menu.record_save(self._menu.choice.map_name(engine.state['map']))
-                    break
-                time.sleep(0.01)
-        self.close()
-        self.state = GameState.GAME_OVER
-
     def _load_failed(self, es, now):
-        """A CONTINUE that never reaches its level (missing or unreadable save):
+        """A load that never reaches its level (missing or unreadable save):
         forget the save and go back to the menu. True when that happened."""
         if es and es.get('in_level'):
             self._loading = None
             return False
         if now - self._loading < LOAD_TIMEOUT:
             return False
-        self._menu.forget_save()
+        self._menu.forget_save(self._slot)
         self.reset()
         return True
 

@@ -27,11 +27,11 @@ def _choices():
 def test_menu_defaults_and_launch_args(sandbox):
     m = _Menu(_choices())
     assert [m.value(i) for i in range(3)] == ["PHASE 1 E1", "HURT ME", "E1M1"]
-    assert m.launch_args() == ["-skill", "3", "-warp", "1", "1"]
+    assert m.new_game_args() == ["-skill", "3", "-warp", "1", "1"]
     m.move(1, 0)                                   # GAME row: next game
     m.move(1, 0)
     assert m.value(0) == "PHASE 2" and m.value(2) == "MAP01"
-    assert m.launch_args() == ["-skill", "3", "-warp", "1"]   # Doom II style warp
+    assert m.new_game_args() == ["-skill", "3", "-warp", "1"]   # Doom II style warp
     m.move(0, 1)                                   # SKILL row
     m.move(-1, 0)
     m.move(-1, 0)
@@ -45,7 +45,7 @@ def test_menu_defaults_and_launch_args(sandbox):
 def test_menu_offers_maps_up_to_the_furthest_reached(sandbox):
     m = _Menu(_choices())
     m.row = 2
-    m.record_cleared(4)                            # E1M3 done, E1M4 is next
+    m.record_cleared(m.choice, 4)                            # E1M3 done, E1M4 is next
     m.move(1, 0)
     m.move(1, 0)
     m.move(1, 0)
@@ -56,7 +56,7 @@ def test_menu_offers_maps_up_to_the_furthest_reached(sandbox):
     m.map = 4
     m.move(1, 0)                                   # another game: progress is per game
     assert m.value(0) == "PHASE 1 E2" and m.map == 1
-    m.record_cleared(2)
+    m.record_cleared(m.choice, 2)
     m.save()
     again = _Menu(_choices())                      # a fresh menu picks the saved state up
     assert again.game == 1 and again.skill == 3 and again.furthest() == 2
@@ -66,7 +66,7 @@ def test_menu_offers_maps_up_to_the_furthest_reached(sandbox):
 
 def test_menu_caps_progress_at_the_wads_last_map(sandbox):
     m = _Menu(_choices())
-    m.record_cleared(99)
+    m.record_cleared(m.choice, 99)
     assert m.furthest() == 9
 
 
@@ -156,6 +156,7 @@ def test_slideshow_closes_the_visual_it_drops(sandbox):
 
 
 # ── saves ────────────────────────────────────────────────────────
+# Slot 0 is AUTO (a new game saves itself there), 1-3 are FILE 1-3.
 
 class _FakeProc:
     def poll(self):
@@ -186,17 +187,21 @@ class _FakeEngine:
 
 @pytest.fixture
 def save_dir(monkeypatch, tmp_path):
-    """Point the save folder at a temp dir; returns a function that creates a slot's file."""
+    """Point the save folder at a temp dir; returns a function that writes a slot's file."""
     monkeypatch.setattr(doom, "_DOOM_DIR", str(tmp_path))
     (tmp_path / ".savegame").mkdir()
-    return lambda slot: (tmp_path / ".savegame" / f"doomsav{slot}.dsg").write_bytes(b"x")
+
+    def write(slot, data=b"x"):
+        (tmp_path / ".savegame" / f"doomsav{slot}.dsg").write_bytes(data)
+    return write
 
 
 def _playing(monkeypatch, engine, frames_idle=0):
+    """A Doom whose engine is `engine`, started by pressing L on the menu's current row."""
     monkeypatch.setattr(doom, "_available", lambda: True)
     monkeypatch.setattr(doom, "_choices", _choices)
     launched = []
-    monkeypatch.setattr(doom, "start_engine", lambda iwad, args: launched.append(args) or engine)
+    monkeypatch.setattr(doom, "start_engine", lambda iwad, args: launched.append((iwad, args)) or engine)
     g = Doom(get_sim_display())
     inp = InputState()
     inp.action_l = True
@@ -213,87 +218,144 @@ def _idle(g, frames, **held):
         g.update(inp, 1 / 30)
 
 
-def test_menu_offers_continue_only_while_the_save_file_exists(sandbox, save_dir):
+E1, E2, P2 = "freedoom1.wad:1", "freedoom1.wad:2", "freedoom2.wad:0"
+
+
+def test_menu_lists_slots_only_while_their_files_exist(sandbox, save_dir):
     m = _Menu(_choices())
-    assert m.saved() is None and m.row == 0
+    assert m._rows() == [0, 1, 2] and m.row == 0 and m.hint() == "L OR R START"
+    m.record_save(0, _choices()[0], "E1M3")
+    assert m.held(0) is None and m._rows() == [0, 1, 2]     # recorded, but no file on disk
+    save_dir(0)
+    assert m.held(0)[1] == "E1M3"
+    assert m._rows() == [0, 1, 2, 3, 4, 5, 6]               # AUTO, and three empty files to store it in
     m.move(0, -1)
-    assert m.row == 2                               # three rows: CONTINUE is not one of them
-    m.record_save("E1M3")
-    assert m.saved() is None                        # recorded, but no file on disk
-    save_dir(1)                                     # PHASE 1 E1 saves to slot 1
-    assert m.saved() == "E1M3"
+    m.move(0, -1)
+    m.move(0, -1)
+    m.move(0, -1)
+    assert m.row == 3 and m.value(3) == "E1M3" and m.hint() == "L OR R LOAD"
+    choice, slot, args = m.press(False, True)
+    assert (choice.key, slot, args) == (E1, 0, ["-loadgame", "0"])
     m.move(0, 1)
-    assert m.row == 3 and m.continuing and m.value(3) == "E1M3"
-    assert m.launch_args() == ["-loadgame", "1"]
-    m.move(0, 1)
-    assert not m.continuing and m.launch_args() == ["-skill", "3", "-warp", "1", "1"]
-    again = _Menu(_choices())                       # next visit: the cursor starts on CONTINUE
-    assert again.row == 3 and again.continuing
-    again.row = 0
-    again.move(1, 0)                                # another game has no save
-    assert again.saved() is None and not again.continuing
-    assert [c.slot for c in _choices()] == [1, 2, 0]
+    assert m.row == 4 and m.value(4) == "EMPTY" and m.hint() == "R STORE AUTO"
+    assert m.press(True, False) is None                     # nothing to load from an empty file
 
 
-def test_level_start_autosave_and_new_level(sandbox, save_dir, monkeypatch):
+def test_storing_auto_into_a_file_and_replacing_one(sandbox, save_dir, tmp_path):
+    m = _Menu(_choices())
+    m.record_save(0, _choices()[0], "E1M3")
+    save_dir(0, b"first game")
+    m.row = 5                                               # FILE 2
+    assert m.press(False, True) is None                     # R: store
+    assert (tmp_path / ".savegame" / "doomsav2.dsg").read_bytes() == b"first game"
+    assert m.held(2)[1] == "E1M3" and m.hint() == "L LOAD  R STORE"
+    choice, slot, args = m.press(True, False)               # L: load it; it keeps saving to FILE 2
+    assert (choice.key, slot, args) == (E1, 2, ["-loadgame", "2"])
+
+    m.record_save(0, _choices()[2], "MAP07")                # a new game has taken AUTO since
+    save_dir(0, b"second game")
+    m.row = 5
+    assert m.press(False, True) is None                     # R on a file in use: asks first
+    assert m.armed == 2 and m.value(5) == "REPLACE?" and m.hint() == "R AGAIN REPLACES"
+    assert (tmp_path / ".savegame" / "doomsav2.dsg").read_bytes() == b"first game"
+    m.move(0, 1)                                            # moving away cancels
+    assert m.armed is None and m.held(2)[1] == "E1M3"
+    m.row = 5
+    m.press(False, True)
+    m.press(False, True)                                    # R twice: replaced
+    assert (tmp_path / ".savegame" / "doomsav2.dsg").read_bytes() == b"second game"
+    assert m.held(2)[0].key == P2 and m.held(2)[1] == "MAP07"
+
+    again = _Menu(_choices())                               # all of it persists
+    assert again.held(0)[1] == "MAP07" and again.held(2)[1] == "MAP07" and again.held(1) is None
+    assert again.row == 3                                   # cursor starts on the slot played last
+
+
+def test_a_slot_for_a_wad_that_is_not_installed_is_not_offered(sandbox, save_dir):
+    settings.set("doom", {"saves": {"1": {"game": "plutonia.wad:0", "label": "MAP03"},
+                                    "9": {"game": E1, "label": "E1M1"}, "2": "junk"}})
+    save_dir(1)
+    m = _Menu(_choices())
+    assert m.held(1) is None and m._rows() == [0, 1, 2] and m.saves.keys() == {1}
+
+
+def test_new_game_autosaves_to_auto_each_level(sandbox, save_dir, monkeypatch):
     e = _FakeEngine()
     g, launched = _playing(monkeypatch, e, frames_idle=20)
-    assert launched == [["-skill", "3", "-warp", "1", "1"]] and e.saved_slots == []
-    _idle(g, 15)                                    # a second into the level
-    assert e.saved_slots == [1]
+    assert launched == [("/x/freedoom1.wad", ["-skill", "3", "-warp", "1", "1"])] and e.saved_slots == []
+    _idle(g, 15)                                            # a second into the level
+    assert e.saved_slots == [0]
     _idle(g, 90)
-    assert e.saved_slots == [1]                     # once per level
-    assert g._menu.saves == {"freedoom1.wad:1": "E1M2"}
-    e.state = dict(e.state, health=0)               # dying does not save
+    assert e.saved_slots == [0]                             # once per level
+    assert g._menu.saves == {0: {"game": E1, "label": "E1M2"}} and g._menu.last == 0
+    e.state = dict(e.state, health=0)                       # dying does not save
     _idle(g, 60)
-    e.state = dict(e.state, gamestate=1)            # nor does the tally
+    e.state = dict(e.state, gamestate=1)                    # nor does the tally
     _idle(g, 60)
-    assert e.saved_slots == [1]
+    assert e.saved_slots == [0]
     e.state = dict(e.state, gamestate=0, health=80, map=3)
     _idle(g, 40)
-    assert e.saved_slots == [1, 1]
-    assert g._menu.saves == {"freedoom1.wad:1": "E1M3"}
+    assert e.saved_slots == [0, 0]
+    assert g._menu.saves[0] == {"game": E1, "label": "E1M3"}
+
+
+def test_a_loaded_file_keeps_saving_to_itself(sandbox, save_dir, monkeypatch):
+    settings.set("doom", {"game": 0, "last": 2, "saves": {"2": {"game": P2, "label": "MAP07"}}})
+    save_dir(2)
+    e = _FakeEngine(episode=1, level=7)
+    g, launched = _playing(monkeypatch, e, frames_idle=40)  # the cursor starts on FILE 2
+    assert launched == [("/x/freedoom2.wad", ["-loadgame", "2"])] and g._loading is None
+    assert e.saved_slots == [2]
+    e.state = dict(e.state, map=8)
+    _idle(g, 40)
+    assert e.saved_slots == [2, 2]
+    assert g._menu.saves == {2: {"game": P2, "label": "MAP08"}}       # AUTO untouched
 
 
 def test_quit_saves_first_and_stops_the_engine(sandbox, save_dir, monkeypatch):
     e = _FakeEngine()
     g, _ = _playing(monkeypatch, e, frames_idle=40)
-    assert e.saved_slots == [1]
+    assert e.saved_slots == [0]
     _idle(g, 70, action_l_held=True, action_r_held=True)
     assert g.state == GameState.GAME_OVER and e.closed and g._engine is None
-    assert e.saved_slots == [1, 1]                  # level start, then the quit
+    assert e.saved_slots == [0, 0]                          # level start, then the quit
     assert e.state["save_serial"] == 2
-    assert g._menu.saves == {"freedoom1.wad:1": "E1M2"}
+
+
+def test_the_shells_own_exit_saves_too(sandbox, save_dir, monkeypatch):
+    """The shell's hold-both exit calls close() without update() ever seeing the hold."""
+    e = _FakeEngine()
+    g, _ = _playing(monkeypatch, e, frames_idle=40)
+    e.state = dict(e.state, map=5)
+    g.close()
+    assert e.saved_slots == [0, 0] and e.closed and g._engine is None
+    assert g._menu.saves[0] == {"game": E1, "label": "E1M5"}
+    g.close()                                               # closing twice is harmless
+    assert e.saved_slots == [0, 0]
 
 
 def test_quit_while_dead_keeps_the_level_start_save(sandbox, save_dir, monkeypatch):
     e = _FakeEngine()
     g, _ = _playing(monkeypatch, e, frames_idle=40)
     e.state = dict(e.state, health=0)
-    _idle(g, 70, action_l_held=True, action_r_held=True)
-    assert g.state == GameState.GAME_OVER and e.closed
-    assert e.saved_slots == [1]
+    g.close()
+    assert e.closed and e.saved_slots == [0]
 
 
 def test_an_engine_without_the_save_command_is_never_asked(sandbox, save_dir, monkeypatch):
     e = _FakeEngine(can_save=0)
     g, _ = _playing(monkeypatch, e, frames_idle=90)
-    _idle(g, 70, action_l_held=True, action_r_held=True)
-    assert e.saved_slots == [] and g._menu.saves == {}
-    assert g.state == GameState.GAME_OVER
+    g.close()
+    assert e.saved_slots == [] and g._menu.saves == {} and e.closed
 
 
-def test_continue_loads_the_slot_and_a_failed_load_returns_to_the_menu(sandbox, save_dir, monkeypatch):
-    settings.set("doom", {"game": 0, "saves": {"freedoom1.wad:1": "E1M5"}})
+def test_a_failed_load_forgets_the_slot_and_returns_to_the_menu(sandbox, save_dir, monkeypatch):
+    settings.set("doom", {"game": 0, "last": 1, "saves": {"1": {"game": E1, "label": "E1M5"}}})
     save_dir(1)
     e = _FakeEngine()
-    g, launched = _playing(monkeypatch, e, frames_idle=5)
-    assert launched == [["-loadgame", "1"]] and g._loading is None    # reached its level
-
-    e2 = _FakeEngine()
-    e2.state = dict(e2.state, in_level=False, gamestate=3)             # the load went nowhere
+    e.state = dict(e.state, in_level=False, gamestate=3)    # the load went nowhere
     monkeypatch.setattr(doom, "LOAD_TIMEOUT", 0.0)
-    g2, launched = _playing(monkeypatch, e2, frames_idle=2)
-    assert launched == [["-loadgame", "1"]]
-    assert g2._engine is None and g2.state == GameState.PLAYING       # back in the menu
-    assert g2._menu.saves == {} and not g2._menu.continuing and e2.closed
+    g, launched = _playing(monkeypatch, e, frames_idle=2)
+    assert launched == [("/x/freedoom1.wad", ["-loadgame", "1"])]
+    assert g._engine is None and g.state == GameState.PLAYING and e.closed     # back in the menu
+    assert g._menu.saves == {} and g._menu.row == 0 and e.saved_slots == []
