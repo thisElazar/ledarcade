@@ -126,9 +126,12 @@ def _listed(cls):
 
 def listed_now(cls):
     """Whether an item may be shown right now: unconditional items always,
-    conditional ones (mature / menu_visible) only while their condition holds.
+    conditional ones (mature / menu_visible) only while their condition holds,
+    dev_only ones only on a dev cabinet.
     The idle screensaver and the catch-all slideshow use this so AFTER HOURS
-    items stay out of them too."""
+    and dev_only items stay out of them too."""
+    if not DEV_MODE and getattr(cls, 'dev_only', False):
+        return False
     return not _is_conditional(cls) or _listed(cls)
 
 

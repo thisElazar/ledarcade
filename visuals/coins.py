@@ -74,6 +74,7 @@ class Coins(Visual):
     description = "Historic coins of the world"
     category = "culture"
     dev_only = True  # 21 of 29 photos need author credit and the manifest records none; hidden until rebuilt
+    idle_exclude = True  # the photos are gitignored, so a cabinet has none to show
     GUIDE = {
         'desc': 'Historical coins rendered from Wikimedia Commons photographs. Ancient Greek, Roman, medieval, and early modern currency.',
         'legend': {
