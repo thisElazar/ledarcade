@@ -27,9 +27,9 @@ UPDATE menu.
   chamber. Inside are a PARTY button, which turns the room into a disco, and
   the AFTER HOURS lever.
 - **AFTER HOURS** lists the cabinet's mature items, which appear nowhere while
-  it is off. Pulling the lever needs the eight-move stick code from your
-  owner's card, and it switches itself off whenever the cabinet restarts. The
-  menu's separator lines turn red while it is on.
+  it is off. Pulling the lever needs a secret code, and it switches itself off
+  whenever the cabinet restarts. The menu's separator lines turn red while it
+  is on.
 - **DOOM**: Freedoom, the free Doom, on the cabinet's panel, with its own
   status display, a GAME / SKILL / MAP menu, an autosave and three save files,
   and a demo that plays itself. It is a mature item, so it is listed only while
