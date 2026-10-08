@@ -47,7 +47,7 @@ class Asteroids(Game):
         self.ship_dx = 0.0
         self.ship_dy = 0.0
         self.ship_visible = True
-        self.invulnerable_timer = 2.0  # Start invulnerable
+        self.invulnerable_timer = 5.0  # Start invulnerable
         self.hyperspace_timer = 0.0  # Ship is dematerialized while > 0
         self.hyperspace_death = False
         self.next_extra_life = 10000  # Extra ship every 10,000 points
@@ -71,8 +71,9 @@ class Asteroids(Game):
     def spawn_asteroids(self, count):
         """Spawn asteroids away from the player. Speed increases with level."""
         # Base speed range increases with level (like original 1979 Asteroids)
-        base_speed_min = 6 + (self.level - 1) * 1.5
-        base_speed_max = 12 + (self.level - 1) * 2.5
+        # October 7th slowed down gameplay (6 to 3 and 12 to 6)
+        base_speed_min = 3 + (self.level - 1) * 1.5
+        base_speed_max = 6 + (self.level - 1) * 2.5
         # Cap maximum speed to keep game playable
         base_speed_min = min(base_speed_min, 25)
         base_speed_max = min(base_speed_max, 45)

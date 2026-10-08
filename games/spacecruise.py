@@ -155,12 +155,12 @@ class SpaceCruise(Game):
     def __init__(self, display: Display):
         super().__init__(display)
         self.reset()
-
+    #Oct 7 2026 changed 120 sec game to 60 sec game
     def reset(self):
         self.state = GameState.PLAYING
         self.time = 0.0
-        self.time_limit = 120.0
-        self.time_remaining = 120.0
+        self.time_limit = 60.0
+        self.time_remaining = 60.0
         self.score = 0
 
         # Rocket position

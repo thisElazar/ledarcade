@@ -48,7 +48,7 @@ class Invaders(Game):
         self.enemy_bullets = []
         self.enemy_dir = 1  # 1 = right, -1 = left
         self.enemy_move_timer = 0
-        self.enemy_move_delay = 0.5
+        self.enemy_move_delay = 2
         self.enemy_drop = False
         
         # Setup enemies
@@ -91,8 +91,9 @@ class Invaders(Game):
         """March delay proportional to remaining invaders — the rack speeds up
         as it thins (emergent, like the original's draw-loop timing), with a
         mild per-level ramp."""
+        #Oct 7 2026 changed return 0.03 to return 0.3
         level_factor = max(0.4, 1.0 - (self.level - 1) * 0.1)
-        return 0.03 + 0.45 * level_factor * len(self.enemies) / max(1, self.initial_enemy_count)
+        return 0.3 + 0.45 * level_factor * len(self.enemies) / max(1, self.initial_enemy_count)
     
     def setup_shields(self):
         """Create defensive shields."""

@@ -102,12 +102,12 @@ class Frogger(Game):
 
         # Each lane has cars moving in one direction at a speed
         lane_configs = [
-            # (row, direction, speed, car_length, gap)
-            (1, 1, 12, 2, 11),   # Slow cars right
-            (2, -1, 16, 2, 10),  # Medium cars left
-            (3, 1, 20, 3, 10),   # Trucks right
-            (4, -1, 14, 2, 9),   # Cars left
-            (5, 1, 24, 2, 9),    # Fast cars right
+            # (row, direction, speed, car_length, gap) October 7th testing half speed vehicles hard set speed variable
+            (1, 1, 6, 2, 11),   # Slow cars right
+            (2, -1, 8, 2, 10),  # Medium cars left
+            (3, 1, 10, 3, 10),   # Trucks right
+            (4, -1, 7, 2, 9),   # Cars left
+            (5, 1, 12, 2, 9),    # Fast cars right
         ]
 
         for row, direction, speed, length, gap in lane_configs:

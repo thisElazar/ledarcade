@@ -47,7 +47,7 @@ class DonkeyKong(Game):
     BARREL_SPEED = 20.0
 
     # Explicit jump arc (parabolic, not physics-based)
-    JUMP_DURATION = 0.5   # Total airtime in seconds
+    JUMP_DURATION = 0.8   # Total airtime in seconds
     JUMP_PEAK = 5         # Max height in pixels at apex
 
     # Player size
