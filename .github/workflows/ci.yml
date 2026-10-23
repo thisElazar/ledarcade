@@ -77,3 +77,20 @@ jobs:
             echo "Run 'python3 site/generate_catalog.py && python3 site/generate_guide.py && python3 tools/build_sources.py && python3 tools/build_history.py && python3 tools/build_credits.py' and commit the result."
             exit 1
           fi
+
+  # The Doom engine lives in-repo (third_party/doomgeneric, GPL). Build it so
+  # a broken patch on top of upstream fails here instead of on a cabinet.
+  # Build only: running it needs a 58 MB Freedoom download the cabinets fetch
+  # themselves.
+  doom-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build doom_pipe
+        run: JOBS=4 third_party/doomgeneric/build.sh
+
+      - name: Check the binary links against libc only
+        run: |
+          ldd third_party/doomgeneric/doomgeneric/doom_pipe
+          ! ldd third_party/doomgeneric/doomgeneric/doom_pipe | grep -E 'X11|SDL'

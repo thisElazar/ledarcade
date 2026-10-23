@@ -241,4 +241,9 @@ led-arcade/
 
 ## License
 
-MIT — do whatever you want with it.
+MIT — do whatever you want with it. See `LICENSE`.
+
+One exception: `third_party/doomgeneric/` is the Doom engine and is GPL-2.0
+(its own `LICENSE` is in that folder, with a `NOTICE.md` on how it is used).
+The cabinet runs it as a separate process over a pipe and never links against
+it, so everything else stays MIT.
