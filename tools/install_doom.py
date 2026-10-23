@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Install Doom on this cabinet: build the engine, fetch Freedoom.
 
-    python3 tools/install_doom.py
+    sudo python3 tools/install_doom.py
 
-Run from the repo as the cabinet user (no sudo). It writes only inside the
+Run from the repo. On a cabinet use sudo: the service runs as root and owns
+data/, and root is also what writes the saves. It writes only inside the
 repo, to paths git ignores:
 
   third_party/doomgeneric/doomgeneric/doom_pipe   the engine, built here
