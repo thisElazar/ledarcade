@@ -31,6 +31,7 @@ import numpy as np
 
 import settings
 from arcade import Game, GameState, InputState, Display, GRID_SIZE, _FONT_3X5
+from tools import install_doom
 
 # Doom's native resolution
 _W, _H, _VIEW_H = 320, 200, 168
@@ -48,11 +49,10 @@ _DK_RUN = 0x80 + 0x36
 _WEAPON_AMMO = {1: 0, 2: 1, 3: 0, 4: 3, 5: 2, 6: 2, 8: 1}
 _SLOT = {0: 1, 7: 1, 1: 2, 2: 3, 8: 3, 3: 4, 4: 5, 5: 6, 6: 7}   # weapontype_t -> key 1-7
 
-# Engine location (sibling to the led-arcade repo)
-_HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_DOOM_DIR = os.path.join(os.path.dirname(_HERE), 'doom_preview')
-_EXE = os.path.join(_DOOM_DIR, 'doomgeneric', 'doomgeneric', 'doom_pipe')
-_WAD_DIR = os.path.join(_DOOM_DIR, 'freedoom-0.13.0')
+# Engine and game data, put in place by tools/install_doom.py (both git-ignored).
+# The engine's cwd is its config dir, so saves live beside the WADs.
+_EXE = install_doom.ENGINE
+_DOOM_DIR = _WAD_DIR = install_doom.WAD_DIR
 # Freedoom Phase 1 is episodic (E1M1 style, Doom I rules), Phase 2 is one long
 # campaign (MAP01 style, Doom II rules). Either or both may be installed.
 _WADS = (('PHASE 1', 'freedoom1.wad'), ('PHASE 2', 'freedoom2.wad'))

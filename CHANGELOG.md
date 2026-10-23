@@ -4,6 +4,13 @@ Changes to the Wonder Cabinet software, newest first. Your cabinet shows
 "update available" in the menu when a new version is out; install it from the
 UPDATE menu.
 
+## Unreleased
+
+### New
+- **DOOM** can now be installed on any cabinet: the engine source ships with
+  the cabinet and one command builds it and fetches Freedoom, checked against
+  known checksums. Until that is run, DOOM stays off the AFTER HOURS list.
+
 ## v1.2 — October 23, 2026
 
 ### New
