@@ -190,7 +190,9 @@ static const struct
     { wp_bfg,             wp_bfg }
 };
 
-#define SLOWTURNTICS	6 
+int             slowturntics = 6;   // LED preview: tunable over the pipe
+int             dg_save_serial;     // LED preview: counts finished saves, sent in the frame header
+#define SLOWTURNTICS	slowturntics 
  
 #define NUMKEYS		256 
 #define MAX_JOY_BUTTONS 20
@@ -1679,6 +1681,7 @@ void G_DoSaveGame (void)
     M_StringCopy(savedescription, "", sizeof(savedescription));
 
     players[consoleplayer].message = DEH_String(GGSAVED);
+    dg_save_serial++;
 
     // draw the pattern into the back screen
     R_FillBackScreen ();	

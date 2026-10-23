@@ -281,8 +281,8 @@ void D_Display (void)
     inhelpscreensstate = inhelpscreens;
     oldgamestate = wipegamestate = gamestate;
     
-    // draw pause pic
-    if (paused)
+    // draw pause pic (not in the LED preview: its harness pauses between moves)
+    if (paused && 0)
     {
 		if (automapactive)
 			y = 4;

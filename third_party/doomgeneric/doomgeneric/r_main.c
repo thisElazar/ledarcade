@@ -103,6 +103,8 @@ lighttable_t*		zlight[LIGHTLEVELS][MAXLIGHTZ];
 
 // bumped light from gun blasts
 int			extralight;			
+int			dg_extralight;		// LED preview: added light, 0-15
+int			dg_fullbright;		// LED preview: no light falloff at all
 
 
 
@@ -828,7 +830,7 @@ void R_SetupFrame (player_t* player)
     viewx = player->mo->x;
     viewy = player->mo->y;
     viewangle = player->mo->angle + viewangleoffset;
-    extralight = player->extralight;
+    extralight = player->extralight + dg_extralight;
 
     viewz = player->viewz;
     
@@ -837,7 +839,7 @@ void R_SetupFrame (player_t* player)
 	
     sscount = 0;
 	
-    if (player->fixedcolormap)
+    if (player->fixedcolormap || dg_fullbright)
     {
 	fixedcolormap =
 	    colormaps

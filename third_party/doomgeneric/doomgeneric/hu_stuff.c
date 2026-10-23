@@ -100,6 +100,10 @@ static boolean		message_nottobefuckedwith;
 static hu_stext_t	w_message;
 static int		message_counter;
 
+// LED preview: last message shown, for doomgeneric_pipe.c
+char			dg_message[64];
+int			dg_message_serial;
+
 extern int		showMessages;
 
 static boolean		headsupactive = false;
@@ -420,6 +424,8 @@ void HU_Ticker(void)
 	    || (plr->message && message_dontfuckwithme))
 	{
 	    HUlib_addMessageToSText(&w_message, 0, plr->message);
+	    M_StringCopy(dg_message, plr->message, sizeof(dg_message));
+	    dg_message_serial++;
 	    plr->message = 0;
 	    message_on = true;
 	    message_counter = HU_MSGTIMEOUT;

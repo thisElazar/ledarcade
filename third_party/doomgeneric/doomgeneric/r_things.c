@@ -340,6 +340,11 @@ short*		mceilingclip;
 fixed_t		spryscale;
 fixed_t		sprtopscreen;
 
+// LED preview: which screen pixels belong to monsters (1), pickups (2) or
+// other shootables (3), for doomgeneric_pipe.c
+byte dg_spritemask[SCREENWIDTH*SCREENHEIGHT];
+static byte dg_masktag;
+
 void R_DrawMaskedColumn (column_t* column)
 {
     int		topscreen;
@@ -372,6 +377,9 @@ void R_DrawMaskedColumn (column_t* column)
 	    // Drawn by either R_DrawColumn
 	    //  or (SHADOW) R_DrawFuzzColumn.
 	    colfunc ();	
+	    if (dg_masktag)
+		for (int y = dc_yl; y <= dc_yh; y++)
+		    dg_spritemask[(y + viewwindowy) * SCREENWIDTH + dc_x + viewwindowx] = dg_masktag;
 	}
 	column = (column_t *)(  (byte *)column + column->length + 4);
     }
@@ -413,6 +421,10 @@ R_DrawVisSprite
 	    ( (vis->mobjflags & MF_TRANSLATION) >> (MF_TRANSSHIFT-8) );
     }
 	
+    dg_masktag = vis->mobjflags & MF_COUNTKILL ? 1
+               : vis->mobjflags & MF_SPECIAL ? 2
+               : vis->mobjflags & MF_SHOOTABLE ? 3 : 0;
+
     dc_iscale = abs(vis->xiscale)>>detailshift;
     dc_texturemid = vis->texturemid;
     frac = vis->startfrac;
@@ -431,6 +443,7 @@ R_DrawVisSprite
 	R_DrawMaskedColumn (column);
     }
 
+    dg_masktag = 0;
     colfunc = basecolfunc;
 }
 

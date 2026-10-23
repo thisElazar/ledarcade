@@ -1827,3 +1827,19 @@ void WI_Start(wbstartstruct_t* wbstartstruct)
     else
 	WI_initStats();
 }
+
+// LED preview: the intermission's live (counting-up) numbers for
+// doomgeneric_pipe.c. -1 means "not shown yet".
+void DG_WIStats(short *out)
+{
+    out[0] = state;               // StatCount, ShowNextLoc, NoState
+    out[1] = sp_state;            // which stat is counting (2 kills .. 10 done)
+    out[2] = cnt_kills[0];        // percents
+    out[3] = cnt_items[0];
+    out[4] = cnt_secret[0];
+    out[5] = cnt_time;            // seconds
+    out[6] = cnt_par;
+    out[7] = wbs ? wbs->epsd : 0; // 0-based episode, maps below 0-based too
+    out[8] = wbs ? wbs->last : 0;
+    out[9] = wbs ? wbs->next : 0;
+}

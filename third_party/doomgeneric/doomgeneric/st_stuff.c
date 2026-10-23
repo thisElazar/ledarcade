@@ -933,6 +933,8 @@ void ST_Ticker (void)
 
 static int st_palette = 0;
 
+int dg_no_damage_tint;   // LED preview: skip the red hurt flash (berserk tint stays)
+
 void ST_doPaletteStuff(void)
 {
 
@@ -941,7 +943,7 @@ void ST_doPaletteStuff(void)
     int		cnt;
     int		bzc;
 
-    cnt = plyr->damagecount;
+    cnt = dg_no_damage_tint ? 0 : plyr->damagecount;
 
     if (plyr->powers[pw_strength])
     {
