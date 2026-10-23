@@ -4,7 +4,7 @@ Changes to the Wonder Cabinet software, newest first. Your cabinet shows
 "update available" in the menu when a new version is out; install it from the
 UPDATE menu.
 
-## Unreleased
+## v1.2 — October 23, 2026
 
 ### New
 - **FORTRESS**: a castle-siege game. Pick a castle, then each round place
@@ -41,6 +41,10 @@ UPDATE menu.
   poses.
 - The website's timeline dated SNAKE from Nokia's 1997 phone game. It now
   dates it from Blockade (1976), the arcade game that started the genre.
+- SPACE INVADERS opens at half its old pace, while the last few invaders
+  still race as they always did.
+- The idle screensaver and ALL VISUALS slideshow no longer show items that
+  are not in the menu.
 
 ## v1.1.1 — September 25, 2026
 
