@@ -9,5 +9,6 @@
 Debug/
 Release/
 Build/
-doomgeneric
+/doomgeneric/doomgeneric
+/doomgeneric/doom_pipe
 doomgeneric.map
