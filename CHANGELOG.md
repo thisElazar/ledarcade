@@ -4,7 +4,7 @@ Changes to the Wonder Cabinet software, newest first. Your cabinet shows
 "update available" in the menu when a new version is out; install it from the
 UPDATE menu.
 
-## Unreleased
+## v1.3 — October 23, 2026
 
 ### New
 - **DOOM** can now be installed on any cabinet: the engine source ships with
