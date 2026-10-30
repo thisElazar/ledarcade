@@ -228,7 +228,7 @@ def set_max_brightness_pct(value):
     set("max_brightness_pct", value)
 
 
-REFRESH_CHOICES = [0, 100, 120, 144, 240]  # 0 = unpinned
+REFRESH_CHOICES = [0, 24, 25, 30, 60, 100, 120, 144, 240]  # 0 = unpinned
 
 
 def get_refresh_hz():
