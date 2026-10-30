@@ -5,7 +5,7 @@ Switches the live mirror (mirror.py) on or off and sets its network port, so
 run_mirror.py on a laptop can show what the panel is showing; switches HDMI
 output, the same picture on a screen plugged into the Pi; and switches WEB,
 which serves that picture to any browser on the network (run_web_mirror.py)
-on the same PORT. With WEB selected, the line at the bottom is the address to
+on the same PORT. With WEB on, the line at the bottom is the address to
 open; the port to add to it is the one above.
 
 Controls:
@@ -142,7 +142,7 @@ class Mirror(Visual):
         if self.busy and not editing:
             # Nothing is mirrored at all, so the address below would be a lie
             d.draw_text_small(2, 55, "PORT IN USE", Colors.RED)
-        elif self.cursor == 3 and self.web and self.address and not editing:
+        elif self.web and self.address and not editing:
             # 15 characters fit from x=2, and 255.255.255.255 is exactly 15
             d.draw_text_small(2, 55, self.address, Colors.CYAN)
         else:
