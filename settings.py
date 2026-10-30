@@ -30,6 +30,7 @@ DEFAULTS = {
     "epilepsy_safe": False,
     "colorblind_mode": "none",  # "none", "protanopia", "deuteranopia", "tritanopia"
     "max_brightness_pct": 100,
+    "refresh_hz": 120,  # pin LED refresh so cameras don't see banding; 0 = unpinned
     "mirror_enabled": False,
     "mirror_port": MIRROR_PORT,
     "mirror_hdmi": False,
@@ -225,6 +226,21 @@ def set_max_brightness_pct(value):
     """Set max brightness percentage (10-100)."""
     value = max(10, min(100, int(value)))
     set("max_brightness_pct", value)
+
+
+REFRESH_CHOICES = [0, 100, 120, 144, 240]  # 0 = unpinned
+
+
+def get_refresh_hz():
+    """Get the pinned LED refresh rate in Hz (0 = unpinned). Applied at boot."""
+    value = get("refresh_hz", 120)
+    return value if value in REFRESH_CHOICES else 120
+
+
+def set_refresh_hz(value):
+    """Set the pinned LED refresh rate (one of REFRESH_CHOICES)."""
+    if value in REFRESH_CHOICES:
+        set("refresh_hz", value)
 
 
 def get_mirror_enabled():

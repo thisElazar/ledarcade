@@ -574,7 +574,8 @@ def main():
     from cabinet_config import get_gpio_slowdown
     display = HardwareDisplay(brightness=saved_brightness,
                               gpio_slowdown=get_gpio_slowdown(),
-                              gamma=saved_gamma, toe=saved_toe)
+                              gamma=saved_gamma, toe=saved_toe,
+                              limit_refresh_hz=persistent.get_refresh_hz())
     # Load persisted safety settings
     display.set_safety(
         colorblind_mode=persistent.get_colorblind_mode(),

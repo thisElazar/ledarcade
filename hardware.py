@@ -193,7 +193,8 @@ class HardwareDisplay:
     Drop-in replacement for arcade.py Display class.
     """
 
-    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2, gamma: float = 2.2, toe: float = 0.25):
+    def __init__(self, brightness: int = 80, gpio_slowdown: int = 2, gamma: float = 2.2, toe: float = 0.25,
+                 limit_refresh_hz: int = 0):
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
@@ -205,6 +206,10 @@ class HardwareDisplay:
         options.gpio_slowdown = gpio_slowdown
         options.brightness = brightness
         options.drop_privileges = False
+        if limit_refresh_hz > 0:
+            # A fixed refresh lets a camera shutter integrate a whole number
+            # of scan cycles, so video shows no rolling bands.
+            options.limit_refresh_rate_hz = limit_refresh_hz
 
         self.matrix = RGBMatrix(options=options)
 
