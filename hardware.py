@@ -198,23 +198,8 @@ class HardwareDisplay:
         if not HAS_MATRIX:
             raise RuntimeError("rgbmatrix library not available")
 
-        options = RGBMatrixOptions()
-        options.rows = 64
-        options.cols = 64
-        from cabinet_config import get_hardware_mapping
-        options.hardware_mapping = get_hardware_mapping()
-        options.gpio_slowdown = gpio_slowdown
-        options.brightness = brightness
-        options.drop_privileges = False
-        if limit_refresh_hz > 0:
-            # A fixed refresh lets a camera shutter integrate a whole number
-            # of scan cycles, so video shows no rolling bands.
-            options.limit_refresh_rate_hz = limit_refresh_hz
-
-        self.matrix = RGBMatrix(options=options)
-
-        # Double-buffered: draw to offscreen canvas, then swap atomically
-        self.canvas = self.matrix.CreateFrameCanvas()
+        self._gpio_slowdown = gpio_slowdown
+        self._open_matrix(brightness, limit_refresh_hz)
 
         # Flat bytearray framebuffer: RGBRGBRGB... row-major, 3 bytes per pixel
         self._fb = bytearray(GRID_SIZE * GRID_SIZE * 3)
@@ -237,6 +222,34 @@ class HardwareDisplay:
         self._mirror = None
         self._hdmi = None
         self._web = None
+
+    def _open_matrix(self, brightness, limit_refresh_hz):
+        options = RGBMatrixOptions()
+        options.rows = 64
+        options.cols = 64
+        from cabinet_config import get_hardware_mapping
+        options.hardware_mapping = get_hardware_mapping()
+        options.gpio_slowdown = self._gpio_slowdown
+        options.brightness = brightness
+        options.drop_privileges = False
+        if limit_refresh_hz > 0:
+            # A fixed refresh lets a camera shutter integrate a whole number
+            # of scan cycles, so video shows no rolling bands.
+            options.limit_refresh_rate_hz = limit_refresh_hz
+
+        self.matrix = RGBMatrix(options=options)
+
+        # Double-buffered: draw to offscreen canvas, then swap atomically
+        self.canvas = self.matrix.CreateFrameCanvas()
+
+    def set_refresh_hz(self, limit_refresh_hz):
+        """Reopen the matrix with a new refresh limit (0 = unpinned). The
+        library reads it only at start-up, so the old matrix is closed first:
+        its destructor stops the refresh thread, and GPIO setup is idempotent."""
+        brightness = self.matrix.brightness
+        self.canvas = None
+        self.matrix = None
+        self._open_matrix(brightness, limit_refresh_hz)
 
     @staticmethod
     def _build_lut(gamma, toe):

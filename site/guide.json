@@ -7334,12 +7334,12 @@
      "legend": {
       "COLOR": "Colorblind filter (NONE=off, PROT=protanopia, DEUT=deuteranopia, TRIT=tritanopia).",
       "MAX BRT": "Maximum brightness percentage the panel is allowed to use.",
-      "REFRESH": "Pins the LED refresh rate in Hz so cameras film it without rolling bands (OFF=unpinned). Applies after a restart."
+      "REFRESH": "Locks the LED refresh rate in Hz so cameras film it without rolling bands (OFF=unlocked). The button opens a test pattern."
      },
      "controls": {
       "Up/Down": "Navigate between options",
       "Left/Right": "Toggle/cycle/adjust the selected option",
-      "Button": "Accept and return to menu"
+      "Button": "Accept and return to menu (on REFRESH: open the test pattern)"
      }
     },
     {
