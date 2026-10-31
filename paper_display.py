@@ -36,18 +36,32 @@ class PanelDisplay(Display):
         from tools import render_clip
         self.comp = self._composer(render_clip)
 
-        # Largest whole-pixel LED whose frame fits this screen (render_clip LEDs are 16 px).
+        # Open at the largest whole-pixel LED whose frame fits this screen
+        # (render_clip LEDs are 16 px); the window can be resized from there.
         cell = max(4, min(render_clip.CELL, (desk_h - SCREEN_MARGIN) * render_clip.CELL // self.comp.h))
         k = cell / render_clip.CELL
-        self.screen = pygame.display.set_mode((round(self.comp.w * k), round(self.comp.h * k)))
-        self.panel_rect = pygame.Rect(round(self.comp.px * k), round(self.comp.py * k),
-                                      cell * GRID_SIZE, cell * GRID_SIZE)
+        self.screen = pygame.display.set_mode((round(self.comp.w * k), round(self.comp.h * k)),
+                                              pygame.RESIZABLE)
+        self._layout()
         self.glow_gain = float(self.comp.mask.mean())   # lit share of each LED cell
 
         self.buffer = [[Colors.BLACK for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
         self.font = pygame.font.Font(None, 24)
         self._color_lut = None
         self._epilepsy_guard = None
+
+    def _layout(self):
+        """Fit the page in the window, centred, letterboxed in the page's own
+        background. Called whenever the window's size changes."""
+        self.screen = pygame.display.get_surface()
+        w, h = self.screen.get_size()
+        k = min(w / self.comp.w, h / self.comp.h)
+        pw, ph = round(self.comp.w * k), round(self.comp.h * k)
+        self.page_rect = pygame.Rect((w - pw) // 2, (h - ph) // 2, pw, ph)
+        side = round(self.comp.mask.shape[0] * k)   # the 1024 px panel at this scale
+        self.panel_rect = pygame.Rect(self.page_rect.x + round(self.comp.px * k),
+                                      self.page_rect.y + round(self.comp.py * k), side, side)
+        self._laid_out = (w, h)
 
     def _panel_pixels(self):
         """The 64x64 buffer as uint8, after the same safety transforms as Display."""
@@ -77,10 +91,13 @@ class PanelDisplay(Display):
         self.screen.blit(glow, self.panel_rect, special_flags=pygame.BLEND_RGB_ADD)
 
     def render(self):
+        if pygame.display.get_surface().get_size() != self._laid_out:   # the window was resized
+            self._layout()
         buf = self._panel_pixels()
         page = pygame.image.frombuffer(self.comp.frame(SimpleNamespace(buffer=buf)),
                                        (self.comp.w, self.comp.h), "RGB")
-        self.screen.blit(pygame.transform.smoothscale(page, self.screen.get_size()), (0, 0))
+        self.screen.fill(tuple(int(c) for c in self.comp.canvas[0, 0]))
+        self.screen.blit(pygame.transform.smoothscale(page, self.page_rect.size), self.page_rect)
         self._glow(buf)
         pygame.display.flip()
 

@@ -11,7 +11,7 @@ cabinet.
     python run_mirror.py --delay 0.4      # deeper buffer for rough Wi-Fi; 0 = none
     python run_mirror.py --port 6464      # if the cabinet's MIRROR menu sets another port
 
-The window resizes, staying square; full screen centres the panel. ESC or closing it quits. See mirror.py for the protocol.
+The window resizes, the panel staying square in the middle of it. ESC or closing it quits. See mirror.py for the protocol.
 """
 
 import argparse
@@ -30,49 +30,12 @@ FRAME_BYTES = GRID_SIZE * GRID_SIZE * 3
 FPS = 30   # the cabinet's nominal rate, until arrivals have been measured
 
 
-def fit(display, side):
-    """Lay the frame out after the window changed size; returns the square's side.
-
-    The window snaps to a square holding the largest whole-pixel LED frame,
-    following whichever edge was dragged. A window as wide as the screen (full
-    screen, zoomed) can't be made square, so there the frame is centred on black.
-    """
-    from tools.render_clip import CELL   # after pygame.init(), like PanelDisplay
-    comp = display.comp
-
-    def led_px(px):
-        return max(1, px * CELL // comp.w)   # whole pixels per LED in a frame px wide
-
-    def frame_px(px):
-        return round(comp.w * led_px(px) / CELL)
-
-    window = pygame.display.get_surface()
-    w, h = window.get_size()
-    full = any(w >= desk_w for desk_w, _ in pygame.display.get_desktop_sizes())
-    if not full:
-        side = frame_px(w if w != side else h)
-        if (w, h) != (side, side):
-            window = pygame.display.set_mode((side, side), pygame.RESIZABLE)
-
-    # Centre in the window we actually got
-    w, h = window.get_size()
-    frame, cell = frame_px(min(w, h)), led_px(min(w, h))
-    k = cell / CELL
-    window.fill((0, 0, 0))
-    display.screen = window.subsurface(((w - frame) // 2, (h - frame) // 2, frame, frame))
-    display.panel_rect = pygame.Rect(round(comp.px * k), round(comp.py * k),
-                                     cell * GRID_SIZE, cell * GRID_SIZE)
-    return side
-
-
 def main(host="arcade.local", delay=0.2, port=MIRROR_PORT):
     addr = (socket.gethostbyname(host), port)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
 
     display = PanelDisplay()
-    pygame.display.set_mode(display.screen.get_size(), pygame.RESIZABLE)
-    side = fit(display, display.screen.get_width())
 
     # Frames wait `delay` seconds in a queue and play out at an even pace, so
     # Wi-Fi hiccups (frames held up ~150 ms, then delivered in a burst) don't
@@ -89,8 +52,6 @@ def main(host="arcade.local", delay=0.2, port=MIRROR_PORT):
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN
                                              and event.key == pygame.K_ESCAPE):
                 return
-            if event.type == pygame.VIDEORESIZE:
-                side = fit(display, side)
 
         now = time.monotonic()
         # 5 hellos a second, far more than the subscription needs: the steady
