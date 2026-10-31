@@ -16,10 +16,9 @@ The same code runs two ways: on a desktop via PyGame (a 640×640 window, 10× sc
 cd led-arcade
 pip install -r requirements.txt      # pygame, numpy, Pillow
 
-python run_arcade.py                 # unified launcher — games + visuals
-# or:
-python main.py                       # games only
-python run_visuals.py                # visuals only
+python run_arcade.py                 # the cabinet's menus, games and visuals in a window
+python run_arcade.py --panel         # same, in the LED-dots-on-black look of the marketing clips
+python run_arcade.py --paper         # same, on the white page of the Reels and carousels
 ```
 
 > **Python version:** use **3.11–3.13**. Python 3.14 currently trips a circular-import bug in `pygame.font`.
@@ -201,10 +200,9 @@ display.draw_text_small(x, y, text, color)  # 3×5 pixel font (left-align at x=2
 
 ```
 led-arcade/
-├── run_arcade.py        # desktop unified launcher (games + visuals)
-├── run_visuals.py       # desktop visuals-only launcher
-├── main.py              # desktop games-only launcher
-├── run_hardware.py      # hardware entry point (Raspberry Pi)
+├── shell.py             # the shell: menu, idle screen, game over + high scores
+├── run_arcade.py        # desktop launcher: shell.py in a window
+├── run_hardware.py      # hardware launcher: shell.py on the matrix (Raspberry Pi)
 ├── mirror.py            # live frame tap + supervisors for the viewers below
 ├── run_mirror.py        # desktop viewer for the cabinet's panel
 ├── run_web_mirror.py    # serves the panel to browsers (MIRROR > WEB)

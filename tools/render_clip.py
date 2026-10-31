@@ -456,7 +456,7 @@ def render_montage(classes, a, out):
     cur = visuals[0]
     total = int(a.each * len(visuals) * a.fps)
     for _ in range(total):
-        # Same loop shape as run_hardware.py's idle screen, except the slot
+        # Same loop shape as shell.py's idle screen, except the slot
         # timer keeps running through the transition so every visual gets
         # exactly --each seconds and the total length is predictable.
         cycle += dt

@@ -2,14 +2,15 @@
 shell's game-over screen.
 
 Before this hook, the shell's game-over screen (`draw_action_selection` in
-run_hardware.py/run_arcade.py, and the base `Game.draw_game_over` used by
-arcade.py's own simple runner) never called a game's `draw_game_over()`
+shell.py, and the base `Game.draw_game_over` that 2-player games and the demo
+visuals build on) never called a game's `draw_game_over()`
 override, so ~30 single-player games' LEVEL/LINES/HEIGHT-style stats never
 reached the panel. This hook lets a game contribute one short string instead.
 """
+import pytest
+
 import arcade
-import run_arcade
-import run_hardware
+import shell
 from arcade import Colors
 from _harness import get_sim_display
 
@@ -59,7 +60,7 @@ def test_default_game_over_stat_is_none():
     assert g.game_over_stat() is None
 
 
-# ── arcade.py's own draw_game_over (simple runner) ──────────────────
+# ── the base Game.draw_game_over ───────────────────────────────────
 
 def test_arcade_draw_game_over_draws_stat(monkeypatch):
     display = get_sim_display()
@@ -87,17 +88,13 @@ def test_arcade_draw_game_over_none_stat_draws_nothing_extra(monkeypatch):
     assert texts == ["GAME OVER", "SCORE:0", ">PLAY AGAIN", " MENU"]
 
 
-# ── run_hardware.py / run_arcade.py draw_action_selection ───────────
+# ── shell.py draw_action_selection ──────────────────────────────────
 
-import pytest
-
-
-@pytest.mark.parametrize("runner", [run_hardware, run_arcade])
 @pytest.mark.parametrize("made_leaderboard,rank", [(False, -1), (True, 3)])
-def test_draw_action_selection_draws_stat(monkeypatch, runner, made_leaderboard, rank):
+def test_draw_action_selection_draws_stat(monkeypatch, made_leaderboard, rank):
     display = get_sim_display()
     calls = capture_draws(display, monkeypatch)
-    runner.draw_action_selection(display, 0, 100, made_leaderboard=made_leaderboard,
+    shell.draw_action_selection(display, 0, 100, made_leaderboard=made_leaderboard,
                                   rank=rank, stat=STAT)
 
     stat_calls = [c for c in calls if c[2] == STAT]
@@ -111,13 +108,11 @@ def test_draw_action_selection_draws_stat(monkeypatch, runner, made_leaderboard,
     assert y + 5 <= 40
 
 
-@pytest.mark.parametrize("runner", [run_hardware, run_arcade])
 @pytest.mark.parametrize("made_leaderboard,rank", [(False, -1), (True, 3)])
-def test_draw_action_selection_none_stat_draws_nothing_extra(monkeypatch, runner,
-                                                               made_leaderboard, rank):
+def test_draw_action_selection_none_stat_draws_nothing_extra(monkeypatch, made_leaderboard, rank):
     display = get_sim_display()
     calls = capture_draws(display, monkeypatch)
-    runner.draw_action_selection(display, 0, 100, made_leaderboard=made_leaderboard,
+    shell.draw_action_selection(display, 0, 100, made_leaderboard=made_leaderboard,
                                   rank=rank, stat=None)
 
     texts = [c[2] for c in calls]
@@ -125,12 +120,11 @@ def test_draw_action_selection_none_stat_draws_nothing_extra(monkeypatch, runner
     assert all(t != "" for t in texts)
 
 
-@pytest.mark.parametrize("runner", [run_hardware, run_arcade])
-def test_game_lacking_hook_does_not_crash(monkeypatch, runner):
+def test_game_lacking_hook_does_not_crash(monkeypatch):
     display = get_sim_display()
     obj = NoHookGame()
-    # This mirrors exactly what the call sites in run_hardware.py/run_arcade.py do.
+    # This mirrors exactly what the call site in shell.py does.
     stat = getattr(obj, "game_over_stat", lambda: None)()
     assert stat is None
     # And feeding that through must not raise either.
-    runner.draw_action_selection(display, 0, 100, stat=stat)
+    shell.draw_action_selection(display, 0, 100, stat=stat)

@@ -21,7 +21,7 @@ import math
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict
+from typing import Tuple
 
 # =============================================================================
 # CONFIGURATION
@@ -110,9 +110,16 @@ class InputHandler:
     def __init__(self):
         self.state = InputState()
         self._prev_keys = set()
-    
+        self.quit = False   # the window was closed
+
+    def cleanup(self):
+        pass
+
     def update(self) -> InputState:
         """Update input state. Call once per frame."""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.quit = True
         keys = pygame.key.get_pressed()
 
         # Directions (held state)
@@ -514,136 +521,3 @@ class Game(ABC):
         else:
             self.display.draw_text_small(4, 44, " PLAY AGAIN", Colors.GRAY)
             self.display.draw_text_small(4, 54, ">MENU", Colors.YELLOW)
-
-
-# =============================================================================
-# MAIN ARCADE SYSTEM
-# =============================================================================
-
-class Arcade:
-    """Main arcade system - handles menu and game switching."""
-    
-    def __init__(self):
-        self.display = Display()
-        self.input = InputHandler()
-        self.clock = pygame.time.Clock()
-        
-        self.games: List[type] = []  # Game classes
-        self.current_game: Optional[Game] = None
-        self.menu_selection = 0
-        self.game_over_selection = 0  # 0 = PLAY AGAIN, 1 = MENU
-        self.in_menu = True
-    
-    def register_game(self, game_class: type):
-        """Register a game class with the arcade."""
-        self.games.append(game_class)
-    
-    def draw_menu(self):
-        """Draw the game selection menu."""
-        self.display.clear(Colors.BLACK)
-        
-        # Title
-        self.display.draw_text_small(4, 2, "LED ARCADE", Colors.CYAN)
-        self.display.draw_line(0, 9, 63, 9, Colors.DARK_GRAY)
-        
-        # Game list
-        visible_games = 6
-        start_idx = max(0, self.menu_selection - visible_games // 2)
-        
-        for i, game_class in enumerate(self.games[start_idx:start_idx + visible_games]):
-            actual_idx = start_idx + i
-            y = 14 + i * 8
-            
-            if actual_idx == self.menu_selection:
-                # Selected item
-                self.display.draw_rect(0, y - 1, 64, 7, Colors.DARK_GRAY)
-                self.display.draw_text_small(2, y, f">{game_class.name}", Colors.YELLOW)
-            else:
-                self.display.draw_text_small(2, y, f" {game_class.name}", Colors.WHITE)
-        
-        # Instructions
-        self.display.draw_line(0, 56, 63, 56, Colors.DARK_GRAY)
-        self.display.draw_text_small(2, 58, "SPACE:SELECT", Colors.GRAY)
-    
-    def run(self):
-        """Main game loop."""
-        running = True
-        exit_hold = 0.0  # Hold-to-exit timer
-
-        while running:
-            dt = self.clock.tick(FPS) / 1000.0  # Delta time in seconds
-
-            # Handle events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            # Update input
-            input_state = self.input.update()
-
-            if self.in_menu:
-                # Hold either button 2 sec to quit
-                if input_state.action_l_held or input_state.action_r_held:
-                    exit_hold += dt
-                    if exit_hold >= 2.0:
-                        running = False
-                else:
-                    exit_hold = 0.0
-
-                # Menu navigation
-                if input_state.up_pressed and self.menu_selection > 0:
-                    self.menu_selection -= 1
-                elif input_state.down_pressed and self.menu_selection < len(self.games) - 1:
-                    self.menu_selection += 1
-                elif (input_state.action_l or input_state.action_r) and self.games:
-                    # Start selected game
-                    self.current_game = self.games[self.menu_selection](self.display)
-                    self.current_game.reset()
-                    self.in_menu = False
-                    exit_hold = 0.0
-
-                self.draw_menu()
-
-            else:
-                # In game — hold BOTH buttons 2 sec to return to menu
-                if input_state.action_l_held and input_state.action_r_held:
-                    exit_hold += dt
-                    if exit_hold >= 2.0:
-                        self.in_menu = True
-                        self.current_game = None
-                        exit_hold = 0.0
-                else:
-                    exit_hold = 0.0
-
-                if self.current_game:
-                    if self.current_game.state in TERMINAL_STATES:
-                        # Handle game over menu selection
-                        if input_state.up_pressed or input_state.down_pressed:
-                            self.game_over_selection = 1 - self.game_over_selection
-                        elif input_state.action_l or input_state.action_r:
-                            if self.game_over_selection == 0:
-                                # Play again
-                                self.current_game.reset()
-                            else:
-                                # Return to menu
-                                self.in_menu = True
-                                self.current_game = None
-                            self.game_over_selection = 0
-                        self.current_game.draw_game_over(self.game_over_selection)
-                    else:
-                        self.current_game.update(input_state, dt)
-                        self.current_game.draw()
-
-            self.display.render()
-
-        pygame.quit()
-
-
-# =============================================================================
-# RUN
-# =============================================================================
-
-if __name__ == "__main__":
-    print("LED Arcade Framework")
-    print("====================")
-    print("This is the base framework. Run 'python main.py' to play games!")

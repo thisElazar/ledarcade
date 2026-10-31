@@ -212,7 +212,7 @@
      "where": "bottom-left of HUD bar, during placement/wave phases",
      "evidence": "games/bloonstd.py:722-726",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'WAVE:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'WAVE:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -261,7 +261,7 @@
      "where": "top-left corner, always, no label",
      "evidence": "games/bomberman.py:807",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "the arcade's own game-over screen shows 'SCORE:{n}' (run_hardware.py:57-63); the class's own game-over screen (bomberman.py:830) is never drawn on the cabinet",
+     "spelled_out_elsewhere": "the arcade's own game-over screen shows 'SCORE:{n}' (shell.py:61-67); the class's own game-over screen (bomberman.py:830) is never drawn on the cabinet",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -285,7 +285,7 @@
      "where": "top HUD, always",
      "evidence": "games/bomberman.py:814-815",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -387,7 +387,7 @@
      "where": "always, top HUD during play",
      "evidence": "games/burgertime.py:1190",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -567,7 +567,7 @@
      "where": "HUD, right side, always during play",
      "evidence": "games/dnd.py:805",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'DEPTH:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'DEPTH:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -672,7 +672,7 @@
      "where": "top-center, always during play",
      "evidence": "games/flappy.py:239",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -711,7 +711,7 @@
      "where": "top-left, always during play",
      "evidence": "games/game2048.py:264-269",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -733,7 +733,7 @@
      "where": "top-left, always during play",
      "evidence": "games/geometrydash.py:420",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true,
@@ -908,7 +908,7 @@
      "where": "HUD, top-left, always during play",
      "evidence": "games/jezzball.py:526",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1240,7 +1240,7 @@
      "where": "status bar, bottom-right, always during play (also on the 'ESCAPED!' status)",
      "evidence": "games/monstermaze.py:723, games/monstermaze.py:738-739",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "title screen shows 'LEVEL {n}' in full before every level (games/monstermaze.py:485-489, re-entered on each escape at games/monstermaze.py:320-326); shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "title screen shows 'LEVEL {n}' in full before every level (games/monstermaze.py:485-489, re-entered on each escape at games/monstermaze.py:320-326); shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1300,7 +1300,7 @@
      "where": "bottom HUD, right of the facing letter, always during play",
      "evidence": "games/monstermaze.py:745-746",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "the 'caught' screen shows 'SCORE:{n}' in full for 2s before game over (games/monstermaze.py:491-515, 313-317); the arcade's own game-over screen also shows 'SCORE:{n}' (run_hardware.py:57-63)",
+     "spelled_out_elsewhere": "the 'caught' screen shows 'SCORE:{n}' in full for 2s before game over (games/monstermaze.py:491-515, 313-317); the arcade's own game-over screen also shows 'SCORE:{n}' (shell.py:61-67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1336,7 +1336,7 @@
      "where": "top-left HUD, always during a run",
      "evidence": "games/nightdriver.py:431",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": true,
      "in_recording": true,
      "checked": true
@@ -1379,7 +1379,7 @@
     },
     "DIST:{n}": {
      "as_drawn": "DIST:#",
-     "meaning": "Total distance travelled (the same value shown as the score during play). Practically never seen while playing: run_hardware.py / run_arcade.py stop calling the game's draw() the moment state becomes GAME_OVER and put up their own game-over flow, so this block renders for at most one frame; the screen is only really visible inside the separate NIGHT DRIVER DEMO visual, which calls game.draw() unconditionally.",
+     "meaning": "Total distance travelled (the same value shown as the score during play). Practically never seen while playing: shell.py stops calling the game's draw() the moment state becomes GAME_OVER and put up their own game-over flow, so this block renders for at most one frame; the screen is only really visible inside the separate NIGHT DRIVER DEMO visual, which calls game.draw() unconditionally.",
      "kind": "abbreviation",
      "where": "game over screen only",
      "evidence": "games/nightdriver.py:464",
@@ -1543,7 +1543,7 @@
      "where": "top HUD during play, gray text at (24,1)",
      "evidence": "games/portal.py:804-805",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "transition screen between rooms spells out 'CHAMBER {n}' (games/portal.py:1128); shell game-over screen shows 'CHAMBER {n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "transition screen between rooms spells out 'CHAMBER {n}' (games/portal.py:1128); shell game-over screen shows 'CHAMBER {n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1591,7 +1591,7 @@
      "where": "top HUD, always during play",
      "evidence": "games/qbert.py:694",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1791,7 +1791,7 @@
      "where": "top HUD, always visible during play",
      "evidence": "games/skifree.py:934",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'STYLE:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'STYLE:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1882,7 +1882,7 @@
      "where": "top-left during play (1,1)",
      "evidence": "games/stack.py:261",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1924,7 +1924,7 @@
      "where": "always, left HUD during play",
      "evidence": "games/tetris.py:388",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1948,7 +1948,7 @@
      "where": "always, left HUD during play",
      "evidence": "games/tetris.py:402",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "shell game-over screen shows 'LINES:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "shell game-over screen shows 'LINES:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -1993,7 +1993,7 @@
      "where": "bottom-left of HUD during play",
      "evidence": "games/windowwasher.py:848",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "level-clear screen spells out 'LEVEL {n}' (games/windowwasher.py:958); shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), run_hardware.py draw_action_selection)",
+     "spelled_out_elsewhere": "level-clear screen spells out 'LEVEL {n}' (games/windowwasher.py:958); shell game-over screen shows 'LEVEL:{n}' under the score (game_over_stat(), shell.py draw_action_selection)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -2017,7 +2017,7 @@
      "where": "top-right of HUD during play",
      "evidence": "games/windowwasher.py:841-844",
      "explained_same_screen": false,
-     "spelled_out_elsewhere": "level-clear screen shows TOTAL:{n}; shell game-over screen shows the same number as SCORE:{n} (run_hardware.py:63)",
+     "spelled_out_elsewhere": "level-clear screen shows TOTAL:{n}; shell game-over screen shows the same number as SCORE:{n} (shell.py:67)",
      "on_site": false,
      "in_recording": true,
      "checked": true
@@ -6721,7 +6721,7 @@
   "games/rushhour.py:421 — diff.upper()[:6] turns BEGINNER into BEGINN. Same pattern: visuals/idlemix.py:337 (SCI MICR/BENC/MACR), visuals/effects.py:94 (5 transition names), visuals/scales.py (14-char subtitles, NOT/NUM/DEG), visuals/wifi_config.py:525 (SSIDs over 12 chars).",
   "Reported, not re-checked: visuals/orbitals.py hybrid scenes show a raw identifier like SP3_H2O; visuals/signs.py shows SPEED 50 for every country.",
   "Crashes the recorder hit under 20 s of input (contract tests' script is ~17 frames and misses them): visuals/peptides.py:5772 IndexError on bead_colors[idx]; visuals/froggerdemo.py KeyError 'dive_timer'.",
-  "run_hardware.py:1044-1058 (and run_arcade.py) — only 2_player games get their own draw_game_over(); every single-player game sees the shell's GAME OVER / SCORE:{n} screen. About 30 single-player draw_game_over overrides (LEVEL:, LINES:, HEIGHT:, DEPTH:, WAVE:, STYLE:, FINAL:) are dead code on the cabinet and only show inside the demo visuals.",
+  "shell.py:1033-1049 — only 2_player games get their own draw_game_over(); every single-player game sees the shell's GAME OVER / SCORE:{n} screen. About 30 single-player draw_game_over overrides (LEVEL:, LINES:, HEIGHT:, DEPTH:, WAVE:, STYLE:, FINAL:) are dead code on the cabinet and only show inside the demo visuals.",
   "games/lunarlander.py:511 — the speed arrow's green/red uses combined speed vs 18, but the crash test (:218-221) checks |vy|<=18 and |vx|<=12 separately: it can read green while lateral speed will crash you.",
   "visuals/entropy.py:249 — the module docstring says Action flips every velocity; Action only cycles the palette and the reversal (:298) is automatic.",
   "visuals/network.py — p= stays on the HUD in Barabasi-Albert mode, where the generator never reads rewire_p.",

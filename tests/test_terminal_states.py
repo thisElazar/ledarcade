@@ -1,7 +1,7 @@
 """Guards for the shell's terminal-state contract.
 
-The shells take over (game-over screen, initials, leaderboard) when a game's
-state enters TERMINAL_STATES. Before this guard existed, the shells checked
+The shell takes over (game-over screen, initials, leaderboard) when a game's
+state enters TERMINAL_STATES. Before this guard existed, the shell checked
 GAME_OVER alone, so the four winnable games (pong, breakout, arkanoid,
 bloonstd) froze on GameState.WIN with no score recorded and no way out short
 of the hold-both-buttons exit.
@@ -12,7 +12,7 @@ from pathlib import Path
 from arcade import GameState, TERMINAL_STATES
 
 REPO = Path(__file__).resolve().parent.parent
-SHELLS = ["run_hardware.py", "run_arcade.py", "arcade.py"]
+SHELLS = ["shell.py"]
 
 
 def test_win_and_game_over_are_terminal():

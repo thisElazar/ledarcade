@@ -102,14 +102,14 @@ def test_game_without_engine_files_is_game_over(sandbox, monkeypatch):
 def test_demo_is_mature_and_kept_off_the_idle_screen(sandbox, monkeypatch):
     from visuals import Plasma
     from visuals.slideshow import AllVisuals
-    import run_arcade
+    import shell
     monkeypatch.setattr(DoomDemo, "menu_visible", staticmethod(lambda: True))
     monkeypatch.setattr("visuals.ALL_VISUALS", [DoomDemo, Plasma])
     assert DoomDemo.mature and DoomDemo.category == "demos"
     assert not catalog.listed_now(DoomDemo) and catalog.listed_now(Plasma)
     assert DoomDemo not in AllVisuals._get_visual_classes(AllVisuals)
     for _ in range(10):
-        assert type(run_arcade._pick_idle_visual(get_sim_display())) is Plasma
+        assert type(shell._pick_idle_visual(get_sim_display())) is Plasma
     levers.set_after_hours(True)
     assert catalog.listed_now(DoomDemo)
     assert DoomDemo in AllVisuals._get_visual_classes(AllVisuals)

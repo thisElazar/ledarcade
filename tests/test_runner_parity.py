@@ -1,22 +1,22 @@
 """The laptop launcher and the cabinet launcher must treat a running item alike.
 
-`run_arcade.py` (sim) and `run_hardware.py` (cabinet, under systemd) are two
-hand-maintained copies of the same ~1000-line state machine: menu, launch,
+`run_arcade.py` (sim) and `run_hardware.py` (cabinet, under systemd) used to be
+two hand-maintained copies of the same ~1000-line state machine: menu, launch,
 hold-both-to-exit, custom-exit visuals, game over, initials entry, play again.
-A fix applied to one and forgotten in the other ships a cabinet that behaves
-differently from everything that was tested on the laptop.
+Both now only build a display and an input handler for `shell.run()`; this
+keeps them wired up alike, and pins the shell's behaviour itself.
 
 Both launchers are run here for real against a tiny spy catalog, fed the same
-scripted session with a deterministic clock. Every call the launcher makes into
+scripted session with a deterministic clock. Every call the shell makes into
 an item (and into the high-score table) is logged, and the two logs must match
-exactly. Absolute assertions pin the behaviour itself, so two launchers that are
-wrong in the same way still fail.
+exactly. Absolute assertions pin the behaviour itself.
 """
 import pytest
 
 import arcade
 import run_arcade
 import run_hardware
+import shell
 from arcade import GameState
 from catalog import Category
 from _harness import script_from_held
@@ -166,48 +166,37 @@ class FakeTime:
         self.now += TICK
 
 
-def _common_patches(monkeypatch, mod, log, high):
-    monkeypatch.setattr(mod, "register_games", lambda *_: None)
-    monkeypatch.setattr(mod, "register_visuals", lambda *_: None)
-    monkeypatch.setattr(mod, "get_all_categories", lambda *_: make_catalog(log))
-    monkeypatch.setattr(mod, "sync_conditional_items", lambda: False)
-    monkeypatch.setattr(mod, "get_high_score_manager", lambda: FakeScores(log, high))
-    monkeypatch.setattr(mod, "_show_splash", lambda *a, **k: None)
-    monkeypatch.setattr(mod.update_checker, "start", lambda: None)
+def _common_patches(monkeypatch, log, high):
+    monkeypatch.setattr(shell, "register_games", lambda *_: None)
+    monkeypatch.setattr(shell, "register_visuals", lambda *_: None)
+    monkeypatch.setattr(shell, "get_all_categories", lambda *_: make_catalog(log))
+    monkeypatch.setattr(shell, "sync_conditional_items", lambda: False)
+    monkeypatch.setattr(shell, "get_high_score_manager", lambda: FakeScores(log, high))
+    monkeypatch.setattr(shell, "_show_splash", lambda *a, **k: None)
+    monkeypatch.setattr(shell.update_checker, "start", lambda: None)
+    monkeypatch.setattr(shell, "time", FakeTime())
     monkeypatch.setattr("builtins.print", lambda *a, **k: None)
 
 
 def run_cabinet(monkeypatch, held_frames, high=False):
     log = Log()
-    _common_patches(monkeypatch, run_hardware, log, high)
+    _common_patches(monkeypatch, log, high)
     frames = script_from_held(arcade.InputState, held_frames)
     monkeypatch.setattr(run_hardware, "_kill_boot_splash", lambda: None)
     monkeypatch.setattr(run_hardware, "HardwareDisplay", NullDisplay)
     monkeypatch.setattr(run_hardware, "HardwareInput",
                         lambda **k: ScriptedInput(log, frames))
-    monkeypatch.setattr(run_hardware, "time", FakeTime())
-    run_hardware.main()  # handles the KeyboardInterrupt itself
+    run_hardware.main()  # the shell handles the KeyboardInterrupt itself
     return list(log)
 
 
 def run_sim(monkeypatch, held_frames, high=False):
     log = Log()
-    _common_patches(monkeypatch, run_arcade, log, high)
+    _common_patches(monkeypatch, log, high)
     frames = script_from_held(arcade.InputState, held_frames)
-    clock = FakeTime()
-
-    class FakeClock:
-        def tick(self, _fps):
-            clock.now += TICK
-            return TICK * 1000.0
-
     monkeypatch.setattr(run_arcade, "InputHandler", lambda: ScriptedInput(log, frames))
-    monkeypatch.setattr(run_arcade.pygame.time, "Clock", FakeClock)
-    monkeypatch.setattr(run_arcade.pygame.event, "get", lambda: [])
-    monkeypatch.setattr(run_arcade, "time", clock)
     monkeypatch.setattr(run_arcade.sys, "argv", ["run_arcade.py"])
-    with pytest.raises(KeyboardInterrupt):
-        run_arcade.main(NullDisplay)
+    run_arcade.main(NullDisplay)
     return list(log)
 
 

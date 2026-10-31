@@ -2,7 +2,7 @@
 Desktop emulators in the look of the marketing renders (tools/render_clip.py),
 live in a window.
 
-    python run_demo.py             # PanelDisplay: just the square, LED dots on black
+    python run_arcade.py --panel   # PanelDisplay: just the square, LED dots on black
     python run_arcade.py --paper   # PaperDisplay: the white page of the Reels and carousels
 
 Every frame is composed by render_clip's own Composer / PaperComposer and
