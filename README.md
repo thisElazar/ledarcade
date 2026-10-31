@@ -16,9 +16,9 @@ The same code runs two ways: on a desktop via PyGame (a 640×640 window, 10× sc
 cd led-arcade
 pip install -r requirements.txt      # pygame, numpy, Pillow
 
-python run_arcade.py                 # the cabinet's menus, games and visuals in a window
-python run_arcade.py --panel         # same, in the LED-dots-on-black look of the marketing clips
+python run_arcade.py                 # the cabinet in a window, in the LED-dots-on-black look of the marketing clips
 python run_arcade.py --paper         # same, on the white page of the Reels and carousels
+python run_arcade.py --plain         # same, as a bare window of square pixels
 ```
 
 > **Python version:** use **3.11–3.13**. Python 3.14 currently trips a circular-import bug in `pygame.font`.

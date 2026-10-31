@@ -10,11 +10,11 @@ Controls:
   Space / Z    - Left / right action button
   Hold both 2s - Back to menu (games and visuals)
 
-    python run_arcade.py           # plain window, square pixels
-    python run_arcade.py --panel   # the square marketing look: LED dots and glow on black
+    python run_arcade.py           # the look of the marketing clips: LED dots and glow on black
     python run_arcade.py --paper   # the white page of the Reels and carousels
+    python run_arcade.py --plain   # a bare window of square pixels
 
-The two looks come from paper_display.py. Close the window or Ctrl-C to quit.
+The two LED looks come from paper_display.py. Close the window or Ctrl-C to quit.
 """
 
 import sys
@@ -29,10 +29,10 @@ def main(display_class=None):
     if display_class is None:
         if "--paper" in sys.argv:
             from paper_display import PaperDisplay as display_class
-        elif "--panel" in sys.argv:
-            from paper_display import PanelDisplay as display_class
-        else:
+        elif "--plain" in sys.argv:
             display_class = Display
+        else:
+            from paper_display import PanelDisplay as display_class
     shell.run(display_class(), InputHandler())
 
 
