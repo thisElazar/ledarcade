@@ -8,7 +8,8 @@ AI Strategy:
 - AIMING: For each ball × pocket, compute ghost ball position
   (behind ball, opposite pocket). Check line-of-sight from cue.
   Score by clear path, distance, cut angle. Aim at best ghost ball.
-- POWER: Proportional to distance from cue to ghost ball.
+- POWER: Enough for the object ball to reach the pocket after friction
+  and the cut, plus margin.
 - SHOOTING/SCORING/FOUL/TURN_CHANGE: no input, let timers handle.
 - GAME_OVER: restart after 3 second pause.
 """
@@ -26,6 +27,7 @@ from games.pool import (
     Pool, PHASE_MODE_SELECT, PHASE_AIMING, PHASE_POWER,
     PHASE_SHOOTING, PHASE_SCORING, PHASE_FOUL, PHASE_TURN_CHANGE,
     POCKETS, BALL_COLLISION_DIST, BALL_VALUES, POCKET_RADIUS,
+    FRICTION, MAX_POWER, SUBSTEPS,
     TABLE_LEFT, TABLE_RIGHT, TABLE_TOP, TABLE_BOTTOM,
 )
 
@@ -62,7 +64,7 @@ class PoolDemo(Visual):
 
         best_score = -999
         best_angle = None
-        best_dist = 30.0
+        best_power = 0.5
 
         for ball in objects:
             for px, py, mult in POCKETS:
@@ -82,8 +84,8 @@ class PoolDemo(Visual):
                 ghost_y = ball.y + ny * BALL_COLLISION_DIST
 
                 # Check ghost ball is on table
-                if (ghost_x < TABLE_LEFT + 2 or ghost_x > TABLE_RIGHT - 2 or
-                        ghost_y < TABLE_TOP + 2 or ghost_y > TABLE_BOTTOM - 2):
+                if (ghost_x < TABLE_LEFT + 1 or ghost_x > TABLE_RIGHT - 1 or
+                        ghost_y < TABLE_TOP + 1 or ghost_y > TABLE_BOTTOM - 1):
                     continue
 
                 # Distance from cue to ghost
@@ -92,9 +94,6 @@ class PoolDemo(Visual):
                 dist_cg = math.sqrt(dx_cg * dx_cg + dy_cg * dy_cg)
                 if dist_cg < 2.0:
                     continue
-
-                # Angle from cue to ghost
-                aim_angle = math.atan2(dy_cg, dx_cg)
 
                 # Cut angle: angle between cue->ball line and ball->pocket line
                 # Lower is easier
@@ -114,8 +113,8 @@ class PoolDemo(Visual):
                 dot = max(-1.0, min(1.0, dot))
                 cut_angle = math.acos(dot)
 
-                # Skip very sharp cuts (>70 degrees)
-                if cut_angle > 1.22:
+                # Skip sharp cuts (>60 degrees) -- they rarely drop
+                if cut_angle > 1.05:
                     continue
 
                 # Direction from cue to ghost (for line-of-sight checks)
@@ -135,6 +134,19 @@ class PoolDemo(Visual):
                         continue
                     perp = abs(ox * dir_y - oy * dir_x)
                     if perp < BALL_COLLISION_DIST + 0.5:
+                        blocked = True
+                        break
+
+                # Check the object ball's path to the pocket is clear too
+                for other in objects:
+                    if other is ball:
+                        continue
+                    ox = other.x - ball.x
+                    oy = other.y - ball.y
+                    proj = -(ox * nx + oy * ny)
+                    if proj < 0 or proj > dist_bp:
+                        continue
+                    if abs(ox * ny - oy * nx) < BALL_COLLISION_DIST + 0.5:
                         blocked = True
                         break
 
@@ -208,8 +220,9 @@ class PoolDemo(Visual):
                 # Distance penalty (prefer closer shots)
                 score -= dist_cg * 0.5
 
-                # Cut angle penalty
-                score -= cut_angle * 30.0
+                # Cut angle penalty, and the ball's own run to the pocket
+                score -= cut_angle * 60.0
+                score -= dist_bp * 0.3
 
                 # Pocket multiplier bonus
                 score += mult * 15.0
@@ -218,18 +231,35 @@ class PoolDemo(Visual):
                 score += BALL_VALUES.get(ball.num, 10) * 0.5
 
                 if score > best_score:
+                    # Power: object ball must reach the pocket (with margin)
+                    # after the cut, and the cue must still have that speed
+                    # when it arrives at the ghost ball.
+                    v_contact = (math.sqrt(2 * FRICTION * (dist_bp + 25.0))
+                                 / max(0.35, math.cos(cut_angle)))
+                    v0 = math.sqrt(v_contact * v_contact
+                                   + 2 * FRICTION * dist_cg)
+                    power = min(1.0, max(0.35, v0 / MAX_POWER))
+                    # The game detects contact a substep late, once the cue
+                    # has sunk into the ball, so the struck normal is off.
+                    # Aim a little closer in (by half a substep of travel).
+                    v0 = power * MAX_POWER
+                    v_contact = math.sqrt(max(1.0, v0 * v0
+                                              - 2 * FRICTION * dist_cg))
+                    sink = v_contact / (30.0 * SUBSTEPS) * 0.5
+                    aim_x = ball.x + nx * (BALL_COLLISION_DIST - sink)
+                    aim_y = ball.y + ny * (BALL_COLLISION_DIST - sink)
                     best_score = score
-                    best_angle = aim_angle
-                    best_dist = dist_cg
+                    best_angle = math.atan2(aim_y - cue.y, aim_x - cue.x)
+                    best_power = power
 
         if best_angle is None:
             # No valid shot found — aim at a safe angle away from all pockets
             best_angle = self._safe_angle(cue)
 
-        # Add small random perturbation to break deterministic loops
-        self.target_angle = (best_angle + random.gauss(0, 0.03)) % (2 * math.pi)
-        # Power: enough to reach the pocket with margin for friction
-        self.target_power = min(0.9, max(0.35, best_dist / 35.0))
+        # Small random perturbation: breaks deterministic loops and keeps
+        # the demo human (it misses now and then)
+        self.target_angle = (best_angle + random.gauss(0, 0.006)) % (2 * math.pi)
+        self.target_power = best_power
 
     def _safe_angle(self, cue):
         """Find an angle that doesn't shoot toward any pocket."""
@@ -276,22 +306,33 @@ class PoolDemo(Visual):
         ai_input = InputState()
         phase = self.game.phase
 
+        # Pick a new target each time we enter aiming phase -- before
+        # steering, or the first aiming frame sees the previous shot's
+        # (already reached) target and fires straight down that old line.
+        if phase == PHASE_AIMING and not self._was_aiming:
+            self._was_aiming = True
+            self._pick_target()
+        elif phase != PHASE_AIMING:
+            self._was_aiming = False
+
         if phase == PHASE_MODE_SELECT:
             # Select 1P mode (already selected by default)
             ai_input.action_l = True
 
         elif phase == PHASE_AIMING:
-            # Steer toward target angle
-            left, right = self._steer_toward(self.target_angle, self.game.aim_angle)
-            ai_input.left = left
-            ai_input.right = right
-
-            # When close enough, press action to start power
-            diff = abs((self.target_angle - self.game.aim_angle + math.pi)
-                       % (2 * math.pi) - math.pi)
-            if diff < 0.05:
-                ai_input.left = False
-                ai_input.right = False
+            # Coarse: hold left/right. Fine: tap up/down (1 degree steps).
+            # A 3px ball leaves no room for the coarse 3-degree window.
+            diff = ((self.target_angle - self.game.aim_angle + math.pi)
+                    % (2 * math.pi) - math.pi)
+            if abs(diff) > 0.06:
+                ai_input.left, ai_input.right = self._steer_toward(
+                    self.target_angle, self.game.aim_angle)
+            elif diff > 0.009:
+                ai_input.down_pressed = True
+            elif diff < -0.009:
+                ai_input.up_pressed = True
+            else:
+                # Close enough: press action to start power
                 ai_input.action_l = True
 
         elif phase == PHASE_POWER:
@@ -299,13 +340,6 @@ class PoolDemo(Visual):
             # IMPORTANT: no direction input or it cancels back to aiming
             if abs(self.game.power - self.target_power) < 0.06:
                 ai_input.action_l = True
-
-        # Pick a new target each time we enter aiming phase
-        if phase == PHASE_AIMING and not self._was_aiming:
-            self._was_aiming = True
-            self._pick_target()
-        elif phase != PHASE_AIMING:
-            self._was_aiming = False
 
         self.game.update(ai_input, dt)
 

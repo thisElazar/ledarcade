@@ -3700,7 +3700,7 @@
      "name": "POOL",
      "cls": "PoolDemo",
      "module": "visuals/pooldemo.py",
-     "desc": "AI plays pool for idle screen demos using ghost ball targeting. AI Strategy: - Select 1P mode automatically - AIMING: For each ball \u00d7 pocket, compute ghost ball position (behind ball, opposite pocket). Check line-of-sight from cue. Score by clear path, distance, cut angle. Aim at best ghost ball. - POWER: Proportional to distance from cue to ghost ball. - SHOOTING/SCORING/FOUL/TURN_CHANGE: no input, let timers handle. - GAME_OVER: restart after 3 second pause.",
+     "desc": "AI plays pool for idle screen demos using ghost ball targeting. AI Strategy: - Select 1P mode automatically - AIMING: For each ball \u00d7 pocket, compute ghost ball position (behind ball, opposite pocket). Check line-of-sight from cue. Score by clear path, distance, cut angle. Aim at best ghost ball. - POWER: Enough for the object ball to reach the pocket after friction and the cut, plus margin. - SHOOTING/SCORING/FOUL/TURN_CHANGE: no input, let timers handle. - GAME_OVER: restart after 3 second pause.",
      "controls": {},
      "stub": true
     },
