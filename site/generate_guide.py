@@ -270,6 +270,12 @@ def main():
                         'module': module_path}
                 entry = build_entry(item, doc_parts,
                                     guides.get(cls_info['cls']))
+                if cat_key == 'demos' and entry.get('stub'):
+                    # A demo's docstring is a developer note: it names the
+                    # game it imitates, not the cabinet's own item. The page
+                    # lists demos by name only, so publish no text for one
+                    # until it has a curated GUIDE.
+                    entry['desc'] = ''
                 items_by_cat.setdefault(cat_key, []).append(entry)
 
     # ART: paintings are created at runtime; group them by artist for display.
@@ -313,8 +319,8 @@ def main():
 
     total = sum(len(c['items']) for c in categories)
     stubs = sum(1 for c in categories for i in c['items'] if i.get('stub'))
-    no_desc = [i['name'] for c in categories for i in c['items']
-               if not i.get('desc')]
+    no_desc = [i['name'] for c in categories if c['key'] != 'demos'
+               for i in c['items'] if not i.get('desc')]
     print(f"Generated {out_path}: {len(categories)} categories, "
           f"{total} entries ({total - stubs} curated, {stubs} stubs), "
           f"{meta['paintings']} paintings")
