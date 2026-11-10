@@ -53,7 +53,7 @@ an update, reboot the cabinet.
 
 On boot, `start.sh` chooses its update mode by the gitignored `.dev` flag:
 
-- **Dev cabinet** (`.dev` present): `git pull --ff-only` — latest `main`.
+- **Dev cabinet** (`.dev` present): fetch, then fast-forward to the latest `main`.
 - **Distribution cabinet** (no `.dev`): fetch tags, check out the highest `v*` tag.
 
 A fresh distribution cabinet is set up by `provision.sh`, which clones the repo
@@ -68,6 +68,18 @@ one, or check out the previous tag on the affected cabinet:
 ```bash
 git checkout v1.3      # on the cabinet, then restart the service
 ```
+
+The owner can also roll back from the cabinet: **UPDATE > RLBK** returns to the
+version it ran before its last update. That writes `.rollback_hold`, and
+`start.sh` then leaves the checkout alone on every boot until a newer version
+than the one rolled back from is published, or the owner runs UPDATE again.
+
+## When an update fails
+
+The UPDATE screen shows FAILED with a short reason (NO NETWORK, TIMED OUT,
+FILES CHANGED, DIVERGED, GIT ERROR) and stays there until the button is
+pressed. Git's own error text, from the menu and from `start.sh` at boot, is
+appended to `.update.log` in the repo folder.
 
 ## Reading the deployed version off a cabinet
 

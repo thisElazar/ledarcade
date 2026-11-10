@@ -15,12 +15,24 @@ import re
 import sys
 import subprocess
 import threading
+import time
 from . import Visual, Display, Colors, GRID_SIZE
 
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROLLBACK_FILE = os.path.join(REPO_DIR, ".rollback_ref")
 DEV_FLAG = os.path.join(REPO_DIR, ".dev")
+# Written by a rollback: the commit that was rolled back FROM. start.sh leaves
+# the checkout alone while that is still the newest version, so a rollback
+# survives a power cycle. A newer release, or UPDATE from this menu, clears it.
+HOLD_FILE = os.path.join(REPO_DIR, ".rollback_hold")
+# Every git command that fails here is appended to this file with git's own
+# error text, so a failed update can be diagnosed afterwards.
+LOG_FILE = os.path.join(REPO_DIR, ".update.log")
+
+# A release is a few MB and a Pi unpacks it slowly; a killed fetch starts again
+# from nothing, so a short limit here means a slow link can never update.
+APPLY_TIMEOUT = 180
 
 # Dev cabinet follows the tip of main; distribution cabinets follow the latest
 # release tag (vMAJOR.MINOR) — mirroring start.sh, so the menu update and the
@@ -29,8 +41,21 @@ DEV = os.path.exists(DEV_FLAG)
 TRACK_LABEL = "main" if DEV else "release"
 
 
+_last_error = ""
+
+
+def _log_failure(args, error):
+    try:
+        with open(LOG_FILE, "a") as f:
+            f.write("%s  git %s\n%s\n\n" % (
+                time.strftime("%Y-%m-%d %H:%M:%S"), " ".join(args), error))
+    except Exception:
+        pass
+
+
 def _git(*args, timeout=15):
-    """Run a git command in the repo directory."""
+    """Run a git command in the repo directory. A failure is logged."""
+    global _last_error
     try:
         result = subprocess.run(
             ["git", "-c", "safe.directory=*"] + list(args),
@@ -39,9 +64,37 @@ def _git(*args, timeout=15):
             text=True,
             timeout=timeout,
         )
+        if result.returncode != 0:
+            _last_error = (result.stderr or "").strip() or "exit %d" % result.returncode
+            _log_failure(args, _last_error)
         return result.returncode == 0, result.stdout.strip()
-    except Exception:
-        return False, ""
+    except subprocess.TimeoutExpired:
+        _last_error = "timed out after %ds" % timeout
+    except Exception as e:
+        _last_error = repr(e)
+    _log_failure(args, _last_error)
+    return False, ""
+
+
+def _reason(error):
+    """A failure in words short enough for the panel (15 characters)."""
+    e = error.lower()
+    if "timed out" in e:
+        return "TIMED OUT"
+    if "could not resolve" in e or "unable to access" in e or "could not read from remote" in e:
+        return "NO NETWORK"
+    if "local changes" in e or "would be overwritten" in e:
+        return "FILES CHANGED"
+    if "divergent" in e or "fast-forward" in e:
+        return "DIVERGED"
+    return "GIT ERROR"
+
+
+def _clear_hold():
+    try:
+        os.remove(HOLD_FILE)
+    except OSError:
+        pass
 
 
 def _short_hash(ref="HEAD"):
@@ -75,20 +128,45 @@ def _fetch_target():
 def _apply_update():
     """Move the checkout to the latest target. Returns (ok, message)."""
     if DEV:
-        ok, output = _git("pull", "origin", "main")
+        ok, output = _git("pull", "origin", "main", timeout=APPLY_TIMEOUT)
         if not ok:
             return False, "FAILED"
+        _clear_hold()
         return True, "UP TO DATE" if "Already up to date" in output else "UPDATED"
     # Distribution: check out the latest release tag (detached HEAD).
-    _git("fetch", "--tags", "--force", "origin")
+    ok, _ = _git("fetch", "--tags", "--force", "origin", timeout=APPLY_TIMEOUT)
+    if not ok:
+        return False, "FAILED"
     tag = _latest_tag()
     if not tag:
         return False, "NO RELEASE"
     before = _short_hash("HEAD")
-    ok, _ = _git("checkout", tag)
+    ok, _ = _git("checkout", tag, timeout=APPLY_TIMEOUT)
     if not ok:
         return False, "FAILED"
+    _clear_hold()
     return True, "UP TO DATE" if before == _short_hash(tag) else "UPDATED"
+
+
+def _apply_rollback(ref):
+    """Move the checkout back to `ref`. Returns True on success.
+
+    reset --hard moves HEAD as well as the files. The old `checkout ref -- .`
+    moved only the files, so git still believed it was on the new version:
+    UPDATE then said "up to date" over old code, and every later update
+    aborted on the "local changes" it had left behind.
+    """
+    ok, held = _git("rev-parse", "HEAD")
+    ok2, _ = _git("reset", "--hard", ref, timeout=APPLY_TIMEOUT)
+    if not ok2:
+        return False
+    if ok and held:
+        try:
+            with open(HOLD_FILE, "w") as f:
+                f.write(held + "\n")
+        except Exception:
+            pass
+    return True
 
 
 class Refresh(Visual):
@@ -120,6 +198,8 @@ class Refresh(Visual):
         self.pull_started = False
         self.pull_done = False
         self.pull_msg = ""
+        self.pull_ok = True
+        self.fail_reason = ""
 
         # --- Rollback page state ---
         self.rolling_back = False
@@ -166,6 +246,10 @@ class Refresh(Visual):
 
     def handle_input(self, input_state) -> bool:
         if self.confirmed:
+            # A failed update waits here so its reason can be read.
+            if self.pull_done and not self.pull_ok and (
+                    input_state.action_l or input_state.action_r):
+                self.wants_exit = True
             return True
 
         # Page switching with left/right
@@ -217,12 +301,14 @@ class Refresh(Visual):
                 except Exception:
                     pass
 
-            ok, self.pull_msg = _apply_update()
+            self.pull_ok, self.pull_msg = _apply_update()
+            if not self.pull_ok:
+                self.fail_reason = _reason(_last_error)
 
             self.pull_done = True
             self.restart_timer = 0.0
 
-        if self.pull_done:
+        if self.pull_done and self.pull_ok:
             self.restart_timer += dt
             if self.restart_timer >= 1.5:
                 os.execv(sys.executable, [sys.executable] + sys.argv)
@@ -233,8 +319,7 @@ class Refresh(Visual):
             try:
                 with open(ROLLBACK_FILE, "r") as f:
                     ref = f.read().strip()
-                ok, _ = _git("checkout", ref, "--", ".")
-                if ok:
+                if _apply_rollback(ref):
                     self.rollback_msg = "REVERTED"
                     try:
                         os.remove(ROLLBACK_FILE)
@@ -269,6 +354,12 @@ class Refresh(Visual):
             else:
                 msg_color = Colors.RED if self.pull_msg in ("FAILED", "NO RELEASE") else Colors.GREEN
                 self.display.draw_text_small(2, 14, self.pull_msg, msg_color)
+                if not self.pull_ok:
+                    # Nothing changed, so there is nothing to restart into.
+                    self.display.draw_text_small(2, 24, self.fail_reason, Colors.YELLOW)
+                    self.display.draw_text_small(2, 42, "NOT UPDATED", Colors.GRAY)
+                    self.display.draw_text_small(2, 52, "BTN:BACK", Colors.GRAY)
+                    return
                 self.display.draw_text_small(2, 28, "RESTARTING", Colors.CYAN)
                 dots = int(self.restart_timer * 3) % 4
                 self.display.draw_text_small(2, 42, "." * dots, Colors.GRAY)
