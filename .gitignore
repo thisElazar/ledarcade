@@ -34,6 +34,8 @@ CLAUDE.md
 
 # Update system
 .rollback_ref
+.rollback_hold
+.update.log
 .dev
 
 # Runtime data (high scores, play history, paint saves)

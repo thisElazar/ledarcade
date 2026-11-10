@@ -69,4 +69,6 @@ def sandbox(monkeypatch, tmp_path):
     monkeypatch.setattr(visuals.paint, "GIF_DIR", str(tmp_path / "paint_gif"))
     monkeypatch.setattr(visuals.paint_gif, "SAVE_DIR", str(tmp_path / "paint_gif"))
     monkeypatch.setattr(visuals.refresh, "ROLLBACK_FILE", str(tmp_path / ".rollback_ref"))
+    monkeypatch.setattr(visuals.refresh, "HOLD_FILE", str(tmp_path / ".rollback_hold"))
+    monkeypatch.setattr(visuals.refresh, "LOG_FILE", str(tmp_path / ".update.log"))
     return attempted
