@@ -65,7 +65,7 @@
      "name": "BURGER TIME",
      "cls": "BurgerTime",
      "module": "games/burgertime.py",
-     "desc": "Walk across burger ingredients to drop them down platforms \u2014 each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge Mr. Hot Dog, Mr. Pickle, and Mr. Egg. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.",
+     "desc": "Walk across burger ingredients to drop them down platforms \u2014 each enemy riding a piece adds an extra floor of travel (and survives the landing, briefly stunned). Dodge the hot dogs, pickles, and eggs. Peppers are earned only from bonus food, so grab it when it appears. Assemble all burgers to clear the level.",
      "how": "You start with 3 lives and 5 peppers. Dropping an ingredient scores 50 points per floor it falls, and catching an enemy under it multiplies that score. Clearing every burger on a level scores extra points and moves you to the next level; losing all 3 lives ends the game.",
      "legend": {
       "top-left number": "Your score.",
@@ -105,8 +105,8 @@
      "name": "DIG DIG",
      "cls": "DigDug",
      "module": "games/digdug.py",
-     "desc": "Dig tunnels underground and inflate enemies with your pump until they pop \u2014 each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; Fygars pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.",
-     "how": "You start with 3 lives, and the run ends once they are gone. Clearing all enemies on a level sends you deeper, where fire-breathing Fygars attack more often and their flames reach farther, and each new level packs in more enemies and more rocks to work with.",
+     "desc": "Dig tunnels underground and inflate enemies with your pump until they pop \u2014 each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; the green fire-breathers pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.",
+     "how": "You start with 3 lives, and the run ends once they are gone. Clearing all enemies on a level sends you deeper, where the green fire-breathers attack more often and their flames reach farther, and each new level packs in more enemies and more rocks to work with.",
      "controls": {
       "Arrow Keys": "Move/Dig",
       "Space": "Pump (hold to inflate enemies)"
@@ -217,7 +217,7 @@
      "name": "MS. PAK-MAN",
      "cls": "MsPacMan",
      "module": "games/mspacman.py",
-     "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.",
+     "desc": "Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; the red and pink ghosts roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.",
      "how": "Power pellets turn the ghosts frightened and edible for a few seconds; eating one scores 200, and each ghost eaten during the same pellet doubles that value up to 1600. Regular dots are worth 10 each, and fruit pays 100 up to 5000 depending on type. You start with 3 lives, and touching a ghost that is not frightened costs one, ending the run at zero.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)"
@@ -246,7 +246,7 @@
      "name": "PAK-MAN",
      "cls": "PacMan",
      "module": "games/pacman.py",
-     "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: Blinky chases (and speeds up as dots run out), Pinky ambushes, Inky flanks, Clyde wanders. Extra life at 10,000 points.",
+     "desc": "Eat all dots in the maze. Power pellets let you eat ghosts temporarily. Ghosts alternate between scattering to corners and chasing. Each ghost has unique AI: the red one chases (and speeds up as dots run out), the pink one ambushes, the cyan one flanks, the orange one wanders. Extra life at 10,000 points.",
      "how": "Every dot is worth 10 points and a power pellet is worth 50. Eating a frightened ghost scores 200 points, doubling with each ghost eaten during the same power pellet. You start with 3 lives, losing one when a ghost catches you outside frightened mode; losing your last life ends the game. Clearing all dots advances the level, refilling the maze and speeding up the ghosts.",
      "controls": {
       "Arrow Keys": "Set direction (queued for next intersection)"
@@ -270,11 +270,11 @@
      "name": "Q*BIT",
      "cls": "QBert",
      "module": "games/qbert.py",
-     "desc": "Hop on cubes in an isometric pyramid to change their colors \u2014 later levels need two hops per cube or revert when you re-hop. Avoid Coily the snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close Coily off the edge.",
+     "desc": "Hop on cubes in an isometric pyramid to change their colors \u2014 later levels need two hops per cube or revert when you re-hop. Avoid the purple snake and the red balls; catch the green ball to freeze everyone. Hop onto a spinning disc to lure a close snake off the edge.",
      "how": "Changing a cube's color scores 25 points, riding an escape disc scores 50, and catching the green ball scores 100 and freezes every enemy. Clearing the whole pyramid scores 1000 plus 250 per level and starts a new, harder one. You start with 3 lives, and the run ends when a fall or an enemy costs you your last one.",
      "legend": {
       "L#": "Current level - the pyramid round you are on.",
-      "curse-bubble symbols": "Comic-strip curse symbols shown beside Q*bert during the pause after he dies.",
+      "curse-bubble symbols": "Comic-strip curse symbols shown beside your character during the pause after a death.",
       "top-left number": "Your score, climbing with every cube colored, disc ride, green ball catch, and finished pyramid."
      },
      "controls": {
@@ -797,7 +797,7 @@
      "name": "POOL",
      "cls": "Pool",
      "module": "games/pool.py",
-     "desc": "Six-ball points pool: Video Hustler scoring with Side Pocket aiming. Aim with the joystick, set power, and shoot. Play alone for a high score on limited shots, or take turns with a second player.",
+     "desc": "Six-ball points pool. Aim with the joystick, set power, and shoot. Play alone for a high score on limited shots, or take turns with a second player.",
      "how": "Each of the 6 numbered balls scores 10 times its number, doubled in a side pocket. One-player mode starts with 10 shots, gains one back per ball potted, and loses one for scratching; clearing the table adds 200 points, 5 more shots, and a re-rack. Two-player mode has no shot limit - turns alternate on a miss or scratch, ending when the table clears, with the higher score winning.",
      "controls": {
       "Left/Right": "Aim cue ball direction",
