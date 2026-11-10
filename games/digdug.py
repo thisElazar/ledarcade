@@ -17,8 +17,8 @@ class DigDug(Game):
     description = "Pump 'em up!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Dig tunnels underground and inflate enemies with your pump until they pop — each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; Fygars pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.',
-        'how': 'You start with 3 lives, and the run ends once they are gone. Clearing all enemies on a level sends you deeper, where fire-breathing Fygars attack more often and their flames reach farther, and each new level packs in more enemies and more rocks to work with.',
+        'desc': 'Dig tunnels underground and inflate enemies with your pump until they pop — each pump lands one stage, and they slowly deflate, so keep at it. Deeper kills score more; the green fire-breathers pay double, quadruple if pumped side-on. Walk under a rock to prime it, then lure enemies below: two under one rock pays 2500, and dropping two rocks reveals a bonus vegetable. The last enemy flees to the surface.',
+        'how': 'You start with 3 lives, and the run ends once they are gone. Clearing all enemies on a level sends you deeper, where the green fire-breathers attack more often and their flames reach farther, and each new level packs in more enemies and more rocks to work with.',
     }
 
     # Colors

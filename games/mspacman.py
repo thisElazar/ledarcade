@@ -18,7 +18,7 @@ class MsPacMan(Game):
     description = "Eat dots, avoid ghosts!"
     category = "arcade"
     GUIDE = {
-        'desc': 'Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; Blinky and Pinky roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.',
+        'desc': 'Eat all dots while avoiding ghosts. Faster than PAK-MAN with multiple mazes; the red and pink ghosts roam unpredictably early in each level. Grab the bouncing fruit before it escapes out a tunnel. Extra life at 10,000 points.',
         'how': 'Power pellets turn the ghosts frightened and edible for a few seconds; eating one scores 200, and each ghost eaten during the same pellet doubles that value up to 1600. Regular dots are worth 10 each, and fruit pays 100 up to 5000 depending on type. You start with 3 lives, and touching a ghost that is not frightened costs one, ending the run at zero.',
     }
 
