@@ -115,8 +115,27 @@ def _latest_tag():
     return max(out.split(), key=lambda t: [int(n) for n in re.findall(r"\d+", t)])
 
 
+def _drop_empty_refs():
+    """Delete ref files a power cut left empty (matches start.sh).
+
+    One empty file under .git/refs makes every fetch die with "bad object
+    refs/remotes/origin/...", so the cabinet never sees a new version. An
+    empty ref names nothing, and the fetch writes it again if it still exists.
+    """
+    for sub in ("remotes", "tags"):
+        for root, _, files in os.walk(os.path.join(REPO_DIR, ".git", "refs", sub)):
+            for name in files:
+                path = os.path.join(root, name)
+                try:
+                    if os.path.getsize(path) == 0:
+                        os.remove(path)
+                except OSError:
+                    pass
+
+
 def _fetch_target():
     """Fetch from origin; return the short hash of the update target."""
+    _drop_empty_refs()
     if DEV:
         _git("fetch", "origin", "main", timeout=10)
         return _short_hash("origin/main")
@@ -127,6 +146,7 @@ def _fetch_target():
 
 def _apply_update():
     """Move the checkout to the latest target. Returns (ok, message)."""
+    _drop_empty_refs()
     if DEV:
         ok, output = _git("pull", "origin", "main", timeout=APPLY_TIMEOUT)
         if not ok:
