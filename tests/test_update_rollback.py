@@ -227,3 +227,29 @@ def test_a_failed_update_stays_on_screen_and_does_not_restart(sandbox, monkeypat
     press.action_l = True
     v.handle_input(press)
     assert v.wants_exit
+
+
+# --- a ref file emptied by a power cut ------------------------------------------
+
+def _empty_a_ref(world):
+    """What a power cut mid-fetch leaves behind: a ref file with nothing in it.
+    Every later fetch then dies with "bad object refs/remotes/origin/..."."""
+    d = os.path.join(world.cab, ".git", "refs", "remotes", "origin", "fix")
+    os.makedirs(d)
+    open(os.path.join(d, "gone"), "w").close()
+
+
+def test_boot_updates_past_an_empty_ref(world, monkeypatch):
+    as_distribution(world, monkeypatch)
+    _empty_a_ref(world)
+    world.release("three", "v1.2")
+    world.boot()
+    assert world.running() == "three"
+
+
+def test_menu_updates_past_an_empty_ref(world, monkeypatch):
+    as_distribution(world, monkeypatch)
+    _empty_a_ref(world)
+    world.release("three", "v1.2")
+    assert refresh._apply_update() == (True, "UPDATED")
+    assert world.running() == "three"

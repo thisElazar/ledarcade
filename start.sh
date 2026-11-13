@@ -31,6 +31,12 @@ held() {
     return 1
 }
 
+# A power cut mid-fetch can leave a ref file with nothing in it. Every later
+# fetch then dies with "bad object refs/remotes/origin/...", and the cabinet
+# stays on its old version for good. An empty ref names nothing, and the fetch
+# below writes it again if it still exists on GitHub.
+find .git/refs/remotes .git/refs/tags -type f -size 0 -delete 2>/dev/null
+
 # Update code (ignore errors if there's no network — run last-known code).
 if [ -f .dev ]; then
     # Dev cabinet: always the latest main.
